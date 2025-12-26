@@ -1,3 +1,5 @@
+using PineGuard.Common;
+
 namespace PineGuard.Rules;
 
 internal static class RuleComparison
@@ -6,9 +8,7 @@ internal static class RuleComparison
         where T : IComparable<T>
     {
         if (min.CompareTo(max) > 0)
-        {
             return false;
-        }
 
         var minOk = inclusion == RangeInclusion.Inclusive
             ? value.CompareTo(min) >= 0

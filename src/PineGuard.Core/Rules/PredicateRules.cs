@@ -2,16 +2,13 @@ namespace PineGuard.Rules;
 
 public static class PredicateRules
 {
-    public static bool Satisfies<T>(T value, Func<T, bool> predicate)
+    public static bool Satisfies<T>(T? value, Func<T, bool> predicate)
     {
-        if (predicate is null)
-        {
-            throw new ArgumentNullException(nameof(predicate));
-        }
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        if (value is null)
+            return false;
 
         return predicate(value);
     }
-
-    public static bool DoesNotSatisfy<T>(T value, Func<T, bool> predicate) =>
-        !Satisfies(value, predicate);
 }

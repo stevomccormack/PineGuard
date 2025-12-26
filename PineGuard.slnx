@@ -3,5 +3,6 @@
   <Project Path="src/PineGuard.Core/PineGuard.Core.csproj" Id="fe913063-5c9d-4151-836d-b490dfc8a0ec" />
   <Project Path="src/PineGuard.DataAnnotations/PineGuard.DataAnnotations.csproj" Id="c2aa5232-69d5-4e90-a7e9-45f31fda828e" />
   <Project Path="src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj" Id="88b528a2-daed-45f0-bc75-1d63fee43cb9" />
-  <Project Path="src/PineGuard.Guards/PineGuard.Guards.csproj" Id="3ce52ac1-abfb-4502-b6b9-b73e515c52be" />
+  <Project Path="src/PineGuard.GuardClauses/PineGuard.GuardClauses.csproj" Id="3ce52ac1-abfb-4502-b6b9-b73e515c52be" />
+  <Project Path="src/PineGuard.MustClauses/PineGuard.MustClauses.csproj" Id="86dafc8b-ed9b-49c6-b4cf-bcb61721ffeb" />
 </Solution>

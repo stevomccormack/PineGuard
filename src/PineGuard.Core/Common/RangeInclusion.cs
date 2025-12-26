@@ -1,4 +1,4 @@
-﻿namespace PineGuard;
+﻿namespace PineGuard.Common;
 
 public enum RangeInclusion
 {
