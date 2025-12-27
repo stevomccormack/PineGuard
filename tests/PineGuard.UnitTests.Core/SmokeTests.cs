@@ -7,6 +7,6 @@ public sealed class SmokeTests
     [Fact]
     public void ProjectLoads()
     {
-        Assert.Equal("PineGuard", PineGuard.PineGuardInfo.Name);
+        Assert.Equal("PineGuard.Core", typeof(PineGuard.Rules.StringRules).Assembly.GetName().Name);
     }
 }

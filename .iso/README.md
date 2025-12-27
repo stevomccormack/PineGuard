@@ -1,13 +1,44 @@
-# `.iso`
+# ISO data generation (.iso)
 
-This folder contains scripts and source data used to generate ISO reference data files in the codebase.
+This folder contains the scripts + source CSVs used to generate ISO reference data in PineGuard.
 
-- Generated output is committed into `src/PineGuard.Core/Standards/Iso/**/DefaultIso*Data.cs`.
-- Scripts should be deterministic and safe to run repeatedly.
+## What gets generated
 
-## Planned generators
+- Countries (ISO 3166-1)
+- Currencies (ISO 4217)
+- Languages (ISO 639-1)
 
-- `GenerateIsoCurrencies.ps1` (ISO 4217)
-- `GenerateIsoLanguages.ps1` (ISO 639)
+Generated C# files are written to:
 
-> Note: ISO content has licensing restrictions. Prefer using the official maintenance agency datasets (e.g., SIX) when available.
+- `src/PineGuard.Core/Standards/Iso/**/DefaultIso*Data.cs`
+
+## How to run
+
+Run scripts from the repository root.
+
+Preview (generate into `.iso/generated` only):
+
+```powershell
+./.iso/GenerateIsoCountries.ps1
+./.iso/GenerateIsoCurrencies.ps1
+./.iso/GenerateIsoLanguages.ps1
+```
+
+Update source (also copy into `src/`):
+
+```powershell
+./.iso/GenerateIsoCountries.ps1 -EnableUpdateTarget $true
+./.iso/GenerateIsoCurrencies.ps1 -EnableUpdateTarget $true
+./.iso/GenerateIsoLanguages.ps1 -EnableUpdateTarget $true
+```
+
+## Code casing
+
+- ISO 3166-1 country codes: UPPERCASE (e.g., `US`, `GBR`)
+- ISO 4217 currency codes: UPPERCASE (e.g., `USD`, `EUR`)
+- ISO 639-1 language codes: lowercase (e.g., `en`, `eng`)
+
+## Notes
+
+- Scripts are intended to be deterministic and safe to rerun.
+- ISO content can have licensing restrictions; prefer official/authorized datasets when available.

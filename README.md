@@ -1,19 +1,15 @@
-# PineGuard – Solution Scaffold (net8.0)
+# PineGuard
 
-This zip is a **clean scaffold** because the PineGuard final `.cs` files are not present in the uploads I can access in this chat.
+PineGuard is a .NET validation/guard library with reusable rules, standards helpers, and integrations.
 
-## Structure
+## Projects
 
-- `src/PineGuard/` – class library (place PineGuard production `.cs` files here)
-- `tests/PineGuard.Tests/` – xUnit test project (place test `.cs` files here)
-
-## How to import your final PineGuard files
-
-1. Copy your PineGuard production `.cs` files into `src/PineGuard/`
-2. Copy your PineGuard test `.cs` files into `tests/PineGuard.Tests/`
-3. Ensure namespaces align (recommended root namespaces):
-   - `PineGuard` for library code
-   - `PineGuard.Tests` for tests
+- `src/PineGuard.Core/` – core rules + common types (net8.0)
+- `src/PineGuard.DataAnnotations/` – DataAnnotations integration
+- `src/PineGuard.FluentValidation/` – FluentValidation integration
+- `src/PineGuard.GuardClauses/` – guard-clause helpers
+- `src/PineGuard.MustClauses/` – “Must” clause helpers
+- `tests/PineGuard.UnitTests.Core/` – xUnit unit tests
 
 ## Build / test
 
@@ -22,13 +18,17 @@ From repo root:
 ```powershell
 dotnet restore
 dotnet build
-dotnet test
+
+# run unit tests
+dotnet test ./tests/PineGuard.UnitTests.Core/PineGuard.UnitTests.Core.csproj
 ```
 
-## Notes
+## ISO reference data generation
 
-- Target framework: `net8.0`
-- Nullable enabled, implicit usings enabled
-- TreatWarningsAsErrors enabled (turn off if you’re importing legacy code)
+This repo includes deterministic generators for ISO reference data (countries/currencies/languages). See `.iso/README.md` for usage:
 
-If you upload the PineGuard `.cs` files (or a zip/repo export), I can drop them into this scaffold and return a fully populated solution.
+- `./.iso/GenerateIsoCountries.ps1`
+- `./.iso/GenerateIsoCurrencies.ps1`
+- `./.iso/GenerateIsoLanguages.ps1`
+
+By default, scripts generate into `.iso/generated`. Use `-EnableUpdateTarget $true` to copy outputs into `src/`.

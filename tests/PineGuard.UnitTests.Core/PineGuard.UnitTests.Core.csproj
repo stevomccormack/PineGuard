@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\PineGuard\PineGuard.csproj" />
+    <ProjectReference Include="..\..\src\PineGuard.Core\PineGuard.Core.csproj" />
   </ItemGroup>
 
 </Project>
