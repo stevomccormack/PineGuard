@@ -18,10 +18,7 @@ public static class IsoDateTime
         WithFractionalSecondsFormat
     ];
 
-    public static string ToIsoString(this DateTime value)
-        => value.ToString("O", CultureInfo.InvariantCulture);
-
-    public static bool TryParseIsoDateTime(string? value, out DateTime result)
+    public static bool TryParse(string? value, out DateTime result)
         => DateTime.TryParseExact(
             value,
             AllFormats,
@@ -29,10 +26,13 @@ public static class IsoDateTime
             DateTimeStyles.None,
             out result);
 
-    public static DateTime ParseIsoDateTime(string value)
+    public static DateTime Parse(string value)
         => DateTime.ParseExact(
             value,
             AllFormats,
             CultureInfo.InvariantCulture,
             DateTimeStyles.None);
+
+    public static string ToIsoString(this DateTime value)
+        => value.ToString("O", CultureInfo.InvariantCulture);
 }

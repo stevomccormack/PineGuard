@@ -1,3 +1,5 @@
+using PineGuard.Utils.Iso;
+
 namespace PineGuard.Iso.Payments.Cards;
 
 /// <summary>
@@ -20,7 +22,7 @@ public abstract class IsoPaymentCardBrand : IIsoPaymentCardBrand
         if (string.IsNullOrWhiteSpace(pan))
             return false;
 
-        var sanitized = PaymentCardUtility.Sanitize(pan);
+        var sanitized = IsoPaymentCardUtility.Sanitize(pan);
         if (string.IsNullOrEmpty(sanitized))
             return false;
 
@@ -67,7 +69,8 @@ public static class IsoPaymentCardBrandUtility
 
     public static IReadOnlyList<IIsoPaymentCardBrand> All => _all.Value;
 
-    public static IIsoPaymentCardBrand? DetectFromPan(string? pan)
+
+    public static IIsoPaymentCardBrand? FromPan(string? pan)
     {
         if (string.IsNullOrWhiteSpace(pan))
             return null;
@@ -81,13 +84,13 @@ public static class IsoPaymentCardBrandUtility
         return null;
     }
 
-    public static bool TryDetectFromPan(string? pan, out IIsoPaymentCardBrand? brand)
+    public static bool TryFromPan(string? pan, out IIsoPaymentCardBrand? brand)
     {
-        brand = DetectFromPan(pan);
+        brand = FromPan(pan);
         return brand is not null;
     }
 
-    public static IIsoPaymentCardBrand? GetByName(string? brandName)
+    public static IIsoPaymentCardBrand? FromBrandName(string? brandName)
     {
         if (string.IsNullOrWhiteSpace(brandName))
             return null;
@@ -101,30 +104,32 @@ public static class IsoPaymentCardBrandUtility
         return null;
     }
 
-    public static bool TryGetByName(string? brandName, out IIsoPaymentCardBrand? brand)
+    public static bool TryFromBrandName(string? brandName, out IIsoPaymentCardBrand? brand)
     {
-        brand = GetByName(brandName);
+        brand = FromBrandName(brandName);
         return brand is not null;
     }
-}
 
-public static class IsoPaymentCardBrandExtension
-{
-    public static IsoCardBrand? ToIsoCardBrand(this IIsoPaymentCardBrand? brand)
+    public static CardBrand? ToIsoCardBrand(IIsoPaymentCardBrand? brand)
     {
         if (brand is null)
             return null;
 
         return brand.BrandName switch
         {
-            VisaCard.Brand => IsoCardBrand.Visa,
-            MastercardCard.Brand => IsoCardBrand.Mastercard,
-            AmericanExpressCard.Brand => IsoCardBrand.AmericanExpress,
-            DiscoverCard.Brand => IsoCardBrand.Discover,
-            DinersClubCard.Brand => IsoCardBrand.DinersClub,
-            JcbCard.Brand => IsoCardBrand.Jcb,
+            VisaCard.Brand => CardBrand.Visa,
+            MastercardCard.Brand => CardBrand.Mastercard,
+            AmericanExpressCard.Brand => CardBrand.AmericanExpress,
+            DiscoverCard.Brand => CardBrand.Discover,
+            DinersClubCard.Brand => CardBrand.DinersClub,
+            JcbCard.Brand => CardBrand.Jcb,
             _ => null
         };
     }
+}
 
+public static class IsoPaymentCardBrandExtension
+{
+    public static CardBrand? ToIsoCardBrand(this IIsoPaymentCardBrand? brand) =>
+        IsoPaymentCardBrandUtility.ToIsoCardBrand(brand);
 }

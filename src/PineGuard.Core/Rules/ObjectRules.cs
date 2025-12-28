@@ -2,10 +2,6 @@ namespace PineGuard.Rules;
 
 public static class ObjectRules
 {
-    public static bool IsNull<T>(T? value) => value is null;
-
-    public static bool IsNotNull<T>(T? value) => value is not null;
-
     public static bool IsEqualTo<T>(T? value, T? other) => EqualityComparer<T>.Default.Equals(value, other);
 
     public static bool IsOfType<T>(object? value) => value is T;

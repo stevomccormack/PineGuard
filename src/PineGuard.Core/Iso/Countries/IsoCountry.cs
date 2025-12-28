@@ -1,4 +1,5 @@
 using PineGuard.Rules;
+using PineGuard.Utils.Iso;
 
 namespace PineGuard.Iso.Countries;
 
@@ -56,4 +57,51 @@ public sealed record IsoCountry
         NumericCode = numericCode;
         Name = name;
     }
+
+    public static bool TryParse(string? value, out IsoCountry country)
+    {
+        country = null!;
+
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        var provider = new DefaultIsoCountryProvider();
+
+        if (IsoCountryUtility.TryParseAlpha2(value, out var alpha2)
+            && provider.TryGetCountryByAlpha2Code(alpha2, out var alpha2Country)
+            && alpha2Country is not null)
+        {
+            country = alpha2Country;
+            return true;
+        }
+
+        if (IsoCountryUtility.TryParseAlpha3(value, out var alpha3)
+            && provider.TryGetCountryByAlpha3Code(alpha3, out var alpha3Country)
+            && alpha3Country is not null)
+        {
+            country = alpha3Country;
+            return true;
+        }
+
+        if (IsoCountryUtility.TryParseNumeric(value, out var numeric)
+            && provider.TryGetCountryByNumericCode(numeric, out var numericCountry)
+            && numericCountry is not null)
+        {
+            country = numericCountry;
+            return true;
+        }
+
+        country = null!;
+        return false;
+    }
+
+    public static IsoCountry Parse(string? value)
+    {
+        if (TryParse(value, out var country))
+            return country;
+
+        throw new FormatException("Value must be an ISO 3166-1 alpha-2, alpha-3, or numeric country code.");
+    }
+
+    public override string ToString() => $"{Name} ({Alpha3Code})";
 }

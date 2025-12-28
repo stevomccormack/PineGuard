@@ -1,3 +1,5 @@
+using PineGuard.Utils.Iso;
+
 namespace PineGuard.Iso.Payments.Cards;
 
 /// <summary>
@@ -25,7 +27,7 @@ public sealed class DiscoverCard : IsoPaymentCardBrand
         if (string.IsNullOrWhiteSpace(pan))
             return false;
 
-        var sanitized = PaymentCardUtility.Sanitize(pan);
+        var sanitized = IsoPaymentCardUtility.Sanitize(pan);
         if (sanitized.Length != PanExactLength)
             return false;
 

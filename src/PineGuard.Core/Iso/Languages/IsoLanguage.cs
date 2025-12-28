@@ -1,4 +1,5 @@
 using PineGuard.Rules;
+using PineGuard.Utils.Iso;
 
 namespace PineGuard.Iso.Languages;
 
@@ -34,4 +35,43 @@ public sealed record IsoLanguage
         Alpha3Code = alpha3Code.ToLowerInvariant();
         Name = name;
     }
+
+    public static bool TryParse(string? value, out IsoLanguage language)
+    {
+        language = null!;
+
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        var provider = new DefaultIsoLanguageProvider();
+
+        if (IsoLanguageUtility.TryParseAlpha2(value, out var alpha2)
+            && provider.TryGetLanguageByAlpha2Code(alpha2, out var alpha2Language)
+            && alpha2Language is not null)
+        {
+            language = alpha2Language;
+            return true;
+        }
+
+        if (IsoLanguageUtility.TryParseAlpha3(value, out var alpha3)
+            && provider.TryGetLanguageByAlpha3Code(alpha3, out var alpha3Language)
+            && alpha3Language is not null)
+        {
+            language = alpha3Language;
+            return true;
+        }
+
+        language = null!;
+        return false;
+    }
+
+    public static IsoLanguage Parse(string? value)
+    {
+        if (TryParse(value, out var language))
+            return language;
+
+        throw new FormatException("Value must be an ISO 639 alpha-2 or alpha-3 language code.");
+    }
+
+    public override string ToString() => $"{Name} ({Alpha3Code})";
 }

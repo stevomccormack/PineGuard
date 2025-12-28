@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Utils;
 
 namespace PineGuard.Rules;
 
@@ -9,9 +10,8 @@ public static class CollectionRules
         if (value is null)
             return false;
 
-        var count = TryGetCount(value);
-        if (count is not null)
-            return count.Value == 0;
+        if (CollectionUtility.TryGetCount(value, out var count))
+            return count == 0;
 
         using var e = value.GetEnumerator();
         return !e.MoveNext();
@@ -22,9 +22,8 @@ public static class CollectionRules
         if (value is null)
             return false;
 
-        var count = TryGetCount(value);
-        if (count is not null)
-            return count.Value != 0;
+        if (CollectionUtility.TryGetCount(value, out var count))
+            return count != 0;
 
         using var e = value.GetEnumerator();
         return e.MoveNext();
@@ -35,9 +34,8 @@ public static class CollectionRules
         if (value is null || count < 0)
             return false;
 
-        var knownCount = TryGetCount(value);
-        if (knownCount is not null)
-            return knownCount.Value == count;
+        if (CollectionUtility.TryGetCount(value, out var knownCount))
+            return knownCount == count;
 
         var seen = 0;
         using var e = value.GetEnumerator();
@@ -56,9 +54,8 @@ public static class CollectionRules
         if (value is null || min < 0)
             return false;
 
-        var count = TryGetCount(value);
-        if (count is not null)
-            return count.Value >= min;
+        if (CollectionUtility.TryGetCount(value, out var count))
+            return count >= min;
 
         var seen = 0;
         using var e = value.GetEnumerator();
@@ -77,9 +74,8 @@ public static class CollectionRules
         if (value is null || max < 0)
             return false;
 
-        var count = TryGetCount(value);
-        if (count is not null)
-            return count.Value <= max;
+        if (CollectionUtility.TryGetCount(value, out var count))
+            return count <= max;
 
         var seen = 0;
         using var e = value.GetEnumerator();
@@ -101,9 +97,8 @@ public static class CollectionRules
         if (min < 0 || max < 0 || min > max)
             return false;
 
-        var count = TryGetCount(value);
-        if (count is not null)
-            return RuleComparison.IsBetween(count.Value, min, max, inclusion);
+        if (CollectionUtility.TryGetCount(value, out var count))
+            return RuleComparison.IsBetween(count, min, max, inclusion);
 
         var upperBound = inclusion == RangeInclusion.Inclusive ? max : max - 1;
         if (upperBound < 0)
@@ -185,14 +180,13 @@ public static class CollectionRules
         return true;
     }
 
-    public static bool HasValidIndex<T>(IEnumerable<T>? value, int index)
+    public static bool HasIndex<T>(IEnumerable<T>? value, int index)
     {
         if (value is null || index < 0)
             return false;
 
-        var count = TryGetCount(value);
-        if (count is not null)
-            return index < count.Value;
+        if (CollectionUtility.TryGetCount(value, out var count))
+            return index < count;
 
         var i = 0;
         using var e = value.GetEnumerator();
@@ -206,11 +200,4 @@ public static class CollectionRules
 
         return false;
     }
-
-    private static int? TryGetCount<T>(IEnumerable<T> value) => value switch
-    {
-        ICollection<T> c => c.Count,
-        IReadOnlyCollection<T> rc => rc.Count,
-        _ => null
-    };
 }

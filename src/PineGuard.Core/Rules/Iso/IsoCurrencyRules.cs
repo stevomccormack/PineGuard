@@ -1,4 +1,5 @@
 using PineGuard.Iso.Currencies;
+using PineGuard.Utils.Iso;
 
 namespace PineGuard.Rules.Iso;
 
@@ -10,25 +11,19 @@ public static class IsoCurrencyRules
     {
         provider ??= DefaultProvider;
 
-        if (!StringRules.IsExactLength(value, IsoCurrency.Alpha3ExactLength))
+        if (!IsoCurrencyUtility.TryParseAlpha3(value, out var alpha3))
             return false;
 
-        if (!StringRules.IsAlphabetic(value))
-            return false;
-
-        return provider.IsValidAlpha3Code(value!);
+        return provider.IsValidAlpha3Code(alpha3);
     }
 
     public static bool IsIsoCurrencyNumeric(string? value, IIsoCurrencyProvider? provider = null)
     {
         provider ??= DefaultProvider;
 
-        if (!StringRules.IsExactLength(value, IsoCurrency.NumericExactLength))
+        if (!IsoCurrencyUtility.TryParseNumeric(value, out var numeric))
             return false;
 
-        if (!NumberStringRules.IsDigitsOnly(value))
-            return false;
-
-        return provider.IsValidNumericCode(value!);
+        return provider.IsValidNumericCode(numeric);
     }
 }

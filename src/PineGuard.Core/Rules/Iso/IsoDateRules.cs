@@ -1,37 +1,16 @@
 using PineGuard.Iso.Dates;
-using System.Globalization;
+using PineGuard.Utils.Iso;
 
 namespace PineGuard.Rules.Iso;
 
 public static class IsoDateRules
 {
-    public static bool IsIsoDateOnly(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
+    public static bool IsIsoDateOnly(string? value) =>
+        IsoDateUtility.TryParseDateOnly(value, out _);
 
-        value = value.Trim();
+    public static bool IsIsoDateTime(string? value) =>
+        IsoDateUtility.TryParseDateTime(value, out _);
 
-        return DateOnly.TryParseExact(
-            value,
-            IsoDateOnly.ExactFormat,
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.None,
-            out _);
-    }
-
-    public static bool IsIsoDateTime(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
-
-        value = value.Trim();
-
-        return DateTimeOffset.TryParseExact(
-            value,
-            IsoDateTimeOffset.AllFormats,
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.RoundtripKind,
-            out _);
-    }
+    public static bool IsIsoDateTimeOffset(string? value) =>
+        IsoDateUtility.TryParseDateTimeOffset(value, out _);
 }

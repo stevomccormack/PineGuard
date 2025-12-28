@@ -34,6 +34,9 @@ public static class IsoRules
     public static bool IsIsoDateTime(string? value) =>
         IsoDateRules.IsIsoDateTime(value);
 
+    public static bool IsIsoDateTimeOffset(string? value) =>
+        IsoDateRules.IsIsoDateTimeOffset(value);
+
     public static bool IsIsoPaymentCard(string? value) =>
         IsoPaymentCardRules.IsIsoPaymentCard(value);
 }

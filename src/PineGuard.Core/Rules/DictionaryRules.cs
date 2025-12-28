@@ -1,94 +1,31 @@
+using PineGuard.Utils;
+
 namespace PineGuard.Rules;
 
 public static class DictionaryRules
 {
     public static bool IsEmpty<TKey, TValue>(IDictionary<TKey, TValue>? dictionary) =>
-        dictionary is null || dictionary.Count == 0;
+        !DictionaryUtility.TryGetCount(dictionary, out var count) || count == 0;
 
-    public static bool HasKey<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TKey key)
-    {
-        if (dictionary is null)
-            return false;
+    public static bool HasItems<TKey, TValue>(IDictionary<TKey, TValue>? dictionary) =>
+        DictionaryUtility.TryGetCount(dictionary, out var count) && count != 0;
 
-        return dictionary.ContainsKey(key);
-    }
+    public static bool HasKey<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TKey key) =>
+        dictionary is not null && dictionary.ContainsKey(key);
 
-    public static bool HasItems<TKey, TValue>(IDictionary<TKey, TValue>? dictionary)
-    {
-        if (dictionary is null)
-            return false;
+    public static bool HasValue<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TValue value) =>
+        DictionaryUtility.TryGetKeyForValue(dictionary, value, out _);
 
-        return dictionary.Count != 0;
-    }
+    public static bool HasKeyValue<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TKey key, TValue value) => 
+        DictionaryUtility.TryGetValue(dictionary, key, out var actual) && 
+        EqualityComparer<TValue>.Default.Equals(actual, value);
 
-    public static bool HasValue<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TValue value)
-    {
-        if (dictionary is null)
-            return false;
+    public static bool HasAnyKey<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, Func<TKey, bool> predicate) =>
+        DictionaryUtility.TryGetAnyKey(dictionary, predicate, out _);
 
-        foreach (var pair in dictionary)
-        {
-            if (EqualityComparer<TValue>.Default.Equals(pair.Value, value))
-                return true;
-        }
+    public static bool HasAnyValue<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, Func<TValue, bool> predicate) =>
+        DictionaryUtility.TryGetAnyValue(dictionary, predicate, out _);
 
-        return false;
-    }
-
-    public static bool HasKeyValue<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TKey key, TValue value)
-    {
-        if (dictionary is null)
-            return false;
-
-        return dictionary.TryGetValue(key, out var actual)
-            && EqualityComparer<TValue>.Default.Equals(actual, value);
-    }
-
-    public static bool HasAnyKey<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, Func<TKey, bool> predicate)
-    {
-        ArgumentNullException.ThrowIfNull(predicate);
-
-        if (dictionary is null)
-            return false;
-
-        foreach (var pair in dictionary)
-        {
-            if (predicate(pair.Key))
-                return true;
-        }
-
-        return false;
-    }
-
-    public static bool HasAnyValue<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, Func<TValue, bool> predicate)
-    {
-        ArgumentNullException.ThrowIfNull(predicate);
-
-        if (dictionary is null)
-            return false;
-
-        foreach (var pair in dictionary)
-        {
-            if (predicate(pair.Value))
-                return true;
-        }
-
-        return false;
-    }
-
-    public static bool HasAnyItem<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, Func<TKey, TValue, bool> predicate)
-    {
-        ArgumentNullException.ThrowIfNull(predicate);
-
-        if (dictionary is null)
-            return false;
-
-        foreach (var pair in dictionary)
-        {
-            if (predicate(pair.Key, pair.Value))
-                return true;
-        }
-
-        return false;
-    }
+    public static bool HasAnyItem<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, Func<TKey, TValue, bool> predicate) =>
+        DictionaryUtility.TryGetAnyItem(dictionary, predicate, out _);
 }

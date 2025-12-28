@@ -1,3 +1,4 @@
+using PineGuard.Utils;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -26,10 +27,10 @@ public static class EnumRules
     public static bool IsDefinedName<TEnum>(string? name, bool ignoreCase = true)
         where TEnum : struct, Enum
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (!StringUtility.TryGetNonEmptyTrimmed(name, out var trimmed))
             return false;
 
-        return Enum.TryParse<TEnum>(name, ignoreCase, out var parsed)
+        return Enum.TryParse<TEnum>(trimmed, ignoreCase, out var parsed)
             && Enum.IsDefined(typeof(TEnum), parsed);
     }
 

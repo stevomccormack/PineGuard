@@ -12,19 +12,19 @@ public static class TimeSpanRules
         return RuleComparison.IsBetween(value.Value, min, max, inclusion);
     }
 
-    public static bool IsGreaterThan(TimeSpan? value, TimeSpan threshold)
+    public static bool IsGreaterThan(TimeSpan? value, TimeSpan threshold, RangeInclusion inclusion = RangeInclusion.Exclusive)
     {
         if (value is null)
             return false;
 
-        return value.Value > threshold;
+        return RuleComparison.IsGreaterThan(value.Value, threshold, inclusion);
     }
 
-    public static bool IsLessThan(TimeSpan? value, TimeSpan threshold)
+    public static bool IsLessThan(TimeSpan? value, TimeSpan threshold, RangeInclusion inclusion = RangeInclusion.Exclusive)
     {
         if (value is null)
             return false;
 
-        return value.Value < threshold;
+        return RuleComparison.IsLessThan(value.Value, threshold, inclusion);
     }
 }

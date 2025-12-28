@@ -1,4 +1,5 @@
 using PineGuard.Iso.Countries;
+using PineGuard.Utils.Iso;
 
 namespace PineGuard.Rules.Iso;
 
@@ -10,38 +11,29 @@ public static class IsoCountryRules
     {
         provider ??= DefaultProvider;
 
-        if (!StringRules.IsExactLength(value, IsoCountry.Alpha2ExactLength))
+        if (!IsoCountryUtility.TryParseAlpha2(value, out var alpha2))
             return false;
 
-        if (!StringRules.IsAlphabetic(value))
-            return false;
-
-        return provider.IsValidAlpha2Code(value!);
+        return provider.IsValidAlpha2Code(alpha2);
     }
 
     public static bool IsIsoCountryAlpha3(string? value, IIsoCountryProvider? provider = null)
     {
         provider ??= DefaultProvider;
 
-        if (!StringRules.IsExactLength(value, IsoCountry.Alpha3ExactLength))
+        if (!IsoCountryUtility.TryParseAlpha3(value, out var alpha3))
             return false;
 
-        if (!StringRules.IsAlphabetic(value))
-            return false;
-
-        return provider.IsValidAlpha3Code(value!);
+        return provider.IsValidAlpha3Code(alpha3);
     }
 
     public static bool IsIsoCountryNumeric(string? value, IIsoCountryProvider? provider = null)
     {
         provider ??= DefaultProvider;
 
-        if (!StringRules.IsExactLength(value, IsoCountry.NumericExactLength))
+        if (!IsoCountryUtility.TryParseNumeric(value, out var numeric))
             return false;
 
-        if (!NumberStringRules.IsDigitsOnly(value))
-            return false;
-
-        return provider.IsValidNumericCode(value!);
+        return provider.IsValidNumericCode(numeric);
     }
 }

@@ -1,3 +1,4 @@
+using PineGuard.Common;
 using PineGuard.Iso.Payments;
 using PineGuard.Iso.Payments.Cards;
 
@@ -5,16 +6,24 @@ namespace PineGuard.Rules.Iso;
 
 public static class IsoPaymentCardRules
 {
-    public static bool IsIsoPaymentCard(string? value)
+    public const char SpaceSeparator = ' ';
+    public const char DashSeparator = '-';
+
+    public static readonly char[] DefaultAllowedSeparators = [SpaceSeparator, DashSeparator];
+
+    public static bool IsIsoPaymentCard(string? value) =>
+        IsIsoPaymentCard(value, DefaultAllowedSeparators);
+
+    public static bool IsIsoPaymentCard(string? value, char[] allowedSeparators)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        ArgumentNullException.ThrowIfNull(allowedSeparators);
+
+        if (!StringNumberRules.TrySanitizeDigits(value, out var digitsOnly, allowedSeparators))
             return false;
 
-        var sanitized = PaymentCardUtility.Sanitize(value);
-
-        if (sanitized.Length is < IsoPaymentCardBrand.MinPanLength or > IsoPaymentCardBrand.MaxPanLength)
+        if (!RuleComparison.IsBetween(digitsOnly.Length, IsoPaymentCardBrand.MinPanLength, IsoPaymentCardBrand.MaxPanLength, RangeInclusion.Inclusive))
             return false;
 
-        return PanAlgorithm.IsValid(sanitized) && LuhnAlgorithm.IsValid(sanitized);
+        return PanAlgorithm.IsValid(digitsOnly) && LuhnAlgorithm.IsValid(digitsOnly);
     }
-}    
+}

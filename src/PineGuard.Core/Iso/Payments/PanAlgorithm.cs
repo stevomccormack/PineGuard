@@ -11,15 +11,14 @@ public static class PanAlgorithm
     public const int PanMinLength = 12;
     public const int PanMaxLength = 19;
 
-    public static bool IsValid(string? value, RangeInclusion inclusion = RangeInclusion.Inclusive)
+    public static bool IsValid(string? digitsOnly)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (digitsOnly is null)
             return false;
 
-        var digits = value.Trim();
-        if (!NumberStringRules.IsDigitsOnly(digits))
+        if (!StringNumberRules.IsDigitsOnly(digitsOnly))
             return false;
 
-        return RuleComparison.IsBetween(digits.Length, PanMinLength, PanMaxLength, inclusion);
+        return RuleComparison.IsBetween(digitsOnly.Length, PanMinLength, PanMaxLength, RangeInclusion.Inclusive);
     }
 }

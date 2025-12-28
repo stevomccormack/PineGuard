@@ -8,32 +8,38 @@ public static class LuhnAlgorithm
     private const int LuhnMultiplier = 2;
     private const int LuhnReduction = 9;
 
-    public static bool IsValid(string? value)
+    public static bool IsValid(string? digitsOnly)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (digitsOnly is null)
             return false;
 
-        var digits = value.Trim();
-        if (!NumberStringRules.IsDigitsOnly(digits))
+        if (!StringNumberRules.IsDigitsOnly(digitsOnly))
             return false;
 
         var sum = 0;
         var alternate = false;
 
-        for (var i = digits.Length - 1; i >= 0; i--)
+        for (var i = digitsOnly.Length - 1; i >= 0; i--)
         {
-            var n = digits[i] - '0';
-            if (alternate)
-            {
-                n *= LuhnMultiplier;
-                if (n > LuhnReduction)
-                    n -= LuhnReduction;
-            }
-
-            sum += n;
+            var digit = digitsOnly[i] - '0';
+            sum += ApplyLuhnTransform(digit, alternate);
             alternate = !alternate;
         }
 
-        return sum % LuhnModulus == 0;
+        return IsValidChecksum(sum);
     }
+
+    private static int ApplyLuhnTransform(int digit, bool shouldDouble)
+    {
+        if (!shouldDouble)
+            return digit;
+
+        digit *= LuhnMultiplier;
+        return digit > LuhnReduction ? digit - LuhnReduction : digit;
+    }
+
+    private static bool IsValidChecksum(int checksum)
+    {
+        return checksum % LuhnModulus == 0;
+    }   
 }

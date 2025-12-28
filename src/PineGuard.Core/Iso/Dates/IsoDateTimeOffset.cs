@@ -25,9 +25,6 @@ public static class IsoDateTimeOffset
         WithTimezoneAndFractionalSecondsFormat
     ];
 
-    public static string ToIsoString(this DateTimeOffset value)
-        => value.ToString("O", CultureInfo.InvariantCulture);
-
     public static bool TryParseIsoDateTime(string? value, out DateTimeOffset result)
         => DateTimeOffset.TryParseExact(
             value,
@@ -42,4 +39,7 @@ public static class IsoDateTimeOffset
             AllFormats,
             CultureInfo.InvariantCulture,
             DateTimeStyles.RoundtripKind);
+
+    public static string ToIsoString(this DateTimeOffset value)
+        => value.ToString("O", CultureInfo.InvariantCulture);
 }

@@ -1,3 +1,5 @@
+using PineGuard.Utils;
+
 namespace PineGuard.Rules;
 
 public static class GuidRules
@@ -6,11 +8,13 @@ public static class GuidRules
 
     public static bool IsNullOrEmpty(Guid? value) => value is null || value.Value == Guid.Empty;
 
-    public static bool IsGuid(string? value)
+    public static bool IsGuid(string? value) => GuidUtility.TryParse(value, out _);
+
+    public static bool IsGuidEmpty(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (!GuidUtility.TryParse(value, out var guid))
             return false;
 
-        return Guid.TryParse(value, out _);
+        return guid == Guid.Empty;
     }
 }

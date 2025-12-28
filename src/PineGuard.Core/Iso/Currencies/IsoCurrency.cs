@@ -1,4 +1,5 @@
 using PineGuard.Rules;
+using PineGuard.Utils.Iso;
 
 namespace PineGuard.Iso.Currencies;
 
@@ -56,4 +57,43 @@ public sealed record IsoCurrency
         DecimalPlaces = decimalPlaces;
         Name = name;
     }
+
+    public static bool TryParse(string? value, out IsoCurrency currency)
+    {
+        currency = null!;
+
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        var provider = new DefaultIsoCurrencyProvider();
+
+        if (IsoCurrencyUtility.TryParseAlpha3(value, out var alpha3)
+            && provider.TryGetCurrencyByAlpha3Code(alpha3, out var alpha3Currency)
+            && alpha3Currency is not null)
+        {
+            currency = alpha3Currency;
+            return true;
+        }
+
+        if (IsoCurrencyUtility.TryParseNumeric(value, out var numeric)
+            && provider.TryGetCurrencyByNumericCode(numeric, out var numericCurrency)
+            && numericCurrency is not null)
+        {
+            currency = numericCurrency;
+            return true;
+        }
+
+        currency = null!;
+        return false;
+    }
+
+    public static IsoCurrency Parse(string? value)
+    {
+        if (TryParse(value, out var currency))
+            return currency;
+
+        throw new FormatException("Value must be an ISO 4217 alpha-3 or numeric currency code.");
+    }
+
+    public override string ToString() => $"{Name} ({Alpha3Code})";
 }

@@ -10,10 +10,7 @@ public static class IsoDateOnly
 {
     public const string ExactFormat = "yyyy-MM-dd";
 
-    public static string ToIsoString(this DateOnly value) =>
-        value.ToString(IsoDateOnly.ExactFormat, CultureInfo.InvariantCulture);
-
-    public static bool TryParseIsoDateOnly(string? value, out DateOnly result) =>
+    public static bool TryParse(string? value, out DateOnly result) =>
         DateOnly.TryParseExact(
             value,
             IsoDateOnly.ExactFormat,
@@ -21,10 +18,13 @@ public static class IsoDateOnly
             DateTimeStyles.None,
             out result);
 
-    public static DateOnly ParseIsoDateOnly(string value) =>
+    public static DateOnly Parse(string value) =>
         DateOnly.ParseExact(
             value,
             IsoDateOnly.ExactFormat,
             CultureInfo.InvariantCulture,
             DateTimeStyles.None);
+
+    public static string ToIsoString(this DateOnly value) =>
+        value.ToString(IsoDateOnly.ExactFormat, CultureInfo.InvariantCulture);
 }

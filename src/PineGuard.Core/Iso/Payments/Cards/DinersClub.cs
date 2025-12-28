@@ -1,3 +1,5 @@
+using PineGuard.Utils.Iso;
+
 namespace PineGuard.Iso.Payments.Cards;
 
 /// <summary>
@@ -25,8 +27,8 @@ public sealed class DinersClubCard : IsoPaymentCardBrand
         if (string.IsNullOrWhiteSpace(pan))
             return false;
 
-        var sanitized = PaymentCardUtility.Sanitize(pan);
-        if (sanitized.Length != PanExactLength)
+        var sanitized = IsoPaymentCardUtility.Sanitize(pan);
+        if (string.IsNullOrEmpty(sanitized))
             return false;
 
         return MatchesIinRange(sanitized, 300, 305)

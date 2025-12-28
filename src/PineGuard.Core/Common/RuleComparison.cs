@@ -1,6 +1,4 @@
-using PineGuard.Common;
-
-namespace PineGuard.Rules;
+namespace PineGuard.Common;
 
 internal static class RuleComparison
 {

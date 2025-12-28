@@ -1,14 +1,9 @@
-using System.Net.Mail;
+using PineGuard.Utils;
 
 namespace PineGuard.Rules;
 
 public static class EmailRules
 {
-    public static bool IsEmail(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
-
-        return MailAddress.TryCreate(value.Trim(), out _);
-    }
+    public static bool IsEmail(string? value) =>
+        EmailUtility.TryCreate(value, out _);
 }

@@ -5,23 +5,23 @@ namespace PineGuard.Iso.Payments.Cards;
 /// <summary>
 /// String enumeration of supported ISO/IEC 7812 payment card brands.
 /// </summary>
-public sealed class IsoCardBrand : StringEnumeration
+public sealed class CardBrand : StringEnumeration
 {
-    public static readonly IsoCardBrand Visa = new(VisaCard.Brand);
-    public static readonly IsoCardBrand Mastercard = new(MastercardCard.Brand);
-    public static readonly IsoCardBrand AmericanExpress = new(AmericanExpressCard.Brand);
-    public static readonly IsoCardBrand Discover = new(DiscoverCard.Brand);
-    public static readonly IsoCardBrand DinersClub = new(DinersClubCard.Brand);
-    public static readonly IsoCardBrand Jcb = new(JcbCard.Brand);
+    public static readonly CardBrand Visa = new(VisaCard.Brand);
+    public static readonly CardBrand Mastercard = new(MastercardCard.Brand);
+    public static readonly CardBrand AmericanExpress = new(AmericanExpressCard.Brand);
+    public static readonly CardBrand Discover = new(DiscoverCard.Brand);
+    public static readonly CardBrand DinersClub = new(DinersClubCard.Brand);
+    public static readonly CardBrand Jcb = new(JcbCard.Brand);
 
-    private IsoCardBrand(string value) : base(value, value) { }
+    private CardBrand(string value) : base(value, value) { }
 
     /// <summary>
     /// Detects card brand from a PAN (Primary Account Number).
     /// </summary>
-    public static IsoCardBrand? FromPan(string? pan)
+    public static CardBrand? FromPan(string? pan)
     {
-        var detected = IsoPaymentCardBrandUtility.DetectFromPan(pan);
+        var detected = IsoPaymentCardBrandUtility.FromPan(pan);
         if (detected is null)
             return null;
 
@@ -40,7 +40,7 @@ public sealed class IsoCardBrand : StringEnumeration
     /// <summary>
     /// Tries to detect card brand from a PAN.
     /// </summary>
-    public static bool TryFromPan(string? pan, out IsoCardBrand? result)
+    public static bool TryFromPan(string? pan, out CardBrand? result)
     {
         result = FromPan(pan);
         return result is not null;
@@ -49,7 +49,7 @@ public sealed class IsoCardBrand : StringEnumeration
 
 public static class IsoCardBrandUtility
 {
-    public static IIsoPaymentCardBrand? ToIsoPaymentCardBrand(IsoCardBrand? brand)
+    public static IIsoPaymentCardBrand? ToIsoPaymentCardBrand(CardBrand? brand)
     {
         if (brand is null)
             return null;
@@ -69,8 +69,6 @@ public static class IsoCardBrandUtility
 
 public static class IsoCardBrandExtension
 {
-    public static IIsoPaymentCardBrand? ToIsoPaymentCardBrand(this IsoCardBrand? brand)
-    {
-        return IsoCardBrandUtility.ToIsoPaymentCardBrand(brand);
-    }
+    public static IIsoPaymentCardBrand? ToIsoPaymentCardBrand(this CardBrand? brand) =>
+        IsoCardBrandUtility.ToIsoPaymentCardBrand(brand);
 }

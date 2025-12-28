@@ -1,11 +1,12 @@
 using PineGuard.Common;
-using System.Globalization;
+using PineGuard.Utils;
 using System.Text.RegularExpressions;
 
 namespace PineGuard.Rules;
 
-public static class StringRules
+public static partial class StringRules
 {
+
     public static bool IsExactLength(string? value, int length)
     {
         if (value is null)
@@ -61,7 +62,7 @@ public static class StringRules
         if (value is null)
             return false;
 
-        return IsAllFromAllowedSet(value, IsDigit, inclusions);
+        return IsAllFromAllowedSet(value, CharRules.IsDigit, inclusions);
     }
 
     public static bool IsAlphanumeric(string? value, char[]? inclusions = null)
@@ -72,56 +73,171 @@ public static class StringRules
         return IsAllFromAllowedSet(value, char.IsLetterOrDigit, inclusions);
     }
 
-    public static bool IsDecimal(string? value, int decimalPlaces = 2)
+    public static bool IsUppercase(string? value, bool lettersOnly = false)
     {
-        if (value is null)
+        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
             return false;
 
-        value = value.Trim();
-        if (value.Length == 0)
-            return false;
+        var hasLetter = false;
 
-        if (decimalPlaces < 0)
-            return false;
+        if (lettersOnly)
+        {
+            foreach (var ch in trimmed)
+            {
+                if (!char.IsLetter(ch) || !char.IsUpper(ch))
+                    return false;
 
-        var decimalPattern = decimalPlaces == 0
-            ? "^[\\+\\-]?\\d+$"
-            : $"^[\\+\\-]?\\d+(?:\\.\\d{{1,{decimalPlaces}}})?$";
+                hasLetter = true;
+            }
 
-        if (!Regex.IsMatch(value, decimalPattern, RegexOptions.CultureInvariant))
-            return false;
+            return hasLetter;
+        }
 
-        return decimal.TryParse(
-            value,
-            NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
-            CultureInfo.InvariantCulture,
-            out _);
+        foreach (var ch in trimmed)
+        {
+            if (char.IsUpper(ch))
+            {
+                hasLetter = true;
+                continue;
+            }
+
+            if (char.IsLetter(ch))
+                return false;
+        }
+
+        return hasLetter;
     }
 
-    public static bool IsExactDecimal(string? value, int exactDecimalPlaces = 2)
+    public static bool IsLowercase(string? value, bool lettersOnly = false)
     {
-        if (value is null)
+        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
             return false;
 
-        value = value.Trim();
-        if (value.Length == 0)
+        var hasLetter = false;
+
+        if (lettersOnly)
+        {
+            foreach (var ch in trimmed)
+            {
+                if (!char.IsLetter(ch) || !char.IsLower(ch))
+                    return false;
+
+                hasLetter = true;
+            }
+
+            return hasLetter;
+        }
+
+        foreach (var ch in trimmed)
+        {
+            if (char.IsLower(ch))
+            {
+                hasLetter = true;
+                continue;
+            }
+
+            if (char.IsLetter(ch))
+                return false;
+        }
+
+        return hasLetter;
+    }
+
+    public static bool IsAscii(string? value)
+    {
+        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
             return false;
 
-        if (exactDecimalPlaces < 0)
+        foreach (var ch in trimmed)
+        {
+            if (ch > CharRules.AsciiMaxValue)
+                return false;
+        }
+
+        return true;
+    }
+
+    public static bool IsPrintableAscii(string? value, bool allowCommonWhitespace = false)
+    {
+        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
             return false;
 
-        var decimalPattern = exactDecimalPlaces == 0
-            ? "^[\\+\\-]?\\d+$"
-            : $"^[\\+\\-]?\\d+\\.\\d{{{exactDecimalPlaces}}}$";
+        foreach (var ch in trimmed)
+        {
+            if (ch is >= CharRules.PrintableAsciiMinValue and <= CharRules.PrintableAsciiMaxValue)
+                continue;
 
-        if (!Regex.IsMatch(value, decimalPattern, RegexOptions.CultureInvariant))
+            if (allowCommonWhitespace && ch is '\r' or '\n' or '\t')
+                continue;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public static bool DoesNotContainWhitespace(string? value)
+    {
+        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
             return false;
 
-        return decimal.TryParse(
-            value,
-            NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
-            CultureInfo.InvariantCulture,
-            out _);
+        foreach (var ch in trimmed)
+        {
+            if (char.IsWhiteSpace(ch))
+                return false;
+        }
+
+        return true;
+    }
+
+    public static bool ContainsNoControlChars(string? value)
+    {
+        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+            return false;
+
+        foreach (var ch in trimmed)
+        {
+            if (char.IsControl(ch))
+                return false;
+        }
+
+        return true;
+    }
+
+    public static bool ContainsOnlyAllowedChars(string? value, char[] allowedChars)
+    {
+        ArgumentNullException.ThrowIfNull(allowedChars);
+
+        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+            return false;
+
+        var allowed = new HashSet<char>(allowedChars);
+
+        foreach (var ch in trimmed)
+        {
+            if (!allowed.Contains(ch))
+                return false;
+        }
+
+        return true;
+    }
+
+    public static bool ContainsAnyDisallowedChars(string? value, char[] allowedChars)
+    {
+        ArgumentNullException.ThrowIfNull(allowedChars);
+
+        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+            return false;
+
+        var allowed = new HashSet<char>(allowedChars);
+
+        foreach (var ch in trimmed)
+        {
+            if (!allowed.Contains(ch))
+                return true;
+        }
+
+        return false;
     }
 
     private static bool IsAllFromAllowedSet(string value, Func<char, bool> basePredicate, char[]? inclusions)
@@ -152,6 +268,4 @@ public static class StringRules
 
         return true;
     }
-
-    private static bool IsDigit(char c) => c is >= '0' and <= '9';
 }
