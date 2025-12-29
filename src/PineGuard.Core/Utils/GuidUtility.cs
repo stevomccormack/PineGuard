@@ -6,7 +6,7 @@ public static class GuidUtility
     {
         guid = default;
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         return Guid.TryParse(trimmed, out guid);

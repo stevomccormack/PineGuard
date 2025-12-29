@@ -8,6 +8,8 @@ namespace PineGuard.Iso.Countries;
 /// </summary>
 public sealed class DefaultIsoCountryProvider : IIsoCountryProvider
 {
+    public static DefaultIsoCountryProvider Instance { get; } = new();
+
     private readonly FrozenDictionary<string, IsoCountry> _countriesByAlpha2Code;
     private readonly FrozenDictionary<string, IsoCountry> _countriesByAlpha3Code;
     private readonly FrozenDictionary<string, IsoCountry> _countriesByNumericCode;
@@ -34,7 +36,7 @@ public sealed class DefaultIsoCountryProvider : IIsoCountryProvider
     public bool IsValidNumericCode(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _countriesByNumericCode.ContainsKey(value);
 
-    public bool TryGetCountryByAlpha2Code(string? value, out IsoCountry? country)
+    public bool TryGetByAlpha2Code(string? value, out IsoCountry? country)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -52,7 +54,7 @@ public sealed class DefaultIsoCountryProvider : IIsoCountryProvider
         return false;
     }
 
-    public bool TryGetCountryByAlpha3Code(string? value, out IsoCountry? country)
+    public bool TryGetByAlpha3Code(string? value, out IsoCountry? country)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -70,7 +72,7 @@ public sealed class DefaultIsoCountryProvider : IIsoCountryProvider
         return false;
     }
 
-    public bool TryGetCountryByNumericCode(string? value, out IsoCountry? country)
+    public bool TryGetByNumericCode(string? value, out IsoCountry? country)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -88,7 +90,7 @@ public sealed class DefaultIsoCountryProvider : IIsoCountryProvider
         return false;
     }
 
-    public bool TryGetCountry(string? value, out IsoCountry? country)
+    public bool TryGet(string? value, out IsoCountry? country)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -96,10 +98,10 @@ public sealed class DefaultIsoCountryProvider : IIsoCountryProvider
             return false;
         }
 
-        return TryGetCountryByAlpha2Code(value, out country) ||
-               TryGetCountryByAlpha3Code(value, out country) ||
-               TryGetCountryByNumericCode(value, out country);
+        return TryGetByAlpha2Code(value, out country) ||
+               TryGetByAlpha3Code(value, out country) ||
+               TryGetByNumericCode(value, out country);
     }
 
-    public IReadOnlyCollection<IsoCountry> GetAllCountries() => _allCountries;
+    public IReadOnlyCollection<IsoCountry> GetAll() => _allCountries;
 }

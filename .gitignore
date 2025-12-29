@@ -1,6 +1,8 @@
 # Custom
 .etc
 .iso/generated/
+.iana/generated/
+.cldr/generated/
 
 
 # Build results

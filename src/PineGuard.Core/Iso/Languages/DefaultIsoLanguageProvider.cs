@@ -1,4 +1,3 @@
-using PineGuard.Standards.Iso;
 using System.Collections.Frozen;
 
 namespace PineGuard.Iso.Languages;
@@ -9,6 +8,8 @@ namespace PineGuard.Iso.Languages;
 /// </summary>
 public sealed class DefaultIsoLanguageProvider : IIsoLanguageProvider
 {
+    public static DefaultIsoLanguageProvider Instance { get; } = new();
+
     private readonly FrozenDictionary<string, IsoLanguage> _languagesByAlpha2Code;
     private readonly FrozenDictionary<string, IsoLanguage> _languagesByAlpha3Code;
     private readonly IReadOnlyCollection<IsoLanguage> _allLanguages;
@@ -28,7 +29,7 @@ public sealed class DefaultIsoLanguageProvider : IIsoLanguageProvider
     public bool IsValidAlpha3Code(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _languagesByAlpha3Code.ContainsKey(value);
 
-    public bool TryGetLanguageByAlpha2Code(string? value, out IsoLanguage? language)
+    public bool TryGetByAlpha2Code(string? value, out IsoLanguage? language)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -46,7 +47,7 @@ public sealed class DefaultIsoLanguageProvider : IIsoLanguageProvider
         return false;
     }
 
-    public bool TryGetLanguageByAlpha3Code(string? value, out IsoLanguage? language)
+    public bool TryGetByAlpha3Code(string? value, out IsoLanguage? language)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -64,7 +65,7 @@ public sealed class DefaultIsoLanguageProvider : IIsoLanguageProvider
         return false;
     }
 
-    public bool TryGetLanguage(string? value, out IsoLanguage? language)
+    public bool TryGet(string? value, out IsoLanguage? language)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -72,9 +73,8 @@ public sealed class DefaultIsoLanguageProvider : IIsoLanguageProvider
             return false;
         }
 
-        return TryGetLanguageByAlpha2Code(value, out language)
-               || TryGetLanguageByAlpha3Code(value, out language);
+        return TryGetByAlpha2Code(value, out language) || TryGetByAlpha3Code(value, out language);
     }
 
-    public IReadOnlyCollection<IsoLanguage> GetAllLanguages() => _allLanguages;
+    public IReadOnlyCollection<IsoLanguage> GetAll() => _allLanguages;
 }

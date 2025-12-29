@@ -75,7 +75,7 @@ public static partial class StringRules
 
     public static bool IsUppercase(string? value, bool lettersOnly = false)
     {
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         var hasLetter = false;
@@ -110,7 +110,7 @@ public static partial class StringRules
 
     public static bool IsLowercase(string? value, bool lettersOnly = false)
     {
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         var hasLetter = false;
@@ -145,7 +145,7 @@ public static partial class StringRules
 
     public static bool IsAscii(string? value)
     {
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         foreach (var ch in trimmed)
@@ -159,7 +159,7 @@ public static partial class StringRules
 
     public static bool IsPrintableAscii(string? value, bool allowCommonWhitespace = false)
     {
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         foreach (var ch in trimmed)
@@ -178,7 +178,7 @@ public static partial class StringRules
 
     public static bool DoesNotContainWhitespace(string? value)
     {
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         foreach (var ch in trimmed)
@@ -192,7 +192,7 @@ public static partial class StringRules
 
     public static bool ContainsNoControlChars(string? value)
     {
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         foreach (var ch in trimmed)
@@ -208,7 +208,7 @@ public static partial class StringRules
     {
         ArgumentNullException.ThrowIfNull(allowedChars);
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         var allowed = new HashSet<char>(allowedChars);
@@ -226,7 +226,7 @@ public static partial class StringRules
     {
         ArgumentNullException.ThrowIfNull(allowedChars);
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         var allowed = new HashSet<char>(allowedChars);

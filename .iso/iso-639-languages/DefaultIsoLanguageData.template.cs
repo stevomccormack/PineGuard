@@ -2,11 +2,10 @@
 // This file was generated from ISO 639 language code data.
 // Do NOT edit manually.
 // Regenerate using ./.iso/GenerateIsoLanguages.ps1
-using PineGuard.Standards.Iso.Languages;
 using System;
 using System.Collections.Frozen;
 
-namespace PineGuard.Standards.Iso;
+namespace PineGuard.Iso.Languages;
 
 /// <summary>
 /// ISO 639 language code data.

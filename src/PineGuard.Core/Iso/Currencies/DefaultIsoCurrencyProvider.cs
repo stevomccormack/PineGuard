@@ -1,4 +1,3 @@
-using PineGuard.Standards.Iso.Currencies;
 using System.Collections.Frozen;
 
 namespace PineGuard.Iso.Currencies;
@@ -9,6 +8,8 @@ namespace PineGuard.Iso.Currencies;
 /// </summary>
 public sealed class DefaultIsoCurrencyProvider : IIsoCurrencyProvider
 {
+    public static DefaultIsoCurrencyProvider Instance { get; } = new();
+
     private readonly FrozenDictionary<string, IsoCurrency> _currenciesByAlpha3Code;
     private readonly FrozenDictionary<string, IsoCurrency> _currenciesByNumericCode;
     private readonly IReadOnlyCollection<IsoCurrency> _allCurrencies;
@@ -28,7 +29,7 @@ public sealed class DefaultIsoCurrencyProvider : IIsoCurrencyProvider
     public bool IsValidNumericCode(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _currenciesByNumericCode.ContainsKey(value);
 
-    public bool TryGetCurrencyByAlpha3Code(string? value, out IsoCurrency? currency)
+    public bool TryGetByAlpha3Code(string? value, out IsoCurrency? currency)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -46,7 +47,7 @@ public sealed class DefaultIsoCurrencyProvider : IIsoCurrencyProvider
         return false;
     }
 
-    public bool TryGetCurrencyByNumericCode(string? value, out IsoCurrency? currency)
+    public bool TryGetByNumericCode(string? value, out IsoCurrency? currency)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -64,7 +65,7 @@ public sealed class DefaultIsoCurrencyProvider : IIsoCurrencyProvider
         return false;
     }
 
-    public bool TryGetCurrency(string? value, out IsoCurrency? currency)
+    public bool TryGet(string? value, out IsoCurrency? currency)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -72,9 +73,8 @@ public sealed class DefaultIsoCurrencyProvider : IIsoCurrencyProvider
             return false;
         }
 
-        return TryGetCurrencyByAlpha3Code(value, out currency) ||
-               TryGetCurrencyByNumericCode(value, out currency);
+        return TryGetByAlpha3Code(value, out currency) || TryGetByNumericCode(value, out currency);
     }
 
-    public IReadOnlyCollection<IsoCurrency> GetAllCurrencies() => _allCurrencies;
+    public IReadOnlyCollection<IsoCurrency> GetAll() => _allCurrencies;
 }

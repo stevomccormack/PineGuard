@@ -230,9 +230,9 @@ try {
     $generatedCode = $languageRows -join [Environment]::NewLine
 
     Write-Verbose "Loading template from: $TemplatePath"
-    $template = Get-Content -Path $TemplatePath -Raw -ErrorAction Stop
+    $template = Get-Content -Path $TemplatePath -Raw -Encoding UTF8 -ErrorAction Stop
 
-    if ($template -notmatch '<< LANGUAGE_ROWS >>') {
+    if (-not $template.Contains('<< LANGUAGE_ROWS >>')) {
         throw "Template file does not contain '<< LANGUAGE_ROWS >>' placeholder: $TemplatePath"
     }
 
@@ -246,7 +246,7 @@ try {
 
     $output | Set-Content -Path $OutputPath -Encoding UTF8 -NoNewline -ErrorAction Stop
 
-    Write-Host "✅ Generated: $OutputPath" -ForegroundColor Green
+    Write-Host "Generated: $OutputPath" -ForegroundColor Green
     Write-Host "Languages: $($languages.Count)" -ForegroundColor Cyan
 }
 catch {

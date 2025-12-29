@@ -2,7 +2,7 @@ namespace PineGuard.Utils;
 
 public static class StringUtility
 {
-    public static bool TryGetNonEmptyTrimmed(string? value, out string trimmed)
+    public static bool TryGetTrimmed(string? value, out string trimmed)
     {
         trimmed = string.Empty;
 

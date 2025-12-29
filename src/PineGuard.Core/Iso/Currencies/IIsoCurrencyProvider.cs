@@ -20,21 +20,21 @@ public interface IIsoCurrencyProvider
     /// <summary>
     /// Attempts to retrieve a currency by its 3-letter alphabetic code (case-insensitive).
     /// </summary>
-    bool TryGetCurrencyByAlpha3Code(string? value, out IsoCurrency? currency);
+    bool TryGetByAlpha3Code(string? value, out IsoCurrency? currency);
 
     /// <summary>
     /// Attempts to retrieve a currency by its 3-digit numeric code.
     /// </summary>
-    bool TryGetCurrencyByNumericCode(string? value, out IsoCurrency? currency);
+    bool TryGetByNumericCode(string? value, out IsoCurrency? currency);
 
     /// <summary>
     /// Attempts to retrieve a currency by any ISO 4217 code format.
     /// Tries alphabetic, then numeric in sequence.
     /// </summary>
-    bool TryGetCurrency(string? value, out IsoCurrency? currency);
+    bool TryGet(string? value, out IsoCurrency? currency);
 
     /// <summary>
     /// Gets all currencies as a read-only collection.
     /// </summary>
-    IReadOnlyCollection<IsoCurrency> GetAllCurrencies();
+    IReadOnlyCollection<IsoCurrency> GetAll();
 }

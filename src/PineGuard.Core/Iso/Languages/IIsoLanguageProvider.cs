@@ -11,11 +11,11 @@ public interface IIsoLanguageProvider
 
     bool IsValidAlpha3Code(string? value);
 
-    bool TryGetLanguageByAlpha2Code(string? value, out IsoLanguage? language);
+    bool TryGetByAlpha2Code(string? value, out IsoLanguage? language);
 
-    bool TryGetLanguageByAlpha3Code(string? value, out IsoLanguage? language);
+    bool TryGetByAlpha3Code(string? value, out IsoLanguage? language);
 
-    bool TryGetLanguage(string? value, out IsoLanguage? language);
+    bool TryGet(string? value, out IsoLanguage? language);
 
-    IReadOnlyCollection<IsoLanguage> GetAllLanguages();
+    IReadOnlyCollection<IsoLanguage> GetAll();
 }

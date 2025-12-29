@@ -275,9 +275,9 @@ $currencyRows = foreach ($c in $currencies) {
 # Template injection
 # =================================================================================================
 
-$template = Get-Content -Path $TemplatePath -Raw
+$template = Get-Content -Path $TemplatePath -Raw -Encoding UTF8
 
-if ($template -notmatch '\<< CURRENCY_ROWS >>') {
+if (-not $template.Contains('<< CURRENCY_ROWS >>')) {
     throw "Template does not contain required placeholder '<< CURRENCY_ROWS >>': $TemplatePath"
 }
 
@@ -294,5 +294,5 @@ if (-not [string]::IsNullOrWhiteSpace($dir) -and -not (Test-Path $dir)) {
 
 Set-Content -Path $OutputPath -Value $output -Encoding UTF8
 
-Write-Host "✅ Generated: $OutputPath"
+Write-Host "Generated: $OutputPath"
 Write-Host "Currencies: $($currencies.Count)"

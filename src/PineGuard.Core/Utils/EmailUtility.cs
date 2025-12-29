@@ -8,7 +8,7 @@ public static class EmailUtility
     {
         email = null;
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         return MailAddress.TryCreate(trimmed, out email);

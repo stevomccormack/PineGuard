@@ -8,7 +8,7 @@ public static class UriUtility
     {
         uri = null;
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         return Uri.TryCreate(trimmed, UriKind.Absolute, out uri);
@@ -18,7 +18,7 @@ public static class UriUtility
     {
         uri = null;
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         return Uri.TryCreate(trimmed, UriKind.Relative, out uri);
@@ -60,7 +60,7 @@ public static class UriUtility
     {
         path = string.Empty;
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         if (!Path.IsPathFullyQualified(trimmed))

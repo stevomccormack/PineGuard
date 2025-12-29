@@ -5,7 +5,7 @@ namespace PineGuard.Rules.Iso;
 
 public static class IsoCountryRules
 {
-    private static readonly IIsoCountryProvider DefaultProvider = new DefaultIsoCountryProvider();
+    private static readonly IIsoCountryProvider DefaultProvider = DefaultIsoCountryProvider.Instance;
 
     public static bool IsIsoCountryAlpha2(string? value, IIsoCountryProvider? provider = null)
     {

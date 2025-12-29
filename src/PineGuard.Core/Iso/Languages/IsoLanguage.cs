@@ -43,10 +43,10 @@ public sealed record IsoLanguage
         if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        var provider = new DefaultIsoLanguageProvider();
+        var provider = DefaultIsoLanguageProvider.Instance;
 
         if (IsoLanguageUtility.TryParseAlpha2(value, out var alpha2)
-            && provider.TryGetLanguageByAlpha2Code(alpha2, out var alpha2Language)
+            && provider.TryGetByAlpha2Code(alpha2, out var alpha2Language)
             && alpha2Language is not null)
         {
             language = alpha2Language;
@@ -54,7 +54,7 @@ public sealed record IsoLanguage
         }
 
         if (IsoLanguageUtility.TryParseAlpha3(value, out var alpha3)
-            && provider.TryGetLanguageByAlpha3Code(alpha3, out var alpha3Language)
+            && provider.TryGetByAlpha3Code(alpha3, out var alpha3Language)
             && alpha3Language is not null)
         {
             language = alpha3Language;

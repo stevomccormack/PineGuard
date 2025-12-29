@@ -34,7 +34,7 @@ public interface IIsoCountryProvider
     /// <param name="value">The 2-letter country code</param>
     /// <param name="country">The country if found; otherwise, null</param>
     /// <returns>true if the country was found; otherwise, false</returns>
-    bool TryGetCountryByAlpha2Code(string? value, out IsoCountry? country);
+    bool TryGetByAlpha2Code(string? value, out IsoCountry? country);
 
     /// <summary>
     /// Attempts to retrieve a country by its 3-letter alpha-3 code (case-insensitive).
@@ -42,7 +42,7 @@ public interface IIsoCountryProvider
     /// <param name="value">The 3-letter country code</param>
     /// <param name="country">The country if found; otherwise, null</param>
     /// <returns>true if the country was found; otherwise, false</returns>
-    bool TryGetCountryByAlpha3Code(string? value, out IsoCountry? country);
+    bool TryGetByAlpha3Code(string? value, out IsoCountry? country);
 
     /// <summary>
     /// Attempts to retrieve a country by its 3-digit numeric code.
@@ -50,7 +50,7 @@ public interface IIsoCountryProvider
     /// <param name="value">The 3-digit numeric country code</param>
     /// <param name="country">The country if found; otherwise, null</param>
     /// <returns>true if the country was found; otherwise, false</returns>
-    bool TryGetCountryByNumericCode(string? value, out IsoCountry? country);
+    bool TryGetByNumericCode(string? value, out IsoCountry? country);
 
     /// <summary>
     /// Attempts to retrieve a country by any valid ISO 3166 code format.
@@ -59,11 +59,11 @@ public interface IIsoCountryProvider
     /// <param name="value">The country code in any valid format</param>
     /// <param name="country">The country if found; otherwise, null</param>
     /// <returns>true if the country was found; otherwise, false</returns>
-    bool TryGetCountry(string? value, out IsoCountry? country);
+    bool TryGet(string? value, out IsoCountry? country);
 
     /// <summary>
     /// Gets all countries as a read-only collection.
     /// </summary>
     /// <returns>A read-only collection of all ISO 3166 countries</returns>
-    IReadOnlyCollection<IsoCountry> GetAllCountries();
+    IReadOnlyCollection<IsoCountry> GetAll();
 }

@@ -1,6 +1,6 @@
 # =================================================================================================
 # GenerateIsoCountries.ps1
-# Run the script from the .iso/ directory.
+# Run the script from the repository root.
 # Before running this script, ensure:
 #   - .iso/iso-3166-countries/iso-3166-country-codes.csv is up-to-date. 
 #   - .iso/iso-3166-countries/DefaultIsoCountryData.template.cs is up-to-date.
@@ -28,7 +28,7 @@
 
 [CmdletBinding()]
 param(
-    [bool]$EnableUpdateTarget = $false
+    [switch]$EnableUpdateTarget
 )
 
 # Set execution policy for this process to allow script execution
@@ -52,7 +52,7 @@ $generatedDir = Join-Path $scriptRoot "generated"
 $outputPath   = Join-Path $generatedDir "DefaultIsoCountryData.cs"
 
 # Target location in source tree
-$targetDir  = Join-Path $scriptRoot "..\src\PineGuard.Core\Standards\Iso"
+$targetDir  = Join-Path $scriptRoot "..\src\PineGuard.Core\Iso\Countries"
 $targetPath = Join-Path $targetDir "DefaultIsoCountryData.cs"
 
 # =================================================================================================
@@ -60,9 +60,9 @@ $targetPath = Join-Path $targetDir "DefaultIsoCountryData.cs"
 # =================================================================================================
 
 Write-Host ""
-Write-Host "═══════════════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "===============================================================" -ForegroundColor Cyan
 Write-Host "  ISO 3166-1 Country Data Generator" -ForegroundColor Cyan
-Write-Host "═══════════════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "===============================================================" -ForegroundColor Cyan
 Write-Host ""
 
 Write-Host "Validating input files..." -ForegroundColor Yellow
@@ -79,15 +79,8 @@ foreach ($file in $requiredFiles) {
         Write-Error "Missing required file: $($file.Name) at $($file.Path)"
         exit 1
     }
-    Write-Host "  ✓ $($file.Name): $($file.Path)" -ForegroundColor Green
+    Write-Host "  OK $($file.Name): $($file.Path)" -ForegroundColor Green
 }
-
-# Validate target directory exists
-if (-not (Test-Path $targetDir)) {
-    Write-Error "Target directory does not exist: $targetDir"
-    exit 1
-}
-Write-Host "  ✓ Target directory: $targetDir" -ForegroundColor Green
 
 Write-Host ""
 
@@ -98,7 +91,7 @@ Write-Host ""
 if (-not (Test-Path $generatedDir)) {
     Write-Host "Creating generated directory..." -ForegroundColor Yellow
     New-Item -ItemType Directory -Path $generatedDir -Force | Out-Null
-    Write-Host "  ✓ Created: $generatedDir" -ForegroundColor Green
+    Write-Host "  OK Created: $generatedDir" -ForegroundColor Green
     Write-Host ""
 }
 
@@ -110,10 +103,11 @@ Write-Host "Generating ISO country data..." -ForegroundColor Yellow
 Write-Host ""
 
 try {
+    $global:LASTEXITCODE = 0
     & $generatorPath -CsvPath $csvPath -TemplatePath $templatePath -OutputPath $outputPath
-    
-    if ($LASTEXITCODE -ne 0 -and $null -ne $LASTEXITCODE) {
-        throw "Generator script exited with code: $LASTEXITCODE"
+
+    if (-not $?) {
+        throw "Generator script failed."
     }
 }
 catch {
@@ -135,20 +129,20 @@ if (-not (Test-Path $outputPath)) {
 }
 
 $fileInfo = Get-Item $outputPath
-Write-Host "  ✓ Generated file size: $($fileInfo.Length) bytes" -ForegroundColor Green
+Write-Host "  OK Generated file size: $($fileInfo.Length) bytes" -ForegroundColor Green
 
 # Basic content validation
 $content = Get-Content $outputPath -Raw
-if ($content -notmatch 'namespace PineGuard\.Standards\.Iso') {
+if (-not $content.Contains('namespace PineGuard.Iso.Countries;')) {
     Write-Error "Generated file does not contain expected namespace"
     exit 1
 }
-if ($content -match '<< COUNTRY_ROWS >>') {
+if ($content.Contains('<< COUNTRY_ROWS >>')) {
     Write-Error "Generated file still contains template placeholder"
     exit 1
 }
 
-Write-Host "  ✓ Content validation passed" -ForegroundColor Green
+Write-Host "  OK Content validation passed" -ForegroundColor Green
 Write-Host ""
 
 # =================================================================================================
@@ -156,11 +150,15 @@ Write-Host ""
 # =================================================================================================
 
 if ($EnableUpdateTarget) {
+    if (-not (Test-Path $targetDir)) {
+        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+    }
+
     Write-Host "Copying to source tree..." -ForegroundColor Yellow
 
     try {
         Copy-Item -Path $outputPath -Destination $targetPath -Force
-        Write-Host "  ✓ Copied to: $targetPath" -ForegroundColor Green
+        Write-Host "  OK Copied to: $targetPath" -ForegroundColor Green
     }
     catch {
         Write-Error "Failed to copy file to target location: $_"
@@ -170,7 +168,7 @@ if ($EnableUpdateTarget) {
     Write-Host ""
 }
 else {
-    Write-Host "Skipping copy to source tree (EnableUpdateTarget=$false)" -ForegroundColor Yellow
+    Write-Host "Skipping copy to source tree (EnableUpdateTarget=$EnableUpdateTarget)" -ForegroundColor Yellow
     Write-Host ""
 }
 
@@ -178,14 +176,14 @@ else {
 # Summary
 # =================================================================================================
 
-Write-Host "═══════════════════════════════════════════════════════════════════" -ForegroundColor Green
-Write-Host "  ✓ Generation Complete!" -ForegroundColor Green
-Write-Host "═══════════════════════════════════════════════════════════════════" -ForegroundColor Green
+Write-Host "===============================================================" -ForegroundColor Green
+Write-Host "  OK Generation Complete!" -ForegroundColor Green
+Write-Host "===============================================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Generated file locations:" -ForegroundColor White
-Write-Host "  • Generated: $outputPath" -ForegroundColor Gray
+Write-Host "  - Generated: $outputPath" -ForegroundColor Gray
 if ($EnableUpdateTarget) {
-    Write-Host "  • Source:    $targetPath" -ForegroundColor Gray
+    Write-Host "  - Source:    $targetPath" -ForegroundColor Gray
 }
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor White

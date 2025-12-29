@@ -65,10 +65,10 @@ public sealed record IsoCountry
         if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        var provider = new DefaultIsoCountryProvider();
+        var provider = DefaultIsoCountryProvider.Instance;
 
         if (IsoCountryUtility.TryParseAlpha2(value, out var alpha2)
-            && provider.TryGetCountryByAlpha2Code(alpha2, out var alpha2Country)
+            && provider.TryGetByAlpha2Code(alpha2, out var alpha2Country)
             && alpha2Country is not null)
         {
             country = alpha2Country;
@@ -76,7 +76,7 @@ public sealed record IsoCountry
         }
 
         if (IsoCountryUtility.TryParseAlpha3(value, out var alpha3)
-            && provider.TryGetCountryByAlpha3Code(alpha3, out var alpha3Country)
+            && provider.TryGetByAlpha3Code(alpha3, out var alpha3Country)
             && alpha3Country is not null)
         {
             country = alpha3Country;
@@ -84,7 +84,7 @@ public sealed record IsoCountry
         }
 
         if (IsoCountryUtility.TryParseNumeric(value, out var numeric)
-            && provider.TryGetCountryByNumericCode(numeric, out var numericCountry)
+            && provider.TryGetByNumericCode(numeric, out var numericCountry)
             && numericCountry is not null)
         {
             country = numericCountry;

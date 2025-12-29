@@ -7,7 +7,7 @@ public static class BufferUtility
 {
     public static bool TryParseHexString(string? value)
     {
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         return IsHexString(trimmed);
@@ -15,7 +15,7 @@ public static class BufferUtility
 
     public static bool TryParseBase64String(string? value)
     {
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         if (trimmed.Length % BufferRules.Base64CharsPerQuantum != 0)

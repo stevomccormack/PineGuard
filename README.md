@@ -32,3 +32,11 @@ This repo includes deterministic generators for ISO reference data (countries/cu
 - `./.iso/GenerateIsoLanguages.ps1`
 
 By default, scripts generate into `.iso/generated`. Use `-EnableUpdateTarget $true` to copy outputs into `src/`.
+
+## IANA time zone data generation
+
+This repo includes a deterministic generator for IANA tzdb time zone reference data (from `zone1970.tab`). See `.iana/tz-zone-info/README.md` for usage:
+
+- `./.iana/GenerateIanaTimeZones.ps1`
+
+By default, the script generates into `.iana/generated`. Use `-EnableUpdateTarget $true` to copy outputs into `src/`.

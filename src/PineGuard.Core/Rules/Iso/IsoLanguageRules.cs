@@ -5,7 +5,7 @@ namespace PineGuard.Rules.Iso;
 
 public static class IsoLanguageRules
 {
-    private static readonly IIsoLanguageProvider DefaultProvider = new DefaultIsoLanguageProvider();
+    private static readonly IIsoLanguageProvider DefaultProvider = DefaultIsoLanguageProvider.Instance;
 
     public static bool IsIsoLanguageAlpha2(string? value, IIsoLanguageProvider? provider = null)
     {

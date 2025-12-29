@@ -2,11 +2,10 @@
 // This file was generated from ISO 3166-1 country code data.
 // Do NOT edit manually.
 // Regenerate using ./.iso/GenerateIsoCountries.ps1
-using PineGuard.Standards.Iso.Countries;
 using System;
 using System.Collections.Frozen;
 
-namespace PineGuard.Standards.Iso;
+namespace PineGuard.Iso.Countries;
 
 /// <summary>
 /// ISO 3166-1 country code data.

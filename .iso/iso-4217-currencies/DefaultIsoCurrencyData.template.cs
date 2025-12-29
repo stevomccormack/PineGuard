@@ -2,11 +2,10 @@
 // This file was generated from ISO 4217 currency code data.
 // Do NOT edit manually.
 // Regenerate using ./.iso/GenerateIsoCurrencies.ps1
-using PineGuard.Standards.Iso.Currencies;
 using System;
 using System.Collections.Frozen;
 
-namespace PineGuard.Standards.Iso;
+namespace PineGuard.Iso.Currencies;
 
 /// <summary>
 /// ISO 4217 currency code data.

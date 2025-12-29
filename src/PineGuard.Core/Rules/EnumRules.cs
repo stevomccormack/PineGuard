@@ -27,7 +27,7 @@ public static class EnumRules
     public static bool IsDefinedName<TEnum>(string? name, bool ignoreCase = true)
         where TEnum : struct, Enum
     {
-        if (!StringUtility.TryGetNonEmptyTrimmed(name, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(name, out var trimmed))
             return false;
 
         return Enum.TryParse<TEnum>(trimmed, ignoreCase, out var parsed)

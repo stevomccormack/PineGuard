@@ -65,10 +65,10 @@ public sealed record IsoCurrency
         if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        var provider = new DefaultIsoCurrencyProvider();
+        var provider = DefaultIsoCurrencyProvider.Instance;
 
         if (IsoCurrencyUtility.TryParseAlpha3(value, out var alpha3)
-            && provider.TryGetCurrencyByAlpha3Code(alpha3, out var alpha3Currency)
+            && provider.TryGetByAlpha3Code(alpha3, out var alpha3Currency)
             && alpha3Currency is not null)
         {
             currency = alpha3Currency;
@@ -76,7 +76,7 @@ public sealed record IsoCurrency
         }
 
         if (IsoCurrencyUtility.TryParseNumeric(value, out var numeric)
-            && provider.TryGetCurrencyByNumericCode(numeric, out var numericCurrency)
+            && provider.TryGetByNumericCode(numeric, out var numericCurrency)
             && numericCurrency is not null)
         {
             currency = numericCurrency;

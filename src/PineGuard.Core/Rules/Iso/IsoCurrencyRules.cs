@@ -5,7 +5,7 @@ namespace PineGuard.Rules.Iso;
 
 public static class IsoCurrencyRules
 {
-    private static readonly IIsoCurrencyProvider DefaultProvider = new DefaultIsoCurrencyProvider();
+    private static readonly IIsoCurrencyProvider DefaultProvider = DefaultIsoCurrencyProvider.Instance;
 
     public static bool IsIsoCurrencyAlpha3(string? value, IIsoCurrencyProvider? provider = null)
     {

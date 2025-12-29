@@ -14,7 +14,7 @@ public static class NetworkUtility
     {
         ipAddress = null;
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         return IPAddress.TryParse(trimmed, out ipAddress);
@@ -24,7 +24,7 @@ public static class NetworkUtility
     {
         ipAddress = null;
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         // Strict dotted-quad segments 0..255
@@ -48,7 +48,7 @@ public static class NetworkUtility
     {
         ipAddress = null;
 
-        if (!StringUtility.TryGetNonEmptyTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
         return IPAddress.TryParse(trimmed, out ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetworkV6;
