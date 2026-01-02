@@ -73,6 +73,12 @@ public static partial class StringRules
         return IsAllFromAllowedSet(value, char.IsLetterOrDigit, inclusions);
     }
 
+    public static bool IsDigitsOnly(string? value) =>
+        StringUtility.TryParseDigitsOnly(value, out _);
+
+    public static bool IsDigitsOnly(string? value, char[]? allowedNonDigitChars = null) =>
+        StringUtility.TryParseDigits(value, out _, allowedNonDigitChars);
+
     public static bool IsUppercase(string? value, bool lettersOnly = false)
     {
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))

@@ -1,10 +1,10 @@
 using PineGuard.Iana.TimeZones;
 using PineGuard.Iso.Countries;
-using PineGuard.Cldr.TimeZones;
+using PineGuard.Utils.Cldr;
 
 namespace PineGuard.Utils;
 
-public static class TimeZoneUtility
+public static partial class TimeZoneUtility
 {
     /// <summary>
     /// Returns the system time zones available on the current OS.
@@ -27,47 +27,19 @@ public static class TimeZoneUtility
         var results = new List<TimeZoneInfo>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var ianaId in ianaTimeZoneIds)
+        foreach (var ianaTimeZoneId in ianaTimeZoneIds)
         {
-            if (string.IsNullOrWhiteSpace(ianaId))
+            if (string.IsNullOrWhiteSpace(ianaTimeZoneId))
                 continue;
 
-            if (OperatingSystem.IsWindows())
+            if (!TryGetSystemTimeZoneFromIanaTimeZoneId(ianaTimeZoneId, territory: alpha2, out var tz)
+                || tz is null)
             {
-                if (!ianaProvider.TryGetById(ianaId, out var ianaTimeZone) || ianaTimeZone is null)
-                    continue;
-
-                var windowsId = ianaTimeZone.ToWindowsTimeZone(territory: alpha2);
-                if (string.IsNullOrWhiteSpace(windowsId))
-                    windowsId = ianaTimeZone.ToWindowsTimeZone();
-
-                if (string.IsNullOrWhiteSpace(windowsId))
-                    continue;
-
-                try
-                {
-                    var tz = TimeZoneInfo.FindSystemTimeZoneById(windowsId);
-                    if (seen.Add(tz.Id))
-                        results.Add(tz);
-                }
-                catch
-                {
-                    // Ignore unknown/unavailable system time zones.
-                }
-
                 continue;
             }
 
-            try
-            {
-                var tz = TimeZoneInfo.FindSystemTimeZoneById(ianaId);
-                if (seen.Add(tz.Id))
-                    results.Add(tz);
-            }
-            catch
-            {
-                // Ignore unknown/unavailable system time zones.
-            }
+            if (seen.Add(tz.Id))
+                results.Add(tz);
         }
 
         return results;
@@ -108,5 +80,23 @@ public static class TimeZoneUtility
             ids[i++] = zone.Id;
 
         return ids;
+    }
+
+    private static bool TryGetSystemTimeZoneFromIanaTimeZoneId(
+        string ianaTimeZoneId,
+        string? territory,
+        out TimeZoneInfo? systemTimeZone)
+    {
+        systemTimeZone = null;
+
+        if (string.IsNullOrWhiteSpace(ianaTimeZoneId))
+            return false;
+
+        var trimmedIana = ianaTimeZoneId.Trim();
+
+        if (!OperatingSystem.IsWindows())
+            return TimeZoneInfo.TryFindSystemTimeZoneById(trimmedIana, out systemTimeZone);
+
+        return CldrTimeZoneUtility.TryGetSystemTimeZone(trimmedIana, territory, out systemTimeZone);
     }
 }

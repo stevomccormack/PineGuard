@@ -37,16 +37,7 @@ public static class CollectionRules
         if (CollectionUtility.TryGetCount(value, out var knownCount))
             return knownCount == count;
 
-        var seen = 0;
-        using var e = value.GetEnumerator();
-        while (e.MoveNext())
-        {
-            seen++;
-            if (seen > count)
-                return false;
-        }
-
-        return seen == count;
+        return TryGetCountUpTo(value, maxInclusive: count, out var seen) && seen == count;
     }
 
     public static bool HasMinCount<T>(IEnumerable<T>? value, int min)
@@ -57,16 +48,8 @@ public static class CollectionRules
         if (CollectionUtility.TryGetCount(value, out var count))
             return count >= min;
 
-        var seen = 0;
-        using var e = value.GetEnumerator();
-        while (e.MoveNext())
-        {
-            seen++;
-            if (seen >= min)
-                return true;
-        }
-
-        return false;
+        // Has at least min items if there exists an element at index (min-1)
+        return min == 0 || HasIndex(value, min - 1);
     }
 
     public static bool HasMaxCount<T>(IEnumerable<T>? value, int max)
@@ -77,16 +60,8 @@ public static class CollectionRules
         if (CollectionUtility.TryGetCount(value, out var count))
             return count <= max;
 
-        var seen = 0;
-        using var e = value.GetEnumerator();
-        while (e.MoveNext())
-        {
-            seen++;
-            if (seen > max)
-                return false;
-        }
-
-        return true;
+        // Has at most max items if it does NOT have an element at index max
+        return !HasIndex(value, max);
     }
 
     public static bool HasCountBetween<T>(IEnumerable<T>? value, int min, int max, RangeInclusion inclusion = RangeInclusion.Inclusive)
@@ -104,14 +79,8 @@ public static class CollectionRules
         if (upperBound < 0)
             return false;
 
-        var seen = 0;
-        using var e = value.GetEnumerator();
-        while (e.MoveNext())
-        {
-            seen++;
-            if (seen > upperBound)
-                return false;
-        }
+        if (!TryGetCountUpTo(value, maxInclusive: upperBound, out var seen))
+            return false;
 
         return RuleComparison.IsBetween(seen, min, max, inclusion);
     }
@@ -188,16 +157,25 @@ public static class CollectionRules
         if (CollectionUtility.TryGetCount(value, out var count))
             return index < count;
 
-        var i = 0;
+        return TryGetCountUpTo(value, maxInclusive: index, out _);
+    }
+
+    private static bool TryGetCountUpTo<T>(IEnumerable<T> value, int maxInclusive, out int seen)
+    {
+        seen = 0;
+
+        if (maxInclusive < 0)
+            return false;
+
         using var e = value.GetEnumerator();
         while (e.MoveNext())
         {
-            if (i == index)
+            if (seen == maxInclusive)
                 return true;
 
-            i++;
+            seen++;
         }
 
-        return false;
+        return true;
     }
 }

@@ -5,15 +5,21 @@ namespace PineGuard.Utils;
 
 public static class BufferUtility
 {
-    public static bool TryParseHexString(string? value)
+    public static bool IsHexString(string? value)
     {
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
-        return IsHexString(trimmed);
+        foreach (var ch in trimmed)
+        {
+            if (!CharRules.IsHexDigit(ch))
+                return false;
+        }
+
+        return true;
     }
 
-    public static bool TryParseBase64String(string? value)
+    public static bool IsBase64String(string? value)
     {
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
@@ -34,18 +40,5 @@ public static class BufferUtility
             if (rented is not null)
                 ArrayPool<byte>.Shared.Return(rented);
         }
-    }
-    private static bool IsHexString(ReadOnlySpan<char> value)
-    {
-        if (value.IsEmpty)
-            return false;
-
-        foreach (var ch in value)
-        {
-            if (!CharRules.IsHexDigit(ch))
-                return false;
-        }
-
-        return true;
     }
 }

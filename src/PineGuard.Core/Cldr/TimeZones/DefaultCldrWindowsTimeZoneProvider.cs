@@ -11,7 +11,7 @@ public sealed class DefaultCldrWindowsTimeZoneProvider : ICldrWindowsTimeZonePro
 {
     public static DefaultCldrWindowsTimeZoneProvider Instance { get; } = new();
 
-    private const string DefaultTerritory = "001";
+    public const string DefaultTerritory = "001";
 
     private static readonly Lazy<FrozenDictionary<string, FrozenDictionary<string, string[]>>> IanaTimeZoneIdsByWindowsIdIndex =
         new(() => DefaultCldrWindowsTimeZoneData.IanaTimeZoneIdsByWindowsId, isThreadSafe: true);
@@ -74,7 +74,7 @@ public sealed class DefaultCldrWindowsTimeZoneProvider : ICldrWindowsTimeZonePro
 
     public bool TryGetIanaTimeZoneIds(string? windowsTimeZoneId, string? territory, out IReadOnlyCollection<string> ianaTimeZoneIds)
     {
-        ianaTimeZoneIds = Array.Empty<string>();
+        ianaTimeZoneIds = [];
 
         if (string.IsNullOrWhiteSpace(windowsTimeZoneId))
             return false;

@@ -34,7 +34,7 @@ public static class IsoCurrencyUtility
         if (trimmed.Length != IsoCurrency.NumericExactLength)
             return false;
 
-        if (!StringNumberRules.IsDigitsOnly(trimmed))
+        if (!StringRules.IsDigitsOnly(trimmed))
             return false;
 
         numeric = trimmed;

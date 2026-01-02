@@ -8,8 +8,8 @@ public static class BufferRules
     public const int Base64BytesPerQuantum = 3;
 
     public static bool IsHex(string? value) =>
-        BufferUtility.TryParseHexString(value);
+        BufferUtility.IsHexString(value);
 
     public static bool IsBase64(string? value) =>
-        BufferUtility.TryParseBase64String(value);
+        BufferUtility.IsBase64String(value);
 }

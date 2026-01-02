@@ -53,7 +53,7 @@ public sealed class DefaultIanaTimeZoneProvider : IIanaTimeZoneProvider
 
     public bool TryGetTimeZoneIdsByCountryAlpha2Code(string? isoCountryAlpha2Code, out IReadOnlyCollection<string> timeZoneIds)
     {
-        timeZoneIds = Array.Empty<string>();
+        timeZoneIds = [];
 
         if (string.IsNullOrWhiteSpace(isoCountryAlpha2Code))
             return false;

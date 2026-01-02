@@ -37,7 +37,7 @@ public static class EnumRules
     public static bool IsFlagsEnum<TEnum>() where TEnum : struct, Enum =>
         typeof(TEnum).IsDefined(typeof(FlagsAttribute), inherit: false);
 
-    public static bool IsDefinedFlagsCombination<TEnum>(TEnum? value)
+    public static bool IsFlagsEnumCombination<TEnum>(TEnum? value)
         where TEnum : struct, Enum
     {
         if (value is null)
@@ -77,7 +77,7 @@ public static class EnumRules
     public static bool HasDescription<TEnum>(TEnum? value) where TEnum : struct, Enum =>
         HasAttribute<TEnum, DescriptionAttribute>(value);
 
-    public static bool HasDisplayAttribute<TEnum>(TEnum? value) where TEnum : struct, Enum =>
+    public static bool HasDisplay<TEnum>(TEnum? value) where TEnum : struct, Enum =>
         HasAttribute<TEnum, DisplayAttribute>(value);
 
     public static bool HasEnumMember<TEnum>(TEnum? value) where TEnum : struct, Enum =>

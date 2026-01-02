@@ -1,10 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+﻿using PineGuard.Utils;
+using System.Runtime.CompilerServices;
 
 namespace PineGuard.MustClauses;
 
 public static partial class MustGuidExtension
 {
-    public static MustResult Guid(
+    public static MustResult<Guid> Guid(
         this IMustClause _,
         string value,
         [CallerArgumentExpression("value")] string? paramName = null)
@@ -15,10 +16,10 @@ public static partial class MustGuidExtension
             || string.IsNullOrWhiteSpace(value)
             || value != value.Trim())
         {
-            return MustResult.Fail(messageTemplate, paramName, value);
+            return MustResult<Guid>.Fail(messageTemplate, paramName, value);
         }
 
-        var ok = System.Guid.TryParse(value, out Guid _);
-        return MustResult.FromBool(ok, messageTemplate, paramName, value);
+        var ok = GuidUtility.TryParse(value, out var parsed);
+        return MustResult<Guid>.FromBool(ok, messageTemplate, paramName, value, parsed);
     }
 }

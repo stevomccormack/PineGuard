@@ -68,24 +68,3 @@ public sealed record IanaTimeZone
 
     public override string ToString() => Id;
 }
-
-public static class IanaTimeZoneExtensions
-{
-    /// <summary>
-    /// Maps an <see cref="IanaTimeZone"/> to a Windows time zone ID using the embedded CLDR windowsZones mapping.
-    /// Returns null when no mapping is found.
-    /// </summary>
-    public static string? ToWindowsTimeZone(
-        this IanaTimeZone? timeZone,
-        string? territory = null,
-        ICldrWindowsTimeZoneProvider? cldrProvider = null)
-    {
-        if (timeZone is null)
-            return null;
-
-        cldrProvider ??= DefaultCldrWindowsTimeZoneProvider.Instance;
-        return cldrProvider.TryGetWindowsTimeZoneId(timeZone.Id, territory, out var windowsId)
-            ? windowsId
-            : null;
-    }
-}

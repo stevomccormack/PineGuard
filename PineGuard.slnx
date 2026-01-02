@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/tests/" />
+  <Folder Name="/tests/">
+    <Project Path="tests/PineGuard.Testing/PineGuard.Testing.csproj" Id="25fce7fa-931f-473b-8f94-a50e5789298d" />
+  </Folder>
   <Project Path="src/PineGuard.Core/PineGuard.Core.csproj" Id="fe913063-5c9d-4151-836d-b490dfc8a0ec" />
   <Project Path="src/PineGuard.DataAnnotations/PineGuard.DataAnnotations.csproj" Id="c2aa5232-69d5-4e90-a7e9-45f31fda828e" />
   <Project Path="src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj" Id="88b528a2-daed-45f0-bc75-1d63fee43cb9" />

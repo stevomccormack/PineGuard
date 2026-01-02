@@ -10,10 +10,7 @@ public static class TimeOnlyRangeRules
             return false;
 
         var r = range.Value;
-
-        return inclusion == RangeInclusion.Inclusive
-            ? r.Start <= r.End
-            : r.Start < r.End;
+        return RangeRules.IsChronological<TimeOnly>(r.Start, r.End, inclusion);
     }
 
     public static bool IsOverlapping(TimeOnlyRange? range1, TimeOnlyRange? range2, RangeInclusion inclusion = RangeInclusion.Exclusive)

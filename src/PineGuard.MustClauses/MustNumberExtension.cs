@@ -5,69 +5,75 @@ namespace PineGuard.MustClauses;
 
 public static partial class MustNumberExtension
 {
-    public static MustResult Positive<TNumber>(
+    public static MustResult<TNumber> Positive<TNumber>(
         this IMustClause _,
         TNumber value,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where TNumber : INumber<TNumber>
-        => MustResult.FromBool(
+        => MustResult<TNumber>.FromBool(
             value > TNumber.Zero,
             "{paramName} must be a positive number.",
             paramName,
+            value,
             value);
 
-    public static MustResult Zero<TNumber>(
+    public static MustResult<TNumber> Zero<TNumber>(
         this IMustClause _,
         TNumber value,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where TNumber : INumber<TNumber>
-        => MustResult.FromBool(
+        => MustResult<TNumber>.FromBool(
             value == TNumber.Zero,
             "{paramName} must be zero.",
             paramName,
+            value,
             value);
 
-    public static MustResult NotZero<TNumber>(
+    public static MustResult<TNumber> NotZero<TNumber>(
         this IMustClause _,
         TNumber value,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where TNumber : INumber<TNumber>
-        => MustResult.FromBool(
+        => MustResult<TNumber>.FromBool(
             value != TNumber.Zero,
             "{paramName} must not be zero.",
             paramName,
+            value,
             value);
 
-    public static MustResult Negative<TNumber>(
+    public static MustResult<TNumber> Negative<TNumber>(
         this IMustClause _,
         TNumber value,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where TNumber : INumber<TNumber>
-        => MustResult.FromBool(
+        => MustResult<TNumber>.FromBool(
             value < TNumber.Zero,
             "{paramName} must be a negative number.",
             paramName,
+            value,
             value);
 
-    public static MustResult ZeroOrPositive<TNumber>(
+    public static MustResult<TNumber> ZeroOrPositive<TNumber>(
         this IMustClause _,
         TNumber value,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where TNumber : INumber<TNumber>
-        => MustResult.FromBool(
+        => MustResult<TNumber>.FromBool(
             value >= TNumber.Zero,
             "{paramName} must be zero or a positive number.",
             paramName,
+            value,
             value);
 
-    public static MustResult ZeroOrNegative<TNumber>(
+    public static MustResult<TNumber> ZeroOrNegative<TNumber>(
         this IMustClause _,
         TNumber value,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where TNumber : INumber<TNumber>
-        => MustResult.FromBool(
+        => MustResult<TNumber>.FromBool(
             value <= TNumber.Zero,
             "{paramName} must be zero or a negative number.",
             paramName,
+            value,
             value);
 }

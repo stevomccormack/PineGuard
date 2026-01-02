@@ -37,7 +37,7 @@ public static class DictionaryUtility
         return true;
     }
 
-    public static bool TryGetKeyForValue<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TValue value, out TKey? key)
+    public static bool TryGetKey<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TValue value, out TKey? key)
     {
         key = default;
 
@@ -107,11 +107,11 @@ public static class DictionaryUtility
         if (dictionary is null)
             return false;
 
-        foreach (var p in dictionary)
+        foreach (var item in dictionary)
         {
-            if (predicate(p.Key, p.Value))
+            if (predicate(item.Key, item.Value))
             {
-                pair = p;
+                pair = item;
                 return true;
             }
         }

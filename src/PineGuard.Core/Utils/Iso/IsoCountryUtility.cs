@@ -52,7 +52,7 @@ public static class IsoCountryUtility
         if (trimmed.Length != IsoCountry.NumericExactLength)
             return false;
 
-        if (!StringNumberRules.IsDigitsOnly(trimmed))
+        if (!StringRules.IsDigitsOnly(trimmed))
             return false;
 
         numeric = trimmed;

@@ -10,10 +10,7 @@ public static class DateTimeOffsetRangeRules
             return false;
 
         var r = range.Value;
-
-        return inclusion == RangeInclusion.Inclusive
-            ? r.Start <= r.End
-            : r.Start < r.End;
+        return RangeRules.IsChronological<DateTimeOffset>(r.Start, r.End, inclusion);
     }
 
     public static bool IsOverlapping(DateTimeOffsetRange? range1, DateTimeOffsetRange? range2, RangeInclusion inclusion = RangeInclusion.Exclusive)

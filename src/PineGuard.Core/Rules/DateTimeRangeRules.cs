@@ -10,10 +10,7 @@ public static class DateTimeRangeRules
             return false;
 
         var r = range.Value;
-
-        return inclusion == RangeInclusion.Inclusive
-            ? r.Start <= r.End
-            : r.Start < r.End;
+        return RangeRules.IsChronological<DateTime>(r.Start, r.End, inclusion);
     }
 
     public static bool IsOverlapping(DateTimeRange? range1, DateTimeRange? range2, RangeInclusion inclusion = RangeInclusion.Exclusive)

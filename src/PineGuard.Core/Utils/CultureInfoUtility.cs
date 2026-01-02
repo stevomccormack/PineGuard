@@ -14,6 +14,9 @@ public static class CultureInfoUtility
     private static readonly ConcurrentDictionary<string, IReadOnlyCollection<CultureInfo>> CulturesByisoLanguageAlpha2CodeCache =
         new(StringComparer.OrdinalIgnoreCase);
 
+    public static bool TryGetCultureName(string? isoLanguageAlpha2Code, out string cultureName) =>
+        TryGetCultureName(isoLanguageAlpha2Code, regionCode: null, out cultureName);
+
     public static bool TryGetCultureName(string? isoLanguageAlpha2Code, string? regionCode, out string cultureName)
     {
         cultureName = string.Empty;
@@ -27,7 +30,7 @@ public static class CultureInfoUtility
         return TryValidateCultureName($"{lang}-{reg}", out cultureName);
     }
 
-    public static bool TryGetCultureName(string? isoLanguageAlpha2Code, out string cultureName)
+    public static bool TryGetCultureNameWithDefaultRegion(string? isoLanguageAlpha2Code, out string cultureName)
     {
         cultureName = string.Empty;
 
@@ -72,10 +75,11 @@ public static class CultureInfoUtility
                 }
                 catch (ArgumentException)
                 {
+                    // do nothing
                 }
             });
 
-            return regions.ToArray();
+            return [.. regions];
         });
     }
 
@@ -91,18 +95,18 @@ public static class CultureInfoUtility
             ForEachSpecificCultureForLanguage(l, result.Add);
 
             result.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Name, b.Name));
-            return result.ToArray();
+            return [.. result];
         });
     }
 
-    private static bool TryValidateCultureName(string cultureNameCandidate, out string validatedCultureName)
+    private static bool TryValidateCultureName(string candidateCultureName, out string validatedCultureName)
     {
         validatedCultureName = string.Empty;
 
         try
         {
-            _ = CultureInfo.GetCultureInfo(cultureNameCandidate);
-            validatedCultureName = cultureNameCandidate;
+            _ = CultureInfo.GetCultureInfo(candidateCultureName);
+            validatedCultureName = candidateCultureName;
             return true;
         }
         catch (CultureNotFoundException)

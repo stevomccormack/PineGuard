@@ -5,7 +5,7 @@ namespace PineGuard.MustClauses;
 
 public static partial class MustTypeExtension
 {
-    public static MustResult OfType(
+    public static MustResult<Type> OfType(
         this IMustClause _,
         string value,
         Type type,
@@ -46,11 +46,12 @@ public static partial class MustTypeExtension
             _ => TryChangeType(value, type)
         };
 
-        return MustResult.FromBool(
+        return MustResult<Type>.FromBool(
             ok,
-            $"{paramName} must be a valid {type.Name}.",
+            "{paramName} must be a valid type.",
             paramName,
-            value);
+            value,
+            type);
     }
 
     static bool TryChangeType(string s, Type t)

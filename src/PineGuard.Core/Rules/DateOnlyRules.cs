@@ -28,21 +28,9 @@ public static class DateOnlyRules
         return RuleComparison.IsBetween(value.Value, min, max, inclusion);
     }
 
-    public static bool IsChronological(DateOnly? start, DateOnly? end, RangeInclusion inclusion = RangeInclusion.Exclusive)
-    {
-        if (start is null || end is null)
-            return false;
+    public static bool IsChronological(DateOnly? start, DateOnly? end, RangeInclusion inclusion = RangeInclusion.Exclusive) =>
+        RangeRules.IsChronological(start, end, inclusion);
 
-        return inclusion == RangeInclusion.Inclusive ? start.Value <= end.Value : start.Value < end.Value;
-    }
-
-    public static bool IsOverlapping(DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, RangeInclusion inclusion = RangeInclusion.Exclusive)
-    {
-        if (start1 is null || end1 is null || start2 is null || end2 is null)
-            return false;
-
-        return inclusion == RangeInclusion.Exclusive
-            ? start1.Value < end2.Value && start2.Value < end1.Value
-            : start1.Value <= end2.Value && start2.Value <= end1.Value;
-    }
+    public static bool IsOverlapping(DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, RangeInclusion inclusion = RangeInclusion.Exclusive) =>
+        RangeRules.IsOverlapping(start1, end1, start2, end2, inclusion);
 }

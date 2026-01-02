@@ -41,16 +41,24 @@ public static class NetworkUtility
                 return false;
         }
 
-        return IPAddress.TryParse(trimmed, out ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork;
+        if (!IPAddress.TryParse(trimmed, out var parsed) || parsed.AddressFamily != AddressFamily.InterNetwork)
+            return false;
+
+        ipAddress = parsed;
+        return true;
     }
 
     public static bool TryParseIpv6(string? value, out IPAddress? ipAddress)
     {
         ipAddress = null;
 
-        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+        if (!TryParseIpAddress(value, out var parsed) || parsed is null)
             return false;
 
-        return IPAddress.TryParse(trimmed, out ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetworkV6;
+        if (parsed.AddressFamily != AddressFamily.InterNetworkV6)
+            return false;
+
+        ipAddress = parsed;
+        return true;
     }
 }

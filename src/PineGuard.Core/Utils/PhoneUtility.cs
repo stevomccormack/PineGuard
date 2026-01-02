@@ -4,7 +4,7 @@ namespace PineGuard.Utils;
 
 public static class PhoneUtility
 {
-    public static bool TrySanitizePhoneDigits(
+    public static bool TryParsePhone(
         string? value,
         out string digits,
         int minDigits = PhoneRules.DefaultMinDigits,
@@ -21,7 +21,7 @@ public static class PhoneUtility
 
         allowedNonDigitCharacters ??= PhoneRules.DefaultAllowedNonDigitCharacters;
 
-        if (!StringNumberRules.TrySanitizeDigits(trimmed, out digits, allowedNonDigitCharacters))
+        if (!StringUtility.TryParseDigits(value, out digits, allowedNonDigitCharacters))
         {
             digits = string.Empty;
             return false;

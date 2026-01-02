@@ -13,7 +13,7 @@ public static class IsoDateOnly
     public static bool TryParse(string? value, out DateOnly result) =>
         DateOnly.TryParseExact(
             value,
-            IsoDateOnly.ExactFormat,
+            ExactFormat,
             CultureInfo.InvariantCulture,
             DateTimeStyles.None,
             out result);
@@ -21,10 +21,10 @@ public static class IsoDateOnly
     public static DateOnly Parse(string value) =>
         DateOnly.ParseExact(
             value,
-            IsoDateOnly.ExactFormat,
+            ExactFormat,
             CultureInfo.InvariantCulture,
             DateTimeStyles.None);
 
     public static string ToIsoString(this DateOnly value) =>
-        value.ToString(IsoDateOnly.ExactFormat, CultureInfo.InvariantCulture);
+        value.ToString(ExactFormat, CultureInfo.InvariantCulture);
 }

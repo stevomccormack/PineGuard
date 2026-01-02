@@ -39,7 +39,7 @@ public static partial class MustIsoExtension
         "VN","VG","VI","WF","EH","YE","ZM","ZW"
     }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
-    public static MustResult Iso2CountryCode(
+    public static MustResult<string> Iso2CountryCode(
         this IMustClause _,
         string value,
         [CallerArgumentExpression("value")] string? paramName = null)
@@ -47,16 +47,18 @@ public static partial class MustIsoExtension
         var messageTemplate = "{paramName} must be ISO 3166-1 alpha-2 country code.";
 
         if (string.IsNullOrEmpty(value))
-            return MustResult.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<string>.Fail(messageTemplate, paramName, value);
 
-        var ok = value.Length == 2
-            && Iso2CountryCodeRegex().IsMatch(value)
-            && Iso2CountryCodes.Contains(value.Trim());
+        var trimmed = value.Trim();
 
-        return MustResult.FromBool(ok, messageTemplate, paramName, value);
+        var ok = trimmed.Length == 2
+            && Iso2CountryCodeRegex().IsMatch(trimmed)
+            && Iso2CountryCodes.Contains(trimmed);
+
+        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, trimmed);
     }
 
-    public static MustResult Iso3CountryCode(
+    public static MustResult<string> Iso3CountryCode(
         this IMustClause _,
         string value,
         [CallerArgumentExpression("value")] string? paramName = null)
@@ -64,13 +66,15 @@ public static partial class MustIsoExtension
         var messageTemplate = "{paramName} must be ISO 3166-1 alpha-3 country code.";
 
         if (string.IsNullOrEmpty(value))
-            return MustResult.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<string>.Fail(messageTemplate, paramName, value);
 
-        var ok = value.Length == 3 && Iso3CountryCodeRegex().IsMatch(value);
-        return MustResult.FromBool(ok, messageTemplate, paramName, value);
+        var trimmed = value.Trim();
+
+        var ok = trimmed.Length == 3 && Iso3CountryCodeRegex().IsMatch(trimmed);
+        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, trimmed);
     }
 
-    public static MustResult IsoCurrencyCode(
+    public static MustResult<string> IsoCurrencyCode(
         this IMustClause _,
         string value,
         [CallerArgumentExpression("value")] string? paramName = null)
@@ -78,9 +82,11 @@ public static partial class MustIsoExtension
         var messageTemplate = "{paramName} must be ISO 4217 currency code.";
 
         if (string.IsNullOrEmpty(value))
-            return MustResult.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<string>.Fail(messageTemplate, paramName, value);
 
-        var ok = value.Length == 3 && IsoCurrencyCodeRegex().IsMatch(value);
-        return MustResult.FromBool(ok, messageTemplate, paramName, value);
+        var trimmed = value.Trim();
+
+        var ok = trimmed.Length == 3 && IsoCurrencyCodeRegex().IsMatch(trimmed);
+        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, trimmed);
     }
 }

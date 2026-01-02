@@ -15,6 +15,6 @@ public static class PhoneRules
         int maxDigits = DefaultMaxDigits,
         char[]? allowedNonDigitCharacters = null)
     {
-        return PhoneUtility.TrySanitizePhoneDigits(value, out _, minDigits, maxDigits, allowedNonDigitCharacters);
+        return PhoneUtility.TryParsePhone(value, out _, minDigits, maxDigits, allowedNonDigitCharacters);
     }
 }

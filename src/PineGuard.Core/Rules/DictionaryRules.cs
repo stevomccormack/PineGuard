@@ -14,7 +14,7 @@ public static class DictionaryRules
         dictionary is not null && dictionary.ContainsKey(key);
 
     public static bool HasValue<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TValue value) =>
-        DictionaryUtility.TryGetKeyForValue(dictionary, value, out _);
+        DictionaryUtility.TryGetKey(dictionary, value, out _);
 
     public static bool HasKeyValue<TKey, TValue>(IDictionary<TKey, TValue>? dictionary, TKey key, TValue value) => 
         DictionaryUtility.TryGetValue(dictionary, key, out var actual) && 

@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace PineGuard.Utils;
 
 public static class UriUtility
@@ -29,7 +27,7 @@ public static class UriUtility
         if (!TryParseAbsolute(value, out uri) || uri is null)
             return false;
 
-        return uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps;
+        return IsHttpOrHttps(uri);
     }
 
     public static bool TryParseHttpsUrl(string? value, out Uri? uri)
@@ -37,7 +35,7 @@ public static class UriUtility
         if (!TryParseAbsolute(value, out uri) || uri is null)
             return false;
 
-        return uri.Scheme == Uri.UriSchemeHttps;
+        return IsHttps(uri);
     }
 
     public static bool TryParseHttpUrl(string? value, out Uri? uri)
@@ -45,7 +43,7 @@ public static class UriUtility
         if (!TryParseAbsolute(value, out uri) || uri is null)
             return false;
 
-        return uri.Scheme == Uri.UriSchemeHttp;
+        return IsHttp(uri);
     }
 
     public static bool TryParseFileUri(string? value, out Uri? uri)
@@ -80,4 +78,13 @@ public static class UriUtility
         scheme = uri.Scheme;
         return scheme.Length != 0;
     }
+
+    private static bool IsHttp(Uri uri) =>
+        uri.Scheme == Uri.UriSchemeHttp;
+
+    private static bool IsHttps(Uri uri) =>
+        uri.Scheme == Uri.UriSchemeHttps;
+
+    private static bool IsHttpOrHttps(Uri uri) =>
+        IsHttp(uri) || IsHttps(uri);
 }

@@ -23,16 +23,14 @@ public static class NumberRules
     public static bool IsZeroOrNegative<T>(T? value) where T : struct, INumber<T> =>
         value is not null && value.Value <= T.Zero;
 
-    public static bool IsGreaterThan<T>(T? value, T min, RangeInclusion inclusion = RangeInclusion.Inclusive)
-        where T : struct, IComparable<T> =>
-        value is not null  && RuleComparison.IsGreaterThan(value.Value, min, inclusion);
+    public static bool IsGreaterThan<T>(T? value, T min) where T : struct, INumber<T> =>
+        value is not null && value.Value > min;
 
     public static bool IsGreaterThanOrEqual<T>(T? value, T min) where T : struct, INumber<T> =>
         value is not null && value.Value >= min;
 
-    public static bool IsLessThan<T>(T? value, T max, RangeInclusion inclusion = RangeInclusion.Inclusive)
-        where T : struct, IComparable<T> =>
-        value is not null && RuleComparison.IsLessThan(value.Value, max, inclusion);
+    public static bool IsLessThan<T>(T? value, T max) where T : struct, INumber<T> =>
+        value is not null && value.Value < max;
 
     public static bool IsLessThanOrEqual<T>(T? value, T max) where T : struct, INumber<T> =>
         value is not null && value.Value <= max;
@@ -65,16 +63,16 @@ public static class NumberRules
     }
 
     public static bool IsEven(int? value) =>
-        value is not null && value.Value % 2 == 0;
+        IsMultipleOf<int>(value, 2);
 
     public static bool IsEven(long? value) =>
-        value is not null && value.Value % 2 == 0;
+        IsMultipleOf<long>(value, 2);
 
     public static bool IsOdd(int? value) =>
-        value is not null && value.Value % 2 != 0;
+        value is not null && !IsMultipleOf<int>(value, 2);
 
     public static bool IsOdd(long? value) =>
-        value is not null && value.Value % 2 != 0;
+        value is not null && !IsMultipleOf<long>(value, 2);
 
     public static bool IsFinite(float? value) =>
         value is not null && float.IsFinite(value.Value);

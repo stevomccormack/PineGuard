@@ -16,7 +16,7 @@ public static class PanAlgorithm
         if (digitsOnly is null)
             return false;
 
-        if (!StringNumberRules.IsDigitsOnly(digitsOnly))
+        if (!StringRules.IsDigitsOnly(digitsOnly))
             return false;
 
         return RuleComparison.IsBetween(digitsOnly.Length, PanMinLength, PanMaxLength, RangeInclusion.Inclusive);

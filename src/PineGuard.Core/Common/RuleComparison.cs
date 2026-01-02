@@ -2,6 +2,10 @@ namespace PineGuard.Common;
 
 internal static class RuleComparison
 {
+    internal static bool Equals<T>(T value, T other)
+        where T : IComparable<T> =>
+        value.CompareTo(other) == 0;
+
     internal static bool IsBetween<T>(T value, T min, T max, RangeInclusion inclusion)
         where T : IComparable<T>
     {

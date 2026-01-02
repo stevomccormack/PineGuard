@@ -29,6 +29,24 @@ public static class CollectionUtility
         if (value is null || index < 0)
             return false;
 
+        if (value is IList<T> list)
+        {
+            if (index >= list.Count)
+                return false;
+
+            item = list[index];
+            return true;
+        }
+
+        if (value is IReadOnlyList<T> roList)
+        {
+            if (index >= roList.Count)
+                return false;
+
+            item = roList[index];
+            return true;
+        }
+
         if (TryGetCount(value, out var count) && index >= count)
             return false;
 
@@ -56,17 +74,31 @@ public static class CollectionUtility
         if (value is null)
             return false;
 
-        var i = 0;
+        if (value is IList<T> list)
+        {
+            for (var i = 0; i < list.Count; i++)
+            {
+                if (EqualityComparer<T>.Default.Equals(list[i], item))
+                {
+                    index = i;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        var idx = 0;
         using var e = value.GetEnumerator();
         while (e.MoveNext())
         {
             if (EqualityComparer<T>.Default.Equals(e.Current, item))
             {
-                index = i;
+                index = idx;
                 return true;
             }
 
-            i++;
+            idx++;
         }
 
         return false;

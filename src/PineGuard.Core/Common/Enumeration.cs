@@ -15,7 +15,7 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
     protected Enumeration(TValue value, string name)
     {
         ArgumentNullException.ThrowIfNull(value);
-        ArgumentNullException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
         var type = GetType();
         var nameRegistry = _nameRegistries.GetOrAdd(type, _ => new ConcurrentDictionary<string, Enumeration<TValue>>(StringComparer.OrdinalIgnoreCase));
@@ -63,7 +63,7 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
 
     public static T? FromName<T>(string name) where T : Enumeration<TValue>
     {
-        ArgumentNullException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
         return GetAll<T>().FirstOrDefault(e => string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase));
     }
 

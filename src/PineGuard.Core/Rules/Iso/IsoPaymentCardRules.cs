@@ -1,6 +1,7 @@
 using PineGuard.Common;
 using PineGuard.Iso.Payments;
 using PineGuard.Iso.Payments.Cards;
+using PineGuard.Utils;
 
 namespace PineGuard.Rules.Iso;
 
@@ -18,7 +19,7 @@ public static class IsoPaymentCardRules
     {
         ArgumentNullException.ThrowIfNull(allowedSeparators);
 
-        if (!StringNumberRules.TrySanitizeDigits(value, out var digitsOnly, allowedSeparators))
+        if (!StringUtility.TryParseDigits(value, out var digitsOnly, allowedSeparators))
             return false;
 
         if (!RuleComparison.IsBetween(digitsOnly.Length, IsoPaymentCardBrand.MinPanLength, IsoPaymentCardBrand.MaxPanLength, RangeInclusion.Inclusive))

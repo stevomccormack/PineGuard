@@ -13,7 +13,7 @@ public static class LuhnAlgorithm
         if (digitsOnly is null)
             return false;
 
-        if (!StringNumberRules.IsDigitsOnly(digitsOnly))
+        if (!StringRules.IsDigitsOnly(digitsOnly))
             return false;
 
         var sum = 0;
