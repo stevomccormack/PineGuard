@@ -2,8 +2,8 @@
 # GenerateIsoCurrencies.ps1
 # Run the script from the repository root.
 # Before running this script, ensure:
-#   - .iso/iso-4217-currencies/iso-4217-currency-codes.csv is up-to-date. 
-#   - .iso/iso-4217-currencies/DefaultIsoCurrencyData.template.cs is up-to-date.
+#   - etc/powershell/iso/iso-4217-currencies/iso-4217-currency-codes.csv is up-to-date.
+#   - etc/powershell/iso/iso-4217-currencies/DefaultIsoCurrencyData.template.cs is up-to-date.
 # =================================================================================================
 # Orchestrates the generation of ISO 4217 currency data for the PineGuard library.
 #
@@ -13,7 +13,7 @@
 #   3. Copies the generated file to the appropriate location in the source tree
 #
 # Directory Structure:
-#   .iso/
+#   etc/powershell/iso/
 #   ├── iso-4217-currencies/
 #   │   ├── iso-4217-currency-codes.csv              # ISO 4217 source data
 #   │   ├── DefaultIsoCurrencyData.template.cs       # C# template with placeholder
@@ -40,7 +40,8 @@ $ErrorActionPreference = "Stop"
 # Configuration
 # =================================================================================================
 
-$scriptRoot = $PSScriptRoot # Ensure you are in the .iso/ directory!
+$scriptRoot = $PSScriptRoot
+$repoRoot = (Resolve-Path (Join-Path $scriptRoot "..\..\..")).Path
 
 # Input files
 $csvPath      = Join-Path $scriptRoot "iso-4217-currencies\iso-4217-currency-codes.csv"
@@ -52,7 +53,7 @@ $generatedDir = Join-Path $scriptRoot "generated"
 $outputPath   = Join-Path $generatedDir "DefaultIsoCurrencyData.cs"
 
 # Target location in source tree
-$targetDir  = Join-Path $scriptRoot "..\src\PineGuard.Core\Iso\Currencies"
+$targetDir  = Join-Path $repoRoot "src\PineGuard.Core\Iso\Currencies"
 $targetPath = Join-Path $targetDir "DefaultIsoCurrencyData.cs"
 
 # =================================================================================================

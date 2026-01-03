@@ -2,8 +2,8 @@
 # GenerateIanaTimeZones.ps1
 # Run the script from the repository root.
 # Before running this script, ensure:
-#   - .iana/iana-tz-zone-info/zone1970.tab is up-to-date.
-#   - .iana/iana-tz-zone-info/DefaultIanaTimeZoneData.template.cs is up-to-date.
+#   - etc/powershell/iana/iana-tz-zone-info/zone1970.tab is up-to-date.
+#   - etc/powershell/iana/iana-tz-zone-info/DefaultIanaTimeZoneData.template.cs is up-to-date.
 # =================================================================================================
 
 [CmdletBinding()]
@@ -15,7 +15,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 $ErrorActionPreference = "Stop"
 
 $ianaRoot = $PSScriptRoot
-$repoRoot = Join-Path $ianaRoot ".."
+$repoRoot = (Resolve-Path (Join-Path $ianaRoot "..\..\..")).Path
 $ianaTzZoneInfoDir = Join-Path $ianaRoot "iana-tz-zone-info"
 
 $zone1970Path = Join-Path $ianaTzZoneInfoDir "zone1970.tab"

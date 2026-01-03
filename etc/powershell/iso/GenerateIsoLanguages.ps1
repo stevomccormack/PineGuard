@@ -2,8 +2,8 @@
 # GenerateIsoLanguages.ps1
 # Run the script from the repository root.
 # Before running this script, ensure:
-#   - .iso/iso-639-languages/iso-639-language-codes.csv is up-to-date. 
-#   - .iso/iso-639-languages/DefaultIsoLanguageData.template.cs is up-to-date.
+#   - etc/powershell/iso/iso-639-languages/iso-639-language-codes.csv is up-to-date.
+#   - etc/powershell/iso/iso-639-languages/DefaultIsoLanguageData.template.cs is up-to-date.
 # =================================================================================================
 # Orchestrates the generation of ISO 639 language data for the PineGuard library.
 #
@@ -13,7 +13,7 @@
 #   3. Copies the generated file to the appropriate location in the source tree
 #
 # Directory Structure:
-#   .iso/
+#   etc/powershell/iso/
 #   ├── iso-639-languages/
 #   │   ├── iso-639-language-codes.csv              # ISO 639 source data
 #   │   ├── DefaultIsoLanguageData.template.cs      # C# template with placeholder
@@ -40,7 +40,8 @@ $ErrorActionPreference = "Stop"
 # Configuration
 # =================================================================================================
 
-$scriptRoot = $PSScriptRoot # Ensure you are in the .iso/ directory!
+$scriptRoot = $PSScriptRoot
+$repoRoot = (Resolve-Path (Join-Path $scriptRoot "..\..\..")).Path
 
 # Input files
 $csvPath      = Join-Path $scriptRoot "iso-639-languages\iso-639-language-codes.csv"
@@ -52,7 +53,7 @@ $generatedDir = Join-Path $scriptRoot "generated"
 $outputPath   = Join-Path $generatedDir "DefaultIsoLanguageData.cs"
 
 # Target location in source tree
-$targetDir  = Join-Path $scriptRoot "..\src\PineGuard.Core\Iso\Languages"
+$targetDir  = Join-Path $repoRoot "src\PineGuard.Core\Iso\Languages"
 $targetPath = Join-Path $targetDir "DefaultIsoLanguageData.cs"
 
 # =================================================================================================

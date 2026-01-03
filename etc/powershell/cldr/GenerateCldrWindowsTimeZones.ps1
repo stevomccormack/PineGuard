@@ -2,8 +2,8 @@
 # GenerateCldrWindowsTimeZones.ps1
 # Run the script from the repository root.
 # Before running this script, ensure:
-#   - .cldr/cldr-windows-zones/windowsZones.xml is up-to-date.
-#   - .cldr/cldr-windows-zones/DefaultCldrWindowsTimeZoneData.template.cs is up-to-date.
+#   - etc/powershell/cldr/cldr-windows-zones/windowsZones.xml is up-to-date.
+#   - etc/powershell/cldr/cldr-windows-zones/DefaultCldrWindowsTimeZoneData.template.cs is up-to-date.
 # =================================================================================================
 
 [CmdletBinding()]
@@ -15,7 +15,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 $ErrorActionPreference = "Stop"
 
 $cldrRoot = $PSScriptRoot
-$repoRoot = Join-Path $cldrRoot ".."
+$repoRoot = (Resolve-Path (Join-Path $cldrRoot "..\..\..")).Path
 $windowsZonesDir = Join-Path $cldrRoot "cldr-windows-zones"
 
 $windowsZonesXmlPath = Join-Path $windowsZonesDir "windowsZones.xml"
