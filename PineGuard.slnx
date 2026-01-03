@@ -1,5 +1,10 @@
 <Solution>
   <Folder Name="/tests/">
+    <Project Path="tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj" />
+    <Project Path="tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj" />
+    <Project Path="tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj" />
+    <Project Path="tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj" />
+    <Project Path="tests/PineGuard.MustClauses.UnitTests/PineGuard.MustClauses.UnitTests.csproj" />
     <Project Path="tests/PineGuard.Testing/PineGuard.Testing.csproj" Id="25fce7fa-931f-473b-8f94-a50e5789298d" />
   </Folder>
   <Project Path="src/PineGuard.Core/PineGuard.Core.csproj" Id="fe913063-5c9d-4151-836d-b490dfc8a0ec" />
