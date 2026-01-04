@@ -2,8 +2,8 @@
 
 public sealed class MustResult<T>
 {
-    public bool IsSuccess { get; }
-    public bool IsFailure => !IsSuccess;
+    public bool Success { get; }
+    public bool Failed => !Success;
 
     public string Message { get; }
     public string? ParamName { get; }
@@ -14,13 +14,13 @@ public sealed class MustResult<T>
     public object? Value { get; }
 
     /// <summary>
-    /// The typed result produced by the operation when <see cref="IsSuccess"/> is true.
+    /// The typed result produced by the operation when <see cref="Success"/> is true.
     /// </summary>
     public T? Result { get; }
 
-    private MustResult(bool isSuccess, string message, string? paramName, object? value, T? result)
+    private MustResult(bool success, string message, string? paramName, object? value, T? result)
     {
-        IsSuccess = isSuccess;
+        Success = success;
         Message = message;
         ParamName = paramName;
         Value = value;
@@ -32,6 +32,17 @@ public sealed class MustResult<T>
 
     public static MustResult<T> Fail(string messageTemplate, string? paramName, object? value) =>
         new(false, FormatMessage(messageTemplate, paramName), paramName, value, default);
+
+    public static implicit operator bool(MustResult<T> mustResult) => mustResult.Success;
+
+    public void Deconstruct(out bool success, out string message, out string? paramName, out object? value, out T? result)
+    {
+        success = Success;
+        message = Message;
+        paramName = ParamName;
+        value = Value;
+        result = Result;
+    }
 
     public static MustResult<T> FromBool(bool ok, string messageTemplate, string? paramName, object? value, T? result) =>
         ok ? Ok(result!, value, paramName) : Fail(messageTemplate, paramName, value);
@@ -46,21 +57,18 @@ public sealed class MustResult<T>
 
     public void ThrowIfFailed()
     {
-        if (IsFailure)
-            throw new ArgumentException(Message, ParamName);
+        if (Failed) throw new ArgumentException(Message, ParamName);
     }
 
     public void ThrowNullIfFailed()
     {
-        if (IsFailure)
-            throw new ArgumentNullException(ParamName, Message);
+        if (Failed) throw new ArgumentNullException(ParamName, Message);
     }
 
     public void ThrowIfFailed<TException>(Func<string, string?, TException> exceptionFactory)
         where TException : Exception
     {
-        if (IsFailure)
-            throw exceptionFactory(Message, ParamName);
+        if (Failed) throw exceptionFactory(Message, ParamName);
     }
 
     public T OrThrow()
@@ -83,15 +91,13 @@ public static class MustResultExtension
         if (results is null)
             return MustResult<T>.Fail("{paramName} must not be null.", nameof(results), results);
 
-        var failures = results.Where(r => r.IsFailure).ToList();
-
+        var failures = results.Where(r => r.Failed).ToList();
         if (failures.Count == 0)
         {
             // No failures; return the first successful result if present, otherwise default.
             foreach (var r in results)
             {
-                if (r.IsSuccess)
-                    return r;
+                if (r.Success) return r;
             }
 
             return MustResult<T>.Ok(result: default!, value: null);

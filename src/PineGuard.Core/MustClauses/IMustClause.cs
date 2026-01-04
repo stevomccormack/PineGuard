@@ -1,5 +1,3 @@
 ﻿namespace PineGuard.MustClauses;
 
-public interface IMustClause
-{
-}
+public interface IMustClause { }

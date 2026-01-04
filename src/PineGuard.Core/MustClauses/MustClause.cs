@@ -2,4 +2,5 @@
 
 public sealed class MustClause : IMustClause
 {
+    internal MustClause() { }
 }
