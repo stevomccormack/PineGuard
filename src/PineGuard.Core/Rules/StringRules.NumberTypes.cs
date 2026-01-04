@@ -6,7 +6,7 @@ namespace PineGuard.Rules;
 
 public static partial class StringRules
 {
-    public static partial class NumberTyped
+    public static partial class NumberTypes
     {
         public const string SignedIntegerPattern = "^[\\+\\-]?\\d+$";
 
@@ -16,20 +16,20 @@ public static partial class StringRules
         public static readonly char[] DefaultAllowedDigitSeparators = [' ', '-'];
 
         public static bool IsDecimal(string? value, int decimalPlaces = 2) =>
-            StringUtility.NumberTyped.TryParseDecimal(value, decimalPlaces, out _);
+            StringUtility.NumberTypes.TryParseDecimal(value, decimalPlaces, out _);
 
         public static bool IsExactDecimal(string? value, int exactDecimalPlaces = 2) =>
-            StringUtility.NumberTyped.TryParseExactDecimal(value, exactDecimalPlaces, out _);
+            StringUtility.NumberTypes.TryParseExactDecimal(value, exactDecimalPlaces, out _);
 
         public static bool IsInt32(string? value) =>
-            StringUtility.NumberTyped.TryParseInt32(value, out _);
+            StringUtility.NumberTypes.TryParseInt32(value, out _);
 
         public static bool IsInt64(string? value) =>
-            StringUtility.NumberTyped.TryParseInt64(value, out _);
+            StringUtility.NumberTypes.TryParseInt64(value, out _);
 
         public static bool IsInt32InRange(string? value, int min, int max, RangeInclusion inclusion = RangeInclusion.Inclusive)
         {
-            if (!StringUtility.NumberTyped.TryParseInt32(value, out var parsed))
+            if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed))
                 return false;
 
             return RuleComparison.IsBetween(parsed, min, max, inclusion);
@@ -37,7 +37,7 @@ public static partial class StringRules
 
         public static bool IsInt64InRange(string? value, long min, long max, RangeInclusion inclusion = RangeInclusion.Inclusive)
         {
-            if (!StringUtility.NumberTyped.TryParseInt64(value, out var parsed))
+            if (!StringUtility.NumberTypes.TryParseInt64(value, out var parsed))
                 return false;
 
             return RuleComparison.IsBetween(parsed, min, max, inclusion);

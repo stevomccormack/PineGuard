@@ -7,9 +7,9 @@ namespace PineGuard.Iso.Languages;
 /// </summary>
 public interface IIsoLanguageProvider
 {
-    bool IsValidAlpha2Code(string? value);
+    bool ContainsAlpha2Code(string? value);
 
-    bool IsValidAlpha3Code(string? value);
+    bool ContainsAlpha3Code(string? value);
 
     bool TryGetByAlpha2Code(string? value, out IsoLanguage? language);
 

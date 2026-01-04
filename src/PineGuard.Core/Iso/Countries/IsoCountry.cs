@@ -1,17 +1,33 @@
-using PineGuard.Rules;
 using PineGuard.Utils.Iso;
+using System.Text.RegularExpressions;
 
 namespace PineGuard.Iso.Countries;
 
 /// <summary>
 /// Represents an ISO 3166 country with all standard code formats.
 /// https://www.iso.org/iso-3166-country-codes.html
+/// https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes    
 /// </summary>
-public sealed record IsoCountry
+public sealed partial record IsoCountry
 {
-    public const int Alpha2ExactLength = 2;
-    public const int Alpha3ExactLength = 3;
-    public const int NumericExactLength = 3;
+    public const string IsoStandard = "ISO 3166";
+
+    public const int Alpha2CodeExactLength = 2;
+    public const int Alpha3CodeExactLength = 3;
+    public const int NumericCodeExactLength = 3;
+
+    public const string Alpha2CodePattern = "^[A-Za-z]{2}$";
+    public const string Alpha3CodePattern = "^[A-Za-z]{3}$";
+    public const string NumericCodePattern = "^[0-9]{3}$";
+
+    [GeneratedRegex(Alpha2CodePattern, RegexOptions.CultureInvariant)]
+    public static partial Regex Alpha2CodeRegex();
+
+    [GeneratedRegex(Alpha3CodePattern, RegexOptions.CultureInvariant)]
+    public static partial Regex Alpha3CodeRegex();
+
+    [GeneratedRegex(NumericCodePattern, RegexOptions.CultureInvariant)]
+    public static partial Regex NumericCodeRegex();
 
     /// <summary>
     /// 2-letter country code (e.g., US, GB, FR)
@@ -40,14 +56,14 @@ public sealed record IsoCountry
         ArgumentNullException.ThrowIfNull(numericCode);
         ArgumentNullException.ThrowIfNull(name);
 
-        if (alpha2Code.Length != Alpha2ExactLength || !StringRules.IsAlphabetic(alpha2Code))
-            throw new ArgumentException($"Alpha2Code must be exactly {Alpha2ExactLength} alphabetic characters.", nameof(alpha2Code));
+        if (!Alpha2CodeRegex().IsMatch(alpha2Code))
+            throw new ArgumentException($"Alpha2Code should be alphabetical with exact length of {Alpha2CodeExactLength} characters.", nameof(alpha2Code));
 
-        if (alpha3Code.Length != Alpha3ExactLength || !StringRules.IsAlphabetic(alpha3Code))
-            throw new ArgumentException($"Alpha3Code must be exactly {Alpha3ExactLength} alphabetic characters.", nameof(alpha3Code));
+        if (!Alpha3CodeRegex().IsMatch(alpha3Code))
+            throw new ArgumentException($"Alpha3Code should be alphabetical with exact length of {Alpha3CodeExactLength} characters.", nameof(alpha3Code));
 
-        if (numericCode.Length != NumericExactLength || !StringRules.IsNumeric(numericCode))
-            throw new ArgumentException($"NumericCode must be exactly {NumericExactLength} digits.", nameof(numericCode));
+        if (!NumericCodeRegex().IsMatch(numericCode))
+            throw new ArgumentException($"NumericCode should be numeric digits only with exact length of {NumericCodeExactLength} characters.", nameof(numericCode));
 
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name cannot be null or whitespace.", nameof(name));
@@ -103,5 +119,5 @@ public sealed record IsoCountry
         throw new FormatException("Value must be an ISO 3166-1 alpha-2, alpha-3, or numeric country code.");
     }
 
-    public override string ToString() => $"{Name} ({Alpha3Code})";
+    public override string ToString() => $"[{IsoStandard}] {Name} ({Alpha3Code})";
 }

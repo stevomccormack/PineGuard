@@ -13,9 +13,9 @@ public static partial class IsoUtility
             Iso.IsoCurrencyUtility.TryParseNumeric(value, out numeric);
 
         public static bool IsIsoCurrencyAlpha3(string? value, IIsoCurrencyProvider? provider = null) =>
-            Rules.Iso.IsoCurrencyRules.IsIsoCurrencyAlpha3(value, provider);
+            Rules.Iso.IsoCurrencyRules.IsIsoAlpha3Code(value, provider);
 
         public static bool IsIsoCurrencyNumeric(string? value, IIsoCurrencyProvider? provider = null) =>
-            Rules.Iso.IsoCurrencyRules.IsIsoCurrencyNumeric(value, provider);
+            Rules.Iso.IsoCurrencyRules.IsIsoNumericCode(value, provider);
     }
 }

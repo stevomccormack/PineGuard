@@ -23,10 +23,10 @@ public sealed class DefaultIsoCurrencyProvider : IIsoCurrencyProvider
         _allCurrencies = _currenciesByAlpha3Code.Values;
     }
 
-    public bool IsValidAlpha3Code(string? value) =>
+    public bool ContainsAlpha3Code(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _currenciesByAlpha3Code.ContainsKey(value);
 
-    public bool IsValidNumericCode(string? value) =>
+    public bool ContainsNumericCode(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _currenciesByNumericCode.ContainsKey(value);
 
     public bool TryGetByAlpha3Code(string? value, out IsoCurrency? currency)

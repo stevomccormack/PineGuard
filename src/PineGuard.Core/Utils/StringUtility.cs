@@ -24,7 +24,7 @@ public static partial class StringUtility
         if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        allowedNonDigitChars ??= StringRules.NumberTyped.DefaultAllowedDigitSeparators;
+        allowedNonDigitChars ??= StringRules.NumberTypes.DefaultAllowedDigitSeparators;
 
         var trimmed = value.Trim();
         if (trimmed.Length == 0)

@@ -3,37 +3,58 @@ using PineGuard.Utils.Iso;
 
 namespace PineGuard.Rules.Iso;
 
-public static class IsoCountryRules
+public static partial class IsoCountryRules
 {
     private static readonly IIsoCountryProvider DefaultProvider = DefaultIsoCountryProvider.Instance;
 
-    public static bool IsIsoCountryAlpha2(string? value, IIsoCountryProvider? provider = null)
+    public static bool IsIsoAlpha2Code(string? value, IIsoCountryProvider? provider = null)
     {
         provider ??= DefaultProvider;
 
-        if (!IsoCountryUtility.TryParseAlpha2(value, out var alpha2))
+        if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        return provider.IsValidAlpha2Code(alpha2);
+        var trimmed = value.Trim();
+        if (!IsoCountry.Alpha2CodeRegex().IsMatch(trimmed))
+            return false;
+
+        if (!IsoCountryUtility.TryParseAlpha2(trimmed, out var alpha2))
+            return false;
+
+        return provider.ContainsAlpha2Code(alpha2);
     }
 
-    public static bool IsIsoCountryAlpha3(string? value, IIsoCountryProvider? provider = null)
+    public static bool IsIsoAlpha3Code(string? value, IIsoCountryProvider? provider = null)
     {
         provider ??= DefaultProvider;
 
-        if (!IsoCountryUtility.TryParseAlpha3(value, out var alpha3))
+        if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        return provider.IsValidAlpha3Code(alpha3);
+        var trimmed = value.Trim();
+        if (!IsoCountry.Alpha3CodeRegex().IsMatch(trimmed))
+            return false;
+
+        if (!IsoCountryUtility.TryParseAlpha3(trimmed, out var alpha3))
+            return false;
+
+        return provider.ContainsAlpha3Code(alpha3);
     }
 
-    public static bool IsIsoCountryNumeric(string? value, IIsoCountryProvider? provider = null)
+    public static bool IsIsoNumericCode(string? value, IIsoCountryProvider? provider = null)
     {
         provider ??= DefaultProvider;
 
-        if (!IsoCountryUtility.TryParseNumeric(value, out var numeric))
+        if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        return provider.IsValidNumericCode(numeric);
+        var trimmed = value.Trim();
+        if (!IsoCountry.NumericCodeRegex().IsMatch(trimmed))
+            return false;
+
+        if (!IsoCountryUtility.TryParseNumeric(trimmed, out var numeric))
+            return false;
+
+        return provider.ContainsNumericCode(numeric);
     }
 }

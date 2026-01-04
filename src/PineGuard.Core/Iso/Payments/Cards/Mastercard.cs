@@ -14,13 +14,13 @@ public sealed class MastercardCard : IsoPaymentCardBrand
     public const string Brand = "Mastercard";
     public const int PanExactLength = 16;
 
-    public override string BrandName => Brand;
-
-    public override int[] ValidPanLengths => [PanExactLength];
-
-    public override string[] IinPrefixes => ["51", "52", "53", "54", "55", "2221", "2720"];
-
-    public override int[] DisplayFormatPattern => [4, 4, 4, 4];
+    public MastercardCard() : base(
+        Brand,
+        [PanExactLength],
+        ["51", "52", "53", "54", "55", "2221", "2720"],
+        [4, 4, 4, 4])
+    {
+    }
 
     public override bool MatchesPan(string? pan)
     {

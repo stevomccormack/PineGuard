@@ -1,29 +1,44 @@
+using PineGuard.Iso.Countries;
 using PineGuard.Iso.Currencies;
 using PineGuard.Utils.Iso;
 
 namespace PineGuard.Rules.Iso;
 
-public static class IsoCurrencyRules
+public static partial class IsoCurrencyRules
 {
     private static readonly IIsoCurrencyProvider DefaultProvider = DefaultIsoCurrencyProvider.Instance;
 
-    public static bool IsIsoCurrencyAlpha3(string? value, IIsoCurrencyProvider? provider = null)
+    public static bool IsIsoAlpha3Code(string? value, IIsoCurrencyProvider? provider = null)
     {
         provider ??= DefaultProvider;
 
-        if (!IsoCurrencyUtility.TryParseAlpha3(value, out var alpha3))
+        if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        return provider.IsValidAlpha3Code(alpha3);
+        var trimmed = value.Trim();
+        if (!IsoCountry.Alpha3CodeRegex().IsMatch(trimmed))
+            return false;
+
+        if (!IsoCurrencyUtility.TryParseAlpha3(trimmed, out var alpha3))
+            return false;
+
+        return provider.ContainsAlpha3Code(alpha3);
     }
 
-    public static bool IsIsoCurrencyNumeric(string? value, IIsoCurrencyProvider? provider = null)
+    public static bool IsIsoNumericCode(string? value, IIsoCurrencyProvider? provider = null)
     {
         provider ??= DefaultProvider;
 
-        if (!IsoCurrencyUtility.TryParseNumeric(value, out var numeric))
+        if (string.IsNullOrWhiteSpace(value))
             return false;
 
-        return provider.IsValidNumericCode(numeric);
+        var trimmed = value.Trim();
+        if (!IsoCountry.NumericCodeRegex().IsMatch(trimmed))
+            return false;
+
+        if (!IsoCurrencyUtility.TryParseNumeric(trimmed, out var numeric))
+            return false;
+
+        return provider.ContainsNumericCode(numeric);
     }
 }

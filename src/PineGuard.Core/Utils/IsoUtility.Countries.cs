@@ -16,12 +16,12 @@ public static partial class IsoUtility
             Iso.IsoCountryUtility.TryParseNumeric(value, out numeric);
 
         public static bool IsIsoCountryAlpha2(string? value, IIsoCountryProvider? provider = null) =>
-            Rules.Iso.IsoCountryRules.IsIsoCountryAlpha2(value, provider);
+            Rules.Iso.IsoCountryRules.IsIsoAlpha2Code(value, provider);
 
         public static bool IsIsoCountryAlpha3(string? value, IIsoCountryProvider? provider = null) =>
-            Rules.Iso.IsoCountryRules.IsIsoCountryAlpha3(value, provider);
+            Rules.Iso.IsoCountryRules.IsIsoAlpha3Code(value, provider);
 
         public static bool IsIsoCountryNumeric(string? value, IIsoCountryProvider? provider = null) =>
-            Rules.Iso.IsoCountryRules.IsIsoCountryNumeric(value, provider);
+            Rules.Iso.IsoCountryRules.IsIsoNumericCode(value, provider);
     }
 }

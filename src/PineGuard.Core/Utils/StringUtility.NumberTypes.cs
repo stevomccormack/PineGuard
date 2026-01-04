@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Rules;
 using System.Globalization;
 
@@ -6,9 +5,8 @@ namespace PineGuard.Utils;
 
 public static partial class StringUtility
 {
-    public static partial class NumberTyped
+    public static partial class NumberTypes
     {
-
         public static bool TryParseInt32(
             string? value,
             out int result,
@@ -70,7 +68,7 @@ public static partial class StringUtility
 
             if (decimalPlaces == 0)
             {
-                if (!StringRules.NumberTyped.SignedIntegerRegex().IsMatch(value))
+                if (!StringRules.NumberTypes.SignedIntegerRegex().IsMatch(value))
                     return false;
 
                 return decimal.TryParse(
@@ -109,7 +107,7 @@ public static partial class StringUtility
 
             if (exactDecimalPlaces == 0)
             {
-                if (!StringRules.NumberTyped.SignedIntegerRegex().IsMatch(value))
+                if (!StringRules.NumberTypes.SignedIntegerRegex().IsMatch(value))
                     return false;
 
                 return decimal.TryParse(

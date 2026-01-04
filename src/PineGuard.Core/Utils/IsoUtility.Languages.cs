@@ -13,9 +13,9 @@ public static partial class IsoUtility
             Iso.IsoLanguageUtility.TryParseAlpha3(value, out alpha3);
 
         public static bool IsIsoLanguageAlpha2(string? value, IIsoLanguageProvider? provider = null) =>
-            Rules.Iso.IsoLanguageRules.IsIsoLanguageAlpha2(value, provider);
+            Rules.Iso.IsoLanguageRules.IsIsoAlpha2Code(value, provider);
 
         public static bool IsIsoLanguageAlpha3(string? value, IIsoLanguageProvider? provider = null) =>
-            Rules.Iso.IsoLanguageRules.IsIsoLanguageAlpha3(value, provider);
+            Rules.Iso.IsoLanguageRules.IsIsoAlpha3Code(value, provider);
     }
 }

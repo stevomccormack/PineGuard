@@ -1,5 +1,5 @@
 using PineGuard.Iso.Payments;
-using PineGuard.Rules;
+using PineGuard.Iso.Payments.Cards;
 using PineGuard.Rules.Iso;
 using System.Text;
 
@@ -7,11 +7,6 @@ namespace PineGuard.Utils.Iso;
 
 public static class IsoPaymentCardUtility
 {
-    public static readonly char[] DefaultAllowedSeparators = IsoPaymentCardRules.DefaultAllowedSeparators;
-
-    public const char SpaceSeparator = IsoPaymentCardRules.SpaceSeparator;
-    public const char DashSeparator = IsoPaymentCardRules.DashSeparator;
-
     private const int UnmaskedDigitsStart = 4;
     private const int UnmaskedDigitsEnd = 4;
     private const char MaskCharacter = '*';
@@ -26,7 +21,7 @@ public static class IsoPaymentCardUtility
 
     public static bool IsLuhnValid(string? cardNumber, char[]? allowedSeparators = null)
     {
-        if (!StringUtility.TryParseDigits(cardNumber, out var digitsOnly, allowedSeparators ?? DefaultAllowedSeparators))
+        if (!StringUtility.TryParseDigits(cardNumber, out var digitsOnly, allowedSeparators ?? IsoPaymentCardBrand.DefaultAllowedSeparators))
             return false;
 
         return LuhnAlgorithm.IsValid(digitsOnly);
@@ -71,7 +66,7 @@ public static class IsoPaymentCardUtility
         return cardNumber.Contains(MaskCharacter);
     }
 
-    public static string Format(string? cardNumber, char separator = SpaceSeparator)
+    public static string Format(string? cardNumber, char separator = IsoPaymentCardBrand.SpaceSeparator)
     {
         if (string.IsNullOrWhiteSpace(cardNumber))
             return string.Empty;
@@ -97,7 +92,7 @@ public static class IsoPaymentCardUtility
 
     public static string Sanitize(string? cardNumber)
     {
-        return StringUtility.TryParseDigits(cardNumber, out var digitsOnly, DefaultAllowedSeparators)
+        return StringUtility.TryParseDigits(cardNumber, out var digitsOnly, IsoPaymentCardBrand.DefaultAllowedSeparators)
             ? digitsOnly
             : string.Empty;
     }

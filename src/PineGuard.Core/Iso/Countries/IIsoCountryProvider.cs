@@ -12,21 +12,21 @@ public interface IIsoCountryProvider
     /// </summary>
     /// <param name="value">The country code to validate (e.g., "US", "GB", "FR")</param>
     /// <returns>true if the code is valid; otherwise, false</returns>
-    bool IsValidAlpha2Code(string? value);
+    bool ContainsAlpha2Code(string? value);
 
     /// <summary>
     /// Validates a 3-letter ISO 3166-1 alpha-3 country code (case-insensitive).
     /// </summary>
     /// <param name="value">The country code to validate (e.g., "USA", "GBR", "FRA")</param>
     /// <returns>true if the code is valid; otherwise, false</returns>
-    bool IsValidAlpha3Code(string? value);
+    bool ContainsAlpha3Code(string? value);
 
     /// <summary>
     /// Validates a 3-digit ISO 3166-1 numeric country code.
     /// </summary>
     /// <param name="value">The country code to validate (e.g., "840", "826", "250")</param>
     /// <returns>true if the code is valid; otherwise, false</returns>
-    bool IsValidNumericCode(string? value);
+    bool ContainsNumericCode(string? value);
 
     /// <summary>
     /// Attempts to retrieve a country by its 2-letter alpha-2 code (case-insensitive).

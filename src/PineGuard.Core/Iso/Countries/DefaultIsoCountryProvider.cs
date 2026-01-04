@@ -27,13 +27,13 @@ public sealed class DefaultIsoCountryProvider : IIsoCountryProvider
         _allCountries = _countriesByAlpha2Code.Values;
     }
 
-    public bool IsValidAlpha2Code(string? value) =>
+    public bool ContainsAlpha2Code(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _countriesByAlpha2Code.ContainsKey(value);
 
-    public bool IsValidAlpha3Code(string? value) =>
+    public bool ContainsAlpha3Code(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _countriesByAlpha3Code.ContainsKey(value);
 
-    public bool IsValidNumericCode(string? value) =>
+    public bool ContainsNumericCode(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _countriesByNumericCode.ContainsKey(value);
 
     public bool TryGetByAlpha2Code(string? value, out IsoCountry? country)

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace PineGuard.Iso.Dates;
 
@@ -6,9 +7,15 @@ namespace PineGuard.Iso.Dates;
 /// ISO 8601 date format constants and utilities.
 /// https://www.iso.org/iso-8601-date-and-time-format.html
 /// </summary>
-public static class IsoDateOnly
+public static partial class IsoDateOnly
 {
+    public const string IsoStandard = "ISO 8601";
+
     public const string ExactFormat = "yyyy-MM-dd";
+    public const string ExactPattern = "^\\d{4}-\\d{2}-\\d{2}$";
+
+    [GeneratedRegex(ExactPattern, RegexOptions.CultureInvariant)]
+    public static partial Regex ExactPatternRegex();
 
     public static bool TryParse(string? value, out DateOnly result) =>
         DateOnly.TryParseExact(

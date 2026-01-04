@@ -13,7 +13,7 @@ public static class IsoLanguageUtility
             return false;
 
         var trimmed = value.Trim();
-        if (trimmed.Length != IsoLanguage.Alpha2ExactLength)
+        if (trimmed.Length != IsoLanguage.Alpha2CodeExactLength)
             return false;
 
         if (!StringRules.IsAlphabetic(trimmed))
@@ -31,7 +31,7 @@ public static class IsoLanguageUtility
             return false;
 
         var trimmed = value.Trim();
-        if (trimmed.Length != IsoLanguage.Alpha3ExactLength)
+        if (trimmed.Length != IsoLanguage.Alpha3CodeExactLength)
             return false;
 
         if (!StringRules.IsAlphabetic(trimmed))

@@ -14,13 +14,13 @@ public sealed class JcbCard : IsoPaymentCardBrand
     public const string Brand = "JCB";
     public const int PanExactLength = 16;
 
-    public override string BrandName => Brand;
-
-    public override int[] ValidPanLengths => [PanExactLength];
-
-    public override string[] IinPrefixes => ["3528", "3589"];
-
-    public override int[] DisplayFormatPattern => [4, 4, 4, 4];
+    public JcbCard() : base(
+        Brand,
+        [PanExactLength],
+        ["3528", "3589"],
+        [4, 4, 4, 4])
+    {
+    }
 
     public override bool MatchesPan(string? pan)
     {

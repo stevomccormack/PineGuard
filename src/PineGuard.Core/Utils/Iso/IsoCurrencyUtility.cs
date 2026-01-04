@@ -13,7 +13,7 @@ public static class IsoCurrencyUtility
             return false;
 
         var trimmed = value.Trim();
-        if (trimmed.Length != IsoCurrency.Alpha3ExactLength)
+        if (trimmed.Length != IsoCurrency.Alpha3CodeExactLength)
             return false;
 
         if (!StringRules.IsAlphabetic(trimmed))
@@ -31,7 +31,7 @@ public static class IsoCurrencyUtility
             return false;
 
         var trimmed = value.Trim();
-        if (trimmed.Length != IsoCurrency.NumericExactLength)
+        if (trimmed.Length != IsoCurrency.NumericCodeExactLength)
             return false;
 
         if (!StringRules.IsDigitsOnly(trimmed))

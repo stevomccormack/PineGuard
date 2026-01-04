@@ -14,13 +14,13 @@ public sealed class DinersClubCard : IsoPaymentCardBrand
     public const string Brand = "Diners Club";
     public const int PanExactLength = 14;
 
-    public override string BrandName => Brand;
-
-    public override int[] ValidPanLengths => [PanExactLength];
-
-    public override string[] IinPrefixes => ["300", "305", "36", "38"];
-
-    public override int[] DisplayFormatPattern => [4, 6, 4];
+    public DinersClubCard() : base(
+        Brand,
+        [PanExactLength],
+        ["300", "305", "36", "38"],
+        [4, 6, 4])
+    {
+    }
 
     public override bool MatchesPan(string? pan)
     {

@@ -5,26 +5,43 @@ using PineGuard.Utils;
 
 namespace PineGuard.Rules.Iso;
 
-public static class IsoPaymentCardRules
+public static partial class IsoPaymentCardRules
 {
-    public const char SpaceSeparator = ' ';
-    public const char DashSeparator = '-';
-
-    public static readonly char[] DefaultAllowedSeparators = [SpaceSeparator, DashSeparator];
-
     public static bool IsIsoPaymentCard(string? value) =>
-        IsIsoPaymentCard(value, DefaultAllowedSeparators);
+        IsIsoPaymentCard(value, IsoPaymentCardBrand.DefaultAllowedSeparators);
 
     public static bool IsIsoPaymentCard(string? value, char[] allowedSeparators)
     {
         ArgumentNullException.ThrowIfNull(allowedSeparators);
 
-        if (!StringUtility.TryParseDigits(value, out var digitsOnly, allowedSeparators))
+        if (allowedSeparators.Length == 0)
+        {
+            if (!StringUtility.TryParseDigitsOnly(value, out var digitsOnly))
+                return false;
+
+            if (!RuleComparison.IsBetween(digitsOnly.Length, IsoPaymentCardBrand.MinPanLength, IsoPaymentCardBrand.MaxPanLength, RangeInclusion.Inclusive))
+                return false;
+
+            return PanAlgorithm.IsValid(digitsOnly) && LuhnAlgorithm.IsValid(digitsOnly);
+        }
+
+        if (allowedSeparators.Length == IsoPaymentCardBrand.DefaultAllowedSeparators.Length
+            && allowedSeparators.Contains(IsoPaymentCardBrand.SpaceSeparator)
+            && allowedSeparators.Contains(IsoPaymentCardBrand.DashSeparator))
+        {
+            if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+                return false;
+
+            if (!IsoPaymentCardBrand.IsoCardNumberWithSeparatorsRegex().IsMatch(trimmed))
+                return false;
+        }
+
+        if (!StringUtility.TryParseDigits(value, out var parsedDigitsOnly, allowedSeparators))
             return false;
 
-        if (!RuleComparison.IsBetween(digitsOnly.Length, IsoPaymentCardBrand.MinPanLength, IsoPaymentCardBrand.MaxPanLength, RangeInclusion.Inclusive))
+        if (!RuleComparison.IsBetween(parsedDigitsOnly.Length, IsoPaymentCardBrand.MinPanLength, IsoPaymentCardBrand.MaxPanLength, RangeInclusion.Inclusive))
             return false;
 
-        return PanAlgorithm.IsValid(digitsOnly) && LuhnAlgorithm.IsValid(digitsOnly);
+        return PanAlgorithm.IsValid(parsedDigitsOnly) && LuhnAlgorithm.IsValid(parsedDigitsOnly);
     }
 }

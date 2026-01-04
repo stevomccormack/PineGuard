@@ -23,10 +23,10 @@ public sealed class DefaultIsoLanguageProvider : IIsoLanguageProvider
         _allLanguages = _languagesByAlpha2Code.Values;
     }
 
-    public bool IsValidAlpha2Code(string? value) =>
+    public bool ContainsAlpha2Code(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _languagesByAlpha2Code.ContainsKey(value);
 
-    public bool IsValidAlpha3Code(string? value) =>
+    public bool ContainsAlpha3Code(string? value) =>
         !string.IsNullOrWhiteSpace(value) && _languagesByAlpha3Code.ContainsKey(value);
 
     public bool TryGetByAlpha2Code(string? value, out IsoLanguage? language)

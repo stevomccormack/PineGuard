@@ -10,12 +10,12 @@ public interface IIsoCurrencyProvider
     /// <summary>
     /// Validates a 3-letter ISO 4217 alphabetic currency code (case-insensitive).
     /// </summary>
-    bool IsValidAlpha3Code(string? value);
+    bool ContainsAlpha3Code(string? value);
 
     /// <summary>
     /// Validates a 3-digit ISO 4217 numeric currency code.
     /// </summary>
-    bool IsValidNumericCode(string? value);
+    bool ContainsNumericCode(string? value);
 
     /// <summary>
     /// Attempts to retrieve a currency by its 3-letter alphabetic code (case-insensitive).

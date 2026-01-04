@@ -1,5 +1,5 @@
-using PineGuard.Rules;
 using PineGuard.Utils.Iso;
+using System.Text.RegularExpressions;
 
 namespace PineGuard.Iso.Languages;
 
@@ -7,10 +7,21 @@ namespace PineGuard.Iso.Languages;
 /// Represents an ISO 639 language.
 /// https://www.iso.org/iso-639-language-codes.html
 /// </summary>
-public sealed record IsoLanguage
+public sealed partial record IsoLanguage
 {
-    public const int Alpha2ExactLength = 2;
-    public const int Alpha3ExactLength = 3;
+    public const string IsoStandard = "ISO 639";
+
+    public const int Alpha2CodeExactLength = 2;
+    public const int Alpha3CodeExactLength = 3;
+
+    public const string Alpha2CodePattern = "^[A-Za-z]{2}$";
+    public const string Alpha3CodePattern = "^[A-Za-z]{3}$";
+
+    [GeneratedRegex(Alpha2CodePattern, RegexOptions.CultureInvariant)]
+    public static partial Regex Alpha2CodeRegex();
+
+    [GeneratedRegex(Alpha3CodePattern, RegexOptions.CultureInvariant)]
+    public static partial Regex Alpha3CodeRegex();
 
     public string Alpha2Code { get; }
     public string Alpha3Code { get; }
@@ -22,11 +33,11 @@ public sealed record IsoLanguage
         ArgumentNullException.ThrowIfNull(alpha3Code);
         ArgumentNullException.ThrowIfNull(name);
 
-        if (!StringRules.IsExactLength(alpha2Code, Alpha2ExactLength) || !StringRules.IsAlphabetic(alpha2Code))
-            throw new ArgumentException($"Alpha2Code must be exactly {Alpha2ExactLength} alphabetic characters.", nameof(alpha2Code));
+        if (!Alpha2CodeRegex().IsMatch(alpha2Code))
+            throw new ArgumentException($"Alpha2Code should be alphabetical with exact length of {Alpha2CodeExactLength} characters.", nameof(alpha2Code));
 
-        if (!StringRules.IsExactLength(alpha3Code, Alpha3ExactLength) || !StringRules.IsAlphabetic(alpha3Code))
-            throw new ArgumentException($"Alpha3Code must be exactly {Alpha3ExactLength} alphabetic characters.", nameof(alpha3Code));
+        if (!Alpha3CodeRegex().IsMatch(alpha3Code))
+            throw new ArgumentException($"Alpha3Code should be alphabetical with exact length of {Alpha3CodeExactLength} characters.", nameof(alpha3Code));
 
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name cannot be null or whitespace.", nameof(name));
@@ -73,5 +84,5 @@ public sealed record IsoLanguage
         throw new FormatException("Value must be an ISO 639 alpha-2 or alpha-3 language code.");
     }
 
-    public override string ToString() => $"{Name} ({Alpha3Code})";
+    public override string ToString() => $"[{IsoStandard}] {Name} ({Alpha3Code})";
 }

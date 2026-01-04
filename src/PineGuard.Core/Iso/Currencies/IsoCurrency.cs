@@ -1,18 +1,30 @@
-using PineGuard.Rules;
 using PineGuard.Utils.Iso;
+using System.Text.RegularExpressions;
 
 namespace PineGuard.Iso.Currencies;
 
 /// <summary>
 /// Represents an ISO 4217 currency with all standard formats.
 /// https://www.iso.org/iso-4217-currency-codes.html
+/// https://en.wikipedia.org/wiki/ISO_4217
 /// </summary>
-public sealed record IsoCurrency
+public sealed partial record IsoCurrency
 {
-    public const int Alpha3ExactLength = 3;
-    public const int NumericExactLength = 3;
+    public const string IsoStandard = "ISO 4217";
+
+    public const int Alpha3CodeExactLength = 3;
+    public const int NumericCodeExactLength = 3;
     public const int MinDecimalPlaces = 0;
     public const int MaxDecimalPlaces = 4;
+
+    public const string Alpha3CodePattern = "^[A-Za-z]{3}$";
+    public const string NumericCodePattern = "^[0-9]{3}$";
+
+    [GeneratedRegex(Alpha3CodePattern, RegexOptions.CultureInvariant)]
+    public static partial Regex Alpha3CodeRegex();
+
+    [GeneratedRegex(NumericCodePattern, RegexOptions.CultureInvariant)]
+    public static partial Regex NumericCodeRegex();
 
     /// <summary>
     /// 3-letter currency code (e.g., USD, EUR, GBP)
@@ -27,7 +39,7 @@ public sealed record IsoCurrency
     /// <summary>
     /// Number of decimal places (e.g., 2 for USD, 0 for JPY, 3 for BHD)
     /// </summary>
-    public int DecimalPlaces { get; }
+    public int DecimalPlaces { get; } = MinDecimalPlaces;
 
     /// <summary>
     /// Official currency name (e.g., US Dollar, Euro, Pound Sterling)
@@ -40,11 +52,11 @@ public sealed record IsoCurrency
         ArgumentNullException.ThrowIfNull(numericCode);
         ArgumentNullException.ThrowIfNull(name);
 
-        if (alpha3Code.Length != Alpha3ExactLength || !StringRules.IsAlphabetic(alpha3Code))
-            throw new ArgumentException($"Alpha3Code must be exactly {Alpha3ExactLength} alphabetic characters.", nameof(alpha3Code));
+        if (!Alpha3CodeRegex().IsMatch(alpha3Code))
+            throw new ArgumentException($"Alpha3Code should be alphabetical with exact length of {Alpha3CodeExactLength} characters.", nameof(alpha3Code));
 
-        if (numericCode.Length != NumericExactLength || !StringRules.IsNumeric(numericCode))
-            throw new ArgumentException($"NumericCode must be exactly {NumericExactLength} digits.", nameof(numericCode));
+        if (!NumericCodeRegex().IsMatch(numericCode))
+            throw new ArgumentException($"NumericCode should be digits only with exact length of {NumericCodeExactLength} characters.", nameof(numericCode));
 
         if (decimalPlaces < MinDecimalPlaces || decimalPlaces > MaxDecimalPlaces)
             throw new ArgumentException($"DecimalPlaces must be between {MinDecimalPlaces} and {MaxDecimalPlaces}.", nameof(decimalPlaces));
@@ -95,5 +107,5 @@ public sealed record IsoCurrency
         throw new FormatException("Value must be an ISO 4217 alpha-3 or numeric currency code.");
     }
 
-    public override string ToString() => $"{Name} ({Alpha3Code})";
+    public override string ToString() => $"[{IsoStandard}] {Name} ({Alpha3Code})";
 }

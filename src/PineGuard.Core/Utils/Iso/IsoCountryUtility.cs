@@ -13,7 +13,7 @@ public static class IsoCountryUtility
             return false;
 
         var trimmed = value.Trim();
-        if (trimmed.Length != IsoCountry.Alpha2ExactLength)
+        if (trimmed.Length != IsoCountry.Alpha2CodeExactLength)
             return false;
 
         if (!StringRules.IsAlphabetic(trimmed))
@@ -31,7 +31,7 @@ public static class IsoCountryUtility
             return false;
 
         var trimmed = value.Trim();
-        if (trimmed.Length != IsoCountry.Alpha3ExactLength)
+        if (trimmed.Length != IsoCountry.Alpha3CodeExactLength)
             return false;
 
         if (!StringRules.IsAlphabetic(trimmed))
@@ -49,7 +49,7 @@ public static class IsoCountryUtility
             return false;
 
         var trimmed = value.Trim();
-        if (trimmed.Length != IsoCountry.NumericExactLength)
+        if (trimmed.Length != IsoCountry.NumericCodeExactLength)
             return false;
 
         if (!StringRules.IsDigitsOnly(trimmed))

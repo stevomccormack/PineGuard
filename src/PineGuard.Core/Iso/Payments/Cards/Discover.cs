@@ -14,13 +14,13 @@ public sealed class DiscoverCard : IsoPaymentCardBrand
     public const string Brand = "Discover";
     public const int PanExactLength = 16;
 
-    public override string BrandName => Brand;
-
-    public override int[] ValidPanLengths => [PanExactLength];
-
-    public override string[] IinPrefixes => ["6011", "644", "649", "65"];
-
-    public override int[] DisplayFormatPattern => [4, 4, 4, 4];
+    public DiscoverCard() : base(
+        Brand,
+        [PanExactLength],
+        ["6011", "644", "649", "65"],
+        [4, 4, 4, 4])
+    {
+    }
 
     public override bool MatchesPan(string? pan)
     {

@@ -12,11 +12,11 @@ public sealed class AmericanExpressCard : IsoPaymentCardBrand
     public const string Brand = "American Express";
     public const int PanExactLength = 15;
 
-    public override string BrandName => Brand;
-
-    public override int[] ValidPanLengths => [PanExactLength];
-
-    public override string[] IinPrefixes => ["34", "37"];
-
-    public override int[] DisplayFormatPattern => [4, 6, 5];
+    public AmericanExpressCard() : base(
+        Brand,
+        [PanExactLength],
+        ["34", "37"],
+        [4, 6, 5])
+    {
+    }
 }
