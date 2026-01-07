@@ -4,7 +4,7 @@ namespace PineGuard.Rules;
 
 public static class TimeOnlyRangeRules
 {
-    public static bool IsChronological(TimeOnlyRange? range, RangeInclusion inclusion = RangeInclusion.Exclusive)
+    public static bool IsChronological(TimeOnlyRange? range, Inclusion inclusion = Inclusion.Exclusive)
     {
         if (range is null)
             return false;
@@ -13,7 +13,7 @@ public static class TimeOnlyRangeRules
         return RangeRules.IsChronological<TimeOnly>(r.Start, r.End, inclusion);
     }
 
-    public static bool IsOverlapping(TimeOnlyRange? range1, TimeOnlyRange? range2, RangeInclusion inclusion = RangeInclusion.Exclusive)
+    public static bool IsOverlapping(TimeOnlyRange? range1, TimeOnlyRange? range2, Inclusion inclusion = Inclusion.Exclusive)
     {
         if (range1 is null || range2 is null)
             return false;

@@ -6,36 +6,49 @@ internal static class RuleComparison
         where T : IComparable<T> =>
         value.CompareTo(other) == 0;
 
-    internal static bool IsBetween<T>(T value, T min, T max, RangeInclusion inclusion)
+    internal static bool IsBetween<T>(T value, T min, T max, Inclusion inclusion = Inclusion.Inclusive)
         where T : IComparable<T>
     {
         if (min.CompareTo(max) > 0)
             return false;
 
-        var minOk = inclusion == RangeInclusion.Inclusive
+        var inclusive = inclusion switch
+        {
+            Inclusion.Inclusive => true,
+            Inclusion.Exclusive => false,
+            _ => throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null)
+        };
+
+        var minOk = inclusive
             ? value.CompareTo(min) >= 0
             : value.CompareTo(min) > 0;
 
-        var maxOk = inclusion == RangeInclusion.Inclusive
+        var maxOk = inclusive
             ? value.CompareTo(max) <= 0
             : value.CompareTo(max) < 0;
 
         return minOk && maxOk;
     }
 
-    internal static bool IsGreaterThan<T>(T value, T min, RangeInclusion inclusion)
+    internal static bool IsGreaterThan<T>(T value, T min, Inclusion inclusion = Inclusion.Inclusive)
         where T : IComparable<T>
     {
-        return inclusion == RangeInclusion.Inclusive
-            ? value.CompareTo(min) >= 0
-            : value.CompareTo(min) > 0;
+        return inclusion switch
+        {
+            Inclusion.Inclusive => value.CompareTo(min) >= 0,
+            Inclusion.Exclusive => value.CompareTo(min) > 0,
+            _ => throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null)
+        };
     }
 
-    internal static bool IsLessThan<T>(T value, T max, RangeInclusion inclusion)
+    internal static bool IsLessThan<T>(T value, T max, Inclusion inclusion = Inclusion.Inclusive)
         where T : IComparable<T>
     {
-        return inclusion == RangeInclusion.Inclusive
-            ? value.CompareTo(max) <= 0
-            : value.CompareTo(max) < 0;
+        return inclusion switch
+        {
+            Inclusion.Inclusive => value.CompareTo(max) <= 0,
+            Inclusion.Exclusive => value.CompareTo(max) < 0,
+            _ => throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null)
+        };
     }
 }

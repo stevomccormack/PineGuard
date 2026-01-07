@@ -87,7 +87,7 @@ public static partial class StringRules
             return NumberRules.IsLessThanOrEqual(parsed, max);
         }
 
-        public static bool IsInRange(string? value, decimal min, decimal max, RangeInclusion inclusion = RangeInclusion.Inclusive)
+        public static bool IsInRange(string? value, decimal min, decimal max, Inclusion inclusion = Inclusion.Inclusive)
         {
             if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed))
                 return false;
@@ -132,9 +132,6 @@ public static partial class StringRules
 
         public static bool IsFinite(string? value)
         {
-            if (StringUtility.NumberTypes.TryParseSingle(value, out var f))
-                return NumberRules.IsFinite(f);
-
             if (!StringUtility.NumberTypes.TryParseDouble(value, out var d))
                 return false;
 
@@ -143,9 +140,6 @@ public static partial class StringRules
 
         public static bool IsNaN(string? value)
         {
-            if (StringUtility.NumberTypes.TryParseSingle(value, out var f))
-                return NumberRules.IsNaN(f);
-
             if (!StringUtility.NumberTypes.TryParseDouble(value, out var d))
                 return false;
 

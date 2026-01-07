@@ -1,3 +1,5 @@
+using PineGuard.Extensions;
+
 namespace PineGuard.Common;
 
 public readonly struct DateOnlyRange : IEquatable<DateOnlyRange>
@@ -8,7 +10,7 @@ public readonly struct DateOnlyRange : IEquatable<DateOnlyRange>
     public DateOnlyRange(DateOnly start, DateOnly end)
     {
         if (start > end)
-            throw new ArgumentException("Start must be less than or equal to End.", nameof(start));
+            throw new ArgumentException($"{nameof(start).TitleCase()} must be less than or equal to End.", nameof(start));
 
         Start = start;
         End = end;
@@ -21,9 +23,9 @@ public readonly struct DateOnlyRange : IEquatable<DateOnlyRange>
     public bool Overlaps(DateOnlyRange other)
         => Start < other.End && other.Start < End;
 
-    public bool Overlaps(DateOnlyRange other, RangeInclusion inclusion)
+    public bool Overlaps(DateOnlyRange other, Inclusion inclusion)
     {
-        if (inclusion == RangeInclusion.Exclusive)
+        if (inclusion == Inclusion.Exclusive)
             return Start < other.End && other.Start < End;
 
         return Start <= other.End && other.Start <= End;

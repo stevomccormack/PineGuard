@@ -4,7 +4,7 @@ namespace PineGuard.Rules;
 
 public static class TimeSpanRules
 {
-    public static bool IsDurationBetween(TimeSpan? value, TimeSpan min, TimeSpan max, RangeInclusion inclusion = RangeInclusion.Inclusive)
+    public static bool IsDurationBetween(TimeSpan? value, TimeSpan min, TimeSpan max, Inclusion inclusion = Inclusion.Inclusive)
     {
         if (value is null)
             return false;
@@ -12,7 +12,7 @@ public static class TimeSpanRules
         return RuleComparison.IsBetween(value.Value, min, max, inclusion);
     }
 
-    public static bool IsGreaterThan(TimeSpan? value, TimeSpan threshold, RangeInclusion inclusion = RangeInclusion.Exclusive)
+    public static bool IsGreaterThan(TimeSpan? value, TimeSpan threshold, Inclusion inclusion = Inclusion.Exclusive)
     {
         if (value is null)
             return false;
@@ -20,7 +20,7 @@ public static class TimeSpanRules
         return RuleComparison.IsGreaterThan(value.Value, threshold, inclusion);
     }
 
-    public static bool IsLessThan(TimeSpan? value, TimeSpan threshold, RangeInclusion inclusion = RangeInclusion.Exclusive)
+    public static bool IsLessThan(TimeSpan? value, TimeSpan threshold, Inclusion inclusion = Inclusion.Exclusive)
     {
         if (value is null)
             return false;

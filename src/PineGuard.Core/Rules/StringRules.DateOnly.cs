@@ -23,7 +23,7 @@ public static partial class StringRules
             return DateOnlyRules.IsInFuture(parsed);
         }
 
-        public static bool IsBetween(string? value, global::System.DateOnly min, global::System.DateOnly max, RangeInclusion inclusion = RangeInclusion.Inclusive)
+        public static bool IsBetween(string? value, global::System.DateOnly min, global::System.DateOnly max, Inclusion inclusion = Inclusion.Inclusive)
         {
             if (!StringUtility.DateOnly.TryParse(value, out var parsed))
                 return false;

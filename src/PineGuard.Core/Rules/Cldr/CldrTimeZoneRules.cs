@@ -1,4 +1,4 @@
-using PineGuard.Cldr.TimeZones;
+using PineGuard.Externals.Cldr.TimeZones;
 
 namespace PineGuard.Rules.Cldr;
 

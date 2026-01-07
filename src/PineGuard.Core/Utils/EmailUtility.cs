@@ -61,9 +61,6 @@ public static partial class EmailUtility
         if (local.Length > MaxLocalPartLength)
             return false;
 
-        if (domain.Length > MaxDomainLength)
-            return false;
-
         if (!domain.Contains(DomainDotChar, StringComparison.Ordinal))
             return false;
 
@@ -81,10 +78,6 @@ public static partial class EmailUtility
                     var asciiDomain = idn.GetAscii(m.Groups[2].Value);
                     return m.Groups[1].Value + asciiDomain;
                 });
-        }
-        catch (RegexMatchTimeoutException)
-        {
-            return false;
         }
         catch (ArgumentException)
         {
@@ -115,8 +108,7 @@ public static partial class EmailUtility
 
         var address = email.Address;
         var at = address.IndexOf(DomainSeparator, StringComparison.Ordinal);
-        if (at <= 0)
-            return false;
+        // `TryStrictCreate` guarantees a single '@' with a non-empty local-part.
 
         var local = address[..at];
         var plus = local.IndexOf(AliasSeparatorChar);

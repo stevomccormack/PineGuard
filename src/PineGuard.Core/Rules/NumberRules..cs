@@ -35,7 +35,7 @@ public static class NumberRules
     public static bool IsLessThanOrEqual<T>(T? value, T max) where T : struct, INumber<T> =>
         value is not null && value.Value <= max;
 
-    public static bool IsInRange<T>(T? value, T min, T max, RangeInclusion inclusion = RangeInclusion.Inclusive)
+    public static bool IsInRange<T>(T? value, T min, T max, Inclusion inclusion = Inclusion.Inclusive)
         where T : struct, IComparable<T> =>
         value is not null && RuleComparison.IsBetween(value.Value, min, max, inclusion);
 

@@ -1,5 +1,5 @@
-using PineGuard.Cldr.TimeZones;
-using PineGuard.Iana.TimeZones;
+using PineGuard.Externals.Cldr.TimeZones;
+using PineGuard.Externals.Iana.TimeZones;
 using PineGuard.Utils.Cldr;
 
 namespace PineGuard.Utils.Iana;

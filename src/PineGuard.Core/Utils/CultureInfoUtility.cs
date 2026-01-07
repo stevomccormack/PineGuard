@@ -68,19 +68,27 @@ public static class CultureInfoUtility
 
             ForEachSpecificCultureForLanguage(l, c =>
             {
-                try
-                {
-                    var region = new RegionInfo(c.Name);
-                    regions.Add(region.TwoLetterISORegionName);
-                }
-                catch (ArgumentException)
-                {
-                    // do nothing
-                }
+                if (TryGetTwoLetterIsoRegionName(c, out var regionCode))
+                    regions.Add(regionCode);
             });
 
             return [.. regions];
         });
+    }
+
+    internal static bool TryGetTwoLetterIsoRegionName(CultureInfo cultureInfo, out string regionCode)
+    {
+        try
+        {
+            var region = new RegionInfo(cultureInfo.Name);
+            regionCode = region.TwoLetterISORegionName;
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            regionCode = string.Empty;
+            return false;
+        }
     }
 
     public static IReadOnlyCollection<CultureInfo> GetCultures(string? isoLanguageAlpha2Code)

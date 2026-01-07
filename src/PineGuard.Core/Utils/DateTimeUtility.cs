@@ -9,4 +9,7 @@ public static class DateTimeUtility
             DateTimeKind.Utc => value,
             _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
         };
+
+    public static TimeSpan Diff(DateTime value, DateTime other) =>
+        ToUtc(value) - ToUtc(other);
 }

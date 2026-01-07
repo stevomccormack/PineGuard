@@ -1,4 +1,4 @@
-using PineGuard.Iso.Currencies;
+using PineGuard.Externals.Iso.Currencies;
 
 namespace PineGuard.Utils;
 

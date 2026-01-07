@@ -1,5 +1,5 @@
+using PineGuard.Externals.Iso.Languages;
 using PineGuard.Iso.Languages;
-using PineGuard.Utils.Iso;
 
 namespace PineGuard.Rules.Iso;
 
@@ -18,10 +18,7 @@ public static partial class IsoLanguageRules
         if (!IsoLanguage.Alpha2CodeRegex().IsMatch(trimmed))
             return false;
 
-        if (!IsoLanguageUtility.TryParseAlpha2(trimmed, out var alpha2))
-            return false;
-
-        return provider.ContainsAlpha2Code(alpha2);
+        return provider.ContainsAlpha2Code(trimmed);
     }
 
     public static bool IsIsoAlpha3Code(string? value, IIsoLanguageProvider? provider = null)
@@ -35,9 +32,6 @@ public static partial class IsoLanguageRules
         if (!IsoLanguage.Alpha3CodeRegex().IsMatch(trimmed))
             return false;
 
-        if (!IsoLanguageUtility.TryParseAlpha3(trimmed, out var alpha3))
-            return false;
-
-        return provider.ContainsAlpha3Code(alpha3);
+        return provider.ContainsAlpha3Code(trimmed);
     }
 }

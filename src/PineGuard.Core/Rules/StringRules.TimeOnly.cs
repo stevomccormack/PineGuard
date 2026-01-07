@@ -7,7 +7,7 @@ public static partial class StringRules
 {
     public static class TimeOnly
     {
-        public static bool IsBetween(string? value, global::System.TimeOnly min, global::System.TimeOnly max, RangeInclusion inclusion = RangeInclusion.Inclusive)
+        public static bool IsBetween(string? value, global::System.TimeOnly min, global::System.TimeOnly max, Inclusion inclusion = Inclusion.Inclusive)
         {
             if (!StringUtility.TimeOnly.TryParse(value, out var parsed))
                 return false;
@@ -15,7 +15,7 @@ public static partial class StringRules
             return TimeOnlyRules.IsBetween(parsed, min, max, inclusion);
         }
 
-        public static bool IsChronological(string? start, string? end, RangeInclusion inclusion = RangeInclusion.Exclusive)
+        public static bool IsChronological(string? start, string? end, Inclusion inclusion = Inclusion.Exclusive)
         {
             if (!StringUtility.TimeOnly.TryParse(start, out var parsedStart))
                 return false;
@@ -31,7 +31,7 @@ public static partial class StringRules
             string? end1,
             string? start2,
             string? end2,
-            RangeInclusion inclusion = RangeInclusion.Exclusive)
+            Inclusion inclusion = Inclusion.Exclusive)
         {
             if (!StringUtility.TimeOnly.TryParse(start1, out var s1))
                 return false;

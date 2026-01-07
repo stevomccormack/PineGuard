@@ -91,17 +91,11 @@ public static class MustResultExtension
         if (results is null)
             return MustResult<T>.Fail("{paramName} must not be null.", nameof(results), results);
 
-        var failures = results.Where(r => r.Failed).ToList();
-        if (failures.Count == 0)
-        {
-            // No failures; return the first successful result if present, otherwise default.
-            foreach (var r in results)
-            {
-                if (r.Success) return r;
-            }
+        var all = results.ToList();
+        if (all.Count == 0) return MustResult<T>.Ok(result: default!, value: null);
 
-            return MustResult<T>.Ok(result: default!, value: null);
-        }
+        var failures = all.Where(r => r.Failed).ToList();
+        if (failures.Count == 0) return all[0];
 
         var first = failures[0];
         var message = string.Join("; ", failures.Select(f => f.Message));

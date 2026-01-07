@@ -1,4 +1,4 @@
-using PineGuard.Iana.TimeZones;
+using PineGuard.Externals.Iana.TimeZones;
 
 namespace PineGuard.Utils.Iana;
 

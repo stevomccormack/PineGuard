@@ -1,4 +1,5 @@
 using PineGuard.Rules;
+using System.Globalization;
 
 namespace PineGuard.Utils;
 
@@ -27,8 +28,6 @@ public static partial class StringUtility
         allowedNonDigitChars ??= StringRules.NumberTypes.DefaultAllowedDigitSeparators;
 
         var trimmed = value.Trim();
-        if (trimmed.Length == 0)
-            return false;
 
         if (allowedNonDigitChars.Length == 0)
         {
@@ -67,4 +66,23 @@ public static partial class StringUtility
         digits = new string(buffer[..written]);
         return true;
     }
+
+    public static bool TitleCase(string? value, out string titleCased)
+    {
+        titleCased = string.Empty;
+
+        if (value is null)
+            return false;
+
+        if (!TryGetTrimmed(value, out var trimmed))
+            return false;
+
+        var textInfo = CultureInfo.InvariantCulture.TextInfo;
+        titleCased = textInfo.ToTitleCase(trimmed.ToLowerInvariant());
+
+        return titleCased.Length != 0;
+    }
+
+    public static bool TitleCase(string? value)
+        => TitleCase(value, out _);
 }

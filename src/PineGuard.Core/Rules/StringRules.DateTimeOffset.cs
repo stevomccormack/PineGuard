@@ -23,7 +23,7 @@ public static partial class StringRules
             return DateTimeOffsetRules.IsInFuture(parsed);
         }
 
-        public static bool IsBetween(string? value, global::System.DateTimeOffset min, global::System.DateTimeOffset max, RangeInclusion inclusion = RangeInclusion.Inclusive)
+        public static bool IsBetween(string? value, global::System.DateTimeOffset min, global::System.DateTimeOffset max, Inclusion inclusion = Inclusion.Inclusive)
         {
             if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed))
                 return false;

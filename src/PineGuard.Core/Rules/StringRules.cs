@@ -15,7 +15,7 @@ public static partial class StringRules
         return value.Length == length;
     }
 
-    public static bool IsLengthBetween(string? value, int min, int max, RangeInclusion inclusion = RangeInclusion.Inclusive)
+    public static bool IsLengthBetween(string? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive)
     {
         if (value is null)
             return false;
@@ -23,7 +23,7 @@ public static partial class StringRules
         return RuleComparison.IsBetween(value.Length, min, max, inclusion);
     }
 
-    public static bool IsLongerThan(string? value, int length, RangeInclusion inclusion = RangeInclusion.Inclusive)
+    public static bool IsLongerThan(string? value, int length, Inclusion inclusion = Inclusion.Inclusive)
     {
         if (value is null)
             return false;
@@ -31,7 +31,7 @@ public static partial class StringRules
         return RuleComparison.IsGreaterThan(value.Length, length, inclusion);
     }
 
-    public static bool IsShorterThan(string? value, int length, RangeInclusion inclusion = RangeInclusion.Inclusive)
+    public static bool IsShorterThan(string? value, int length, Inclusion inclusion = Inclusion.Inclusive)
     {
         if (value is null)
             return false;

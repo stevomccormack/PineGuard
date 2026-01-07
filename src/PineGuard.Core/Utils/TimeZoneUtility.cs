@@ -1,5 +1,5 @@
-using PineGuard.Iana.TimeZones;
-using PineGuard.Iso.Countries;
+using PineGuard.Externals.Iana.TimeZones;
+using PineGuard.Externals.Iso.Countries;
 using PineGuard.Utils.Cldr;
 
 namespace PineGuard.Utils;
@@ -15,12 +15,18 @@ public static partial class TimeZoneUtility
     /// </summary>
     public static IReadOnlyCollection<TimeZoneInfo> GetTimeZones(string? isoCountryAlpha2Code)
     {
+        return GetTimeZones(isoCountryAlpha2Code, DefaultIanaTimeZoneProvider.Instance);
+    }
+
+    internal static IReadOnlyCollection<TimeZoneInfo> GetTimeZones(string? isoCountryAlpha2Code, IIanaTimeZoneProvider ianaProvider)
+    {
+        ArgumentNullException.ThrowIfNull(ianaProvider);
+
         if (!StringUtility.TryGetTrimmed(isoCountryAlpha2Code, out var alpha2))
             return [];
 
         alpha2 = alpha2.ToUpperInvariant();
 
-        var ianaProvider = DefaultIanaTimeZoneProvider.Instance;
         if (!ianaProvider.TryGetTimeZoneIdsByCountryAlpha2Code(alpha2, out var ianaTimeZoneIds))
             return [];
 
@@ -32,11 +38,8 @@ public static partial class TimeZoneUtility
             if (string.IsNullOrWhiteSpace(ianaTimeZoneId))
                 continue;
 
-            if (!TryGetSystemTimeZoneFromIanaTimeZoneId(ianaTimeZoneId, territory: alpha2, out var tz)
-                || tz is null)
-            {
+            if (!TryGetSystemTimeZoneFromIanaTimeZoneId(ianaTimeZoneId, territory: alpha2, out var tz) || tz is null)
                 continue;
-            }
 
             if (seen.Add(tz.Id))
                 results.Add(tz);
@@ -89,14 +92,13 @@ public static partial class TimeZoneUtility
     {
         systemTimeZone = null;
 
-        if (string.IsNullOrWhiteSpace(ianaTimeZoneId))
-            return false;
-
         var trimmedIana = ianaTimeZoneId.Trim();
 
-        if (!OperatingSystem.IsWindows())
-            return TimeZoneInfo.TryFindSystemTimeZoneById(trimmedIana, out systemTimeZone);
+        // First try direct system lookup (IANA on non-Windows, Windows IDs on Windows where applicable).
+        if (TimeZoneInfo.TryFindSystemTimeZoneById(trimmedIana, out systemTimeZone))
+            return true;
 
+        // Then fall back to CLDR mapping (primarily helpful on Windows, but harmless elsewhere).
         return CldrTimeZoneUtility.TryGetSystemTimeZone(trimmedIana, territory, out systemTimeZone);
     }
 }

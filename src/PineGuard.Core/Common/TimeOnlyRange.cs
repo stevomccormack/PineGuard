@@ -1,3 +1,5 @@
+using PineGuard.Extensions;
+
 namespace PineGuard.Common;
 
 public readonly struct TimeOnlyRange : IEquatable<TimeOnlyRange>
@@ -8,7 +10,7 @@ public readonly struct TimeOnlyRange : IEquatable<TimeOnlyRange>
     public TimeOnlyRange(TimeOnly start, TimeOnly end)
     {
         if (start > end)
-            throw new ArgumentException("Start must be less than or equal to End.", nameof(start));
+            throw new ArgumentException($"{nameof(start).TitleCase()} must be less than or equal to {nameof(end).TitleCase()}.", nameof(start));
 
         Start = start;
         End = end;
@@ -20,9 +22,9 @@ public readonly struct TimeOnlyRange : IEquatable<TimeOnlyRange>
 
     public bool Overlaps(TimeOnlyRange other) => Start < other.End && other.Start < End;
 
-    public bool Overlaps(TimeOnlyRange other, RangeInclusion inclusion)
+    public bool Overlaps(TimeOnlyRange other, Inclusion inclusion)
     {
-        if (inclusion == RangeInclusion.Exclusive)
+        if (inclusion == Inclusion.Exclusive)
             return Start < other.End && other.Start < End;
 
         return Start <= other.End && other.Start <= End;

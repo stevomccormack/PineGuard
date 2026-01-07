@@ -1,3 +1,4 @@
+using PineGuard.Extensions;
 using System.Collections.Concurrent;
 using System.Reflection;
 
@@ -21,14 +22,14 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
         var nameRegistry = _nameRegistries.GetOrAdd(type, _ => new ConcurrentDictionary<string, Enumeration<TValue>>(StringComparer.OrdinalIgnoreCase));
         if (!nameRegistry.TryAdd(name, this))
         {
-            throw new ArgumentException($"An enumeration with the name '{name}' already exists in {type.Name}.", nameof(name));
+            throw new ArgumentException($"{nameof(name).TitleCase()} '{name}' already exists in {type.Name}.", nameof(name));
         }
 
         var valueRegistry = _valueRegistries.GetOrAdd(type, _ => new ConcurrentDictionary<TValue, Enumeration<TValue>>());
         if (!valueRegistry.TryAdd(value, this))
         {
             nameRegistry.TryRemove(name, out _); // Rollback name registration
-            throw new ArgumentException($"An enumeration with the value '{value}' already exists in {type.Name}.", nameof(value));
+            throw new ArgumentException($"{nameof(value).TitleCase()} '{value}' already exists in {type.Name}.", nameof(value));
         }
 
         Value = value;

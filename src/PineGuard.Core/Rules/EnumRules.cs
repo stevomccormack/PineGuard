@@ -68,9 +68,6 @@ public static class EnumRules
             return false;
 
         var member = typeof(TEnum).GetMember(name, BindingFlags.Public | BindingFlags.Static);
-        if (member.Length == 0)
-            return false;
-
         return member[0].IsDefined(typeof(TAttribute), inherit: false);
     }
 

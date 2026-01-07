@@ -1,5 +1,5 @@
-using PineGuard.Cldr.TimeZones;
-using PineGuard.Iana.TimeZones;
+using PineGuard.Externals.Cldr.TimeZones;
+using PineGuard.Externals.Iana.TimeZones;
 
 namespace PineGuard.Utils.Cldr;
 
@@ -33,10 +33,10 @@ public static class CldrTimeZoneExtension
         if (windowsTimeZone is null)
             return null;
 
-        if (OperatingSystem.IsWindows())
-            return CldrTimeZoneUtility.ToIanaTimeZone(windowsTimeZone.Id, territory, cldrProvider, ianaProvider);
-
         ianaProvider ??= DefaultIanaTimeZoneProvider.Instance;
-        return ianaProvider.TryGetById(windowsTimeZone.Id, out var tz) ? tz : null;
+        if (ianaProvider.TryGetById(windowsTimeZone.Id, out var tz))
+            return tz;
+
+        return CldrTimeZoneUtility.ToIanaTimeZone(windowsTimeZone.Id, territory, cldrProvider, ianaProvider);
     }
 }

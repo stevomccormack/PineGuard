@@ -27,7 +27,7 @@ public static partial class StringRules
         public static bool IsInt64(string? value) =>
             StringUtility.NumberTypes.TryParseInt64(value, out _);
 
-        public static bool IsInt32InRange(string? value, int min, int max, RangeInclusion inclusion = RangeInclusion.Inclusive)
+        public static bool IsInt32InRange(string? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive)
         {
             if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed))
                 return false;
@@ -35,7 +35,7 @@ public static partial class StringRules
             return RuleComparison.IsBetween(parsed, min, max, inclusion);
         }
 
-        public static bool IsInt64InRange(string? value, long min, long max, RangeInclusion inclusion = RangeInclusion.Inclusive)
+        public static bool IsInt64InRange(string? value, long min, long max, Inclusion inclusion = Inclusion.Inclusive)
         {
             if (!StringUtility.NumberTypes.TryParseInt64(value, out var parsed))
                 return false;

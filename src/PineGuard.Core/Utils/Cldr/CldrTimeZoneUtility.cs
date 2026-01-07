@@ -1,5 +1,5 @@
-using PineGuard.Cldr.TimeZones;
-using PineGuard.Iana.TimeZones;
+using PineGuard.Externals.Cldr.TimeZones;
+using PineGuard.Externals.Iana.TimeZones;
 
 namespace PineGuard.Utils.Cldr;
 
@@ -86,18 +86,30 @@ public static class CldrTimeZoneUtility
         out string windowsTimeZoneId,
         ICldrWindowsTimeZoneProvider? provider = null)
     {
+        return TryGetWindowsTimeZoneIdCore(
+            timeZone,
+            territory,
+            out windowsTimeZoneId,
+            provider,
+            isWindows: OperatingSystem.IsWindows());
+    }
+
+    internal static bool TryGetWindowsTimeZoneIdCore(
+        TimeZoneInfo? timeZone,
+        string? territory,
+        out string windowsTimeZoneId,
+        ICldrWindowsTimeZoneProvider? provider,
+        bool isWindows)
+    {
         windowsTimeZoneId = string.Empty;
 
         if (timeZone is null)
             return false;
 
-        if (OperatingSystem.IsWindows())
+        if (isWindows)
         {
-            if (string.IsNullOrWhiteSpace(timeZone.Id))
-                return false;
-
             windowsTimeZoneId = timeZone.Id.Trim();
-            return true;
+            return windowsTimeZoneId.Length > 0;
         }
 
         provider ??= DefaultCldrWindowsTimeZoneProvider.Instance;
@@ -122,12 +134,7 @@ public static class CldrTimeZoneUtility
         if (TimeZoneInfo.TryFindSystemTimeZoneById(id, out timeZone))
             return true;
 
-        if (!OperatingSystem.IsWindows())
-        {
-            timeZone = null;
-            return false;
-        }
-
+        // If direct lookup fails, try interpreting the input as an IANA ID and mapping to a Windows ID via CLDR.
         ianaProvider ??= DefaultIanaTimeZoneProvider.Instance;
         if (!ianaProvider.TryGetById(id, out var ianaTz) || ianaTz is null)
             return false;
