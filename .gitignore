@@ -1,8 +1,7 @@
 # Custom
 .etc
-.iso/generated/
-.iana/generated/
-.cldr/generated/
+etc/generated/
+.dotnet/
 
 
 # Build results
