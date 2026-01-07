@@ -22,13 +22,13 @@ Place the extracted file at:
 
 Generated C# files are written to:
 
-- `src/PineGuard.Core/Cldr/TimeZones/DefaultCldrWindowsTimeZoneData.cs`
+- `src/PineGuard.Core/Externals/Cldr/TimeZones/DefaultCldrWindowsTimeZoneData.cs`
 
 ### How to run
 
 Run scripts from the repository root.
 
-Preview (generate into `etc/powershell/cldr/generated` only):
+Preview (generate into `etc/generated` only):
 
 ```powershell
 ./etc/powershell/cldr/GenerateCldrWindowsTimeZones.ps1
@@ -37,5 +37,5 @@ Preview (generate into `etc/powershell/cldr/generated` only):
 Update source (also copy into `src/`):
 
 ```powershell
-./etc/powershell/cldr/GenerateCldrWindowsTimeZones.ps1 -EnableUpdateTarget
+./etc/powershell/cldr/GenerateCldrWindowsTimeZones.ps1 -EnableUpdateTarget $true
 ```

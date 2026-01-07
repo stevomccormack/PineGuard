@@ -8,7 +8,7 @@
 
 [CmdletBinding()]
 param(
-    [switch]$EnableUpdateTarget
+    [bool]$EnableUpdateTarget = $false
 )
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
@@ -22,10 +22,10 @@ $windowsZonesXmlPath = Join-Path $windowsZonesDir "windowsZones.xml"
 $templatePath = Join-Path $windowsZonesDir "DefaultCldrWindowsTimeZoneData.template.cs"
 $generatorPath = Join-Path $windowsZonesDir "DefaultCldrWindowsTimeZoneDataGenerator.ps1"
 
-$generatedDir = Join-Path $cldrRoot "generated"
+$generatedDir = Join-Path $repoRoot "etc\generated"
 $outputPath = Join-Path $generatedDir "DefaultCldrWindowsTimeZoneData.cs"
 
-$targetDir = Join-Path $repoRoot "src\PineGuard.Core\Cldr\TimeZones"
+$targetDir = Join-Path $repoRoot "src\PineGuard.Core\Externals\Cldr\TimeZones"
 $targetPath = Join-Path $targetDir "DefaultCldrWindowsTimeZoneData.cs"
 
 Write-Host "" 

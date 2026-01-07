@@ -10,13 +10,13 @@ This folder contains the scripts + source CSVs used to generate ISO reference da
 
 Generated C# files are written to:
 
-- `src/PineGuard.Core/Iso/**/DefaultIso*Data.cs`
+- `src/PineGuard.Core/Externals/Iso/**/DefaultIso*Data.cs`
 
 ## How to run
 
 Run scripts from the repository root.
 
-Preview (generate into `etc/powershell/iso/generated` only):
+Preview (generate into `etc/generated` only):
 
 ```powershell
 ./etc/powershell/iso/GenerateIsoCountries.ps1
@@ -27,9 +27,9 @@ Preview (generate into `etc/powershell/iso/generated` only):
 Update source (also copy into `src/`):
 
 ```powershell
-./etc/powershell/iso/GenerateIsoCountries.ps1 -EnableUpdateTarget
-./etc/powershell/iso/GenerateIsoCurrencies.ps1 -EnableUpdateTarget
-./etc/powershell/iso/GenerateIsoLanguages.ps1 -EnableUpdateTarget
+./etc/powershell/iso/GenerateIsoCountries.ps1 -EnableUpdateTarget $true
+./etc/powershell/iso/GenerateIsoCurrencies.ps1 -EnableUpdateTarget $true
+./etc/powershell/iso/GenerateIsoLanguages.ps1 -EnableUpdateTarget $true
 ```
 
 ## Code casing

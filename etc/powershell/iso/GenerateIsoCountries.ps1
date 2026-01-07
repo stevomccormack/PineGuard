@@ -28,7 +28,7 @@
 
 [CmdletBinding()]
 param(
-    [switch]$EnableUpdateTarget
+    [bool]$EnableUpdateTarget = $false
 )
 
 # Set execution policy for this process to allow script execution
@@ -49,11 +49,11 @@ $templatePath = Join-Path $scriptRoot "iso-3166-countries\DefaultIsoCountryData.
 $generatorPath = Join-Path $scriptRoot "iso-3166-countries\DefaultIsoCountryDataGenerator.ps1"
 
 # Output paths
-$generatedDir = Join-Path $scriptRoot "generated"
+$generatedDir = Join-Path $repoRoot "etc\generated"
 $outputPath   = Join-Path $generatedDir "DefaultIsoCountryData.cs"
 
 # Target location in source tree
-$targetDir  = Join-Path $repoRoot "src\PineGuard.Core\Iso\Countries"
+$targetDir  = Join-Path $repoRoot "src\PineGuard.Core\Externals\Iso\Countries"
 $targetPath = Join-Path $targetDir "DefaultIsoCountryData.cs"
 
 # =================================================================================================

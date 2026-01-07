@@ -8,7 +8,7 @@
 
 [CmdletBinding()]
 param(
-    [switch]$EnableUpdateTarget
+    [bool]$EnableUpdateTarget = $false
 )
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
@@ -22,10 +22,10 @@ $zone1970Path = Join-Path $ianaTzZoneInfoDir "zone1970.tab"
 $templatePath = Join-Path $ianaTzZoneInfoDir "DefaultIanaTimeZoneData.template.cs"
 $generatorPath = Join-Path $ianaTzZoneInfoDir "DefaultIanaTimeZoneDataGenerator.ps1"
 
-$generatedDir = Join-Path $ianaRoot "generated"
+$generatedDir = Join-Path $repoRoot "etc\generated"
 $outputPath = Join-Path $generatedDir "DefaultIanaTimeZoneData.cs"
 
-$targetDir = Join-Path $repoRoot "src\PineGuard.Core\Iana\TimeZones"
+$targetDir = Join-Path $repoRoot "src\PineGuard.Core\Externals\Iana\TimeZones"
 $targetPath = Join-Path $targetDir "DefaultIanaTimeZoneData.cs"
 
 Write-Host "" 

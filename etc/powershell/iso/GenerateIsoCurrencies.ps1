@@ -28,7 +28,7 @@
 
 [CmdletBinding()]
 param(
-    [switch]$EnableUpdateTarget
+    [bool]$EnableUpdateTarget = $false
 )
 
 # Set execution policy for this process to allow script execution
@@ -49,11 +49,11 @@ $templatePath = Join-Path $scriptRoot "iso-4217-currencies\DefaultIsoCurrencyDat
 $generatorPath = Join-Path $scriptRoot "iso-4217-currencies\DefaultIsoCurrencyDataGenerator.ps1"
 
 # Output paths
-$generatedDir = Join-Path $scriptRoot "generated"
+$generatedDir = Join-Path $repoRoot "etc\generated"
 $outputPath   = Join-Path $generatedDir "DefaultIsoCurrencyData.cs"
 
 # Target location in source tree
-$targetDir  = Join-Path $repoRoot "src\PineGuard.Core\Iso\Currencies"
+$targetDir  = Join-Path $repoRoot "src\PineGuard.Core\Externals\Iso\Currencies"
 $targetPath = Join-Path $targetDir "DefaultIsoCurrencyData.cs"
 
 # =================================================================================================

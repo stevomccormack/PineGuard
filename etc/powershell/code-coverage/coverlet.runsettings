@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <!-- Explicitly include the main library to avoid collector regressions that only report PineGuard.Testing -->
+          <Include>[PineGuard.Core]*</Include>
+          <!-- Exclude build artifacts and generated sources from coverage to keep reports stable -->
+          <ExcludeByFile>**/obj/**;**\\obj\\**;**/bin/**;**\\bin\\**</ExcludeByFile>
+          <!-- Exclude compiler/source-generated code (including GeneratedRegex output) -->
+          <ExcludeByAttribute>GeneratedCodeAttribute;CompilerGeneratedAttribute;ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
