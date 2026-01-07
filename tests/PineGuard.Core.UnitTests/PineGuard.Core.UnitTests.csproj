@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PineGuard.Core\PineGuard.Core.csproj" />
+    <ProjectReference Include="..\PineGuard.Testing\PineGuard.Testing.csproj" />
   </ItemGroup>
 
 </Project>

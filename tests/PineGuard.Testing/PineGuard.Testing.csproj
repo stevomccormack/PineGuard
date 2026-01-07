@@ -10,4 +10,8 @@
     <PackageReference Include="xunit.abstractions" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PineGuard.Core\PineGuard.Core.csproj" />
+  </ItemGroup>
+
 </Project>
