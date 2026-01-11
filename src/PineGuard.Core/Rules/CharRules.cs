@@ -14,7 +14,7 @@ public static class CharRules
 
     public static bool IsLetterOrDigit(char c) => char.IsLetterOrDigit(c);
 
-    public static bool IsAscii(char c) => c is >= AsciiMinValue and <= AsciiMaxValue;
+    public static bool IsAscii(char c) => c <= AsciiMaxValue;
 
     public static bool IsPrintableAscii(char c) => c is >= PrintableAsciiMinValue and <= PrintableAsciiMaxValue;
 

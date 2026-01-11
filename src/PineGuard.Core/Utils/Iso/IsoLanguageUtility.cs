@@ -1,4 +1,4 @@
-using PineGuard.Iso.Languages;
+using PineGuard.Externals.Iso.Languages;
 using PineGuard.Rules;
 
 namespace PineGuard.Utils.Iso;

@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Frozen;
 
-namespace PineGuard.Iso.Currencies;
+namespace PineGuard.Externals.Iso.Currencies;
 
 /// <summary>
 /// ISO 4217 currency code data.

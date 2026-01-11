@@ -1,9 +1,8 @@
 using PineGuard.Extensions;
-using PineGuard.Externals.Iso.Languages;
 using PineGuard.Utils.Iso;
 using System.Text.RegularExpressions;
 
-namespace PineGuard.Iso.Languages;
+namespace PineGuard.Externals.Iso.Languages;
 
 /// <summary>
 /// Represents an ISO 639 language.

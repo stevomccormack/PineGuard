@@ -86,7 +86,7 @@ public sealed class MustResult<T>
 
 public static class MustResultExtension
 {
-    public static MustResult<T> Combine<T>(this IEnumerable<MustResult<T>> results)
+    public static MustResult<T> Combine<T>(this IEnumerable<MustResult<T>>? results)
     {
         if (results is null)
             return MustResult<T>.Fail("{paramName} must not be null.", nameof(results), results);

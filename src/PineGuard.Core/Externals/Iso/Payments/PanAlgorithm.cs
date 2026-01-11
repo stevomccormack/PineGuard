@@ -19,6 +19,6 @@ public static class PanAlgorithm
         if (!StringRules.IsDigitsOnly(digitsOnly))
             return false;
 
-        return RuleComparison.IsBetween(digitsOnly.Length, PanMinLength, PanMaxLength, Inclusion.Inclusive);
+        return RuleComparison.IsBetween(digitsOnly.Length, PanMinLength, PanMaxLength);
     }
 }

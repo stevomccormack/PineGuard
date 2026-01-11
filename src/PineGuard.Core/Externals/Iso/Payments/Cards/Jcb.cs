@@ -1,4 +1,3 @@
-using PineGuard.Iso.Payments.Cards;
 using PineGuard.Utils.Iso;
 
 namespace PineGuard.Externals.Iso.Payments.Cards;
@@ -8,20 +7,15 @@ namespace PineGuard.Externals.Iso.Payments.Cards;
 /// </summary>
 /// <remarks>
 /// PAN = full card number. IIN = leading digits of PAN used for issuer/brand identification.
-/// JCB IIN range is <c>3528</c>–<c>3589</c>. PAN length is typically 16.
+/// JCB IIN range is <c>3528</c>ï¿½<c>3589</c>. PAN length is typically 16.
 /// </remarks>
-public sealed class JcbCard : IsoPaymentCardBrand
+public sealed class JcbCard() : IsoPaymentCardBrand(Brand,
+    [PanExactLength],
+    ["3528", "3589"],
+    [4, 4, 4, 4])
 {
     public const string Brand = "JCB";
     public const int PanExactLength = 16;
-
-    public JcbCard() : base(
-        Brand,
-        [PanExactLength],
-        ["3528", "3589"],
-        [4, 4, 4, 4])
-    {
-    }
 
     public override bool MatchesPan(string? pan)
     {

@@ -47,7 +47,10 @@ public static class CollectionUtility
             return true;
         }
 
-        if (TryGetCount(value, out var count) && index >= count)
+        if (value is ICollection<T> c && index >= c.Count)
+            return false;
+
+        if (value is IReadOnlyCollection<T> rc && index >= rc.Count)
             return false;
 
         var i = 0;

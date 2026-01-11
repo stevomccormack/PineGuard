@@ -63,16 +63,16 @@ public static class NumberRules
     }
 
     public static bool IsEven(int? value) =>
-        IsMultipleOf<int>(value, 2);
+        IsMultipleOf(value, 2);
 
     public static bool IsEven(long? value) =>
-        IsMultipleOf<long>(value, 2);
+        IsMultipleOf(value, 2);
 
     public static bool IsOdd(int? value) =>
-        value is not null && !IsMultipleOf<int>(value, 2);
+        value is not null && !IsMultipleOf(value, 2);
 
     public static bool IsOdd(long? value) =>
-        value is not null && !IsMultipleOf<long>(value, 2);
+        value is not null && !IsMultipleOf(value, 2);
 
     public static bool IsFinite(float? value) =>
         value is not null && float.IsFinite(value.Value);

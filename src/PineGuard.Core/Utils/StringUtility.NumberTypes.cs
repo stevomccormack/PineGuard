@@ -5,7 +5,7 @@ namespace PineGuard.Utils;
 
 public static partial class StringUtility
 {
-    public static partial class NumberTypes
+    public static class NumberTypes
     {
         public static bool TryParseInt32(
             string? value,

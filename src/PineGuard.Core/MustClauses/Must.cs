@@ -2,7 +2,7 @@
 
 public static class Must
 {
-    private static readonly MustClause _mustClause = new();
+    private static readonly MustClause MustClause = new();
 
-    public static IMustClause Be => _mustClause;
+    public static IMustClause Be => MustClause;
 }

@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Frozen;
 
-namespace PineGuard.Iso.Countries;
+namespace PineGuard.Externals.Iso.Countries;
 
 /// <summary>
 /// ISO 3166-1 country code data.

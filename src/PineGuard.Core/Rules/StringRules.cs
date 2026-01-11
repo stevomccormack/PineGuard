@@ -76,7 +76,7 @@ public static partial class StringRules
     public static bool IsDigitsOnly(string? value) =>
         StringUtility.TryParseDigitsOnly(value, out _);
 
-    public static bool IsDigitsOnly(string? value, char[]? allowedNonDigitChars = null) =>
+    public static bool IsDigitsOnly(string? value, char[]? allowedNonDigitChars) =>
         StringUtility.TryParseDigits(value, out _, allowedNonDigitChars);
 
     public static bool IsUppercase(string? value, bool lettersOnly = false)

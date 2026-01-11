@@ -1,6 +1,4 @@
-﻿using PineGuard.Iso.Countries;
-
-namespace PineGuard.Externals.Iso.Countries;
+﻿namespace PineGuard.Externals.Iso.Countries;
 
 /// <summary>
 /// Provides validation and lookup services for ISO 3166 country codes.

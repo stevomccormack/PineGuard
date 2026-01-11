@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace PineGuard.Iso.Dates;
+namespace PineGuard.Externals.Iso.Dates;
 
 /// <summary>
 /// ISO 8601 date-time formats with offset/UTC (recommended for representing an instant in time).

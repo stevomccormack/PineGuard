@@ -11,7 +11,7 @@ public static partial class StringUtility
             if (value is null)
                 return true;
 
-            if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            if (!TryGetTrimmed(value, out var trimmed))
                 return false;
 
             if (bool.TryParse(trimmed, out var parsed))

@@ -1,9 +1,9 @@
 using PineGuard.Externals.Iso.Currencies;
-using PineGuard.Iso.Countries;
+using PineGuard.Externals.Iso.Countries;
 
 namespace PineGuard.Rules.Iso;
 
-public static partial class IsoCurrencyRules
+public static class IsoCurrencyRules
 {
     private static readonly IIsoCurrencyProvider DefaultProvider = DefaultIsoCurrencyProvider.Instance;
 

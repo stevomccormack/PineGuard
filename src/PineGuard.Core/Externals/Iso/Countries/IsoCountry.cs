@@ -1,9 +1,8 @@
 using PineGuard.Extensions;
-using PineGuard.Externals.Iso.Countries;
 using PineGuard.Utils.Iso;
 using System.Text.RegularExpressions;
 
-namespace PineGuard.Iso.Countries;
+namespace PineGuard.Externals.Iso.Countries;
 
 /// <summary>
 /// Represents an ISO 3166 country with all standard code formats.

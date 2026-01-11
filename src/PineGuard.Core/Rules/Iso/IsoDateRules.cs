@@ -1,9 +1,9 @@
-using PineGuard.Iso.Dates;
+using PineGuard.Externals.Iso.Dates;
 using PineGuard.Utils.Iso;
 
 namespace PineGuard.Rules.Iso;
 
-public static partial class IsoDateRules
+public static class IsoDateRules
 {
     public static bool IsIsoDateOnly(string? value)
     {

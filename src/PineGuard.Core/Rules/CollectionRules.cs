@@ -10,8 +10,11 @@ public static class CollectionRules
         if (value is null)
             return false;
 
-        if (CollectionUtility.TryGetCount(value, out var count))
-            return count == 0;
+        if (value is ICollection<T> c)
+            return c.Count == 0;
+
+        if (value is IReadOnlyCollection<T> rc)
+            return rc.Count == 0;
 
         using var e = value.GetEnumerator();
         return !e.MoveNext();
@@ -22,8 +25,11 @@ public static class CollectionRules
         if (value is null)
             return false;
 
-        if (CollectionUtility.TryGetCount(value, out var count))
-            return count != 0;
+        if (value is ICollection<T> c)
+            return c.Count != 0;
+
+        if (value is IReadOnlyCollection<T> rc)
+            return rc.Count != 0;
 
         using var e = value.GetEnumerator();
         return e.MoveNext();
@@ -34,8 +40,11 @@ public static class CollectionRules
         if (value is null || count < 0)
             return false;
 
-        if (CollectionUtility.TryGetCount(value, out var knownCount))
-            return knownCount == count;
+        if (value is ICollection<T> c)
+            return c.Count == count;
+
+        if (value is IReadOnlyCollection<T> rc)
+            return rc.Count == count;
 
         return TryGetCountUpTo(value, maxInclusive: count, out var seen) && seen == count;
     }
@@ -45,8 +54,11 @@ public static class CollectionRules
         if (value is null || min < 0)
             return false;
 
-        if (CollectionUtility.TryGetCount(value, out var count))
-            return count >= min;
+        if (value is ICollection<T> c)
+            return c.Count >= min;
+
+        if (value is IReadOnlyCollection<T> rc)
+            return rc.Count >= min;
 
         // Has at least min items if there exists an element at index (min-1)
         return min == 0 || HasIndex(value, min - 1);
@@ -57,8 +69,11 @@ public static class CollectionRules
         if (value is null || max < 0)
             return false;
 
-        if (CollectionUtility.TryGetCount(value, out var count))
-            return count <= max;
+        if (value is ICollection<T> c)
+            return c.Count <= max;
+
+        if (value is IReadOnlyCollection<T> rc)
+            return rc.Count <= max;
 
         // Has at most max items if it does NOT have an element at index max
         return !HasIndex(value, max);
@@ -72,8 +87,11 @@ public static class CollectionRules
         if (min < 0 || max < 0 || min > max)
             return false;
 
-        if (CollectionUtility.TryGetCount(value, out var count))
-            return RuleComparison.IsBetween(count, min, max, inclusion);
+        if (value is ICollection<T> c)
+            return RuleComparison.IsBetween(c.Count, min, max, inclusion);
+
+        if (value is IReadOnlyCollection<T> rc)
+            return RuleComparison.IsBetween(rc.Count, min, max, inclusion);
 
         var upperBound = inclusion == Inclusion.Inclusive ? max : max - 1;
         if (upperBound < 0)
@@ -154,8 +172,11 @@ public static class CollectionRules
         if (value is null || index < 0)
             return false;
 
-        if (CollectionUtility.TryGetCount(value, out var count))
-            return index < count;
+        if (value is ICollection<T> c)
+            return index < c.Count;
+
+        if (value is IReadOnlyCollection<T> rc)
+            return index < rc.Count;
 
         return CollectionUtility.TryGet(value, index, out _);
     }

@@ -84,7 +84,7 @@ public static partial class EmailUtility
             return false;
         }
 
-        if (!MailAddress.TryCreate(normalized, out var parsed) || parsed is null)
+        if (!MailAddress.TryCreate(normalized, out var parsed))
             return false;
 
         if (!string.Equals(parsed.Address, normalized, StringComparison.Ordinal))

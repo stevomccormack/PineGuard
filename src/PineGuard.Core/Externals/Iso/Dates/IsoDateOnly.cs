@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace PineGuard.Iso.Dates;
+namespace PineGuard.Externals.Iso.Dates;
 
 /// <summary>
 /// ISO 8601 date format constants and utilities.
@@ -29,8 +29,7 @@ public static partial class IsoDateOnly
         DateOnly.ParseExact(
             value,
             ExactFormat,
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.None);
+            CultureInfo.InvariantCulture);
 
     public static string ToIsoString(this DateOnly value) =>
         value.ToString(ExactFormat, CultureInfo.InvariantCulture);

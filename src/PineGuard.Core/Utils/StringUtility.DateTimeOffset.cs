@@ -10,7 +10,7 @@ public static partial class StringUtility
         {
             dateTimeOffset = null;
 
-            if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            if (!TryGetTrimmed(value, out var trimmed))
                 return false;
 
             if (global::System.DateTimeOffset.TryParse(trimmed, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var parsed))

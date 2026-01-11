@@ -1,11 +1,11 @@
 using PineGuard.Common;
 using PineGuard.Externals.Iso.Payments;
-using PineGuard.Iso.Payments.Cards;
+using PineGuard.Externals.Iso.Payments.Cards;
 using PineGuard.Utils;
 
 namespace PineGuard.Rules.Iso;
 
-public static partial class IsoPaymentCardRules
+public static class IsoPaymentCardRules
 {
     public static bool IsIsoPaymentCard(string? value) =>
         IsIsoPaymentCard(value, IsoPaymentCardBrand.DefaultAllowedSeparators);
@@ -19,7 +19,7 @@ public static partial class IsoPaymentCardRules
             if (!StringUtility.TryParseDigitsOnly(value, out var digitsOnly))
                 return false;
 
-            if (!RuleComparison.IsBetween(digitsOnly.Length, IsoPaymentCardBrand.MinPanLength, IsoPaymentCardBrand.MaxPanLength, Inclusion.Inclusive))
+            if (!RuleComparison.IsBetween(digitsOnly.Length, IsoPaymentCardBrand.MinPanLength, IsoPaymentCardBrand.MaxPanLength))
                 return false;
 
             return LuhnAlgorithm.IsValid(digitsOnly);
@@ -39,7 +39,7 @@ public static partial class IsoPaymentCardRules
         if (!StringUtility.TryParseDigits(value, out var parsedDigitsOnly, allowedSeparators))
             return false;
 
-        if (!RuleComparison.IsBetween(parsedDigitsOnly.Length, IsoPaymentCardBrand.MinPanLength, IsoPaymentCardBrand.MaxPanLength, Inclusion.Inclusive))
+        if (!RuleComparison.IsBetween(parsedDigitsOnly.Length, IsoPaymentCardBrand.MinPanLength, IsoPaymentCardBrand.MaxPanLength))
             return false;
 
         return LuhnAlgorithm.IsValid(parsedDigitsOnly);

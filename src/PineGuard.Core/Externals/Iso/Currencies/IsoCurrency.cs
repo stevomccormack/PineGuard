@@ -1,9 +1,8 @@
 using PineGuard.Extensions;
-using PineGuard.Externals.Iso.Currencies;
 using PineGuard.Utils.Iso;
 using System.Text.RegularExpressions;
 
-namespace PineGuard.Iso.Currencies;
+namespace PineGuard.Externals.Iso.Currencies;
 
 /// <summary>
 /// Represents an ISO 4217 currency with all standard formats.

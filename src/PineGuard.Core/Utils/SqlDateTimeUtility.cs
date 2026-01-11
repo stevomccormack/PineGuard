@@ -13,7 +13,7 @@ public static class SqlDateTimeUtility
             return false;
 
         var dt = value.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Unspecified);
-        if (!RuleComparison.IsBetween(dt, SqlDateTimeRules.MinValue, SqlDateTimeRules.MaxValue, Inclusion.Inclusive))
+        if (!RuleComparison.IsBetween(dt, SqlDateTimeRules.MinValue, SqlDateTimeRules.MaxValue))
             return false;
 
         sqlDate = value.Value;
@@ -31,7 +31,7 @@ public static class SqlDateTimeUtility
 
         // SQL datetime is stored without offset; compare as instant in UTC.
         var utc = v.UtcDateTime;
-        if (!RuleComparison.IsBetween(utc, SqlDateTimeRules.MinValue, SqlDateTimeRules.MaxValue, Inclusion.Inclusive))
+        if (!RuleComparison.IsBetween(utc, SqlDateTimeRules.MinValue, SqlDateTimeRules.MaxValue))
             return false;
 
         sqlDateTime = v;
@@ -46,7 +46,7 @@ public static class SqlDateTimeUtility
             return false;
 
         var v = value.Value;
-        if (!RuleComparison.IsBetween(v, SqlDateTimeRules.MinValue, SqlDateTimeRules.MaxValue, Inclusion.Inclusive))
+        if (!RuleComparison.IsBetween(v, SqlDateTimeRules.MinValue, SqlDateTimeRules.MaxValue))
             return false;
 
         sqlDateTime = v;

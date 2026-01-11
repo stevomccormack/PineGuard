@@ -2,7 +2,7 @@
 
 public static class Guard
 {
-    private static readonly GuardClause _guardClause = new();
+    private static readonly GuardClause GuardClause = new();
 
-    public static IGuardClause Against => _guardClause;
+    public static IGuardClause Against => GuardClause;
 }

@@ -1,5 +1,3 @@
-using PineGuard.Iso.Payments.Cards;
-
 namespace PineGuard.Externals.Iso.Payments.Cards;
 
 /// <summary>
@@ -9,16 +7,11 @@ namespace PineGuard.Externals.Iso.Payments.Cards;
 /// PAN = full card number. IIN = leading digits of PAN used for issuer/brand identification.
 /// Amex PANs are typically 15 digits and start with <c>34</c> or <c>37</c>. Display format is commonly <c>4-6-5</c>.
 /// </remarks>
-public sealed class AmericanExpressCard : IsoPaymentCardBrand
+public sealed class AmericanExpressCard() : IsoPaymentCardBrand(Brand,
+    [PanExactLength],
+    ["34", "37"],
+    [4, 6, 5])
 {
     public const string Brand = "American Express";
     public const int PanExactLength = 15;
-
-    public AmericanExpressCard() : base(
-        Brand,
-        [PanExactLength],
-        ["34", "37"],
-        [4, 6, 5])
-    {
-    }
 }

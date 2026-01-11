@@ -1,5 +1,4 @@
 ﻿using PineGuard.Common;
-using PineGuard.Iso.Payments.Cards;
 
 namespace PineGuard.Externals.Iso.Payments.Cards;
 

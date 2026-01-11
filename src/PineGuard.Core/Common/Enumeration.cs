@@ -5,10 +5,10 @@ using System.Reflection;
 namespace PineGuard.Common;
 
 public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, IComparable<Enumeration<TValue>>
-    where TValue : notnull, IComparable<TValue>
+    where TValue : IComparable<TValue>
 {
-    private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, Enumeration<TValue>>> _nameRegistries = new();
-    private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<TValue, Enumeration<TValue>>> _valueRegistries = new();
+    private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, Enumeration<TValue>>> NameRegistries = new();
+    private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<TValue, Enumeration<TValue>>> ValueRegistries = new();
 
     public TValue Value { get; }
     public string Name { get; }
@@ -19,13 +19,13 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
         var type = GetType();
-        var nameRegistry = _nameRegistries.GetOrAdd(type, _ => new ConcurrentDictionary<string, Enumeration<TValue>>(StringComparer.OrdinalIgnoreCase));
+        var nameRegistry = NameRegistries.GetOrAdd(type, _ => new ConcurrentDictionary<string, Enumeration<TValue>>(StringComparer.OrdinalIgnoreCase));
         if (!nameRegistry.TryAdd(name, this))
         {
             throw new ArgumentException($"{nameof(name).TitleCase()} '{name}' already exists in {type.Name}.", nameof(name));
         }
 
-        var valueRegistry = _valueRegistries.GetOrAdd(type, _ => new ConcurrentDictionary<TValue, Enumeration<TValue>>());
+        var valueRegistry = ValueRegistries.GetOrAdd(type, _ => new ConcurrentDictionary<TValue, Enumeration<TValue>>());
         if (!valueRegistry.TryAdd(value, this))
         {
             nameRegistry.TryRemove(name, out _); // Rollback name registration
@@ -42,7 +42,7 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
             .Where(f => typeof(T).IsAssignableFrom(f.FieldType))
             .Select(f => (T)f.GetValue(null)!)];
-    } 
+    }
 
     public static T? FromValue<T>(TValue value) where T : Enumeration<TValue>
     {
@@ -102,7 +102,7 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
 
     public static bool operator ==(Enumeration<TValue>? left, Enumeration<TValue>? right)
     {
-        return (left is null)? right is null: left.Equals(right);
+        return (left is null) ? right is null : left.Equals(right);
     }
 
     public static bool operator !=(Enumeration<TValue>? left, Enumeration<TValue>? right)

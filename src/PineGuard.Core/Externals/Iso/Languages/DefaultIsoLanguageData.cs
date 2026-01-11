@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Frozen;
 
-namespace PineGuard.Iso.Languages;
+namespace PineGuard.Externals.Iso.Languages;
 
 /// <summary>
 /// ISO 639 language code data.

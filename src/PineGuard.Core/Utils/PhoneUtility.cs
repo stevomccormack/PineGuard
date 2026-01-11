@@ -13,7 +13,7 @@ public static class PhoneUtility
     {
         digits = string.Empty;
 
-        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+        if (!StringUtility.TryGetTrimmed(value, out _))
             return false;
 
         if (minDigits < 1 || maxDigits < 1 || minDigits > maxDigits)

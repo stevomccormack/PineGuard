@@ -1,10 +1,8 @@
 using PineGuard.Extensions;
-using PineGuard.Externals.Iso.Payments;
-using PineGuard.Externals.Iso.Payments.Cards;
 using PineGuard.Utils.Iso;
 using System.Text.RegularExpressions;
 
-namespace PineGuard.Iso.Payments.Cards;
+namespace PineGuard.Externals.Iso.Payments.Cards;
 
 /// <summary>
 /// Base implementation for ISO/IEC 7812 payment card brand specifications.
@@ -143,7 +141,7 @@ public abstract partial class IsoPaymentCardBrand : IIsoPaymentCardBrand
 
 public static class IsoPaymentCardBrandUtility
 {
-    private static readonly Lazy<IIsoPaymentCardBrand[]> _all = new(() =>
+    private static readonly Lazy<IIsoPaymentCardBrand[]> AllBrands = new(() =>
     [
         new VisaCard(),
         new MastercardCard(),
@@ -153,7 +151,7 @@ public static class IsoPaymentCardBrandUtility
         new JcbCard(),
     ]);
 
-    public static IReadOnlyList<IIsoPaymentCardBrand> All => _all.Value;
+    public static IReadOnlyList<IIsoPaymentCardBrand> All => AllBrands.Value;
 
     public static IIsoPaymentCardBrand? FromPan(string? pan)
     {

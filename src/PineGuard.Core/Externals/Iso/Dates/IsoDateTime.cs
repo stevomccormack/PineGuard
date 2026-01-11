@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace PineGuard.Iso.Dates;
+namespace PineGuard.Externals.Iso.Dates;
 
 /// <summary>
 /// ISO 8601 local date-time formats (no offset).

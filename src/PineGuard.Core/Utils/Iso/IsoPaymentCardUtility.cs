@@ -1,5 +1,5 @@
 using PineGuard.Externals.Iso.Payments;
-using PineGuard.Iso.Payments.Cards;
+using PineGuard.Externals.Iso.Payments.Cards;
 using PineGuard.Rules.Iso;
 using System.Text;
 

@@ -1,4 +1,3 @@
-using PineGuard.Iso.Payments.Cards;
 using PineGuard.Utils.Iso;
 
 namespace PineGuard.Externals.Iso.Payments.Cards;
@@ -8,20 +7,15 @@ namespace PineGuard.Externals.Iso.Payments.Cards;
 /// </summary>
 /// <remarks>
 /// PAN = full card number. IIN = leading digits of PAN used for issuer/brand identification.
-/// Common IIN ranges: <c>51</c>–<c>55</c> and <c>2221</c>–<c>2720</c>. PAN length is typically 16.
+/// Common IIN ranges: <c>51</c>ï¿½<c>55</c> and <c>2221</c>ï¿½<c>2720</c>. PAN length is typically 16.
 /// </remarks>
-public sealed class MastercardCard : IsoPaymentCardBrand
+public sealed class MastercardCard() : IsoPaymentCardBrand(Brand,
+    [PanExactLength],
+    ["51", "52", "53", "54", "55", "2221", "2720"],
+    [4, 4, 4, 4])
 {
     public const string Brand = "Mastercard";
     public const int PanExactLength = 16;
-
-    public MastercardCard() : base(
-        Brand,
-        [PanExactLength],
-        ["51", "52", "53", "54", "55", "2221", "2720"],
-        [4, 4, 4, 4])
-    {
-    }
 
     public override bool MatchesPan(string? pan)
     {

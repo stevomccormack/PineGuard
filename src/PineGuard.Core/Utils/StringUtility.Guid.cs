@@ -8,7 +8,7 @@ public static partial class StringUtility
         {
             guid = null;
 
-            if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            if (!TryGetTrimmed(value, out var trimmed))
                 return false;
 
             if (System.Guid.TryParse(trimmed, out var parsed))

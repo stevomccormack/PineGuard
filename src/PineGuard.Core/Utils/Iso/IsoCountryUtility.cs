@@ -1,4 +1,4 @@
-using PineGuard.Iso.Countries;
+using PineGuard.Externals.Iso.Countries;
 using PineGuard.Rules;
 
 namespace PineGuard.Utils.Iso;

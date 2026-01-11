@@ -3,7 +3,7 @@ using PineGuard.Externals.Iana.TimeZones;
 
 namespace PineGuard.Rules;
 
-public static partial class TimeZoneRules
+public static class TimeZoneRules
 {
     public static class Iana
     {

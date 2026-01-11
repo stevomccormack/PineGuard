@@ -18,6 +18,8 @@ public readonly struct DateOnlyRange : IEquatable<DateOnlyRange>
 
     public int DayCount => End.DayNumber - Start.DayNumber + 1;
 
+    public TimeSpan Duration => TimeSpan.FromDays(DayCount);
+
     public bool Contains(DateOnly value) => value >= Start && value <= End;
 
     public bool Overlaps(DateOnlyRange other)

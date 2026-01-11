@@ -1,9 +1,8 @@
 using PineGuard.Externals.Iso.Languages;
-using PineGuard.Iso.Languages;
 
 namespace PineGuard.Rules.Iso;
 
-public static partial class IsoLanguageRules
+public static class IsoLanguageRules
 {
     private static readonly IIsoLanguageProvider DefaultProvider = DefaultIsoLanguageProvider.Instance;
 

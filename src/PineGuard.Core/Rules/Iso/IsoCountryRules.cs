@@ -1,9 +1,8 @@
 using PineGuard.Externals.Iso.Countries;
-using PineGuard.Iso.Countries;
 
 namespace PineGuard.Rules.Iso;
 
-public static partial class IsoCountryRules
+public static class IsoCountryRules
 {
     private static readonly IIsoCountryProvider DefaultProvider = DefaultIsoCountryProvider.Instance;
 
@@ -15,10 +14,7 @@ public static partial class IsoCountryRules
             return false;
 
         var trimmed = value.Trim();
-        if (!IsoCountry.Alpha2CodeRegex().IsMatch(trimmed))
-            return false;
-
-        return provider.ContainsAlpha2Code(trimmed);
+        return IsoCountry.Alpha2CodeRegex().IsMatch(trimmed) && provider.ContainsAlpha2Code(trimmed);
     }
 
     public static bool IsIsoAlpha3Code(string? value, IIsoCountryProvider? provider = null)

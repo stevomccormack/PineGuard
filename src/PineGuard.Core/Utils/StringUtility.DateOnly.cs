@@ -10,7 +10,7 @@ public static partial class StringUtility
         {
             date = null;
 
-            if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            if (!TryGetTrimmed(value, out var trimmed))
                 return false;
 
             if (global::System.DateOnly.TryParse(trimmed, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))

@@ -10,7 +10,7 @@ public static partial class StringUtility
         {
             timeSpan = null;
 
-            if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            if (!TryGetTrimmed(value, out var trimmed))
                 return false;
 
             if (global::System.TimeSpan.TryParse(trimmed, CultureInfo.InvariantCulture, out var parsed))
