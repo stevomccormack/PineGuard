@@ -5,7 +5,6 @@ public abstract record TryCase<TValue, TOut>(
     TValue? Value,
     bool ExpectedReturn,
     TOut? ExpectedOutValue)
-    : ReturnWithOutCase<TValue, bool, TOut>(Name, Value, ExpectedReturn, ExpectedOutValue)
+    : ReturnOutCase<TValue, bool, TOut>(Name, Value, ExpectedReturn, ExpectedOutValue)
 {
-    public bool ExpectedSuccess => ExpectedReturn;
 }

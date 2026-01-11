@@ -6,5 +6,4 @@ public abstract record IsCase<TValue>(
     bool ExpectedReturn)
     : ReturnCase<TValue, bool>(Name, Value, ExpectedReturn)
 {
-    public bool Expected => ExpectedReturn;
 }

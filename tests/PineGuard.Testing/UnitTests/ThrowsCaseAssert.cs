@@ -1,14 +1,16 @@
+using PineGuard.Testing.Common;
+
 namespace PineGuard.Testing.UnitTests;
 
 public static class ThrowsCaseAssert
 {
-    public static void AssertExpected(Exception ex, IThrowsCase testCase)
+    public static void Expected(Exception ex, IThrowsCase testCase)
     {
         ArgumentNullException.ThrowIfNull(testCase);
-        AssertExpected(ex, testCase.ExpectedException);
+        Expected(ex, testCase.ExpectedException);
     }
 
-    public static void AssertExpected(Exception ex, ExpectedException expected)
+    public static void Expected(Exception ex, ExpectedException expected)
     {
         ArgumentNullException.ThrowIfNull(ex);
         ArgumentNullException.ThrowIfNull(expected);

@@ -1,6 +1,4 @@
-using PineGuard.Testing;
-
-namespace PineGuard.Testing.UnitTests;
+namespace PineGuard.Testing.Common;
 
 public interface IThrowsCase
 {

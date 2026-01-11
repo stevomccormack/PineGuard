@@ -121,15 +121,10 @@ public abstract class BaseUnitTest : IDisposable
         CultureInfo.CurrentUICulture = uiCulture;
     }
 
-    private sealed class Scope : IDisposable
+    private sealed class Scope(Action onDispose) : IDisposable
     {
-        private readonly Action _onDispose;
+        private readonly Action _onDispose = onDispose ?? throw new ArgumentNullException(nameof(onDispose));
         private int _disposed;
-
-        public Scope(Action onDispose)
-        {
-            _onDispose = onDispose ?? throw new ArgumentNullException(nameof(onDispose));
-        }
 
         public void Dispose()
         {
