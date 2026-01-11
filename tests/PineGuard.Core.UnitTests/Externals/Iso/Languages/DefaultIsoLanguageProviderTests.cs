@@ -1,5 +1,4 @@
 using PineGuard.Externals.Iso.Languages;
-using PineGuard.Iso.Languages;
 using PineGuard.Testing.UnitTests;
 using System.Collections.Frozen;
 
@@ -12,13 +11,13 @@ public sealed class DefaultIsoLanguageProviderTests : BaseUnitTest
     {
         var testLanguage = new IsoLanguage("aa", "aaa", "Test Language");
 
-        FrozenDictionary<string, IsoLanguage> alpha2 =
+        var alpha2 =
             new Dictionary<string, IsoLanguage>(StringComparer.Ordinal)
             {
                 { "aa", testLanguage },
             }.ToFrozenDictionary(StringComparer.Ordinal);
 
-        FrozenDictionary<string, IsoLanguage> alpha3 =
+        var alpha3 =
             new Dictionary<string, IsoLanguage>(StringComparer.Ordinal)
             {
                 { "aaa", testLanguage },
@@ -47,16 +46,18 @@ public sealed class DefaultIsoLanguageProviderTests : BaseUnitTest
         var ok = provider.TryGet(testCase.Value, out var lang);
 
         // Assert
-        Assert.Equal(testCase.Expected, ok);
-        if (testCase.Expected)
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(lang);
             Assert.True(provider.GetAll().Count > 0);
-            Assert.Equal(testCase.ExpectedAlpha2, lang.Alpha2Code);
+            Assert.NotNull(testCase.ExpectedOutValue);
+            Assert.Equal(testCase.ExpectedOutValue, lang.Alpha2Code);
         }
         else
         {
             Assert.Null(lang);
+            Assert.Null(testCase.ExpectedOutValue);
         }
     }
 
@@ -72,7 +73,7 @@ public sealed class DefaultIsoLanguageProviderTests : BaseUnitTest
         var contains = provider.ContainsAlpha2Code(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, contains);
+        Assert.Equal(testCase.ExpectedReturn, contains);
     }
 
     [Theory]
@@ -84,7 +85,7 @@ public sealed class DefaultIsoLanguageProviderTests : BaseUnitTest
 
         var contains = provider.ContainsAlpha3Code(testCase.Value);
 
-        Assert.Equal(testCase.Expected, contains);
+        Assert.Equal(testCase.ExpectedReturn, contains);
     }
 
     [Theory]
@@ -96,14 +97,17 @@ public sealed class DefaultIsoLanguageProviderTests : BaseUnitTest
 
         var ok = provider.TryGetByAlpha2Code(testCase.Value, out var lang);
 
-        Assert.Equal(testCase.Expected, ok);
-        if (testCase.Expected)
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(lang);
+            Assert.NotNull(testCase.ExpectedOutValue);
+            Assert.Equal(testCase.ExpectedOutValue, lang.Alpha2Code);
         }
         else
         {
             Assert.Null(lang);
+            Assert.Null(testCase.ExpectedOutValue);
         }
     }
 
@@ -116,14 +120,17 @@ public sealed class DefaultIsoLanguageProviderTests : BaseUnitTest
 
         var ok = provider.TryGetByAlpha3Code(testCase.Value, out var lang);
 
-        Assert.Equal(testCase.Expected, ok);
-        if (testCase.Expected)
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(lang);
+            Assert.NotNull(testCase.ExpectedOutValue);
+            Assert.Equal(testCase.ExpectedOutValue, lang.Alpha3Code);
         }
         else
         {
             Assert.Null(lang);
+            Assert.Null(testCase.ExpectedOutValue);
         }
     }
 

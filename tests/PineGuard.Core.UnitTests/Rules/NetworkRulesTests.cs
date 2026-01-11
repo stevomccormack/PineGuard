@@ -12,7 +12,7 @@ public sealed class NetworkRulesTests : BaseUnitTest
     {
         var result = NetworkRules.IsIpAddress(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -22,7 +22,7 @@ public sealed class NetworkRulesTests : BaseUnitTest
     {
         var result = NetworkRules.IsIpv4(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -32,6 +32,6 @@ public sealed class NetworkRulesTests : BaseUnitTest
     {
         var result = NetworkRules.IsIpv6(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

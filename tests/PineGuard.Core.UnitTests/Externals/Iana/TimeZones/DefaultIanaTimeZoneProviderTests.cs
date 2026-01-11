@@ -32,7 +32,7 @@ public sealed class DefaultIanaTimeZoneProviderTests : BaseUnitTest
         var result = provider.IsValidTimeZoneId(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -47,17 +47,17 @@ public sealed class DefaultIanaTimeZoneProviderTests : BaseUnitTest
         var result = provider.TryGetById(testCase.Value, out var tz);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
 
-        if (testCase.Expected)
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(tz);
-            Assert.Equal(testCase.ExpectedId, tz!.Id);
+            Assert.Equal(testCase.ExpectedOutValue, tz.Id);
         }
         else
         {
             Assert.Null(tz);
-            Assert.Null(testCase.ExpectedId);
+            Assert.Null(testCase.ExpectedOutValue);
         }
     }
 
@@ -79,7 +79,7 @@ public sealed class DefaultIanaTimeZoneProviderTests : BaseUnitTest
     [Theory]
     [MemberData(nameof(DefaultIanaTimeZoneProviderTestData.TryGetTimeZoneIdsByCountryAlpha2Code.ValidCases), MemberType = typeof(DefaultIanaTimeZoneProviderTestData.TryGetTimeZoneIdsByCountryAlpha2Code))]
     [MemberData(nameof(DefaultIanaTimeZoneProviderTestData.TryGetTimeZoneIdsByCountryAlpha2Code.EdgeCases), MemberType = typeof(DefaultIanaTimeZoneProviderTestData.TryGetTimeZoneIdsByCountryAlpha2Code))]
-    public void TryGetTimeZoneIdsByCountryAlpha2Code_ReturnsExpected(DefaultIanaTimeZoneProviderTestData.TryGetTimeZoneIdsByCountryAlpha2Code.ValidCase testCase)
+    public void TryGetTimeZoneIdsByCountryAlpha2Code_ReturnsExpected(DefaultIanaTimeZoneProviderTestData.TryGetTimeZoneIdsByCountryAlpha2Code.Case testCase)
     {
         // Arrange
         var provider = DefaultIanaTimeZoneProviderTestData.CreateSampleProvider();
@@ -88,7 +88,7 @@ public sealed class DefaultIanaTimeZoneProviderTests : BaseUnitTest
         var result = provider.TryGetTimeZoneIdsByCountryAlpha2Code(testCase.Value, out var ids);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
-        Assert.Equal(testCase.ExpectedIds, ids);
+        Assert.Equal(testCase.ExpectedReturn, result);
+        Assert.Equal(testCase.ExpectedOutValue, ids);
     }
 }

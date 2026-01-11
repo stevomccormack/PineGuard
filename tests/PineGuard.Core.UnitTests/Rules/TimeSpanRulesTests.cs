@@ -12,7 +12,7 @@ public sealed class TimeSpanRulesTests : BaseUnitTest
     {
         var result = TimeSpanRules.IsDurationBetween(testCase.Value, testCase.Min, testCase.Max, testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -22,7 +22,7 @@ public sealed class TimeSpanRulesTests : BaseUnitTest
     {
         var result = TimeSpanRules.IsGreaterThan(testCase.Value, testCase.Threshold, testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -32,6 +32,6 @@ public sealed class TimeSpanRulesTests : BaseUnitTest
     {
         var result = TimeSpanRules.IsLessThan(testCase.Value, testCase.Threshold, testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

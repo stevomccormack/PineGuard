@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Rules;
 using PineGuard.Testing.UnitTests;
 
@@ -12,13 +11,11 @@ public sealed class DateOnlyRangeRulesTests : BaseUnitTest
         MemberType = typeof(DateOnlyRangeRulesTestData.IsChronological))]
     public void IsChronological_ReturnsExpected_ForValidCases(DateOnlyRangeRulesTestData.IsChronological.Case testCase)
     {
-        // Arrange
-
         // Act
-        var result = DateOnlyRangeRules.IsChronological(testCase.Range, testCase.Inclusion);
+        var result = DateOnlyRangeRules.IsChronological(testCase.Value, testCase.Inclusion);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -27,13 +24,11 @@ public sealed class DateOnlyRangeRulesTests : BaseUnitTest
         MemberType = typeof(DateOnlyRangeRulesTestData.IsChronological))]
     public void IsChronological_ReturnsFalse_ForNullOrExclusiveSameDay(DateOnlyRangeRulesTestData.IsChronological.Case testCase)
     {
-        // Arrange
-
         // Act
-        var result = DateOnlyRangeRules.IsChronological(testCase.Range, testCase.Inclusion);
+        var result = DateOnlyRangeRules.IsChronological(testCase.Value, testCase.Inclusion);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -42,13 +37,11 @@ public sealed class DateOnlyRangeRulesTests : BaseUnitTest
         MemberType = typeof(DateOnlyRangeRulesTestData.IsOverlapping))]
     public void IsOverlapping_RespectsInclusion(DateOnlyRangeRulesTestData.IsOverlapping.Case testCase)
     {
-        // Arrange
-
         // Act
-        var result = DateOnlyRangeRules.IsOverlapping(testCase.Range1, testCase.Range2, testCase.Inclusion);
+        var result = DateOnlyRangeRules.IsOverlapping(testCase.Value.Range1, testCase.Value.Range2, testCase.Inclusion);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -57,12 +50,10 @@ public sealed class DateOnlyRangeRulesTests : BaseUnitTest
         MemberType = typeof(DateOnlyRangeRulesTestData.IsOverlapping))]
     public void IsOverlapping_ReturnsFalse_WhenEitherRangeIsNull(DateOnlyRangeRulesTestData.IsOverlapping.Case testCase)
     {
-        // Arrange
-
         // Act
-        var result = DateOnlyRangeRules.IsOverlapping(testCase.Range1, testCase.Range2, testCase.Inclusion);
+        var result = DateOnlyRangeRules.IsOverlapping(testCase.Value.Range1, testCase.Value.Range2, testCase.Inclusion);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

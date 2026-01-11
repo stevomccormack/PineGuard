@@ -1,4 +1,5 @@
 using PineGuard.Rules;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules;
 
@@ -6,48 +7,26 @@ public static class CharRulesTestData
 {
     public static class ClassificationMethods
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
+        public static TheoryData<Case> ValidCases =>
+        [
             new("Uppercase letter", 'A', true, false, true, true, true, false, false, true, false),
             new("Lowercase letter", 'a', true, false, true, true, true, false, false, false, true),
             new("Digit", '0', false, true, true, true, true, false, false, false, false),
-        };
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
+        public static TheoryData<Case> EdgeCases =>
+        [
             new("ASCII min", CharRules.AsciiMinValue, false, false, false, true, false, false, true, false, false),
             new("ASCII max", CharRules.AsciiMaxValue, false, false, false, true, false, false, true, false, false),
-            new(
-                "Printable ASCII min",
-                CharRules.PrintableAsciiMinValue,
-                false,
-                false,
-                false,
-                true,
-                true,
-                true,
-                false,
-                false,
-                false),
-            new(
-                "Printable ASCII max",
-                CharRules.PrintableAsciiMaxValue,
-                false,
-                false,
-                false,
-                true,
-                true,
-                false,
-                false,
-                false,
-                false),
+            new("Printable ASCII min", CharRules.PrintableAsciiMinValue, false, false, false, true, true, true, false, false, false),
+            new("Printable ASCII max", CharRules.PrintableAsciiMaxValue, false, false, false, true, true, false, false, false, false),
             new("Unit separator", '\u001F', false, false, false, true, false, false, true, false, false),
 
             // C1 control character: not ASCII, but still control.
             new("C1 control", '\u0080', false, false, false, false, false, false, true, false, false),
-        };
+        ];
 
-        #region Cases
+        #region Case Records
 
         public sealed record Case(
             string Name,
@@ -70,18 +49,18 @@ public static class CharRulesTestData
 
     public static class IsHexDigit
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
+        public static TheoryData<Case> ValidCases =>
+        [
             new("Numeric", '9', true),
             new("Lowercase f", 'f', true),
             new("Lowercase a", 'a', true),
             new("Uppercase A", 'A', true),
             new("Uppercase B", 'B', true),
             new("Uppercase E", 'E', true),
-        };
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
+        public static TheoryData<Case> EdgeCases =>
+        [
             new("Min hex digit", '0', true),
             new("Max hex digit", 'F', true),
 
@@ -92,14 +71,12 @@ public static class CharRulesTestData
 
             new("ASCII min", CharRules.AsciiMinValue, false),
             new("ASCII max", CharRules.AsciiMaxValue, false),
-        };
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, char Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, char Value, bool ExpectedReturn)
+            : IsCase<char>(Name, Value, ExpectedReturn);
 
         #endregion
     }

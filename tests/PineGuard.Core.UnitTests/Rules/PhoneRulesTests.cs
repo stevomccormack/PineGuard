@@ -12,7 +12,7 @@ public sealed class PhoneRulesTests : BaseUnitTest
     {
         var result = PhoneRules.IsPhoneNumber(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]

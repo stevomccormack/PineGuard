@@ -12,7 +12,7 @@ public sealed class TimeOnlyRulesTests : BaseUnitTest
     {
         var result = TimeOnlyRules.IsBetween(testCase.Value, testCase.Min, testCase.Max, testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -20,9 +20,9 @@ public sealed class TimeOnlyRulesTests : BaseUnitTest
     [MemberData(nameof(TimeOnlyRulesTestData.IsChronological.EdgeCases), MemberType = typeof(TimeOnlyRulesTestData.IsChronological))]
     public void IsChronological_ReturnsExpected(TimeOnlyRulesTestData.IsChronological.Case testCase)
     {
-        var result = TimeOnlyRules.IsChronological(testCase.Start, testCase.End, testCase.Inclusion);
+        var result = TimeOnlyRules.IsChronological(testCase.Value.Start, testCase.Value.End, testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -30,8 +30,13 @@ public sealed class TimeOnlyRulesTests : BaseUnitTest
     [MemberData(nameof(TimeOnlyRulesTestData.IsOverlapping.EdgeCases), MemberType = typeof(TimeOnlyRulesTestData.IsOverlapping))]
     public void IsOverlapping_ReturnsExpected(TimeOnlyRulesTestData.IsOverlapping.Case testCase)
     {
-        var result = TimeOnlyRules.IsOverlapping(testCase.Start1, testCase.End1, testCase.Start2, testCase.End2, testCase.Inclusion);
+        var result = TimeOnlyRules.IsOverlapping(
+            testCase.Value.Start1,
+            testCase.Value.End1,
+            testCase.Value.Start2,
+            testCase.Value.End2,
+            testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

@@ -1,52 +1,54 @@
-using Xunit;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules;
 
 public static class TimeZoneRulesTestData
 {
-    public static class Iana_IsIanaTimeZoneId
-    {
-        public static TheoryData<Case> ValidCases => new()
+    public static class Iana
+	{
+        public static class IsTimeZoneId
         {
-            { new Case(Name: "America/New_York => true", Value: "America/New_York", Expected: true) },
-        };
+            public static TheoryData<Case> ValidCases =>
+            [
+                new("America/New_York => true", "America/New_York", true),
+            ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "Not/AZone => false", Value: "Not/AZone", Expected: false) },
-            { new Case(Name: "null => false", Value: null, Expected: false) },
-        };
+            public static TheoryData<Case> EdgeCases =>
+            [
+                new("Not/AZone => false", "Not/AZone", false),
+                new("null => false", null, false),
+            ];
 
-        #region Cases
+            #region Case Records
 
-        public sealed record Case(string Name, string? Value, bool Expected)
-        {
-            public override string ToString() => Name;
+            public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+                : IsCase<string?>(Name, Value, ExpectedReturn);
+
+            #endregion
         }
+	}
 
-        #endregion
-    }
-
-    public static class Cldr_IsWindowsTimeZoneId
-    {
-        public static TheoryData<Case> ValidCases => new()
+    public static class Cldr
+	{
+        public static class IsWindowsTimeZoneId
         {
-            { new Case(Name: "UTC => true", Value: "UTC", Expected: true) },
-        };
+            public static TheoryData<Case> ValidCases =>
+            [
+                new("UTC => true", "UTC", true),
+            ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "Not/AZone => false", Value: "Not/AZone", Expected: false) },
-            { new Case(Name: "null => false", Value: null, Expected: false) },
-        };
+            public static TheoryData<Case> EdgeCases =>
+            [
+                new("Not/AZone => false", "Not/AZone", false),
+                new("null => false", null, false),
+            ];
 
-        #region Cases
+            #region Case Records
 
-        public sealed record Case(string Name, string? Value, bool Expected)
-        {
-            public override string ToString() => Name;
+            public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+                : IsCase<string?>(Name, Value, ExpectedReturn);
+
+            #endregion
         }
-
-        #endregion
-    }
+	}
 }

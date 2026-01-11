@@ -1,4 +1,5 @@
-using PineGuard.Testing;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Externals.Iso.Countries;
 
@@ -6,116 +7,83 @@ public static class IsoCountryTestData
 {
     public static class Constructor
     {
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            V("US", alpha2: "US", alpha3: "USA", numeric: "840", countryName: "United States"),
-            V("FR", alpha2: "fr", alpha3: "FRA", numeric: "250", countryName: "France"),
-            V("JP", alpha2: "jp", alpha3: "JPN", numeric: "392", countryName: "Japan"),
-            V("CA", alpha2: "ca", alpha3: "CAN", numeric: "124", countryName: "Canada"),
-        };
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("US", (Alpha2: "US", Alpha3: "USA", Numeric: "840", CountryName: "United States")),
+            new("FR", (Alpha2: "fr", Alpha3: "FRA", Numeric: "250", CountryName: "France")),
+            new("JP", (Alpha2: "jp", Alpha3: "JPN", Numeric: "392", CountryName: "Japan")),
+            new("CA", (Alpha2: "ca", Alpha3: "CAN", Numeric: "124", CountryName: "Canada")),
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            V("GB lowercase", alpha2: "gb", alpha3: "gbr", numeric: "826", countryName: "United Kingdom"),
-        };
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("GB lowercase", (Alpha2: "gb", Alpha3: "gbr", Numeric: "826", CountryName: "United Kingdom")),
+        ];
 
-        public static TheoryData<InvalidCase> InvalidCases => new()
-        {
-            I("Alpha2 too short", alpha2: "U", alpha3: "USA", numeric: "840", nameValue: "United States", expectedParamName: "alpha2Code"),
-            I("Alpha2 too long", alpha2: "USA", alpha3: "USA", numeric: "840", nameValue: "United States", expectedParamName: "alpha2Code"),
-            I("Alpha2 non-alpha", alpha2: "U1", alpha3: "USA", numeric: "840", nameValue: "United States", expectedParamName: "alpha2Code"),
-            I("Alpha2 has surrounding whitespace", alpha2: "  us ", alpha3: "usa", numeric: "840", nameValue: "United States", expectedParamName: "alpha2Code"),
-            I("Alpha2 tab-wrapped", alpha2: "\tGB\t", alpha3: "GBR", numeric: "826", nameValue: "United Kingdom", expectedParamName: "alpha2Code"),
-            I("Alpha3 too short", alpha2: "US", alpha3: "US", numeric: "840", nameValue: "United States", expectedParamName: "alpha3Code"),
-            I("Alpha3 non-alpha", alpha2: "US", alpha3: "US1", numeric: "840", nameValue: "United States", expectedParamName: "alpha3Code"),
-            I("Alpha3 too long", alpha2: "US", alpha3: "USAA", numeric: "840", nameValue: "United States", expectedParamName: "alpha3Code"),
-            I("Numeric too short", alpha2: "US", alpha3: "USA", numeric: "84", nameValue: "United States", expectedParamName: "numericCode"),
-            I("Numeric non-digit", alpha2: "US", alpha3: "USA", numeric: "84A", nameValue: "United States", expectedParamName: "numericCode"),
-            I("Numeric too long", alpha2: "US", alpha3: "USA", numeric: "8400", nameValue: "United States", expectedParamName: "numericCode"),
-            I("Name whitespace", alpha2: "US", alpha3: "USA", numeric: "840", nameValue: " ", expectedParamName: "name"),
-        };
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new("Alpha2 too short", (Alpha2: "U", Alpha3: "USA", Numeric: "840", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "alpha2Code")),
+            new("Alpha2 too long", (Alpha2: "USA", Alpha3: "USA", Numeric: "840", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "alpha2Code")),
+            new("Alpha2 non-alpha", (Alpha2: "U1", Alpha3: "USA", Numeric: "840", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "alpha2Code")),
+            new("Alpha2 has surrounding whitespace", (Alpha2: "  us ", Alpha3: "usa", Numeric: "840", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "alpha2Code")),
+            new("Alpha2 tab-wrapped", (Alpha2: "\tGB\t", Alpha3: "GBR", Numeric: "826", CountryName: "United Kingdom"), new ExpectedException(typeof(ArgumentException), "alpha2Code")),
+            new("Alpha3 too short", (Alpha2: "US", Alpha3: "US", Numeric: "840", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "alpha3Code")),
+            new("Alpha3 non-alpha", (Alpha2: "US", Alpha3: "US1", Numeric: "840", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "alpha3Code")),
+            new("Alpha3 too long", (Alpha2: "US", Alpha3: "USAA", Numeric: "840", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "alpha3Code")),
+            new("Numeric too short", (Alpha2: "US", Alpha3: "USA", Numeric: "84", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "numericCode")),
+            new("Numeric non-digit", (Alpha2: "US", Alpha3: "USA", Numeric: "84A", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "numericCode")),
+            new("Numeric too long", (Alpha2: "US", Alpha3: "USA", Numeric: "8400", CountryName: "United States"), new ExpectedException(typeof(ArgumentException), "numericCode")),
+            new("Name whitespace", (Alpha2: "US", Alpha3: "USA", Numeric: "840", CountryName: " "), new ExpectedException(typeof(ArgumentException), "name")),
+        ];
 
-        private static ValidCase V(string name, string alpha2, string alpha3, string numeric, string countryName)
-            => new(name, alpha2, alpha3, numeric, countryName);
-
-        private static InvalidCase I(string name, string alpha2, string alpha3, string numeric, string nameValue, string expectedParamName)
-            => new(
-                name,
-                alpha2,
-                alpha3,
-                numeric,
-                nameValue,
-                ExpectedException: new ExpectedException(typeof(ArgumentException), ParamName: expectedParamName));
-
-        #region Cases
-
-        public abstract record Case(string Name);
-
-        public sealed record ValidCase(string Name, string Alpha2, string Alpha3, string Numeric, string CountryName) : Case(Name);
+        public sealed record ValidCase(
+            string Name,
+            (string Alpha2, string Alpha3, string Numeric, string CountryName) Value)
+            : ValueCase<(string Alpha2, string Alpha3, string Numeric, string CountryName)>(Name, Value);
 
         public sealed record InvalidCase(
             string Name,
-            string Alpha2,
-            string Alpha3,
-            string Numeric,
-            string CountryName,
-            ExpectedException ExpectedException) : Case(Name);
-
-        #endregion
+            (string Alpha2, string Alpha3, string Numeric, string CountryName) Value,
+            ExpectedException ExpectedException)
+            : ThrowsCase<(string Alpha2, string Alpha3, string Numeric, string CountryName)>(Name, Value, ExpectedException);
     }
 
     public static class TryParse
     {
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            V("US", alpha2: "US", alpha3: "USA", numeric: "840"),
-            V("GB", alpha2: "gb", alpha3: "gbr", numeric: "826"),
-        };
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("US", (Alpha2: "US", Alpha3: "USA", Numeric: "840")),
+            new("GB", (Alpha2: "gb", Alpha3: "gbr", Numeric: "826")),
+        ];
 
-        public static TheoryData<EdgeCase> EdgeCases => new()
-        {
-            E("Null", value: null, expected: false),
-            E("Empty", value: string.Empty, expected: false),
-            E("Space", value: " ", expected: false),
-            E("Tab", value: "\t", expected: false),
-            E("Not a code", value: "not-a-code", expected: false),
-        };
+        public static TheoryData<EdgeCase> EdgeCases =>
+        [
+            new("Null", null, false),
+            new("Empty", string.Empty, false),
+            new("Space", " ", false),
+            new("Tab", "\t", false),
+            new("Not a code", "not-a-code", false),
+        ];
 
-        private static ValidCase V(string name, string alpha2, string alpha3, string numeric) => new(name, alpha2, alpha3, numeric);
+        public sealed record ValidCase(string Name, (string Alpha2, string Alpha3, string Numeric) Value)
+            : ValueCase<(string Alpha2, string Alpha3, string Numeric)>(Name, Value);
 
-        private static EdgeCase E(string name, string? value, bool expected) => new(name, value, expected);
-
-        #region Cases
-
-        public abstract record Case(string Name);
-
-        public sealed record ValidCase(string Name, string Alpha2, string Alpha3, string Numeric) : Case(Name);
-
-        public sealed record EdgeCase(string Name, string? Value, bool Expected) : Case(Name);
-
-        #endregion
+        public sealed record EdgeCase(string Name, string? Value, bool ExpectedReturn)
+            : IsCase<string?>(Name, Value, ExpectedReturn);
     }
 
     public static class Parse
     {
-        public static TheoryData<InvalidCase> InvalidCases => new()
-        {
-            I("Null", value: null),
-            I("Empty", value: string.Empty),
-            I("Space", value: " "),
-            I("Tab", value: "\t"),
-            I("Not a code", value: "not-a-code"),
-        };
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new("Null", null, new ExpectedException(typeof(FormatException), null, "ISO")),
+            new("Empty", string.Empty, new ExpectedException(typeof(FormatException), null, "ISO")),
+            new("Space", " ", new ExpectedException(typeof(FormatException), null, "ISO")),
+            new("Tab", "\t", new ExpectedException(typeof(FormatException), null, "ISO")),
+            new("Not a code", "not-a-code", new ExpectedException(typeof(FormatException), null, "ISO")),
+        ];
 
-        private static InvalidCase I(string name, string? value)
-            => new(name, value, ExpectedException: new ExpectedException(typeof(FormatException), MessageContains: "ISO"));
-
-        #region Cases
-
-        public abstract record Case(string Name);
-
-        public sealed record InvalidCase(string Name, string? Value, ExpectedException ExpectedException) : Case(Name);
-
-        #endregion
+        public sealed record InvalidCase(string Name, string? Value, ExpectedException ExpectedException)
+            : ThrowsCase<string?>(Name, Value, ExpectedException);
     }
 }

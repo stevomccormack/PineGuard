@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules;
 
@@ -11,10 +12,10 @@ public static class DateOnlyRulesTestData
             get
             {
                 var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                return new TheoryData<Case>
-                {
-                    { new Case(Name: "Two days ago", Value: today.AddDays(-2), Expected: true) },
-                };
+                return
+                [
+                    new("Two days ago", today.AddDays(-2), true),
+                ];
             }
         }
 
@@ -23,20 +24,18 @@ public static class DateOnlyRulesTestData
             get
             {
                 var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                return new TheoryData<Case>
-                {
-                    { new Case(Name: "Today", Value: today, Expected: false) },
-                    { new Case(Name: "Null", Value: null, Expected: false) },
-                };
+                return
+                [
+                    new("Today", today, false),
+                    new("Null", null, false),
+                ];
             }
         }
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, DateOnly? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, DateOnly? Value, bool ExpectedReturn)
+            : IsCase<DateOnly?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
@@ -48,10 +47,10 @@ public static class DateOnlyRulesTestData
             get
             {
                 var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                return new TheoryData<Case>
-                {
-                    { new Case(Name: "In two days", Value: today.AddDays(2), Expected: true) },
-                };
+                return
+                [
+                    new("In two days", today.AddDays(2), true),
+                ];
             }
         }
 
@@ -60,167 +59,157 @@ public static class DateOnlyRulesTestData
             get
             {
                 var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                return new TheoryData<Case>
-                {
-                    { new Case(Name: "Today", Value: today, Expected: false) },
-                    { new Case(Name: "Null", Value: null, Expected: false) },
-                };
+                return
+                [
+                    new("Today", today, false),
+                    new("Null", null, false),
+                ];
             }
         }
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, DateOnly? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, DateOnly? Value, bool ExpectedReturn)
+            : IsCase<DateOnly?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsBetween
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "Middle inclusive", Value: new DateOnly(2024, 01, 02), Min: new DateOnly(2024, 01, 01), Max: new DateOnly(2024, 01, 03), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "Min inclusive", Value: new DateOnly(2024, 01, 01), Min: new DateOnly(2024, 01, 01), Max: new DateOnly(2024, 01, 03), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "Min exclusive", Value: new DateOnly(2024, 01, 01), Min: new DateOnly(2024, 01, 01), Max: new DateOnly(2024, 01, 03), Inclusion: Inclusion.Exclusive, Expected: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Middle inclusive", new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 03), Inclusion.Inclusive, true),
+            new("Min inclusive", new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 03), Inclusion.Inclusive, true),
+            new("Min exclusive", new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 03), Inclusion.Exclusive, false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "Null value", Value: null, Min: new DateOnly(2024, 01, 01), Max: new DateOnly(2024, 01, 03), Inclusion: Inclusion.Inclusive, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null value", null, new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 03), Inclusion.Inclusive, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, DateOnly? Value, DateOnly Min, DateOnly Max, Inclusion Inclusion, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, DateOnly? Value, DateOnly Min, DateOnly Max, Inclusion Inclusion, bool ExpectedReturn)
+            : IsCase<DateOnly?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsBefore
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "Before inclusive", Value: new DateOnly(2024, 01, 01), Other: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "Same day inclusive", Value: new DateOnly(2024, 01, 02), Other: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "Same day exclusive", Value: new DateOnly(2024, 01, 02), Other: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Exclusive, Expected: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Before inclusive", new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02), Inclusion.Inclusive, true),
+            new("Same day inclusive", new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 02), Inclusion.Inclusive, true),
+            new("Same day exclusive", new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 02), Inclusion.Exclusive, false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "Null value", Value: null, Other: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Inclusive, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null value", null, new DateOnly(2024, 01, 02), Inclusion.Inclusive, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, DateOnly? Value, DateOnly Other, Inclusion Inclusion, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, DateOnly? Value, DateOnly Other, Inclusion Inclusion, bool ExpectedReturn)
+            : IsCase<DateOnly?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsAfter
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "After inclusive", Value: new DateOnly(2024, 01, 03), Other: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "Same day inclusive", Value: new DateOnly(2024, 01, 02), Other: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "Same day exclusive", Value: new DateOnly(2024, 01, 02), Other: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Exclusive, Expected: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("After inclusive", new DateOnly(2024, 01, 03), new DateOnly(2024, 01, 02), Inclusion.Inclusive, true),
+            new("Same day inclusive", new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 02), Inclusion.Inclusive, true),
+            new("Same day exclusive", new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 02), Inclusion.Exclusive, false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "Null value", Value: null, Other: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Inclusive, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null value", null, new DateOnly(2024, 01, 02), Inclusion.Inclusive, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, DateOnly? Value, DateOnly Other, Inclusion Inclusion, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, DateOnly? Value, DateOnly Other, Inclusion Inclusion, bool ExpectedReturn)
+            : IsCase<DateOnly?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsSame
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "Same day", Value: new DateOnly(2024, 01, 02), Other: new DateOnly(2024, 01, 02), Expected: true) },
-            { new Case(Name: "Different day", Value: new DateOnly(2024, 01, 02), Other: new DateOnly(2024, 01, 03), Expected: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Same day", new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 02), true),
+            new("Different day", new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 03), false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "Null value", Value: null, Other: new DateOnly(2024, 01, 02), Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null value", null, new DateOnly(2024, 01, 02), false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, DateOnly? Value, DateOnly Other, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, DateOnly? Value, DateOnly Other, bool ExpectedReturn)
+            : IsCase<DateOnly?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsChronological
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "Increasing exclusive", Start: new DateOnly(2024, 01, 01), End: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Exclusive, Expected: true) },
-            { new Case(Name: "Same day inclusive", Start: new DateOnly(2024, 01, 01), End: new DateOnly(2024, 01, 01), Inclusion: Inclusion.Inclusive, Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Increasing exclusive", (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02)), Inclusion.Exclusive, true),
+            new("Same day inclusive", (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 01)), Inclusion.Inclusive, true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "Both null", Start: null, End: null, Inclusion: Inclusion.Exclusive, Expected: false) },
-            { new Case(Name: "End null", Start: new DateOnly(2024, 01, 01), End: null, Inclusion: Inclusion.Exclusive, Expected: false) },
-            { new Case(Name: "Start null", Start: null, End: new DateOnly(2024, 01, 01), Inclusion: Inclusion.Exclusive, Expected: false) },
-            { new Case(Name: "Same day exclusive", Start: new DateOnly(2024, 01, 01), End: new DateOnly(2024, 01, 01), Inclusion: Inclusion.Exclusive, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Both null", (null, null), Inclusion.Exclusive, false),
+            new("End null", (new DateOnly(2024, 01, 01), null), Inclusion.Exclusive, false),
+            new("Start null", (null, new DateOnly(2024, 01, 01)), Inclusion.Exclusive, false),
+            new("Same day exclusive", (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 01)), Inclusion.Exclusive, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, DateOnly? Start, DateOnly? End, Inclusion Inclusion, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, (DateOnly? Start, DateOnly? End) Value, Inclusion Inclusion, bool ExpectedReturn)
+            : IsCase<(DateOnly? Start, DateOnly? End)>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsOverlapping
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "Touching inclusive", Start1: new DateOnly(2024, 01, 01), End1: new DateOnly(2024, 01, 02), Start2: new DateOnly(2024, 01, 02), End2: new DateOnly(2024, 01, 03), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "Touching exclusive", Start1: new DateOnly(2024, 01, 01), End1: new DateOnly(2024, 01, 02), Start2: new DateOnly(2024, 01, 02), End2: new DateOnly(2024, 01, 03), Inclusion: Inclusion.Exclusive, Expected: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Touching inclusive", (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 03)), Inclusion.Inclusive, true),
+            new("Touching exclusive", (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 03)), Inclusion.Exclusive, false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "All null", Start1: null, End1: null, Start2: null, End2: null, Inclusion: Inclusion.Exclusive, Expected: false) },
-            { new Case(Name: "End1 null", Start1: new DateOnly(2024, 01, 01), End1: null, Start2: new DateOnly(2024, 01, 01), End2: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Exclusive, Expected: false) },
-            { new Case(Name: "Start2 null", Start1: new DateOnly(2024, 01, 01), End1: new DateOnly(2024, 01, 02), Start2: null, End2: new DateOnly(2024, 01, 02), Inclusion: Inclusion.Exclusive, Expected: false) },
-            { new Case(Name: "End2 null", Start1: new DateOnly(2024, 01, 01), End1: new DateOnly(2024, 01, 02), Start2: new DateOnly(2024, 01, 01), End2: null, Inclusion: Inclusion.Exclusive, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("All null", (null, null, null, null), Inclusion.Exclusive, false),
+            new("End1 null", (new DateOnly(2024, 01, 01), null, new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02)), Inclusion.Exclusive, false),
+            new("Start2 null", (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02), null, new DateOnly(2024, 01, 02)), Inclusion.Exclusive, false),
+            new("End2 null", (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 01), null), Inclusion.Exclusive, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, DateOnly? Start1, DateOnly? End1, DateOnly? Start2, DateOnly? End2, Inclusion Inclusion, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(
+            string Name,
+            (DateOnly? Start1, DateOnly? End1, DateOnly? Start2, DateOnly? End2) Value,
+            Inclusion Inclusion,
+            bool ExpectedReturn)
+            : IsCase<(DateOnly? Start1, DateOnly? End1, DateOnly? Start2, DateOnly? End2)>(Name, Value, ExpectedReturn);
 
         #endregion
     }

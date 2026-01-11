@@ -1,22 +1,14 @@
 using PineGuard.Externals.Iana.TimeZones;
 using System.Collections.Frozen;
-using PineGuard.Testing;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Externals.Iana.TimeZones;
 
 public static class DefaultIanaTimeZoneProviderTestData
 {
-    public static IanaTimeZone SampleZoneEuropeLondon { get; } = new(
-        "Europe/London",
-        new[] { "GB" },
-        "+5130-00007",
-        "United Kingdom");
+    public static IanaTimeZone SampleZoneEuropeLondon { get; } = new("Europe/London", ["GB"], "+5130-00007", "United Kingdom");
 
-    public static IanaTimeZone SampleZoneAmericaNewYork { get; } = new(
-        "America/New_York",
-        new[] { "US" },
-        "+404251-0740023",
-        null);
+    public static IanaTimeZone SampleZoneAmericaNewYork { get; } = new("America/New_York", ["US"], "+404251-0740023", null);
 
     public static FrozenDictionary<string, IanaTimeZone> SampleZonesById { get; } =
         new Dictionary<string, IanaTimeZone>
@@ -38,102 +30,69 @@ public static class DefaultIanaTimeZoneProviderTestData
 
     public static class IsValidTimeZoneId
     {
-        private static ValidCase V(string name, string? value, bool expected) => new(Name: name, Value: value, Expected: expected);
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("known", "Europe/London", true),
+            new("known trims", " Europe/London ", true),
+            new("known other", "America/New_York", true),
+        ];
 
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            { V("known", "Europe/London", expected: true) },
-            { V("known trims", " Europe/London ", expected: true) },
-            { V("known other", "America/New_York", expected: true) },
-        };
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("null", null, false),
+            new("empty", "", false),
+            new("space", " ", false),
+            new("tabs/newlines", "\t\r\n", false),
+            new("unknown", "Europe/Paris", false),
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            { V("null", null, expected: false) },
-            { V("empty", "", expected: false) },
-            { V("space", " ", expected: false) },
-            { V("tabs/newlines", "\t\r\n", expected: false) },
-            { V("unknown", "Europe/Paris", expected: false) },
-        };
-
-        #region Cases
-
-        public record Case(string Name, string? Value);
-
-        public sealed record ValidCase(string Name, string? Value, bool Expected)
-            : Case(Name, Value);
-
-        public record InvalidCase(string Name, string? Value, ExpectedException ExpectedException)
-            : Case(Name, Value);
-
-        #endregion
+        public sealed record ValidCase(string Name, string? Value, bool ExpectedReturn)
+            : IsCase<string?>(Name, Value, ExpectedReturn);
     }
 
     public static class TryGetById
     {
-        private static ValidCase V(string name, string? value, bool expected, string? expectedId) => new(Name: name, Value: value, Expected: expected, ExpectedId: expectedId);
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("known", "Europe/London", true, "Europe/London"),
+            new("known trims", " Europe/London ", true, "Europe/London"),
+            new("known other", "America/New_York", true, "America/New_York"),
+        ];
 
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            { V("known", "Europe/London", expected: true, expectedId: "Europe/London") },
-            { V("known trims", " Europe/London ", expected: true, expectedId: "Europe/London") },
-            { V("known other", "America/New_York", expected: true, expectedId: "America/New_York") },
-        };
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("null", null, false, null),
+            new("empty", "", false, null),
+            new("space", " ", false, null),
+            new("tabs/newlines", "\t\r\n", false, null),
+            new("unknown", "Europe/Paris", false, null),
+            new("tabs trim", "\tEurope/London\t", true, "Europe/London"),
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            { V("null", null, expected: false, expectedId: null) },
-            { V("empty", "", expected: false, expectedId: null) },
-            { V("space", " ", expected: false, expectedId: null) },
-            { V("tabs/newlines", "\t\r\n", expected: false, expectedId: null) },
-            { V("unknown", "Europe/Paris", expected: false, expectedId: null) },
-            { V("tabs trim", "\tEurope/London\t", expected: true, expectedId: "Europe/London") },
-        };
-
-        #region Cases
-
-        public record Case(string Name, string? Value);
-
-        public sealed record ValidCase(string Name, string? Value, bool Expected, string? ExpectedId)
-            : Case(Name, Value);
-
-        public record InvalidCase(string Name, string? Value, ExpectedException ExpectedException)
-            : Case(Name, Value);
-
-        #endregion
+        public sealed record ValidCase(string Name, string? Value, bool ExpectedReturn, string? ExpectedOutValue)
+            : TryCase<string?, string?>(Name, Value, ExpectedReturn, ExpectedOutValue);
     }
 
     public static class TryGetTimeZoneIdsByCountryAlpha2Code
     {
-        private static ValidCase V(string name, string? value, bool expected, string[] expectedIds) => new(Name: name, Value: value, Expected: expected, ExpectedIds: expectedIds);
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("GB", "GB", true, ["Europe/London"]),
+            new("gb", "gb", true, ["Europe/London"]),
+            new("us trims", "  us ", true, ["America/New_York"]),
+        ];
 
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            { V("GB", "GB", expected: true, expectedIds: ["Europe/London"]) },
-            { V("gb", "gb", expected: true, expectedIds: ["Europe/London"]) },
-            { V("us trims", "  us ", expected: true, expectedIds: ["America/New_York"]) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("GB space", "GB ", true, ["Europe/London"]),
+            new("null", null, false, []),
+            new("empty", "", false, []),
+            new("space", " ", false, []),
+            new("tabs/newlines", "\t\r\n", false, []),
+            new("unknown", "FR", false, []),
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            { V("GB space", "GB ", expected: true, expectedIds: ["Europe/London"]) },
-            { V("null", null, expected: false, expectedIds: Array.Empty<string>()) },
-            { V("empty", "", expected: false, expectedIds: Array.Empty<string>()) },
-            { V("space", " ", expected: false, expectedIds: Array.Empty<string>()) },
-            { V("tabs/newlines", "\t\r\n", expected: false, expectedIds: Array.Empty<string>()) },
-            { V("unknown", "FR", expected: false, expectedIds: Array.Empty<string>()) },
-        };
-
-        #region Cases
-
-        public record Case(string Name, string? Value);
-
-        public sealed record ValidCase(string Name, string? Value, bool Expected, string[] ExpectedIds)
-            : Case(Name, Value);
-
-        public record InvalidCase(string Name, string? Value, ExpectedException ExpectedException)
-            : Case(Name, Value);
-
-        #endregion
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn, IReadOnlyCollection<string> ExpectedOutValue)
+            : TryCase<string?, IReadOnlyCollection<string>>(Name, Value, ExpectedReturn, ExpectedOutValue);
     }
 }

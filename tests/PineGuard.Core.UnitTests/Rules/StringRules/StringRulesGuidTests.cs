@@ -11,7 +11,7 @@ public sealed class StringRulesGuidTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Guid.IsEmpty(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -21,6 +21,6 @@ public sealed class StringRulesGuidTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Guid.IsNullOrEmpty(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

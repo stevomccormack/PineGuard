@@ -10,7 +10,7 @@ public sealed class IsoDateUtilityTests : BaseUnitTest
     [MemberData(nameof(IsoDateUtilityTestData.TryParseDateOnly.EdgeCases), MemberType = typeof(IsoDateUtilityTestData.TryParseDateOnly))]
     public void TryParseDateOnly_ReturnsExpected(IsoDateUtilityTestData.TryParseDateOnly.Case testCase)
     {
-        var result = IsoDateUtility.TryParseDateOnly(testCase.Input, out var date);
+        var result = IsoDateUtility.TryParseDateOnly(testCase.Value, out var date);
 
         Assert.Equal(testCase.ExpectedSuccess, result);
         Assert.Equal(testCase.ExpectedDateOnly, date);
@@ -21,7 +21,7 @@ public sealed class IsoDateUtilityTests : BaseUnitTest
     [MemberData(nameof(IsoDateUtilityTestData.TryParseDateTime.EdgeCases), MemberType = typeof(IsoDateUtilityTestData.TryParseDateTime))]
     public void TryParseDateTime_ReturnsExpected(IsoDateUtilityTestData.TryParseDateTime.Case testCase)
     {
-        var result = IsoDateUtility.TryParseDateTime(testCase.Input, out var dateTime);
+        var result = IsoDateUtility.TryParseDateTime(testCase.Value, out var dateTime);
 
         Assert.Equal(testCase.ExpectedSuccess, result);
         Assert.Equal(testCase.ExpectedDateTime, dateTime);
@@ -32,7 +32,7 @@ public sealed class IsoDateUtilityTests : BaseUnitTest
     [MemberData(nameof(IsoDateUtilityTestData.TryParseDateTimeOffset.EdgeCases), MemberType = typeof(IsoDateUtilityTestData.TryParseDateTimeOffset))]
     public void TryParseDateTimeOffset_ReturnsExpected(IsoDateUtilityTestData.TryParseDateTimeOffset.Case testCase)
     {
-        var result = IsoDateUtility.TryParseDateTimeOffset(testCase.Input, out var dto);
+        var result = IsoDateUtility.TryParseDateTimeOffset(testCase.Value, out var dto);
 
         Assert.Equal(testCase.ExpectedSuccess, result);
         Assert.Equal(testCase.ExpectedDateTimeOffset, dto);

@@ -16,7 +16,7 @@ public sealed class PredicateRulesTests : BaseUnitTest
         var result = PredicateRules.Satisfies(testCase.Value, Predicate);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -30,14 +30,12 @@ public sealed class PredicateRulesTests : BaseUnitTest
         var result = PredicateRules.Satisfies(testCase.Value, Predicate);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]
     public void Satisfies_Throws_WhenPredicateIsNull()
     {
-        // Arrange
-
         // Act
         _ = Assert.Throws<ArgumentNullException>(() => PredicateRules.Satisfies(1, predicate: null!));
 

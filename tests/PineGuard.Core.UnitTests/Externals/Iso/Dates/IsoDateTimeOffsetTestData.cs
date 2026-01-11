@@ -1,5 +1,6 @@
-using PineGuard.Iso.Dates;
-using PineGuard.Testing;
+using PineGuard.Externals.Iso.Dates;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
 using System.Globalization;
 
 namespace PineGuard.Core.UnitTests.Externals.Iso.Dates;
@@ -8,40 +9,34 @@ public static class IsoDateTimeOffsetTestData
 {
     public static class TryParse
     {
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            V("Zulu", value: "2020-01-02T03:04:05Z", expectedResult: new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero)),
-            V("Fraction .1234567 Z", value: "2020-01-02T03:04:05.1234567Z", expectedResult: new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero).AddTicks(1_234_567)),
-            V("Offset +01:00", value: "2020-01-02T03:04:05+01:00", expectedResult: new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.FromHours(1))),
-            V("Fraction .5 -08:00", value: "2020-01-02T03:04:05.5-08:00", expectedResult: new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.FromHours(-8)).AddTicks(5_000_000)),
-            V("Missing timezone", value: "2020-01-02T03:04:05", expectedResult: ParseExpected("2020-01-02T03:04:05")),
-        };
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("Zulu", "2020-01-02T03:04:05Z", true, new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero)),
+            new("Fraction .1234567 Z", "2020-01-02T03:04:05.1234567Z", true,
+                new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero).AddTicks(1_234_567)),
+            new("Offset +01:00", "2020-01-02T03:04:05+01:00", true,
+                new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.FromHours(1))),
+            new("Fraction .5 -08:00", "2020-01-02T03:04:05.5-08:00", true,
+                new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.FromHours(-8)).AddTicks(5_000_000)),
+            new("Missing timezone", "2020-01-02T03:04:05", true, ParseExpected("2020-01-02T03:04:05"))
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            E("Null", value: null),
-            E("Empty", value: string.Empty),
-            E("Space", value: " "),
-            E("Tab", value: "\t"),
-            E("Date only", value: "2020-01-02"),
-            E("Missing seconds", value: "2020-01-02T03:04"),
-            E("Too many fractional digits", value: "2020-01-02T03:04:05.12345678Z"),
-            E("Invalid offset format", value: "2020-01-02T03:04:05+01:0"),
-            E("Invalid offset values", value: "2020-01-02T03:04:05+99:99"),
-            E("Non-date", value: "abcd"),
-        };
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("Null", null, false, default),
+            new("Empty", string.Empty, false, default),
+            new("Space", " ", false, default),
+            new("Tab", "\t", false, default),
+            new("Date only", "2020-01-02", false, default),
+            new("Missing seconds", "2020-01-02T03:04", false, default),
+            new("Too many fractional digits", "2020-01-02T03:04:05.12345678Z", false, default),
+            new("Invalid offset format", "2020-01-02T03:04:05+01:0", false, default),
+            new("Invalid offset values", "2020-01-02T03:04:05+99:99", false, default),
+            new("Non-date", "abcd", false, default)
+        ];
 
-        private static ValidCase V(string name, string value, DateTimeOffset expectedResult) => new(name, value, Expected: true, expectedResult);
-
-        private static ValidCase E(string name, string? value) => new(name, value, Expected: false, ExpectedResult: default);
-
-        #region Cases
-
-        public abstract record Case(string Name);
-
-        public sealed record ValidCase(string Name, string? Value, bool Expected, DateTimeOffset ExpectedResult) : Case(Name);
-
-        #endregion
+        public sealed record ValidCase(string Name, string? Value, bool ExpectedReturn, DateTimeOffset ExpectedOutValue)
+            : TryCase<string?, DateTimeOffset>(Name, Value, ExpectedReturn, ExpectedOutValue);
 
         private static DateTimeOffset ParseExpected(string value)
             => DateTimeOffset.ParseExact(
@@ -53,52 +48,37 @@ public static class IsoDateTimeOffsetTestData
 
     public static class Parse
     {
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            V("Zulu", value: "2020-01-02T03:04:05Z", expectedResult: new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero)),
-            V("Fraction .1234567 Z", value: "2020-01-02T03:04:05.1234567Z", expectedResult: new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero).AddTicks(1_234_567)),
-            V("Offset +01:00", value: "2020-01-02T03:04:05+01:00", expectedResult: new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.FromHours(1))),
-            V("Fraction .5 -08:00", value: "2020-01-02T03:04:05.5-08:00", expectedResult: new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.FromHours(-8)).AddTicks(5_000_000)),
-            V("Missing timezone", value: "2020-01-02T03:04:05", expectedResult: ParseExpected("2020-01-02T03:04:05")),
-        };
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("Zulu", "2020-01-02T03:04:05Z", new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero)),
+            new("Fraction .1234567 Z", "2020-01-02T03:04:05.1234567Z",
+                new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero).AddTicks(1_234_567)),
+            new("Offset +01:00", "2020-01-02T03:04:05+01:00",
+                new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.FromHours(1))),
+            new("Fraction .5 -08:00", "2020-01-02T03:04:05.5-08:00",
+                new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.FromHours(-8)).AddTicks(5_000_000)),
+            new("Missing timezone", "2020-01-02T03:04:05", ParseExpected("2020-01-02T03:04:05"))
+        ];
 
-        public static TheoryData<InvalidCase> InvalidCases => new()
-        {
-            I("Null", value: null, expectedExceptionType: typeof(ArgumentNullException), expectedParamName: "input"),
-            I("Empty", value: string.Empty),
-            I("Space", value: " "),
-            I("Tab", value: "\t"),
-            I("Date only", value: "2020-01-02"),
-            I("Missing seconds", value: "2020-01-02T03:04"),
-            I("Too many fractional digits", value: "2020-01-02T03:04:05.12345678Z"),
-            I("Invalid offset format", value: "2020-01-02T03:04:05+01:0"),
-            I("Invalid offset values", value: "2020-01-02T03:04:05+99:99"),
-            I("Non-date", value: "abcd"),
-        };
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new("Null", null, new ExpectedException(typeof(ArgumentNullException), "input")),
+            new("Empty", string.Empty, new ExpectedException(typeof(FormatException))),
+            new("Space", " ", new ExpectedException(typeof(FormatException))),
+            new("Tab", "\t", new ExpectedException(typeof(FormatException))),
+            new("Date only", "2020-01-02", new ExpectedException(typeof(FormatException))),
+            new("Missing seconds", "2020-01-02T03:04", new ExpectedException(typeof(FormatException))),
+            new("Too many fractional digits", "2020-01-02T03:04:05.12345678Z", new ExpectedException(typeof(FormatException))),
+            new("Invalid offset format", "2020-01-02T03:04:05+01:0", new ExpectedException(typeof(FormatException))),
+            new("Invalid offset values", "2020-01-02T03:04:05+99:99", new ExpectedException(typeof(FormatException))),
+            new("Non-date", "abcd", new ExpectedException(typeof(FormatException)))
+        ];
 
-        private static ValidCase V(string name, string value, DateTimeOffset expectedResult) => new(name, value, expectedResult);
+        public sealed record ValidCase(string Name, string Value, DateTimeOffset ExpectedReturn)
+            : ReturnCase<string, DateTimeOffset>(Name, Value, ExpectedReturn);
 
-        private static InvalidCase I(
-            string name,
-            string? value,
-            Type? expectedExceptionType = null,
-            string? expectedParamName = null)
-            => new(
-                name,
-                value,
-                ExpectedException: new ExpectedException(
-                    expectedExceptionType ?? typeof(FormatException),
-                    ParamName: expectedParamName));
-
-        #region Cases
-
-        public abstract record Case(string Name);
-
-        public sealed record ValidCase(string Name, string Value, DateTimeOffset ExpectedResult) : Case(Name);
-
-        public sealed record InvalidCase(string Name, string? Value, ExpectedException ExpectedException) : Case(Name);
-
-        #endregion
+        public sealed record InvalidCase(string Name, string? Value, ExpectedException ExpectedException)
+            : ThrowsCase<string?>(Name, Value, ExpectedException);
 
         private static DateTimeOffset ParseExpected(string value)
             => DateTimeOffset.ParseExact(
@@ -110,20 +90,15 @@ public static class IsoDateTimeOffsetTestData
 
     public static class ToIsoString
     {
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            V("Zulu", value: new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero), expected: "2020-01-02T03:04:05.0000000+00:00"),
-            V("Leap day", value: new DateTimeOffset(2000, 02, 29, 00, 00, 00, TimeSpan.Zero), expected: "2000-02-29T00:00:00.0000000+00:00"),
-        };
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("Zulu", new DateTimeOffset(2020, 01, 02, 03, 04, 05, TimeSpan.Zero),
+                "2020-01-02T03:04:05.0000000+00:00"),
+            new("Leap day", new DateTimeOffset(2000, 02, 29, 00, 00, 00, TimeSpan.Zero),
+                "2000-02-29T00:00:00.0000000+00:00")
+        ];
 
-        private static ValidCase V(string name, DateTimeOffset value, string expected) => new(name, value, expected);
-
-        #region Cases
-
-        public abstract record Case(string Name);
-
-        public sealed record ValidCase(string Name, DateTimeOffset Value, string Expected) : Case(Name);
-
-        #endregion
+        public sealed record ValidCase(string Name, DateTimeOffset Value, string ExpectedReturn)
+            : ReturnCase<DateTimeOffset, string>(Name, Value, ExpectedReturn);
     }
 }

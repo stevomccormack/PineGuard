@@ -11,7 +11,7 @@ public sealed class BoolRulesTests : BaseUnitTest
     {
         var result = BoolRules.IsTrue(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -21,7 +21,7 @@ public sealed class BoolRulesTests : BaseUnitTest
     {
         var result = BoolRules.IsTrue(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -31,7 +31,7 @@ public sealed class BoolRulesTests : BaseUnitTest
     {
         var result = BoolRules.IsFalse(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -41,7 +41,7 @@ public sealed class BoolRulesTests : BaseUnitTest
     {
         var result = BoolRules.IsFalse(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -51,7 +51,7 @@ public sealed class BoolRulesTests : BaseUnitTest
     {
         var result = BoolRules.IsNullOrTrue(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -61,7 +61,7 @@ public sealed class BoolRulesTests : BaseUnitTest
     {
         var result = BoolRules.IsNullOrTrue(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -71,7 +71,7 @@ public sealed class BoolRulesTests : BaseUnitTest
     {
         var result = BoolRules.IsNullOrFalse(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -81,7 +81,7 @@ public sealed class BoolRulesTests : BaseUnitTest
     {
         var result = BoolRules.IsNullOrFalse(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 }

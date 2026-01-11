@@ -20,8 +20,6 @@ public sealed class TimeOnlyRangeTests : BaseUnitTest
     [MemberData(nameof(TimeOnlyRangeTestData.Constructor.ValidCases), MemberType = typeof(TimeOnlyRangeTestData.Constructor))]
     public void Ctor_SetsStartEnd_AndDuration(TimeOnlyRangeTestData.Constructor.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var range = new TimeOnlyRange(testCase.Start, testCase.End);
 
@@ -36,8 +34,6 @@ public sealed class TimeOnlyRangeTests : BaseUnitTest
     [MemberData(nameof(TimeOnlyRangeTestData.Constructor.EdgeCases), MemberType = typeof(TimeOnlyRangeTestData.Constructor))]
     public void Ctor_EdgeCases_SetsStartEnd_AndDuration(TimeOnlyRangeTestData.Constructor.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var range = new TimeOnlyRange(testCase.Start, testCase.End);
 
@@ -51,16 +47,13 @@ public sealed class TimeOnlyRangeTests : BaseUnitTest
     public void Ctor_WhenStartAfterEnd_Throws(TimeOnlyRangeTestData.Constructor.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Assert.Throws<ArgumentException>(() => _ = new TimeOnlyRange(testCase.Start, testCase.End));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => _ = new TimeOnlyRange(invalidCase.Start, invalidCase.End));
 
         // Assert
-        Assert.IsType(testCase.ExpectedException.Type, ex);
-        if (testCase.ExpectedException.ParamName is not null)
-            Assert.Equal(testCase.ExpectedException.ParamName, ex.ParamName);
-        if (testCase.ExpectedException.MessageContains is not null)
-            Assert.Contains(testCase.ExpectedException.MessageContains, ex.Message, StringComparison.OrdinalIgnoreCase);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Theory]
@@ -147,7 +140,7 @@ public sealed class TimeOnlyRangeTests : BaseUnitTest
         // Act
         var equalsTyped = range1.Equals(range2);
         var equalsObject = range1.Equals((object)range2);
-        var equalsNullObject = range1.Equals((object?)null);
+        var equalsNullObject = range1.Equals(null);
 
         // Assert
         Assert.True(equalsTyped);

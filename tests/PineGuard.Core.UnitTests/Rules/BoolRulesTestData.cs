@@ -1,95 +1,89 @@
+using PineGuard.Testing.UnitTests;
+
 namespace PineGuard.Core.UnitTests.Rules;
 
 public static class BoolRulesTestData
 {
     public static class IsTrue
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "true", Value: true, Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("true", true, true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null", Value: null, Expected: false) },
-            { new Case(Name: "false", Value: false, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null", null, false),
+            new("false", false, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, bool? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, bool? Value, bool ExpectedReturn)
+            : IsCase<bool?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsFalse
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "false", Value: false, Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("false", false, true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null", Value: null, Expected: false) },
-            { new Case(Name: "true", Value: true, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null", null, false),
+            new("true", true, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, bool? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, bool? Value, bool ExpectedReturn)
+            : IsCase<bool?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsNullOrTrue
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "null", Value: null, Expected: true) },
-            { new Case(Name: "true", Value: true, Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("null", null, true),
+            new("true", true, true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "false", Value: false, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("false", false, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, bool? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, bool? Value, bool ExpectedReturn)
+            : IsCase<bool?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsNullOrFalse
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "null", Value: null, Expected: true) },
-            { new Case(Name: "false", Value: false, Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("null", null, true),
+            new("false", false, true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "true", Value: true, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("true", true, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, bool? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, bool? Value, bool ExpectedReturn)
+            : IsCase<bool?>(Name, Value, ExpectedReturn);
 
         #endregion
     }

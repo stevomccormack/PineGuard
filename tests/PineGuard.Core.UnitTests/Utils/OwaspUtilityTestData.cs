@@ -1,3 +1,4 @@
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Utils;
@@ -6,168 +7,168 @@ public static class OwaspUtilityTestData
 {
     public static class ContainsSqlInjectionRisk
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "SELECT * FROM Users => true", Input: "SELECT * FROM Users", ExpectedReturn: true) },
-            { new Case(Name: "hello world => false", Input: "hello world", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("SELECT * FROM Users => true", "SELECT * FROM Users", true),
+            new("hello world => false", "hello world", false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null => false", Input: null, ExpectedReturn: false) },
-            { new Case(Name: "whitespace => false", Input: " ", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null => false", null, false),
+            new("whitespace => false", " ", false),
+        ];
 
-        public static TheoryData<ThrowsCase> InvalidCases => [];
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Input, bool ExpectedReturn)
-            : HasCase<string?>(Name, Input, ExpectedReturn);
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : HasCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }
 
     public static class ContainsPathTraversalRisk
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "../etc/passwd => true", Input: "../etc/passwd", ExpectedReturn: true) },
-            { new Case(Name: "relative/path => false", Input: "relative/path", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("../etc/passwd => true", "../etc/passwd", true),
+            new("relative/path => false", "relative/path", false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null => false", Input: null, ExpectedReturn: false) },
-            { new Case(Name: "whitespace => false", Input: " ", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null => false", null, false),
+            new("whitespace => false", " ", false),
+        ];
 
-        public static TheoryData<ThrowsCase> InvalidCases => [];
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Input, bool ExpectedReturn)
-            : HasCase<string?>(Name, Input, ExpectedReturn);
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : HasCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }
 
     public static class ContainsCommandInjectionRisk
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "foo;rm -rf / => true", Input: "foo;rm -rf /", ExpectedReturn: true) },
-            { new Case(Name: "safe => false", Input: "safe", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("foo;rm -rf / => true", "foo;rm -rf /", true),
+            new("safe => false", "safe", false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null => false", Input: null, ExpectedReturn: false) },
-            { new Case(Name: "whitespace => false", Input: " ", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null => false", null, false),
+            new("whitespace => false", " ", false),
+        ];
 
-        public static TheoryData<ThrowsCase> InvalidCases => [];
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Input, bool ExpectedReturn)
-            : HasCase<string?>(Name, Input, ExpectedReturn);
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : HasCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }
 
     public static class ContainsCrLfRisk
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "Header: value\\r\\nX: y => true", Input: "Header: value\r\nX: y", ExpectedReturn: true) },
-            { new Case(Name: "Header: value => false", Input: "Header: value", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Header: value\\r\\nX: y => true", "Header: value\r\nX: y", true),
+            new("Header: value => false", "Header: value", false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null => false", Input: null, ExpectedReturn: false) },
-            { new Case(Name: "whitespace => false", Input: " ", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null => false", null, false),
+            new("whitespace => false", " ", false),
+        ];
 
-        public static TheoryData<ThrowsCase> InvalidCases => [];
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Input, bool ExpectedReturn)
-            : HasCase<string?>(Name, Input, ExpectedReturn);
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : HasCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }
 
     public static class ContainsLdapFilterRisk
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "(uid=*) => true", Input: "(uid=*)", ExpectedReturn: true) },
-            { new Case(Name: "uid=alice => false", Input: "uid=alice", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("(uid=*) => true", "(uid=*)", true),
+            new("uid=alice => false", "uid=alice", false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null => false", Input: null, ExpectedReturn: false) },
-            { new Case(Name: "whitespace => false", Input: " ", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null => false", null, false),
+            new("whitespace => false", " ", false),
+        ];
 
-        public static TheoryData<ThrowsCase> InvalidCases => [];
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Input, bool ExpectedReturn)
-            : HasCase<string?>(Name, Input, ExpectedReturn);
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : HasCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }
 
     public static class ContainsOpenRedirectRisk
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "http://example.com => true", Input: "http://example.com", ExpectedReturn: true) },
-            { new Case(Name: "relative/path => false", Input: "relative/path", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("http://example.com => true", "http://example.com", true),
+            new("relative/path => false", "relative/path", false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null => false", Input: null, ExpectedReturn: false) },
-            { new Case(Name: "whitespace => false", Input: " ", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null => false", null, false),
+            new("whitespace => false", " ", false),
+        ];
 
-        public static TheoryData<ThrowsCase> InvalidCases => [];
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Input, bool ExpectedReturn)
-            : HasCase<string?>(Name, Input, ExpectedReturn);
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : HasCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }
 
     public static class ContainsSsrfSchemeRisk
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "file://etc/passwd => true", Input: "file://etc/passwd", ExpectedReturn: true) },
-            { new Case(Name: "https://example.com => false", Input: "https://example.com", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("file://etc/passwd => true", "file://etc/passwd", true),
+            new("https://example.com => false", "https://example.com", false),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null => false", Input: null, ExpectedReturn: false) },
-            { new Case(Name: "whitespace => false", Input: " ", ExpectedReturn: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null => false", null, false),
+            new("whitespace => false", " ", false),
+        ];
 
-        public static TheoryData<ThrowsCase> InvalidCases => [];
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Input, bool ExpectedReturn)
-            : HasCase<string?>(Name, Input, ExpectedReturn);
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : HasCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }

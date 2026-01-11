@@ -68,7 +68,7 @@ public sealed class IanaTimeZoneUtilityTests : BaseUnitTest
     [MemberData(nameof(IanaTimeZoneUtilityTestData.IsValidTimeZoneId.EdgeCases), MemberType = typeof(IanaTimeZoneUtilityTestData.IsValidTimeZoneId))]
     public void IsValidTimeZoneId_ReturnsExpected(IanaTimeZoneUtilityTestData.IsValidTimeZoneId.Case testCase)
     {
-        var result = IanaTimeZoneUtility.IsValidTimeZoneId(testCase.Input);
+        var result = IanaTimeZoneUtility.IsValidTimeZoneId(testCase.Value);
 
         Assert.Equal(testCase.ExpectedReturn, result);
     }
@@ -83,7 +83,7 @@ public sealed class IanaTimeZoneUtilityTests : BaseUnitTest
 
         Assert.True(IanaTimeZoneUtility.TryGetIanaTimeZone("Example/Zone", out var tz, provider));
         Assert.NotNull(tz);
-        Assert.Equal("Example/Zone", tz!.Id);
+        Assert.Equal("Example/Zone", tz.Id);
         Assert.Equal(1, provider.TryGetByIdCalls);
 
         var all = IanaTimeZoneUtility.GetAll(provider);

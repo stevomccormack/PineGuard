@@ -1,4 +1,6 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Common;
 
@@ -6,45 +8,43 @@ public static class InclusionTestData
 {
     public static class DefinedValues
     {
-        private static ValidCase V(string name, Inclusion inclusion, int expectedIntValue)
-            => new(Name: name, Inclusion: inclusion, ExpectedIntValue: expectedIntValue);
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("inc", Inclusion.Inclusive, 0),
+            new("exc", Inclusion.Exclusive, 1),
+        ];
 
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            { V("inc", Inclusion.Inclusive, 0) },
-            { V("exc", Inclusion.Exclusive, 1) },
-        };
+        public static TheoryData<Case> EdgeCases => [];
 
-        #region Cases
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        public record Case(string Name, Inclusion Inclusion);
+        #region Case Records
 
-        public sealed record ValidCase(string Name, Inclusion Inclusion, int ExpectedIntValue)
-            : Case(Name, Inclusion);
+        public sealed record Case(string Name, Inclusion Inclusion, int ExpectedIntValue)
+            : ReturnCase<Inclusion, int>(Name, Inclusion, ExpectedIntValue);
 
         #endregion
     }
 
     public static class UndefinedValues
     {
-        private static ValidCase V(string name, Inclusion inclusion, int expectedIntValue)
-            => new(Name: name, Inclusion: inclusion, ExpectedIntValue: expectedIntValue);
+        public static TheoryData<Case> ValidCases => [];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            { V("-1", (Inclusion)(-1), -1) },
-            { V("2", (Inclusion)2, 2) },
-            { V("42", (Inclusion)42, 42) },
-            { V("min", (Inclusion)int.MinValue, int.MinValue) },
-            { V("max", (Inclusion)int.MaxValue, int.MaxValue) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("-1", (Inclusion)(-1), -1),
+            new("2", (Inclusion)2, 2),
+            new("42", (Inclusion)42, 42),
+            new("min", (Inclusion)int.MinValue, int.MinValue),
+            new("max", (Inclusion)int.MaxValue, int.MaxValue),
+        ];
 
-        #region Cases
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        public record Case(string Name, Inclusion Inclusion);
+        #region Case Records
 
-        public sealed record ValidCase(string Name, Inclusion Inclusion, int ExpectedIntValue)
-            : Case(Name, Inclusion);
+        public sealed record Case(string Name, Inclusion Inclusion, int ExpectedIntValue)
+            : ReturnCase<Inclusion, int>(Name, Inclusion, ExpectedIntValue);
 
         #endregion
     }

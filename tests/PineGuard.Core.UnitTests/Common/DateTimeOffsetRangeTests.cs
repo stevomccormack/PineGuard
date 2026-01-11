@@ -49,8 +49,6 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
     [MemberData(nameof(DateTimeOffsetRangeTestData.Constructor.ValidCases), MemberType = typeof(DateTimeOffsetRangeTestData.Constructor))]
     public void Ctor_SetsStartEnd_AndDuration(DateTimeOffsetRangeTestData.Constructor.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var range = new DateTimeOffsetRange(testCase.Start, testCase.End);
 
@@ -65,8 +63,6 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
     [MemberData(nameof(DateTimeOffsetRangeTestData.Constructor.EdgeCases), MemberType = typeof(DateTimeOffsetRangeTestData.Constructor))]
     public void Ctor_EdgeCases_SetsStartEnd_AndDuration(DateTimeOffsetRangeTestData.Constructor.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var range = new DateTimeOffsetRange(testCase.Start, testCase.End);
 
@@ -80,21 +76,13 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
     public void Ctor_WhenStartAfterEnd_Throws(DateTimeOffsetRangeTestData.Constructor.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Assert.Throws<ArgumentException>(() => _ = new DateTimeOffsetRange(testCase.Start, testCase.End));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => _ = new DateTimeOffsetRange(invalidCase.Start, invalidCase.End));
 
         // Assert
-        Assert.IsType(testCase.ExpectedException.Type, ex);
-        if (testCase.ExpectedException.ParamName is not null)
-        {
-            Assert.Equal(testCase.ExpectedException.ParamName, ex.ParamName);
-        }
-
-        if (testCase.ExpectedException.MessageContains is not null)
-        {
-            Assert.Contains(testCase.ExpectedException.MessageContains, ex.Message, StringComparison.OrdinalIgnoreCase);
-        }
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Theory]
@@ -272,7 +260,7 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
         // Act
         var equalsTyped = range1.Equals(range2);
         var equalsObject = range1.Equals((object)range2);
-        var equalsNullObject = range1.Equals((object?)null);
+        var equalsNullObject = range1.Equals(null);
 
         // Assert
         Assert.True(equalsTyped);

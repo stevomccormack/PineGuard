@@ -1,26 +1,26 @@
+using PineGuard.Testing.UnitTests;
+
 namespace PineGuard.Core.UnitTests.Rules;
 
 public static class PredicateRulesTestData
 {
     public static class Satisfies
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "matches", Value: 5, Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("matches", 5, true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "null", Value: null, Expected: false) },
-            { new Case(Name: "not match", Value: 5, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null", null, false),
+            new("not match", 5, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, int? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, int? Value, bool ExpectedReturn)
+            : IsCase<int?>(Name, Value, ExpectedReturn);
 
         #endregion
     }

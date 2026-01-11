@@ -10,15 +10,12 @@ public sealed class TimeZoneUtilityCldrTests : BaseUnitTest
     private sealed class FakeCldrWindowsTimeZoneProvider : ICldrWindowsTimeZoneProvider
     {
         public string? LastIanaId { get; private set; }
-        public string? LastTerritory { get; private set; }
 
         public bool IsValidWindowsTimeZoneId(string? windowsTimeZoneId) =>
             string.Equals(windowsTimeZoneId, "UTC", StringComparison.OrdinalIgnoreCase);
 
         public bool TryGetIanaTimeZoneIds(string? windowsTimeZoneId, string? territory, out IReadOnlyCollection<string> ianaTimeZoneIds)
         {
-            LastTerritory = territory;
-
             if (string.Equals(windowsTimeZoneId, "UTC", StringComparison.OrdinalIgnoreCase))
             {
                 ianaTimeZoneIds = ["Etc/UTC"];
@@ -32,7 +29,6 @@ public sealed class TimeZoneUtilityCldrTests : BaseUnitTest
         public bool TryGetWindowsTimeZoneId(string? ianaTimeZoneId, string? territory, out string windowsTimeZoneId)
         {
             LastIanaId = ianaTimeZoneId;
-            LastTerritory = territory;
 
             if (string.Equals(ianaTimeZoneId, "Etc/UTC", StringComparison.Ordinal))
             {
@@ -63,7 +59,7 @@ public sealed class TimeZoneUtilityCldrTests : BaseUnitTest
             return false;
         }
 
-        public IReadOnlyCollection<IanaTimeZone> GetAll() => [new IanaTimeZone("Etc/UTC", ["US"], "+0000+00000", comment: null)];
+        public IReadOnlyCollection<IanaTimeZone> GetAll() => [new("Etc/UTC", ["US"], "+0000+00000", comment: null)];
 
         public bool TryGetTimeZoneIdsByCountryAlpha2Code(string? isoCountryAlpha2Code, out IReadOnlyCollection<string> timeZoneIds)
         {
@@ -97,7 +93,7 @@ public sealed class TimeZoneUtilityCldrTests : BaseUnitTest
 
         var iana = TimeZoneUtility.Cldr.ToIanaTimeZone("UTC", territory: null, cldrProvider, ianaProvider);
         Assert.NotNull(iana);
-        Assert.Equal("Etc/UTC", iana!.Id);
+        Assert.Equal("Etc/UTC", iana.Id);
 
         if (OperatingSystem.IsWindows())
         {

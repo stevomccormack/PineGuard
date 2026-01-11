@@ -1,4 +1,4 @@
-using PineGuard.Iso.Languages;
+using PineGuard.Externals.Iso.Languages;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Externals.Iso.Languages;
@@ -9,8 +9,6 @@ public sealed class IsoLanguageTests : BaseUnitTest
     [MemberData(nameof(IsoLanguageTestData.Constructor.ValidCases), MemberType = typeof(IsoLanguageTestData.Constructor))]
     public void Ctor_WhenValid_NormalizesAndSetsProperties(IsoLanguageTestData.Constructor.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var lang = new IsoLanguage(testCase.Alpha2Code, testCase.Alpha3Code, testCase.NameValue);
 
@@ -28,12 +26,13 @@ public sealed class IsoLanguageTests : BaseUnitTest
     public void Ctor_WhenInvalid_ThrowsExpected(IsoLanguageTestData.Constructor.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Assert.Throws(testCase.ExpectedException.Type, () => _ = new IsoLanguage(testCase.Alpha2Code, testCase.Alpha3Code, testCase.NameValue));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => _ = new IsoLanguage(invalidCase.Alpha2Code, invalidCase.Alpha3Code, invalidCase.NameValue));
 
         // Assert
-        Assert.Equal(testCase.ExpectedException.ParamName, ((ArgumentException)ex).ParamName);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Theory]
@@ -41,17 +40,15 @@ public sealed class IsoLanguageTests : BaseUnitTest
     [MemberData(nameof(IsoLanguageTestData.TryParse.EdgeCases), MemberType = typeof(IsoLanguageTestData.TryParse))]
     public void TryParse_ReturnsExpected(IsoLanguageTestData.TryParse.Case testCase)
     {
-        // Arrange
-
         // Act
         var ok = IsoLanguage.TryParse(testCase.Value, out var lang);
 
         // Assert
-        Assert.Equal(testCase.Expected, ok);
-        if (testCase.Expected)
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(lang);
-            Assert.Equal(testCase.ExpectedAlpha2, lang.Alpha2Code);
+            Assert.Equal(testCase.ExpectedOutValue, lang.Alpha2Code);
         }
         else
         {
@@ -63,8 +60,6 @@ public sealed class IsoLanguageTests : BaseUnitTest
     [MemberData(nameof(IsoLanguageTestData.Parse.ValidCases), MemberType = typeof(IsoLanguageTestData.Parse))]
     public void Parse_WhenValid_ReturnsExpected(IsoLanguageTestData.Parse.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var lang = IsoLanguage.Parse(testCase.Value);
 
@@ -77,13 +72,13 @@ public sealed class IsoLanguageTests : BaseUnitTest
     public void Parse_WhenInvalid_ThrowsExpected(IsoLanguageTestData.Parse.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Assert.Throws(testCase.ExpectedException.Type, () => _ = IsoLanguage.Parse(testCase.Value!));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => _ = IsoLanguage.Parse(invalidCase.Value!));
 
         // Assert
-        if (testCase.ExpectedException.MessageContains is not null)
-            Assert.Contains(testCase.ExpectedException.MessageContains, ex.Message, StringComparison.OrdinalIgnoreCase);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Fact]

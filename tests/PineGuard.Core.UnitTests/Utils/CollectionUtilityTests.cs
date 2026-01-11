@@ -5,22 +5,15 @@ namespace PineGuard.Core.UnitTests.Utils;
 
 public sealed class CollectionUtilityTests : BaseUnitTest
 {
-    private sealed class ReadOnlyListOnly<T> : IReadOnlyList<T>
+    private sealed class ReadOnlyListOnly<T>(params T[] items) : IReadOnlyList<T>
     {
-        private readonly T[] _items;
+        public int Count => items.Length;
 
-        public ReadOnlyListOnly(params T[] items)
-        {
-            _items = items;
-        }
+        public T this[int index] => items[index];
 
-        public int Count => _items.Length;
+        public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)items).GetEnumerator();
 
-        public T this[int index] => _items[index];
-
-        public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)_items).GetEnumerator();
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _items.GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => items.GetEnumerator();
     }
 
     [Fact]
@@ -46,13 +39,24 @@ public sealed class CollectionUtilityTests : BaseUnitTest
     [Fact]
     public void TryGetCount_ReturnsTrue_ForIReadOnlyCollection()
     {
-        IReadOnlyCollection<int> readOnly = Array.AsReadOnly(new[] { 1, 2, 3, 4 });
+        IReadOnlyCollection<int> readOnly = Array.AsReadOnly([1, 2, 3, 4]);
         IEnumerable<int> values = readOnly;
 
         var result = CollectionUtility.TryGetCount(values, out var count);
 
         Assert.True(result);
         Assert.Equal(4, count);
+    }
+
+    [Fact]
+    public void TryGetCount_ReturnsTrue_ForIReadOnlyCollectionOnly()
+    {
+        IEnumerable<int> values = new ReadOnlyListOnly<int>(1, 2, 3);
+
+        var result = CollectionUtility.TryGetCount(values, out var count);
+
+        Assert.True(result);
+        Assert.Equal(3, count);
     }
 
     [Fact]
@@ -74,13 +78,13 @@ public sealed class CollectionUtilityTests : BaseUnitTest
     public void TryGet_ReturnsFalse_ForNullOrNegativeIndex()
     {
         Assert.False(CollectionUtility.TryGet<string>(null, 0, out _));
-        Assert.False(CollectionUtility.TryGet(new[] { "a" }, -1, out _));
+        Assert.False(CollectionUtility.TryGet(["a"], -1, out _));
     }
 
     [Fact]
     public void TryGet_Works_ForIListPath()
     {
-        IList<string> list = new List<string> { "a", "b", "c" };
+        IList<string> list = ["a", "b", "c"];
 
         Assert.True(CollectionUtility.TryGet(list, 1, out var item));
         Assert.Equal("b", item);
@@ -91,7 +95,7 @@ public sealed class CollectionUtilityTests : BaseUnitTest
     [Fact]
     public void TryGet_Works_ForIReadOnlyListPath()
     {
-        IReadOnlyList<string> roList = Array.AsReadOnly(new[] { "a", "b" });
+        IReadOnlyList<string> roList = Array.AsReadOnly(["a", "b"]);
 
         Assert.True(CollectionUtility.TryGet(roList, 0, out var item));
         Assert.Equal("a", item);
@@ -131,13 +135,23 @@ public sealed class CollectionUtilityTests : BaseUnitTest
     public void TryGet_UsesCountShortCircuit_ForCountableNonList()
     {
         // Queue<T> is countable but not indexable.
-        IEnumerable<string> values = new Queue<string>(new[] { "a", "b" });
+        IEnumerable<string> values = new Queue<string>(["a", "b"]);
 
         Assert.False(CollectionUtility.TryGet(values, 2, out var outOfRange));
         Assert.Null(outOfRange);
 
         Assert.True(CollectionUtility.TryGet(values, 1, out var item));
         Assert.Equal("b", item);
+    }
+
+    [Fact]
+    public void TryGet_ReturnsFalse_ForICollectionNonList_WhenIndexOutOfRange()
+    {
+        // HashSet<T> is countable but not indexable.
+        IEnumerable<string> values = new HashSet<string>(StringComparer.Ordinal) { "a", "b" };
+
+        Assert.False(CollectionUtility.TryGet(values, 2, out var outOfRange));
+        Assert.Null(outOfRange);
     }
 
     [Fact]
@@ -152,7 +166,7 @@ public sealed class CollectionUtilityTests : BaseUnitTest
     [Fact]
     public void TryGetIndex_Works_ForIListPath()
     {
-        IList<int> list = new List<int> { 10, 20, 30 };
+        IList<int> list = [10, 20, 30];
 
         Assert.True(CollectionUtility.TryGetIndex(list, 20, out var index));
         Assert.Equal(1, index);

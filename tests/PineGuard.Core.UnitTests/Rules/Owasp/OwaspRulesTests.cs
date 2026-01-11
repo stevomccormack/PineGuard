@@ -6,12 +6,48 @@ namespace PineGuard.Core.UnitTests.Rules.Owasp;
 public sealed class OwaspRulesTests : BaseUnitTest
 {
     [Theory]
+    [MemberData(nameof(OwaspRulesTestData.OwaspRegexXss.HtmlTagRegexCases), MemberType = typeof(OwaspRulesTestData.OwaspRegexXss))]
+    public void HtmlTagRegex_ReturnsExpected(OwaspRulesTestData.OwaspRegexXss.Case testCase)
+    {
+        var result = OwaspRegex.Xss.HtmlTagRegex().IsMatch(testCase.Value!);
+
+        Assert.Equal(testCase.ExpectedReturn, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(OwaspRulesTestData.OwaspRegexXss.HtmlEntityEncodedAngleBracketRegexCases), MemberType = typeof(OwaspRulesTestData.OwaspRegexXss))]
+    public void HtmlEntityEncodedAngleBracketRegex_ReturnsExpected(OwaspRulesTestData.OwaspRegexXss.Case testCase)
+    {
+        var result = OwaspRegex.Xss.HtmlEntityEncodedAngleBracketRegex().IsMatch(testCase.Value!);
+
+        Assert.Equal(testCase.ExpectedReturn, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(OwaspRulesTestData.OwaspRegexXss.ScriptProtocolRegexCases), MemberType = typeof(OwaspRulesTestData.OwaspRegexXss))]
+    public void ScriptProtocolRegex_ReturnsExpected(OwaspRulesTestData.OwaspRegexXss.Case testCase)
+    {
+        var result = OwaspRegex.Xss.ScriptProtocolRegex().IsMatch(testCase.Value!);
+
+        Assert.Equal(testCase.ExpectedReturn, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(OwaspRulesTestData.OwaspRegexXss.HtmlEventHandlerAttributeRegexCases), MemberType = typeof(OwaspRulesTestData.OwaspRegexXss))]
+    public void HtmlEventHandlerAttributeRegex_ReturnsExpected(OwaspRulesTestData.OwaspRegexXss.Case testCase)
+    {
+        var result = OwaspRegex.Xss.HtmlEventHandlerAttributeRegex().IsMatch(testCase.Value!);
+
+        Assert.Equal(testCase.ExpectedReturn, result);
+    }
+
+    [Theory]
     [MemberData(nameof(OwaspRulesTestData.IsOwaspSafe.ValidCases), MemberType = typeof(OwaspRulesTestData.IsOwaspSafe))]
     public void IsOwaspSafe_ReturnsTrue_ForSafeStrings(OwaspRulesTestData.IsOwaspSafe.Case testCase)
     {
         var result = OwaspRules.IsOwaspSafe(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -21,7 +57,7 @@ public sealed class OwaspRulesTests : BaseUnitTest
     {
         var result = OwaspRules.IsOwaspDangerous(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -31,7 +67,7 @@ public sealed class OwaspRulesTests : BaseUnitTest
     {
         var result = OwaspRules.IsXssSafe(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -40,7 +76,7 @@ public sealed class OwaspRulesTests : BaseUnitTest
     {
         var result = OwaspRules.IsSqlInjectionSafe(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -49,7 +85,7 @@ public sealed class OwaspRulesTests : BaseUnitTest
     {
         var result = OwaspRules.IsPathTraversalSafe(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -58,7 +94,7 @@ public sealed class OwaspRulesTests : BaseUnitTest
     {
         var result = OwaspRules.IsCommandInjectionSafe(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -67,7 +103,7 @@ public sealed class OwaspRulesTests : BaseUnitTest
     {
         var result = OwaspRules.IsCrLfSafe(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -76,7 +112,7 @@ public sealed class OwaspRulesTests : BaseUnitTest
     {
         var result = OwaspRules.IsLdapFilterSafe(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -85,7 +121,7 @@ public sealed class OwaspRulesTests : BaseUnitTest
     {
         var result = OwaspRules.IsOpenRedirectSafe(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -94,6 +130,6 @@ public sealed class OwaspRulesTests : BaseUnitTest
     {
         var result = OwaspRules.IsSsrfSchemeSafe(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

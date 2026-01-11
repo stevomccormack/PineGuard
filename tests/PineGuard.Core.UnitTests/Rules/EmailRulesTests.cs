@@ -12,7 +12,7 @@ public sealed class EmailRulesTests : BaseUnitTest
     {
         var result = EmailRules.IsEmail(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -22,7 +22,7 @@ public sealed class EmailRulesTests : BaseUnitTest
     {
         var result = EmailRules.IsStrictEmail(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -32,6 +32,6 @@ public sealed class EmailRulesTests : BaseUnitTest
     {
         var result = EmailRules.HasAlias(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

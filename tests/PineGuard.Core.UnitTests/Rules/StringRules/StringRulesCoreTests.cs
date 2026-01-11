@@ -47,7 +47,7 @@ public sealed class StringRulesCoreTests : BaseUnitTest
     public void IsAlphabetic_ReturnsExpected(StringRulesCoreTestData.IsAlphabetic.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.IsAlphabetic(testCase.Value);
-        Assert.Equal(testCase.ExpectedDefault, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
 
         var resultWithDashInclusions = PineGuard.Rules.StringRules.IsAlphabetic(testCase.Value, inclusions: ['-']);
         Assert.Equal(testCase.ExpectedWithDashInclusions, resultWithDashInclusions);
@@ -61,7 +61,7 @@ public sealed class StringRulesCoreTests : BaseUnitTest
     public void IsNumeric_ReturnsExpected(StringRulesCoreTestData.IsNumeric.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.IsNumeric(testCase.Value);
-        Assert.Equal(testCase.ExpectedDefault, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
 
         var resultWithDashInclusions = PineGuard.Rules.StringRules.IsNumeric(testCase.Value, inclusions: ['-']);
         Assert.Equal(testCase.ExpectedWithDashInclusions, resultWithDashInclusions);
@@ -75,7 +75,7 @@ public sealed class StringRulesCoreTests : BaseUnitTest
     public void IsAlphanumeric_ReturnsExpected(StringRulesCoreTestData.IsAlphanumeric.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.IsAlphanumeric(testCase.Value);
-        Assert.Equal(testCase.ExpectedDefault, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
 
         var resultWithDashInclusions = PineGuard.Rules.StringRules.IsAlphanumeric(testCase.Value, inclusions: ['-']);
         Assert.Equal(testCase.ExpectedWithDashInclusions, resultWithDashInclusions);
@@ -89,7 +89,7 @@ public sealed class StringRulesCoreTests : BaseUnitTest
     public void IsDigitsOnly_Default_ReturnsExpected(StringRulesCoreTestData.IsDigitsOnly.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.IsDigitsOnly(testCase.Value);
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -97,7 +97,7 @@ public sealed class StringRulesCoreTests : BaseUnitTest
     public void IsDigitsOnly_WithAllowedNonDigitChars_ReturnsExpected(StringRulesCoreTestData.IsDigitsOnlyWithAllowedNonDigitChars.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.IsDigitsOnly(testCase.Value, allowedNonDigitChars: ['-']);
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]

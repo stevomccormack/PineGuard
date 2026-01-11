@@ -8,8 +8,6 @@ public sealed class BufferRulesTests : BaseUnitTest
     [Fact]
     public void Constants_AreExpected()
     {
-        // Arrange
-
         // Act
 
         // Assert
@@ -20,28 +18,24 @@ public sealed class BufferRulesTests : BaseUnitTest
     [Theory]
     [MemberData(nameof(BufferRulesTestData.IsHex.ValidCases), MemberType = typeof(BufferRulesTestData.IsHex))]
     [MemberData(nameof(BufferRulesTestData.IsHex.EdgeCases), MemberType = typeof(BufferRulesTestData.IsHex))]
-    public void IsHex_ReturnsExpected(PineGuard.Core.UnitTests.Utils.BufferUtilityTestData.IsHexString.Case testCase)
+    public void IsHex_ReturnsExpected(Utils.BufferUtilityTestData.IsHexString.Case testCase)
     {
-        // Arrange
-
         // Act
-        var result = BufferRules.IsHex(testCase.Input);
+        var result = BufferRules.IsHex(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
     [MemberData(nameof(BufferRulesTestData.IsBase64.ValidCases), MemberType = typeof(BufferRulesTestData.IsBase64))]
     [MemberData(nameof(BufferRulesTestData.IsBase64.EdgeCases), MemberType = typeof(BufferRulesTestData.IsBase64))]
-    public void IsBase64_ReturnsExpected(PineGuard.Core.UnitTests.Utils.BufferUtilityTestData.IsBase64String.Case testCase)
+    public void IsBase64_ReturnsExpected(Utils.BufferUtilityTestData.IsBase64String.Case testCase)
     {
-        // Arrange
-
         // Act
-        var result = BufferRules.IsBase64(testCase.Input);
+        var result = BufferRules.IsBase64(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

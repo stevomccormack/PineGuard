@@ -1,5 +1,4 @@
 using PineGuard.Externals.Iso.Currencies;
-using PineGuard.Iso.Currencies;
 using PineGuard.Testing.UnitTests;
 using System.Collections.Frozen;
 
@@ -12,13 +11,13 @@ public sealed class DefaultIsoCurrencyProviderTests : BaseUnitTest
     {
         var testCurrency = new IsoCurrency("AAA", "000", 2, "Test Currency");
 
-        FrozenDictionary<string, IsoCurrency> alpha3 =
+        var alpha3 =
             new Dictionary<string, IsoCurrency>(StringComparer.Ordinal)
             {
                 { "AAA", testCurrency },
             }.ToFrozenDictionary(StringComparer.Ordinal);
 
-        FrozenDictionary<string, IsoCurrency> numeric =
+        var numeric =
             new Dictionary<string, IsoCurrency>(StringComparer.Ordinal)
             {
                 { "000", testCurrency },
@@ -47,16 +46,18 @@ public sealed class DefaultIsoCurrencyProviderTests : BaseUnitTest
         var ok = provider.TryGet(testCase.Value, out var currency);
 
         // Assert
-        Assert.Equal(testCase.Expected, ok);
-        if (testCase.Expected)
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(currency);
             Assert.True(provider.GetAll().Count > 0);
-            Assert.Equal(testCase.ExpectedAlpha3, currency.Alpha3Code);
+            Assert.NotNull(testCase.ExpectedOutValue);
+            Assert.Equal(testCase.ExpectedOutValue, currency.Alpha3Code);
         }
         else
         {
             Assert.Null(currency);
+            Assert.Null(testCase.ExpectedOutValue);
         }
     }
 
@@ -72,7 +73,7 @@ public sealed class DefaultIsoCurrencyProviderTests : BaseUnitTest
         var contains = provider.ContainsAlpha3Code(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, contains);
+        Assert.Equal(testCase.ExpectedReturn, contains);
     }
 
     [Theory]
@@ -84,7 +85,7 @@ public sealed class DefaultIsoCurrencyProviderTests : BaseUnitTest
 
         var contains = provider.ContainsNumericCode(testCase.Value);
 
-        Assert.Equal(testCase.Expected, contains);
+        Assert.Equal(testCase.ExpectedReturn, contains);
     }
 
     [Theory]
@@ -99,15 +100,17 @@ public sealed class DefaultIsoCurrencyProviderTests : BaseUnitTest
         var ok = provider.TryGetByAlpha3Code(testCase.Value, out var currency);
 
         // Assert
-        Assert.Equal(testCase.Expected, ok);
-        if (testCase.Expected)
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(currency);
-            Assert.Equal(testCase.ExpectedAlpha3, currency.Alpha3Code);
+            Assert.NotNull(testCase.ExpectedOutValue);
+            Assert.Equal(testCase.ExpectedOutValue, currency.Alpha3Code);
         }
         else
         {
             Assert.Null(currency);
+            Assert.Null(testCase.ExpectedOutValue);
         }
     }
 
@@ -120,15 +123,17 @@ public sealed class DefaultIsoCurrencyProviderTests : BaseUnitTest
 
         var ok = provider.TryGetByNumericCode(testCase.Value, out var currency);
 
-        Assert.Equal(testCase.Expected, ok);
-        if (testCase.Expected)
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(currency);
-            Assert.Equal(testCase.ExpectedNumeric, currency.NumericCode);
+            Assert.NotNull(testCase.ExpectedOutValue);
+            Assert.Equal(testCase.ExpectedOutValue, currency.NumericCode);
         }
         else
         {
             Assert.Null(currency);
+            Assert.Null(testCase.ExpectedOutValue);
         }
     }
 }

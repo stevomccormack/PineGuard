@@ -1,5 +1,4 @@
 using PineGuard.Externals.Iso.Payments.Cards;
-using PineGuard.Iso.Payments.Cards;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Externals.Iso.Payments.Cards;
@@ -18,8 +17,6 @@ public sealed class IsoPaymentCardBrandUtilityTests : BaseUnitTest
     [Fact]
     public void All_ContainsExpectedBrands()
     {
-        // Arrange
-
         // Act
         var all = IsoPaymentCardBrandUtility.All;
 
@@ -38,29 +35,16 @@ public sealed class IsoPaymentCardBrandUtilityTests : BaseUnitTest
     [MemberData(nameof(IsoPaymentCardBrandUtilityTestData.FromPan.EdgeCases), MemberType = typeof(IsoPaymentCardBrandUtilityTestData.FromPan))]
     public void FromPan_ReturnsExpected(IsoPaymentCardBrandUtilityTestData.FromPan.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var brand = IsoPaymentCardBrandUtility.FromPan(testCase.Pan);
+        var brand = IsoPaymentCardBrandUtility.FromPan(testCase.Value);
 
         // Assert
-        if (testCase.Expected)
-        {
-            Assert.NotNull(brand);
-            Assert.Equal(testCase.ExpectedBrandName, brand!.BrandName);
-        }
-        else
-        {
-            Assert.Null(brand);
-            Assert.Null(testCase.ExpectedBrandName);
-        }
+        Assert.Equal(testCase.ExpectedReturn, brand?.BrandName);
     }
 
     [Fact]
     public void TryFromPan_SetsOutParam()
     {
-        // Arrange
-
         // Act
         var ok = IsoPaymentCardBrandUtility.TryFromPan("4000000000000000", out var brand);
         var bad = IsoPaymentCardBrandUtility.TryFromPan("9999999999999999", out var noBrand);
@@ -77,29 +61,16 @@ public sealed class IsoPaymentCardBrandUtilityTests : BaseUnitTest
     [MemberData(nameof(IsoPaymentCardBrandUtilityTestData.FromBrandName.EdgeCases), MemberType = typeof(IsoPaymentCardBrandUtilityTestData.FromBrandName))]
     public void FromBrandName_ReturnsExpected(IsoPaymentCardBrandUtilityTestData.FromBrandName.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var brand = IsoPaymentCardBrandUtility.FromBrandName(testCase.BrandName);
+        var brand = IsoPaymentCardBrandUtility.FromBrandName(testCase.Value);
 
         // Assert
-        if (testCase.Expected)
-        {
-            Assert.NotNull(brand);
-            Assert.Equal(testCase.ExpectedBrandName, brand!.BrandName);
-        }
-        else
-        {
-            Assert.Null(brand);
-            Assert.Null(testCase.ExpectedBrandName);
-        }
+        Assert.Equal(testCase.ExpectedReturn, brand?.BrandName);
     }
 
     [Fact]
     public void TryFromBrandName_SetsOutParam()
     {
-        // Arrange
-
         // Act
         var ok = IsoPaymentCardBrandUtility.TryFromBrandName("visa", out var brand);
         var bad = IsoPaymentCardBrandUtility.TryFromBrandName("unknown", out var noBrand);
@@ -142,7 +113,7 @@ public sealed class IsoPaymentCardBrandUtilityTests : BaseUnitTest
     public void ToIsoCardBrand_Extension_ForwardsToUtility()
     {
         // Arrange
-        IIsoPaymentCardBrand? brand = new VisaCard();
+        IIsoPaymentCardBrand brand = new VisaCard();
 
         // Act
         var viaExtension = brand.ToIsoCardBrand();

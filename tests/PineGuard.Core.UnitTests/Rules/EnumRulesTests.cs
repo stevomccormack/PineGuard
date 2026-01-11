@@ -9,9 +9,9 @@ public sealed class EnumRulesTests : BaseUnitTest
     [MemberData(nameof(EnumRulesTestData.IsDefined.ValidCases), MemberType = typeof(EnumRulesTestData.IsDefined))]
     public void IsDefined_ReturnsTrue_ForDefinedValue(EnumRulesTestData.IsDefined.Case testCase)
     {
-        var result = EnumRules.IsDefined<EnumRulesTestData.SimpleEnum>(testCase.Value);
+        var result = EnumRules.IsDefined(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -19,9 +19,9 @@ public sealed class EnumRulesTests : BaseUnitTest
     [MemberData(nameof(EnumRulesTestData.IsDefined.EdgeCases), MemberType = typeof(EnumRulesTestData.IsDefined))]
     public void IsDefined_ReturnsFalse_ForNullOrUndefined(EnumRulesTestData.IsDefined.Case testCase)
     {
-        var result = EnumRules.IsDefined<EnumRulesTestData.SimpleEnum>(testCase.Value);
+        var result = EnumRules.IsDefined(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -31,7 +31,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.IsDefinedValue<EnumRulesTestData.SimpleEnum>(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -41,7 +41,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.IsDefinedValue<EnumRulesTestData.SimpleEnum>(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -51,7 +51,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.IsDefinedName<EnumRulesTestData.SimpleEnum>(testCase.Value, testCase.IgnoreCase);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -61,7 +61,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.IsDefinedName<EnumRulesTestData.SimpleEnum>(testCase.Value, testCase.IgnoreCase);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -78,9 +78,9 @@ public sealed class EnumRulesTests : BaseUnitTest
         MemberType = typeof(EnumRulesTestData.IsFlagsEnumCombination))]
     public void IsFlagsEnumCombination_ReturnsExpected_ForValidCombinations(EnumRulesTestData.IsFlagsEnumCombination.Case testCase)
     {
-        var result = EnumRules.IsFlagsEnumCombination<EnumRulesTestData.SampleFlags>(testCase.Value);
+        var result = EnumRules.IsFlagsEnumCombination(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -90,9 +90,9 @@ public sealed class EnumRulesTests : BaseUnitTest
         MemberType = typeof(EnumRulesTestData.IsFlagsEnumCombination))]
     public void IsFlagsEnumCombination_ReturnsFalse_ForUndefinedBits(EnumRulesTestData.IsFlagsEnumCombination.Case testCase)
     {
-        var result = EnumRules.IsFlagsEnumCombination<EnumRulesTestData.SampleFlags>(testCase.Value);
+        var result = EnumRules.IsFlagsEnumCombination(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -102,9 +102,9 @@ public sealed class EnumRulesTests : BaseUnitTest
     public void IsFlagsEnumCombination_ForNonFlagsEnum_ReturnsExpected(
         EnumRulesTestData.IsFlagsEnumCombinationNonFlags.Case testCase)
     {
-        var result = EnumRules.IsFlagsEnumCombination<EnumRulesTestData.SimpleEnum>(testCase.Value);
+        var result = EnumRules.IsFlagsEnumCombination(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -113,7 +113,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.HasFlag(testCase.Value, testCase.Flag);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -123,7 +123,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.HasFlag(testCase.Value, testCase.Flag);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -133,7 +133,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.HasDescription(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -145,7 +145,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.HasDescription(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -155,7 +155,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.HasDisplay(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -165,7 +165,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.HasDisplay(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -175,7 +175,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.HasEnumMember(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -185,7 +185,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.HasEnumMember(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -195,7 +195,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.IsObsolete(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -205,7 +205,7 @@ public sealed class EnumRulesTests : BaseUnitTest
     {
         var result = EnumRules.IsObsolete(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 }

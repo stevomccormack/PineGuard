@@ -16,13 +16,11 @@ public sealed class EnumerationTests : BaseUnitTest
     [MemberData(nameof(EnumerationTestData.IntConstructor.ValidCases), MemberType = typeof(EnumerationTestData.IntConstructor))]
     public void Ctor_RegistersValueAndName(EnumerationTestData.IntConstructor.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var enumeration = new DynamicIntEnumeration(testCase.Value, testCase.EnumerationName);
+        var enumeration = new DynamicIntEnumeration(testCase.InputValue, testCase.EnumerationName);
 
         // Assert
-        Assert.Equal(testCase.Value, enumeration.Value);
+        Assert.Equal(testCase.InputValue, enumeration.Value);
         Assert.Equal(testCase.EnumerationName, enumeration.Name);
         Assert.Equal(testCase.EnumerationName, enumeration.ToString());
     }
@@ -32,12 +30,13 @@ public sealed class EnumerationTests : BaseUnitTest
     public void Ctor_WhenNameIsNullOrWhitespace_Throws(EnumerationTestData.IntConstructor.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Assert.ThrowsAny<ArgumentException>(() => _ = new DynamicIntEnumeration(testCase.Value, testCase.EnumerationName!));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => _ = new DynamicIntEnumeration(invalidCase.EnumerationValue, invalidCase.EnumerationName!));
 
         // Assert
-        Assert.Equal(testCase.Expected.ParamName, ex.ParamName);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Fact]
@@ -74,8 +73,6 @@ public sealed class EnumerationTests : BaseUnitTest
     [Fact]
     public void GetAll_ReturnsPublicStaticDeclaredFieldsOnly()
     {
-        // Arrange
-
         // Act
         var all = Enumeration<int>.GetAll<Color>();
 
@@ -91,8 +88,6 @@ public sealed class EnumerationTests : BaseUnitTest
     [Fact]
     public void FromValue_ReturnsMatchOrNull_Repeatable()
     {
-        // Arrange
-
         // Act
         var red1 = Enumeration<int>.FromValue<Color>(1);
         var red2 = Enumeration<int>.FromValue<Color>(1);
@@ -107,10 +102,8 @@ public sealed class EnumerationTests : BaseUnitTest
     [Fact]
     public void TryFromValue_WhenNull_ReturnsFalse()
     {
-        // Arrange
-
         // Act
-        var ok = Enumeration<string>.TryFromValue<DynamicStringEnumeration>(null, out DynamicStringEnumeration? result);
+        var ok = Enumeration<string>.TryFromValue(null, out DynamicStringEnumeration? result);
 
         // Assert
         Assert.False(ok);
@@ -120,8 +113,6 @@ public sealed class EnumerationTests : BaseUnitTest
     [Fact]
     public void FromName_ReturnsMatch_IgnoresCase()
     {
-        // Arrange
-
         // Act
         var green = Enumeration<int>.FromName<Color>("gReEn");
 
@@ -132,12 +123,10 @@ public sealed class EnumerationTests : BaseUnitTest
     [Fact]
     public void FromName_WhenNullOrWhitespace_Throws()
     {
-        // Arrange
-
         // Act
-        var exNull = Assert.ThrowsAny<ArgumentException>(() => _ = Enumeration<int>.FromName<Color>(null!));
-        var exEmpty = Assert.ThrowsAny<ArgumentException>(() => _ = Enumeration<int>.FromName<Color>(""));
-        var exWhitespace = Assert.ThrowsAny<ArgumentException>(() => _ = Enumeration<int>.FromName<Color>(" "));
+        var exNull = Assert.Throws<ArgumentNullException>(() => _ = Enumeration<int>.FromName<Color>(null!));
+        var exEmpty = Assert.Throws<ArgumentException>(() => _ = Enumeration<int>.FromName<Color>(""));
+        var exWhitespace = Assert.Throws<ArgumentException>(() => _ = Enumeration<int>.FromName<Color>(" "));
 
         // Assert
         Assert.Equal("name", exNull.ParamName);
@@ -148,8 +137,6 @@ public sealed class EnumerationTests : BaseUnitTest
     [Fact]
     public void TryFromName_WhenNullOrWhitespace_ReturnsFalse()
     {
-        // Arrange
-
         // Act
         var okNull = Enumeration<int>.TryFromName<Color>(null, out var nullResult);
         var okEmpty = Enumeration<int>.TryFromName<Color>("", out var emptyResult);
@@ -191,7 +178,7 @@ public sealed class EnumerationTests : BaseUnitTest
     [Fact]
     public void Equals_WhenOtherIsNull_ReturnsFalse()
     {
-        Assert.False(Color.Red.Equals((Enumeration<int>?)null));
+        Assert.False(Color.Red.Equals(null));
     }
 
     [Fact]
@@ -263,7 +250,10 @@ public sealed class EnumerationTests : BaseUnitTest
     public void Equals_Object_ReturnsFalse_WhenObjectIsNotEnumeration()
     {
         Assert.False(Color.Red.Equals(new object()));
-        Assert.False(Color.Red.Equals("Red"));
+
+        object other = "Red";
+        object enumeration = Color.Red;
+        Assert.False(enumeration.Equals(other));
     }
 
     [Theory]
@@ -271,18 +261,19 @@ public sealed class EnumerationTests : BaseUnitTest
     public void StringEnumeration_Ctor_Throws_ForNullValueOrBadName(EnumerationTestData.StringConstructor.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Assert.ThrowsAny<ArgumentException>(() => _ = new DynamicStringEnumeration(testCase.Value!, testCase.EnumerationName!));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => _ = new DynamicStringEnumeration(invalidCase.EnumerationValue!, invalidCase.EnumerationName!));
 
         // Assert
-        Assert.Equal(testCase.Expected.ParamName, ex.ParamName);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     private static void ClearRegistries(Type closedEnumerationType)
     {
-        ClearStaticConcurrentDictionary(closedEnumerationType, "_nameRegistries");
-        ClearStaticConcurrentDictionary(closedEnumerationType, "_valueRegistries");
+        ClearStaticConcurrentDictionary(closedEnumerationType, "NameRegistries");
+        ClearStaticConcurrentDictionary(closedEnumerationType, "ValueRegistries");
     }
 
     private static void ClearStaticConcurrentDictionary(Type closedEnumerationType, string fieldName)
@@ -303,19 +294,9 @@ public sealed class EnumerationTests : BaseUnitTest
         clear?.Invoke(instance, parameters: null);
     }
 
-    private sealed class DynamicIntEnumeration : Enumeration<int>
-    {
-        public DynamicIntEnumeration(int value, string name) : base(value, name)
-        {
-        }
-    }
+    private sealed class DynamicIntEnumeration(int value, string name) : Enumeration<int>(value, name);
 
-    private sealed class DynamicStringEnumeration : StringEnumeration
-    {
-        public DynamicStringEnumeration(string value, string name) : base(value, name)
-        {
-        }
-    }
+    private sealed class DynamicStringEnumeration(string value, string name) : StringEnumeration(value, name);
 
     private sealed class Color : Enumeration<int>
     {

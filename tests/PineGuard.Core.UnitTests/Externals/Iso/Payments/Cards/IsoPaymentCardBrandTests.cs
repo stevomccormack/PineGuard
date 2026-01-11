@@ -1,17 +1,17 @@
-using PineGuard.Iso.Payments.Cards;
+using PineGuard.Externals.Iso.Payments.Cards;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Externals.Iso.Payments.Cards;
 
 public sealed class IsoPaymentCardBrandTests : BaseUnitTest
 {
-    private sealed class TestBrand : IsoPaymentCardBrand
+    private sealed class TestBrand(
+        string brandName,
+        int[] validPanLengths,
+        string[] iinPrefixes,
+        int[] displayFormatPattern)
+        : IsoPaymentCardBrand(brandName, validPanLengths, iinPrefixes, displayFormatPattern)
     {
-        public TestBrand(string brandName, int[] validPanLengths, string[] iinPrefixes, int[] displayFormatPattern)
-            : base(brandName, validPanLengths, iinPrefixes, displayFormatPattern)
-        {
-        }
-
         public bool CallMatchesIinRange(string sanitizedPan, int rangeStart, int rangeEnd) =>
             MatchesIinRange(sanitizedPan, rangeStart, rangeEnd);
     }
@@ -21,25 +21,18 @@ public sealed class IsoPaymentCardBrandTests : BaseUnitTest
     public void Constructor_Throws_ForInvalidInputs(IsoPaymentCardBrandTestData.Constructor.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Record.Exception(() => new TestBrand(testCase.BrandName!, testCase.ValidPanLengths!, testCase.IinPrefixes!, testCase.DisplayFormatPattern!));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () =>
+            new TestBrand(
+                invalidCase.Value.BrandName!,
+                invalidCase.Value.ValidPanLengths!,
+                invalidCase.Value.IinPrefixes!,
+                invalidCase.Value.DisplayFormatPattern!));
 
         // Assert
-        Assert.NotNull(ex);
-        Assert.IsType(testCase.ExpectedException.Type, ex);
-
-        if (testCase.ExpectedException.ParamName is not null)
-        {
-            var actualParam = ex switch
-            {
-                ArgumentNullException ane => ane.ParamName,
-                ArgumentException ae => ae.ParamName,
-                _ => null
-            };
-
-            Assert.Equal(testCase.ExpectedException.ParamName, actualParam);
-        }
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Fact]
@@ -65,13 +58,11 @@ public sealed class IsoPaymentCardBrandTests : BaseUnitTest
     [MemberData(nameof(IsoPaymentCardBrandTestData.IsoCardNumberWithSeparatorsRegex.EdgeCases), MemberType = typeof(IsoPaymentCardBrandTestData.IsoCardNumberWithSeparatorsRegex))]
     public void IsoCardNumberWithSeparatorsRegex_ReturnsExpected(IsoPaymentCardBrandTestData.IsoCardNumberWithSeparatorsRegex.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var result = IsoPaymentCardBrand.IsoCardNumberWithSeparatorsRegex().IsMatch(testCase.Value);
+        var result = IsoPaymentCardBrand.IsoCardNumberWithSeparatorsRegex().IsMatch(testCase.Value ?? string.Empty);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -88,7 +79,7 @@ public sealed class IsoPaymentCardBrandTests : BaseUnitTest
             || brand.CallMatchesIinRange(pan, 2221, 2720);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]

@@ -18,7 +18,7 @@ public sealed class SqlDateTimeRulesTests : BaseUnitTest
         var tooEarly = new DateTime(1600, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
 
         Assert.False(SqlDateTimeRules.IsInSqlDateTimeRange(tooEarly));
-        Assert.False(SqlDateTimeRules.IsInSqlDateTimeRange((DateTime?)null));
+        Assert.False(SqlDateTimeRules.IsInSqlDateTimeRange(null));
     }
 
     [Fact]

@@ -12,15 +12,17 @@ public sealed class EmailUtilityTests : BaseUnitTest
     {
         var result = EmailUtility.TryCreate(testCase.Value, out var email);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
 
-        if (testCase.Expected)
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(email);
+            Assert.Equal(testCase.ExpectedOutValue, email.Address);
         }
         else
         {
             Assert.Null(email);
+            Assert.Null(testCase.ExpectedOutValue);
         }
     }
 
@@ -31,16 +33,17 @@ public sealed class EmailUtilityTests : BaseUnitTest
     {
         var result = EmailUtility.TryStrictCreate(testCase.Value, out var email);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
 
-        if (testCase.Expected)
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(email);
-            Assert.Equal(testCase.ExpectedAddress, email!.Address);
+            Assert.Equal(testCase.ExpectedOutValue, email.Address);
         }
         else
         {
             Assert.Null(email);
+            Assert.Equal(string.Empty, testCase.ExpectedOutValue);
         }
     }
 
@@ -60,7 +63,7 @@ public sealed class EmailUtilityTests : BaseUnitTest
     {
         var result = EmailUtility.TryGetAlias(testCase.Value, out var alias);
 
-        Assert.Equal(testCase.Expected, result);
-        Assert.Equal(testCase.ExpectedAlias, alias);
+        Assert.Equal(testCase.ExpectedReturn, result);
+        Assert.Equal(testCase.ExpectedOutValue, alias);
     }
 }

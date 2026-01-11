@@ -1,4 +1,5 @@
-using PineGuard.Testing;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Externals.Iso.Payments.Cards;
 
@@ -6,95 +7,124 @@ public static class IsoPaymentCardBrandTestData
 {
     public static class Constructor
     {
-        private static InvalidCase I(string name, string? brandName, int[]? validPanLengths, string[]? iinPrefixes, int[]? displayFormatPattern, Type exceptionType, string? paramName) =>
-            new(Name: name, BrandName: brandName, ValidPanLengths: validPanLengths, IinPrefixes: iinPrefixes, DisplayFormatPattern: displayFormatPattern, ExpectedException: new ExpectedException(exceptionType, paramName));
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new(
+                "brand null",
+                (BrandName: null, ValidPanLengths: [16], IinPrefixes: ["4"], DisplayFormatPattern: [4, 4, 4, 4]),
+                new ExpectedException(typeof(ArgumentNullException), "brandName")),
+            new(
+                "brand space",
+                (BrandName: " ", ValidPanLengths: [16], IinPrefixes: ["4"], DisplayFormatPattern: [4, 4, 4, 4]),
+                new ExpectedException(typeof(ArgumentException), "brandName")),
+            new(
+                "lengths null",
+                (BrandName: "X", ValidPanLengths: null, IinPrefixes: ["4"], DisplayFormatPattern: [4, 4, 4, 4]),
+                new ExpectedException(typeof(ArgumentNullException), "validPanLengths")),
+            new(
+                "lengths empty",
+                (BrandName: "X", ValidPanLengths: [], IinPrefixes: ["4"], DisplayFormatPattern: [4, 4, 4, 4]),
+                new ExpectedException(typeof(ArgumentException), "validPanLengths")),
+            new(
+                "lengths 0",
+                (BrandName: "X", ValidPanLengths: [0], IinPrefixes: ["4"], DisplayFormatPattern: [4, 4, 4, 4]),
+                new ExpectedException(typeof(ArgumentOutOfRangeException), "validPanLengths")),
+            new(
+                "prefixes null",
+                (BrandName: "X", ValidPanLengths: [16], IinPrefixes: null, DisplayFormatPattern: [4, 4, 4, 4]),
+                new ExpectedException(typeof(ArgumentNullException), "iinPrefixes")),
+            new(
+                "prefixes empty",
+                (BrandName: "X", ValidPanLengths: [16], IinPrefixes: [], DisplayFormatPattern: [4, 4, 4, 4]),
+                new ExpectedException(typeof(ArgumentException), "iinPrefixes")),
+            new(
+                "prefixes space",
+                (BrandName: "X", ValidPanLengths: [16], IinPrefixes: [" "], DisplayFormatPattern: [4, 4, 4, 4]),
+                new ExpectedException(typeof(ArgumentException), "iinPrefixes")),
+            new(
+                "prefixes non-digit",
+                (BrandName: "X", ValidPanLengths: [16], IinPrefixes: ["4a"], DisplayFormatPattern: [4, 4, 4, 4]),
+                new ExpectedException(typeof(ArgumentException), "iinPrefixes")),
+            new(
+                "pattern null",
+                (BrandName: "X", ValidPanLengths: [16], IinPrefixes: ["4"], DisplayFormatPattern: null),
+                new ExpectedException(typeof(ArgumentNullException), "displayFormatPattern")),
+            new(
+                "pattern empty",
+                (BrandName: "X", ValidPanLengths: [16], IinPrefixes: ["4"], DisplayFormatPattern: []),
+                new ExpectedException(typeof(ArgumentException), "displayFormatPattern")),
+            new(
+                "pattern contains 0",
+                (BrandName: "X", ValidPanLengths: [16], IinPrefixes: ["4"], DisplayFormatPattern: [4, 4, 0, 4]),
+                new ExpectedException(typeof(ArgumentOutOfRangeException), "displayFormatPattern")),
+            new(
+                "pattern sum mismatch",
+                (BrandName: "X", ValidPanLengths: [16], IinPrefixes: ["4"], DisplayFormatPattern: [4, 4, 4]),
+                new ExpectedException(typeof(ArgumentException), "displayFormatPattern")),
+        ];
 
-        public static TheoryData<InvalidCase> InvalidCases => new()
-        {
-            { I("brand null", null, [16], ["4"], [4, 4, 4, 4], typeof(ArgumentNullException), "brandName") },
-            { I("brand space", " ", [16], ["4"], [4, 4, 4, 4], typeof(ArgumentException), "brandName") },
-            { I("lengths null", "X", null, ["4"], [4, 4, 4, 4], typeof(ArgumentNullException), "validPanLengths") },
-            { I("lengths empty", "X", Array.Empty<int>(), ["4"], [4, 4, 4, 4], typeof(ArgumentException), "validPanLengths") },
-            { I("lengths 0", "X", [0], ["4"], [4, 4, 4, 4], typeof(ArgumentOutOfRangeException), "validPanLengths") },
-            { I("prefixes null", "X", [16], null, [4, 4, 4, 4], typeof(ArgumentNullException), "iinPrefixes") },
-            { I("prefixes empty", "X", [16], Array.Empty<string>(), [4, 4, 4, 4], typeof(ArgumentException), "iinPrefixes") },
-            { I("prefixes space", "X", [16], [" "], [4, 4, 4, 4], typeof(ArgumentException), "iinPrefixes") },
-            { I("prefixes non-digit", "X", [16], ["4a"], [4, 4, 4, 4], typeof(ArgumentException), "iinPrefixes") },
-            { I("pattern null", "X", [16], ["4"], null, typeof(ArgumentNullException), "displayFormatPattern") },
-            { I("pattern empty", "X", [16], ["4"], Array.Empty<int>(), typeof(ArgumentException), "displayFormatPattern") },
-            { I("pattern contains 0", "X", [16], ["4"], [4, 4, 0, 4], typeof(ArgumentOutOfRangeException), "displayFormatPattern") },
-            { I("pattern sum mismatch", "X", [16], ["4"], [4, 4, 4], typeof(ArgumentException), "displayFormatPattern") },
-        };
+        #region Case Records
 
-        #region Cases
-
-        public record Case(string Name, string? BrandName, int[]? ValidPanLengths, string[]? IinPrefixes, int[]? DisplayFormatPattern);
-
-        public record InvalidCase(string Name, string? BrandName, int[]? ValidPanLengths, string[]? IinPrefixes, int[]? DisplayFormatPattern, ExpectedException ExpectedException)
-            : Case(Name, BrandName, ValidPanLengths, IinPrefixes, DisplayFormatPattern);
+        public sealed record InvalidCase(
+            string Name,
+            (string? BrandName, int[]? ValidPanLengths, string[]? IinPrefixes, int[]? DisplayFormatPattern) Value,
+            ExpectedException ExpectedException)
+            : ThrowsCase<(string? BrandName, int[]? ValidPanLengths, string[]? IinPrefixes, int[]? DisplayFormatPattern)>(Name, Value, ExpectedException);
 
         #endregion
     }
 
     public static class IsoCardNumberWithSeparatorsRegex
     {
-        private static ValidCase V(string name, string value, bool expected) => new(Name: name, Value: value, Expected: expected);
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("spaces", "1234 5678 9012 3456", true),
+            new("dashes", "1234-5678-9012-3456", true),
+            new("single digit", "0", true),
+            new("digit-dash-digit", "9-9", true),
+            new("space", " ", true),
+        ];
 
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            { V("spaces", "1234 5678 9012 3456", expected: true) },
-            { V("dashes", "1234-5678-9012-3456", expected: true) },
-            { V("single digit", "0", expected: true) },
-            { V("digit-dash-digit", "9-9", expected: true) },
-            { V("space", " ", expected: true) },
-        };
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("empty", "", false),
+            new("underscores", "1234_5678", false),
+            new("letters", "abcd", false),
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            { V("empty", "", expected: false) },
-            { V("underscores", "1234_5678", expected: false) },
-            { V("letters", "abcd", expected: false) },
-        };
+        #region Case Records
 
-        #region Cases
-
-        public record Case(string Name, string Value);
-
-        public sealed record ValidCase(string Name, string Value, bool Expected)
-            : Case(Name, Value);
+        public sealed record ValidCase(string Name, string Value, bool ExpectedReturn)
+            : IsCase<string>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class MatchesIinRange
     {
-        private static ValidCase V(string name, string? sanitizedPan, bool expected) => new(Name: name, SanitizedPan: sanitizedPan, Expected: expected);
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("51", "5100000000000000", true),
+            new("55", "5500000000000000", true),
+            new("2221", "2221000000000000", true),
+            new("2720", "2720000000000000", true),
+        ];
 
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            { V("51", "5100000000000000", expected: true) },
-            { V("55", "5500000000000000", expected: true) },
-            { V("2221", "2221000000000000", expected: true) },
-            { V("2720", "2720000000000000", expected: true) },
-        };
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("null", null, false),
+            new("empty", "", false),
+            new("length < 4", "123", false),
+            new("50", "5000000000000000", false),
+            new("56", "5600000000000000", false),
+            new("2220", "2220000000000000", false),
+            new("2721", "2721000000000000", false),
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            { V("null", null, expected: false) },
-            { V("empty", "", expected: false) },
-            { V("length < 4", "123", expected: false) },
-            { V("50", "5000000000000000", expected: false) },
-            { V("56", "5600000000000000", expected: false) },
-            { V("2220", "2220000000000000", expected: false) },
-            { V("2721", "2721000000000000", expected: false) },
-        };
+        #region Case Records
 
-        #region Cases
-
-        public record Case(string Name, string? SanitizedPan);
-
-        public sealed record ValidCase(string Name, string? SanitizedPan, bool Expected)
-            : Case(Name, SanitizedPan);
+        public sealed record ValidCase(string Name, string? SanitizedPan, bool ExpectedReturn)
+            : IsCase<string?>(Name, SanitizedPan, ExpectedReturn);
 
         #endregion
     }

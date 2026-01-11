@@ -10,12 +10,10 @@ public sealed class PanAlgorithmTests : BaseUnitTest
     [MemberData(nameof(PanAlgorithmTestData.IsValid.EdgeCases), MemberType = typeof(PanAlgorithmTestData.IsValid))]
     public void IsValid_ReturnsExpected(PanAlgorithmTestData.IsValid.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var result = PanAlgorithm.IsValid(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

@@ -9,10 +9,8 @@ public sealed class MustResultTests : BaseUnitTest
     [MemberData(nameof(MustResultTestData.Ok.IntValidCases), MemberType = typeof(MustResultTestData.Ok))]
     public void Ok_SetsProperties_AndImplicitBoolConversion(MustResultTestData.Ok.IntValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var mustResult = MustResult<int>.Ok(testCase.Result, testCase.Value, testCase.ParamName);
+        var mustResult = MustResult<int>.Ok(testCase.Result, testCase.InputValue, testCase.ParamName);
         bool asBool = mustResult;
 
         // Assert
@@ -20,7 +18,7 @@ public sealed class MustResultTests : BaseUnitTest
         Assert.False(mustResult.Failed);
         Assert.Equal(string.Empty, mustResult.Message);
         Assert.Equal(testCase.ParamName, mustResult.ParamName);
-        Assert.Equal(testCase.Value, mustResult.Value);
+        Assert.Equal(testCase.InputValue, mustResult.Value);
         Assert.Equal(testCase.Result, mustResult.Result);
         Assert.True(asBool);
     }
@@ -29,15 +27,13 @@ public sealed class MustResultTests : BaseUnitTest
     [MemberData(nameof(MustResultTestData.Ok.StringValidCases), MemberType = typeof(MustResultTestData.Ok))]
     public void Ok_AllowsNullResults_ForReferenceTypes(MustResultTestData.Ok.StringValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var mustResult = MustResult<string?>.Ok(testCase.Result, testCase.Value, testCase.ParamName);
+        var mustResult = MustResult<string?>.Ok(testCase.Result, testCase.InputValue, testCase.ParamName);
 
         // Assert
         Assert.True(mustResult.Success);
         Assert.Equal(testCase.Result, mustResult.Result);
-        Assert.Equal(testCase.Value, mustResult.Value);
+        Assert.Equal(testCase.InputValue, mustResult.Value);
         Assert.Equal(testCase.ParamName, mustResult.ParamName);
     }
 
@@ -45,10 +41,8 @@ public sealed class MustResultTests : BaseUnitTest
     [MemberData(nameof(MustResultTestData.Fail.ValidCases), MemberType = typeof(MustResultTestData.Fail))]
     public void Fail_SetsProperties_AndFormatsMessage(MustResultTestData.Fail.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var mustResult = MustResult<int>.Fail(testCase.Template, testCase.ParamName, testCase.Value);
+        var mustResult = MustResult<int>.Fail(testCase.Template, testCase.ParamName, testCase.InputValue);
         bool asBool = mustResult;
 
         // Assert
@@ -56,7 +50,7 @@ public sealed class MustResultTests : BaseUnitTest
         Assert.True(mustResult.Failed);
         Assert.Equal(testCase.ExpectedMessage, mustResult.Message);
         Assert.Equal(testCase.ParamName, mustResult.ParamName);
-        Assert.Equal(testCase.Value, mustResult.Value);
+        Assert.Equal(testCase.InputValue, mustResult.Value);
         Assert.Equal(default(int), mustResult.Result);
         Assert.False(asBool);
     }
@@ -66,7 +60,7 @@ public sealed class MustResultTests : BaseUnitTest
     public void Deconstruct_ExposesAllFields(MustResultTestData.Fail.ValidCase testCase)
     {
         // Arrange
-        var mustResult = MustResult<int>.Fail(testCase.Template, testCase.ParamName, testCase.Value);
+        var mustResult = MustResult<int>.Fail(testCase.Template, testCase.ParamName, testCase.InputValue);
 
         // Act
         mustResult.Deconstruct(out var success, out var message, out var deconstructedParamName, out var deconstructedValue, out var result);
@@ -75,7 +69,7 @@ public sealed class MustResultTests : BaseUnitTest
         Assert.Equal(mustResult.Success, success);
         Assert.Equal(testCase.ExpectedMessage, message);
         Assert.Equal(testCase.ParamName, deconstructedParamName);
-        Assert.Equal(testCase.Value, deconstructedValue);
+        Assert.Equal(testCase.InputValue, deconstructedValue);
         Assert.Equal(mustResult.Result, result);
     }
 
@@ -83,16 +77,14 @@ public sealed class MustResultTests : BaseUnitTest
     [MemberData(nameof(MustResultTestData.FromBoolWithResult.ValidCases), MemberType = typeof(MustResultTestData.FromBoolWithResult))]
     public void FromBool_WithResult_ReturnsOkOrFail(MustResultTestData.FromBoolWithResult.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var mustResult = MustResult<int>.FromBool(testCase.Ok, testCase.Template, testCase.ParamName, testCase.Value, testCase.Result);
+        var mustResult = MustResult<int>.FromBool(testCase.IsOk, testCase.Template, testCase.ParamName, testCase.InputValue, testCase.Result);
 
         // Assert
         Assert.Equal(testCase.ExpectedSuccess, mustResult.Success);
         Assert.Equal(testCase.ExpectedMessage, mustResult.Message);
         Assert.Equal(testCase.ParamName, mustResult.ParamName);
-        Assert.Equal(testCase.Value, mustResult.Value);
+        Assert.Equal(testCase.InputValue, mustResult.Value);
 
         if (testCase.ExpectedSuccess)
         {
@@ -108,16 +100,14 @@ public sealed class MustResultTests : BaseUnitTest
     [MemberData(nameof(MustResultTestData.FromBoolWithoutResult.ValidCases), MemberType = typeof(MustResultTestData.FromBoolWithoutResult))]
     public void FromBool_WithoutResult_ReturnsOkOrFail(MustResultTestData.FromBoolWithoutResult.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var mustResult = MustResult<int>.FromBool(testCase.Ok, testCase.Template, testCase.ParamName, testCase.Value);
+        var mustResult = MustResult<int>.FromBool(testCase.IsOk, testCase.Template, testCase.ParamName, testCase.InputValue);
 
         // Assert
         Assert.Equal(testCase.ExpectedSuccess, mustResult.Success);
         Assert.Equal(testCase.ExpectedMessage, mustResult.Message);
         Assert.Equal(testCase.ParamName, mustResult.ParamName);
-        Assert.Equal(testCase.Value, mustResult.Value);
+        Assert.Equal(testCase.InputValue, mustResult.Value);
 
         if (testCase.ExpectedSuccess)
         {
@@ -130,38 +120,37 @@ public sealed class MustResultTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(MustResultTestData.ThrowIfFailed.InvalidCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
+    [MemberData(nameof(MustResultTestData.ThrowIfFailed.ThrowIfFailedInvalidCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
     public void ThrowIfFailed_ThrowsArgumentException_WhenFailed(MustResultTestData.ThrowIfFailed.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Assert.Throws<ArgumentException>(() => testCase.MustResult.ThrowIfFailed());
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => invalidCase.MustResult.ThrowIfFailed());
 
         // Assert
-        Assert.Equal(testCase.MustResult.ParamName, ex.ParamName);
-        Assert.Contains(testCase.MustResult.Message, ex.Message, StringComparison.Ordinal);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Theory]
-    [MemberData(nameof(MustResultTestData.ThrowIfFailed.InvalidCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
+    [MemberData(nameof(MustResultTestData.ThrowIfFailed.ThrowNullIfFailedInvalidCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
     public void ThrowNullIfFailed_ThrowsArgumentNullException_WhenFailed(MustResultTestData.ThrowIfFailed.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Assert.Throws<ArgumentNullException>(() => testCase.MustResult.ThrowNullIfFailed());
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => invalidCase.MustResult.ThrowNullIfFailed());
 
         // Assert
-        Assert.Equal(testCase.MustResult.ParamName, ex.ParamName);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Theory]
     [MemberData(nameof(MustResultTestData.ThrowIfFailed.ValidCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
     public void ThrowNullIfFailed_DoesNotThrow_WhenSuccessful(MustResultTestData.ThrowIfFailed.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         testCase.MustResult.ThrowNullIfFailed();
 
@@ -170,18 +159,19 @@ public sealed class MustResultTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(MustResultTestData.ThrowIfFailed.InvalidCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
+    [MemberData(nameof(MustResultTestData.ThrowIfFailed.ThrowIfFailedGenericInvalidCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
     public void ThrowIfFailed_Generic_UsesExceptionFactory(MustResultTestData.ThrowIfFailed.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
         static InvalidOperationException ExceptionFactory(string message, string? paramName) =>
             new($"{paramName}:{message}");
 
         // Act
-        var ex = Assert.Throws<InvalidOperationException>(() => testCase.MustResult.ThrowIfFailed(ExceptionFactory));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => invalidCase.MustResult.ThrowIfFailed(ExceptionFactory));
 
         // Assert
-        Assert.Contains(testCase.MustResult.Message, ex.Message, StringComparison.Ordinal);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Theory]
@@ -229,21 +219,17 @@ public sealed class MustResultTests : BaseUnitTest
     [MemberData(nameof(MustResultTestData.OrThrow.FallbackValidCases), MemberType = typeof(MustResultTestData.OrThrow))]
     public void OrThrow_WithFallback_ReturnsFallbackOnlyWhenResultIsNull(MustResultTestData.OrThrow.FallbackValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var result = testCase.MustResult.OrThrow(testCase.Fallback);
+        var result = testCase.Value.MustResult.OrThrow(testCase.Value.Fallback);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
     [MemberData(nameof(MustResultTestData.Combine.NullCases), MemberType = typeof(MustResultTestData.Combine))]
     public void Combine_ReturnsFail_WhenResultsIsNull(MustResultTestData.Combine.NullCase testCase)
     {
-        // Arrange
-
         // Act
         var combined = testCase.Results!.Combine();
 

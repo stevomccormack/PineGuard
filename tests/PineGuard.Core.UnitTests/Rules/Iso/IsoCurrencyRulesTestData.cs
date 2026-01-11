@@ -1,4 +1,5 @@
 using PineGuard.Externals.Iso.Currencies;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules.Iso;
 
@@ -6,115 +7,104 @@ public static class IsoCurrencyRulesTestData
 {
     public static class IsIsoAlpha3Code
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case("USD", "USD", true) },
-            { new Case("usd", "usd", true) },
-            { new Case("padded", " USD ", true) },
-            { new Case("EUR", "EUR", true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("USD", "USD", true),
+            new("usd", "usd", true),
+            new("padded", " USD ", true),
+            new("EUR", "EUR", true)
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case("null", null, false) },
-            { new Case("empty", string.Empty, false) },
-            { new Case("space", " ", false) },
-            { new Case("too short", "US", false) },
-            { new Case("too long", "USDD", false) },
-            { new Case("unknown", "ZZZ", false) },
-            { new Case("invalid chars", "U$D", false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null", null, false),
+            new("empty", string.Empty, false),
+            new("space", " ", false),
+            new("too short", "US", false),
+            new("too long", "USDD", false),
+            new("unknown", "ZZZ", false),
+            new("invalid chars", "U$D", false)
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : IsCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }
 
     public static class IsIsoNumericCode
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case("840", "840", true) },
-            { new Case("padded", " 840 ", true) },
-            { new Case("978", "978", true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("840", "840", true),
+            new("padded", " 840 ", true),
+            new("978", "978", true)
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case("null", null, false) },
-            { new Case("empty", string.Empty, false) },
-            { new Case("space", " ", false) },
-            { new Case("too short", "84", false) },
-            { new Case("too long", "8400", false) },
-            { new Case("not numeric", "ABC", false) },
-            { new Case("unknown", "000", false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("null", null, false),
+            new("empty", string.Empty, false),
+            new("space", " ", false),
+            new("too short", "84", false),
+            new("too long", "8400", false),
+            new("not numeric", "ABC", false),
+            new("unknown", "000", false)
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : IsCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }
 
     public static class IsIsoAlpha3CodeWithProvider
     {
-        public static TheoryData<Case> Cases => new()
-        {
-            { new Case("known", "USD", new FakeIsoCurrencyProvider(alpha3: ["USD"], numeric: ["840"]), true) },
-            { new Case("unknown", "EUR", new FakeIsoCurrencyProvider(alpha3: ["USD"], numeric: ["840"]), false) },
-        };
+        public static TheoryData<Case> Cases =>
+        [
+            new("known", "USD", new FakeIsoCurrencyProvider(alpha3: ["USD"], numeric: ["840"]), true),
+            new("unknown", "EUR", new FakeIsoCurrencyProvider(alpha3: ["USD"], numeric: ["840"]), false)
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Value, IIsoCurrencyProvider Provider, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, string? Value, IIsoCurrencyProvider Provider, bool ExpectedReturn)
+            : IsCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion Cases
     }
 
-    public sealed class FakeIsoCurrencyProvider : IIsoCurrencyProvider
+    public sealed class FakeIsoCurrencyProvider(IEnumerable<string> alpha3, IEnumerable<string> numeric)
+        : IIsoCurrencyProvider
     {
-        private readonly HashSet<string> _alpha3;
-        private readonly HashSet<string> _numeric;
-
-        public FakeIsoCurrencyProvider(IEnumerable<string> alpha3, IEnumerable<string> numeric)
-        {
-            _alpha3 = new HashSet<string>(alpha3, StringComparer.OrdinalIgnoreCase);
-            _numeric = new HashSet<string>(numeric, StringComparer.Ordinal);
-        }
+        private readonly HashSet<string> _alpha3 = new(alpha3, StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _numeric = new(numeric, StringComparer.Ordinal);
 
         public bool ContainsAlpha3Code(string? value) => value is not null && _alpha3.Contains(value);
         public bool ContainsNumericCode(string? value) => value is not null && _numeric.Contains(value);
 
-        public bool TryGetByAlpha3Code(string? value, out PineGuard.Iso.Currencies.IsoCurrency? currency)
+        public bool TryGetByAlpha3Code(string? value, out IsoCurrency? currency)
         {
             currency = null;
             return false;
         }
 
-        public bool TryGetByNumericCode(string? value, out PineGuard.Iso.Currencies.IsoCurrency? currency)
+        public bool TryGetByNumericCode(string? value, out IsoCurrency? currency)
         {
             currency = null;
             return false;
         }
 
-        public bool TryGet(string? value, out PineGuard.Iso.Currencies.IsoCurrency? currency)
+        public bool TryGet(string? value, out IsoCurrency? currency)
         {
             currency = null;
             return false;
         }
 
-        public IReadOnlyCollection<PineGuard.Iso.Currencies.IsoCurrency> GetAll() => Array.Empty<PineGuard.Iso.Currencies.IsoCurrency>();
+        public IReadOnlyCollection<IsoCurrency> GetAll() => [];
     }
 }

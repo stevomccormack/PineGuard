@@ -1,114 +1,111 @@
 namespace PineGuard.Core.UnitTests.Common;
 
-using PineGuard.Testing;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
 
 public static class EnumerationTestData
 {
     public static class IntConstructor
     {
-        public sealed record ValidCase(string Name, int Value, string EnumerationName);
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("Alpha", 1, "Alpha"),
+            new("Bravo", 2, "Bravo"),
+            new("Charlie", 3, "Charlie"),
+            new("Delta", 4, "Delta"),
+            new("Echo", 5, "Echo"),
+            new("Foxtrot", 6, "Foxtrot"),
+            new("Golf", 7, "Golf"),
+            new("Hotel", 8, "Hotel"),
+            new("India", 9, "India"),
+            new("Juliet", 10, "Juliet"),
+            new("Kilo", 11, "Kilo"),
+            new("Lima", 12, "Lima"),
+            new("Mike", 13, "Mike"),
+            new("November", 14, "November"),
+            new("Oscar", 15, "Oscar"),
+            new("Papa", 16, "Papa"),
+            new("Quebec", 17, "Quebec"),
+            new("Romeo", 18, "Romeo"),
+            new("Sierra", 19, "Sierra"),
+            new("Tango", 20, "Tango"),
+        ];
 
-        public sealed record InvalidCase(string Name, int Value, string? EnumerationName, ExpectedException Expected);
+        public static TheoryData<ValidCase> EdgeCases => [];
 
-        private static ValidCase V(int value, string enumerationName)
-            => new(Name: enumerationName, Value: value, EnumerationName: enumerationName);
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new("value=1, name='<null>'", 1, null, new ExpectedException(typeof(ArgumentNullException), "name")),
+            new("value=2, name=''", 2, "", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=3, name=' '", 3, " ", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=4, name='\t'", 4, "\t", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=5, name='\r'", 5, "\r", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=6, name='\n'", 6, "\n", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=7, name='\u00A0'", 7, "\u00A0", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=8, name='\u2007'", 8, "\u2007", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=9, name='\u202F'", 9, "\u202F", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=10, name='\u2003'", 10, "\u2003", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=11, name='\u2009'", 11, "\u2009", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=12, name='\u3000'", 12, "\u3000", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=13, name='\v'", 13, "\v", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=14, name='\f'", 14, "\f", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=15, name='\t\t'", 15, "\t\t", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=16, name='  '", 16, "  ", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=17, name='\n\n'", 17, "\n\n", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=18, name='\r\n'", 18, "\r\n", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=19, name='\t \n'", 19, "\t \n", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value=20, name=' \t '", 20, " \t ", new ExpectedException(typeof(ArgumentException), "name")),
+        ];
 
-        private static InvalidCase I(int value, string? enumerationName)
-            => new(
-                Name: $"value={value}, name='{enumerationName ?? "<null>"}'",
-                Value: value,
-                EnumerationName: enumerationName,
-                Expected: new ExpectedException(typeof(ArgumentException), ParamName: "name"));
+        #region Case Records
 
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            { V(1, "Alpha") },
-            { V(2, "Bravo") },
-            { V(3, "Charlie") },
-            { V(4, "Delta") },
-            { V(5, "Echo") },
-            { V(6, "Foxtrot") },
-            { V(7, "Golf") },
-            { V(8, "Hotel") },
-            { V(9, "India") },
-            { V(10, "Juliet") },
-            { V(11, "Kilo") },
-            { V(12, "Lima") },
-            { V(13, "Mike") },
-            { V(14, "November") },
-            { V(15, "Oscar") },
-            { V(16, "Papa") },
-            { V(17, "Quebec") },
-            { V(18, "Romeo") },
-            { V(19, "Sierra") },
-            { V(20, "Tango") },
-        };
+        public sealed record ValidCase(string Name, int InputValue, string EnumerationName)
+            : ReturnCase<(int Value, string EnumerationName), string>(Name, (InputValue, EnumerationName), EnumerationName);
 
-        public static TheoryData<InvalidCase> InvalidCases => new()
-        {
-            { I(1, null) },
-            { I(2, "") },
-            { I(3, " ") },
-            { I(4, "\t") },
-            { I(5, "\r") },
-            { I(6, "\n") },
-            { I(7, "\u00A0") },
-            { I(8, "\u2007") },
-            { I(9, "\u202F") },
-            { I(10, "\u2003") },
-            { I(11, "\u2009") },
-            { I(12, "\u3000") },
-            { I(13, "\v") },
-            { I(14, "\f") },
-            { I(15, "\t\t") },
-            { I(16, "  ") },
-            { I(17, "\n\n") },
-            { I(18, "\r\n") },
-            { I(19, "\t \n") },
-            { I(20, " \t ") },
-        };
+        public sealed record InvalidCase(string Name, int EnumerationValue, string? EnumerationName, ExpectedException ExpectedException)
+            : ThrowsCase<(int EnumerationValue, string? EnumerationName)>(Name, (EnumerationValue, EnumerationName), ExpectedException);
+
+        #endregion
     }
 
     public static class StringConstructor
     {
-        public sealed record InvalidCase(string Name, string? Value, string? EnumerationName, ExpectedException Expected);
+        public static TheoryData<ValidCase> ValidCases => [];
 
-        private static InvalidCase IValue(string? value, string? enumerationName)
-            => new(
-                Name: $"value='{value ?? "<null>"}', name='{enumerationName ?? "<null>"}'",
-                Value: value,
-                EnumerationName: enumerationName,
-                Expected: new ExpectedException(typeof(ArgumentException), ParamName: "value"));
+        public static TheoryData<ValidCase> EdgeCases => [];
 
-        private static InvalidCase IName(string? value, string? enumerationName)
-            => new(
-                Name: $"value='{value ?? "<null>"}', name='{enumerationName ?? "<null>"}'",
-                Value: value,
-                EnumerationName: enumerationName,
-                Expected: new ExpectedException(typeof(ArgumentException), ParamName: "name"));
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new("value='<null>', name='X'", null, "X", new ExpectedException(typeof(ArgumentNullException), "value")),
+            new("value='<null>', name='<null>'", null, null, new ExpectedException(typeof(ArgumentNullException), "value")),
+            new("value='ok', name='<null>'", "ok", null, new ExpectedException(typeof(ArgumentNullException), "name")),
+            new("value='ok', name=''", "ok", "", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name=' '", "ok", " ", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\t'", "ok", "\t", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\r'", "ok", "\r", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\n'", "ok", "\n", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\u00A0'", "ok", "\u00A0", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\u2007'", "ok", "\u2007", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\u202F'", "ok", "\u202F", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\u2003'", "ok", "\u2003", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\u2009'", "ok", "\u2009", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\u3000'", "ok", "\u3000", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\v'", "ok", "\v", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\f'", "ok", "\f", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='  '", "ok", "  ", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\t\t'", "ok", "\t\t", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\n\n'", "ok", "\n\n", new ExpectedException(typeof(ArgumentException), "name")),
+            new("value='ok', name='\r\n'", "ok", "\r\n", new ExpectedException(typeof(ArgumentException), "name")),
+        ];
 
-        public static TheoryData<InvalidCase> InvalidCases => new()
-        {
-            { IValue(null, "X") },
-            { IValue(null, null) },
-            { IName("ok", null) },
-            { IName("ok", "") },
-            { IName("ok", " ") },
-            { IName("ok", "\t") },
-            { IName("ok", "\r") },
-            { IName("ok", "\n") },
-            { IName("ok", "\u00A0") },
-            { IName("ok", "\u2007") },
-            { IName("ok", "\u202F") },
-            { IName("ok", "\u2003") },
-            { IName("ok", "\u2009") },
-            { IName("ok", "\u3000") },
-            { IName("ok", "\v") },
-            { IName("ok", "\f") },
-            { IName("ok", "  ") },
-            { IName("ok", "\t\t") },
-            { IName("ok", "\n\n") },
-            { IName("ok", "\r\n") },
-        };
+        #region Case Records
+
+        public sealed record ValidCase(string Name, string InputValue, string EnumerationName)
+            : ReturnCase<(string Value, string EnumerationName), string>(Name, (InputValue, EnumerationName), EnumerationName);
+
+        public sealed record InvalidCase(string Name, string? EnumerationValue, string? EnumerationName, ExpectedException ExpectedException)
+            : ThrowsCase<(string? EnumerationValue, string? EnumerationName)>(Name, (EnumerationValue, EnumerationName), ExpectedException);
+
+        #endregion
     }
 }

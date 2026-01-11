@@ -1,4 +1,5 @@
-using PineGuard.Iso.Dates;
+using PineGuard.Externals.Iso.Dates;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Externals.Iso.Dates;
@@ -10,18 +11,16 @@ public sealed class IsoDateTimeOffsetTests : BaseUnitTest
     [MemberData(nameof(IsoDateTimeOffsetTestData.TryParse.EdgeCases), MemberType = typeof(IsoDateTimeOffsetTestData.TryParse))]
     public void TryParse_ReturnsExpected(IsoDateTimeOffsetTestData.TryParse.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var ok = IsoDateTimeOffset.TryParse(testCase.Value, out var result);
 
         // Assert
-        Assert.Equal(testCase.Expected, ok);
-        Assert.Equal(testCase.ExpectedResult, result);
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        Assert.Equal(testCase.ExpectedOutValue, result);
 
-        if (testCase.Expected)
+        if (testCase.ExpectedReturn)
         {
-            Assert.Matches(IsoDateTimeOffset.AllPatternsRegex(), testCase.Value);
+            Assert.Matches(IsoDateTimeOffset.AllPatternsRegex(), testCase.Value!);
         }
     }
 
@@ -29,36 +28,36 @@ public sealed class IsoDateTimeOffsetTests : BaseUnitTest
     [MemberData(nameof(IsoDateTimeOffsetTestData.Parse.ValidCases), MemberType = typeof(IsoDateTimeOffsetTestData.Parse))]
     public void Parse_WhenValid_ReturnsExpected(IsoDateTimeOffsetTestData.Parse.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var result = IsoDateTimeOffset.Parse(testCase.Value);
+        var result = IsoDateTimeOffset.Parse(testCase.Value!);
 
         // Assert
-        Assert.Equal(testCase.ExpectedResult, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
     [MemberData(nameof(IsoDateTimeOffsetTestData.Parse.InvalidCases), MemberType = typeof(IsoDateTimeOffsetTestData.Parse))]
-    public void Parse_WhenInvalid_ThrowsExpected(IsoDateTimeOffsetTestData.Parse.InvalidCase testCase)
+    public void Parse_WhenInvalid_ThrowsExpected(IThrowsCase testCase)
     {
         // Arrange
+        var invalidCase = Assert.IsType<IsoDateTimeOffsetTestData.Parse.InvalidCase>(testCase);
 
         // Act
-        _ = Assert.Throws(testCase.ExpectedException.Type, () => _ = IsoDateTimeOffset.Parse(testCase.Value!));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => _ = IsoDateTimeOffset.Parse(invalidCase.Value!));
+
+        // Assert
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Theory]
     [MemberData(nameof(IsoDateTimeOffsetTestData.ToIsoString.ValidCases), MemberType = typeof(IsoDateTimeOffsetTestData.ToIsoString))]
     public void ToIsoString_UsesRoundTripFormat(IsoDateTimeOffsetTestData.ToIsoString.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var result = testCase.Value.ToIsoString();
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result.Contains('T', StringComparison.Ordinal));
     }
 }

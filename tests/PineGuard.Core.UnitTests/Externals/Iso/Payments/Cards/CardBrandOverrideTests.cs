@@ -12,9 +12,9 @@ public sealed class CardBrandOverrideTests : BaseUnitTest
     {
         var card = new MastercardCard();
 
-        var result = card.MatchesPan(testCase.Pan);
+        var result = card.MatchesPan(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -24,9 +24,9 @@ public sealed class CardBrandOverrideTests : BaseUnitTest
     {
         var card = new JcbCard();
 
-        var result = card.MatchesPan(testCase.Pan);
+        var result = card.MatchesPan(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -36,9 +36,9 @@ public sealed class CardBrandOverrideTests : BaseUnitTest
     {
         var card = new DiscoverCard();
 
-        var result = card.MatchesPan(testCase.Pan);
+        var result = card.MatchesPan(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -48,9 +48,9 @@ public sealed class CardBrandOverrideTests : BaseUnitTest
     {
         var card = new DinersClubCard();
 
-        var result = card.MatchesPan(testCase.Pan);
+        var result = card.MatchesPan(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -59,8 +59,8 @@ public sealed class CardBrandOverrideTests : BaseUnitTest
     {
         var card = new VisaCard();
 
-        var result = card.MatchesPan(testCase.Pan);
+        var result = card.MatchesPan(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

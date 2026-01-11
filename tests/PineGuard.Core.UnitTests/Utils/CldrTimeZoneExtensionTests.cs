@@ -15,7 +15,7 @@ public sealed class CldrTimeZoneExtensionTests : BaseUnitTest
         if (testCase.ExpectedHasValue)
         {
             Assert.NotNull(tz);
-            Assert.Equal("America/New_York", tz!.Id);
+            Assert.Equal("America/New_York", tz.Id);
         }
         else
         {
@@ -32,12 +32,12 @@ public sealed class CldrTimeZoneExtensionTests : BaseUnitTest
 
         var ianaResult = ianaTz.ToIanaTimeZone();
         Assert.NotNull(ianaResult);
-        Assert.Equal("America/New_York", ianaResult!.Id);
+        Assert.Equal("America/New_York", ianaResult.Id);
 
         var windowsTz = TimeZoneInfo.CreateCustomTimeZone("Eastern Standard Time", TimeSpan.FromHours(-5), "EST", "EST");
 
         var windowsResult = windowsTz.ToIanaTimeZone();
         Assert.NotNull(windowsResult);
-        Assert.Equal("America/New_York", windowsResult!.Id);
+        Assert.Equal("America/New_York", windowsResult.Id);
     }
 }

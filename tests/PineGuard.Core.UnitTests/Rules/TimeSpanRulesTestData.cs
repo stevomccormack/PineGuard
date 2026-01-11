@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules;
 
@@ -6,72 +7,66 @@ public static class TimeSpanRulesTestData
 {
     public static class IsDurationBetween
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "middle inclusive", Value: TimeSpan.FromMinutes(30), Min: TimeSpan.FromMinutes(10), Max: TimeSpan.FromMinutes(60), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "at min inclusive", Value: TimeSpan.FromMinutes(10), Min: TimeSpan.FromMinutes(10), Max: TimeSpan.FromMinutes(60), Inclusion: Inclusion.Inclusive, Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("middle inclusive", TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive, true),
+            new("at min inclusive", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive, true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "at min exclusive", Value: TimeSpan.FromMinutes(10), Min: TimeSpan.FromMinutes(10), Max: TimeSpan.FromMinutes(60), Inclusion: Inclusion.Exclusive, Expected: false) },
-            { new Case(Name: "null", Value: null, Min: TimeSpan.FromMinutes(10), Max: TimeSpan.FromMinutes(60), Inclusion: Inclusion.Inclusive, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("at min exclusive", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Exclusive, false),
+            new("null", null, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, TimeSpan? Value, TimeSpan Min, TimeSpan Max, Inclusion Inclusion, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, TimeSpan? Value, TimeSpan Min, TimeSpan Max, Inclusion Inclusion, bool ExpectedReturn)
+            : IsCase<TimeSpan?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsGreaterThan
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "above exclusive", Value: TimeSpan.FromMinutes(11), Threshold: TimeSpan.FromMinutes(10), Inclusion: Inclusion.Exclusive, Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("above exclusive", TimeSpan.FromMinutes(11), TimeSpan.FromMinutes(10), Inclusion.Exclusive, true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "equal exclusive", Value: TimeSpan.FromMinutes(10), Threshold: TimeSpan.FromMinutes(10), Inclusion: Inclusion.Exclusive, Expected: false) },
-            { new Case(Name: "equal inclusive", Value: TimeSpan.FromMinutes(10), Threshold: TimeSpan.FromMinutes(10), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "null", Value: null, Threshold: TimeSpan.FromMinutes(10), Inclusion: Inclusion.Inclusive, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("equal exclusive", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Exclusive, false),
+            new("equal inclusive", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Inclusive, true),
+            new("null", null, TimeSpan.FromMinutes(10), Inclusion.Inclusive, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, TimeSpan? Value, TimeSpan Threshold, Inclusion Inclusion, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, TimeSpan? Value, TimeSpan Threshold, Inclusion Inclusion, bool ExpectedReturn)
+            : IsCase<TimeSpan?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsLessThan
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "below exclusive", Value: TimeSpan.FromMinutes(9), Threshold: TimeSpan.FromMinutes(10), Inclusion: Inclusion.Exclusive, Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("below exclusive", TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(10), Inclusion.Exclusive, true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "equal exclusive", Value: TimeSpan.FromMinutes(10), Threshold: TimeSpan.FromMinutes(10), Inclusion: Inclusion.Exclusive, Expected: false) },
-            { new Case(Name: "equal inclusive", Value: TimeSpan.FromMinutes(10), Threshold: TimeSpan.FromMinutes(10), Inclusion: Inclusion.Inclusive, Expected: true) },
-            { new Case(Name: "null", Value: null, Threshold: TimeSpan.FromMinutes(10), Inclusion: Inclusion.Inclusive, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("equal exclusive", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Exclusive, false),
+            new("equal inclusive", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Inclusive, true),
+            new("null", null, TimeSpan.FromMinutes(10), Inclusion.Inclusive, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, TimeSpan? Value, TimeSpan Threshold, Inclusion Inclusion, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, TimeSpan? Value, TimeSpan Threshold, Inclusion Inclusion, bool ExpectedReturn)
+            : IsCase<TimeSpan?>(Name, Value, ExpectedReturn);
 
         #endregion
     }

@@ -11,16 +11,14 @@ public sealed class StringExtensionTests : BaseUnitTest
     [MemberData(nameof(StringExtensionTestData.TitleCase.EdgeCases), MemberType = typeof(StringExtensionTestData.TitleCase))]
     public void TitleCase_ReturnsExpected(StringExtensionTestData.TitleCase.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var actual = testCase.Value.TitleCase();
-        var utilityActual = StringUtility.TitleCase(testCase.Value, out var title);
+        var actual = testCase.Value!.TitleCase();
+        var utilityActual = StringUtility.TitleCase(testCase.Value!, out var title);
 
         // Assert
-        Assert.Equal(testCase.Expected, actual);
-        Assert.Equal(testCase.Expected, utilityActual);
-        Assert.Equal(testCase.ExpectedTitle, title);
-        Assert.Equal(StringUtility.TitleCase(testCase.Value), actual);
+        Assert.Equal(testCase.ExpectedReturn, actual);
+        Assert.Equal(testCase.ExpectedReturn, utilityActual);
+        Assert.Equal(testCase.ExpectedOutValue, title);
+        Assert.Equal(StringUtility.TitleCase(testCase.Value!), actual);
     }
 }

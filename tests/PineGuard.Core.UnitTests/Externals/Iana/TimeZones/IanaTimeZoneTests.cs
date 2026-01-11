@@ -10,10 +10,8 @@ public sealed class IanaTimeZoneTests : BaseUnitTest
     [MemberData(nameof(IanaTimeZoneTestData.Constructor.EdgeCases), MemberType = typeof(IanaTimeZoneTestData.Constructor))]
     public void Constructor_NormalizesProperties(IanaTimeZoneTestData.Constructor.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var tz = new IanaTimeZone(testCase.Id!, testCase.CountryAlpha2Codes!, testCase.Coordinates!, testCase.Comment);
+        var tz = new IanaTimeZone(testCase.Id, testCase.CountryAlpha2Codes, testCase.Coordinates, testCase.Comment);
 
         // Assert
         Assert.Equal(testCase.ExpectedId, tz.Id);
@@ -28,29 +26,13 @@ public sealed class IanaTimeZoneTests : BaseUnitTest
     public void Constructor_Throws_ForInvalidInputs(IanaTimeZoneTestData.Constructor.InvalidCase testCase)
     {
         // Arrange
-        static void AssertParamName(Exception ex, string? expected)
-        {
-            if (expected is null)
-                return;
-
-            switch (ex)
-            {
-                case ArgumentNullException ane:
-                    Assert.Equal(expected, ane.ParamName);
-                    break;
-                case ArgumentException ae:
-                    Assert.Equal(expected, ae.ParamName);
-                    break;
-            }
-        }
+        var invalidCase = testCase;
 
         // Act
-        var ex = Record.Exception(() => new IanaTimeZone(testCase.Id!, testCase.CountryAlpha2Codes!, testCase.Coordinates!, testCase.Comment));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => _ = new IanaTimeZone(invalidCase.Id!, invalidCase.CountryAlpha2Codes!, invalidCase.Coordinates!, invalidCase.Comment));
 
         // Assert
-        Assert.NotNull(ex);
-        Assert.IsType(testCase.ExpectedException.Type, ex);
-        AssertParamName(ex!, testCase.ExpectedException.ParamName);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Fact]

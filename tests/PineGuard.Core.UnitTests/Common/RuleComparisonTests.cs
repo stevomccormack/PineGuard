@@ -1,6 +1,5 @@
 using System.Reflection;
 using PineGuard.Common;
-using PineGuard.Testing;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Common;
@@ -9,15 +8,13 @@ public sealed class RuleComparisonTests : BaseUnitTest
 {
     [Theory]
     [MemberData(nameof(RuleComparisonTestData.Equality.ValidCases), MemberType = typeof(RuleComparisonTestData.Equality))]
-    public void Equals_Generic_ComparesByCompareTo(RuleComparisonTestData.Equality.ValidCase testCase)
+    public void Equals_Generic_ComparesByCompareTo(RuleComparisonTestData.Equality.Case testCase)
     {
-        // Arrange
-
         // Act
-        var result = InvokeGenericStatic<bool>("Equals", testCase.Value, testCase.Other);
+        var result = InvokeGenericStatic<bool>("Equals", testCase.Value.Value, testCase.Value.Other);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -25,97 +22,89 @@ public sealed class RuleComparisonTests : BaseUnitTest
     [MemberData(nameof(RuleComparisonTestData.IsBetween.EdgeCases), MemberType = typeof(RuleComparisonTestData.IsBetween))]
     public void IsBetween_HandlesInclusiveAndExclusive(RuleComparisonTestData.IsBetween.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var result = InvokeGenericStatic<bool>(
             "IsBetween",
-            testCase.Value,
-            testCase.Min,
-            testCase.Max,
-            testCase.Inclusion);
+            testCase.Value.Value,
+            testCase.Value.Min,
+            testCase.Value.Max,
+            testCase.Value.Inclusion);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
     [MemberData(nameof(RuleComparisonTestData.IsBetween.EdgeCases), MemberType = typeof(RuleComparisonTestData.IsBetween))]
     public void IsBetween_HandlesEdgeCases(RuleComparisonTestData.IsBetween.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var result = InvokeGenericStatic<bool>(
             "IsBetween",
-            testCase.Value,
-            testCase.Min,
-            testCase.Max,
-            testCase.Inclusion);
+            testCase.Value.Value,
+            testCase.Value.Min,
+            testCase.Value.Max,
+            testCase.Value.Inclusion);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
     [MemberData(nameof(RuleComparisonTestData.Boundaries.ValidCases), MemberType = typeof(RuleComparisonTestData.Boundaries))]
     public void IsGreaterThan_AndIsLessThan_RespectInclusion(RuleComparisonTestData.Boundaries.ValidCase testCase)
     {
-        // Arrange
-
         // Act
-        var greater = InvokeGenericStatic<bool>("IsGreaterThan", testCase.Value, testCase.Boundary, testCase.Inclusion);
-        var less = InvokeGenericStatic<bool>("IsLessThan", testCase.Value, testCase.Boundary, testCase.Inclusion);
+        var greater = InvokeGenericStatic<bool>("IsGreaterThan", testCase.Value.Value, testCase.Value.Boundary, testCase.Value.Inclusion);
+        var less = InvokeGenericStatic<bool>("IsLessThan", testCase.Value.Value, testCase.Value.Boundary, testCase.Value.Inclusion);
 
         // Assert
-        Assert.Equal(testCase.ExpectedGreaterThan, greater);
-        Assert.Equal(testCase.ExpectedLessThan, less);
+        Assert.Equal(testCase.ExpectedReturn.ExpectedGreaterThan, greater);
+        Assert.Equal(testCase.ExpectedReturn.ExpectedLessThan, less);
     }
 
     [Theory]
     [MemberData(nameof(RuleComparisonTestData.IsBetween.InvalidCases), MemberType = typeof(RuleComparisonTestData.IsBetween))]
     public void IsBetween_Throws_ForInvalidInclusion(RuleComparisonTestData.IsBetween.InvalidCase testCase)
     {
-        var ex = Assert.Throws<TargetInvocationException>(() =>
-            InvokeGenericStatic<bool>("IsBetween", testCase.Value, testCase.Min, testCase.Max, testCase.Inclusion));
+        var invalidCase = testCase;
 
-        AssertExpectedInnerException(ex, testCase.ExpectedException);
+        var ex = Assert.Throws<TargetInvocationException>(() =>
+            InvokeGenericStatic<bool>(
+                "IsBetween",
+                invalidCase.Value.Value,
+                invalidCase.Value.Min,
+                invalidCase.Value.Max,
+                invalidCase.Value.Inclusion));
+
+        Assert.NotNull(ex.InnerException);
+        ThrowsCaseAssert.Expected(ex.InnerException!, invalidCase);
     }
 
     [Theory]
     [MemberData(nameof(RuleComparisonTestData.Boundaries.InvalidCases), MemberType = typeof(RuleComparisonTestData.Boundaries))]
     public void IsGreaterThan_Throws_ForInvalidInclusion(RuleComparisonTestData.Boundaries.InvalidCase testCase)
     {
-        var ex = Assert.Throws<TargetInvocationException>(() =>
-            InvokeGenericStatic<bool>("IsGreaterThan", testCase.Value, testCase.Boundary, testCase.Inclusion));
+        var invalidCase = testCase;
 
-        AssertExpectedInnerException(ex, testCase.ExpectedException);
+        var ex = Assert.Throws<TargetInvocationException>(() =>
+            InvokeGenericStatic<bool>("IsGreaterThan", invalidCase.Value.Value, invalidCase.Value.Boundary, invalidCase.Value.Inclusion));
+
+        Assert.NotNull(ex.InnerException);
+        ThrowsCaseAssert.Expected(ex.InnerException!, invalidCase);
     }
 
     [Theory]
     [MemberData(nameof(RuleComparisonTestData.Boundaries.InvalidCases), MemberType = typeof(RuleComparisonTestData.Boundaries))]
     public void IsLessThan_Throws_ForInvalidInclusion(RuleComparisonTestData.Boundaries.InvalidCase testCase)
     {
+        var invalidCase = testCase;
+
         var ex = Assert.Throws<TargetInvocationException>(() =>
-            InvokeGenericStatic<bool>("IsLessThan", testCase.Value, testCase.Boundary, testCase.Inclusion));
+            InvokeGenericStatic<bool>("IsLessThan", invalidCase.Value.Value, invalidCase.Value.Boundary, invalidCase.Value.Inclusion));
 
-        AssertExpectedInnerException(ex, testCase.ExpectedException);
-    }
-
-    private static void AssertExpectedInnerException(TargetInvocationException ex, ExpectedException expected)
-    {
         Assert.NotNull(ex.InnerException);
-        Assert.IsType(expected.Type, ex.InnerException);
-
-        if (expected.ParamName is not null)
-        {
-            Assert.Equal(expected.ParamName, ((ArgumentOutOfRangeException)ex.InnerException!).ParamName);
-        }
-
-        if (expected.MessageContains is not null)
-        {
-            Assert.Contains(expected.MessageContains, ex.InnerException!.Message);
-        }
+        ThrowsCaseAssert.Expected(ex.InnerException!, invalidCase);
     }
 
     private static TResult InvokeGenericStatic<TResult>(string methodName, params object[] args)

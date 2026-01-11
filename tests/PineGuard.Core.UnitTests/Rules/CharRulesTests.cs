@@ -8,8 +8,6 @@ public sealed class CharRulesTests : BaseUnitTest
     [Fact]
     public void Constants_AreExpected()
     {
-        // Arrange
-
         // Act
 
         // Assert
@@ -25,8 +23,6 @@ public sealed class CharRulesTests : BaseUnitTest
     public void ClassificationMethods_ReturnExpected(
         CharRulesTestData.ClassificationMethods.Case testCase)
     {
-        // Arrange
-
         // Act
 
         // Assert
@@ -46,12 +42,10 @@ public sealed class CharRulesTests : BaseUnitTest
     [MemberData(nameof(CharRulesTestData.IsHexDigit.EdgeCases), MemberType = typeof(CharRulesTestData.IsHexDigit))]
     public void IsHexDigit_ReturnsExpected(CharRulesTestData.IsHexDigit.Case testCase)
     {
-        // Arrange
-
         // Act
         var result = CharRules.IsHexDigit(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

@@ -8,8 +8,6 @@ public sealed class ObjectRulesTests : BaseUnitTest
     [Fact]
     public void IsEqualTo_UsesDefaultEqualityComparer()
     {
-        // Arrange
-
         // Act
         var equal = ObjectRules.IsEqualTo("abc", "abc");
         var notEqual = ObjectRules.IsEqualTo("abc", "def");
@@ -25,52 +23,44 @@ public sealed class ObjectRulesTests : BaseUnitTest
     [MemberData(nameof(ObjectRulesTestData.IsOfType.ValidCases), MemberType = typeof(ObjectRulesTestData.IsOfType))]
     public void IsOfType_ReturnsTrue_WhenValueIsT(ObjectRulesTestData.IsOfType.Case testCase)
     {
-        // Arrange
-
         // Act
         var result = ObjectRules.IsOfType<string>(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
     [MemberData(nameof(ObjectRulesTestData.IsOfType.EdgeCases), MemberType = typeof(ObjectRulesTestData.IsOfType))]
     public void IsOfType_ReturnsFalse_WhenValueIsNotT(ObjectRulesTestData.IsOfType.Case testCase)
     {
-        // Arrange
-
         // Act
         var result = ObjectRules.IsOfType<string>(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
     [MemberData(nameof(ObjectRulesTestData.IsAssignableToType.ValidCases), MemberType = typeof(ObjectRulesTestData.IsAssignableToType))]
     public void IsAssignableToType_ReturnsTrue_WhenValueIsAssignable(ObjectRulesTestData.IsAssignableToType.Case testCase)
     {
-        // Arrange
-
         // Act
         var result = ObjectRules.IsAssignableToType<string>(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
     [MemberData(nameof(ObjectRulesTestData.IsAssignableToType.EdgeCases), MemberType = typeof(ObjectRulesTestData.IsAssignableToType))]
     public void IsAssignableToType_ReturnsFalse_WhenNullOrNotAssignable(ObjectRulesTestData.IsAssignableToType.Case testCase)
     {
-        // Arrange
-
         // Act
         var result = ObjectRules.IsAssignableToType<Exception>(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]

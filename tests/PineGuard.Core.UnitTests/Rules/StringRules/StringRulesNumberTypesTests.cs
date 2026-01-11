@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules.StringRules;
@@ -12,7 +11,7 @@ public sealed class StringRulesNumberTypesTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.NumberTypes.IsDecimal(testCase.Value, decimalPlaces: 2);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -22,7 +21,7 @@ public sealed class StringRulesNumberTypesTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.NumberTypes.IsDecimal(testCase.Value, decimalPlaces: 0);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]
@@ -38,7 +37,7 @@ public sealed class StringRulesNumberTypesTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.NumberTypes.IsExactDecimal(testCase.Value, exactDecimalPlaces: 2);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -49,7 +48,7 @@ public sealed class StringRulesNumberTypesTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.NumberTypes.IsExactDecimal(testCase.Value, exactDecimalPlaces: 0);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]
@@ -65,7 +64,7 @@ public sealed class StringRulesNumberTypesTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.NumberTypes.IsInt32(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -75,7 +74,7 @@ public sealed class StringRulesNumberTypesTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.NumberTypes.IsInt64(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -84,12 +83,12 @@ public sealed class StringRulesNumberTypesTests : BaseUnitTest
     public void IsInt32InRange_ReturnsExpected(StringRulesNumberTypesTestData.IsInt32InRange.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.NumberTypes.IsInt32InRange(
-            testCase.Value,
-            testCase.Min,
-            testCase.Max,
-            testCase.Inclusion);
+            testCase.Value.Text,
+            testCase.Value.Min,
+            testCase.Value.Max,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -98,11 +97,11 @@ public sealed class StringRulesNumberTypesTests : BaseUnitTest
     public void IsInt64InRange_ReturnsExpected(StringRulesNumberTypesTestData.IsInt64InRange.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.NumberTypes.IsInt64InRange(
-            testCase.Value,
-            testCase.Min,
-            testCase.Max,
-            testCase.Inclusion);
+            testCase.Value.Text,
+            testCase.Value.Min,
+            testCase.Value.Max,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

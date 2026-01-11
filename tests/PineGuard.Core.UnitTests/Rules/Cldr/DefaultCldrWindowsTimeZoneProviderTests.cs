@@ -18,7 +18,7 @@ public sealed class DefaultCldrWindowsTimeZoneProviderTests : BaseUnitTest
         var result = provider.IsValidWindowsTimeZoneId(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]
@@ -209,11 +209,11 @@ public sealed class DefaultCldrWindowsTimeZoneProviderTests : BaseUnitTest
         {
             ["Zulu Time"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
             {
-                ["US"] = new[] { "America/Foo" },
+                ["US"] = ["America/Foo"],
             }.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase),
             ["Alpha Time"] = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
             {
-                ["US"] = new[] { "America/Foo" },
+                ["US"] = ["America/Foo"],
             }.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase),
         };
 
@@ -229,7 +229,7 @@ public sealed class DefaultCldrWindowsTimeZoneProviderTests : BaseUnitTest
     {
         var byTerritory = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
         {
-            ["US"] = new[] { "America/Los_Angeles" },
+            ["US"] = ["America/Los_Angeles"],
         }.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
 
         var index = new Dictionary<string, FrozenDictionary<string, string[]>>(StringComparer.OrdinalIgnoreCase)
@@ -252,7 +252,7 @@ public sealed class DefaultCldrWindowsTimeZoneProviderTests : BaseUnitTest
     {
         var byTerritory = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
         {
-            ["US"] = new[] { "America/Los_Angeles" },
+            ["US"] = ["America/Los_Angeles"],
         }.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
 
         var index = new Dictionary<string, FrozenDictionary<string, string[]>>(StringComparer.OrdinalIgnoreCase)
@@ -373,13 +373,13 @@ public sealed class DefaultCldrWindowsTimeZoneProviderTests : BaseUnitTest
         var field = dataType.GetField("IanaTimeZoneIdsByWindowsId", BindingFlags.NonPublic | BindingFlags.Static);
         Assert.NotNull(field);
 
-        var frozen = field!.GetValue(null);
+        var frozen = field.GetValue(null);
         Assert.NotNull(frozen);
 
         // Avoid binding directly to FrozenDictionary in tests; treat it as dictionaries for ordering logic.
         var result = new Dictionary<string, Dictionary<string, string[]>>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var winKvp in (System.Collections.IEnumerable)frozen!)
+        foreach (var winKvp in (System.Collections.IEnumerable)frozen)
         {
             var winKvpType = winKvp.GetType();
             var windowsId = (string)winKvpType.GetProperty("Key")!.GetValue(winKvp)!;
@@ -405,7 +405,7 @@ public sealed class DefaultCldrWindowsTimeZoneProviderTests : BaseUnitTest
         var windowsToTerritoryToIana = GetWindowsToTerritoryToIanaMap();
 
         // Build: IANA id -> territory -> windows id (mirrors production logic, but kept test-local).
-        var ianaToTerritoryToWindows = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+        var ianaToTerritoryToWindows = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var winKvp in windowsToTerritoryToIana)
         {
@@ -423,7 +423,7 @@ public sealed class DefaultCldrWindowsTimeZoneProviderTests : BaseUnitTest
 
                     if (!ianaToTerritoryToWindows.TryGetValue(ianaId, out var terrMap))
                     {
-                        terrMap = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        terrMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                         ianaToTerritoryToWindows[ianaId] = terrMap;
                     }
 

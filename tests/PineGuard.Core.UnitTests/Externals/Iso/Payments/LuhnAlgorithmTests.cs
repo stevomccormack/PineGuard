@@ -10,12 +10,10 @@ public sealed class LuhnAlgorithmTests : BaseUnitTest
     [MemberData(nameof(LuhnAlgorithmTestData.IsValid.EdgeCases), MemberType = typeof(LuhnAlgorithmTestData.IsValid))]
     public void IsValid_ReturnsExpected(LuhnAlgorithmTestData.IsValid.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var result = LuhnAlgorithm.IsValid(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

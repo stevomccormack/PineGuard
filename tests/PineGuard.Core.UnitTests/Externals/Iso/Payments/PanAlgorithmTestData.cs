@@ -1,40 +1,41 @@
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
+
 namespace PineGuard.Core.UnitTests.Externals.Iso.Payments;
 
 public static class PanAlgorithmTestData
 {
     public static class IsValid
     {
-        private static ValidCase V(string name, string? value, bool expected) => new(Name: name, Value: value, Expected: expected);
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("min 12", new string('1', 12), true),
+            new("13", new string('2', 13), true),
+            new("16", new string('3', 16), true),
+            new("max 19", new string('4', 19), true)
+        ];
 
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            { V("min 12", new string('1', 12), expected: true) },
-            { V("13", new string('2', 13), expected: true) },
-            { V("16", new string('3', 16), expected: true) },
-            { V("max 19", new string('4', 19), expected: true) },
-        };
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("min 12 other digit", new string('9', 12), true),
+            new("max 19 other digit", new string('9', 19), true),
+            new("too short 11", new string('1', 11), false),
+            new("too long 20", new string('1', 20), false),
+            new("letters", "1234abcd5678", false),
+            new("spaces", "1234 5678 9012", false),
+            new("dashes", "1234-5678-9012", false),
+            new("null", null, false),
+            new("empty", "", false),
+            new("space", " ", false),
+            new("tab", "\t", false)
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            { V("min 12 other digit", new string('9', 12), expected: true) },
-            { V("max 19 other digit", new string('9', 19), expected: true) },
-            { V("too short 11", new string('1', 11), expected: false) },
-            { V("too long 20", new string('1', 20), expected: false) },
-            { V("letters", "1234abcd5678", expected: false) },
-            { V("spaces", "1234 5678 9012", expected: false) },
-            { V("dashes", "1234-5678-9012", expected: false) },
-            { V("null", null, expected: false) },
-            { V("empty", "", expected: false) },
-            { V("space", " ", expected: false) },
-            { V("tab", "\t", expected: false) },
-        };
+        public static TheoryData<IThrowsCase> InvalidCases => [];
 
-        #region Cases
+        #region Case Records
 
-        public record Case(string Name, string? Value);
-
-        public sealed record ValidCase(string Name, string? Value, bool Expected)
-            : Case(Name, Value);
+        public sealed record ValidCase(string Name, string? Value, bool ExpectedReturn)
+            : IsCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion
     }

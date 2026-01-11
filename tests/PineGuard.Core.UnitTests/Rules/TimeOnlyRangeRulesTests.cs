@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Rules;
 using PineGuard.Testing.UnitTests;
 
@@ -11,9 +10,9 @@ public sealed class TimeOnlyRangeRulesTests : BaseUnitTest
     [MemberData(nameof(TimeOnlyRangeRulesTestData.IsChronological.EdgeCases), MemberType = typeof(TimeOnlyRangeRulesTestData.IsChronological))]
     public void IsChronological_ReturnsExpected(TimeOnlyRangeRulesTestData.IsChronological.Case testCase)
     {
-        var result = TimeOnlyRangeRules.IsChronological(testCase.Range, testCase.Inclusion);
+        var result = TimeOnlyRangeRules.IsChronological(testCase.Value, testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -21,8 +20,8 @@ public sealed class TimeOnlyRangeRulesTests : BaseUnitTest
     [MemberData(nameof(TimeOnlyRangeRulesTestData.IsOverlapping.EdgeCases), MemberType = typeof(TimeOnlyRangeRulesTestData.IsOverlapping))]
     public void IsOverlapping_ReturnsExpected(TimeOnlyRangeRulesTestData.IsOverlapping.Case testCase)
     {
-        var result = TimeOnlyRangeRules.IsOverlapping(testCase.Range1, testCase.Range2, testCase.Inclusion);
+        var result = TimeOnlyRangeRules.IsOverlapping(testCase.Value.Range1, testCase.Value.Range2, testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

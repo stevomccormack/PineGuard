@@ -33,7 +33,7 @@ public sealed class StringRulesDateOnlyTests : BaseUnitTest
         var min = new DateOnly(2020, 1, 1);
         var max = new DateOnly(2020, 1, 31);
 
-        Assert.True(PineGuard.Rules.StringRules.DateOnly.IsBetween("2020-01-01", min, max, Inclusion.Inclusive));
+        Assert.True(PineGuard.Rules.StringRules.DateOnly.IsBetween("2020-01-01", min, max));
         Assert.False(PineGuard.Rules.StringRules.DateOnly.IsBetween("2020-01-01", min, max, Inclusion.Exclusive));
 
         Assert.True(PineGuard.Rules.StringRules.DateOnly.IsBetween("2020-01-15", min, max));

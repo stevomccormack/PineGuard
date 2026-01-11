@@ -10,7 +10,7 @@ public sealed class StringUtilityNumberTypesTests : BaseUnitTest
     [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseInt32.EdgeCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseInt32))]
     public void TryParseInt32_ReturnsExpected(StringUtilityNumberTypesTestData.TryParseInt32.Case testCase)
     {
-        var ok = StringUtility.NumberTypes.TryParseInt32(testCase.Input, out var result);
+        var ok = StringUtility.NumberTypes.TryParseInt32(testCase.Value, out var result);
 
         Assert.Equal(testCase.ExpectedSuccess, ok);
         Assert.Equal(testCase.ExpectedInt32, result);
@@ -21,7 +21,7 @@ public sealed class StringUtilityNumberTypesTests : BaseUnitTest
     [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseInt64.EdgeCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseInt64))]
     public void TryParseInt64_ReturnsExpected(StringUtilityNumberTypesTestData.TryParseInt64.Case testCase)
     {
-        var ok = StringUtility.NumberTypes.TryParseInt64(testCase.Input, out var result);
+        var ok = StringUtility.NumberTypes.TryParseInt64(testCase.Value, out var result);
 
         Assert.Equal(testCase.ExpectedSuccess, ok);
         Assert.Equal(testCase.ExpectedInt64, result);
@@ -32,9 +32,9 @@ public sealed class StringUtilityNumberTypesTests : BaseUnitTest
     [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseDecimal.EdgeCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseDecimal))]
     public void TryParseDecimal_ReturnsExpected(StringUtilityNumberTypesTestData.TryParseDecimal.Case testCase)
     {
-        IFormatProvider? provider = StringUtilityNumberTypesTestData.GetProvider(testCase.CultureName);
+        var provider = StringUtilityNumberTypesTestData.GetProvider(testCase.CultureName);
 
-        var ok = StringUtility.NumberTypes.TryParseDecimal(testCase.Input, out var result, provider: provider);
+        var ok = StringUtility.NumberTypes.TryParseDecimal(testCase.Value, out var result, provider: provider);
 
         Assert.Equal(testCase.ExpectedSuccess, ok);
         Assert.Equal(testCase.ExpectedDecimal, result);
@@ -45,9 +45,9 @@ public sealed class StringUtilityNumberTypesTests : BaseUnitTest
     [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseSingle.EdgeCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseSingle))]
     public void TryParseSingle_ReturnsExpected(StringUtilityNumberTypesTestData.TryParseSingle.Case testCase)
     {
-        IFormatProvider? provider = StringUtilityNumberTypesTestData.GetProvider(testCase.CultureName);
+        var provider = StringUtilityNumberTypesTestData.GetProvider(testCase.CultureName);
 
-        var ok = StringUtility.NumberTypes.TryParseSingle(testCase.Input, out var result, provider: provider);
+        var ok = StringUtility.NumberTypes.TryParseSingle(testCase.Value, out var result, provider: provider);
 
         Assert.Equal(testCase.ExpectedSuccess, ok);
         Assert.Equal(testCase.ExpectedSingle, result);
@@ -58,9 +58,9 @@ public sealed class StringUtilityNumberTypesTests : BaseUnitTest
     [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseDouble.EdgeCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseDouble))]
     public void TryParseDouble_ReturnsExpected(StringUtilityNumberTypesTestData.TryParseDouble.Case testCase)
     {
-        IFormatProvider? provider = StringUtilityNumberTypesTestData.GetProvider(testCase.CultureName);
+        var provider = StringUtilityNumberTypesTestData.GetProvider(testCase.CultureName);
 
-        var ok = StringUtility.NumberTypes.TryParseDouble(testCase.Input, out var result, provider: provider);
+        var ok = StringUtility.NumberTypes.TryParseDouble(testCase.Value, out var result, provider: provider);
 
         Assert.Equal(testCase.ExpectedSuccess, ok);
         Assert.Equal(testCase.ExpectedDouble, result);

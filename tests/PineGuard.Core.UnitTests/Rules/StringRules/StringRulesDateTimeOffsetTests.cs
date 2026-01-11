@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules.StringRules;
@@ -12,7 +11,7 @@ public sealed class StringRulesDateTimeOffsetTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.DateTimeOffset.IsInPast(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -22,7 +21,7 @@ public sealed class StringRulesDateTimeOffsetTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.DateTimeOffset.IsInFuture(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -31,11 +30,11 @@ public sealed class StringRulesDateTimeOffsetTests : BaseUnitTest
     public void IsBetween_RespectsInclusion(StringRulesDateTimeOffsetTestData.IsBetween.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.DateTimeOffset.IsBetween(
-            testCase.Value,
-            testCase.Min,
-            testCase.Max,
-            testCase.Inclusion);
+            testCase.Value.Text,
+            testCase.Value.Min,
+            testCase.Value.Max,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

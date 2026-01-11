@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules.StringRules;
@@ -11,12 +10,12 @@ public sealed class StringRulesTimeOnlyTests : BaseUnitTest
     public void IsBetween_ReturnsExpected(StringRulesTimeOnlyTestData.IsBetween.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.TimeOnly.IsBetween(
-            testCase.Value,
-            testCase.Min,
-            testCase.Max,
-            testCase.Inclusion);
+            testCase.Value.Text,
+            testCase.Value.Min,
+            testCase.Value.Max,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -25,11 +24,11 @@ public sealed class StringRulesTimeOnlyTests : BaseUnitTest
     public void IsChronological_ReturnsExpected(StringRulesTimeOnlyTestData.IsChronological.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.TimeOnly.IsChronological(
-            testCase.Start,
-            testCase.End,
-            testCase.Inclusion);
+            testCase.Value.Start,
+            testCase.Value.End,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -38,12 +37,12 @@ public sealed class StringRulesTimeOnlyTests : BaseUnitTest
     public void IsOverlapping_ReturnsExpected(StringRulesTimeOnlyTestData.IsOverlapping.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.TimeOnly.IsOverlapping(
-            testCase.Start1,
-            testCase.End1,
-            testCase.Start2,
-            testCase.End2,
-            testCase.Inclusion);
+            testCase.Value.Start1,
+            testCase.Value.End1,
+            testCase.Value.Start2,
+            testCase.Value.End2,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

@@ -35,7 +35,7 @@ public sealed class CldrTimeZoneRulesTests : BaseUnitTest
         var result = CldrTimeZoneRules.IsWindowsTimeZoneId(testCase.Value, provider);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -49,14 +49,12 @@ public sealed class CldrTimeZoneRulesTests : BaseUnitTest
         var result = CldrTimeZoneRules.IsWindowsTimeZoneId(testCase.Value, provider);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]
     public void IsWindowsTimeZoneId_UsesDefaultProvider_WhenProviderIsNull()
     {
-        // Arrange
-
         // Act
         var result = CldrTimeZoneRules.IsWindowsTimeZoneId("This is not a Windows time zone id", provider: null);
 

@@ -10,7 +10,7 @@ public sealed class OwaspUtilityTests : BaseUnitTest
     [MemberData(nameof(OwaspUtilityTestData.ContainsSqlInjectionRisk.EdgeCases), MemberType = typeof(OwaspUtilityTestData.ContainsSqlInjectionRisk))]
     public void ContainsSqlInjectionRisk_ReturnsExpected(OwaspUtilityTestData.ContainsSqlInjectionRisk.Case testCase)
     {
-        var result = OwaspUtility.ContainsSqlInjectionRisk(testCase.Input);
+        var result = OwaspUtility.ContainsSqlInjectionRisk(testCase.Value);
 
         Assert.Equal(testCase.ExpectedReturn, result);
     }
@@ -20,7 +20,7 @@ public sealed class OwaspUtilityTests : BaseUnitTest
     [MemberData(nameof(OwaspUtilityTestData.ContainsPathTraversalRisk.EdgeCases), MemberType = typeof(OwaspUtilityTestData.ContainsPathTraversalRisk))]
     public void ContainsPathTraversalRisk_ReturnsExpected(OwaspUtilityTestData.ContainsPathTraversalRisk.Case testCase)
     {
-        var result = OwaspUtility.ContainsPathTraversalRisk(testCase.Input);
+        var result = OwaspUtility.ContainsPathTraversalRisk(testCase.Value);
 
         Assert.Equal(testCase.ExpectedReturn, result);
     }
@@ -30,7 +30,7 @@ public sealed class OwaspUtilityTests : BaseUnitTest
     [MemberData(nameof(OwaspUtilityTestData.ContainsCommandInjectionRisk.EdgeCases), MemberType = typeof(OwaspUtilityTestData.ContainsCommandInjectionRisk))]
     public void ContainsCommandInjectionRisk_ReturnsExpected(OwaspUtilityTestData.ContainsCommandInjectionRisk.Case testCase)
     {
-        var result = OwaspUtility.ContainsCommandInjectionRisk(testCase.Input);
+        var result = OwaspUtility.ContainsCommandInjectionRisk(testCase.Value);
 
         Assert.Equal(testCase.ExpectedReturn, result);
     }
@@ -40,7 +40,7 @@ public sealed class OwaspUtilityTests : BaseUnitTest
     [MemberData(nameof(OwaspUtilityTestData.ContainsCrLfRisk.EdgeCases), MemberType = typeof(OwaspUtilityTestData.ContainsCrLfRisk))]
     public void ContainsCrLfRisk_ReturnsExpected(OwaspUtilityTestData.ContainsCrLfRisk.Case testCase)
     {
-        var result = OwaspUtility.ContainsCrLfRisk(testCase.Input);
+        var result = OwaspUtility.ContainsCrLfRisk(testCase.Value);
 
         Assert.Equal(testCase.ExpectedReturn, result);
     }
@@ -50,7 +50,7 @@ public sealed class OwaspUtilityTests : BaseUnitTest
     [MemberData(nameof(OwaspUtilityTestData.ContainsLdapFilterRisk.EdgeCases), MemberType = typeof(OwaspUtilityTestData.ContainsLdapFilterRisk))]
     public void ContainsLdapFilterRisk_ReturnsExpected(OwaspUtilityTestData.ContainsLdapFilterRisk.Case testCase)
     {
-        var result = OwaspUtility.ContainsLdapFilterRisk(testCase.Input);
+        var result = OwaspUtility.ContainsLdapFilterRisk(testCase.Value);
 
         Assert.Equal(testCase.ExpectedReturn, result);
     }
@@ -60,7 +60,7 @@ public sealed class OwaspUtilityTests : BaseUnitTest
     [MemberData(nameof(OwaspUtilityTestData.ContainsOpenRedirectRisk.EdgeCases), MemberType = typeof(OwaspUtilityTestData.ContainsOpenRedirectRisk))]
     public void ContainsOpenRedirectRisk_ReturnsExpected(OwaspUtilityTestData.ContainsOpenRedirectRisk.Case testCase)
     {
-        var result = OwaspUtility.ContainsOpenRedirectRisk(testCase.Input);
+        var result = OwaspUtility.ContainsOpenRedirectRisk(testCase.Value);
 
         Assert.Equal(testCase.ExpectedReturn, result);
     }
@@ -70,7 +70,7 @@ public sealed class OwaspUtilityTests : BaseUnitTest
     [MemberData(nameof(OwaspUtilityTestData.ContainsSsrfSchemeRisk.EdgeCases), MemberType = typeof(OwaspUtilityTestData.ContainsSsrfSchemeRisk))]
     public void ContainsSsrfSchemeRisk_ReturnsExpected(OwaspUtilityTestData.ContainsSsrfSchemeRisk.Case testCase)
     {
-        var result = OwaspUtility.ContainsSsrfSchemeRisk(testCase.Input);
+        var result = OwaspUtility.ContainsSsrfSchemeRisk(testCase.Value);
 
         Assert.Equal(testCase.ExpectedReturn, result);
     }

@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules.StringRules;
@@ -12,7 +11,7 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsPositive(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -22,7 +21,7 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsNegative(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -32,7 +31,7 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsZero(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -42,7 +41,7 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsNotZero(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -52,7 +51,7 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsZeroOrPositive(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -62,7 +61,7 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsZeroOrNegative(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -70,9 +69,9 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     [MemberData(nameof(StringRulesNumbersTestData.IsGreaterThan.EdgeCases), MemberType = typeof(StringRulesNumbersTestData.IsGreaterThan))]
     public void IsGreaterThan_ReturnsExpected(StringRulesNumbersTestData.IsGreaterThan.Case testCase)
     {
-        var result = PineGuard.Rules.StringRules.Numbers.IsGreaterThan(testCase.Value, testCase.Min);
+        var result = PineGuard.Rules.StringRules.Numbers.IsGreaterThan(testCase.Value.Text, testCase.Value.Min);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -80,9 +79,9 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     [MemberData(nameof(StringRulesNumbersTestData.IsGreaterThanOrEqual.EdgeCases), MemberType = typeof(StringRulesNumbersTestData.IsGreaterThanOrEqual))]
     public void IsGreaterThanOrEqual_ReturnsExpected(StringRulesNumbersTestData.IsGreaterThanOrEqual.Case testCase)
     {
-        var result = PineGuard.Rules.StringRules.Numbers.IsGreaterThanOrEqual(testCase.Value, testCase.Min);
+        var result = PineGuard.Rules.StringRules.Numbers.IsGreaterThanOrEqual(testCase.Value.Text, testCase.Value.Min);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -90,9 +89,9 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     [MemberData(nameof(StringRulesNumbersTestData.IsLessThan.EdgeCases), MemberType = typeof(StringRulesNumbersTestData.IsLessThan))]
     public void IsLessThan_ReturnsExpected(StringRulesNumbersTestData.IsLessThan.Case testCase)
     {
-        var result = PineGuard.Rules.StringRules.Numbers.IsLessThan(testCase.Value, testCase.Max);
+        var result = PineGuard.Rules.StringRules.Numbers.IsLessThan(testCase.Value.Text, testCase.Value.Max);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -100,9 +99,9 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     [MemberData(nameof(StringRulesNumbersTestData.IsLessThanOrEqual.EdgeCases), MemberType = typeof(StringRulesNumbersTestData.IsLessThanOrEqual))]
     public void IsLessThanOrEqual_ReturnsExpected(StringRulesNumbersTestData.IsLessThanOrEqual.Case testCase)
     {
-        var result = PineGuard.Rules.StringRules.Numbers.IsLessThanOrEqual(testCase.Value, testCase.Max);
+        var result = PineGuard.Rules.StringRules.Numbers.IsLessThanOrEqual(testCase.Value.Text, testCase.Value.Max);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -111,12 +110,12 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     public void IsInRange_ReturnsExpected(StringRulesNumbersTestData.IsInRange.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsInRange(
-            testCase.Value,
-            testCase.Min,
-            testCase.Max,
-            testCase.Inclusion);
+            testCase.Value.Text,
+            testCase.Value.Min,
+            testCase.Value.Max,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -124,9 +123,9 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     [MemberData(nameof(StringRulesNumbersTestData.IsApproximately.EdgeCases), MemberType = typeof(StringRulesNumbersTestData.IsApproximately))]
     public void IsApproximately_ReturnsExpected(StringRulesNumbersTestData.IsApproximately.Case testCase)
     {
-        var result = PineGuard.Rules.StringRules.Numbers.IsApproximately(testCase.Value, testCase.Target, testCase.Tolerance);
+        var result = PineGuard.Rules.StringRules.Numbers.IsApproximately(testCase.Value.Text, testCase.Value.Target, testCase.Value.Tolerance);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -134,9 +133,9 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     [MemberData(nameof(StringRulesNumbersTestData.IsMultipleOf.EdgeCases), MemberType = typeof(StringRulesNumbersTestData.IsMultipleOf))]
     public void IsMultipleOf_ReturnsExpected(StringRulesNumbersTestData.IsMultipleOf.Case testCase)
     {
-        var result = PineGuard.Rules.StringRules.Numbers.IsMultipleOf(testCase.Value, testCase.Factor);
+        var result = PineGuard.Rules.StringRules.Numbers.IsMultipleOf(testCase.Value.Text, testCase.Value.Factor);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -146,7 +145,7 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsEven(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -156,7 +155,7 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsOdd(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -166,7 +165,7 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsFinite(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -176,6 +175,6 @@ public sealed class StringRulesNumbersTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Numbers.IsNaN(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

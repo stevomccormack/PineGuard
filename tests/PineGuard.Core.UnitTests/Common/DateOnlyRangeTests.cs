@@ -47,8 +47,6 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
     [MemberData(nameof(DateOnlyRangeTestData.Constructor.ValidCases), MemberType = typeof(DateOnlyRangeTestData.Constructor))]
     public void Ctor_SetsStartEnd_AndDayCount(DateOnlyRangeTestData.Constructor.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var range = new DateOnlyRange(testCase.Start, testCase.End);
 
@@ -56,6 +54,7 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
         Assert.Equal(testCase.Start, range.Start);
         Assert.Equal(testCase.End, range.End);
         Assert.Equal(testCase.ExpectedDayCount, range.DayCount);
+        Assert.Equal(TimeSpan.FromDays(testCase.ExpectedDayCount), range.Duration);
         Assert.True(range.Contains(testCase.Start));
     }
 
@@ -63,8 +62,6 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
     [MemberData(nameof(DateOnlyRangeTestData.Constructor.EdgeCases), MemberType = typeof(DateOnlyRangeTestData.Constructor))]
     public void Ctor_EdgeCases_SetsStartEnd_AndDayCount(DateOnlyRangeTestData.Constructor.ValidCase testCase)
     {
-        // Arrange
-
         // Act
         var range = new DateOnlyRange(testCase.Start, testCase.End);
 
@@ -72,6 +69,7 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
         Assert.Equal(testCase.Start, range.Start);
         Assert.Equal(testCase.End, range.End);
         Assert.Equal(testCase.ExpectedDayCount, range.DayCount);
+        Assert.Equal(TimeSpan.FromDays(testCase.ExpectedDayCount), range.Duration);
         Assert.True(range.Contains(testCase.End));
     }
 
@@ -80,16 +78,13 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
     public void Ctor_WhenStartAfterEnd_Throws(DateOnlyRangeTestData.Constructor.InvalidCase testCase)
     {
         // Arrange
+        var invalidCase = testCase;
 
         // Act
-        var ex = Assert.Throws<ArgumentException>(() => _ = new DateOnlyRange(testCase.Start, testCase.End));
+        var ex = Assert.Throws(invalidCase.ExpectedException.Type, () => _ = new DateOnlyRange(invalidCase.Start, invalidCase.End));
 
         // Assert
-        Assert.IsType(testCase.ExpectedException.Type, ex);
-        if (testCase.ExpectedException.ParamName is not null)
-            Assert.Equal(testCase.ExpectedException.ParamName, ex.ParamName);
-        if (testCase.ExpectedException.MessageContains is not null)
-            Assert.Contains(testCase.ExpectedException.MessageContains, ex.Message, StringComparison.OrdinalIgnoreCase);
+        ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
     [Theory]
@@ -269,7 +264,7 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
         // Act
         var equalsTyped = range1.Equals(range2);
         var equalsObject = range1.Equals((object)range2);
-        var equalsNullObject = range1.Equals((object?)null);
+        var equalsNullObject = range1.Equals(null);
 
         // Assert
         Assert.True(equalsTyped);

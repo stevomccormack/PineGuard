@@ -5,6 +5,15 @@ namespace PineGuard.Core.UnitTests.Rules;
 
 public sealed class CollectionRulesTests : BaseUnitTest
 {
+    private sealed class ReadOnlyCollectionOnly<T>(params T[] items) : IReadOnlyCollection<T>
+    {
+        public int Count => items.Length;
+
+        public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)items).GetEnumerator();
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => items.GetEnumerator();
+    }
+
     [Fact]
     public void HasCountBetween_ReturnsFalse_WhenExclusiveMaxIsZero_ForNonCountableEnumerable()
     {
@@ -25,7 +34,7 @@ public sealed class CollectionRulesTests : BaseUnitTest
         var value = CollectionRulesTestData.Enumerate(1, 2, 3);
 
         // Act
-        var result = CollectionRules.HasCountBetween(value, 0, 1, PineGuard.Common.Inclusion.Inclusive);
+        var result = CollectionRules.HasCountBetween(value, 0, 1);
 
         // Assert
         Assert.False(result);
@@ -36,13 +45,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void IsEmpty_ReturnsTrue_ForEmptyCollections(CollectionRulesTestData.IsEmpty.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value;
 
         // Act
         var result = CollectionRules.IsEmpty(value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -51,13 +60,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void IsEmpty_ReturnsFalse_ForNonEmptyOrNullCollections(CollectionRulesTestData.IsEmpty.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value;
 
         // Act
         var result = CollectionRules.IsEmpty(value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -66,13 +75,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasItems_ReturnsTrue_ForNonEmptyCollections(CollectionRulesTestData.HasItems.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value;
 
         // Act
         var result = CollectionRules.HasItems(value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -81,13 +90,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasItems_ReturnsFalse_ForEmptyOrNullCollections(CollectionRulesTestData.HasItems.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value;
 
         // Act
         var result = CollectionRules.HasItems(value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -96,13 +105,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasExactCount_ReturnsTrue_ForMatchingCounts(CollectionRulesTestData.HasExactCount.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasExactCount(value, testCase.Count);
+        var result = CollectionRules.HasExactCount(value, testCase.Value.Count);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -111,13 +120,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasExactCount_ReturnsFalse_ForNonMatchingCounts(CollectionRulesTestData.HasExactCount.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasExactCount(value, testCase.Count);
+        var result = CollectionRules.HasExactCount(value, testCase.Value.Count);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -126,13 +135,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasMinCount_ReturnsTrue_ForEnoughItems(CollectionRulesTestData.HasMinCount.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasMinCount(value, testCase.Min);
+        var result = CollectionRules.HasMinCount(value, testCase.Value.Min);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -141,13 +150,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasMinCount_ReturnsFalse_ForNotEnoughItems(CollectionRulesTestData.HasMinCount.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasMinCount(value, testCase.Min);
+        var result = CollectionRules.HasMinCount(value, testCase.Value.Min);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -156,13 +165,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasMaxCount_ReturnsTrue_WhenWithinMax(CollectionRulesTestData.HasMaxCount.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasMaxCount(value, testCase.Max);
+        var result = CollectionRules.HasMaxCount(value, testCase.Value.Max);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -171,13 +180,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasMaxCount_ReturnsFalse_WhenExceedsMax(CollectionRulesTestData.HasMaxCount.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasMaxCount(value, testCase.Max);
+        var result = CollectionRules.HasMaxCount(value, testCase.Value.Max);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -186,13 +195,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasCountBetween_ReturnsTrue_ForMatchingCounts(CollectionRulesTestData.HasCountBetween.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasCountBetween(value, testCase.Min, testCase.Max, testCase.Inclusion);
+        var result = CollectionRules.HasCountBetween(value, testCase.Value.Min, testCase.Value.Max, testCase.Value.Inclusion);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -201,13 +210,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasCountBetween_ReturnsFalse_ForNonMatchingCounts(CollectionRulesTestData.HasCountBetween.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasCountBetween(value, testCase.Min, testCase.Max, testCase.Inclusion);
+        var result = CollectionRules.HasCountBetween(value, testCase.Value.Min, testCase.Value.Max, testCase.Value.Inclusion);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -216,13 +225,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasIndex_ReturnsTrue_ForExistingIndex(CollectionRulesTestData.HasIndex.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasIndex(value, testCase.Index);
+        var result = CollectionRules.HasIndex(value, testCase.Value.Index);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -231,13 +240,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasIndex_ReturnsFalse_ForMissingIndex(CollectionRulesTestData.HasIndex.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasIndex(value, testCase.Index);
+        var result = CollectionRules.HasIndex(value, testCase.Value.Index);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -246,13 +255,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void Contains_ReturnsTrue_ForContainedItem(CollectionRulesTestData.Contains.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.Contains(value, testCase.Item);
+        var result = CollectionRules.Contains(value, testCase.Value.Item);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -261,13 +270,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void Contains_ReturnsFalse_ForMissingItem(CollectionRulesTestData.Contains.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.Contains(value, testCase.Item);
+        var result = CollectionRules.Contains(value, testCase.Value.Item);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -276,13 +285,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasAny_ReturnsTrue_WhenAnyMatch(CollectionRulesTestData.HasAny.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasAny(value, testCase.Predicate);
+        var result = CollectionRules.HasAny(value, testCase.Value.Predicate);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -291,13 +300,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasAny_ReturnsFalse_WhenNoMatchOrNull(CollectionRulesTestData.HasAny.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasAny(value, testCase.Predicate);
+        var result = CollectionRules.HasAny(value, testCase.Value.Predicate);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -319,13 +328,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasAll_ReturnsTrue_WhenAllMatch(CollectionRulesTestData.HasAll.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasAll(value, testCase.Predicate);
+        var result = CollectionRules.HasAll(value, testCase.Value.Predicate);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -334,13 +343,13 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void HasAll_ReturnsFalse_WhenNotAllMatchOrNull(CollectionRulesTestData.HasAll.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
+        var value = testCase.Value.Value;
 
         // Act
-        var result = CollectionRules.HasAll(value, testCase.Predicate);
+        var result = CollectionRules.HasAll(value, testCase.Value.Predicate);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -362,14 +371,14 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void IsSubsetOf_ReturnsTrue_ForSubsets(CollectionRulesTestData.IsSubsetOf.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
-        var other = testCase.OtherFactory();
+        var value = testCase.Value.Value;
+        var other = testCase.Value.Other;
 
         // Act
         var result = CollectionRules.IsSubsetOf(value, other);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -378,14 +387,31 @@ public sealed class CollectionRulesTests : BaseUnitTest
     public void IsSubsetOf_ReturnsFalse_ForNonSubsetsOrNull(CollectionRulesTestData.IsSubsetOf.Case testCase)
     {
         // Arrange
-        var value = testCase.ValueFactory();
-        var other = testCase.OtherFactory();
+        var value = testCase.Value.Value;
+        var other = testCase.Value.Other;
 
         // Act
         var result = CollectionRules.IsSubsetOf(value, other);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
+    }
+
+    [Fact]
+    public void ReadOnlyCollectionBranches_AreUsed_ForIReadOnlyCollectionOnly()
+    {
+        // Arrange
+        IEnumerable<int> empty = new ReadOnlyCollectionOnly<int>();
+        IEnumerable<int> two = new ReadOnlyCollectionOnly<int>(1, 2);
+
+        // Assert
+        Assert.True(CollectionRules.IsEmpty(empty));
+        Assert.True(CollectionRules.HasItems(two));
+        Assert.True(CollectionRules.HasExactCount(two, 2));
+        Assert.True(CollectionRules.HasMinCount(two, 2));
+        Assert.True(CollectionRules.HasMaxCount(two, 2));
+        Assert.True(CollectionRules.HasCountBetween(two, 1, 3));
+        Assert.True(CollectionRules.HasIndex(two, 1));
     }
 }

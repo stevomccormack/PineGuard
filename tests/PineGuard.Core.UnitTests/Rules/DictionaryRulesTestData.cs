@@ -1,3 +1,5 @@
+using PineGuard.Testing.UnitTests;
+
 namespace PineGuard.Core.UnitTests.Rules;
 
 public static class DictionaryRulesTestData
@@ -14,208 +16,193 @@ public static class DictionaryRulesTestData
 
     public static class IsEmpty
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            new("Null", NullDictionary, true),
-            new("Empty", EmptyDictionary, true),
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Null", NullDictionary(), true),
+            new("Empty", EmptyDictionary(), true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            new("Non-empty", NonEmptyDictionary, false),
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Non-empty", NonEmptyDictionary(), false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, Func<IDictionary<string, int>?> DictionaryFactory, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, IDictionary<string, int>? Value, bool ExpectedReturn)
+            : IsCase<IDictionary<string, int>?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class HasItems
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            new("Non-empty", NonEmptyDictionary, true),
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Non-empty", NonEmptyDictionary(), true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            new("Null", NullDictionary, false),
-            new("Empty", EmptyDictionary, false),
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null", NullDictionary(), false),
+            new("Empty", EmptyDictionary(), false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, Func<IDictionary<string, int>?> DictionaryFactory, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, IDictionary<string, int>? Value, bool ExpectedReturn)
+            : HasCase<IDictionary<string, int>?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class HasKey
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            new("Existing key", NonEmptyDictionary, "a", true),
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Existing key", (NonEmptyDictionary(), Key: "a"), true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            new("Null dictionary", NullDictionary, "a", false),
-            new("Empty dictionary", EmptyDictionary, "a", false),
-            new("Missing key", NonEmptyDictionary, "missing", false),
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null dictionary", (NullDictionary(), Key: "a"), false),
+            new("Empty dictionary", (EmptyDictionary(), Key: "a"), false),
+            new("Missing key", (NonEmptyDictionary(), Key: "missing"), false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, Func<IDictionary<string, int>?> DictionaryFactory, string Key, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(
+            string Name,
+            (IDictionary<string, int>? Dictionary, string Key) Value,
+            bool ExpectedReturn)
+            : HasCase<(IDictionary<string, int>? Dictionary, string Key)>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class HasValue
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            new("Existing value", NonEmptyDictionary, 2, true),
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Existing value", (NonEmptyDictionary(), SearchValue: 2), true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            new("Null dictionary", NullDictionary, 2, false),
-            new("Empty dictionary", EmptyDictionary, 2, false),
-            new("Missing value", NonEmptyDictionary, 999, false),
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null dictionary", (NullDictionary(), SearchValue: 2), false),
+            new("Empty dictionary", (EmptyDictionary(), SearchValue: 2), false),
+            new("Missing value", (NonEmptyDictionary(), SearchValue: 999), false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, Func<IDictionary<string, int>?> DictionaryFactory, int Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(
+            string Name,
+            (IDictionary<string, int>? Dictionary, int SearchValue) Value,
+            bool ExpectedReturn)
+            : HasCase<(IDictionary<string, int>? Dictionary, int SearchValue)>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class HasKeyValue
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            new("Existing pair", NonEmptyDictionary, "b", 2, true),
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Existing pair", (NonEmptyDictionary(), Key: "b", SearchValue: 2), true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            new("Null dictionary", NullDictionary, "b", 2, false),
-            new("Empty dictionary", EmptyDictionary, "b", 2, false),
-            new("Missing key", NonEmptyDictionary, "missing", 2, false),
-            new("Wrong value", NonEmptyDictionary, "b", 999, false),
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null dictionary", (NullDictionary(), Key: "b", SearchValue: 2), false),
+            new("Empty dictionary", (EmptyDictionary(), Key: "b", SearchValue: 2), false),
+            new("Missing key", (NonEmptyDictionary(), Key: "missing", SearchValue: 2), false),
+            new("Wrong value", (NonEmptyDictionary(), Key: "b", SearchValue: 999), false),
+        ];
 
-        #region Cases
+        #region Case Records
 
         public sealed record Case(
             string Name,
-            Func<IDictionary<string, int>?> DictionaryFactory,
-            string Key,
-            int Value,
-            bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+            (IDictionary<string, int>? Dictionary, string Key, int SearchValue) Value,
+            bool ExpectedReturn)
+            : HasCase<(IDictionary<string, int>? Dictionary, string Key, int SearchValue)>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class HasAnyKey
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            new("Key matches", NonEmptyDictionary, key => key == "a", true),
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Key matches", (NonEmptyDictionary(), Predicate: key => key == "a"), true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            new("Null dictionary", NullDictionary, _ => true, false),
-            new("Empty dictionary", EmptyDictionary, _ => true, false),
-            new("No match", NonEmptyDictionary, _ => false, false),
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null dictionary", (NullDictionary(), Predicate: _ => true), false),
+            new("Empty dictionary", (EmptyDictionary(), Predicate: _ => true), false),
+            new("No match", (NonEmptyDictionary(), Predicate: _ => false), false),
+        ];
 
-        #region Cases
+        #region Case Records
 
         public sealed record Case(
             string Name,
-            Func<IDictionary<string, int>?> DictionaryFactory,
-            Func<string, bool> Predicate,
-            bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+            (IDictionary<string, int>? Dictionary, Func<string, bool> Predicate) Value,
+            bool ExpectedReturn)
+            : HasCase<(IDictionary<string, int>? Dictionary, Func<string, bool> Predicate)>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class HasAnyValue
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            new("Value matches", NonEmptyDictionary, v => v == 1, true),
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Value matches", (NonEmptyDictionary(), Predicate: v => v == 1), true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            new("Null dictionary", NullDictionary, _ => true, false),
-            new("Empty dictionary", EmptyDictionary, _ => true, false),
-            new("No match", NonEmptyDictionary, _ => false, false),
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null dictionary", (NullDictionary(), Predicate: _ => true), false),
+            new("Empty dictionary", (EmptyDictionary(), Predicate: _ => true), false),
+            new("No match", (NonEmptyDictionary(), Predicate: _ => false), false),
+        ];
 
-        #region Cases
+        #region Case Records
 
         public sealed record Case(
             string Name,
-            Func<IDictionary<string, int>?> DictionaryFactory,
-            Func<int, bool> Predicate,
-            bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+            (IDictionary<string, int>? Dictionary, Func<int, bool> Predicate) Value,
+            bool ExpectedReturn)
+            : HasCase<(IDictionary<string, int>? Dictionary, Func<int, bool> Predicate)>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class HasAnyItem
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            new("Item matches", NonEmptyDictionary, (k, v) => k == "b" && v == 2, true),
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("Item matches", (NonEmptyDictionary(), Predicate: (k, v) => k == "b" && v == 2), true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            new("Null dictionary", NullDictionary, (_, _) => true, false),
-            new("Empty dictionary", EmptyDictionary, (_, _) => true, false),
-            new("No match", NonEmptyDictionary, (_, _) => false, false),
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("Null dictionary", (NullDictionary(), Predicate: (_, _) => true), false),
+            new("Empty dictionary", (EmptyDictionary(), Predicate: (_, _) => true), false),
+            new("No match", (NonEmptyDictionary(), Predicate: (_, _) => false), false),
+        ];
 
-        #region Cases
+        #region Case Records
 
         public sealed record Case(
             string Name,
-            Func<IDictionary<string, int>?> DictionaryFactory,
-            Func<string, int, bool> Predicate,
-            bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+            (IDictionary<string, int>? Dictionary, Func<string, int, bool> Predicate) Value,
+            bool ExpectedReturn)
+            : HasCase<(IDictionary<string, int>? Dictionary, Func<string, int, bool> Predicate)>(Name, Value, ExpectedReturn);
 
         #endregion
     }

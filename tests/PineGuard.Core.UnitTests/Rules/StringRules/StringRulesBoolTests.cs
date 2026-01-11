@@ -10,7 +10,7 @@ public sealed class StringRulesBoolTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Bool.IsTrue(@case.Value);
 
-        Assert.Equal(@case.Expected, result);
+        Assert.Equal(@case.ExpectedReturn, result);
     }
 
     [Theory]
@@ -19,7 +19,7 @@ public sealed class StringRulesBoolTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Bool.IsFalse(@case.Value);
 
-        Assert.Equal(@case.Expected, result);
+        Assert.Equal(@case.ExpectedReturn, result);
     }
 
     [Theory]
@@ -28,7 +28,7 @@ public sealed class StringRulesBoolTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Bool.IsNullOrTrue(@case.Value);
 
-        Assert.Equal(@case.Expected, result);
+        Assert.Equal(@case.ExpectedReturn, result);
     }
 
     [Theory]
@@ -37,6 +37,6 @@ public sealed class StringRulesBoolTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.Bool.IsNullOrFalse(@case.Value);
 
-        Assert.Equal(@case.Expected, result);
+        Assert.Equal(@case.ExpectedReturn, result);
     }
 }

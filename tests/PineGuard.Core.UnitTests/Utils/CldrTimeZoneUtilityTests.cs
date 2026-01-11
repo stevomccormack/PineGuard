@@ -63,7 +63,7 @@ public sealed class CldrTimeZoneUtilityTests : BaseUnitTest
             return false;
         }
 
-        public IReadOnlyCollection<IanaTimeZone> GetAll() => [new IanaTimeZone("Etc/UTC", ["US"], "+0000+00000", comment: null)];
+        public IReadOnlyCollection<IanaTimeZone> GetAll() => [new("Etc/UTC", ["US"], "+0000+00000", comment: null)];
 
         public bool TryGetTimeZoneIdsByCountryAlpha2Code(string? isoCountryAlpha2Code, out IReadOnlyCollection<string> timeZoneIds)
         {
@@ -210,8 +210,8 @@ public sealed class CldrTimeZoneUtilityTests : BaseUnitTest
     {
         var result = CldrTimeZoneUtility.TryParseWindowsTimeZoneId(testCase.Value, out var windowsId);
 
-        Assert.Equal(testCase.Expected, result);
-        Assert.Equal(testCase.ExpectedWindowsId, windowsId);
+        Assert.Equal(testCase.ExpectedReturn, result);
+        Assert.Equal(testCase.ExpectedOutValue, windowsId);
     }
 
     [Fact]
@@ -234,7 +234,7 @@ public sealed class CldrTimeZoneUtilityTests : BaseUnitTest
         var tz = CldrTimeZoneUtility.ToIanaTimeZone("UTC", territory: null, cldrProvider, ianaProvider);
 
         Assert.NotNull(tz);
-        Assert.Equal("Etc/UTC", tz!.Id);
+        Assert.Equal("Etc/UTC", tz.Id);
     }
 
     [Fact]
@@ -390,7 +390,7 @@ public sealed class CldrTimeZoneUtilityTests : BaseUnitTest
         {
             Assert.True(result);
             Assert.NotNull(tz);
-            Assert.Equal("UTC", tz!.Id);
+            Assert.Equal("UTC", tz.Id);
         }
         else
         {
@@ -499,6 +499,6 @@ public sealed class CldrTimeZoneUtilityTests : BaseUnitTest
 
         Assert.True(result);
         Assert.NotNull(tz);
-        Assert.Equal("UTC", tz!.Id);
+        Assert.Equal("UTC", tz.Id);
     }
 }

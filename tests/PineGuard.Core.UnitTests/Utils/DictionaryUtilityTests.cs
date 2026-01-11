@@ -10,10 +10,10 @@ public sealed class DictionaryUtilityTests : BaseUnitTest
     [MemberData(nameof(DictionaryUtilityTestData.TryGetCount.EdgeCases), MemberType = typeof(DictionaryUtilityTestData.TryGetCount))]
     public void TryGetCount_ReturnsExpected(DictionaryUtilityTestData.TryGetCount.Case testCase)
     {
-        var found = DictionaryUtility.TryGetCount(testCase.Dictionary, out var count);
+        var found = DictionaryUtility.TryGetCount(testCase.Value, out var count);
 
-        Assert.Equal(testCase.ExpectedFound, found);
-        Assert.Equal(testCase.ExpectedCount, count);
+        Assert.Equal(testCase.ExpectedReturn, found);
+        Assert.Equal(testCase.ExpectedOutValue, count);
     }
 
     [Theory]
@@ -21,10 +21,10 @@ public sealed class DictionaryUtilityTests : BaseUnitTest
     [MemberData(nameof(DictionaryUtilityTestData.TryGetValue.EdgeCases), MemberType = typeof(DictionaryUtilityTestData.TryGetValue))]
     public void TryGetValue_ReturnsExpected(DictionaryUtilityTestData.TryGetValue.Case testCase)
     {
-        var found = DictionaryUtility.TryGetValue(testCase.Dictionary, testCase.Key, out var value);
+        var found = DictionaryUtility.TryGetValue(testCase.Value.Dictionary, testCase.Value.Key, out var value);
 
-        Assert.Equal(testCase.ExpectedFound, found);
-        Assert.Equal(testCase.ExpectedValue, value);
+        Assert.Equal(testCase.ExpectedReturn, found);
+        Assert.Equal(testCase.ExpectedOutValue, value);
     }
 
     [Theory]
@@ -32,10 +32,10 @@ public sealed class DictionaryUtilityTests : BaseUnitTest
     [MemberData(nameof(DictionaryUtilityTestData.TryGetKeyValue.EdgeCases), MemberType = typeof(DictionaryUtilityTestData.TryGetKeyValue))]
     public void TryGetKeyValue_ReturnsExpected(DictionaryUtilityTestData.TryGetKeyValue.Case testCase)
     {
-        var found = DictionaryUtility.TryGetKeyValue(testCase.Dictionary, testCase.Key, out var pair);
+        var found = DictionaryUtility.TryGetKeyValue(testCase.Value.Dictionary, testCase.Value.Key, out var pair);
 
-        Assert.Equal(testCase.ExpectedFound, found);
-        Assert.Equal(testCase.ExpectedPair, pair);
+        Assert.Equal(testCase.ExpectedReturn, found);
+        Assert.Equal(testCase.ExpectedOutValue, pair);
     }
 
     [Theory]
@@ -43,10 +43,10 @@ public sealed class DictionaryUtilityTests : BaseUnitTest
     [MemberData(nameof(DictionaryUtilityTestData.TryGetKey.EdgeCases), MemberType = typeof(DictionaryUtilityTestData.TryGetKey))]
     public void TryGetKey_ReturnsExpected(DictionaryUtilityTestData.TryGetKey.Case testCase)
     {
-        var found = DictionaryUtility.TryGetKey(testCase.Dictionary, testCase.Value, out var key);
+        var found = DictionaryUtility.TryGetKey(testCase.Value.Dictionary, testCase.Value.Value, out var key);
 
-        Assert.Equal(testCase.ExpectedFound, found);
-        Assert.Equal(testCase.ExpectedKey, key);
+        Assert.Equal(testCase.ExpectedReturn, found);
+        Assert.Equal(testCase.ExpectedOutValue, key);
     }
 
     [Fact]

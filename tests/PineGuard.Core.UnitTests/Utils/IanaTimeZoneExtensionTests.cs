@@ -24,7 +24,7 @@ public sealed class IanaTimeZoneExtensionTests : BaseUnitTest
         Assert.True(ok);
         Assert.NotNull(tz);
 
-        var windowsId = tz!.ToWindowsTimeZoneId();
+        var windowsId = tz.ToWindowsTimeZoneId();
         Assert.Equal("Eastern Standard Time", windowsId);
     }
 }

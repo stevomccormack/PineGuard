@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Rules;
 using PineGuard.Testing.UnitTests;
 
@@ -10,9 +9,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsPositiveInt.ValidCases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
     public void IsPositive_ReturnsTrue_ForPositive(NumberRulesTestData.IsPositiveInt.Case testCase)
     {
-        var result = NumberRules.IsPositive<int>(testCase.Value);
+        var result = NumberRules.IsPositive(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -20,9 +19,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsPositiveInt.EdgeCases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
     public void IsPositive_ReturnsFalse_ForNullOrNonPositive(NumberRulesTestData.IsPositiveInt.Case testCase)
     {
-        var result = NumberRules.IsPositive<int>(testCase.Value);
+        var result = NumberRules.IsPositive(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -30,9 +29,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsNegativeInt.ValidCases), MemberType = typeof(NumberRulesTestData.IsNegativeInt))]
     public void IsNegative_ReturnsTrue_ForNegative(NumberRulesTestData.IsNegativeInt.Case testCase)
     {
-        var result = NumberRules.IsNegative<int>(testCase.Value);
+        var result = NumberRules.IsNegative(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -40,9 +39,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsNegativeInt.EdgeCases), MemberType = typeof(NumberRulesTestData.IsNegativeInt))]
     public void IsNegative_ReturnsFalse_ForNullOrNonNegative(NumberRulesTestData.IsNegativeInt.Case testCase)
     {
-        var result = NumberRules.IsNegative<int>(testCase.Value);
+        var result = NumberRules.IsNegative(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -50,9 +49,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsZeroInt.ValidCases), MemberType = typeof(NumberRulesTestData.IsZeroInt))]
     public void IsZero_ReturnsTrue_ForZero(NumberRulesTestData.IsZeroInt.Case testCase)
     {
-        var result = NumberRules.IsZero<int>(testCase.Value);
+        var result = NumberRules.IsZero(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -60,9 +59,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsZeroInt.EdgeCases), MemberType = typeof(NumberRulesTestData.IsZeroInt))]
     public void IsZero_ReturnsFalse_ForNullOrNonZero(NumberRulesTestData.IsZeroInt.Case testCase)
     {
-        var result = NumberRules.IsZero<int>(testCase.Value);
+        var result = NumberRules.IsZero(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -70,9 +69,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsNotZeroInt.ValidCases), MemberType = typeof(NumberRulesTestData.IsNotZeroInt))]
     public void IsNotZero_ReturnsTrue_ForNonZero(NumberRulesTestData.IsNotZeroInt.Case testCase)
     {
-        var result = NumberRules.IsNotZero<int>(testCase.Value);
+        var result = NumberRules.IsNotZero(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -80,9 +79,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsNotZeroInt.EdgeCases), MemberType = typeof(NumberRulesTestData.IsNotZeroInt))]
     public void IsNotZero_ReturnsFalse_ForNullOrZero(NumberRulesTestData.IsNotZeroInt.Case testCase)
     {
-        var result = NumberRules.IsNotZero<int>(testCase.Value);
+        var result = NumberRules.IsNotZero(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -90,9 +89,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsZeroOrPositiveInt.ValidCases), MemberType = typeof(NumberRulesTestData.IsZeroOrPositiveInt))]
     public void IsZeroOrPositive_ReturnsTrue_ForZeroOrPositive(NumberRulesTestData.IsZeroOrPositiveInt.Case testCase)
     {
-        var result = NumberRules.IsZeroOrPositive<int>(testCase.Value);
+        var result = NumberRules.IsZeroOrPositive(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -100,9 +99,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsZeroOrPositiveInt.EdgeCases), MemberType = typeof(NumberRulesTestData.IsZeroOrPositiveInt))]
     public void IsZeroOrPositive_ReturnsFalse_ForNullOrNegative(NumberRulesTestData.IsZeroOrPositiveInt.Case testCase)
     {
-        var result = NumberRules.IsZeroOrPositive<int>(testCase.Value);
+        var result = NumberRules.IsZeroOrPositive(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -110,9 +109,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsZeroOrNegativeInt.ValidCases), MemberType = typeof(NumberRulesTestData.IsZeroOrNegativeInt))]
     public void IsZeroOrNegative_ReturnsTrue_ForZeroOrNegative(NumberRulesTestData.IsZeroOrNegativeInt.Case testCase)
     {
-        var result = NumberRules.IsZeroOrNegative<int>(testCase.Value);
+        var result = NumberRules.IsZeroOrNegative(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -120,9 +119,9 @@ public sealed class NumberRulesTests : BaseUnitTest
     [MemberData(nameof(NumberRulesTestData.IsZeroOrNegativeInt.EdgeCases), MemberType = typeof(NumberRulesTestData.IsZeroOrNegativeInt))]
     public void IsZeroOrNegative_ReturnsFalse_ForNullOrPositive(NumberRulesTestData.IsZeroOrNegativeInt.Case testCase)
     {
-        var result = NumberRules.IsZeroOrNegative<int>(testCase.Value);
+        var result = NumberRules.IsZeroOrNegative(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -133,7 +132,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsGreaterThan(testCase.Value, testCase.Min);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -143,7 +142,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsGreaterThanOrEqual(testCase.Value, testCase.Min);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -153,7 +152,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsLessThan(testCase.Value, testCase.Max);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -163,7 +162,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsLessThanOrEqual(testCase.Value, testCase.Max);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -173,7 +172,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsInRange(testCase.Value, testCase.Min, testCase.Max, testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -183,7 +182,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsApproximately(testCase.Value, testCase.Target, testCase.Tolerance);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -193,7 +192,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsMultipleOf(testCase.Value, testCase.Factor);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -203,7 +202,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsEven(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -213,7 +212,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsEven(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -223,7 +222,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsOdd(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -233,7 +232,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsOdd(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -243,7 +242,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsFinite(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -253,7 +252,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsFinite(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -263,7 +262,7 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsNaN(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -273,6 +272,6 @@ public sealed class NumberRulesTests : BaseUnitTest
     {
         var result = NumberRules.IsNaN(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

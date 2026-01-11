@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Rules.Iso;
 using PineGuard.Testing.UnitTests;
 
@@ -12,7 +11,7 @@ public sealed class IsoDateRulesTests : BaseUnitTest
     {
         var result = IsoDateRules.IsIsoDateOnly(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -22,7 +21,7 @@ public sealed class IsoDateRulesTests : BaseUnitTest
     {
         var result = IsoDateRules.IsIsoDateOnly(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -32,7 +31,7 @@ public sealed class IsoDateRulesTests : BaseUnitTest
     {
         var result = IsoDateRules.IsIsoDateTime(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -42,7 +41,7 @@ public sealed class IsoDateRulesTests : BaseUnitTest
     {
         var result = IsoDateRules.IsIsoDateTime(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -52,7 +51,7 @@ public sealed class IsoDateRulesTests : BaseUnitTest
     {
         var result = IsoDateRules.IsIsoDateTimeOffset(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -62,7 +61,7 @@ public sealed class IsoDateRulesTests : BaseUnitTest
     {
         var result = IsoDateRules.IsIsoDateTimeOffset(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -72,6 +71,6 @@ public sealed class IsoDateRulesTests : BaseUnitTest
     {
         var result = PineGuard.Rules.StringRules.DateOnly.IsBetween(testCase.Value, testCase.Min, testCase.Max, testCase.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

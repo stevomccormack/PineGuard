@@ -1,4 +1,3 @@
-using PineGuard.Externals.Iso.Countries;
 using PineGuard.Rules.Iso;
 using PineGuard.Testing.UnitTests;
 
@@ -12,7 +11,7 @@ public sealed class IsoCountryRulesTests : BaseUnitTest
     {
         var result = IsoCountryRules.IsIsoAlpha2Code(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -22,7 +21,7 @@ public sealed class IsoCountryRulesTests : BaseUnitTest
     {
         var result = IsoCountryRules.IsIsoAlpha2Code(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -32,7 +31,7 @@ public sealed class IsoCountryRulesTests : BaseUnitTest
     {
         var result = IsoCountryRules.IsIsoAlpha3Code(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -42,7 +41,7 @@ public sealed class IsoCountryRulesTests : BaseUnitTest
     {
         var result = IsoCountryRules.IsIsoAlpha3Code(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -52,7 +51,7 @@ public sealed class IsoCountryRulesTests : BaseUnitTest
     {
         var result = IsoCountryRules.IsIsoNumericCode(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -62,7 +61,7 @@ public sealed class IsoCountryRulesTests : BaseUnitTest
     {
         var result = IsoCountryRules.IsIsoNumericCode(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -72,6 +71,6 @@ public sealed class IsoCountryRulesTests : BaseUnitTest
     {
         var result = IsoCountryRules.IsIsoAlpha2Code(testCase.Value, testCase.Provider);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

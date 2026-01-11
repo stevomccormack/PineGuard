@@ -11,7 +11,7 @@ public sealed class IsoPaymentCardRulesTests : BaseUnitTest
     {
         var result = IsoPaymentCardRules.IsIsoPaymentCard(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -21,7 +21,7 @@ public sealed class IsoPaymentCardRulesTests : BaseUnitTest
     {
         var result = IsoPaymentCardRules.IsIsoPaymentCard(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -31,7 +31,7 @@ public sealed class IsoPaymentCardRulesTests : BaseUnitTest
     {
         var result = IsoPaymentCardRules.IsIsoPaymentCard(testCase.Value, allowedSeparators: []);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -41,7 +41,7 @@ public sealed class IsoPaymentCardRulesTests : BaseUnitTest
     {
         var result = IsoPaymentCardRules.IsIsoPaymentCard(testCase.Value, allowedSeparators: []);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -51,7 +51,7 @@ public sealed class IsoPaymentCardRulesTests : BaseUnitTest
     {
         var result = IsoPaymentCardRules.IsIsoPaymentCard(testCase.Value, testCase.AllowedSeparators);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Fact]

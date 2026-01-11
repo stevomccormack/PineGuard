@@ -11,10 +11,10 @@ public sealed class BufferUtilityTests : BaseUnitTest
     public void IsHexString_ReturnsExpected(BufferUtilityTestData.IsHexString.Case testCase)
     {
         // Act
-        var result = BufferUtility.IsHexString(testCase.Input);
+        var result = BufferUtility.IsHexString(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -23,9 +23,9 @@ public sealed class BufferUtilityTests : BaseUnitTest
     public void IsBase64String_ReturnsExpected(BufferUtilityTestData.IsBase64String.Case testCase)
     {
         // Act
-        var result = BufferUtility.IsBase64String(testCase.Input);
+        var result = BufferUtility.IsBase64String(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

@@ -13,8 +13,8 @@ public sealed class CultureInfoUtilityTests : BaseUnitTest
     {
         var result = CultureInfoUtility.TryGetCultureName(testCase.IsoLanguageAlpha2Code, out var cultureName);
 
-        Assert.Equal(testCase.Expected, result);
-        Assert.Equal(testCase.ExpectedCultureName, cultureName);
+        Assert.Equal(testCase.ExpectedReturn, result);
+        Assert.Equal(testCase.ExpectedOutValue, cultureName);
     }
 
     [Theory]
@@ -24,12 +24,12 @@ public sealed class CultureInfoUtilityTests : BaseUnitTest
     {
         var result = CultureInfoUtility.TryGetCultureInfo(testCase.IsoLanguageAlpha2Code, out var cultureInfo);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
 
-        if (testCase.Expected)
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(cultureInfo);
-            Assert.Equal(testCase.ExpectedCultureName, cultureInfo!.Name);
+            Assert.Equal(testCase.ExpectedOutValue, cultureInfo.Name);
         }
         else
         {
@@ -44,8 +44,8 @@ public sealed class CultureInfoUtilityTests : BaseUnitTest
     {
         var result = CultureInfoUtility.TryGetCultureName(testCase.IsoLanguageAlpha2Code, testCase.RegionCode, out var cultureName);
 
-        Assert.Equal(testCase.Expected, result);
-        Assert.Equal(testCase.ExpectedCultureName, cultureName);
+        Assert.Equal(testCase.ExpectedReturn, result);
+        Assert.Equal(testCase.ExpectedOutValue, cultureName);
     }
 
     [Theory]
@@ -55,8 +55,8 @@ public sealed class CultureInfoUtilityTests : BaseUnitTest
     {
         var result = CultureInfoUtility.TryGetCultureNameWithDefaultRegion(testCase.IsoLanguageAlpha2Code, out var cultureName);
 
-        Assert.Equal(testCase.Expected, result);
-        Assert.Equal(testCase.ExpectedCultureName, cultureName);
+        Assert.Equal(testCase.ExpectedReturn, result);
+        Assert.Equal(testCase.ExpectedOutValue, cultureName);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public sealed class CultureInfoUtilityTests : BaseUnitTest
 
         Assert.True(result);
         Assert.NotNull(cultureInfo);
-        Assert.Equal("en-US", cultureInfo!.Name);
+        Assert.Equal("en-US", cultureInfo.Name);
     }
 
     [Fact]

@@ -1,5 +1,4 @@
 using PineGuard.Externals.Iso.Countries;
-using PineGuard.Iso.Countries;
 using PineGuard.Testing.UnitTests;
 using System.Collections.Frozen;
 
@@ -19,7 +18,7 @@ public sealed class DefaultIsoCountryProviderTests : BaseUnitTest
         var result = provider.ContainsAlpha2Code(testCase.Value);
 
         // Assert
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(provider.GetAll().Count > 0);
     }
 
@@ -32,7 +31,7 @@ public sealed class DefaultIsoCountryProviderTests : BaseUnitTest
 
         var result = provider.ContainsAlpha3Code(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -44,7 +43,7 @@ public sealed class DefaultIsoCountryProviderTests : BaseUnitTest
 
         var result = provider.ContainsNumericCode(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -56,9 +55,9 @@ public sealed class DefaultIsoCountryProviderTests : BaseUnitTest
         var provider = DefaultIsoCountryProvider.Instance;
 
         // Act
-        var ok2 = provider.TryGetByAlpha2Code(testCase.Alpha2, out var by2);
-        var ok3 = provider.TryGetByAlpha3Code(testCase.Alpha3, out var by3);
-        var okN = provider.TryGetByNumericCode(testCase.Numeric, out var byN);
+        var ok2 = provider.TryGetByAlpha2Code(testCase.Value.Alpha2, out var by2);
+        var ok3 = provider.TryGetByAlpha3Code(testCase.Value.Alpha3, out var by3);
+        var okN = provider.TryGetByNumericCode(testCase.Value.Numeric, out var byN);
 
         // Assert
         Assert.True(ok2);
@@ -84,8 +83,8 @@ public sealed class DefaultIsoCountryProviderTests : BaseUnitTest
         var ok = provider.TryGetByAlpha2Code(testCase.Value, out var country);
 
         // Assert
-        Assert.Equal(testCase.Expected, ok);
-        Assert.Null(country);
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        Assert.Equal(testCase.ExpectedOutValue, country);
     }
 
     [Theory]
@@ -96,8 +95,8 @@ public sealed class DefaultIsoCountryProviderTests : BaseUnitTest
 
         var ok = provider.TryGetByAlpha3Code(testCase.Value, out var country);
 
-        Assert.Equal(testCase.Expected, ok);
-        Assert.Null(country);
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        Assert.Equal(testCase.ExpectedOutValue, country);
     }
 
     [Theory]
@@ -108,8 +107,8 @@ public sealed class DefaultIsoCountryProviderTests : BaseUnitTest
 
         var ok = provider.TryGetByNumericCode(testCase.Value, out var country);
 
-        Assert.Equal(testCase.Expected, ok);
-        Assert.Null(country);
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        Assert.Equal(testCase.ExpectedOutValue, country);
     }
 
     [Theory]
@@ -121,15 +120,17 @@ public sealed class DefaultIsoCountryProviderTests : BaseUnitTest
 
         var ok = provider.TryGet(testCase.Value, out var country);
 
-        Assert.Equal(testCase.Expected, ok);
-        if (testCase.Expected)
+        Assert.Equal(testCase.ExpectedReturn, ok);
+        if (testCase.ExpectedReturn)
         {
             Assert.NotNull(country);
-            Assert.Equal(testCase.ExpectedAlpha2, country.Alpha2Code);
+            Assert.NotNull(testCase.ExpectedOutValue);
+            Assert.Equal(testCase.ExpectedOutValue.Alpha2Code, country.Alpha2Code);
         }
         else
         {
             Assert.Null(country);
+            Assert.Null(testCase.ExpectedOutValue);
         }
     }
 

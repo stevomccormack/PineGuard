@@ -1,4 +1,5 @@
-using PineGuard.Testing;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Externals.Iso.Dates;
 
@@ -6,125 +7,90 @@ public static class IsoDateOnlyTestData
 {
     public static class TryParse
     {
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            V("2020-01-02", value: "2020-01-02", expectedResult: new DateOnly(2020, 01, 02)),
-            V("1999-12-31", value: "1999-12-31", expectedResult: new DateOnly(1999, 12, 31)),
-            V("2000-02-29", value: "2000-02-29", expectedResult: new DateOnly(2000, 02, 29)),
-            V("2024-02-29", value: "2024-02-29", expectedResult: new DateOnly(2024, 02, 29)),
-            V("Min", value: "0001-01-01", expectedResult: DateOnly.MinValue),
-            V("Max", value: "9999-12-31", expectedResult: DateOnly.MaxValue),
-        };
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("2020-01-02", "2020-01-02", true, new DateOnly(2020, 01, 02)),
+            new("1999-12-31", "1999-12-31", true, new DateOnly(1999, 12, 31)),
+            new("2000-02-29", "2000-02-29", true, new DateOnly(2000, 02, 29)),
+            new("2024-02-29", "2024-02-29", true, new DateOnly(2024, 02, 29)),
+            new("Min", "0001-01-01", true, DateOnly.MinValue),
+            new("Max", "9999-12-31", true, DateOnly.MaxValue)
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            E("Null", value: null),
-            E("Empty", value: string.Empty),
-            E("Space", value: " "),
-            E("Tab", value: "\t"),
-            E("Newline", value: "\r\n"),
-            E("Slash separators", value: "2020/01/02"),
-            E("Non-padded", value: "2020-1-2"),
-            E("Short year", value: "20-01-02"),
-            E("Month 13", value: "2020-13-01"),
-            E("Month 0", value: "2020-00-01"),
-            E("Day 0", value: "2020-01-00"),
-            E("Day 32", value: "2020-01-32"),
-            E("Non-leap Feb 29", value: "2021-02-29"),
-            E("Non-date", value: "abcd-ef-gh"),
-            E("DateTime", value: "2020-01-02T00:00:00"),
-            E("Date with Z", value: "2020-01-02Z"),
-        };
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("Null", null, false, default),
+            new("Empty", string.Empty, false, default),
+            new("Space", " ", false, default),
+            new("Tab", "\t", false, default),
+            new("Newline", "\r\n", false, default),
+            new("Slash separators", "2020/01/02", false, default),
+            new("Non-padded", "2020-1-2", false, default),
+            new("Short year", "20-01-02", false, default),
+            new("Month 13", "2020-13-01", false, default),
+            new("Month 0", "2020-00-01", false, default),
+            new("Day 0", "2020-01-00", false, default),
+            new("Day 32", "2020-01-32", false, default),
+            new("Non-leap Feb 29", "2021-02-29", false, default),
+            new("Non-date", "abcd-ef-gh", false, default),
+            new("DateTime", "2020-01-02T00:00:00", false, default),
+            new("Date with Z", "2020-01-02Z", false, default)
+        ];
 
-        private static ValidCase V(string name, string value, DateOnly expectedResult) => new(name, value, Expected: true, expectedResult);
-
-        private static ValidCase E(string name, string? value) => new(name, value, Expected: false, ExpectedResult: default);
-
-        #region Cases
-
-        public abstract record Case(string Name);
-
-        public sealed record ValidCase(string Name, string? Value, bool Expected, DateOnly ExpectedResult) : Case(Name);
-
-        #endregion
+        public sealed record ValidCase(string Name, string? Value, bool ExpectedReturn, DateOnly ExpectedOutValue)
+            : TryCase<string?, DateOnly>(Name, Value, ExpectedReturn, ExpectedOutValue);
     }
 
     public static class Parse
     {
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            V("2020-01-02", value: "2020-01-02", expectedResult: new DateOnly(2020, 01, 02)),
-            V("1999-12-31", value: "1999-12-31", expectedResult: new DateOnly(1999, 12, 31)),
-            V("2000-02-29", value: "2000-02-29", expectedResult: new DateOnly(2000, 02, 29)),
-            V("2024-02-29", value: "2024-02-29", expectedResult: new DateOnly(2024, 02, 29)),
-            V("Min", value: "0001-01-01", expectedResult: DateOnly.MinValue),
-            V("Max", value: "9999-12-31", expectedResult: DateOnly.MaxValue),
-        };
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("2020-01-02", "2020-01-02", new DateOnly(2020, 01, 02)),
+            new("1999-12-31", "1999-12-31", new DateOnly(1999, 12, 31)),
+            new("2000-02-29", "2000-02-29", new DateOnly(2000, 02, 29)),
+            new("2024-02-29", "2024-02-29", new DateOnly(2024, 02, 29)),
+            new("Min", "0001-01-01", DateOnly.MinValue),
+            new("Max", "9999-12-31", DateOnly.MaxValue)
+        ];
 
-        public static TheoryData<InvalidCase> InvalidCases => new()
-        {
-            I("Null", value: null, expectedExceptionType: typeof(ArgumentNullException), expectedParamName: "s"),
-            I("Empty", value: string.Empty),
-            I("Space", value: " "),
-            I("Tab", value: "\t"),
-            I("Newline", value: "\r\n"),
-            I("Slash separators", value: "2020/01/02"),
-            I("Non-padded", value: "2020-1-2"),
-            I("Short year", value: "20-01-02"),
-            I("Month 13", value: "2020-13-01"),
-            I("Month 0", value: "2020-00-01"),
-            I("Day 0", value: "2020-01-00"),
-            I("Day 32", value: "2020-01-32"),
-            I("Non-leap Feb 29", value: "2021-02-29"),
-            I("Non-date", value: "abcd-ef-gh"),
-            I("DateTime", value: "2020-01-02T00:00:00"),
-            I("Date with Z", value: "2020-01-02Z"),
-        };
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new("Null", null, new ExpectedException(typeof(ArgumentNullException), "s")),
+            new("Empty", string.Empty, new ExpectedException(typeof(FormatException), null, "date")),
+            new("Space", " ", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Tab", "\t", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Newline", "\r\n", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Slash separators", "2020/01/02", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Non-padded", "2020-1-2", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Short year", "20-01-02", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Month 13", "2020-13-01", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Month 0", "2020-00-01", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Day 0", "2020-01-00", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Day 32", "2020-01-32", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Non-leap Feb 29", "2021-02-29", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Non-date", "abcd-ef-gh", new ExpectedException(typeof(FormatException), null, "date")),
+            new("DateTime", "2020-01-02T00:00:00", new ExpectedException(typeof(FormatException), null, "date")),
+            new("Date with Z", "2020-01-02Z", new ExpectedException(typeof(FormatException), null, "date"))
+        ];
 
-        private static ValidCase V(string name, string value, DateOnly expectedResult) => new(name, value, expectedResult);
+        public sealed record ValidCase(string Name, string Value, DateOnly ExpectedReturn)
+            : ReturnCase<string, DateOnly>(Name, Value, ExpectedReturn);
 
-        private static InvalidCase I(
-            string name,
-            string? value,
-            Type? expectedExceptionType = null,
-            string? expectedParamName = null)
-            => new(
-                name,
-                value,
-                ExpectedException: new ExpectedException(
-                    expectedExceptionType ?? typeof(FormatException),
-                    ParamName: expectedParamName,
-                    MessageContains: expectedExceptionType is null ? "date" : null));
-
-        #region Cases
-
-        public abstract record Case(string Name);
-
-        public sealed record ValidCase(string Name, string Value, DateOnly ExpectedResult) : Case(Name);
-
-        public sealed record InvalidCase(string Name, string? Value, ExpectedException ExpectedException) : Case(Name);
-
-        #endregion
+        public sealed record InvalidCase(string Name, string? Value, ExpectedException ExpectedException)
+            : ThrowsCase<string?>(Name, Value, ExpectedException);
     }
 
     public static class ToIsoString
     {
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            V("Min", value: DateOnly.MinValue, expected: "0001-01-01"),
-            V("Max", value: DateOnly.MaxValue, expected: "9999-12-31"),
-            V("2020-01-02", value: new DateOnly(2020, 01, 02), expected: "2020-01-02"),
-            V("2024-02-29", value: new DateOnly(2024, 02, 29), expected: "2024-02-29"),
-        };
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("Min", DateOnly.MinValue, "0001-01-01"),
+            new("Max", DateOnly.MaxValue, "9999-12-31"),
+            new("2020-01-02", new DateOnly(2020, 01, 02), "2020-01-02"),
+            new("2024-02-29", new DateOnly(2024, 02, 29), "2024-02-29")
+        ];
 
-        private static ValidCase V(string name, DateOnly value, string expected) => new(name, value, expected);
-
-        #region Cases
-
-        public abstract record Case(string Name);
-
-        public sealed record ValidCase(string Name, DateOnly Value, string Expected) : Case(Name);
-
-        #endregion
+        public sealed record ValidCase(string Name, DateOnly Value, string ExpectedReturn)
+            : ReturnCase<DateOnly, string>(Name, Value, ExpectedReturn);
     }
 }

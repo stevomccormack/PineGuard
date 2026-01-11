@@ -1,4 +1,4 @@
-using Xunit;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules;
 
@@ -6,73 +6,67 @@ public static class EmailRulesTestData
 {
     public static class IsEmail
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "user@example.com => true", Value: "user@example.com", Expected: true) },
-            { new Case(Name: "display name form => true", Value: "User <user@example.com>", Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("user@example.com => true", "user@example.com", true),
+            new("display name form => true", "User <user@example.com>", true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "not-an-email => false", Value: "not-an-email", Expected: false) },
-            { new Case(Name: "null => false", Value: null, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("not-an-email => false", "not-an-email", false),
+            new("null => false", null, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : IsCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class IsStrictEmail
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "user@example.com => true", Value: "user@example.com", Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("user@example.com => true", "user@example.com", true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "display name form => false", Value: "User <user@example.com>", Expected: false) },
-            { new Case(Name: "space in local => false", Value: "user example@example.com", Expected: false) },
-            { new Case(Name: "user@localhost => false", Value: "user@localhost", Expected: false) },
-            { new Case(Name: "null => false", Value: null, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("display name form => false", "User <user@example.com>", false),
+            new("space in local => false", "user example@example.com", false),
+            new("user@localhost => false", "user@localhost", false),
+            new("null => false", null, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : IsCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion
     }
 
     public static class HasAlias
     {
-        public static TheoryData<Case> ValidCases => new()
-        {
-            { new Case(Name: "user+alias@example.com => true", Value: "user+alias@example.com", Expected: true) },
-        };
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("user+alias@example.com => true", "user+alias@example.com", true),
+        ];
 
-        public static TheoryData<Case> EdgeCases => new()
-        {
-            { new Case(Name: "user@example.com => false", Value: "user@example.com", Expected: false) },
-            { new Case(Name: "display name form => false", Value: "User <user+alias@example.com>", Expected: false) },
-            { new Case(Name: "null => false", Value: null, Expected: false) },
-        };
+        public static TheoryData<Case> EdgeCases =>
+        [
+            new("user@example.com => false", "user@example.com", false),
+            new("display name form => false", "User <user+alias@example.com>", false),
+            new("null => false", null, false),
+        ];
 
-        #region Cases
+        #region Case Records
 
-        public sealed record Case(string Name, string? Value, bool Expected)
-        {
-            public override string ToString() => Name;
-        }
+        public sealed record Case(string Name, string? Value, bool ExpectedReturn)
+            : IsCase<string?>(Name, Value, ExpectedReturn);
 
         #endregion
     }

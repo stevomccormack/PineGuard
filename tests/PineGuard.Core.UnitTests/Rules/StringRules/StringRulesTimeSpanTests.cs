@@ -1,4 +1,3 @@
-using PineGuard.Common;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Rules.StringRules;
@@ -11,12 +10,12 @@ public sealed class StringRulesTimeSpanTests : BaseUnitTest
     public void IsDurationBetween_ReturnsExpected(StringRulesTimeSpanTestData.IsDurationBetween.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.TimeSpan.IsDurationBetween(
-            testCase.Value,
-            testCase.Min,
-            testCase.Max,
-            testCase.Inclusion);
+            testCase.Value.Text,
+            testCase.Value.Min,
+            testCase.Value.Max,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -25,11 +24,11 @@ public sealed class StringRulesTimeSpanTests : BaseUnitTest
     public void IsGreaterThan_ReturnsExpected(StringRulesTimeSpanTestData.IsGreaterThan.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.TimeSpan.IsGreaterThan(
-            testCase.Value,
-            testCase.Threshold,
-            testCase.Inclusion);
+            testCase.Value.Text,
+            testCase.Value.Threshold,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 
     [Theory]
@@ -38,10 +37,10 @@ public sealed class StringRulesTimeSpanTests : BaseUnitTest
     public void IsLessThan_ReturnsExpected(StringRulesTimeSpanTestData.IsLessThan.Case testCase)
     {
         var result = PineGuard.Rules.StringRules.TimeSpan.IsLessThan(
-            testCase.Value,
-            testCase.Threshold,
-            testCase.Inclusion);
+            testCase.Value.Text,
+            testCase.Value.Threshold,
+            testCase.Value.Inclusion);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

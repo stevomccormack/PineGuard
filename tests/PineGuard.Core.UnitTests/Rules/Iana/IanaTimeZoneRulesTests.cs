@@ -12,6 +12,6 @@ public sealed class IanaTimeZoneRulesTests : BaseUnitTest
     {
         var result = IanaTimeZoneRules.IsIanaTimeZoneId(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }

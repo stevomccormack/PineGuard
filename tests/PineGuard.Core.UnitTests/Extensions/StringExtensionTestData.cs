@@ -1,4 +1,4 @@
-using PineGuard.Testing;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Extensions;
 
@@ -6,42 +6,35 @@ public static class StringExtensionTestData
 {
     public static class TitleCase
     {
-        private static ValidCase V(string name, string value, bool expected, string expectedTitle) => new(Name: name, Value: value, Expected: expected, ExpectedTitle: expectedTitle);
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("simple", "hello", true, "Hello"),
+            new("two words", "hello world", true, "Hello World"),
+            new("all caps", "HELLO WORLD", true, "Hello World"),
+            new("trim", "  hello world  ", true, "Hello World"),
+            new("mixed", "mIXeD caSe", true, "Mixed Case"),
+            new("single char", "a", true, "A"),
+            new("xUnit", "xUnit", true, "Xunit"),
+        ];
 
-        public static TheoryData<ValidCase> ValidCases => new()
-        {
-            { V("simple", "hello", expected: true, expectedTitle: "Hello") },
-            { V("two words", "hello world", expected: true, expectedTitle: "Hello World") },
-            { V("all caps", "HELLO WORLD", expected: true, expectedTitle: "Hello World") },
-            { V("trim", "  hello world  ", expected: true, expectedTitle: "Hello World") },
-            { V("mixed", "mIXeD caSe", expected: true, expectedTitle: "Mixed Case") },
-            { V("single char", "a", expected: true, expectedTitle: "A") },
-            { V("xUnit", "xUnit", expected: true, expectedTitle: "Xunit") },
-        };
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("already title", "already Title Case", true, "Already Title Case"),
+            new("multiple spaces", "two   spaces", true, "Two   Spaces"),
+            new("leading digits", "123 abc", true, "123 Abc"),
+            new("empty", "", false, string.Empty),
+            new("space", " ", false, string.Empty),
+            new("tab", "\t", false, string.Empty),
+            new("newline", "\r\n", false, string.Empty),
+            new("mixed whitespace", "   \t  ", false, string.Empty),
+            new("nbsp", "\u00A0", false, string.Empty),
+            new("figure space", "\u2007\u2007", false, string.Empty),
+        ];
 
-        public static TheoryData<ValidCase> EdgeCases => new()
-        {
-            { V("already title", "already Title Case", expected: true, expectedTitle: "Already Title Case") },
-            { V("multiple spaces", "two   spaces", expected: true, expectedTitle: "Two   Spaces") },
-            { V("leading digits", "123 abc", expected: true, expectedTitle: "123 Abc") },
-            { V("empty", "", expected: false, expectedTitle: string.Empty) },
-            { V("space", " ", expected: false, expectedTitle: string.Empty) },
-            { V("tab", "\t", expected: false, expectedTitle: string.Empty) },
-            { V("newline", "\r\n", expected: false, expectedTitle: string.Empty) },
-            { V("mixed whitespace", "   \t  ", expected: false, expectedTitle: string.Empty) },
-            { V("nbsp", "\u00A0", expected: false, expectedTitle: string.Empty) },
-            { V("figure space", "\u2007\u2007", expected: false, expectedTitle: string.Empty) },
-        };
+        #region Case Records
 
-        #region Cases
-
-        public record Case(string Name, string Value);
-
-        public sealed record ValidCase(string Name, string Value, bool Expected, string ExpectedTitle)
-            : Case(Name, Value);
-
-        public record InvalidCase(string Name, string Value, ExpectedException ExpectedException)
-            : Case(Name, Value);
+        public sealed record ValidCase(string Name, string Value, bool ExpectedReturn, string ExpectedOutValue)
+            : TryCase<string, string>(Name, Value, ExpectedReturn, ExpectedOutValue);
 
         #endregion
     }

@@ -1,4 +1,3 @@
-using PineGuard.Externals.Iso.Currencies;
 using PineGuard.Rules.Iso;
 using PineGuard.Testing.UnitTests;
 
@@ -12,7 +11,7 @@ public sealed class IsoCurrencyRulesTests : BaseUnitTest
     {
         var result = IsoCurrencyRules.IsIsoAlpha3Code(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -22,7 +21,7 @@ public sealed class IsoCurrencyRulesTests : BaseUnitTest
     {
         var result = IsoCurrencyRules.IsIsoAlpha3Code(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -32,7 +31,7 @@ public sealed class IsoCurrencyRulesTests : BaseUnitTest
     {
         var result = IsoCurrencyRules.IsIsoNumericCode(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.True(result);
     }
 
@@ -42,7 +41,7 @@ public sealed class IsoCurrencyRulesTests : BaseUnitTest
     {
         var result = IsoCurrencyRules.IsIsoNumericCode(testCase.Value);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
         Assert.False(result);
     }
 
@@ -52,6 +51,6 @@ public sealed class IsoCurrencyRulesTests : BaseUnitTest
     {
         var result = IsoCurrencyRules.IsIsoAlpha3Code(testCase.Value, testCase.Provider);
 
-        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedReturn, result);
     }
 }
