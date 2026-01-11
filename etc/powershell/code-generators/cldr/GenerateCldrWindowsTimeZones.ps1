@@ -1,9 +1,9 @@
 # =================================================================================================
-# GenerateIanaTimeZones.ps1
+# GenerateCldrWindowsTimeZones.ps1
 # Run the script from the repository root.
 # Before running this script, ensure:
-#   - etc/powershell/iana/iana-tz-zone-info/zone1970.tab is up-to-date.
-#   - etc/powershell/iana/iana-tz-zone-info/DefaultIanaTimeZoneData.template.cs is up-to-date.
+#   - etc/powershell/code-generators/cldr/cldr-windows-zones/windowsZones.xml is up-to-date.
+#   - etc/powershell/code-generators/cldr/cldr-windows-zones/DefaultCldrWindowsTimeZoneData.template.cs is up-to-date.
 # =================================================================================================
 
 [CmdletBinding()]
@@ -14,30 +14,30 @@ param(
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
 $ErrorActionPreference = "Stop"
 
-$ianaRoot = $PSScriptRoot
-$repoRoot = (Resolve-Path (Join-Path $ianaRoot "..\..\..")).Path
-$ianaTzZoneInfoDir = Join-Path $ianaRoot "iana-tz-zone-info"
+$cldrRoot = $PSScriptRoot
+$repoRoot = (Resolve-Path (Join-Path $cldrRoot "..\..\..\..")).Path
+$windowsZonesDir = Join-Path $cldrRoot "cldr-windows-zones"
 
-$zone1970Path = Join-Path $ianaTzZoneInfoDir "zone1970.tab"
-$templatePath = Join-Path $ianaTzZoneInfoDir "DefaultIanaTimeZoneData.template.cs"
-$generatorPath = Join-Path $ianaTzZoneInfoDir "DefaultIanaTimeZoneDataGenerator.ps1"
+$windowsZonesXmlPath = Join-Path $windowsZonesDir "windowsZones.xml"
+$templatePath = Join-Path $windowsZonesDir "DefaultCldrWindowsTimeZoneData.template.cs"
+$generatorPath = Join-Path $windowsZonesDir "DefaultCldrWindowsTimeZoneDataGenerator.ps1"
 
-$generatedDir = Join-Path $repoRoot "etc\generated"
-$outputPath = Join-Path $generatedDir "DefaultIanaTimeZoneData.cs"
+$generatedDir = Join-Path $repoRoot "etc\artifacts\code-generators\cldr"
+$outputPath = Join-Path $generatedDir "DefaultCldrWindowsTimeZoneData.cs"
 
-$targetDir = Join-Path $repoRoot "src\PineGuard.Core\Externals\Iana\TimeZones"
-$targetPath = Join-Path $targetDir "DefaultIanaTimeZoneData.cs"
+$targetDir = Join-Path $repoRoot "src\PineGuard.Core\Externals\Cldr\TimeZones"
+$targetPath = Join-Path $targetDir "DefaultCldrWindowsTimeZoneData.cs"
 
 Write-Host "" 
 Write-Host "===============================================================" -ForegroundColor Cyan
-Write-Host "  IANA tzdb Time Zone Data Generator" -ForegroundColor Cyan
+Write-Host "  CLDR Windows Time Zone Mapping Generator" -ForegroundColor Cyan
 Write-Host "===============================================================" -ForegroundColor Cyan
 Write-Host "" 
 
 Write-Host "Validating input files..." -ForegroundColor Yellow
 
 $requiredFiles = @(
-    @{ Path = $zone1970Path; Name = "zone1970.tab" }
+    @{ Path = $windowsZonesXmlPath; Name = "windowsZones.xml" }
     @{ Path = $templatePath; Name = "Template file" }
     @{ Path = $generatorPath; Name = "Generator script" }
 )
@@ -55,19 +55,20 @@ if (-not (Test-Path $generatedDir)) {
 }
 
 Write-Host "" 
-Write-Host "Generating IANA time zone data..." -ForegroundColor Yellow
+Write-Host "Generating CLDR Windows time zone mapping data..." -ForegroundColor Yellow
 Write-Host "" 
 
 try {
     $global:LASTEXITCODE = 0
-    & $generatorPath -Zone1970TabPath $zone1970Path -TemplatePath $templatePath -OutputPath $outputPath
+
+    & $generatorPath -WindowsZonesXmlPath $windowsZonesXmlPath -TemplatePath $templatePath -OutputPath $outputPath
 
     if (-not $?) {
         throw "Generator script failed."
     }
 }
 catch {
-    Write-Error "Failed to generate IANA time zone data: $_"
+    Write-Error "Failed to generate CLDR Windows time zone mapping data: $_"
     exit 1
 }
 

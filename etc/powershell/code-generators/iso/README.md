@@ -1,4 +1,4 @@
-# ISO data generation (etc/powershell/iso)
+# ISO data generation (etc/powershell/code-generators/iso)
 
 This folder contains the scripts + source CSVs used to generate ISO reference data in PineGuard.
 
@@ -16,20 +16,26 @@ Generated C# files are written to:
 
 Run scripts from the repository root.
 
-Preview (generate into `etc/generated` only):
+Preview (generate into `etc/artifacts` only):
 
 ```powershell
-./etc/powershell/iso/GenerateIsoCountries.ps1
-./etc/powershell/iso/GenerateIsoCurrencies.ps1
-./etc/powershell/iso/GenerateIsoLanguages.ps1
+./etc/powershell/code-generators/iso/GenerateIsoCountries.ps1
+./etc/powershell/code-generators/iso/GenerateIsoCurrencies.ps1
+./etc/powershell/code-generators/iso/GenerateIsoLanguages.ps1
 ```
+
+Preview output is written under:
+
+- `etc/artifacts/code-generators/iso/DefaultIsoCountryData.cs`
+- `etc/artifacts/code-generators/iso/DefaultIsoCurrencyData.cs`
+- `etc/artifacts/code-generators/iso/DefaultIsoLanguageData.cs`
 
 Update source (also copy into `src/`):
 
 ```powershell
-./etc/powershell/iso/GenerateIsoCountries.ps1 -EnableUpdateTarget $true
-./etc/powershell/iso/GenerateIsoCurrencies.ps1 -EnableUpdateTarget $true
-./etc/powershell/iso/GenerateIsoLanguages.ps1 -EnableUpdateTarget $true
+./etc/powershell/code-generators/iso/GenerateIsoCountries.ps1 -EnableUpdateTarget $true
+./etc/powershell/code-generators/iso/GenerateIsoCurrencies.ps1 -EnableUpdateTarget $true
+./etc/powershell/code-generators/iso/GenerateIsoLanguages.ps1 -EnableUpdateTarget $true
 ```
 
 ## Code casing

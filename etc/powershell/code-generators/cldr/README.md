@@ -1,4 +1,4 @@
-# CLDR data generation (etc/powershell/cldr)
+# CLDR data generation (etc/powershell/code-generators/cldr)
 
 This folder contains scripts + source files used to generate CLDR reference data for PineGuard.
 
@@ -14,7 +14,7 @@ PineGuard uses CLDR's Windows time zone mapping data to relate Windows time zone
 
 Place the extracted file at:
 
-- `./etc/powershell/cldr/cldr-windows-zones/windowsZones.xml`
+- `./etc/powershell/code-generators/cldr/cldr-windows-zones/windowsZones.xml`
 
 ### What gets generated
 
@@ -28,14 +28,18 @@ Generated C# files are written to:
 
 Run scripts from the repository root.
 
-Preview (generate into `etc/generated` only):
+Preview (generate into `etc/artifacts` only):
 
 ```powershell
-./etc/powershell/cldr/GenerateCldrWindowsTimeZones.ps1
+./etc/powershell/code-generators/cldr/GenerateCldrWindowsTimeZones.ps1
 ```
+
+Preview output is written under:
+
+- `etc/artifacts/code-generators/cldr/DefaultCldrWindowsTimeZoneData.cs`
 
 Update source (also copy into `src/`):
 
 ```powershell
-./etc/powershell/cldr/GenerateCldrWindowsTimeZones.ps1 -EnableUpdateTarget $true
+./etc/powershell/code-generators/cldr/GenerateCldrWindowsTimeZones.ps1 -EnableUpdateTarget $true
 ```

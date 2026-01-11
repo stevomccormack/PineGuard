@@ -77,7 +77,7 @@ function Try-ParseConditionCoverage {
 }
 
 $repoRoot = Get-RepoRoot
-$resultsRoot = Join-Path $repoRoot 'etc/generated/code-coverage/testresults'
+$resultsRoot = Join-Path $repoRoot 'etc/artifacts/code-coverage/xplat/testresults'
 
 Write-Host "Repo root: $repoRoot" -ForegroundColor DarkGray
 Write-Host "Coverage results: $resultsRoot" -ForegroundColor DarkGray
@@ -244,7 +244,7 @@ else {
 }
 
 if ($OpenHtml) {
-    $indexPath = Join-Path $repoRoot 'etc/generated/code-coverage/html/index.html'
+    $indexPath = Join-Path $repoRoot 'etc/artifacts/code-coverage/xplat/html/index.html'
     if (Test-Path $indexPath) {
         Write-Host ''
         Write-Host "Opening HTML report: $indexPath" -ForegroundColor Cyan

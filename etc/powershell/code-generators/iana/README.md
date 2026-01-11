@@ -1,4 +1,4 @@
-# IANA Time Zone data generation (etc/powershell/iana)
+# IANA Time Zone data generation (etc/powershell/code-generators/iana)
 
 This folder contains scripts + source files used to generate IANA time zone reference data in PineGuard.
 
@@ -19,22 +19,22 @@ Generated C# files are written to:
 
 Run scripts from the repository root.
 
-Preview (generate into `etc/generated` only):
+Preview (generate into `etc/artifacts` only):
 
 ```powershell
-./etc/powershell/iana/GenerateIanaTimeZones.ps1
+./etc/powershell/code-generators/iana/GenerateIanaTimeZones.ps1
 ```
 
 Update source (also copy into `src/`):
 
 ```powershell
-./etc/powershell/iana/GenerateIanaTimeZones.ps1 -EnableUpdateTarget $true
+./etc/powershell/code-generators/iana/GenerateIanaTimeZones.ps1 -EnableUpdateTarget $true
 ```
 
 ## File layout
 
-- Inputs (tzdb artifacts + template + generator): `./etc/powershell/iana/iana-tz-zone-info/`
-- Preview output: `./etc/generated/DefaultIanaTimeZoneData.cs`
+- Inputs (tzdb artifacts + template + generator): `./etc/powershell/code-generators/iana/iana-tz-zone-info/`
+- Preview output: `./etc/artifacts/code-generators/iana/DefaultIanaTimeZoneData.cs`
 - Source output (when enabled): `./src/PineGuard.Core/Externals/Iana/TimeZones/DefaultIanaTimeZoneData.cs`
 
 ## Notes

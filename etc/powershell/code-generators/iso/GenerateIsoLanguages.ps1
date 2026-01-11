@@ -1,11 +1,11 @@
 # =================================================================================================
-# GenerateIsoCountries.ps1
+# GenerateIsoLanguages.ps1
 # Run the script from the repository root.
 # Before running this script, ensure:
-#   - etc/powershell/iso/iso-3166-countries/iso-3166-country-codes.csv is up-to-date.
-#   - etc/powershell/iso/iso-3166-countries/DefaultIsoCountryData.template.cs is up-to-date.
+#   - etc/powershell/code-generators/iso/iso-639-languages/iso-639-language-codes.csv is up-to-date.
+#   - etc/powershell/code-generators/iso/iso-639-languages/DefaultIsoLanguageData.template.cs is up-to-date.
 # =================================================================================================
-# Orchestrates the generation of ISO 3166-1 country data for the PineGuard library.
+# Orchestrates the generation of ISO 639 language data for the PineGuard library.
 #
 # This script:
 #   1. Validates the presence of required input files (CSV data and C# template)
@@ -13,17 +13,17 @@
 #   3. Copies the generated file to the appropriate location in the source tree
 #
 # Directory Structure:
-#   etc/powershell/iso/
-#   ├── iso-3166-countries/
-#   │   ├── iso-3166-country-codes.csv              # ISO 3166-1 source data
-#   │   ├── DefaultIsoCountryData.template.cs       # C# template with placeholder
-#   │   └── DefaultIsoCountryDataGenerator.ps1      # Generator script
+#   etc/powershell/code-generators/iso/
+#   ├── iso-639-languages/
+#   │   ├── iso-639-language-codes.csv              # ISO 639 source data
+#   │   ├── DefaultIsoLanguageData.template.cs      # C# template with placeholder
+#   │   └── DefaultIsoLanguageDataGenerator.ps1     # Generator script
 #   ├── generated/
-#   │   └── DefaultIsoCountryData.cs                # Generated output (git-ignored)
-#   └── GenerateIsoCountries.ps1                    # This orchestration script
+#   │   └── DefaultIsoLanguageData.cs               # Generated output (git-ignored)
+#   └── GenerateIsoLanguages.ps1                    # This orchestration script
 #
-# Reference: https://www.iso.org/iso-3166-country-codes.html
-# Standard: ISO 3166-1:2020
+# Reference: https://www.iso.org/iso-639-language-codes.html
+# Standard: ISO 639
 # =================================================================================================
 
 [CmdletBinding()]
@@ -41,20 +41,20 @@ $ErrorActionPreference = "Stop"
 # =================================================================================================
 
 $scriptRoot = $PSScriptRoot
-$repoRoot = (Resolve-Path (Join-Path $scriptRoot "..\..\..")).Path
+$repoRoot = (Resolve-Path (Join-Path $scriptRoot "..\..\..\..")).Path
 
 # Input files
-$csvPath      = Join-Path $scriptRoot "iso-3166-countries\iso-3166-country-codes.csv"
-$templatePath = Join-Path $scriptRoot "iso-3166-countries\DefaultIsoCountryData.template.cs"
-$generatorPath = Join-Path $scriptRoot "iso-3166-countries\DefaultIsoCountryDataGenerator.ps1"
+$csvPath      = Join-Path $scriptRoot "iso-639-languages\iso-639-language-codes.csv"
+$templatePath = Join-Path $scriptRoot "iso-639-languages\DefaultIsoLanguageData.template.cs"
+$generatorPath = Join-Path $scriptRoot "iso-639-languages\DefaultIsoLanguageDataGenerator.ps1"
 
 # Output paths
-$generatedDir = Join-Path $repoRoot "etc\generated"
-$outputPath   = Join-Path $generatedDir "DefaultIsoCountryData.cs"
+$generatedDir = Join-Path $repoRoot "etc\artifacts\code-generators\iso"
+$outputPath   = Join-Path $generatedDir "DefaultIsoLanguageData.cs"
 
 # Target location in source tree
-$targetDir  = Join-Path $repoRoot "src\PineGuard.Core\Externals\Iso\Countries"
-$targetPath = Join-Path $targetDir "DefaultIsoCountryData.cs"
+$targetDir  = Join-Path $repoRoot "src\PineGuard.Core\Externals\Iso\Languages"
+$targetPath = Join-Path $targetDir "DefaultIsoLanguageData.cs"
 
 # =================================================================================================
 # Validation
@@ -62,7 +62,7 @@ $targetPath = Join-Path $targetDir "DefaultIsoCountryData.cs"
 
 Write-Host ""
 Write-Host "===============================================================" -ForegroundColor Cyan
-Write-Host "  ISO 3166-1 Country Data Generator" -ForegroundColor Cyan
+Write-Host "  ISO 639 Language Data Generator" -ForegroundColor Cyan
 Write-Host "===============================================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -100,7 +100,7 @@ if (-not (Test-Path $generatedDir)) {
 # Execute Generator
 # =================================================================================================
 
-Write-Host "Generating ISO country data..." -ForegroundColor Yellow
+Write-Host "Generating ISO language data..." -ForegroundColor Yellow
 Write-Host ""
 
 try {
@@ -112,7 +112,7 @@ try {
     }
 }
 catch {
-    Write-Error "Failed to generate ISO country data: $_"
+    Write-Error "Failed to generate ISO language data: $_"
     exit 1
 }
 
@@ -134,11 +134,11 @@ Write-Host "  OK Generated file size: $($fileInfo.Length) bytes" -ForegroundColo
 
 # Basic content validation
 $content = Get-Content $outputPath -Raw
-if (-not $content.Contains('namespace PineGuard.Iso.Countries;')) {
+if (-not $content.Contains('namespace PineGuard.Externals.Iso.Languages;')) {
     Write-Error "Generated file does not contain expected namespace"
     exit 1
 }
-if ($content.Contains('<< COUNTRY_ROWS >>')) {
+if ($content.Contains('<< LANGUAGE_ROWS >>')) {
     Write-Error "Generated file still contains template placeholder"
     exit 1
 }
@@ -191,5 +191,5 @@ Write-Host "Next steps:" -ForegroundColor White
 Write-Host "  1. Review the changes in $targetPath" -ForegroundColor Gray
 Write-Host "  2. Build the PineGuard.Core project to verify compilation" -ForegroundColor Gray
 Write-Host "  3. Run unit tests to ensure data integrity" -ForegroundColor Gray
-Write-Host "  4. Commit the updated DefaultIsoCountryData.cs file" -ForegroundColor Gray
+Write-Host "  4. Commit the updated DefaultIsoLanguageData.cs file" -ForegroundColor Gray
 Write-Host ""

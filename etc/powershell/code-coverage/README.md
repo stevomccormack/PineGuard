@@ -22,35 +22,35 @@ The HTML report uses ReportGenerator via `dotnet-reportgenerator-globaltool` ins
 
 ## Scripts
 
-### GenerateCodeCoverageReport.ps1
+### xplat/GenerateCodeCoverageReport.ps1
 
 Generates fresh coverage output by:
 
 - discovering runnable unit test projects under `tests/**/*.UnitTests.csproj`
 - running `dotnet test` with `--collect:"XPlat Code Coverage"`
 - using `etc/powershell/code-coverage/coverlet.runsettings`
-- producing HTML under `etc/generated/code-coverage/html`
+- producing HTML under `etc/artifacts/code-coverage/xplat/html`
 
 Run from repo root:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/GenerateCodeCoverageReport.ps1"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/GenerateCodeCoverageReport.ps1"
 ```
 
 Common variants:
 
 ```powershell
 # Debug (default)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/GenerateCodeCoverageReport.ps1" -Configuration Debug
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/GenerateCodeCoverageReport.ps1" -Configuration Debug
 
 # Release
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/GenerateCodeCoverageReport.ps1" -Configuration Release
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/GenerateCodeCoverageReport.ps1" -Configuration Release
 
 # Clean the generated output folder first
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/GenerateCodeCoverageReport.ps1" -Clean
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/GenerateCodeCoverageReport.ps1" -Clean
 
 # Clean + Debug
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/GenerateCodeCoverageReport.ps1" -Configuration Debug -Clean
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/GenerateCodeCoverageReport.ps1" -Configuration Debug -Clean
 ```
 
 Notes:
@@ -58,9 +58,9 @@ Notes:
 - The script skips `*.UnitTests.csproj` projects that contain no `*.cs` files (outside `bin/`/`obj/`) to avoid misleading “No test is available” runs.
 - Coverage collection is occasionally intermittent (empty/invalid Cobertura output). The script detects that and automatically retries once.
 
-### AnalyzeCodeCoverage.ps1
+### xplat/AnalyzeCodeCoverage.ps1
 
-Reads the newest Cobertura XML file per test project under `etc/generated/code-coverage/testresults/**/coverage.cobertura.xml`, filters coverage to a scope (by default `src/PineGuard.Core/**`), and prints:
+Reads the newest Cobertura XML file per test project under `etc/artifacts/code-coverage/xplat/testresults/**/coverage.cobertura.xml`, filters coverage to a scope (by default `src/PineGuard.Core/**`), and prints:
 
 - filtered line + branch totals
 - lowest-covered classes list
@@ -68,51 +68,66 @@ Reads the newest Cobertura XML file per test project under `etc/generated/code-c
 Run from repo root:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1"
 ```
 
 Common variants:
 
 ```powershell
 # Show more/less rows
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" -Top 10
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" -Top 50
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" -Top 10
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" -Top 50
 
 # Open the HTML report after printing the summary
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" -OpenHtml
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" -OpenHtml
 
 # Fail the command if the filtered scope is not 100% line+branch
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" -Enforce100
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" -Enforce100
 
 # Print a formatted table (may truncate depending on console width)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" -AsTable
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" -AsTable
 ```
 
 Changing the filtered scope (matches Cobertura `class filename` values):
 
 ```powershell
 # Include only PineGuard.Core (default)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" `
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" `
   -IncludeFileRegex '^src[\\/]+PineGuard\.Core[\\/]+'
 
 # Exclude build artifacts (default)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" `
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" `
   -ExcludeFileRegex '^src[\\/]+PineGuard\.Core[\\/]obj[\\/]+'
 
 # Example: analyze a different project folder under src
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" `
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" `
   -IncludeFileRegex '^src[\\/]+PineGuard\.GuardClauses[\\/]+'
+```
+
+### dotcover/GenerateDotCoverReport.ps1
+
+Collects coverage using JetBrains dotCover and writes artifacts under `etc/artifacts/code-coverage/dotcover`.
+
+Run from repo root:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/dotcover/GenerateDotCoverReport.ps1"
 ```
 
 ## Outputs
 
-After running GenerateCodeCoverageReport.ps1:
+After running xplat/GenerateCodeCoverageReport.ps1:
 
 - HTML report:
-  - `etc/generated/code-coverage/html/index.html`
-  - `etc/generated/code-coverage/html/summary.html`
+  - `etc/artifacts/code-coverage/xplat/html/index.html`
+  - `etc/artifacts/code-coverage/xplat/html/summary.html`
 - Raw test results + Cobertura XML (per test project run):
-  - `etc/generated/code-coverage/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
+  - `etc/artifacts/code-coverage/xplat/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
+
+After running dotcover/GenerateDotCoverReport.ps1:
+
+- dotCover artifacts:
+  - `etc/artifacts/code-coverage/dotcover`
 
 Notes about the structure:
 
@@ -169,12 +184,12 @@ Some test projects are intentionally empty placeholders. The generator script sk
 
 ```powershell
 # 1) generate coverage
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/GenerateCodeCoverageReport.ps1" -Configuration Debug
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/GenerateCodeCoverageReport.ps1" -Configuration Debug
 
 # 2) analyze and pick targets
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" -Top 30
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" -Top 30
 
 # 3) (after adding tests) repeat
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/GenerateCodeCoverageReport.ps1" -Configuration Debug
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1" -Top 30
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/GenerateCodeCoverageReport.ps1" -Configuration Debug
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./etc/powershell/code-coverage/xplat/AnalyzeCodeCoverage.ps1" -Top 30
 ```

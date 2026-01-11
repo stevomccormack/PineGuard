@@ -99,9 +99,9 @@ function Test-CoverageLooksValid {
 }
 
 $repoRoot = Get-RepoRoot
-$generatedRoot = Join-Path $repoRoot 'etc/generated/code-coverage'
+$generatedRoot = Join-Path $repoRoot 'etc/artifacts/code-coverage/xplat'
 $resultsRoot = Join-Path $generatedRoot 'testresults'
-$runSettingsPath = Join-Path $PSScriptRoot 'coverlet.runsettings'
+$runSettingsPath = Join-Path (Split-Path -Parent $PSScriptRoot) 'coverlet.runsettings'
 
 if ($Clean) {
     if (Test-Path $generatedRoot) {
