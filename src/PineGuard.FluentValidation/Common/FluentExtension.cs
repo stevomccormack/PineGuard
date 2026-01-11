@@ -6,7 +6,6 @@ namespace PineGuard.FluentValidation.Common;
 public static class FluentExtension
 {
     private const string ParamNameToken = "{paramName}";
-    private const string DefaultNotNullMessageTemplate = "{paramName} must not be null.";
 
     public static IRuleBuilderOptions<T, TProp?> MustBe<T, TProp>(
         this IRuleBuilder<T, TProp?> ruleBuilder,

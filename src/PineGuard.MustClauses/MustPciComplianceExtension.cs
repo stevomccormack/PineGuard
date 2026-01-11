@@ -2,7 +2,7 @@
 
 namespace PineGuard.MustClauses;
 
-public static partial class MustPciComplianceExtension
+public static class MustPciComplianceExtension
 {
     public static MustResult<string> MaskedCard(
         this IMustClause _,

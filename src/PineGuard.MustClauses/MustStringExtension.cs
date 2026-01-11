@@ -41,7 +41,7 @@ public static partial class MustStringExtension
 
     public static MustResult<string> Alphabetical(
         this IMustClause _,
-        string value,
+        string? value,
         [CallerArgumentExpression("value")] string? paramName = null)
         => MustResult<string>.FromBool(
             value is not null && AlphaRegex().IsMatch(value),
@@ -52,7 +52,7 @@ public static partial class MustStringExtension
 
     public static MustResult<string> Numeric(
         this IMustClause _,
-        string value,
+        string? value,
         [CallerArgumentExpression("value")] string? paramName = null)
         => MustResult<string>.FromBool(
             value is not null && NumericRegex().IsMatch(value),

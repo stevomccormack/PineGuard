@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace PineGuard.MustClauses;
 
-public static partial class MustNumberExtension
+public static class MustNumberExtension
 {
     public static MustResult<TNumber> Positive<TNumber>(
         this IMustClause _,

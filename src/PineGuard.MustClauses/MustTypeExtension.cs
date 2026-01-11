@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace PineGuard.MustClauses;
 
-public static partial class MustTypeExtension
+public static class MustTypeExtension
 {
     public static MustResult<Type> OfType(
         this IMustClause _,
@@ -11,36 +11,36 @@ public static partial class MustTypeExtension
         Type type,
         [CallerArgumentExpression("value")] string? paramName = null)
     {
-        bool ok = type switch
+        var ok = type switch
         {
-            var t when t == typeof(string)
+            _ when type == typeof(string)
                 => !string.IsNullOrWhiteSpace(value),
 
-            var t when t == typeof(int)
-                => int.TryParse(value, out int _),
+            _ when type == typeof(int)
+                => int.TryParse(value, out var _),
 
-            var t when t == typeof(long)
-                => long.TryParse(value, out long _),
+            _ when type == typeof(long)
+                => long.TryParse(value, out var _),
 
-            var t when t == typeof(double)
-                => double.TryParse(value, out double _),
+            _ when type == typeof(double)
+                => double.TryParse(value, out var _),
 
-            var t when t == typeof(decimal)
-                => decimal.TryParse(value, out decimal _),
+            _ when type == typeof(decimal)
+                => decimal.TryParse(value, out var _),
 
-            var t when t == typeof(bool)
-                => bool.TryParse(value, out bool _),
+            _ when type == typeof(bool)
+                => bool.TryParse(value, out var _),
 
-            var t when t == typeof(DateTime)
-                => DateTime.TryParse(value, out DateTime _),
+            _ when type == typeof(DateTime)
+                => DateTime.TryParse(value, out var _),
 
-            var t when t == typeof(Guid)
-                => Guid.TryParse(value, out Guid _),
+            _ when type == typeof(Guid)
+                => Guid.TryParse(value, out var _),
 
-            var t when t == typeof(System.DayOfWeek)
-                => int.TryParse(value, out int dayVal) && dayVal >= 0 && dayVal <= 6,
+            _ when type == typeof(DayOfWeek)
+                => int.TryParse(value, out var dayVal) && dayVal >= 0 && dayVal <= 6,
 
-            var t when t.IsEnum
+            _ when type.IsEnum
                 => Enum.TryParse(type, value, true, out var enumVal) && Enum.IsDefined(type, enumVal),
 
             _ => TryChangeType(value, type)
@@ -54,11 +54,11 @@ public static partial class MustTypeExtension
             type);
     }
 
-    static bool TryChangeType(string s, Type t)
+    private static bool TryChangeType(string s, Type t)
     {
         try
         {
-            Convert.ChangeType(s, t, CultureInfo.InvariantCulture);
+            _ = Convert.ChangeType(s, t, CultureInfo.InvariantCulture);
             return true;
         }
         catch

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace PineGuard.MustClauses;
 
-public static partial class MustGuidExtension
+public static class MustGuidExtension
 {
     public static MustResult<Guid> Guid(
         this IMustClause _,

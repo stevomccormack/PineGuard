@@ -2,7 +2,7 @@
 
 namespace PineGuard.MustClauses;
 
-public static partial class MustNullExtension
+public static class MustNullExtension
 {
     public static MustResult<T> NotNull<T>(
         this IMustClause _,

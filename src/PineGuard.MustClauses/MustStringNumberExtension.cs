@@ -2,7 +2,7 @@
 
 namespace PineGuard.MustClauses;
 
-public static partial class MustStringNumberExtension
+public static class MustStringNumberExtension
 {
     public static MustResult<decimal> NotZero(
         this IMustClause _,
