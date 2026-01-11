@@ -124,9 +124,10 @@ In this repo, most remaining branch misses map directly to **missing test permut
 
 Preferred approach:
 
-- Add rows to `XxxTestData` datasets (`ValidCases`, `InvalidCases`, `ValidEdgeCases`, `InvalidEdgeCases`) to flip the exact missing condition outcomes.
+- Add rows to `XxxTestData` datasets (`ValidCases`, `EdgeCases`, `InvalidCases`) to flip the exact missing condition outcomes.
 - Prefer `TheoryData<TCase>` with record case types (named fields) so expanding permutations stays readable and deterministic.
-- For guard/argument failures, assert exception `Type` and (when relevant) `ParamName` (see the unit test spec for the shared expected-exception shape).
+- For guard/argument failures, put true exception scenarios in `InvalidCases` and assert exception `Type` and (when relevant) `ParamName`.
+  - Follow the unit-test spec case shapes: inputs in a single `Value` (named tuple when multiple inputs), multiple expected outputs as tuple `ExpectedReturn`, and throws cases via `IThrowsCase` + `ExpectedException`.
 
 See: `docs/ai/unit-tests-agent-spec.md`.
 

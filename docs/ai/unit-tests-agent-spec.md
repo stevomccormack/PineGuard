@@ -20,9 +20,20 @@ If you are doing coverage work, read these docs in order:
 - All tests must pass.
 - Tests must be deterministic and stable across machines.
 - Every test case record must include a non-empty `Name` field/property (readability is non-negotiable).
-- Make xUnit theory row output readable by either:
-  - deriving case records from `PineGuard.Testing.UnitTests.BaseCase` (preferred), OR
-  - implementing `public override string ToString() => Name;`.
+- Make xUnit theory row output readable by deriving case records from the shared PineGuard base case records (preferred). Only use `public override string ToString() => Name;` if absolutely necessary.
+- **Do not use named arguments in `new(...)`** (e.g., `new(Name: "x", ...)`) anywhere.
+  - **Only exception**: naming tuple elements inside the `Value` tuple is allowed and required, e.g. `Value: (start: ..., end: ...)`.
+- **Only use these public case record names** inside operation groups:
+  - `public sealed record ValidCase ...`
+  - `public sealed record InvalidCase ...`
+- **Default to generic `TheoryData<TCase>`** and collection expressions:
+  - `public static TheoryData<ValidCase> ValidCases => [ new(...), ... ];`
+  - `public static TheoryData<ValidCase> EdgeCases => [ new(...), ... ];`
+  - `public static TheoryData<IThrowsCase> InvalidCases => [ new(...), ... ];`
+  - Never use non-generic `TheoryData` (it expects `object[]` rows and will cause compile errors).
+  - **Exception (rare):** `InvalidCases` may use `IEnumerable<object[]>` with single-element rows only to work around the known `TheoryData<IThrowsCase>` + collection-expression binding issue (see “Known compiler edge-case” below).
+- Do not introduce `TheoryDataFactory` (or any `Create(...)` helper) to build `TheoryData`.
+- **No helper factories**: do not introduce `V(...)`, `I(...)`, `E(...)`, `Case(...)` builders, or any similar private helper methods.
 - Do not add new test frameworks or infrastructure unless the repo already uses it.
 
 ---
@@ -94,6 +105,8 @@ Disallowed:
 
 - `[InlineData]`
 - `IEnumerable<object[]>` / `object[]` / ad-hoc arrays
+  - **Exception:** `IEnumerable<object[]>` is allowed only for the `InvalidCases` workaround documented in “Known compiler edge-case” below.
+- non-generic `TheoryData` (it uses `object[]` rows)
 - defining datasets inside the test class
 
 Rationale: stable diffs, consistent style, easy expansion during coverage pushes.
@@ -111,9 +124,9 @@ This repository uses a single, repeatable TestData pattern. Treat `RuleCompariso
 - One top-level file per unit: `XxxTestData.cs` containing `public static class XxxTestData`.
 - Inside it, create **operation groups** as nested `public static class` types (e.g., `Constructor`, `Parse`, `IsBetween`, `Boundaries`).
 - Each operation group must define exactly these datasets (no others):
-  - `ValidCases` (`TheoryData<Case>`)
-  - `EdgeCases` (`TheoryData<Case>`)
-  - `InvalidCases` (`TheoryData<ThrowsCase>`) (throwing-only; may be empty)
+  - `ValidCases` (`TheoryData<ValidCase>`) (non-throw “normal” scenarios)
+  - `EdgeCases` (`TheoryData<ValidCase>`) (non-throw boundary / domain / “interesting” scenarios)
+  - `InvalidCases` (`TheoryData<IThrowsCase>`) (**throwing only**; may be empty)
 
 Definitions:
 
@@ -131,99 +144,106 @@ Rule of thumb:
 
 - If the test expects an exception → `InvalidCases`.
 - If the test expects “failure” WITHOUT an exception (e.g., `false`, `null`, default out-param) → `EdgeCases`.
-
-`InvalidCases` must always exist, even when empty:
+- Used simplified expressions for defining TheoryData e.g. [] instead of new(){ new ... }
 
 ```csharp
-public static TheoryData<ThrowsCase> InvalidCases => [];
+public static TheoryData<IThrowsCase> InvalidCases => []; // use simplified [] expression
 ```
 
 #### Case records (strict)
 
-Each operation group ends with a `#region Cases` section that defines the public record types.
+Each operation group ends with a `#region Case Records` section that defines the public record types.
 
 Placement (strict):
 
-- Put the `#region Cases` at the **end of the operation group** (after `ValidCases`/`EdgeCases`/`InvalidCases`).
+- Put the `#region Case Records` at the **end of the operation group** (after `ValidCases`/`EdgeCases`/`InvalidCases`).
 - Keep the case record(s) public, and keep them inside that region.
 
 Rules:
 
-- Prefer **one** record type named `Case` for `ValidCases` and `EdgeCases`.
-- Define a separate throw-case record only when the data shape differs (typically because it needs additional inputs beyond `Name` + `ExpectedException`).
-- Every record must include a `Name` field/property.
-- Ensure xUnit output is readable by either:
-  - deriving from `PineGuard.Testing.UnitTests.BaseCase` (preferred), OR
-  - implementing `public override string ToString() => Name;`.
+- Always define exactly two public case records in an operation group:
+  - `ValidCase` for all non-throw cases (including edge cases and graceful failures)
+  - `InvalidCase` for throw-only cases
+- Do NOT create compatibility alias records (no `Case` records, no wrapper records, no forwarding records).
+- Every record must include a non-empty `Name`.
+- Prefer using PineGuard’s shared base case records (`IsCase`, `HasCase`, `TryCase`, `ReturnCase`, `ReturnOutCase`, `ThrowsCase`) so the shape is consistent across the repo.
+- Prefer representing inputs as a single `Value` payload. For multiple inputs, use a **named tuple** in `Value`.
+- Ensure xUnit output is readable by inheriting from the shared PineGuard base case records.
+- Use the following order of preference with base classes:
+  1. For ValidCases, EdgeCases that are testing boolean validation check methods (IsXxxxx, HasXxxxx or TryXxxx): use `PineGuard.Testing.UnitTests.IsCase, PineGuard.Testing.UnitTests.HasCase, PineGuard.Testing.UnitTests.TryCase` These are top preference and should be tightly related to their use case.
+  2. For ValidCases, EdgeCases that do not relate to Is, Has, Try use: `ReturnCase<TValue, TResult>` or `ReturnOutCase<TValue, TResult, TOut>`
+  3. For InvalidCases, create a record inheriting `PineGuard.Testing.UnitTests.ThrowsCase<TValue>`
+- Avoid deriving directly from `ValueCase<TValue>` unless there is no meaningful expected return/out value and `Value` alone is the key thing being tested.
 
 Example shapes:
 
-- `public sealed record Case(string Name, /* inputs... */, /* expected... */) : BaseCase(Name);`
-- `public sealed record InvalidCase(string Name, /* inputs... */, ExpectedException ExpectedException) : ThrowsCase(Name, ExpectedException);`
+- `public sealed record ValidCase(string Name, int Value, int Min, int Max, Inclusion Inclusion, bool ExpectedReturn) : IsCase<(int Value, int Min, int Max, Inclusion Inclusion)>(Name, Value, ExpectedReturn);`
+- `public sealed record InvalidCase(string Name, TimeOnly Start, TimeOnly End, ExpectedException ExpectedException) : ThrowsCase<(TimeOnly Start, TimeOnly End)>(Name, (Start, End), ExpectedException);`
 
 Preferred shared case record types (use when they fit; do not invent new shapes):
 
 - `BaseCase` (Name + ToString)
 - `ValueCase<TValue>` (Name + Value)
 - `ReturnCase<TValue, TResult>` (Name + Value + ExpectedReturn)
-- `ReturnWithOutCase<TValue, TResult, TOut>` (Name + Value + ExpectedReturn + ExpectedOutValue)
+- `ReturnOutCase<TValue, TResult, TOut>` (Name + Value + ExpectedReturn + ExpectedOutValue)
 - `TryCase<TValue, TOut>` (for `TryXxx(value, out outValue)` patterns; `ExpectedReturn` is `bool`)
 - `IsCase<TValue>` (for boolean predicate patterns; `ExpectedReturn` is `bool`)
 - `HasCase<TValue>` (alias of `IsCase<TValue>`; use when semantics read better as “Has…”)
 - `IThrowsCase` / `ThrowsCase` (standardizes throws-only `InvalidCases` via `ExpectedException`)
 
-#### Contextual naming (strict)
+Selection order (strict):
 
-When using the shared case base records, concrete case records MUST use domain/context-specific parameter names.
-Do NOT propagate abstract parameter names like `Value`, `ExpectedReturn`, or `ExpectedOutValue` into concrete case records.
+1. `IsCase<TValue>` / `HasCase<TValue>` when the API returns `bool`
+2. `TryCase<TValue, TOut>` when the API returns `bool` and has an `out` value
+3. `ReturnCase<TValue, TResult>` when the API returns a non-`bool` value.
+4. `ReturnOutCase<TValue, TResult, TOut>` when the API returns a value and also has an `out` parameter.
+5. `ThrowsCase<TValue>` (for `InvalidCase`)
+6. `ValueCase<TValue>` only when there is no meaningful expected return/out value.
+7. `BaseCase` is acceptable when explicit properties read better than a single `Value` tuple.
 
-Rationale: the base classes are generic by design; case records should read like a sentence in their local domain.
+#### Value shape and naming (strict)
 
-Examples:
+- Prefer representing **inputs** as a single `Value` parameter/property.
+  - If there are multiple inputs, prefer a **named tuple** so each element reads clearly:
+    - `(start: ..., end: ...)`, `(text: ..., min: ..., max: ..., inclusion: ...)`, etc.
+  - Tuple element naming is the **only** allowed “named argument” usage.
+- For **expectations**:
+  - Predicates (`Is...` / `Has...`) use `ExpectedReturn` (bool)
+  - Try-patterns use `ExpectedReturn` (bool) and `ExpectedOutValue`
+  - If a test needs to assert multiple expected outputs, represent them as a **named tuple** in `ExpectedReturn`.
+  - Throws use `ExpectedException`
+
+#### Record formatting (strict)
+
+- Put the primary constructor on a single line.
+- Put the inheritance clause on the next line.
+
+Example:
 
 ```csharp
-// Bad: the dataset reads like plumbing.
-public sealed record Case(string Name, string? Value)
-  : ValueCase<string>(Name, Value);
-
-// Good: the dataset reads like the domain.
-public sealed record Case(string Name, string? emailAddress)
-  : ValueCase<string>(Name, emailAddress);
+public sealed record ValidCase(string Name, (int Start, int End) Value, (bool IsGreaterThan, bool IsLessThan) ExpectedReturn)
+  : ReturnCase<(int Start, int End), (bool IsGreaterThan, bool IsLessThan)>(Name, Value, ExpectedReturn);
 ```
+
+Examples (positional `new(...)`; no named ctor args) and must use [] collection expression notation:
 
 ```csharp
-// For predicate APIs (Is/Has): use IsCase/HasCase and name the value contextually.
-public sealed record Case(string Name, string? password)
-  : IsCase<string>(Name, password, ExpectedReturn: true);
+public static TheoryData<ValidCase> ValidCases =>
+[
+  new("in range", (text: "12:00:00", min: new TimeOnly(11, 0), max: new TimeOnly(13, 0), inclusion: Inclusion.Inclusive), true),
+];
+
+public static TheoryData<IThrowsCase> InvalidCases =>
+[
+  new InvalidCase("null", null, new ExpectedException(typeof(ArgumentNullException), "s")),
+];
+
+public sealed record ValidCase(string Name, (string? text, TimeOnly min, TimeOnly max, Inclusion inclusion) Value, bool ExpectedReturn)
+  : IsCase<(string? text, TimeOnly min, TimeOnly max, Inclusion inclusion)>(Name, Value, ExpectedReturn);
+
+public sealed record InvalidCase(string Name, string? Value, ExpectedException ExpectedException)
+  : ThrowsCase<string?>(Name, Value, ExpectedException);
 ```
-
-```csharp
-// For TryXxx(value, out outValue) APIs: use TryCase and name both value and expected out-value contextually.
-public sealed record Case(string Name, string? input, bool expectedSuccess, IPAddress? expectedIp)
-  : TryCase<string, IPAddress>(Name, input, expectedSuccess, expectedIp);
-```
-
-#### Helper factories (optional)
-
-Use private static helper factories for readability and consistency.
-
-Required:
-
-- Define and use a `V(...)` helper in each operation group for `ValidCases`/`EdgeCases` case construction.
-
-Optional (but preferred when `InvalidCases` becomes non-empty):
-
-- Define and use an `I(...)` helper for throw-cases.
-
-Define helpers at the top of the operation group, e.g.:
-
-- `private static Case V(...) => new(...);`
-- `private static InvalidCase I(...) => new(...);`
-
-Formatting (strict):
-
-- `=> new(...)` must be a single line.
-- Prefer positional arguments in `new(...)` (avoid named arguments unless necessary for clarity).
 
 #### InvalidCases must be wired in tests (required)
 
@@ -236,22 +256,24 @@ Pattern:
 ```csharp
 [Theory]
 [MemberData(nameof(XxxTestData.SomeOperation.InvalidCases), MemberType = typeof(XxxTestData.SomeOperation))]
-public void SomeOperation_ThrowsExpected(ThrowsCase testCase)
+public void SomeOperation_ThrowsExpected(IThrowsCase testCase)
 {
   var ex = Assert.Throws(testCase.ExpectedException.Type, () =>
   {
     // Act: call the API under test here.
   });
 
-  ThrowsCaseAssert.AssertExpected(ex, testCase);
+  ThrowsCaseAssert.Expected(ex, testCase);
 }
 ```
 
 #### Dataset row formatting (strict)
 
-- Every case row must be a single line:
-  - `{ new Case("...", ...) },` or `{ new InvalidCase("...", ...) },`
+- Every case row must be a single `new(...)` expression inside a collection expression:
+  - Prefer target-typed: `new("...", ...)`
+  - If the dataset is interface-typed (e.g., `TheoryData<IThrowsCase>`), use the concrete type: `new InvalidCase("...", ...)`
 - Keep `Name` concise and shorthand (e.g., `"0==0"`, `"min>max"`, `"invalid inclusion 123"`).
+- Do NOT use named params! We can add them later.
 
 #### xUnit MemberData wiring (important)
 
@@ -262,18 +284,25 @@ Example:
 ```csharp
 [Theory]
 [MemberData(nameof(RuleComparisonTestData.IsBetween.ValidCases), MemberType = typeof(RuleComparisonTestData.IsBetween))]
-public void IsBetween_ReturnsExpected(RuleComparisonTestData.IsBetween.Case c) { /* ... */ }
+public void IsBetween_ReturnsExpected(RuleComparisonTestData.IsBetween.ValidCase testCase) { /* ... */ }
 ```
 
 ### ExpectedException (guard/invalid tests)
 
-Use `PineGuard.Testing.ExpectedException` (see `tests/PineGuard.Testing/ExpectedException.cs`) to define throw expectations.
+Use `PineGuard.Testing.ExpectedException` (see `tests/PineGuard.Testing/Common/ExpectedException.cs`) to define throw expectations.
 
 It supports:
 
 - exception `Type`
 - optional `ParamName`
 - optional `MessageContains` (only assert message content when necessary)
+
+Formatting (strict):
+
+- Use positional arguments only:
+  - `new ExpectedException(typeof(ArgumentNullException), "paramName")`
+  - `new ExpectedException(typeof(FormatException), null, "ISO")`
+- Do not use named arguments (e.g., `ParamName: "x"`, `MessageContains: "y"`).
 
 ### Throws-only InvalidCases (shared abstraction)
 
@@ -283,34 +312,58 @@ Definitions in `PineGuard.Testing.UnitTests`:
 
 - `IThrowsCase` (preferred opt-in): exposes `ExpectedException ExpectedException { get; }`
   - Use this when your `InvalidCase` already inherits a different base record (single inheritance limitation).
-- `ThrowsCase` (convenience base record): `Name + ExpectedException`
+- `ThrowsCase<TValue>` (convenience base record): `Name + Value + ExpectedException` (and it implements `IThrowsCase`).
   - Use this when your `InvalidCase` does not already inherit another base record.
+
+Strict typing rule:
+
+- Default to `TheoryData<IThrowsCase>` for `InvalidCases`.
+- You may still populate it with `new InvalidCase(...)` rows as long as `InvalidCase : IThrowsCase` (e.g., by inheriting `ThrowsCase<TValue>`).
+- If you prefer `TheoryData<InvalidCase>`, that is also allowed (the test method parameter should then be `InvalidCase`).
 
 Shared assertion helper:
 
-- `ThrowsCaseAssert.AssertExpected(Exception ex, ExpectedException expected)`
+- `ThrowsCaseAssert.Expected(Exception ex, ExpectedException expected)`
   - Does NOT depend on xUnit; it throws a descriptive exception on mismatch.
   - Standard pattern:
 
 ```csharp
 var ex = Assert.Throws(testCase.ExpectedException.Type, () => /* Act */);
-ThrowsCaseAssert.AssertExpected(ex, testCase.ExpectedException);
+ThrowsCaseAssert.Expected(ex, testCase.ExpectedException);
 ```
 
 If your `InvalidCase` implements `IThrowsCase`, you may also use the overload:
 
 ```csharp
 var ex = Assert.Throws(testCase.ExpectedException.Type, () => /* Act */);
-ThrowsCaseAssert.AssertExpected(ex, testCase);
+ThrowsCaseAssert.Expected(ex, testCase);
 ```
+
+### Known compiler edge-case (TheoryData<IThrowsCase> + collection expressions)
+
+Sometimes `TheoryData<IThrowsCase> InvalidCases => [ ... ]` fails to bind when using collection expressions, with errors that look like rows being treated as `object[]` instead of `IThrowsCase`.
+
+Approved workaround (use only when you hit the compiler issue): switch ONLY that dataset to `IEnumerable<object[]>` with single-element rows:
+
+```csharp
+public static IEnumerable<object[]> InvalidCases =>
+[
+  [ new InvalidCase("start after end", (start: 2, end: 1), new ExpectedException(typeof(ArgumentException), "start")) ],
+];
+```
+
+Notes:
+
+- Keep the throws-theory signature as `IThrowsCase` (or `InvalidCase`) as appropriate for the test.
+- Do not convert everything to `IEnumerable<object[]>`—this is a narrow escape hatch to keep the suite building.
 
 ### Case counts (aim for rule coverage, not volume)
 
 As a default starting point:
 
-- `ValidCases`: 6-10 cases that cover unique normalization/valid combinations
+- `ValidCases`: 6-12 cases that cover unique normalization/valid combinations
 - `InvalidCases`: 6-12 cases that cover unique guard/validation failure reasons
-- `EdgeCases`: 3-6 cases (reserve for true boundaries and non-throw edge behaviors)
+- `EdgeCases`: 6-12 cases (reserve for true boundaries and non-throw edge behaviors)
 
 Increase counts when:
 
@@ -326,7 +379,7 @@ If a dataset requires single-use/stateful inputs (iterators, streams, enumerator
 
 To keep datasets readable as they grow:
 
-- Use small factory helpers (e.g., `V(...)` / `I(...)`) inside the operation group.
+- Do not add helper factories (`V(...)` / `I(...)` / `E(...)`). Keep datasets as direct `new(...)` rows.
 - Keep expected fields minimal: assert only what matters for the behavior under test.
 
 ---
@@ -471,11 +524,11 @@ Use this to start a new session without re-explaining context:
   - `etc/powershell/code-coverage/AnalyzeCodeCoverage.ps1`
 - Test base utilities:
   - `tests/PineGuard.Testing/UnitTests/BaseUnitTest.cs`
-  - `tests/PineGuard.Testing/UnitTests/BaseTestCases.cs`
+  - `tests/PineGuard.Testing/UnitTests/BaseCases.cs`
   - `tests/PineGuard.Testing/UnitTests/TryCase.cs`
   - `tests/PineGuard.Testing/UnitTests/IsCase.cs`
   - `tests/PineGuard.Testing/UnitTests/HasCase.cs`
-  - `tests/PineGuard.Testing/UnitTests/IThrowsCase.cs`
+  - `tests/PineGuard.Testing/Common/IThrowsCase.cs`
   - `tests/PineGuard.Testing/UnitTests/ThrowsCase.cs`
   - `tests/PineGuard.Testing/UnitTests/ThrowsCaseAssert.cs`
-  - `tests/PineGuard.Testing/ExpectedException.cs`
+  - `tests/PineGuard.Testing/Common/ExpectedException.cs`
