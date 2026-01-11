@@ -3,7 +3,7 @@
 # Cleans up generated outputs afterwards.
 #
 # Intended usage (from repo root):
-#   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tests/etc/powershell/GeneratorScriptTests.ps1
+#   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tests/etc/powershell/CodeGeneratorScriptTests.ps1
 
 [CmdletBinding()]
 param()
@@ -51,26 +51,26 @@ function Invoke-Generator {
 $scriptRoot = $PSScriptRoot
 $repoRoot = (Resolve-Path (Join-Path $scriptRoot "..\..\..")).Path
 
-$generatedDir = Join-Path $repoRoot "etc\generated"
+$generatedRoot = Join-Path $repoRoot "etc\artifacts\code-generators"
 
 $generators = @(
-    @{ Script = "etc\powershell\iso\GenerateIsoCountries.ps1";  Output = "DefaultIsoCountryData.cs" },
-    @{ Script = "etc\powershell\iso\GenerateIsoCurrencies.ps1"; Output = "DefaultIsoCurrencyData.cs" },
-    @{ Script = "etc\powershell\iso\GenerateIsoLanguages.ps1";  Output = "DefaultIsoLanguageData.cs" },
-    @{ Script = "etc\powershell\iana\GenerateIanaTimeZones.ps1"; Output = "DefaultIanaTimeZoneData.cs" },
-    @{ Script = "etc\powershell\cldr\GenerateCldrWindowsTimeZones.ps1"; Output = "DefaultCldrWindowsTimeZoneData.cs" }
+    @{ Script = "etc\powershell\code-generators\iso\GenerateIsoCountries.ps1";  Category = "iso";  Output = "DefaultIsoCountryData.cs" },
+    @{ Script = "etc\powershell\code-generators\iso\GenerateIsoCurrencies.ps1"; Category = "iso";  Output = "DefaultIsoCurrencyData.cs" },
+    @{ Script = "etc\powershell\code-generators\iso\GenerateIsoLanguages.ps1";  Category = "iso";  Output = "DefaultIsoLanguageData.cs" },
+    @{ Script = "etc\powershell\code-generators\iana\GenerateIanaTimeZones.ps1"; Category = "iana"; Output = "DefaultIanaTimeZoneData.cs" },
+    @{ Script = "etc\powershell\code-generators\cldr\GenerateCldrWindowsTimeZones.ps1"; Category = "cldr"; Output = "DefaultCldrWindowsTimeZoneData.cs" }
 )
 
-$generatedFiles = $generators | ForEach-Object { Join-Path $generatedDir $_.Output }
+$generatedFiles = $generators | ForEach-Object { Join-Path (Join-Path $generatedRoot $_.Category) $_.Output }
 
 Write-Host "Repo root: $repoRoot" -ForegroundColor DarkGray
-Write-Host "Generated dir: $generatedDir" -ForegroundColor DarkGray
+Write-Host "Generated root: $generatedRoot" -ForegroundColor DarkGray
 
 Set-Location -LiteralPath $repoRoot
 
 # Ensure generated directory exists.
-if (-not (Test-Path -LiteralPath $generatedDir)) {
-    New-Item -ItemType Directory -Path $generatedDir -Force | Out-Null
+if (-not (Test-Path -LiteralPath $generatedRoot)) {
+    New-Item -ItemType Directory -Path $generatedRoot -Force | Out-Null
 }
 
 # Clean any previous outputs for determinism.
@@ -85,7 +85,7 @@ try {
         $scriptPath = Join-Path $repoRoot $g.Script
         Invoke-Generator -ScriptPath $scriptPath
 
-        $outputPath = Join-Path $generatedDir $g.Output
+        $outputPath = Join-Path (Join-Path $generatedRoot $g.Category) $g.Output
         Assert-FileExistsAndNotEmpty -Path $outputPath
         Write-Host "  OK Output: $outputPath" -ForegroundColor Green
     }
