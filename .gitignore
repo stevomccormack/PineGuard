@@ -1,6 +1,6 @@
 # Custom
 .etc
-etc/generated/
+etc/artifacts/
 .dotnet/
 
 
