@@ -144,8 +144,8 @@ public static class UriRulesTestData
     {
         public static TheoryData<Case> ValidCases =>
         [
-            new("windows", "C:\\Temp\\file.txt", true),
-            new("unc", "\\\\server\\share\\file.txt", true)
+            new("windows", @"C:\Temp\file.txt", true),
+            new("unc", @"\\server\share\file.txt", true)
         ];
 
         public static TheoryData<Case> EdgeCases =>

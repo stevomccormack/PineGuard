@@ -15,9 +15,9 @@ public static class StringUtilityNumberTypesTestData
 
         public static TheoryData<Case> EdgeCases =>
         [
-            new("null", null, false, default),
-            new("space", " ", false, default),
-            new("not a number", "not", false, default),
+            new("null", null, false, 0),
+            new("space", " ", false, 0),
+            new("not a number", "not", false, 0),
         ];
 
         public static TheoryData<IThrowsCase> InvalidCases => [];
@@ -39,9 +39,9 @@ public static class StringUtilityNumberTypesTestData
 
         public static TheoryData<Case> EdgeCases =>
         [
-            new("null", null, false, default),
-            new("tab", "\t", false, default),
-            new("not a number", "not", false, default),
+            new("null", null, false, 0),
+            new("tab", "\t", false, 0),
+            new("not a number", "not", false, 0),
         ];
 
         public static TheoryData<IThrowsCase> InvalidCases => [];
@@ -64,9 +64,9 @@ public static class StringUtilityNumberTypesTestData
 
         public static TheoryData<Case> EdgeCases =>
         [
-            new("null", null, null, false, default),
-            new("space", " ", null, false, default),
-            new("comma w/o culture", "1,23", null, false, default),
+            new("null", null, null, false, 0),
+            new("space", " ", null, false, 0),
+            new("comma w/o culture", "1,23", null, false, 0),
         ];
 
         public static TheoryData<IThrowsCase> InvalidCases => [];
@@ -89,9 +89,9 @@ public static class StringUtilityNumberTypesTestData
 
         public static TheoryData<Case> EdgeCases =>
         [
-            new("null", null, null, false, default),
-            new("space", " ", null, false, default),
-            new("comma w/o culture", "1,5", null, false, default),
+            new("null", null, null, false, 0),
+            new("space", " ", null, false, 0),
+            new("comma w/o culture", "1,5", null, false, 0),
         ];
 
         public static TheoryData<IThrowsCase> InvalidCases => [];
@@ -114,9 +114,9 @@ public static class StringUtilityNumberTypesTestData
 
         public static TheoryData<Case> EdgeCases =>
         [
-            new("null", null, null, false, default),
-            new("space", " ", null, false, default),
-            new("comma w/o culture", "1,5", null, false, default),
+            new("null", null, null, false, 0),
+            new("space", " ", null, false, 0),
+            new("comma w/o culture", "1,5", null, false, 0),
         ];
 
         public static TheoryData<IThrowsCase> InvalidCases => [];

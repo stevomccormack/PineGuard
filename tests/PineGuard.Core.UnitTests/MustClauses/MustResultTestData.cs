@@ -68,7 +68,7 @@ public static class MustResultTestData
             : ReturnCase<(bool Ok, string Template, string? ParamName, object? Value, int Result), (bool ExpectedSuccess, string ExpectedMessage, string? ExpectedParamName, object? ExpectedValue, int ExpectedResult)>(
                 Name,
                 (IsOk, Template, ParamName, InputValue, Result),
-                (ExpectedSuccess, ExpectedMessage, ParamName, InputValue, ExpectedSuccess ? Result : default));
+                (ExpectedSuccess, ExpectedMessage, ParamName, InputValue, ExpectedSuccess ? Result : 0));
     }
 
     public static class FromBoolWithoutResult

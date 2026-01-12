@@ -51,7 +51,7 @@ public sealed class MustResultTests : BaseUnitTest
         Assert.Equal(testCase.ExpectedMessage, mustResult.Message);
         Assert.Equal(testCase.ParamName, mustResult.ParamName);
         Assert.Equal(testCase.InputValue, mustResult.Value);
-        Assert.Equal(default(int), mustResult.Result);
+        Assert.Equal(0, mustResult.Result);
         Assert.False(asBool);
     }
 
@@ -92,7 +92,7 @@ public sealed class MustResultTests : BaseUnitTest
         }
         else
         {
-            Assert.Equal(default(int), mustResult.Result);
+            Assert.Equal(0, mustResult.Result);
         }
     }
 
@@ -111,11 +111,11 @@ public sealed class MustResultTests : BaseUnitTest
 
         if (testCase.ExpectedSuccess)
         {
-            Assert.Equal(default(int), mustResult.Result);
+            Assert.Equal(0, mustResult.Result);
         }
         else
         {
-            Assert.Equal(default(int), mustResult.Result);
+            Assert.Equal(0, mustResult.Result);
         }
     }
 

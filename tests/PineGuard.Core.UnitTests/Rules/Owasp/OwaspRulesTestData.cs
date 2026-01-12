@@ -136,8 +136,8 @@ public static class OwaspRulesTestData
             new("relative", "relative/path", true),
             new("dotdot", "../etc/passwd", false),
             new("absolute unix", "/etc/passwd", false),
-            new("absolute windows", "C:\\Windows\\System32", false),
-            new("unc", "\\\\server\\share\\file.txt", false),
+            new("absolute windows", @"C:\Windows\System32", false),
+            new("unc", @"\\server\share\file.txt", false),
             new("null", null, false),
             new("space", " ", false)
         ];

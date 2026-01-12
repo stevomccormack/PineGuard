@@ -81,7 +81,7 @@ public static class OwaspUtilityTestData
     {
         public static TheoryData<Case> ValidCases =>
         [
-            new("Header: value\\r\\nX: y => true", "Header: value\r\nX: y", true),
+            new(@"Header: value\r\nX: y => true", "Header: value\r\nX: y", true),
             new("Header: value => false", "Header: value", false),
         ];
 
