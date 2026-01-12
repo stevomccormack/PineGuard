@@ -38,7 +38,7 @@ public static class MustTypeExtension
                 => Guid.TryParse(value, out var _),
 
             _ when type == typeof(DayOfWeek)
-                => int.TryParse(value, out var dayVal) && dayVal >= 0 && dayVal <= 6,
+                => int.TryParse(value, out var dayVal) && dayVal is >= 0 and <= 6,
 
             _ when type.IsEnum
                 => Enum.TryParse(type, value, true, out var enumVal) && Enum.IsDefined(type, enumVal),

@@ -4,7 +4,7 @@ public static class GuidUtility
 {
     public static bool TryParse(string? value, out Guid guid)
     {
-        guid = default;
+        guid = Guid.Empty;
 
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;

@@ -154,13 +154,7 @@ public static partial class StringRules
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
-        foreach (var ch in trimmed)
-        {
-            if (ch > CharRules.AsciiMaxValue)
-                return false;
-        }
-
-        return true;
+        return trimmed.All(ch => ch <= CharRules.AsciiMaxValue);
     }
 
     public static bool IsPrintableAscii(string? value, bool allowCommonWhitespace = false)
@@ -187,13 +181,7 @@ public static partial class StringRules
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
-        foreach (var ch in trimmed)
-        {
-            if (char.IsWhiteSpace(ch))
-                return false;
-        }
-
-        return true;
+        return trimmed.All(ch => !char.IsWhiteSpace(ch));
     }
 
     public static bool ContainsNoControlChars(string? value)
@@ -201,13 +189,7 @@ public static partial class StringRules
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
-        foreach (var ch in trimmed)
-        {
-            if (char.IsControl(ch))
-                return false;
-        }
-
-        return true;
+        return trimmed.All(ch => !char.IsControl(ch));
     }
 
     public static bool ContainsOnlyAllowedChars(string? value, char[] allowedChars)
@@ -219,13 +201,7 @@ public static partial class StringRules
 
         var allowed = new HashSet<char>(allowedChars);
 
-        foreach (var ch in trimmed)
-        {
-            if (!allowed.Contains(ch))
-                return false;
-        }
-
-        return true;
+        return trimmed.All(ch => allowed.Contains(ch));
     }
 
     public static bool ContainsAnyDisallowedChars(string? value, char[] allowedChars)
@@ -237,41 +213,18 @@ public static partial class StringRules
 
         var allowed = new HashSet<char>(allowedChars);
 
-        foreach (var ch in trimmed)
-        {
-            if (!allowed.Contains(ch))
-                return true;
-        }
-
-        return false;
+        return trimmed.Any(ch => !allowed.Contains(ch));
     }
 
     private static bool IsAllFromAllowedSet(string value, Func<char, bool> basePredicate, char[]? inclusions)
     {
         if (inclusions is null || inclusions.Length == 0)
         {
-            foreach (var ch in value)
-            {
-                if (!basePredicate(ch))
-                    return false;
-            }
-
-            return true;
+            return value.All(basePredicate);
         }
 
         var inclusionSet = new HashSet<char>(inclusions);
 
-        foreach (var ch in value)
-        {
-            if (basePredicate(ch))
-                continue;
-
-            if (inclusionSet.Contains(ch))
-                continue;
-
-            return false;
-        }
-
-        return true;
+        return value.Where(ch => !basePredicate(ch)).All(ch => inclusionSet.Contains(ch));
     }
 }

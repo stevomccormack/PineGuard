@@ -11,13 +11,12 @@ public static partial class StringUtility
             if (!TryGetTrimmed(value, out var trimmed))
                 return false;
 
-            if (System.Guid.TryParse(trimmed, out var parsed))
-            {
-                guid = parsed;
-                return true;
-            }
+            if (!System.Guid.TryParse(trimmed, out var parsed)) 
+                return false;
 
-            return false;
+            guid = parsed;
+            return true;
+
         }
     }
 }

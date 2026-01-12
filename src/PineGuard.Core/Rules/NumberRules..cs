@@ -24,16 +24,16 @@ public static class NumberRules
         value is not null && value.Value <= T.Zero;
 
     public static bool IsGreaterThan<T>(T? value, T min) where T : struct, INumber<T> =>
-        value is not null && value.Value > min;
+        value > min;
 
     public static bool IsGreaterThanOrEqual<T>(T? value, T min) where T : struct, INumber<T> =>
-        value is not null && value.Value >= min;
+        value >= min;
 
     public static bool IsLessThan<T>(T? value, T max) where T : struct, INumber<T> =>
-        value is not null && value.Value < max;
+        value < max;
 
     public static bool IsLessThanOrEqual<T>(T? value, T max) where T : struct, INumber<T> =>
-        value is not null && value.Value <= max;
+        value <= max;
 
     public static bool IsInRange<T>(T? value, T min, T max, Inclusion inclusion = Inclusion.Inclusive)
         where T : struct, IComparable<T> =>

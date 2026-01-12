@@ -8,7 +8,7 @@ public static partial class StringRules
 {
     public static partial class NumberTypes
     {
-        public const string SignedIntegerPattern = "^[\\+\\-]?\\d+$";
+        public const string SignedIntegerPattern = @"^[\+\-]?\d+$";
 
         [GeneratedRegex(SignedIntegerPattern, RegexOptions.CultureInvariant)]
         public static partial Regex SignedIntegerRegex();

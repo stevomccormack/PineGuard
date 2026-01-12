@@ -7,10 +7,10 @@ public static partial class OwaspRegex
     public static partial class Xss
     {
         public const string NoAngleBracketsPattern = "^[^<>]*$";
-        public const string HtmlTagPattern = "<\\s*/?\\s*[a-zA-Z][^>]*>";
+        public const string HtmlTagPattern = @"<\s*/?\s*[a-zA-Z][^>]*>";
         public const string HtmlEntityEncodedAngleBracketPattern = "(?:&#0*60;|&#x0*3c;|&lt;|&#0*62;|&#x0*3e;|&gt;)";
-        public const string ScriptProtocolPattern = "\\b(?:javascript|data)\\s*:";
-        public const string HtmlEventHandlerAttributePattern = "\\bon[a-z]+\\s*=";
+        public const string ScriptProtocolPattern = @"\b(?:javascript|data)\s*:";
+        public const string HtmlEventHandlerAttributePattern = @"\bon[a-z]+\s*=";
 
         [GeneratedRegex(NoAngleBracketsPattern, RegexOptions.CultureInvariant)]
         public static partial Regex NoAngleBracketsRegex();
@@ -30,12 +30,12 @@ public static partial class OwaspRegex
 
     public static partial class SqlInjection
     {
-        public const string SqlKeywordPattern = "\\b(select|insert|update|delete|drop|alter|create|truncate|exec(?:ute)?|merge|union|grant|revoke)\\b";
-        public const string SqlCommentPattern = "(--|/\\*|\\*/|#)";
-        public const string SqlBooleanPattern = "\\b(or|and)\\b\\s+\\w+\\s*(=|!=|<>|<|>|<=|>=)";
+        public const string SqlKeywordPattern = @"\b(select|insert|update|delete|drop|alter|create|truncate|exec(?:ute)?|merge|union|grant|revoke)\b";
+        public const string SqlCommentPattern = @"(--|/\*|\*/|#)";
+        public const string SqlBooleanPattern = @"\b(or|and)\b\s+\w+\s*(=|!=|<>|<|>|<=|>=)";
         public const string SqlStatementTerminatorPattern = ";";
         public const string SqlQuotePattern = "['\"]";
-        public const string SqlUnionSelectPattern = "\\bunion\\b\\s+\\bselect\\b";
+        public const string SqlUnionSelectPattern = @"\bunion\b\s+\bselect\b";
 
         [GeneratedRegex(SqlKeywordPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
         public static partial Regex SqlKeywordRegex();
@@ -58,10 +58,10 @@ public static partial class OwaspRegex
 
     public static partial class PathTraversal
     {
-        public const string DotDotSegmentPattern = "(\\.\\.(?:/|\\\\)|%2e%2e(?:%2f|%5c)|%2e%2e/)";
+        public const string DotDotSegmentPattern = @"(\.\.(?:/|\\)|%2e%2e(?:%2f|%5c)|%2e%2e/)";
         public const string AbsoluteUnixPathPattern = "^/";
-        public const string WindowsDriveAbsolutePathPattern = "^[a-zA-Z]:\\\\?";
-        public const string UncPathPattern = "^\\\\\\\\";
+        public const string WindowsDriveAbsolutePathPattern = @"^[a-zA-Z]:\\?";
+        public const string UncPathPattern = @"^\\\\";
 
         [GeneratedRegex(DotDotSegmentPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
         public static partial Regex DotDotSegmentRegex();
@@ -79,8 +79,8 @@ public static partial class OwaspRegex
     public static partial class CommandInjection
     {
         public const string ShellMetacharactersPattern = "[;&|`$><]";
-        public const string NewlinePattern = "\\r|\\n|%0d|%0a";
-        public const string CommandChainingPattern = "(&&|\\|\\||;)";
+        public const string NewlinePattern = @"\r|\n|%0d|%0a";
+        public const string CommandChainingPattern = @"(&&|\|\||;)";
 
         [GeneratedRegex(ShellMetacharactersPattern, RegexOptions.CultureInvariant)]
         public static partial Regex ShellMetacharactersRegex();
@@ -94,7 +94,7 @@ public static partial class OwaspRegex
 
     public static partial class HeaderInjection
     {
-        public const string CrLfPattern = "\\r|\\n|%0d|%0a";
+        public const string CrLfPattern = @"\r|\n|%0d|%0a";
 
         [GeneratedRegex(CrLfPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
         public static partial Regex CrLfRegex();
@@ -102,7 +102,7 @@ public static partial class OwaspRegex
 
     public static partial class LdapInjection
     {
-        public const string LdapFilterSpecialCharsPattern = "[\\*\\(\\)\\\\\\x00]";
+        public const string LdapFilterSpecialCharsPattern = @"[\*\(\)\\\x00]";
 
         [GeneratedRegex(LdapFilterSpecialCharsPattern, RegexOptions.CultureInvariant)]
         public static partial Regex LdapFilterSpecialCharsRegex();
@@ -118,7 +118,7 @@ public static partial class OwaspRegex
 
     public static partial class Ssrf
     {
-        public const string DangerousSchemePattern = "\\b(?:file|gopher|ftp|data|javascript)\\s*:";
+        public const string DangerousSchemePattern = @"\b(?:file|gopher|ftp|data|javascript)\s*:";
 
         [GeneratedRegex(DangerousSchemePattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
         public static partial Regex DangerousSchemeRegex();

@@ -46,9 +46,8 @@ public abstract partial class IsoPaymentCardBrand : IIsoPaymentCardBrand
         if (validPanLengths.Length == 0)
             throw new ArgumentException($"{nameof(validPanLengths).TitleCase()} cannot be empty.", nameof(validPanLengths));
 
-        for (var i = 0; i < validPanLengths.Length; i++)
+        foreach (var len in validPanLengths)
         {
-            var len = validPanLengths[i];
             if (len < MinPanLength || len > MaxPanLength)
                 throw new ArgumentOutOfRangeException(nameof(validPanLengths), len, $"{nameof(validPanLengths).TitleCase()} must contain values between {MinPanLength} and {MaxPanLength}.");
         }
@@ -56,15 +55,13 @@ public abstract partial class IsoPaymentCardBrand : IIsoPaymentCardBrand
         if (iinPrefixes.Length == 0)
             throw new ArgumentException($"{nameof(iinPrefixes).TitleCase()} cannot be empty.", nameof(iinPrefixes));
 
-        for (var i = 0; i < iinPrefixes.Length; i++)
+        foreach (var prefix in iinPrefixes)
         {
-            var prefix = iinPrefixes[i];
             if (string.IsNullOrWhiteSpace(prefix))
                 throw new ArgumentException($"{nameof(iinPrefixes).TitleCase()} cannot contain null or whitespace values.", nameof(iinPrefixes));
 
-            for (var j = 0; j < prefix.Length; j++)
+            foreach (var ch in prefix)
             {
-                var ch = prefix[j];
                 if (ch is < '0' or > '9')
                     throw new ArgumentException($"{nameof(iinPrefixes).TitleCase()} must contain digits only.", nameof(iinPrefixes));
             }
@@ -74,9 +71,8 @@ public abstract partial class IsoPaymentCardBrand : IIsoPaymentCardBrand
             throw new ArgumentException($"{nameof(displayFormatPattern).TitleCase()} cannot be empty.", nameof(displayFormatPattern));
 
         var total = 0;
-        for (var i = 0; i < displayFormatPattern.Length; i++)
+        foreach (var part in displayFormatPattern)
         {
-            var part = displayFormatPattern[i];
             if (part <= 0)
                 throw new ArgumentOutOfRangeException(nameof(displayFormatPattern), part, $"{nameof(displayFormatPattern).TitleCase()} must contain values greater than 0.");
 
@@ -113,13 +109,7 @@ public abstract partial class IsoPaymentCardBrand : IIsoPaymentCardBrand
         if (!Array.Exists(_validPanLengths, length => sanitized.Length == length))
             return false;
 
-        foreach (var prefix in _iinPrefixes)
-        {
-            if (sanitized.StartsWith(prefix, StringComparison.Ordinal))
-                return true;
-        }
-
-        return false;
+        return _iinPrefixes.Any(prefix => sanitized.StartsWith(prefix, StringComparison.Ordinal));
     }
 
     protected static bool MatchesIinRange(string sanitizedPan, int rangeStart, int rangeEnd)
@@ -158,13 +148,7 @@ public static class IsoPaymentCardBrandUtility
         if (string.IsNullOrWhiteSpace(pan))
             return null;
 
-        foreach (var brand in All)
-        {
-            if (brand.MatchesPan(pan))
-                return brand;
-        }
-
-        return null;
+        return All.FirstOrDefault(brand => brand.MatchesPan(pan));
     }
 
     public static bool TryFromPan(string? pan, out IIsoPaymentCardBrand? brand)
@@ -180,13 +164,7 @@ public static class IsoPaymentCardBrandUtility
 
         var trimmed = brandName.Trim();
 
-        foreach (var brand in All)
-        {
-            if (string.Equals(brand.BrandName, trimmed, StringComparison.OrdinalIgnoreCase))
-                return brand;
-        }
-
-        return null;
+        return All.FirstOrDefault(brand => string.Equals(brand.BrandName, trimmed, StringComparison.OrdinalIgnoreCase));
     }
 
     public static bool TryFromBrandName(string? brandName, out IIsoPaymentCardBrand? brand)

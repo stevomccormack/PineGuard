@@ -13,13 +13,13 @@ public static partial class StringUtility
             if (!TryGetTrimmed(value, out var trimmed))
                 return false;
 
-            if (global::System.DateOnly.TryParse(trimmed, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
-            {
-                date = parsed;
-                return true;
-            }
+            if (!global::System.DateOnly.TryParse(trimmed, CultureInfo.InvariantCulture, DateTimeStyles.None,
+                    out var parsed)) 
+                return false;
 
-            return false;
+            date = parsed;
+            return true;
+
         }
     }
 }

@@ -46,11 +46,10 @@ public static class DictionaryUtility
 
         foreach (var pair in dictionary)
         {
-            if (EqualityComparer<TValue>.Default.Equals(pair.Value, value))
-            {
-                key = pair.Key;
-                return true;
-            }
+            if (!EqualityComparer<TValue>.Default.Equals(pair.Value, value)) continue;
+
+            key = pair.Key;
+            return true;
         }
 
         return false;
@@ -67,11 +66,10 @@ public static class DictionaryUtility
 
         foreach (var pair in dictionary)
         {
-            if (predicate(pair.Key))
-            {
-                key = pair.Key;
-                return true;
-            }
+            if (!predicate(pair.Key)) continue;
+
+            key = pair.Key;
+            return true;
         }
 
         return false;
@@ -88,11 +86,10 @@ public static class DictionaryUtility
 
         foreach (var pair in dictionary)
         {
-            if (predicate(pair.Value))
-            {
-                value = pair.Value;
-                return true;
-            }
+            if (!predicate(pair.Value)) continue;
+
+            value = pair.Value;
+            return true;
         }
 
         return false;
@@ -109,11 +106,10 @@ public static class DictionaryUtility
 
         foreach (var item in dictionary)
         {
-            if (predicate(item.Key, item.Value))
-            {
-                pair = item;
-                return true;
-            }
+            if (!predicate(item.Key, item.Value)) continue;
+
+            pair = item;
+            return true;
         }
 
         return false;

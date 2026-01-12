@@ -10,14 +10,7 @@ public static class MustGuidExtension
         string value,
         [CallerArgumentExpression("value")] string? paramName = null)
     {
-        var messageTemplate = "{paramName} must be a valid GUID.";
-
-        if (string.IsNullOrEmpty(value)
-            || string.IsNullOrWhiteSpace(value)
-            || value != value.Trim())
-        {
-            return MustResult<Guid>.Fail(messageTemplate, paramName, value);
-        }
+        const string messageTemplate = "{paramName} must be a valid GUID.";
 
         var ok = GuidUtility.TryParse(value, out var parsed);
         return MustResult<Guid>.FromBool(ok, messageTemplate, paramName, value, parsed);

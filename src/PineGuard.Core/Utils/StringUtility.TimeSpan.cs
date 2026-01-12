@@ -13,13 +13,12 @@ public static partial class StringUtility
             if (!TryGetTrimmed(value, out var trimmed))
                 return false;
 
-            if (global::System.TimeSpan.TryParse(trimmed, CultureInfo.InvariantCulture, out var parsed))
-            {
-                timeSpan = parsed;
-                return true;
-            }
+            if (!global::System.TimeSpan.TryParse(trimmed, CultureInfo.InvariantCulture, out var parsed)) 
+                return false;
+            
+            timeSpan = parsed;
+            return true;
 
-            return false;
         }
     }
 }

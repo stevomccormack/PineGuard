@@ -13,7 +13,7 @@ public static partial class StringUtility
             NumberStyles styles = NumberStyles.AllowLeadingSign,
             IFormatProvider? provider = null)
         {
-            result = default;
+            result = 0;
 
             if (string.IsNullOrWhiteSpace(value))
                 return false;
@@ -28,7 +28,7 @@ public static partial class StringUtility
             NumberStyles styles = NumberStyles.AllowLeadingSign,
             IFormatProvider? provider = null)
         {
-            result = default;
+            result = 0;
 
             if (string.IsNullOrWhiteSpace(value))
                 return false;
@@ -43,7 +43,7 @@ public static partial class StringUtility
             NumberStyles styles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
             IFormatProvider? provider = null)
         {
-            result = default;
+            result = 0;
 
             if (string.IsNullOrWhiteSpace(value))
                 return false;
@@ -54,7 +54,7 @@ public static partial class StringUtility
 
         public static bool TryParseDecimal(string? value, int decimalPlaces, out decimal result)
         {
-            result = default;
+            result = 0;
 
             if (value is null)
                 return false;
@@ -93,7 +93,7 @@ public static partial class StringUtility
 
         public static bool TryParseExactDecimal(string? value, int exactDecimalPlaces, out decimal result)
         {
-            result = default;
+            result = 0;
 
             if (value is null)
                 return false;
@@ -136,7 +136,7 @@ public static partial class StringUtility
             NumberStyles styles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
             IFormatProvider? provider = null)
         {
-            result = default;
+            result = 0;
 
             if (string.IsNullOrWhiteSpace(value))
                 return false;
@@ -151,7 +151,7 @@ public static partial class StringUtility
             NumberStyles styles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
             IFormatProvider? provider = null)
         {
-            result = default;
+            result = 0;
 
             if (string.IsNullOrWhiteSpace(value))
                 return false;

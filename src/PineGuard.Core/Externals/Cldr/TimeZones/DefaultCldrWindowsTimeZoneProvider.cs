@@ -37,15 +37,10 @@ public sealed class DefaultCldrWindowsTimeZoneProvider : ICldrWindowsTimeZonePro
             var windowsId = winKvp.Key;
             var byTerritory = winKvp.Value;
 
-            foreach (var terrKvp in byTerritory)
+            foreach (var (territory, ianaIds) in byTerritory)
             {
-                var territory = terrKvp.Key;
-                var ianaIds = terrKvp.Value;
-
-                for (var i = 0; i < ianaIds.Length; i++)
+                foreach (var ianaId in ianaIds)
                 {
-                    var ianaId = ianaIds[i];
-
                     if (!ianaToTerritoryToWindows.TryGetValue(ianaId, out var terrMap))
                     {
                         terrMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);

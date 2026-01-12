@@ -102,7 +102,7 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
 
     public static bool operator ==(Enumeration<TValue>? left, Enumeration<TValue>? right)
     {
-        return (left is null) ? right is null : left.Equals(right);
+        return left?.Equals(right) ?? right is null;
     }
 
     public static bool operator !=(Enumeration<TValue>? left, Enumeration<TValue>? right)

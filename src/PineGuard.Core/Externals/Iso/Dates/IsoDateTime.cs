@@ -20,11 +20,11 @@ public static partial class IsoDateTime
         WithFractionalSecondsFormat
     ];
 
-    public const string BasicPattern = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$";
-    public const string WithFractionalSecondsPattern = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{1,7}$";
+    public const string BasicPattern = @"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$";
+    public const string WithFractionalSecondsPattern = @"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{1,7}$";
     public const string AllPatterns = "^(?:" +
-        "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}" +
-        "(?:\\.\\d{1,7})?" +
+        @"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}" +
+        @"(?:\.\d{1,7})?" +
         ")$";
 
     [GeneratedRegex(AllPatterns, RegexOptions.CultureInvariant)]

@@ -81,11 +81,9 @@ public static class CollectionUtility
         {
             for (var i = 0; i < list.Count; i++)
             {
-                if (EqualityComparer<T>.Default.Equals(list[i], item))
-                {
-                    index = i;
-                    return true;
-                }
+                if (!EqualityComparer<T>.Default.Equals(list[i], item)) continue;
+                index = i;
+                return true;
             }
 
             return false;

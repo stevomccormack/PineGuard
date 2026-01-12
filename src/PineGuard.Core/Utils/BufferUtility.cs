@@ -10,13 +10,7 @@ public static class BufferUtility
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
-        foreach (var ch in trimmed)
-        {
-            if (!CharRules.IsHexDigit(ch))
-                return false;
-        }
-
-        return true;
+        return trimmed.All(CharRules.IsHexDigit);
     }
 
     public static bool IsBase64String(string? value)

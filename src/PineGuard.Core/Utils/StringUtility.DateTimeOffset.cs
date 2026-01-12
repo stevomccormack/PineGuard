@@ -13,13 +13,13 @@ public static partial class StringUtility
             if (!TryGetTrimmed(value, out var trimmed))
                 return false;
 
-            if (global::System.DateTimeOffset.TryParse(trimmed, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var parsed))
-            {
-                dateTimeOffset = parsed;
-                return true;
-            }
+            if (!global::System.DateTimeOffset.TryParse(trimmed, CultureInfo.InvariantCulture,
+                    DateTimeStyles.RoundtripKind, out var parsed)) 
+                return false;
 
-            return false;
+            dateTimeOffset = parsed;
+            return true;
+
         }
     }
 }

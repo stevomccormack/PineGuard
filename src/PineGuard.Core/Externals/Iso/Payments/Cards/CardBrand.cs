@@ -22,10 +22,7 @@ public sealed class CardBrand : StringEnumeration
     public static CardBrand? FromPan(string? pan)
     {
         var detected = IsoPaymentCardBrandUtility.FromPan(pan);
-        if (detected is null)
-            return null;
-
-        return IsoPaymentCardBrandUtility.ToIsoCardBrand(detected);
+        return detected is null ? null : IsoPaymentCardBrandUtility.ToIsoCardBrand(detected);
     }
 
     /// <summary>

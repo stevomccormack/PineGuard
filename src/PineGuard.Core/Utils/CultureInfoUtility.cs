@@ -8,10 +8,10 @@ public static class CultureInfoUtility
     private static readonly Lazy<CultureInfo[]> SpecificCulturesCache =
         new(() => CultureInfo.GetCultures(CultureTypes.SpecificCultures));
 
-    private static readonly ConcurrentDictionary<string, IReadOnlyCollection<string>> RegionCodesByisoLanguageAlpha2CodeCache =
+    private static readonly ConcurrentDictionary<string, IReadOnlyCollection<string>> RegionCodesByIsoLanguageAlpha2CodeCache =
         new(StringComparer.OrdinalIgnoreCase);
 
-    private static readonly ConcurrentDictionary<string, IReadOnlyCollection<CultureInfo>> CulturesByisoLanguageAlpha2CodeCache =
+    private static readonly ConcurrentDictionary<string, IReadOnlyCollection<CultureInfo>> CulturesByIsoLanguageAlpha2CodeCache =
         new(StringComparer.OrdinalIgnoreCase);
 
     public static bool TryGetCultureName(string? isoLanguageAlpha2Code, out string cultureName) =>
@@ -62,7 +62,7 @@ public static class CultureInfoUtility
         if (!StringUtility.TryGetTrimmed(isoLanguageAlpha2Code, out var lang))
             return [];
 
-        return RegionCodesByisoLanguageAlpha2CodeCache.GetOrAdd(lang, static l =>
+        return RegionCodesByIsoLanguageAlpha2CodeCache.GetOrAdd(lang, static l =>
         {
             var regions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -96,7 +96,7 @@ public static class CultureInfoUtility
         if (!StringUtility.TryGetTrimmed(isoLanguageAlpha2Code, out var lang))
             return [];
 
-        return CulturesByisoLanguageAlpha2CodeCache.GetOrAdd(lang, static l =>
+        return CulturesByIsoLanguageAlpha2CodeCache.GetOrAdd(lang, static l =>
         {
             var result = new List<CultureInfo>();
 
