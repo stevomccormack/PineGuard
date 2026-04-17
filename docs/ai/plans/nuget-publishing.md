@@ -1,169 +1,191 @@
 # NuGet Publishing Plan for PineGuard
 
-## Context
+## Status
 
-PineGuard is a mature, multi-target validation library with 5 source packages, 100% test coverage,
-zero Roslyn warnings, and zero SonarQube issues. This plan covers publishing all packages to
-nuget.org, adding the AuditCli as a dotnet tool, and the CI/CD release workflow.
+PineGuard is a mature multi-target validation library now living in a clean,
+fresh public repo (MIT, nuget.org) at
+[github.com/stevomccormack/PineGuard](https://github.com/stevomccormack/PineGuard).
+Six ship-ready packages, 13,000+ tests green on net8.0 and net10.0, zero
+Roslyn warnings, zero SonarQube issues, and a working PowerShell toolchain.
+
+**What's not yet set up:** NuGet metadata, an icon bundled into each package,
+per-package README files for nuget.org, MinVer versioning, Source Link, and a
+publish workflow wired to GitHub Releases.
 
 ## Package Inventory
 
-| Package | Internal Dependencies | Purpose |
-|---------|-----------------------|---------|
-| `PineGuard.Core` | — | Rules engine, primitives |
-| `PineGuard.MustClauses` | Core | Result-based fluent API |
-| `PineGuard.GuardClauses` | Core, Must | Throw-on-failure guards |
-| `PineGuard.FluentValidation` | Core, Must | FluentValidation adapters |
-| `PineGuard.DataAnnotations` | Core, Must | `[Attribute]` validators |
-| `PineGuard.Testing` | Core | Test fixtures for consumers writing PineGuard tests |
-| `PineGuard.AuditCli` | — | dotnet global tool (separate from library packages) |
+| Package | Dependencies | Purpose |
+|---------|--------------|---------|
+| `PineGuard.Core` | — | Rules engine and primitive validations |
+| `PineGuard.MustClauses` | Core | Result-based composable validators |
+| `PineGuard.GuardClauses` | Core, Must | Fail-fast guards with typed returns |
+| `PineGuard.FluentValidation` | Core, Must, FluentValidation | AbstractValidator extensions |
+| `PineGuard.DataAnnotations` | Core, Must | `[ValidationAttribute]` implementations |
+| `PineGuard.Testing` | Core, FluentValidation, xunit | Shared fixtures and base classes for consumers |
 
-`PineGuard.Testing` already has `IsTestProject: false` and should be published so consumers can
-use the shared test infrastructure when building PineGuard-based validation.
+`tools/audit-cli/` is internal tooling and is **not** part of the first release
+cut. Ship it as a dotnet global tool in a follow-up once the library packages
+are stable.
 
-## Locked Decisions
+## Design Decisions (locked)
 
-- **All ProjectReferences become PackageReferences automatically** — NuGet handles this when all
-  referenced projects are also published packages. No manual `.nuspec` needed.
-- **No per-TFM packages** — one package per library containing all TFM assets inside it
-  (`netstandard2.1;net8.0;net10.0`). NuGet resolves the best-matching TFM at install time.
-- **MinVer for versioning** — git-tag-driven, zero manual version bumping. Tag `v1.0.0` → package
-  version `1.0.0`. Pre-releases use `v1.1.0-alpha.1` tags.
-- **Symbol packages** — `.snupkg` format, pushed alongside `.nupkg` to nuget.org.
-- **Source Link** — Microsoft.SourceLink.GitHub enables IDE step-into-source for consumers.
-- **Deterministic builds** — enabled on CI only (`ContinuousIntegrationBuild`).
+- **Pack format:** one package per library containing all three TFMs
+  (`netstandard2.1;net8.0;net10.0`). NuGet resolves the best match at install.
+- **Versioning:** MinVer drives versions from annotated git tags (`v1.0.0` →
+  package `1.0.0`). Pre-releases use `v1.1.0-alpha.1` etc.
+- **Publish trigger:** `on: release: types: [published]` — fires only when a
+  GitHub Release is moved out of Draft. Prevents accidental publishes from a
+  mistyped tag push and gives you a review gate.
+- **Symbol packages:** `.snupkg` format, pushed alongside `.nupkg`.
+- **Source Link:** `Microsoft.SourceLink.GitHub` enables IDE step-into-source.
+- **Branching:** trunk-based on `main`. No `develop`. Hotfix via on-demand
+  `release/x.y` branches only when a v1 consumer needs a fix after main has
+  moved to v2 breaking work.
 
-## Target Framework Strategy
+## Prerequisites (once, before any publish work)
 
-Current TFMs: `netstandard2.1;net8.0;net10.0`
+1. **Icon file.** The brand icon is at
+   `docs/brand/pineguard-logo-512px.png` (512×512). nuget.org accepts any size
+   up to 1 MB but recommends 128×128 for package-page rendering; the 512px PNG
+   renders cleanly at that size without a separate downscale.
 
-- Keep `netstandard2.1` — covers Xamarin, Unity, Blazor WASM, .NET Core 3.x/5/6/7.
-- Drop `net8.0` when it reaches EOL (November 2026).
-- `net10.0` is STS (EOL May 2026) — add `net12.0` when available; consider whether to retain
-  `net10.0` during the overlap window.
-- `Microsoft.CSharp` conditional reference in `DataAnnotations` for `netstandard2.1` is already
-  handled correctly and will flow into the published package's conditional dependency.
-- `System.Text.Json` and `System.ComponentModel.Annotations` are inbox on net8.0+; NuGet will
-  include them as conditional dependencies for `netstandard2.1` consumers only.
+   Keep the PNG in `docs/brand/` (source of truth) and reference it from each
+   `.csproj` via a relative path — no need to duplicate the file at the root.
 
-## Implementation Steps
+2. **Per-package README.md files.** Each `.csproj` needs a short focused README
+   sitting next to it (e.g. `src/PineGuard.Core/README.md`). The root README is
+   too broad for nuget.org's left-column display. Aim for ~20–40 lines per
+   package: one-paragraph summary, install snippet, 3–5 canonical examples,
+   link back to the root README for the full picture.
 
-### 1. NuGet Metadata — `Directory.Build.props`
+3. **nuget.org account + API key.** Create a push-only API key at
+   nuget.org → Account → API Keys with:
+   - Key name: `pineguard-github-actions`
+   - Package owner: your nuget.org account
+   - Scopes: Push + Push new packages and package versions
+   - Glob pattern: `PineGuard.*`
+   - Expiration: 365 days (renewable; shorter is fine for first release)
 
-Add shared metadata inside a condition so test/tool projects are excluded:
+   Store as repo secret `NUGET_TOKEN` at
+   github.com/stevomccormack/PineGuard → Settings → Secrets → Actions.
+
+## Implementation
+
+### 1. Shared package metadata — `Directory.Build.props`
+
+Add a packable condition so test projects (which have `IsTestProject=true`
+from the SDK) and non-packable assets stay out of the pack step.
 
 ```xml
-<PropertyGroup Condition="'$(IsPackable)' != 'false' and '$(IsTestProject)' != 'true'">
-  <Authors>Steve McCormack</Authors>
-  <Company>stevomccormack</Company>
-  <Copyright>Copyright © 2024-2025 Steve McCormack</Copyright>
-  <PackageLicenseExpression>MIT</PackageLicenseExpression>
-  <PackageProjectUrl>https://github.com/stevomccormack/PineGuard</PackageProjectUrl>
-  <RepositoryUrl>https://github.com/stevomccormack/PineGuard</RepositoryUrl>
-  <RepositoryType>git</RepositoryType>
-  <PackageIcon>icon.png</PackageIcon>
-  <PackageReadmeFile>README.md</PackageReadmeFile>
-  <PackageTags>validation;guard;must;fluent;data-annotations;dotnet</PackageTags>
-  <PublishRepositoryUrl>true</PublishRepositoryUrl>
-  <EmbedUntrackedSources>true</EmbedUntrackedSources>
-  <IncludeSymbols>true</IncludeSymbols>
-  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  <Deterministic>true</Deterministic>
-  <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+<Project>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net8.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS8795</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsPackable)' != 'false' and '$(IsTestProject)' != 'true'">
+    <Authors>Steve McCormack</Authors>
+    <Company>stevomccormack</Company>
+    <Copyright>Copyright © 2026 Steve McCormack</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/stevomccormack/PineGuard</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/stevomccormack/PineGuard</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>pineguard-logo-512px.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>validation;guard;must;fluent;data-annotations;dotnet</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsPackable)' != 'false' and '$(IsTestProject)' != 'true'">
+    <PackageReference Include="MinVer" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
+```
+
+### 2. Per-`.csproj` additions
+
+Each of the six packable projects needs:
+
+```xml
+<PropertyGroup>
+  <Description>One focused sentence describing the package's role.</Description>
 </PropertyGroup>
-```
 
-Each `.csproj` adds its own `<Description>` and optionally `<PackageTags>` override.
-
-### 2. Versioning — MinVer
-
-```xml
-<!-- Directory.Packages.props -->
-<PackageVersion Include="MinVer" Version="5.0.0" />
-
-<!-- Directory.Build.props (inside packable condition) -->
 <ItemGroup>
-  <PackageReference Include="MinVer" PrivateAssets="all" />
-</ItemGroup>
-```
-
-### 3. Source Link
-
-```xml
-<!-- Directory.Packages.props -->
-<PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-
-<!-- Directory.Build.props (inside packable condition) -->
-<ItemGroup>
-  <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" />
-</ItemGroup>
-```
-
-### 4. Package Icon and Per-Package README
-
-Each packable `.csproj` includes:
-
-```xml
-<ItemGroup>
-  <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
+  <None Include="..\..\docs\brand\pineguard-logo-512px.png" Pack="true" PackagePath="\" />
   <None Include="README.md" Pack="true" PackagePath="\" />
 </ItemGroup>
 ```
 
-Each package needs a short, focused `README.md` alongside its `.csproj`. The root README is too
-broad for per-package display on nuget.org.
+Path depth for `PineGuard.Testing` (lives under `tests/`): `..\..\docs\brand\…`.
+Path depth for the `src/PineGuard.X/` packages: `..\..\docs\brand\…`.
 
-### 5. License File
+Suggested `<Description>` for each:
 
-Either use `<PackageLicenseExpression>MIT</PackageLicenseExpression>` (sufficient for nuget.org),
-or embed the file for enterprise compliance tooling:
+| Package | Description |
+|---------|-------------|
+| `PineGuard.Core` | Zero-dependency validation primitives: rules and utilities for strings, numbers, dates, collections, URIs, emails, network identifiers, and OWASP-safe input. |
+| `PineGuard.MustClauses` | Result-based composable validators. Must.Be.Email(value) returns a MustResult<T> the caller inspects or escalates. |
+| `PineGuard.GuardClauses` | Fail-fast guards with parsed typed returns. Guard.Against.NotHttpsUrl(url) returns a Uri or throws. |
+| `PineGuard.FluentValidation` | Rule-builder extensions for FluentValidation's AbstractValidator pipeline. |
+| `PineGuard.DataAnnotations` | `[ValidationAttribute]` implementations for DTOs, MVC binding, Blazor forms, and EF Core. |
+| `PineGuard.Testing` | Shared fixtures, base test classes, and assertion helpers for consumers writing PineGuard-based validation tests. |
+
+### 3. `PineGuard.Testing` — flip to packable
+
+Already has `<IsTestProject>false</IsTestProject>`. The shared metadata in
+`Directory.Build.props` will now apply to it since neither `IsPackable=false`
+nor `IsTestProject=true`. Verify with `dotnet pack tests/PineGuard.Testing`.
+
+### 4. Central package versions — `Directory.Packages.props`
+
+Append:
 
 ```xml
-<PackageLicenseFile>LICENSE</PackageLicenseFile>
-<!-- plus -->
-<None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+<PackageVersion Include="MinVer" Version="5.0.0" />
+<PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
 ```
 
-### 6. AuditCli as a dotnet tool
+### 5. MinVer configuration (optional tweak)
 
-In `tools/audit-cli/solution/PineGuard.AuditCli.csproj`:
+Defaults work for `v1.0.0`-style tags. If you want to start at `0.1.0-alpha.1`,
+set the floor in `Directory.Build.props`:
 
 ```xml
 <PropertyGroup>
-  <PackAsTool>true</PackAsTool>
-  <ToolCommandName>pineguard-audit</ToolCommandName>
-  <PackageId>PineGuard.AuditCli</PackageId>
-  <Description>Audit CLI for PineGuard validation rule coverage analysis.</Description>
+  <MinVerTagPrefix>v</MinVerTagPrefix>
+  <MinVerDefaultPreReleaseIdentifiers>alpha.0</MinVerDefaultPreReleaseIdentifiers>
 </PropertyGroup>
 ```
 
-Consumers install with: `dotnet tool install PineGuard.AuditCli -g`
+### 6. Polyfill leakage check
 
-### 7. Package Validation in CI
+`src/PineGuard.Core/Polyfills/CallerArgumentExpressionAttribute.cs` is linked
+into Must, Guard, and Fluent projects as an `internal` type. Run `dotnet pack`
+locally and inspect each `.nupkg` (rename to `.zip`, look at
+`lib/{tfm}/{pkg}.dll` via `ildasm` or `dotnet-sos`) to confirm it isn't
+exposed in the public API surface. Only a concern if any project references it
+with `internal: false` — unlikely but worth a one-time audit.
 
-Add to the build job in `ci.yml`:
-
-```yaml
-- run: dotnet pack --configuration Release --no-build --output ./artifacts
-- run: dotnet tool run dotnet-package-validate --package ./artifacts/*.nupkg
-```
-
-Add to `Directory.Packages.props`:
-
-```xml
-<PackageVersion Include="Microsoft.DotNet.PackageValidation" Version="1.0.0-preview.7" />
-```
-
-### 8. Publish Workflow — `.github/workflows/publish.yml`
-
-Triggered by publishing a GitHub Release (not a raw tag push — see Branching & Release Strategy).
+### 7. GitHub Actions publish workflow — `.github/workflows/publish.yml`
 
 ```yaml
 name: Publish to NuGet
 
 on:
   release:
-    types: [published]    # fires only when release moves from Draft → Published
+    types: [published]
 
 jobs:
   publish:
@@ -173,11 +195,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0    # MinVer requires full git history
+          fetch-depth: 0  # MinVer needs full git history + tags
 
       - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       - name: Restore
         run: dotnet restore PineGuard.slnx
@@ -186,7 +210,7 @@ jobs:
         run: dotnet build PineGuard.slnx -c Release --no-restore
 
       - name: Test
-        run: dotnet test PineGuard.slnx -c Release --no-build
+        run: dotnet test PineGuard.slnx -c Release --no-build --verbosity minimal
 
       - name: Pack
         run: dotnet pack PineGuard.slnx -c Release --no-build --output ./artifacts
@@ -194,157 +218,144 @@ jobs:
       - name: Push to NuGet
         run: |
           dotnet nuget push ./artifacts/*.nupkg \
-            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --api-key ${{ secrets.NUGET_TOKEN }} \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
-        # .snupkg symbol packages are pushed automatically alongside .nupkg
 ```
 
-Add `NUGET_API_KEY` as a secret in GitHub repo settings (generate on nuget.org → Account → API Keys,
-scoped to push only, with a package prefix filter of `PineGuard.*`).
+`.snupkg` symbol packages are pushed automatically alongside `.nupkg`.
 
-### 9. Pre-release via GitHub Packages (Optional)
+### 8. CI workflow (separate from publish) — `.github/workflows/ci.yml`
 
-For alpha/beta validation before pushing to nuget.org, publish to GitHub Packages first:
+If you don't already have one, add a PR-gate workflow:
 
 ```yaml
-- name: Push to GitHub Packages (pre-release only)
-  if: contains(github.ref, '-')    # e.g. v1.0.0-alpha.1
-  run: |
-    dotnet nuget push ./artifacts/*.nupkg \
-      --api-key ${{ secrets.GITHUB_TOKEN }} \
-      --source https://nuget.pkg.github.com/stevomccormack/index.json
+name: CI
+on:
+  pull_request: { branches: [main] }
+  push:         { branches: [main] }
+
+jobs:
+  build-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-dotnet@v5
+        with: { dotnet-version: "10.0.x" }
+      - run: dotnet restore PineGuard.slnx
+      - run: dotnet build PineGuard.slnx -c Release --no-restore
+      - run: dotnet test PineGuard.slnx -c Release --no-build
 ```
 
-## Branching & Release Strategy
-
-### Recommendation: Trunk-based, tags only
-
-**No develop branch. No permanent release branches.**
-
-| Strategy | Verdict | Reason |
-|----------|---------|--------|
-| `main` + annotated tags | **Recommended** | Minimal overhead; MinVer works perfectly; single source of truth |
-| `main` + `develop` | Avoid | Gitflow is designed for parallel-stream teams. Double merges, no benefit for a single developer or small library team |
-| Permanent `release/x.y` | Create on demand only | Only needed when `main` has moved to breaking v2 work and a v1 consumer needs a hotfix; never pre-create |
-
-The `releases/*` trigger in `ci.yml` is the correct escape hatch — keep it, but don't create the
-branch until a real backport scenario arises.
-
-### MinVer Behaviour by Situation
-
-MinVer requires **annotated tags** (not lightweight) and **full git history** (`fetch-depth: 0`).
-
-| Situation | MinVer output | Package version |
-|-----------|---------------|-----------------|
-| Commit is tagged `v1.0.0` | `1.0.0` | Stable release |
-| 3 commits after `v1.0.0` on main | `1.0.1-alpha.0.3.abcdef` | Auto pre-release |
-| Tagged `v1.1.0-beta.1` | `1.1.0-beta.1` | Explicit pre-release |
-| On `release/1.0` branch, tagged `v1.0.1` | `1.0.1` | Patch from release branch |
-
-Pre-release packages between stable tags are automatic — no version file to update.
-
-### Release Flow
+## Release Flow (end-to-end walkthrough)
 
 ```
 feature/add-something
         │
-        └─ PR → main (CI: build, test, coverage, format, roslyn — all must pass)
+        └─ PR → main (CI green)
                     │
-                    │  (work accumulates, all green)
-                    │
-                    ▼
-         gh release create v1.0.0 --generate-notes
+                    │  (accumulate changes; CI stays green on main)
                     │
                     ▼
-         publish.yml triggers → pack → push to nuget.org
+         gh release create v1.0.0 \
+           --draft \
+           --generate-notes \
+           --title "1.0.0"
+                    │
+                    │  (review auto-generated notes, edit if needed)
+                    │
+                    ▼
+         Click "Publish release" in GitHub UI
+         (or: gh release edit v1.0.0 --draft=false)
+                    │
+                    ▼
+         publish.yml fires automatically
+           restore → build → test → pack → push → nuget.org
+                    │
+                    ▼
+         All 6 packages appear on nuget.org within 5–10 min
+         (indexing can take up to 1 hour before they show in `dotnet add package` search)
 ```
 
-### Publish Trigger: GitHub Release (recommended over raw tag push)
+Annotated tag is created by `gh release create` automatically — no need for a
+separate `git tag -a` step.
 
-Use `on: release: types: [published]` rather than `on: push: tags: ['v*']`.
+### First release suggestion
 
-Benefits:
-- You can draft and review the release before it fires the publish job.
-- `gh release create v1.0.0 --generate-notes` auto-generates notes from merged PR titles.
-- Release notes are attached to the tag on GitHub and serve as the changelog.
-- Prevents accidental publishes from a mis-typed tag push.
+Cut `v0.1.0-alpha.1` first to validate the entire pipeline on a pre-release
+version. Install into a scratch project, confirm icon + README + Source Link
+all render on nuget.org. Then cut `v1.0.0` when ready.
 
-```yaml
-on:
-  release:
-    types: [published]    # fires only when you click Publish (not on Draft)
-```
+## Verification
 
-To create a release from the CLI:
-```bash
-gh release create v1.0.0 --generate-notes --title "1.0.0"
-# Review the draft, then publish in the GitHub UI or:
-gh release edit v1.0.0 --draft=false
-```
+After the first successful publish, verify on each package page:
+- Icon renders (top-left of the package page)
+- README renders (main body, should be the per-package README, not the root)
+- Source Link works: in a consumer project, `Go to Definition` on a
+  PineGuard type steps into the decompiled-with-source view, not metadata-only.
+- Symbol package resolved: the `.snupkg` is at
+  `https://nuget.smbsrc.net/src/…` or directly queryable via
+  `nuget.org/packages/PineGuard.Core` → Symbol sidebar.
 
-### Branch Protection Rules (GitHub Settings)
+Rollback path if something is wrong:
+- `dotnet nuget delete PineGuard.Core 1.0.0 --api-key ...` (works within 72h)
+- Or "list as unlisted" via the nuget.org web UI (permanent; new installs
+  won't see it but existing consumers keep working).
 
-- **`main`**: require PR, require all CI jobs to pass, no direct push, no force push.
-- **Tag pattern `v*`**: restrict tag creation to maintainers only (prevents accidental publish
-  triggers from contributors).
+## Branch Protection
 
-### Hotfix Flow (when it arises)
+At github.com/stevomccormack/PineGuard → Settings → Branches → `main`:
+- Require pull request before merging
+- Require all CI jobs to pass
+- No direct push
+- No force push
 
-```
-v1.0.0 tag on main
-        │
-        └─ main moves forward to v2 breaking work
-        │
-        │  consumer reports critical v1 bug
-        │
-        ▼
-git checkout -b release/1.0 v1.0.0
-        │
-        └─ fix commit on release/1.0
-        │
-        ▼
-gh release create v1.0.1 --target release/1.0 --generate-notes
-        │
-        ▼
-publish.yml triggers from the v1.0.1 tag
-        │
-        ▼
-cherry-pick fix back to main (or open a PR)
-```
+At Settings → Tags:
+- Protect pattern `v*` — restrict tag creation to maintainers only. Prevents
+  accidental publish triggers from contributors.
 
 ## Open Questions
 
-- **`global.json`** — currently absent. Consider adding with `"rollForward": "latestMinor"` to pin
-  SDK major version for reproducible local + CI builds.
-- **API compatibility baseline** — on first public release, generate a baseline with
-  `Microsoft.DotNet.ApiCompat`. From v2 onwards CI enforces no accidental breaking changes.
-- **Package signing** — nuget.org supports Authenticode signing. Not mandatory but increases trust.
-  Requires a code-signing certificate stored in GitHub secrets.
-- **CHANGELOG** — decide on format (Keep a Changelog, conventional commits). Set
-  `<PackageReleaseNotes>` in each release or embed `CHANGELOG.md`.
-- **`CallerArgumentExpressionAttribute` polyfill** — inline polyfills in MustClauses, GuardClauses,
-  FluentValidation are `internal`. Verify the `.nuspec` does not expose them. Run
-  `dotnet pack` and inspect the `.nupkg` to confirm.
+- **`global.json`** — currently absent. Consider `"rollForward": "latestMinor"`
+  to pin SDK major version for reproducible local + CI builds.
+- **API compatibility baseline** — on `v1.0.0` generate a baseline with
+  `Microsoft.DotNet.ApiCompat`. From `v1.1.0` onwards CI enforces no
+  accidental breaking changes.
+- **Package signing** — nuget.org supports Authenticode signing. Not
+  mandatory but adds trust. Requires a code-signing cert in GitHub secrets.
+- **CHANGELOG** — pick a format: Keep a Changelog, conventional commits, or
+  rely purely on GitHub's auto-generated release notes (simplest). If you want
+  `<PackageReleaseNotes>` in the `.nupkg` itself, consume the release body
+  via a small workflow step before pack.
+- **Public API baseline tool** — `PublicApiAnalyzers` can enforce that every
+  public type/member is listed in `PublicAPI.Shipped.txt` / `PublicAPI.Unshipped.txt`.
+  Worth adding once the surface is stable.
 
-## Things Not Covered Here (Out of Scope)
+## Execution Order
 
-- Chocolatey / winget packaging for AuditCli (only relevant if CLI adoption becomes a goal)
-- MyGet / Azure Artifacts (only if enterprise internal feed is needed)
-- NPM — not applicable; PineGuard is .NET only. NPM is the JavaScript/Node.js package manager.
-  A JS/TS port would be a separate project.
+1. Add per-package `README.md` files (6 files — quickest wins, no tooling yet).
+2. Update `Directory.Build.props` with packable metadata block.
+3. Add `MinVer` and `Microsoft.SourceLink.GitHub` to `Directory.Packages.props`.
+4. Add `<Description>` and `<None Include=...>` blocks to each packable `.csproj`.
+5. Run `dotnet pack PineGuard.slnx -c Release` locally; inspect each `.nupkg`:
+   - Contains `pineguard-logo-512px.png` at root
+   - Contains `README.md` at root (the per-package one, not root README)
+   - `lib/netstandard2.1/`, `lib/net8.0/`, `lib/net10.0/` all present
+   - No polyfill types in public surface
+6. Add `.github/workflows/ci.yml` (if not present) and `publish.yml`.
+7. Register `PineGuard.*` on nuget.org; add `NUGET_TOKEN` secret.
+8. Enable branch and tag protection rules.
+9. Cut `v0.1.0-alpha.1` via GitHub Release; verify full pipeline succeeds.
+10. Verify icon + READMEs + Source Link on nuget.org.
+11. When satisfied, cut `v1.0.0`.
+12. Follow-up: `PineGuard.AuditCli` as a dotnet global tool in a separate release.
 
-## Recommended Execution Order
+## Related
 
-1. Add NuGet metadata to `Directory.Build.props`
-2. Add MinVer to `Directory.Packages.props` and `Directory.Build.props`
-3. Add Microsoft.SourceLink.GitHub
-4. Create package icon (`icon.png`) and per-package `README.md` files
-5. Add `LICENSE` file embedding
-6. Run `dotnet pack` locally and inspect `.nupkg` contents to verify
-7. Add `publish.yml` GitHub Actions workflow
-8. Register on nuget.org, get API key scoped to `PineGuard.*`, add `NUGET_API_KEY` secret
-9. Configure `PineGuard.AuditCli` as a dotnet tool
-10. Tag `v0.1.0-alpha.1`, let CI publish, verify on nuget.org
-11. Add package validation (`Microsoft.DotNet.PackageValidation`) to CI
-12. Add `global.json` for SDK version pinning
+- [`docs/ai/plans/multi-target-framework.md`](multi-target-framework.md) — target-framework strategy
+- [`docs/ai/plans/competitive-analysis.md`](competitive-analysis.md) — positioning vs other validation libraries
+- [`docs/ai/plans/v2-masterplan.md`](v2-masterplan.md) — overall v2 roadmap
