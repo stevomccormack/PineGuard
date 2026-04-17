@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.MustClauses.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\PineGuard.Core\Polyfills\CallerArgumentExpressionAttribute.cs"
+             Link="Polyfills\CallerArgumentExpressionAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
+  </ItemGroup>
+
+</Project>
