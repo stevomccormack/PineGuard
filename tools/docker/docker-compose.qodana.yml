@@ -1,0 +1,37 @@
+# docker-compose.qodana.yml
+# Qodana local code inspection for PineGuard.
+#
+# Requires:
+#   QODANA_TOKEN  — Qodana Cloud token ($env:QODANA_TOKEN = '<token>')
+#
+# All other paths default to local repo layout. Override if needed:
+#   QODANA_PROJECT_DIR  — host path to repo root       (default: ../../)
+#   QODANA_RESULTS_DIR  — host path for results output (default: ../../artifacts/qodana)
+#   QODANA_CONFIG_PATH  — config path inside container (default: qodana.all.yaml)
+#
+# Network: pineguard must exist before running (docker-network.ps1 creates it).
+
+name: pineguard
+
+services:
+  qodana:
+    image: jetbrains/qodana-dotnet:2025.3
+    container_name: pineguard-qodana
+    environment:
+      QODANA_TOKEN: ${QODANA_TOKEN}
+    volumes:
+      - ${QODANA_PROJECT_DIR:-../../}:/data/project
+      - ${QODANA_RESULTS_DIR:-../../artifacts/qodana}:/data/results
+      - pineguard-qodana-cache:/data/cache
+    command: ["--config", "${QODANA_CONFIG_PATH:-/data/project/tools/code-inspection/qodana/config/qodana.all.yaml}"]
+    networks:
+      - pineguard
+
+volumes:
+  pineguard-qodana-cache:
+    name: pineguard-qodana-cache
+
+networks:
+  pineguard:
+    external: true
+    name: pineguard

@@ -1,0 +1,147 @@
+<#
+.SYNOPSIS
+    Run Code Coverage
+
+.DESCRIPTION
+    Part of the PineGuard PowerShell toolchain.
+
+.PARAMETER Mode
+    See the param block for details.
+
+.PARAMETER Scope
+    See the param block for details.
+
+.PARAMETER Configuration
+    See the param block for details.
+
+.PARAMETER Clean
+    See the param block for details.
+
+.PARAMETER NoOpen
+    See the param block for details.
+
+.PARAMETER SkipHtml
+    See the param block for details.
+
+.PARAMETER ProjectFilter
+    See the param block for details.
+
+.PARAMETER Top
+    See the param block for details.
+
+.PARAMETER IncludeFileRegex
+    See the param block for details.
+
+.PARAMETER ExcludeFileRegex
+    See the param block for details.
+
+.PARAMETER IncludeClassNameRegex
+    See the param block for details.
+
+.PARAMETER ExcludeClassNameRegex
+    See the param block for details.
+
+.PARAMETER FailCoverageBelow
+    See the param block for details.
+
+.PARAMETER FailBranchBelow
+    See the param block for details.
+
+.PARAMETER Enforce100
+    See the param block for details.
+
+.PARAMETER Isolated
+    See the param block for details.
+
+.PARAMETER Relaxed
+    See the param block for details.
+
+.PARAMETER Filter
+    See the param block for details.
+
+.PARAMETER Framework
+    See the param block for details.
+
+.PARAMETER Format
+    See the param block for details.
+#>
+
+[CmdletBinding()]
+param(
+    [ValidateSet('Generate', 'Analyze', 'GenerateAndAnalyze')] [string] $Mode = 'GenerateAndAnalyze',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'All', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Debug', 'Release')] [string] $Configuration = 'Debug',
+    [switch] $Clean,
+    [switch] $NoOpen,
+    [switch] $SkipHtml,
+    [string] $ProjectFilter = '*.UnitTests.csproj',
+    [ValidateRange(1, 500)] [int] $Top = 30,
+    [string] $IncludeFileRegex,
+    [string] $ExcludeFileRegex,
+    [string] $IncludeClassNameRegex,
+    [string] $ExcludeClassNameRegex,
+    [ValidateRange(0.0, 100.0)] [double] $FailCoverageBelow = 0.0,
+    [ValidateRange(0.0, 100.0)] [double] $FailBranchBelow = 0.0,
+    [switch] $Enforce100,
+    [switch] $Isolated,
+    [switch] $Relaxed,
+    [string] $Filter,
+    [string] $Framework,
+    [string] $Format
+)
+
+if ($Scope -in 'Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Testing') {
+    if (-not $Relaxed) {
+        $Enforce100 = $true
+    }
+}
+
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+
+$utilityPath = Join-Path $PSScriptRoot 'Import-CodeCoverageUtility.ps1'
+if (-not (Test-Path $utilityPath)) {
+    throw "Import-CodeCoverageUtility.ps1 not found at: $utilityPath"
+}
+
+. $utilityPath
+
+$xplatGenerate = Join-Path $PSScriptRoot 'xplat\Gen-CoverageReport.ps1'
+$xplatAnalyze = Join-Path $PSScriptRoot 'xplat\Test-CoverageAnalysis.ps1'
+
+# If the user didn't explicitly supply a ProjectFilter, prefer the tightest default per scope
+# (keeps coverage loops fast and avoids running unrelated test projects).
+$effectiveProjectFilter = $ProjectFilter
+if (-not $PSBoundParameters.ContainsKey('ProjectFilter')) {
+    switch ($Scope) {
+        'Core' { $effectiveProjectFilter = 'PineGuard.Core.UnitTests.csproj' }
+        'MustClauses' { $effectiveProjectFilter = 'PineGuard.MustClauses.UnitTests.csproj' }
+        'GuardClauses' { $effectiveProjectFilter = 'PineGuard.GuardClauses.UnitTests.csproj' }
+        'DataAnnotations' { $effectiveProjectFilter = 'PineGuard.DataAnnotations.UnitTests.csproj' }
+        'FluentValidation' { $effectiveProjectFilter = 'PineGuard.FluentValidation.UnitTests.csproj' }
+        'All' { $effectiveProjectFilter = '*.UnitTests.csproj' }
+        'Testing' { $effectiveProjectFilter = '*.UnitTests.csproj' }
+    }
+}
+
+if ($Mode -in @('Generate', 'GenerateAndAnalyze')) {
+    $generateParams = @{
+        Configuration = $Configuration
+        Scope         = $Scope
+        Clean         = $Clean
+        NoOpen        = $NoOpen
+        SkipHtml      = $SkipHtml
+        ProjectFilter = $effectiveProjectFilter
+        Isolated      = $Isolated
+        Filter        = $Filter
+        Framework     = $Framework
+    }
+    if ($PSBoundParameters.ContainsKey('Format')) {
+        $generateParams['Format'] = $Format
+    }
+    & $xplatGenerate @generateParams
+}
+
+if ($Mode -in @('Analyze', 'GenerateAndAnalyze')) {
+    & $xplatAnalyze -Scope $Scope -Top $Top -IncludeFileRegex $IncludeFileRegex -ExcludeFileRegex $ExcludeFileRegex -IncludeClassNameRegex $IncludeClassNameRegex -ExcludeClassNameRegex $ExcludeClassNameRegex -FailCoverageBelow $FailCoverageBelow -FailBranchBelow $FailBranchBelow -Enforce100:$Enforce100
+}

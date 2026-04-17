@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../../../src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj" />
+  <Project Path="../../../tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj" />
+</Solution>
+

@@ -1,0 +1,15 @@
+<Solution>
+  <Project Path="../../../src/PineGuard.Core/PineGuard.Core.csproj" />
+  <Project Path="../../../tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj" />
+  <Project Path="../../../src/PineGuard.MustClauses/PineGuard.MustClauses.csproj" />
+  <Project Path="../../../tests/PineGuard.MustClauses.UnitTests/PineGuard.MustClauses.UnitTests.csproj" />
+  <Project Path="../../../src/PineGuard.GuardClauses/PineGuard.GuardClauses.csproj" />
+  <Project Path="../../../tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj" />
+  <Project Path="../../../src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj" />
+  <Project Path="../../../tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj" />
+  <Project Path="../../../src/PineGuard.DataAnnotations/PineGuard.DataAnnotations.csproj" />
+  <Project Path="../../../tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj" />
+  <Project Path="../../../tests/PineGuard.Testing/PineGuard.Testing.csproj" />
+  <Project Path="../../../tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj" />
+</Solution>
+

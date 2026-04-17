@@ -1,0 +1,41 @@
+# docker-compose.sonarqube.yml
+# SonarQube Community Edition — local dev server for PineGuard.
+#
+# Do not run directly. Use sonarqube-up.ps1 / sonarqube-down.ps1.
+#
+# First run: default credentials are admin / admin (SonarQube will prompt to change).
+# Analysis:  run tools/sonar-scanner/Run-SonarScanner.ps1 once the server is UP.
+#
+# Network: pineguard must exist before running (docker-network.ps1 creates it).
+
+name: pineguard
+
+services:
+  sonarqube:
+    image: sonarqube:community
+    container_name: pineguard-sonarqube
+    ports:
+      - "9001:9000"
+    environment:
+      # Disables Elasticsearch bootstrap checks — required for local dev on Windows/Mac.
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    volumes:
+      - pineguard-sonarqube-data:/opt/sonarqube/data
+      - pineguard-sonarqube-extensions:/opt/sonarqube/extensions
+      - pineguard-sonarqube-logs:/opt/sonarqube/logs
+    networks:
+      - pineguard
+    stop_grace_period: 60s
+
+volumes:
+  pineguard-sonarqube-data:
+    name: pineguard-sonarqube-data
+  pineguard-sonarqube-extensions:
+    name: pineguard-sonarqube-extensions
+  pineguard-sonarqube-logs:
+    name: pineguard-sonarqube-logs
+
+networks:
+  pineguard:
+    external: true
+    name: pineguard

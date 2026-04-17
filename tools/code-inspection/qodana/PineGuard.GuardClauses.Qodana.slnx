@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../../../src/PineGuard.GuardClauses/PineGuard.GuardClauses.csproj" />
+  <Project Path="../../../tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj" />
+</Solution>
+
