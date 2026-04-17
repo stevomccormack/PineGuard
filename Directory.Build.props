@@ -9,4 +9,29 @@
          ReSharper's own parser doesn't execute source generators, so it false-positives this as a compiler error. -->
     <NoWarn>$(NoWarn);CS8795</NoWarn>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsPackable)' != 'false' and '$(IsTestProject)' != 'true'">
+    <Authors>Steve McCormack</Authors>
+    <Company>stevomccormack</Company>
+    <Copyright>Copyright © 2026 Steve McCormack</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/stevomccormack/PineGuard</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/stevomccormack/PineGuard</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>pineguard-logo-512px.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>validation;guard;must;fluent;data-annotations;dotnet</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <MinVerDefaultPreReleaseIdentifiers>alpha.0</MinVerDefaultPreReleaseIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsPackable)' != 'false' and '$(IsTestProject)' != 'true'">
+    <PackageReference Include="MinVer" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" />
+  </ItemGroup>
 </Project>
