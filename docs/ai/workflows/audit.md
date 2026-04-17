@@ -1,0 +1,77 @@
+# Workflow: Run Audit CLI
+
+> [!NOTE]
+> Runs PineGuard's repo audits via the PowerShell wrappers under `tools/audit-cli/`.
+> These audits check convention compliance and cross-layer mapping/parity.
+
+## Context
+
+- **Role**: [Software Engineer](../roles/builder.md)
+- **Reference**: `tools/audit-cli/Run-All.ps1` (compat: `tools/audit-cli/Run-AuditRules.ps1`)
+
+## Rule08 Notes (ordering parity)
+
+- MustClauses define the canonical concept ordering.
+- GuardClauses are frequently named for forbidden states and implemented via Must complements; Rule08 compares Guard ordering using the **Must clause each Guard method invokes** (not the Guard method name).
+
+## Parameters
+
+- **Scope**: (`All`, `Library`, `Testing`) — implemented via wrapper scripts under `tools/audit-cli/`.
+- **Rules**: (optional) any RuleId present in `tools/audit-cli/rules/Load-Catalog.ps1`.
+  - Library rules: Rule01..Rule10
+  - Testing rules: Rule50..Rule54
+- **Configuration**: (`Debug`, `Release`) — used by rules that build/analyze compiled output
+- **RepoRoot**: (optional) repo root path; defaults to auto-resolve
+- **AllowViolations**: (optional switch) applies to rules that support policy allowlists (e.g., Rule07 + Rule08)
+
+## Auto-Approval
+
+- **Gemini**: `// turbo-all`
+- **Claude**: `Project Rules` allow scripts.
+- **Cursor**: `cmd: powershell` allowed.
+
+## Steps
+
+// turbo-all
+
+1. **Run all audit rules (recommended)**
+
+   ```powershell
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RepoRoot "."
+   ```
+
+   Optional: allow violations for Rule07 (useful while tightening the policy):
+
+   ```powershell
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RepoRoot "." -AllowViolations
+   ```
+
+   Library-only (default subset):
+
+   ```powershell
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-AuditLibraryRules.ps1" -Configuration Release -RepoRoot "."
+   ```
+
+   Testing-only (default subset):
+
+   ```powershell
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-AuditTestingRules.ps1" -Configuration Release -RepoRoot "."
+   ```
+
+2. **Run a single rule (when iterating)**
+
+   Examples:
+
+   ```powershell
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/rules/Test-Rule02-RulesUsage.ps1" -Configuration Release -RepoRoot "."
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/rules/Test-Rule07-Nullability.ps1" -RepoRoot "."
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/rules/Test-Rule08-Ordering.ps1" -RepoRoot "."
+   ```
+
+3. **Inspect outputs**
+   - Rule output files are written under `artifacts/audit/` (e.g., `artifacts/audit/Rule02-rules-to-must-usage-scan.txt`).
+   - Treat any reported violations as blocking unless the run explicitly used `-AllowViolations`.
+
+4. **Triage + remediate**
+   - Fix the highest-signal violations first (naming/collisions, missing mappings, parity).
+   - Re-run the specific rule you’re iterating on, then re-run `Run-All.ps1` before finalizing.

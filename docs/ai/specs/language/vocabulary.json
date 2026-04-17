@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "stripPrefixes": ["Not", "Has", "Is"],
+  "ignoreMethods": ["MustBe"],
+  "aliases": {
+    "OwaspSafe": "Owasp",
+    "OwaspUnsafe": "Owasp",
+
+    "XssSafe": "Xss",
+    "SqlInjectionSafe": "SqlInjection",
+    "PathTraversalSafe": "PathTraversal",
+    "CommandInjectionSafe": "CommandInjection",
+    "CrLfSafe": "CrLf",
+    "LdapFilterSafe": "LdapFilter",
+    "OpenRedirectSafe": "OpenRedirect",
+    "SsrfSchemeSafe": "SsrfScheme"
+    ,
+    "InSqlDateTimeOffsetRange": "InSqlDateTimeRange",
+    "HasFileExtension": "FileExtension",
+    "Required": "Null"
+  },
+  "concepts": [],
+  "opposites": [
+    {
+      "a": "Lowercase",
+      "b": "Uppercase",
+      "omitNegationsInParity": true
+    },
+    {
+      "a": "Positive",
+      "b": "Negative",
+      "omitNegationsInParity": true
+    },
+    {
+      "a": "Even",
+      "b": "Odd",
+      "omitNegationsInParity": true
+    },
+    {
+      "a": "Past",
+      "b": "Future",
+      "omitNegationsInParity": true
+    },
+    {
+      "a": "Before",
+      "b": "After",
+      "omitNegationsInParity": true
+    },
+    {
+      "a": "OwaspSafe",
+      "b": "OwaspUnsafe",
+      "omitNegationsInParity": true
+    }
+  ]
+}
