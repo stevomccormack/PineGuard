@@ -1,0 +1,17 @@
+using PineGuard.Testing.UnitTests.GuardClauses;
+using Xunit.Abstractions;
+
+namespace PineGuard.GuardClauses.UnitTests;
+
+public sealed class GuardIdentifierClausesTests(ITestOutputHelper output) : BaseGuardUnitTest(output)
+{
+    [Theory]
+    [MemberData(nameof(GuardIdentifierClausesTestData.NotSlug.ValidCases), MemberType = typeof(GuardIdentifierClausesTestData.NotSlug))]
+    [MemberData(nameof(GuardIdentifierClausesTestData.NotSlug.InvalidCases), MemberType = typeof(GuardIdentifierClausesTestData.NotSlug))]
+    public void NotSlug_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.NotSlug(value));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+}
