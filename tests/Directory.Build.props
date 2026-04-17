@@ -1,0 +1,9 @@
+<Project>
+  <!-- Chain to root Directory.Build.props for shared settings -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <!-- Test projects are executables — cannot target netstandard2.1 -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+  </PropertyGroup>
+</Project>

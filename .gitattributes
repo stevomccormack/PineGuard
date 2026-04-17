@@ -1,0 +1,53 @@
+# ===================================================================
+# Line-ending normalisation — LF in repo, CRLF on Windows checkout
+# ===================================================================
+# Git stores LF in the repo. On checkout, core.autocrlf=true
+# converts to CRLF on Windows. .editorconfig uses end_of_line=lf.
+# ===================================================================
+
+* text=auto
+
+# ===================================================================
+# Explicitly text files — normalise to LF in repo
+# ===================================================================
+*.cs        text
+*.csproj    text
+*.props     text
+*.targets   text
+*.sln       text
+*.slnx      text
+*.md        text
+*.txt       text
+*.json      text
+*.xml       text
+*.yaml      text
+*.yml       text
+*.config    text
+*.ruleset   text
+*.editorconfig text
+*.gitattributes text
+*.gitignore text
+*.ps1       text
+*.psm1      text
+*.psd1      text
+*.sh        text eol=lf
+*.cmd       text
+*.bat       text
+
+# ===================================================================
+# Binary files — never normalise
+# ===================================================================
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.zip       binary
+*.gz        binary
+*.7z        binary
+*.nupkg     binary
+*.snupkg    binary
+*.dll       binary
+*.exe       binary
+*.pdb       binary
+*.pdf       binary

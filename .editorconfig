@@ -1,0 +1,576 @@
+root = true
+
+# ===================================================================
+# Global editor settings
+# ===================================================================
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+tab_width = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# -------------------------------------------------------------------
+# Markdown — trailing whitespace is significant (line breaks)
+# -------------------------------------------------------------------
+[*.md]
+trim_trailing_whitespace = false
+
+# -------------------------------------------------------------------
+# JSON / YAML / XML project files
+# -------------------------------------------------------------------
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[*.{xml,csproj,props,targets,ruleset,config}]
+indent_size = 2
+
+# -------------------------------------------------------------------
+# PowerShell scripts
+# -------------------------------------------------------------------
+[*.{ps1,psm1,psd1}]
+indent_size = 4
+
+# -------------------------------------------------------------------
+# Solution / project files
+# -------------------------------------------------------------------
+[*.sln]
+indent_style = tab
+
+[*.{slnx}]
+indent_size = 2
+
+# -------------------------------------------------------------------
+# C# — Global defaults
+# -------------------------------------------------------------------
+[*.cs]
+max_line_length = 140
+indent_size = 4
+tab_width = 4
+
+# Extension blocks (C# 14) — suppress to maintain compatibility with older .NET targets
+resharper_convert_to_extension_block_highlighting = none
+
+# Escape sequences — keep explicit forms (e.g. \u0007) for clarity
+resharper_can_simplify_string_escape_sequence_highlighting = none
+
+# Interface members are consumed by implementing classes across projects
+resharper_unused_member_in_super_global_highlighting = none
+
+# -------------------------------------------------------------------
+# C# formatting — using directives, braces, spacing
+# -------------------------------------------------------------------
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# ===================================================================
+# C# — PineGuard Library Projects (/src)
+# ===================================================================
+# Production library code. Every rule mirrors the conventions
+# established across Core, MustClauses, GuardClauses,
+# FluentValidation and DataAnnotations.
+#
+# Optimised for symmetry, readability, and visual clarity.
+# ===================================================================
+
+[src/{PineGuard.Core,PineGuard.DataAnnotations,PineGuard.FluentValidation,PineGuard.GuardClauses,PineGuard.MustClauses}/**/*.cs]
+
+# -------------------------------------------------------------------
+# Layout
+# -------------------------------------------------------------------
+max_line_length = 140
+
+# -------------------------------------------------------------------
+# Namespace declarations — file-scoped (one per file, no nesting)
+# -------------------------------------------------------------------
+csharp_style_namespace_declarations = file_scoped:warning
+
+# -------------------------------------------------------------------
+# this. qualification — never (properties assigned directly)
+# -------------------------------------------------------------------
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# -------------------------------------------------------------------
+# Predefined types — use language keywords (string, int, bool)
+# -------------------------------------------------------------------
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_predefined_type_for_member_access = true:warning
+
+# -------------------------------------------------------------------
+# Accessibility modifiers — always explicit
+# -------------------------------------------------------------------
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,required,volatile,async:warning
+dotnet_style_readonly_field = true:suggestion
+
+# -------------------------------------------------------------------
+# var — prefer everywhere (var ok = ..., var result = ...)
+# -------------------------------------------------------------------
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:suggestion
+
+# -------------------------------------------------------------------
+# Expression-bodied members — prefer => for concise methods
+# -------------------------------------------------------------------
+csharp_style_expression_bodied_methods = true:suggestion
+csharp_style_expression_bodied_constructors = false:silent
+csharp_style_expression_bodied_operators = true:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_indexers = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+csharp_style_expression_bodied_lambdas = true:suggestion
+csharp_style_expression_bodied_local_functions = true:suggestion
+
+# -------------------------------------------------------------------
+# Pattern matching — prefer modern patterns (is, is not, switch)
+# -------------------------------------------------------------------
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_style_prefer_not_pattern = true:suggestion
+csharp_style_prefer_pattern_matching = true:suggestion
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_prefer_extended_property_pattern = true:suggestion
+
+# -------------------------------------------------------------------
+# Null checking — is null / ?? / ?. patterns
+# -------------------------------------------------------------------
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning
+csharp_style_throw_expression = false:silent
+csharp_style_conditional_delegate_call = true:suggestion
+
+# -------------------------------------------------------------------
+# Object creation — target-typed new(...)
+# -------------------------------------------------------------------
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
+
+# -------------------------------------------------------------------
+# Primary constructors — prefer where appropriate
+# -------------------------------------------------------------------
+csharp_style_prefer_primary_constructors = true:suggestion
+
+# -------------------------------------------------------------------
+# Top-level statements — never (library code)
+# -------------------------------------------------------------------
+csharp_style_prefer_top_level_statements = false:warning
+
+# -------------------------------------------------------------------
+# Modern C# preferences
+# -------------------------------------------------------------------
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
+csharp_style_prefer_utf8_string_literals = true:suggestion
+csharp_style_prefer_readonly_struct = true:suggestion
+csharp_style_prefer_readonly_struct_member = true:suggestion
+csharp_style_prefer_method_group_conversion = true:suggestion
+csharp_style_prefer_tuple_swap = true:suggestion
+csharp_style_deconstructed_variable_declaration = true:suggestion
+csharp_prefer_static_local_function = true:suggestion
+csharp_style_prefer_local_over_anonymous_function = true:suggestion
+
+# -------------------------------------------------------------------
+# Expressions — conditional, compound, collection
+# -------------------------------------------------------------------
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
+dotnet_style_prefer_conditional_expression_over_return = true:suggestion
+dotnet_style_prefer_compound_assignment = true:suggestion
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+dotnet_style_prefer_collection_expression = true:suggestion
+dotnet_style_prefer_simplified_interpolation = true:suggestion
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+
+# -------------------------------------------------------------------
+# Parentheses — for clarity in binary operators
+# -------------------------------------------------------------------
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_other_operators = never_if_unnecessary:suggestion
+
+# -------------------------------------------------------------------
+# Braces — require only when the body spans multiple statements
+# -------------------------------------------------------------------
+csharp_prefer_braces = when_multiline:suggestion
+
+# -------------------------------------------------------------------
+# Unused values — discard with _
+# -------------------------------------------------------------------
+csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion
+csharp_style_unused_value_assignment_preference = discard_variable:suggestion
+
+# -------------------------------------------------------------------
+# Operator placement when wrapping — ternary ? : at line start
+# -------------------------------------------------------------------
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+
+# ===================================================================
+#   FORMATTING
+# ===================================================================
+
+# -------------------------------------------------------------------
+# Allman brace style — opening brace on its own line
+# -------------------------------------------------------------------
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+
+# -------------------------------------------------------------------
+# Indentation
+# -------------------------------------------------------------------
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_indent_labels = one_less_than_current
+csharp_indent_block_contents = true
+csharp_indent_braces = false
+csharp_indent_case_contents_when_block = true
+
+# -------------------------------------------------------------------
+# Spacing
+# -------------------------------------------------------------------
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+csharp_space_between_parentheses = false
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_after_comma = true
+csharp_space_before_comma = false
+csharp_space_after_dot = false
+csharp_space_before_dot = false
+csharp_space_after_semicolon_in_for_statement = true
+csharp_space_before_semicolon_in_for_statement = false
+csharp_space_around_declaration_statements = false
+csharp_space_before_open_square_brackets = false
+csharp_space_between_empty_square_brackets = false
+csharp_space_between_square_brackets = false
+
+# -------------------------------------------------------------------
+# Line preservation & blank lines
+# -------------------------------------------------------------------
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = true
+dotnet_style_allow_multiple_blank_lines_experimental = false:warning
+dotnet_style_allow_statement_immediately_after_block_experimental = false:suggestion
+
+# ===================================================================
+#   NAMING CONVENTIONS
+# ===================================================================
+
+# --- Symbol definitions --------------------------------------------
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+
+dotnet_naming_symbols.type_parameters.applicable_kinds = type_parameter
+dotnet_naming_symbols.type_parameters.applicable_accessibilities = *
+
+dotnet_naming_symbols.types.applicable_kinds = class,struct,interface,enum,delegate
+dotnet_naming_symbols.types.applicable_accessibilities = *
+
+dotnet_naming_symbols.const_fields.applicable_kinds = field
+dotnet_naming_symbols.const_fields.applicable_accessibilities = *
+dotnet_naming_symbols.const_fields.required_modifiers = const
+
+dotnet_naming_symbols.static_readonly_fields.applicable_kinds = field
+dotnet_naming_symbols.static_readonly_fields.applicable_accessibilities = *
+dotnet_naming_symbols.static_readonly_fields.required_modifiers = static,readonly
+
+dotnet_naming_symbols.members.applicable_kinds = method,property,event
+dotnet_naming_symbols.members.applicable_accessibilities = *
+
+dotnet_naming_symbols.parameters.applicable_kinds = parameter
+dotnet_naming_symbols.parameters.applicable_accessibilities = *
+
+dotnet_naming_symbols.locals.applicable_kinds = local
+dotnet_naming_symbols.locals.applicable_accessibilities = *
+
+dotnet_naming_symbols.local_functions.applicable_kinds = local_function
+dotnet_naming_symbols.local_functions.applicable_accessibilities = *
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private,internal
+
+# --- Style definitions ---------------------------------------------
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.camel_case.capitalization = camel_case
+
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+
+dotnet_naming_style.i_prefix.capitalization = pascal_case
+dotnet_naming_style.i_prefix.required_prefix = I
+
+dotnet_naming_style.t_prefix.capitalization = pascal_case
+dotnet_naming_style.t_prefix.required_prefix = T
+
+# --- Rules (highest priority first) --------------------------------
+
+dotnet_naming_rule.interfaces_must_begin_with_i.severity = warning
+dotnet_naming_rule.interfaces_must_begin_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_must_begin_with_i.style = i_prefix
+
+dotnet_naming_rule.type_parameters_must_begin_with_t.severity = warning
+dotnet_naming_rule.type_parameters_must_begin_with_t.symbols = type_parameters
+dotnet_naming_rule.type_parameters_must_begin_with_t.style = t_prefix
+
+dotnet_naming_rule.types_must_be_pascal_case.severity = warning
+dotnet_naming_rule.types_must_be_pascal_case.symbols = types
+dotnet_naming_rule.types_must_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.const_fields_must_be_pascal_case.severity = warning
+dotnet_naming_rule.const_fields_must_be_pascal_case.symbols = const_fields
+dotnet_naming_rule.const_fields_must_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.static_readonly_must_be_pascal_case.severity = warning
+dotnet_naming_rule.static_readonly_must_be_pascal_case.symbols = static_readonly_fields
+dotnet_naming_rule.static_readonly_must_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.members_must_be_pascal_case.severity = warning
+dotnet_naming_rule.members_must_be_pascal_case.symbols = members
+dotnet_naming_rule.members_must_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.parameters_must_be_camel_case.severity = warning
+dotnet_naming_rule.parameters_must_be_camel_case.symbols = parameters
+dotnet_naming_rule.parameters_must_be_camel_case.style = camel_case
+
+dotnet_naming_rule.locals_must_be_camel_case.severity = suggestion
+dotnet_naming_rule.locals_must_be_camel_case.symbols = locals
+dotnet_naming_rule.locals_must_be_camel_case.style = camel_case
+
+dotnet_naming_rule.local_functions_must_be_pascal_case.severity = suggestion
+dotnet_naming_rule.local_functions_must_be_pascal_case.symbols = local_functions
+dotnet_naming_rule.local_functions_must_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.private_fields_must_be_underscore_camel_case.severity = warning
+dotnet_naming_rule.private_fields_must_be_underscore_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_must_be_underscore_camel_case.style = underscore_camel_case
+
+# ===================================================================
+#   RESHARPER / RIDER
+# ===================================================================
+
+# --- Wrapping ------------------------------------------------------
+resharper_csharp_max_line_length = 140
+resharper_wrap_parameters_style = chop_if_long
+resharper_wrap_arguments_style = chop_if_long
+resharper_wrap_before_arrow_with_expressions = false
+resharper_wrap_after_arrow_with_expressions = true
+resharper_wrap_after_dot_in_method_calls = false
+resharper_wrap_chained_method_calls = chop_if_long
+resharper_wrap_extends_list_style = chop_always
+resharper_wrap_before_extends_colon = true
+resharper_wrap_before_first_type_parameter_constraint = true
+resharper_wrap_multiple_type_parameter_constraints_style = chop_always
+
+# --- Blank lines ---------------------------------------------------
+resharper_keep_blank_lines_in_declarations = 1
+resharper_keep_blank_lines_in_code = 1
+resharper_blank_lines_after_using_list = 1
+resharper_blank_lines_around_type = 1
+resharper_blank_lines_around_single_line_type = 1
+resharper_blank_lines_around_member = 1
+resharper_blank_lines_around_single_line_member = 1
+resharper_blank_lines_inside_type = 0
+
+# --- Braces & statements -------------------------------------------
+resharper_braces_for_ifelse = not_required
+resharper_braces_for_for = required_for_multiline
+resharper_braces_for_foreach = required_for_multiline
+resharper_braces_for_while = required_for_multiline
+resharper_braces_for_using = required_for_multiline
+resharper_braces_for_lock = required_for_multiline
+resharper_braces_for_fixed = required_for_multiline
+resharper_place_simple_embedded_statement_on_same_line = never
+
+# --- Attributes & type constraints ---------------------------------
+resharper_place_attribute_on_same_line = false
+resharper_place_type_constraints_on_same_line = false
+
+# --- Arrangement ---------------------------------------------------
+resharper_keep_existing_arrangement = true
+
+# --- Inspections ---------------------------------------------------
+resharper_only_used_by_implementation_highlighting = none
+dotnet_diagnostic.IDE0046.severity = none
+
+# ===================================================================
+# Grammar checker — suppress for files with unfixable false positives
+# (quoted string literals in <code> examples, range syntax in <c> tags)
+# ===================================================================
+[src/**/FilePathAttributes.cs]
+resharper_grammar_mistake_in_comment_highlighting = none
+
+[src/**/GuardFilePathClauses.cs]
+resharper_grammar_mistake_in_comment_highlighting = none
+
+[src/**/MustFilePathClauses.cs]
+resharper_grammar_mistake_in_comment_highlighting = none
+
+[src/**/FluentDateOnlyExtensions.cs]
+resharper_grammar_mistake_in_comment_highlighting = none
+
+# ===================================================================
+# C# — PineGuard.Core
+# ===================================================================
+[src/PineGuard.Core/**/*.cs]
+# out parameters in TryParse utilities are part of the public API; callers may discard
+resharper_out_parameter_value_is_always_discarded_global_highlighting = none
+# public members (e.g. regex pattern constants) are part of the public API
+resharper_member_can_be_private_global_highlighting = none
+# public API property accessors are consumed by external callers
+resharper_unused_auto_property_accessor_global_highlighting = none
+# public API members (rules, utilities, extensions) are consumed by external callers
+resharper_unused_member_global_highlighting = none
+resharper_unused_type_global_highlighting = none
+# Roslyn IDE0051: interface/public members are consumed by external callers
+dotnet_diagnostic.IDE0051.severity = none
+# partial types are intentionally partial for extensibility and code generation
+resharper_partial_type_with_single_part_highlighting = none
+
+# ===================================================================
+# C# — PineGuard.DataAnnotations
+# ===================================================================
+[src/PineGuard.DataAnnotations/**/*.cs]
+# attribute properties need public setters for named-parameter syntax
+resharper_auto_property_can_be_made_get_only_global_highlighting = none
+resharper_member_can_be_private_global_highlighting = none
+resharper_property_can_be_made_init_only_global_highlighting = none
+# attribute classes are consumed externally via reflection
+resharper_unused_type_global_highlighting = none
+resharper_unused_auto_property_accessor_global_highlighting = none
+# protected helper methods are consumed by derived attribute classes
+resharper_unused_member_local_highlighting = none
+
+# ===================================================================
+# C# — PineGuard.MustClauses
+# ===================================================================
+[src/PineGuard.MustClauses/**/*.cs]
+# defensive null checks are the MustClauses validation pattern (parameters may be null at runtime)
+resharper_condition_is_always_true_or_false_according_to_nullable_api_contract_highlighting = none
+# intentional pattern: different conditions produce the same failure result
+resharper_duplicated_sequential_if_bodies_highlighting = none
+
+# ===================================================================
+# C# — PineGuard.GuardClauses
+# ===================================================================
+[src/PineGuard.GuardClauses/**/*.cs]
+# guard methods are public API consumed externally (same rationale as FluentValidation)
+resharper_unused_member_global_highlighting = none
+
+# ===================================================================
+# C# — PineGuard.FluentValidation
+# ===================================================================
+[src/PineGuard.FluentValidation/**/*.cs]
+# extension methods return IRuleBuilderOptions for chaining; callers may discard
+resharper_unused_method_return_value_global_highlighting = none
+# extension methods are public API consumed by external projects
+resharper_unused_member_global_highlighting = none
+
+# ===================================================================
+# C# — PineGuard.Testing (fixture library)
+# ===================================================================
+# Fixture properties (AllScenarios, AllNonNullScenarios) exist by
+# convention for composability via spread expressions. They are public
+# API consumed cross-project; ReSharper may not track all usages.
+# -------------------------------------------------------------------
+[tests/PineGuard.Testing/**/*.cs]
+resharper_unused_member_global_highlighting = none
+
+# ===================================================================
+# C# — PineGuard Test projects
+# ===================================================================
+# Tests use long method names, inline test data, and constructs that
+# legitimately trigger warnings irrelevant to production code.
+# Relax rules here to reduce noise without weakening library standards.
+# -------------------------------------------------------------------
+[tests/{PineGuard.Core.UnitTests,PineGuard.DataAnnotations.UnitTests,PineGuard.FluentValidation.UnitTests,PineGuard.GuardClauses.UnitTests,PineGuard.MustClauses.UnitTests,PineGuard.Testing,PineGuard.Testing.UnitTests}/**/*.cs]
+max_line_length = 400
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_allow_blank_lines_between_consecutive_braces = true
+csharp_allow_blank_line_after_colon_in_constructor_initializer = true
+csharp_space_around_parameters = false
+
+# ReSharper — Suppress spelling inspections in test projects
+# resharper_enforce_do_expression_braces = false
+
+# Suppress typo/spelling warnings (IdentifierTypo, StringLiteralTypo, etc.)
+# resharper_identifier_typo_highlighting = none
+resharper_string_literal_typo_highlighting = none
+# resharper_comment_typo_highlighting = none
+
+# Suppress unused type (test classes and test data are discovered by the test runner)
+resharper_unused_type_global_highlighting = none
+resharper_class_never_instantiated_global_highlighting = none
+
+# Suppress member-can-be-private (fixture fields are public for nameof() usage in scenarios)
+resharper_member_can_be_private_global_highlighting = none
+
+# Suppress unused auto-property accessor (record positional properties participate in implicit ToString/Equals)
+resharper_unused_auto_property_accessor_global_highlighting = none
+
+# Suppress member-hides-outer-class
+resharper_member_hides_static_from_outer_class_highlighting = none
+
+# Suppress NotResolvedInText (test data uses fake paramNames in ArgumentException constructors)
+resharper_not_resolved_in_text_highlighting = none
+
+# Suppress specify-culture warnings (BaseUnitTest sets CultureInfo.InvariantCulture in ctor)
+resharper_specify_string_comparison_highlighting = none
+resharper_specify_a_culture_in_string_conversion_explicitly_highlighting = none
+
+# Suppress duplicate switch arms (test data intentionally maps different named cases to the same expected result)
+resharper_duplicated_switch_expression_arms_highlighting = none
+
+# Suppress escape sequence simplification (test fixtures use explicit escapes for clarity)
+resharper_escape_sequence_can_be_simplified_highlighting = none
+# resharper_markup_attribute_typo_highlighting = none
+# resharper_markup_text_typo_highlighting = none
+
+# Suppress other noisy ReSharper inspections in tests
+# resharper_arrange_type_member_modifiers_highlighting = none
+# resharper_redundant_using_directive_highlighting = none
+
+# Symmetric Bracing (Allman Style)
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+
+# Single Line Spacing & Preservation
+dotnet_style_allow_multiple_blank_lines_experimental = false
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = true
+resharper_keep_blank_lines_in_declarations = 1
+resharper_keep_blank_lines_in_code = 1
+
+# Record / class inheritance — always on new line, colon at start of new line
+resharper_wrap_extends_list_style = chop_always
+resharper_wrap_before_extends_colon = true
+resharper_align_extends_list = false
+
+# Attribute Formatting
+resharper_place_attribute_on_same_line = false
