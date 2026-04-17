@@ -1,0 +1,56 @@
+name: Publish to NuGet
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: publish-nuget
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore PineGuard.slnx
+
+      - name: Build
+        run: dotnet build PineGuard.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test PineGuard.slnx -c Release --no-build --verbosity minimal
+
+      - name: Pack
+        run: dotnet pack PineGuard.slnx -c Release --no-build --output ./artifacts
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./artifacts/
+          retention-days: 30
+
+      - name: Push to NuGet
+        run: |
+          dotnet nuget push "./artifacts/*.nupkg" \
+            --api-key "${{ secrets.NUGET_TOKEN }}" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
