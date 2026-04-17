@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.FluentValidation.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\PineGuard.Core\Polyfills\CallerArgumentExpressionAttribute.cs"
+             Link="Polyfills\CallerArgumentExpressionAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
+    <ProjectReference Include="..\PineGuard.MustClauses\PineGuard.MustClauses.csproj" />
+  </ItemGroup>
+
+</Project>
