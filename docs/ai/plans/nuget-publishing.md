@@ -337,22 +337,37 @@ At Settings → Tags:
 
 ## Execution Order
 
-1. Add per-package `README.md` files (6 files — quickest wins, no tooling yet).
-2. Update `Directory.Build.props` with packable metadata block.
-3. Add `MinVer` and `Microsoft.SourceLink.GitHub` to `Directory.Packages.props`.
-4. Add `<Description>` and `<None Include=...>` blocks to each packable `.csproj`.
-5. Run `dotnet pack PineGuard.slnx -c Release` locally; inspect each `.nupkg`:
-   - Contains `pineguard-logo-512px.png` at root
-   - Contains `README.md` at root (the per-package one, not root README)
-   - `lib/netstandard2.1/`, `lib/net8.0/`, `lib/net10.0/` all present
-   - No polyfill types in public surface
-6. Add `.github/workflows/ci.yml` (if not present) and `publish.yml`.
-7. Register `PineGuard.*` on nuget.org; add `NUGET_TOKEN` secret.
-8. Enable branch and tag protection rules.
-9. Cut `v0.1.0-alpha.1` via GitHub Release; verify full pipeline succeeds.
-10. Verify icon + READMEs + Source Link on nuget.org.
-11. When satisfied, cut `v1.0.0`.
-12. Follow-up: `PineGuard.AuditCli` as a dotnet global tool in a separate release.
+Progress: **1 / 12 complete**.
+
+- [x] **1. Per-package `README.md` files (6 files)** — `src/PineGuard.Core/README.md`, `src/PineGuard.MustClauses/README.md`, `src/PineGuard.GuardClauses/README.md`, `src/PineGuard.FluentValidation/README.md`, `src/PineGuard.DataAnnotations/README.md`, `tests/PineGuard.Testing/README.md`. Each follows a four-block shape: benefit-first masthead → canonical four-rule example (Email, StrictEmail, OwaspSafe, HttpsUrl) → architectural sweet spot (DDD for Guard; Clean Architecture for Fluent and DataAnnotations) → shared "one rule library, every call site" closer. Committed in `7e9213e`.
+- [ ] **2. `Directory.Build.props`** — add packable metadata block (see §1).
+- [ ] **3. `Directory.Packages.props`** — add `MinVer` and `Microsoft.SourceLink.GitHub` entries (see §4).
+- [ ] **4. Per-`.csproj` additions** — `<Description>` plus the `<None Include="..\..\docs\brand\pineguard-logo-512px.png">` and `<None Include="README.md">` blocks (see §2).
+- [ ] **5. Local `dotnet pack` verification** — run `dotnet pack PineGuard.slnx -c Release` and inspect each `.nupkg`:
+    - [ ] Contains `pineguard-logo-512px.png` at root
+    - [ ] Contains `README.md` at root (the per-package one, not the root README)
+    - [ ] `lib/netstandard2.1/`, `lib/net8.0/`, `lib/net10.0/` all present
+    - [ ] No polyfill types in public surface
+- [ ] **6. GitHub Actions workflows** — `.github/workflows/ci.yml` (if not present) and `publish.yml`.
+- [ ] **7. nuget.org account + secret** — register `PineGuard.*` on nuget.org; add `NUGET_TOKEN` repo secret.
+- [ ] **8. Branch and tag protection** — enable on `main` and the `v*` tag pattern.
+- [ ] **9. Cut `v0.1.0-alpha.1`** — via GitHub Release; verify full pipeline end-to-end.
+- [ ] **10. Post-publish verification** — icon, READMEs, and Source Link render correctly on nuget.org.
+- [ ] **11. Cut `v1.0.0`** — once the alpha pipeline is proven.
+- [ ] **12. Follow-up: `PineGuard.AuditCli`** — ship as a dotnet global tool in a separate release cut.
+
+## Notes from execution
+
+Decisions and findings captured while working through the plan, worth preserving so the same ground isn't re-litigated at later steps.
+
+- **Canonical four-rule example set.** Every layer's README leads its `## Examples` block with the same four rules: `Email`, `StrictEmail`, `OwaspSafe`, `HttpsUrl`. Chosen because they're the rules most developers recognise by name, they cover three validation axes (format, security, URL scheme), and they let a reader skim any two READMEs and see the same concept expressed in two surfaces.
+- **Target-framework ordering: modern-first.** Every README and every TFM mention uses `net8.0`, `net10.0`, `netstandard2.1` in that order. Reads as "we're modern-first with legacy support" rather than the opposite.
+- **`[Required]` on netstandard2.1.** Confirmed to work — lives in the `System.ComponentModel.Annotations` NuGet package which is already a transitive dependency via `PineGuard.Core`. Same for `[StringLength]`, `[MaxLength]`, `[Range]`, etc. DA README's "Chain with built-in DataAnnotations" example uses `[Required] [MaxLength(256)] [HttpsUrl]` composition.
+- **`[Required]` vs PineGuard's `[NotNull]`.** Subtly different: `[Required]` rejects null *and* empty string (unless `AllowEmptyStrings = true`); `[NotNull]` rejects null only. DA README documents the distinction in a "Presence semantics" subsection so consumers pick the right one.
+- **Architectural framing: "perfect fit for", not "built for".** Guard is a perfect fit for DDD; Fluent and DataAnnotations are a perfect fit for Clean Architecture. But none of them are *limited to* those patterns — the READMEs list the broader use cases first, then call out the architectural sweet spot. "Built for X" would have been too narrow.
+- **Guard's differentiating moat.** Exception policy at three tiers (global, per-scope, per-call). Ardalis.GuardClauses — the dominant alternative — offers only a per-call override. Guard's README leads with this as the explicit differentiator paragraph.
+- **Chain-with-built-ins sections.** Both Fluent and DataAnnotations READMEs include a "Chain with FluentValidation's built-ins" / "Chain with built-in DataAnnotations" subsection showing PineGuard rules composing with `.MaximumLength()`, `.When()`, `.WithMessage()`, `[Required]`, `[StringLength]`, `[Range]`. These pull their weight in onboarding — they show PineGuard isn't an all-or-nothing commitment.
+- **Unverified against source code.** A couple of README API shapes weren't grep-verified before commit: `Must.Be.GuidV4`, `Must.Be.NotNull().AndThen(...)` composition, `GuidRules` / `StrictEmail` parity across every layer. Worth a spot-check during step 5 when inspecting the built `.nupkg`s — any example that doesn't compile against the packed assembly needs the README nudged.
 
 ## Related
 
