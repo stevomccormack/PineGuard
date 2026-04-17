@@ -44,13 +44,18 @@ are stable.
 
 ## Prerequisites (once, before any publish work)
 
-1. **Icon file.** The brand icon is at
-   `docs/brand/pineguard-logo-512px.png` (512×512). nuget.org accepts any size
-   up to 1 MB but recommends 128×128 for package-page rendering; the 512px PNG
-   renders cleanly at that size without a separate downscale.
+1. **Icon file.** The packaging icon is at
+   `docs/brand/pineguard-icon-128px.png` (128×128, ~31 KB). Generated from the
+   512×512 brand master (`docs/brand/pineguard-logo-512px.png`, 5.3 MB) because
+   NuGet enforces a hard 1 MB cap on packaged icons (error NU5047) and the
+   master PNG exceeds it. The 128px variant downscales cleanly via
+   `System.Drawing` high-quality bicubic and renders at nuget.org's
+   recommended package-page size.
 
-   Keep the PNG in `docs/brand/` (source of truth) and reference it from each
-   `.csproj` via a relative path — no need to duplicate the file at the root.
+   Both PNGs live in `docs/brand/` (512px = brand master, 128px = shipping
+   artifact). The 128px file is the one referenced by each `.csproj`; keeping
+   the 512px master in the repo lets anyone regenerate the shipping size
+   without a round-trip to the design tool.
 
 2. **Per-package README.md files.** Each `.csproj` needs a short focused README
    sitting next to it (e.g. `src/PineGuard.Core/README.md`). The root README is
@@ -337,17 +342,17 @@ At Settings → Tags:
 
 ## Execution Order
 
-Progress: **4 / 12 complete**.
+Progress: **5 / 12 complete**.
 
 - [x] **1. Per-package `README.md` files (6 files)** — `src/PineGuard.Core/README.md`, `src/PineGuard.MustClauses/README.md`, `src/PineGuard.GuardClauses/README.md`, `src/PineGuard.FluentValidation/README.md`, `src/PineGuard.DataAnnotations/README.md`, `tests/PineGuard.Testing/README.md`. Each follows a four-block shape: benefit-first masthead → canonical four-rule example (Email, StrictEmail, OwaspSafe, HttpsUrl) → architectural sweet spot (DDD for Guard; Clean Architecture for Fluent and DataAnnotations) → shared "one rule library, every call site" closer. Committed in `7e9213e`.
 - [x] **2. `Directory.Build.props`** — packable metadata block added (see §1). `MinVerDefaultPreReleaseIdentifiers=alpha.0` set inside the gated PropertyGroup; `MinVerTagPrefix>v` skipped (MinVer default). Committed in `cff873d`.
 - [x] **3. `Directory.Packages.props`** — `MinVer 7.0.0` and `Microsoft.SourceLink.GitHub 10.0.202` added (both latest stable as of 2026-04, newer than the 5.0.0/8.0.0 floor originally spec'd). `dotnet restore PineGuard.slnx --force` passes clean across all 12 projects. Committed in `cff873d`.
-- [x] **4. Per-`.csproj` additions** — `<Description>` plus `<None Include="..\..\docs\brand\pineguard-logo-512px.png">` and `<None Include="README.md">` pack blocks landed across all six shippable projects (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing). DataAnnotations description trimmed of the "EF Core" framing since the README doesn't pitch it — kept description and README in sync instead. Release build clean across netstandard2.1, net8.0, and net10.0. Committed in `e55007c`.
-- [ ] **5. Local `dotnet pack` verification** — run `dotnet pack PineGuard.slnx -c Release` and inspect each `.nupkg`:
-    - [ ] Contains `pineguard-logo-512px.png` at root
-    - [ ] Contains `README.md` at root (the per-package one, not the root README)
-    - [ ] `lib/netstandard2.1/`, `lib/net8.0/`, `lib/net10.0/` all present
-    - [ ] No polyfill types in public surface
+- [x] **4. Per-`.csproj` additions** — `<Description>` plus `<None Include="..\..\docs\brand\pineguard-icon-128px.png">` and `<None Include="README.md">` pack blocks landed across all six shippable projects (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing). DataAnnotations description trimmed of the "EF Core" framing since the README doesn't pitch it — kept description and README in sync instead. Release build clean across netstandard2.1, net8.0, and net10.0. Initially referenced the 512px brand master; repointed at a 128px shipping artifact during step 5 after hitting NuGet's 1 MB icon cap. Committed in `e55007c`.
+- [x] **5. Local `dotnet pack` verification** — `dotnet pack PineGuard.slnx -c Release --output ./artifacts` produces six `.nupkg` + six `.snupkg` cleanly. All six packages contain `pineguard-icon-128px.png` (31 KB) and the per-package `README.md` at the nupkg root. Polyfill leakage check confirmed via `System.Reflection.Metadata` inspection of the ns2.1 DLLs (Core, Must, Guard, Fluent): `System.Runtime.CompilerServices.CallerArgumentExpressionAttribute` is `NotPublic` (internal) in every case — no leakage into the public API surface. Source-level confirmation: the polyfill is `internal sealed` and gated behind `#if !NET8_0_OR_GREATER`, so it compiles only into the ns2.1 flavor. See the "Notes from execution" entries below for the icon-cap finding, the Testing TFM divergence, and the runtimeconfig.json cosmetic quirk.
+    - [x] Contains `pineguard-icon-128px.png` at root (all six)
+    - [x] Contains `README.md` at root (per-package, confirmed by byte-size match against each `src/*/README.md` and `tests/PineGuard.Testing/README.md`)
+    - [x] `lib/netstandard2.1/`, `lib/net8.0/`, `lib/net10.0/` all present for Core, Must, Guard, Fluent, DataAnnotations. Testing ships `lib/net8.0/` + `lib/net10.0/` only — ns2.1 is intentionally absent (see notes).
+    - [x] No polyfill types in public surface (`CallerArgumentExpressionAttribute` confirmed `NotPublic` in all four linked ns2.1 assemblies).
 - [ ] **6. GitHub Actions workflows** — `.github/workflows/ci.yml` (if not present) and `publish.yml`.
 - [ ] **7. nuget.org account + secret** — register `PineGuard.*` on nuget.org; add `NUGET_TOKEN` repo secret.
 - [ ] **8. Branch and tag protection** — enable on `main` and the `v*` tag pattern.
@@ -368,6 +373,11 @@ Decisions and findings captured while working through the plan, worth preserving
 - **Guard's differentiating moat.** Exception policy at three tiers (global, per-scope, per-call). Ardalis.GuardClauses — the dominant alternative — offers only a per-call override. Guard's README leads with this as the explicit differentiator paragraph.
 - **Chain-with-built-ins sections.** Both Fluent and DataAnnotations READMEs include a "Chain with FluentValidation's built-ins" / "Chain with built-in DataAnnotations" subsection showing PineGuard rules composing with `.MaximumLength()`, `.When()`, `.WithMessage()`, `[Required]`, `[StringLength]`, `[Range]`. These pull their weight in onboarding — they show PineGuard isn't an all-or-nothing commitment.
 - **Unverified against source code.** A couple of README API shapes weren't grep-verified before commit: `Must.Be.GuidV4`, `Must.Be.NotNull().AndThen(...)` composition, `GuidRules` / `StrictEmail` parity across every layer. Worth a spot-check during step 5 when inspecting the built `.nupkg`s — any example that doesn't compile against the packed assembly needs the README nudged.
+- **NuGet icon size cap (NU5047).** nuget.org enforces a 1 MB hard ceiling on packaged icons. The brand master at `docs/brand/pineguard-logo-512px.png` is 5.3 MB (exported uncompressed) and failed pack with `error NU5047: The icon file size must not exceed 1 megabyte.` Resolution: generated `docs/brand/pineguard-icon-128px.png` (128×128, 31 KB) via a one-shot `System.Drawing` bicubic downscale, updated `<PackageIcon>` in `Directory.Build.props` and the `<None Include>` path in all six csprojs to reference the 128px variant. The 512px master stays in the repo as the brand source of truth.
+- **PineGuard.Testing ships net8.0/net10.0, not ns2.1.** Plan originally assumed uniform `netstandard2.1;net8.0;net10.0` across all six packages, but Testing is semantically different: it's test-support code, consumed only by test-executable projects, and `dotnet test` cannot run a netstandard2.1 assembly (ns2.1 is a library surface spec, not a runtime). A `lib/netstandard2.1/` asset for Testing would be a ghost TFM no consumer could ever resolve. Empirically confirmed by attempting the override — `tests/PineGuard.Testing/Fixtures/TimeOnlyRulesFixtures.cs` uses `System.TimeOnly` (.NET 6+) unconditionally, so the ns2.1 compile also fails. Conclusion: Testing's inherited `tests/Directory.Build.props` TFM set (`net8.0;net10.0`) is semantically correct. The five production packages (Core, Must, Guard, Fluent, DataAnnotations) keep all three TFMs — ns2.1 matters for them because consumer production libraries can target ns2.1.
+- **`runtimeconfig.json` stub in Testing's nupkg.** `lib/net8.0/PineGuard.Testing.runtimeconfig.json` and the net10.0 equivalent (340–342 bytes each) get emitted even with `<IsTestProject>false</IsTestProject>`, `<OutputType>Library</OutputType>`, and `<GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>` all set (MSBuild `-getProperty` confirms all three resolve correctly, but the file still gets generated and packed). Traced to SDK behavior that persists under the test-SDK-adjacent project configuration. Accepted as a cosmetic quirk — files are trivially small, do not affect consumer resolution, and suppressing them would require a custom pack-time target. Revisit if consumer noise becomes an issue.
+- **Polyfill leakage check — metadata inspection.** Ran `System.Reflection.Metadata` (PowerShell 7) over the ns2.1 DLLs of every package that links `Polyfills/CallerArgumentExpressionAttribute.cs` (Core, Must, Guard, Fluent). `TypeDefinition.Attributes & VisibilityMask` returned `NotPublic` for `System.Runtime.CompilerServices.CallerArgumentExpressionAttribute` in all four assemblies. No leakage. The polyfill is also source-gated behind `#if !NET8_0_OR_GREATER`, so it only compiles into the ns2.1 flavor in the first place — the BCL's own type is used on net8.0 and net10.0.
+- **Dependabot audit (step 5 detour).** Only one Dependabot PR in repo history: #1, open, patch-level bump `System.Text.Json 10.0.5 → 10.0.6` touching only `Directory.Packages.props`. Zero merged Dependabot PRs. Current pins are the original hand-set versions. Ns2.1 compatibility of the five production packages was empirically confirmed by successful pack — FluentValidation 11.12.0, System.Text.Json 10.0.5, System.ComponentModel.Annotations 5.0.0, Microsoft.CSharp 4.7.0, xunit 2.9.3 all resolve cleanly for a ns2.1 consumer graph. The Testing ns2.1 failure is in our own source (TimeOnly), not a dependency regression.
 
 ## Related
 
