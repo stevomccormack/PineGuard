@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.DataAnnotations.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
+    <ProjectReference Include="..\PineGuard.MustClauses\PineGuard.MustClauses.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <!-- dynamic keyword requires Microsoft.CSharp on netstandard2.1 -->
+    <PackageReference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

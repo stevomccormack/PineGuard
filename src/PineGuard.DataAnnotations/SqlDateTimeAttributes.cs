@@ -1,0 +1,92 @@
+#if NET8_0_OR_GREATER
+using System.ComponentModel.DataAnnotations;
+using PineGuard.DataAnnotations.Common;
+using PineGuard.MustClauses;
+
+namespace PineGuard.DataAnnotations;
+
+/// <summary>
+/// Validates that the annotated <see cref="DateOnly"/> property or field falls within the SQL Server
+/// <c>date</c> type range (<c>0001-01-01</c> to <c>9999-12-31</c>).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustSqlDateTimeClauses.InSqlDateRange"/>. Supported on properties, fields, and
+/// parameters of type <see cref="DateOnly"/>.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class RecordModel
+/// {
+///     [InSqlDateRange]
+///     public DateOnly CreatedDate { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="InSqlDateTimeRangeAttribute"/>
+/// <seealso cref="MustSqlDateTimeClauses.InSqlDateRange"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/sqldatetime">SQL DateTime Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class InSqlDateRangeAttribute() : ValidationAttributeBase(typeof(DateOnly))
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var dateValue = (DateOnly)value!;
+        var result = Must.Be.InSqlDateRange(dateValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="DateTime"/> or <see cref="DateTimeOffset"/> property or field
+/// falls within the SQL Server <c>datetime2</c> type range
+/// (<c>0001-01-01 00:00:00</c> to <c>9999-12-31 23:59:59.9999999</c>).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to the appropriate <c>InSqlDateTimeRange</c> overload on
+/// <see cref="MustSqlDateTimeClauses"/>. Supported on properties, fields, and
+/// parameters of type <see cref="DateTime"/> or <see cref="DateTimeOffset"/>.
+/// </para>
+/// <para>
+/// If the value is neither <see cref="DateTime"/> nor <see cref="DateTimeOffset"/>, validation passes silently.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class RecordModel
+/// {
+///     [InSqlDateTimeRange]
+///     public DateTime CreatedAt { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="InSqlDateRangeAttribute"/>
+/// <seealso cref="MustSqlDateTimeClauses"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/sqldatetime">SQL DateTime Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class InSqlDateTimeRangeAttribute() : ValidationAttributeBase(typeof(object))
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        switch (value)
+        {
+            case DateTime dt:
+                {
+                    var result = Must.Be.InSqlDateTimeRange(dt, paramName: null);
+                    return FromMustResult(result, validationContext);
+                }
+            case DateTimeOffset dto:
+                {
+                    var result = Must.Be.InSqlDateTimeRange(dto, paramName: null);
+                    return FromMustResult(result, validationContext);
+                }
+            default:
+                return ValidationResult.Success;
+        }
+    }
+}
+#endif
