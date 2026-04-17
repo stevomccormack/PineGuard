@@ -2,11 +2,13 @@
 
   <PropertyGroup>
     <IsTestProject>false</IsTestProject>
+    <!-- TFMs inherited from tests/Directory.Build.props: net8.0;net10.0. netstandard2.1 is intentionally excluded — fixtures reference TimeOnly (net6.0+) unconditionally. -->
+    <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
     <Description>Shared fixtures, base test classes, and assertion helpers for consumers writing PineGuard-based validation tests.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\brand\pineguard-logo-512px.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\docs\brand\pineguard-icon-128px.png" Pack="true" PackagePath="\" />
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
