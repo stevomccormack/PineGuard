@@ -2,7 +2,13 @@
 
   <PropertyGroup>
     <IsTestProject>false</IsTestProject>
+    <Description>Shared fixtures, base test classes, and assertion helpers for consumers writing PineGuard-based validation tests.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\brand\pineguard-logo-512px.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="PineGuard.Testing.UnitTests" />

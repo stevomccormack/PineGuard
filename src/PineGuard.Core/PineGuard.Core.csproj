@@ -2,7 +2,13 @@
 
   <PropertyGroup>
     <RootNamespace>PineGuard</RootNamespace>
+    <Description>Zero-dependency validation primitives: rules and utilities for strings, numbers, dates, collections, URIs, emails, network identifiers, and OWASP-safe input.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\brand\pineguard-logo-512px.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="PineGuard.Core.UnitTests" />
