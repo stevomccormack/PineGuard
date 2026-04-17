@@ -337,11 +337,11 @@ At Settings → Tags:
 
 ## Execution Order
 
-Progress: **1 / 12 complete**.
+Progress: **3 / 12 complete**.
 
 - [x] **1. Per-package `README.md` files (6 files)** — `src/PineGuard.Core/README.md`, `src/PineGuard.MustClauses/README.md`, `src/PineGuard.GuardClauses/README.md`, `src/PineGuard.FluentValidation/README.md`, `src/PineGuard.DataAnnotations/README.md`, `tests/PineGuard.Testing/README.md`. Each follows a four-block shape: benefit-first masthead → canonical four-rule example (Email, StrictEmail, OwaspSafe, HttpsUrl) → architectural sweet spot (DDD for Guard; Clean Architecture for Fluent and DataAnnotations) → shared "one rule library, every call site" closer. Committed in `7e9213e`.
-- [ ] **2. `Directory.Build.props`** — add packable metadata block (see §1).
-- [ ] **3. `Directory.Packages.props`** — add `MinVer` and `Microsoft.SourceLink.GitHub` entries (see §4).
+- [x] **2. `Directory.Build.props`** — packable metadata block added (see §1). `MinVerDefaultPreReleaseIdentifiers=alpha.0` set inside the gated PropertyGroup; `MinVerTagPrefix>v` skipped (MinVer default). Committed in `cff873d`.
+- [x] **3. `Directory.Packages.props`** — `MinVer 7.0.0` and `Microsoft.SourceLink.GitHub 10.0.202` added (both latest stable as of 2026-04, newer than the 5.0.0/8.0.0 floor originally spec'd). `dotnet restore PineGuard.slnx --force` passes clean across all 12 projects. Committed in `cff873d`.
 - [ ] **4. Per-`.csproj` additions** — `<Description>` plus the `<None Include="..\..\docs\brand\pineguard-logo-512px.png">` and `<None Include="README.md">` blocks (see §2).
 - [ ] **5. Local `dotnet pack` verification** — run `dotnet pack PineGuard.slnx -c Release` and inspect each `.nupkg`:
     - [ ] Contains `pineguard-logo-512px.png` at root
