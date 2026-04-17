@@ -337,12 +337,12 @@ At Settings → Tags:
 
 ## Execution Order
 
-Progress: **3 / 12 complete**.
+Progress: **4 / 12 complete**.
 
 - [x] **1. Per-package `README.md` files (6 files)** — `src/PineGuard.Core/README.md`, `src/PineGuard.MustClauses/README.md`, `src/PineGuard.GuardClauses/README.md`, `src/PineGuard.FluentValidation/README.md`, `src/PineGuard.DataAnnotations/README.md`, `tests/PineGuard.Testing/README.md`. Each follows a four-block shape: benefit-first masthead → canonical four-rule example (Email, StrictEmail, OwaspSafe, HttpsUrl) → architectural sweet spot (DDD for Guard; Clean Architecture for Fluent and DataAnnotations) → shared "one rule library, every call site" closer. Committed in `7e9213e`.
 - [x] **2. `Directory.Build.props`** — packable metadata block added (see §1). `MinVerDefaultPreReleaseIdentifiers=alpha.0` set inside the gated PropertyGroup; `MinVerTagPrefix>v` skipped (MinVer default). Committed in `cff873d`.
 - [x] **3. `Directory.Packages.props`** — `MinVer 7.0.0` and `Microsoft.SourceLink.GitHub 10.0.202` added (both latest stable as of 2026-04, newer than the 5.0.0/8.0.0 floor originally spec'd). `dotnet restore PineGuard.slnx --force` passes clean across all 12 projects. Committed in `cff873d`.
-- [ ] **4. Per-`.csproj` additions** — `<Description>` plus the `<None Include="..\..\docs\brand\pineguard-logo-512px.png">` and `<None Include="README.md">` blocks (see §2).
+- [x] **4. Per-`.csproj` additions** — `<Description>` plus `<None Include="..\..\docs\brand\pineguard-logo-512px.png">` and `<None Include="README.md">` pack blocks landed across all six shippable projects (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing). DataAnnotations description trimmed of the "EF Core" framing since the README doesn't pitch it — kept description and README in sync instead. Release build clean across netstandard2.1, net8.0, and net10.0. Committed in `e55007c`.
 - [ ] **5. Local `dotnet pack` verification** — run `dotnet pack PineGuard.slnx -c Release` and inspect each `.nupkg`:
     - [ ] Contains `pineguard-logo-512px.png` at root
     - [ ] Contains `README.md` at root (the per-package one, not the root README)
