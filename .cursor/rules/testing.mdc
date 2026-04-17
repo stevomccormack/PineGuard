@@ -1,0 +1,10 @@
+---
+description: "PineGuard unit test rules — Theory+TheoryData, 100% coverage, nested Op Groups"
+globs: ["tests/**"]
+alwaysApply: false
+---
+
+# Unit Tests
+
+Read `docs/ai/rules/testing.md` before writing or editing any unit tests.
+Read `docs/ai/specs/testing/unit-test.md` for the full testing specification.

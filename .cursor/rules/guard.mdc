@@ -1,0 +1,10 @@
+---
+description: "PineGuard GuardClauses layer rules — throw-on-failure, delegates to Must"
+globs: ["src/PineGuard.GuardClauses/**"]
+alwaysApply: false
+---
+
+# GuardClauses
+
+Read `docs/ai/rules/guard.md` before writing or editing any GuardClauses code.
+Read `docs/ai/specs/guard-clauses/project.md` for the full GuardClauses project specification.

@@ -1,0 +1,13 @@
+{
+    "editor.wordWrap": "off",
+    "editor.wordWrapColumn": 140,
+    "editor.rulers": [
+        140,
+        400
+    ],
+    "editor.minimap.enabled": true,
+    "sonarlint.connectedMode.project": {
+        "connectionId": "http-localhost-9001",
+        "projectKey": "PineGuard"
+    }
+}

@@ -1,0 +1,10 @@
+---
+description: "PineGuard DataAnnotations layer rules — ValidationAttribute adapters for MustClauses"
+globs: ["src/PineGuard.DataAnnotations/**"]
+alwaysApply: false
+---
+
+# DataAnnotations
+
+Read `docs/ai/rules/annotation.md` before writing or editing any DataAnnotations code.
+Read `docs/ai/specs/data-annotations/project.md` for the full DataAnnotations project specification.

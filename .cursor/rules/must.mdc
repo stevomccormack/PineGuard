@@ -1,0 +1,10 @@
+---
+description: "PineGuard MustClauses layer rules — fluent validation, canonical messages, MustResult<T>"
+globs: ["src/PineGuard.MustClauses/**"]
+alwaysApply: false
+---
+
+# MustClauses
+
+Read `docs/ai/rules/must.md` before writing or editing any MustClauses code.
+Read `docs/ai/specs/must-clauses/project.md` for the full MustClauses project specification.

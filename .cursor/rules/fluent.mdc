@@ -1,0 +1,10 @@
+---
+description: "PineGuard FluentValidation layer rules — IRuleBuilder extensions adapting MustClauses"
+globs: ["src/PineGuard.FluentValidation/**"]
+alwaysApply: false
+---
+
+# FluentValidation
+
+Read `docs/ai/rules/fluent.md` before writing or editing any FluentValidation code.
+Read `docs/ai/specs/fluent-validation/project.md` for the full FluentValidation project specification.

@@ -1,0 +1,9 @@
+---
+description: "PineGuard tools rules — PowerShell scripts, code-diagnostics, sonar-scanner"
+globs: ["tools/**"]
+alwaysApply: false
+---
+
+# Tools & Scripts
+
+Read `docs/ai/rules/tools.md` before writing or editing any PowerShell tooling.

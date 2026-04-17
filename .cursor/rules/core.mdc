@@ -1,0 +1,10 @@
+---
+description: "PineGuard Core layer rules — pure logic, no IO, no messages"
+globs: ["src/PineGuard.Core/**"]
+alwaysApply: false
+---
+
+# Core Rules & Utils
+
+Read `docs/ai/rules/core.md` before writing or editing any Core code.
+Read `docs/ai/specs/core/project.md` for the full Core project specification.

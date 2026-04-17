@@ -1,0 +1,484 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "releases/*"
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Detect which source areas changed (skip unaffected test projects on PRs)
+  # ---------------------------------------------------------------------------
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      core: ${{ steps.filter.outputs.core }}
+      must-clauses: ${{ steps.filter.outputs.must-clauses }}
+      guard-clauses: ${{ steps.filter.outputs.guard-clauses }}
+      fluent-validation: ${{ steps.filter.outputs.fluent-validation }}
+      data-annotations: ${{ steps.filter.outputs.data-annotations }}
+      testing: ${{ steps.filter.outputs.testing }}
+      any-src: ${{ steps.filter.outputs.any-src }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            core:
+              - 'src/PineGuard.Core/**'
+              - 'tests/PineGuard.Core.UnitTests/**'
+            must-clauses:
+              - 'src/PineGuard.MustClauses/**'
+              - 'tests/PineGuard.MustClauses.UnitTests/**'
+            guard-clauses:
+              - 'src/PineGuard.GuardClauses/**'
+              - 'tests/PineGuard.GuardClauses.UnitTests/**'
+            fluent-validation:
+              - 'src/PineGuard.FluentValidation/**'
+              - 'tests/PineGuard.FluentValidation.UnitTests/**'
+            data-annotations:
+              - 'src/PineGuard.DataAnnotations/**'
+              - 'tests/PineGuard.DataAnnotations.UnitTests/**'
+            testing:
+              - 'tests/PineGuard.Testing/**'
+              - 'tests/PineGuard.Testing.UnitTests/**'
+            any-src:
+              - 'src/**'
+              - 'tests/**'
+              - '*.slnx'
+              - '*.sln'
+              - 'Directory.Packages.props'
+              - '.editorconfig'
+
+  # ---------------------------------------------------------------------------
+  # 2. Build the entire solution once (shared by test + roslyn jobs)
+  # ---------------------------------------------------------------------------
+  build:
+    needs: changes
+    if: needs.changes.outputs.any-src == 'true' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore PineGuard.slnx
+
+      - name: Build
+        run: dotnet build PineGuard.slnx -c Release --no-restore
+
+      # Persist built binaries for downstream jobs
+      - name: Upload build output
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            src/*/bin/Release/
+            src/*/obj/
+            tests/*/bin/
+            tests/*/obj/
+          retention-days: 1
+
+  # ---------------------------------------------------------------------------
+  # 3. Unit tests — matrix of affected test projects
+  # ---------------------------------------------------------------------------
+  test:
+    needs: [changes, build]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Core tests: run if core, testing (shared fixtures), or push to main
+          - project: tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj
+            name: Core
+            run-if: core-or-testing-or-main
+
+          # MustClauses tests: run if core, must-clauses, testing, or main
+          - project: tests/PineGuard.MustClauses.UnitTests/PineGuard.MustClauses.UnitTests.csproj
+            name: MustClauses
+            run-if: core-or-must-or-testing-or-main
+
+          # GuardClauses tests: run if core, must, guard, testing, or main
+          - project: tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj
+            name: GuardClauses
+            run-if: core-or-must-or-guard-or-testing-or-main
+
+          # FluentValidation tests: run if core, must, fluent, testing, or main
+          - project: tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj
+            name: FluentValidation
+            run-if: core-or-must-or-fluent-or-testing-or-main
+
+          # DataAnnotations tests: run if core, must, data, testing, or main
+          - project: tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj
+            name: DataAnnotations
+            run-if: core-or-must-or-data-or-testing-or-main
+
+          # Testing (fixture library) tests: run if testing or main
+          - project: tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj
+            name: Testing
+            run-if: testing-or-main
+
+    name: "Test: ${{ matrix.name }}"
+    steps:
+      - uses: actions/checkout@v6
+
+      # Determine if this matrix entry should actually run
+      - name: Should run
+        id: should-run
+        shell: bash
+        run: |
+          IS_MAIN="${{ github.ref == 'refs/heads/main' }}"
+          CORE="${{ needs.changes.outputs.core }}"
+          MUST="${{ needs.changes.outputs.must-clauses }}"
+          GUARD="${{ needs.changes.outputs.guard-clauses }}"
+          FLUENT="${{ needs.changes.outputs.fluent-validation }}"
+          DATA="${{ needs.changes.outputs.data-annotations }}"
+          TESTING="${{ needs.changes.outputs.testing }}"
+          RUN_IF="${{ matrix.run-if }}"
+
+          SHOULD_RUN=false
+
+          case "$RUN_IF" in
+            core-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-must-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-must-or-guard-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-must-or-fluent-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$FLUENT" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-must-or-data-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DATA" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+          esac
+
+          echo "result=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
+
+      - name: Setup .NET
+        if: steps.should-run.outputs.result == 'true'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Download build output
+        if: steps.should-run.outputs.result == 'true'
+        uses: actions/download-artifact@v8
+        with:
+          name: build-output
+          path: .
+
+      - name: Cache NuGet packages
+        if: steps.should-run.outputs.result == 'true'
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore NuGet packages
+        if: steps.should-run.outputs.result == 'true'
+        run: dotnet restore PineGuard.slnx
+
+      - name: Run tests
+        if: steps.should-run.outputs.result == 'true'
+        run: >
+          dotnet test ${{ matrix.project }}
+          -c Release
+          --no-build
+          --logger "trx;LogFileName=results.trx"
+          --collect:"XPlat Code Coverage"
+          --results-directory ./test-results/${{ matrix.name }}
+
+      - name: Upload test results
+        if: steps.should-run.outputs.result == 'true' && always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-${{ matrix.name }}
+          path: ./test-results/${{ matrix.name }}/
+          retention-days: 7
+
+      - name: Skip notice
+        if: steps.should-run.outputs.result != 'true'
+        run: echo "Skipped — no relevant changes detected for ${{ matrix.name }}"
+
+  # ---------------------------------------------------------------------------
+  # 4. Coverage — merge reports and enforce 100%
+  # ---------------------------------------------------------------------------
+  coverage:
+    needs: test
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.4.*
+
+      - name: Download all test results
+        id: download
+        uses: actions/download-artifact@v8
+        with:
+          pattern: test-results-*
+          path: ./test-results/
+          merge-multiple: true
+        continue-on-error: true
+
+      - name: Find coverage files
+        id: find-coverage
+        shell: bash
+        run: |
+          if [ ! -d "./test-results" ]; then
+            echo "No test-results directory — tests may have been skipped."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          FILES=$(find ./test-results -name "coverage.cobertura.xml" -type f | tr '\n' ';')
+          echo "files=$FILES" >> "$GITHUB_OUTPUT"
+          if [ -z "$FILES" ]; then
+            echo "No coverage files found."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "Coverage files: $FILES"
+          fi
+
+      - name: Generate coverage report
+        if: steps.find-coverage.outputs.found == 'true'
+        run: >
+          reportgenerator
+          -reports:"${{ steps.find-coverage.outputs.files }}"
+          -targetdir:./coverage-report
+          -reporttypes:"Cobertura;TextSummary;MarkdownSummaryGithub"
+
+      - name: Check coverage threshold
+        id: coverage-check
+        if: steps.find-coverage.outputs.found == 'true'
+        continue-on-error: true
+        env:
+          MIN_COV: ${{ vars.MIN_CODE_COVERAGE }}
+        shell: bash
+        run: |
+          THRESHOLD="${MIN_COV:-100}"
+          SUMMARY=$(cat ./coverage-report/Summary.txt)
+          echo "$SUMMARY"
+
+          # Extract line coverage percentage
+          LINE_COV=$(echo "$SUMMARY" | grep -oP 'Line coverage:\s+\K[\d.]+')
+          echo "Line coverage: ${LINE_COV}% (required: ${THRESHOLD}%)"
+
+          if [ "$(echo "$LINE_COV < $THRESHOLD" | bc -l)" -eq 1 ]; then
+            echo "::error::Line coverage is ${LINE_COV}% — ${THRESHOLD}% required"
+            exit 1
+          fi
+
+          # Extract branch coverage percentage
+          BRANCH_COV=$(echo "$SUMMARY" | grep -oP 'Branch coverage:\s+\K[\d.]+')
+          echo "Branch coverage: ${BRANCH_COV}% (required: ${THRESHOLD}%)"
+
+          if [ "$(echo "$BRANCH_COV < $THRESHOLD" | bc -l)" -eq 1 ]; then
+            echo "::error::Branch coverage is ${BRANCH_COV}% — ${THRESHOLD}% required"
+            exit 1
+          fi
+
+          echo "Coverage meets threshold (${THRESHOLD}%)"
+
+      - name: Post coverage to PR
+        if: steps.find-coverage.outputs.found == 'true' && steps.coverage-check.outcome == 'success' && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: coverage
+          path: ./coverage-report/SummaryGithub.md
+
+      - name: Post coverage failure to PR
+        if: steps.find-coverage.outputs.found == 'true' && steps.coverage-check.outcome == 'failure' && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: coverage
+          path: ./coverage-report/SummaryGithub.md
+
+      - name: Fail if coverage check failed
+        if: steps.coverage-check.outcome == 'failure'
+        run: exit 1
+
+      - name: Upload coverage report
+        if: always() && steps.find-coverage.outputs.found == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: ./coverage-report/
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # 5. Format check — verify .editorconfig compliance
+  # ---------------------------------------------------------------------------
+  format:
+    needs: changes
+    if: needs.changes.outputs.any-src == 'true' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Check formatting
+        id: fmt
+        continue-on-error: true
+        shell: bash
+        run: |
+          dotnet format PineGuard.slnx --verify-no-changes --verbosity diagnostic 2>&1 | tee ./format-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Prepare format failure report
+        if: steps.fmt.outcome == 'failure' && github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          {
+            echo "## Formatting check failed"
+            echo ""
+            echo "Run \`dotnet format PineGuard.slnx\` locally to fix, then push."
+            echo ""
+            echo "<details><summary>Details</summary>"
+            echo ""
+            echo '```'
+            cat ./format-output.txt
+            echo '```'
+            echo ""
+            echo "</details>"
+          } > ./format-report.md
+
+      - name: Post format failure to PR
+        if: steps.fmt.outcome == 'failure' && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: format
+          path: ./format-report.md
+
+      - name: Fail if formatting check failed
+        if: steps.fmt.outcome == 'failure'
+        run: exit 1
+
+  # ---------------------------------------------------------------------------
+  # 6. Roslyn — zero compiler warnings
+  # ---------------------------------------------------------------------------
+  roslyn:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build and check warnings
+        id: roslyn
+        continue-on-error: true
+        shell: bash
+        run: |
+          OUTPUT=$(dotnet build PineGuard.slnx -c Release --no-incremental 2>&1)
+          echo "$OUTPUT"
+
+          WARNINGS=$(echo "$OUTPUT" | grep -cP ':\s+warning\s+CS\d+' || true)
+          echo ""
+          echo "Roslyn CS warnings: $WARNINGS"
+
+          if [ "$WARNINGS" -gt 0 ]; then
+            echo ""
+            echo "::error::Found $WARNINGS Roslyn compiler warning(s) — zero required"
+            WARN_LINES=$(echo "$OUTPUT" | grep -P ':\s+warning\s+CS\d+' || true)
+            echo "$WARN_LINES"
+            {
+              echo "## Roslyn compiler warnings ($WARNINGS)"
+              echo ""
+              echo "Fix all CS warnings before merging."
+              echo ""
+              echo '```'
+              echo "$WARN_LINES"
+              echo '```'
+            } > ./roslyn-report.md
+            exit 1
+          fi
+
+          echo "No Roslyn compiler warnings found."
+
+      - name: Post roslyn failure to PR
+        if: steps.roslyn.outcome == 'failure' && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: roslyn
+          path: ./roslyn-report.md
+
+      - name: Fail if roslyn check failed
+        if: steps.roslyn.outcome == 'failure'
+        run: exit 1
+
+  # ---------------------------------------------------------------------------
+  # 8. Qodana — JetBrains code inspection (opt-in via QODANA_ENABLED variable)
+  # ---------------------------------------------------------------------------
+  qodana:
+    needs: build
+    if: vars.QODANA_ENABLED == 'true' && needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@v2025.3
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        with:
+          args: --config, tools/code-inspection/qodana/config/qodana.all.yaml
+          upload-result: true

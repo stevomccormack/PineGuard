@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "qodana": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@jetbrains/qodana-mcp",
+        "--token",
+        "${env.QODANA_TOKEN}",
+        "--project-dir",
+        "."
+      ]
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GH_TOKEN": "${env.GH_TOKEN}"
+      }
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ]
+    },
+    "docker": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-docker"
+      ]
+    },
+    "sonarqube": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-fetch"
+      ]
+    }
+  }
+}

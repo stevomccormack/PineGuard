@@ -1,0 +1,1312 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Test: Core (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: MustClauses (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.MustClauses.UnitTests/PineGuard.MustClauses.UnitTests.csproj"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: GuardClauses (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: FluentValidation (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: DataAnnotations (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: Testing (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: All (sequential)",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Test: Core (fast)",
+                "Test: MustClauses (fast)",
+                "Test: GuardClauses (fast)",
+                "Test: FluentValidation (fast)",
+                "Test: DataAnnotations (fast)",
+                "Test: Testing (fast)"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: Last (auto)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/auto/Run-Last.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: List Rules",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-ListRules"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: All (strict)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                "."
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: All (allow violations)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-AllowViolations"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Parity (Rule06)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule06",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Catalog Integrity (Rule09)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule09",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: PS Normalization (Rule10)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule10",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Fast Subset (Rule06,Rule09,Rule10)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule06,Rule09,Rule10",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: All (continue + show failures)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-ContinueOnError",
+                "-ShowFailures"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Library Rules (default)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-AuditLibraryRules.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                "."
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Library Rules (allow violations)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-AuditLibraryRules.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-AllowViolations"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Testing Rules (default)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-AuditTestingRules.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                "."
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Testing Rules (allow violations)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-AuditTestingRules.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-AllowViolations"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Unit Tests File Normalization (Rule50)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-AuditTestingRules.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule50",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Unit Tests Class Structure (Rule51)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-AuditTestingRules.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule51",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Unit Tests Case Records (Rule52)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-AuditTestingRules.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule52",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Unit Tests Orphans (Rule53)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-AuditTestingRules.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule53",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Unit Tests Tuple Conventions (Rule54)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-AuditTestingRules.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule54",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Inspect: Qodana: Core",
+            "dependsOn": [
+                "Quality: Qodana: Core"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Inspect: Qodana: MustClauses",
+            "dependsOn": [
+                "Quality: Qodana: MustClauses"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Inspect: Qodana: GuardClauses",
+            "dependsOn": [
+                "Quality: Qodana: GuardClauses"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Inspect: Qodana: FluentValidation",
+            "dependsOn": [
+                "Quality: Qodana: FluentValidation"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Inspect: Qodana: DataAnnotations",
+            "dependsOn": [
+                "Quality: Qodana: DataAnnotations"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Inspect: Qodana: Testing",
+            "dependsOn": [
+                "Quality: Qodana: Testing"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Inspect: Qodana: All (sequential)",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Inspect: Qodana: Core",
+                "Inspect: Qodana: MustClauses",
+                "Inspect: Qodana: GuardClauses",
+                "Inspect: Qodana: FluentValidation",
+                "Inspect: Qodana: DataAnnotations",
+                "Inspect: Qodana: Testing"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Inspect: Qodana: All (single)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "All",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean: Artifacts (recursive, all)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/maintenance/Clean-Artifacts.ps1",
+                "-Recursive",
+                "-All"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Scanner: Initialize Local SonarQube",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/sonar-scanner/Initialize-SonarQube.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Scanner: Run SonarQube Analysis",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/sonar-scanner/Run-SonarScanner.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Scanner: Get Issues (All)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "-Severity",
+                "All"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Scanner: Get Issues (Blockers)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "-Severity",
+                "Blocker"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Scanner: Get Issues (High)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "-Severity",
+                "High"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Scanner: Get Issues (Medium)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "-Severity",
+                "Medium"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Scanner: Get Issues (Low)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "-Severity",
+                "Low"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean: Logs (recursive, all)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/maintenance/Clean-Logs.ps1",
+                "-Recursive",
+                "-All"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean: Root (txt/log, non-recursive)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/maintenance/Clean-Root.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean: Root (recursive, WhatIf)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/maintenance/Clean-Root.ps1",
+                "-WhatIf",
+                "-Recursive",
+                "-All"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean: Run (Logs + Artifacts)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/maintenance/Run-Clean.ps1",
+                "-Logs",
+                "-Artifacts",
+                "-Recursive",
+                "-All"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean: Run (Logs + Artifacts + Root, WhatIf)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/maintenance/Run-Clean.ps1",
+                "-WhatIf",
+                "-Logs",
+                "-Artifacts",
+                "-Root",
+                "-Recursive",
+                "-All"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Coverage: Core (xplat, fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-coverage/Run-CodeCoverage.ps1",
+                "-Engine",
+                "xplat",
+                "-Mode",
+                "GenerateAndAnalyze",
+                "-Scope",
+                "Core",
+                "-NoOpen",
+                "-SkipHtml"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Coverage: MustClauses (xplat, fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-coverage/Run-CodeCoverage.ps1",
+                "-Engine",
+                "xplat",
+                "-Mode",
+                "GenerateAndAnalyze",
+                "-Scope",
+                "MustClauses",
+                "-NoOpen",
+                "-SkipHtml"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Coverage: GuardClauses (xplat, fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-coverage/Run-CodeCoverage.ps1",
+                "-Engine",
+                "xplat",
+                "-Mode",
+                "GenerateAndAnalyze",
+                "-Scope",
+                "GuardClauses",
+                "-NoOpen",
+                "-SkipHtml"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Coverage: FluentValidation (xplat, fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-coverage/Run-CodeCoverage.ps1",
+                "-Engine",
+                "xplat",
+                "-Mode",
+                "GenerateAndAnalyze",
+                "-Scope",
+                "FluentValidation",
+                "-NoOpen",
+                "-SkipHtml"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Coverage: DataAnnotations (xplat, fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-coverage/Run-CodeCoverage.ps1",
+                "-Engine",
+                "xplat",
+                "-Mode",
+                "GenerateAndAnalyze",
+                "-Scope",
+                "DataAnnotations",
+                "-NoOpen",
+                "-SkipHtml"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Coverage: Testing (xplat, fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-coverage/Run-CodeCoverage.ps1",
+                "-Engine",
+                "xplat",
+                "-Mode",
+                "GenerateAndAnalyze",
+                "-Scope",
+                "Testing",
+                "-NoOpen",
+                "-SkipHtml"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Coverage: All (sequential)",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Coverage: Core (xplat, fast)",
+                "Coverage: MustClauses (xplat, fast)",
+                "Coverage: GuardClauses (xplat, fast)",
+                "Coverage: FluentValidation (xplat, fast)",
+                "Coverage: DataAnnotations (xplat, fast)",
+                "Coverage: Testing (xplat, fast)"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Coverage: GuardClauses (auto)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/auto/Run-Coverage.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Verify: Solution (slow)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "dotnet test ./PineGuard.slnx -c Debug -v minimal"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality: Qodana: Core",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "Core",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality: Qodana: MustClauses",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "MustClauses",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality: Qodana: GuardClauses",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "GuardClauses",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality: Qodana: FluentValidation",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "FluentValidation",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality: Qodana: DataAnnotations",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "DataAnnotations",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality: Qodana: Testing",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "Testing",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality: Qodana: All",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "All",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality: Qodana: All (sequential)",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Quality: Qodana: Core",
+                "Quality: Qodana: MustClauses",
+                "Quality: Qodana: GuardClauses",
+                "Quality: Qodana: FluentValidation",
+                "Quality: Qodana: DataAnnotations",
+                "Quality: Qodana: Testing"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit Solution (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-Solution.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit Tools (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-Tools.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit Agent (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-Agent.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit Docs (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-Docs.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit Testing (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-Testing.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit Core (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-Core.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit MustClauses (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-MustClauses.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit GuardClauses (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-GuardClauses.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit FluentValidation (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-FluentValidation.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit DataAnnotations (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-DataAnnotations.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Run Commits (all, auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Run-Commits.ps1",
+                "-All",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Run Commits (all, dry run)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Run-Commits.ps1",
+                "-All",
+                "-DryRun"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Run Commits (all, auto message, safe push)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Run-Commits.ps1",
+                "-All",
+                "-AutoMessage",
+                "-SafePush"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Format: Core",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-formatter/Run-Format.ps1",
+                "-Scope",
+                "Core"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Format: MustClauses",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-formatter/Run-Format.ps1",
+                "-Scope",
+                "MustClauses"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Format: GuardClauses",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-formatter/Run-Format.ps1",
+                "-Scope",
+                "GuardClauses"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Format: FluentValidation",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-formatter/Run-Format.ps1",
+                "-Scope",
+                "FluentValidation"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Format: DataAnnotations",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-formatter/Run-Format.ps1",
+                "-Scope",
+                "DataAnnotations"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Format: Testing",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-formatter/Run-Format.ps1",
+                "-Scope",
+                "Testing"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Format: All (single)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-formatter/Run-Format.ps1",
+                "-Scope",
+                "All"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Format: All (sequential)",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Format: Core",
+                "Format: MustClauses",
+                "Format: GuardClauses",
+                "Format: FluentValidation",
+                "Format: DataAnnotations",
+                "Format: Testing"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

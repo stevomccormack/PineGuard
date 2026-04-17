@@ -1,0 +1,29 @@
+version: 2
+
+updates:
+  # NuGet packages (Central Package Management via Directory.Packages.props)
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      xunit:
+        patterns: ["xunit*"]
+      microsoft-test:
+        patterns: ["Microsoft.NET.Test.*", "coverlet.*"]
+      microsoft-codeanalysis:
+        patterns: ["Microsoft.CodeAnalysis*"]
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+
+  # GitHub Actions versions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"

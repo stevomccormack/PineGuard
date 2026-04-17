@@ -1,0 +1,29 @@
+# PineGuard Global Rules
+
+This file is an adapter. The canonical Brain lives in `docs/ai/`. Do not add logic here.
+
+Read `docs/ai/rules/global.md` for invariants that apply to all code in this repository.
+
+## Key Invariants
+
+- Layer order: Core Utils → Core Rules → MustClauses → GuardClauses → Integrations
+- Must owns canonical messages; Guard/Fluent/Data reuse them (never duplicate)
+- Guard calls Must (never duplicate logic)
+- Deterministic: No IO in Core Rules/Utils
+- File-scoped namespaces, sorted usings, arrow functions for single-line expressions
+- All output files → `artifacts/` or `logs/`, NEVER project root
+
+## Coding Standards
+
+Read `docs/ai/specs/coding-standard.md` for formatting, naming, and style rules.
+
+## Safety
+
+Read `docs/ai/specs/safety.md` for Tier 0/1/2 command classification.
+
+## Knowledge Base
+
+- **Brain index**: `docs/ai/README.md`
+- **Specs**: `docs/ai/specs/` — normative engineering rules
+- **Skills**: `docs/ai/skills/` — reusable implementation recipes
+- **Agents**: `docs/ai/agents/` — canonical playbooks
