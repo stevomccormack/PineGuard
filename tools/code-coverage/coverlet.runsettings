@@ -6,9 +6,14 @@
         <Configuration>
           <!-- Explicitly include the main library to avoid collector regressions that only report PineGuard.Testing -->
           <Include>[PineGuard.*]*</Include>
-          <!-- Exclude build artifacts and generated sources from coverage to keep reports stable -->
-          <ExcludeByFile>**/obj/**;**\\obj\\**;**/bin/**;**\\bin\\**</ExcludeByFile>
-          <!-- Exclude compiler/source-generated code (including GeneratedRegex output) -->
+          <!-- Exclude compiler/source-generated types that have no test value:
+               - GeneratedRegex source generator emits DFA state machines under System.Text.RegularExpressions.Generated.*
+               - These are internal implementation, not user code, and exercise only a subset of DFA paths at runtime.
+               ExcludeByAttribute alone is insufficient because the attribute is on the partial method, not the emitted class. -->
+          <Exclude>[*]System.Text.RegularExpressions.Generated.*</Exclude>
+          <!-- Exclude build artifacts -->
+          <ExcludeByFile>**/obj/**;**\obj\**;**/bin/**;**\bin\**</ExcludeByFile>
+          <!-- Exclude compiler/source-generated code -->
           <ExcludeByAttribute>GeneratedCodeAttribute;CompilerGeneratedAttribute;ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
         </Configuration>
       </DataCollector>

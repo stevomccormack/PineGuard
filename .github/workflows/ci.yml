@@ -213,6 +213,7 @@ jobs:
           --no-build
           --logger "trx;LogFileName=results.trx"
           --collect:"XPlat Code Coverage"
+          --settings tools/code-coverage/coverlet.runsettings
           --results-directory ./test-results/${{ matrix.name }}
 
       - name: Upload test results
