@@ -342,7 +342,7 @@ At Settings → Tags:
 
 ## Execution Order
 
-Progress: **7 / 12 complete**.
+Progress: **8 / 12 complete**.
 
 - [x] **1. Per-package `README.md` files (6 files)** — `src/PineGuard.Core/README.md`, `src/PineGuard.MustClauses/README.md`, `src/PineGuard.GuardClauses/README.md`, `src/PineGuard.FluentValidation/README.md`, `src/PineGuard.DataAnnotations/README.md`, `tests/PineGuard.Testing/README.md`. Each follows a four-block shape: benefit-first masthead → canonical four-rule example (Email, StrictEmail, OwaspSafe, HttpsUrl) → architectural sweet spot (DDD for Guard; Clean Architecture for Fluent and DataAnnotations) → shared "one rule library, every call site" closer. Committed in `7e9213e`.
 - [x] **2. `Directory.Build.props`** — packable metadata block added (see §1). `MinVerDefaultPreReleaseIdentifiers=alpha.0` set inside the gated PropertyGroup; `MinVerTagPrefix>v` skipped (MinVer default). Committed in `cff873d`.
@@ -355,7 +355,7 @@ Progress: **7 / 12 complete**.
     - [x] No polyfill types in public surface (`CallerArgumentExpressionAttribute` confirmed `NotPublic` in all four linked ns2.1 assemblies).
 - [x] **6. GitHub Actions workflows** — `.github/workflows/ci.yml` was already in place as a full PR gate (changes-filter, matrix tests, coverage with `MIN_CODE_COVERAGE` threshold, format check, Roslyn warnings, Qodana opt-in), so the plan's "if not present" bypass applied. Added `.github/workflows/publish.yml` for the release-triggered publish pipeline: restore → build → test → pack → upload artifacts → `dotnet nuget push --skip-duplicate`. Fetch-depth 0 for MinVer git-tag resolution, SDK 8.0 + 10.0 installed, concurrency group `publish-nuget` with `cancel-in-progress: false` so overlapping publishes queue rather than clobber, and a 30-day artifact upload step before push so a failed `nuget push` still leaves the signed packages inspectable in the run. Still blocked on `NUGET_TOKEN` (step 7) before the workflow can actually fire.
 - [x] **7. nuget.org account + secret** — API key scoped to push + push-new-versions on glob `PineGuard.*` created on nuget.org, and `NUGET_TOKEN` added as a GitHub Actions repo secret (confirmed by maintainer; `gh secret list` blocked by PAT scope locally, so the correctness of the secret name is validated on first release trigger). `publish.yml` is now live and will fire when a GitHub Release is published.
-- [ ] **8. Branch and tag protection** — enable on `main` and the `v*` tag pattern.
+- [x] **8. Branch and tag protection** — two repository rulesets created via `gh api`: ID 15232074 "main: PR required, no force push, no delete" (rules: `pull_request` with 0 approvals, `non_fast_forward`, `deletion`; zero bypass actors so even the maintainer is PR-gated), and ID 15232076 "v* tags: maintainers only" (rules: `creation`, `update`, `deletion` on `refs/tags/v*`; Repository admin role allowed to bypass so `gh release create v*` still works for maintainers). `current_user_can_bypass` reports `never` for the branch rule and `always` for the tag rule, confirming the configuration resolved as intended. UI view at https://github.com/stevomccormack/PineGuard/settings/rules.
 - [ ] **9. Cut `v0.1.0-alpha.1`** — via GitHub Release; verify full pipeline end-to-end.
 - [ ] **10. Post-publish verification** — icon, READMEs, and Source Link render correctly on nuget.org.
 - [ ] **11. Cut `v1.0.0`** — once the alpha pipeline is proven.
