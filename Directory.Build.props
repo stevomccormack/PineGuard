@@ -18,7 +18,7 @@
     <PackageProjectUrl>https://github.com/stevomccormack/PineGuard</PackageProjectUrl>
     <RepositoryUrl>https://github.com/stevomccormack/PineGuard</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageIcon>pineguard-icon-128px.png</PackageIcon>
+    <PackageIcon>pineguard-logo-128px.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>validation;validator;input-validation;model-validation;validation-rules;defensive-programming;owasp;csharp;dotnet</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

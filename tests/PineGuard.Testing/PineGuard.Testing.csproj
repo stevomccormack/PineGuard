@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\brand\pineguard-icon-128px.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 

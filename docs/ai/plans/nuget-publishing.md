@@ -45,12 +45,15 @@ are stable.
 ## Prerequisites (once, before any publish work)
 
 1. **Icon file.** The packaging icon is at
-   `docs/brand/pineguard-icon-128px.png` (128×128, ~31 KB). Generated from the
-   512×512 brand master (`docs/brand/pineguard-logo-512px.png`, 5.3 MB) because
-   NuGet enforces a hard 1 MB cap on packaged icons (error NU5047) and the
-   master PNG exceeds it. The 128px variant downscales cleanly via
-   `System.Drawing` high-quality bicubic and renders at nuget.org's
-   recommended package-page size.
+   `docs/brand/pineguard-logo-128px.png` (128×128, ~12 KB, transparent bg).
+   Generated from the brand master (`docs/brand/pineguard-logo-512px.png`,
+   5.3 MB) because NuGet enforces a hard 1 MB cap on packaged icons
+   (error NU5047) and the master PNG exceeds it. The 128px variant
+   downscales via `System.Drawing` high-quality bicubic and a luminance
+   chroma-key strips the opaque grey background baked into the master,
+   producing a transparent-edge PNG that renders cleanly against any
+   nuget.org theme. The resize is reproducible via
+   `.etc/powershell/resize-icon.ps1`.
 
    Both PNGs live in `docs/brand/` (512px = brand master, 128px = shipping
    artifact). The 128px file is the one referenced by each `.csproj`; keeping
