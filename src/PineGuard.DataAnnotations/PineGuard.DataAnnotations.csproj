@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <Description>ValidationAttribute implementations for DTOs, MVC binding, and Blazor forms.</Description>
+    <PackageTags>$(PackageTags);data-annotations;validationattribute;mvc;blazor;model-binding</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

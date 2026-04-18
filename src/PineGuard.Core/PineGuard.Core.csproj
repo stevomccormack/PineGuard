@@ -3,6 +3,7 @@
   <PropertyGroup>
     <RootNamespace>PineGuard</RootNamespace>
     <Description>Zero-dependency validation primitives: rules and utilities for strings, numbers, dates, collections, URIs, emails, network identifiers, and OWASP-safe input.</Description>
+    <PackageTags>$(PackageTags);parsing;regex;format-validation</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

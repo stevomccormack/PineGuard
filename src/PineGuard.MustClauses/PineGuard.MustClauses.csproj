@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <Description>Result-based composable validators. Must.Be.Email(value) returns a MustResult that the caller inspects or escalates.</Description>
+    <PackageTags>$(PackageTags);must-clauses;result-type;railway-oriented;functional-error-handling</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

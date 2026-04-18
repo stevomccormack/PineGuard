@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <Description>Fail-fast guards with parsed typed returns. Guard.Against.NotHttpsUrl(url) returns a Uri or throws.</Description>
+    <PackageTags>$(PackageTags);guard-clauses;argument-validation;argumentexception;null-check;fail-fast;ddd;clean-architecture;domain-driven-design</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
