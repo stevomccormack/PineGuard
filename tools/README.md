@@ -19,6 +19,7 @@ PowerShell scripts for building, testing, auditing, formatting, generating, and 
 | [docker](docker/) | Docker Compose stacks for Qodana and SonarQube | `docker-up.ps1` | Qodana, SonarQube |
 | [git](git/README.md) | Scoped commit orchestration | `Run-Commits.ps1` | Agent, Core, DataAnnotations, Docs, FluentValidation, GuardClauses, MustClauses, Testing, Tools, Solution |
 | [maintenance](maintenance/README.md) | Cleanup of artifacts, logs, and root build files | `Run-Clean.ps1` | `-Logs`, `-Artifacts`, `-Root` |
+| [release](release/README.md) | GitHub Release publishing, ruleset toggles, nuget.org unlist | `Run-GithubRelease.ps1` | `-BypassPR`, `-Unlist`, `-Draft`, `-Force`, `-Watch` |
 | [sonar-scanner](sonar-scanner/README.md) | SonarQube static analysis scanning | `Run-SonarScanner.ps1` | Project-level scanning |
 | [testing](testing/README.md) | `dotnet test` wrapper with async support | `Run-Tests.ps1` | Project or Solution targeting |
 

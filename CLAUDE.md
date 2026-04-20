@@ -128,6 +128,13 @@ Before acting, adopt a persona from the Engineering Business Unit:
 - `/audit-cli`: Act as **Builder**. Execute `docs/ai/agents/audit-cli.md`.
 - `/scaffold-vertical-slice`: Act as **Builder**. Execute `docs/ai/agents/scaffold-vertical-slice.md`.
 
+### Release
+
+- `/github-release-publish`: Act as **Shipper**. Execute `docs/ai/agents/github-release-publish.md`.
+- `/github-ruleset-disable`: Act as **Shipper**. Execute `docs/ai/agents/github-ruleset-disable.md`.
+- `/github-ruleset-enable`: Act as **Shipper**. Execute `docs/ai/agents/github-ruleset-enable.md`.
+- `/nuget-unlist`: Act as **Shipper**. Execute `docs/ai/agents/nuget-unlist.md`.
+
 ## 3. Native Claude Code Features
 
 Claude Code has native features in `.claude/` that **reference** the Brain (never duplicate it):
