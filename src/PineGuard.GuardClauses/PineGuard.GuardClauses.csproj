@@ -15,11 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\PineGuard.Core\Polyfills\CallerArgumentExpressionAttribute.cs"
-             Link="Polyfills\CallerArgumentExpressionAttribute.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
     <ProjectReference Include="..\PineGuard.MustClauses\PineGuard.MustClauses.csproj" />
   </ItemGroup>
