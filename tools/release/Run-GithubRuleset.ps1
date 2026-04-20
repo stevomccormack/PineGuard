@@ -86,4 +86,4 @@ if ($LASTEXITCODE -ne 0) {
     Fail "gh api PATCH rulesets/$($ruleset.id) failed: $result"
 }
 
-Write-Ok "$Name: ruleset #$($ruleset.id) enforcement set to '$enforcement'"
+Write-Ok "${Name}: ruleset #$($ruleset.id) enforcement set to '$enforcement'"
