@@ -1,12 +1,12 @@
 namespace PineGuard.Common;
 
-internal static class RuleComparison
+public static class RuleComparison
 {
-    internal static bool Equals<T>(T value, T other)
+    public static bool Equals<T>(T value, T other)
         where T : IComparable<T> =>
         value.CompareTo(other) == 0;
 
-    internal static bool IsBetween<T>(T value, T min, T max, Inclusion inclusion = Inclusion.Inclusive)
+    public static bool IsBetween<T>(T value, T min, T max, Inclusion inclusion = Inclusion.Inclusive)
         where T : IComparable<T>
     {
         if (min.CompareTo(max) > 0)
@@ -30,7 +30,7 @@ internal static class RuleComparison
         return minOk && maxOk;
     }
 
-    internal static bool IsGreaterThan<T>(T value, T min, Inclusion inclusion = Inclusion.Inclusive)
+    public static bool IsGreaterThan<T>(T value, T min, Inclusion inclusion = Inclusion.Inclusive)
         where T : IComparable<T> =>
         inclusion switch
         {
@@ -39,7 +39,7 @@ internal static class RuleComparison
             _ => throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null)
         };
 
-    internal static bool IsLessThan<T>(T value, T max, Inclusion inclusion = Inclusion.Inclusive)
+    public static bool IsLessThan<T>(T value, T max, Inclusion inclusion = Inclusion.Inclusive)
         where T : IComparable<T> =>
         inclusion switch
         {

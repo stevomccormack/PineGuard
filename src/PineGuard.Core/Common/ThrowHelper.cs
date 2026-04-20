@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace PineGuard.Common;
 
-internal static class ThrowHelper
+public static class ThrowHelper
 {
     /// <summary>
     /// Throws an <see cref="ArgumentNullException"/> when <paramref name="argument"/> is <see langword="null"/>.
@@ -11,7 +11,7 @@ internal static class ThrowHelper
     /// <param name="argument">The argument to validate.</param>
     /// <param name="paramName">The argument name. Defaults to the caller expression when omitted.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void ThrowIfNull(
+    public static void ThrowIfNull(
         [NotNull] object? argument,
         [CallerArgumentExpression(nameof(argument))] string? paramName = null)
     {
@@ -28,7 +28,7 @@ internal static class ThrowHelper
     /// <param name="argument">The argument to validate.</param>
     /// <param name="paramName">The argument name. Defaults to the caller expression when omitted.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void ThrowIfNullOrWhiteSpace(
+    public static void ThrowIfNullOrWhiteSpace(
         [NotNull] string? argument,
         [CallerArgumentExpression(nameof(argument))] string? paramName = null)
     {
