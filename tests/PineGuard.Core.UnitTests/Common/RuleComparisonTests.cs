@@ -126,7 +126,7 @@ public sealed class RuleComparisonTests : BaseUnitTest
             typeof(Inclusion).Assembly.GetType("PineGuard.Common.RuleComparison", throwOnError: true)!;
 
         var method = ruleComparisonType
-            .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
             .Single(m => string.Equals(m.Name, methodName, StringComparison.Ordinal) && m.IsGenericMethodDefinition);
 
         var constructed = method.MakeGenericMethod(typeof(int));
