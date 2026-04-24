@@ -5,7 +5,7 @@
 .claude/agent-memory-local/
 .claude/run/
 .dotnet/
-.etc/
+.etc/powershell/.env
 artifacts/
 diagnostics/
 docs/ai/chat-*.md

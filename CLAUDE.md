@@ -128,6 +128,11 @@ Before acting, adopt a persona from the Engineering Business Unit:
 - `/audit-cli`: Act as **Builder**. Execute `docs/ai/agents/audit-cli.md`.
 - `/scaffold-vertical-slice`: Act as **Builder**. Execute `docs/ai/agents/scaffold-vertical-slice.md`.
 
+### Council
+
+- `/ask-council`: Act as **Architect**. Execute `docs/ai/agents/ask-council.md`.
+- `/plan-with-council`: Act as **Architect**. Execute `docs/ai/workflows/plan-with-council.md`.
+
 ### Release
 
 - `/github-release-publish`: Act as **Shipper**. Execute `docs/ai/agents/github-release-publish.md`.

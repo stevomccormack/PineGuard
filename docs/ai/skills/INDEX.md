@@ -42,6 +42,12 @@ Canonical, model-agnostic skill definitions. These are the source of truth.
 | [Create Workflow](create-workflow/SKILL.md) | `pineguard.skill.scaffold-workflow` | Create a canonical agent playbook in `docs/ai/agents/` |
 | [Scaffold Quality Tool](scaffold-quality-tool/SKILL.md) | `pineguard.skill.scaffold-quality-tool` | Add a new quality/inspection tool as a first-class Brain citizen |
 
+### Decision Support
+
+| Skill | ID | Description |
+|-------|----|-------------|
+| [Ask Council](ask-council/SKILL.md) | `pineguard.skill.ask-council` | Pressure-test a decision via 5 advisors + anonymous peer review + chairman synthesis |
+
 ### Meta
 
 | Skill | Description |
@@ -72,6 +78,7 @@ Thin `context: fork` wrappers that delegate to Brain skills or standalone toolin
 | [generate-xml-docs](../../.claude/skills/document/SKILL.md) | `generate-xml-docs` | XML documentation generation |
 | [changelog](../../.claude/skills/changelog/SKILL.md) | *(standalone)* | Generate changelog from git history |
 | [dependency-audit](../../.claude/skills/dependency-audit/SKILL.md) | *(standalone)* | Check NuGet vulnerabilities and outdated packages |
+| [ask-council](../../.claude/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
 
 ---
 
@@ -87,6 +94,7 @@ Copilot-compatible adapters for GitHub-hosted workflows.
 | [roslyn-fix](../../.github/skills/fix-roslyn/SKILL.md) | `roslyn-fix` | Roslyn warning fixes |
 | [scan-run](../../.github/skills/scan-sonar/SKILL.md) | `scan-run` | SonarQube analysis |
 | [scan-fix](../../.github/skills/fix-sonar/SKILL.md) | `scan-fix` | SonarQube issue fixes |
+| [ask-council](../../.github/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
 
 ---
 

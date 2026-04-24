@@ -45,13 +45,31 @@ Recommended DRY mapping:
 - `docs/ai/commands/coverage.md` ↔ tasks labelled `Coverage:*`
 - `docs/ai/commands/fix.md` ↔ tasks labelled `Debug:*` (often interactive; not auto-approved)
 
-## Copilot / Claude / Gemini / Other Agents
+## Copilot / Claude / Gemini / Pi Agents
 
 Adapters must remain thin and point to canonical agents.
 
 - GitHub Copilot adapter: `.github/copilot-instructions.md`
 - Claude adapter: `CLAUDE.md`
 - Gemini adapter stubs: `.agent/workflows/*.md`
+- Pi adapter: `.pi/AGENTS.md` + `.pi/skills/*/SKILL.md`
+
+### Worked example: `ask-council`
+
+Shows the full adapter fan-out from one Brain capability:
+
+| Layer | File |
+|---|---|
+| Brain skill | `docs/ai/skills/ask-council/SKILL.md` |
+| Brain agent | `docs/ai/agents/ask-council.md` |
+| Brain command | `docs/ai/commands/council.md` |
+| Brain spec | `docs/ai/specs/council.md` |
+| Brain roles | `docs/ai/roles/council.md` |
+| Brain workflow | `docs/ai/workflows/plan-with-council.md` |
+| Claude | `.claude/skills/ask-council/SKILL.md`, `.claude/commands/ask-council.md`, `.claude/commands/plan-with-council.md` |
+| Copilot | `.github/skills/ask-council/SKILL.md`, `.github/prompts/ask-council.prompt.md` |
+| Gemini | `.agent/workflows/ask-council.md` |
+| Pi | `.pi/skills/ask-council/SKILL.md` |
 
 Best practice for portability (Claude Code / other tools):
 

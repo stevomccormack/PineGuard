@@ -119,6 +119,7 @@ docs/ai/rules/global.md          (always applies — invariants, file hygiene)
 | Fix Roslyn Warnings | `skills/fix-roslyn/` | Fix compiler warnings by code pattern |
 | Scaffold Quality Tool | `skills/scaffold-quality-tool/` | Meta-skill: add a new quality/inspection tool |
 | Create Workflow | `skills/scaffold-workflow/` | Agent playbook generation |
+| Ask Council | `skills/ask-council/` | Pressure-test a decision via 5 advisors + peer review + chairman synthesis |
 | Skills Format (Template) | `skills/meta-template/` | Meta-template defining skill structure |
 
 ## Roles Inventory
@@ -137,6 +138,7 @@ All roles are defined in `docs/ai/roles/` and registered in `docs/ai/business-un
 | Code Reviewer | Critic | `roles/reviewer.md` | PR review, catching drift from specs |
 | DevOps Engineer | Shipper | `roles/shipper.md` | CI/CD, packaging, release automation |
 | Business Analyst | Clarifier | `roles/business-analyst.md` | Requirements, acceptance criteria |
+| Council (Contrarian / First Principles / Expansionist / Outsider / Executor / Chairman) | Multi-perspective Reviewer | `roles/council.md` | Stateless advisor personas used only in the ask-council procedure |
 
 ### Claude Code Agent ↔ Brain Role Mapping
 
