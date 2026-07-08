@@ -164,7 +164,6 @@ Act as **{Role}**. Execute workflow `docs/ai/workflows/scan-{tool}.md` with Scop
 
 **Meta-references:**
 - `docs/ai/meta/taxonomy.md` — How concepts compose
-- `docs/ai/skills/meta-template/SKILL.md` — Skill file template
 - `docs/ai/skills/scaffold-workflow/SKILL.md` — Workflow creation recipe
 
 ## 7. File Count Summary

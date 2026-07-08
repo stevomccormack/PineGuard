@@ -37,7 +37,6 @@ This persona is adopted for architecture, cross-cutting design, tooling strategy
 
 ### Skills
 - [Create Workflow](../skills/scaffold-workflow/SKILL.md)
-- [Skills Format (Template)](../skills/meta-template/SKILL.md)
 
 ### Workflows
 - [Engineering Standards](../workflows/standard.md)
