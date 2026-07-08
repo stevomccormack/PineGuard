@@ -61,6 +61,18 @@ resharper_can_simplify_string_escape_sequence_highlighting = none
 resharper_unused_member_in_super_global_highlighting = none
 
 # -------------------------------------------------------------------
+# .NET code-quality analyzers — intentional design decisions
+# (global: Roslyn's editorconfig matcher does not collapse /**/ for
+# files at a project root, so per-project sections cannot carry these)
+# -------------------------------------------------------------------
+# CA1000: static factory/lookup members on generic types are the core API shape
+# (Enumeration<TValue>.FromValue/FromName, MustResult<T>.Success/Failure)
+dotnet_diagnostic.CA1000.severity = none
+# CA1720: identifiers deliberately name the validated type — the library's whole
+# vocabulary is type-named validation (Must.Be.Guid, CsvColumnType.Int32, StringRules.Guid)
+dotnet_diagnostic.CA1720.severity = none
+
+# -------------------------------------------------------------------
 # C# formatting — using directives, braces, spacing
 # -------------------------------------------------------------------
 dotnet_sort_system_directives_first = true

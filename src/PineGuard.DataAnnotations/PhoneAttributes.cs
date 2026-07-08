@@ -15,7 +15,6 @@ namespace PineGuard.DataAnnotations;
 /// </para>
 /// <para>
 /// For custom digit-length requirements, use <see cref="CustomPhoneNumberAttribute"/>.
-/// For ITU-T E.164 international phone numbers, use <see cref="InternationalPhoneNumberAttribute"/>.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
 /// </remarks>

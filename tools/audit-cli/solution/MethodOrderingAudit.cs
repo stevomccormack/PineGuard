@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -23,8 +24,8 @@ internal static class MethodOrderingAudit
 
         var sb = new StringBuilder();
         sb.AppendLine($"{RuleId} - {Title}");
-        sb.AppendLine($"GeneratedAtUtc: {DateTime.UtcNow:O}");
-        sb.AppendLine($"RepoRoot: {repoRoot}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"GeneratedAtUtc: {DateTime.UtcNow:O}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"RepoRoot: {repoRoot}");
         sb.AppendLine();
 
         foreach (var family in families.OrderBy(f => f.MustTypeName, StringComparer.Ordinal))
@@ -117,9 +118,9 @@ internal static class MethodOrderingAudit
             }
         }
 
-        sb.AppendLine($"Families: {families.Count}");
-        sb.AppendLine($"Violations: {violations.Count}");
-        sb.AppendLine($"Warnings: {warnings.Count}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Families: {families.Count}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Violations: {violations.Count}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Warnings: {warnings.Count}");
         sb.AppendLine();
 
         if (violations.Count > 0)
@@ -169,7 +170,7 @@ internal static class MethodOrderingAudit
         return $"{familyHeader} - {layer} order mismatch\nExpected: [{expectedText}]\nActual:   [{actualText}]";
     }
 
-    private static IReadOnlyList<string> BuildGroupOrder(IReadOnlyList<string> memberNames, string domainName, Layer layer)
+    private static List<string> BuildGroupOrder(IReadOnlyList<string> memberNames, string domainName, Layer layer)
     {
         var seen = new HashSet<string>(StringComparer.Ordinal);
         var ordered = new List<string>();
@@ -622,7 +623,7 @@ internal static class MethodOrderingAudit
                 c.Parent is ClassDeclarationSyntax parent &&
                 string.Equals(parent.Identifier.Text, outerTypeName, StringComparison.Ordinal));
 
-    private static IReadOnlyList<string> ExtractPublicStaticMethodNamesDistinctInOrder(ClassDeclarationSyntax cls)
+    private static List<string> ExtractPublicStaticMethodNamesDistinctInOrder(ClassDeclarationSyntax cls)
     {
         var names = new List<string>();
         var seen = new HashSet<string>(StringComparer.Ordinal);

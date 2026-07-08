@@ -18,8 +18,8 @@ public static class RuleScenarioExtension
         scenarios.Where(s => names.Contains(s.Name, StringComparer.Ordinal)).ToArray();
 
     // Projection
-    public static RuleScenario<V>[] Project<T, V>(this RuleScenario<T>[] scenarios, Func<T, V> selector) =>
-        scenarios.Select(s => new RuleScenario<V>(s.Name, selector(s.Inputs), s.IsValid)).ToArray();
+    public static RuleScenario<TOut>[] Project<T, TOut>(this RuleScenario<T>[] scenarios, Func<T, TOut> selector) =>
+        scenarios.Select(s => new RuleScenario<TOut>(s.Name, selector(s.Inputs), s.IsValid)).ToArray();
 
     // Rules layer
     public static TheoryData<RuleCase<T>> ToRuleCases<T>(this RuleScenario<T>[] scenarios)

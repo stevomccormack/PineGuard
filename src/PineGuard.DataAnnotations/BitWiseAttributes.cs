@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -118,7 +119,7 @@ public sealed class HasAllBitsAttribute(int mask) : ValidationAttributeBase(type
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var intValue = (int)value!;
-        var result = Must.Be.HasAllBits(intValue, Mask.ToString(), paramName: null);
+        var result = Must.Be.HasAllBits(intValue, Mask.ToString(CultureInfo.InvariantCulture), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -158,7 +159,7 @@ public sealed class HasAnyBitsAttribute(int mask) : ValidationAttributeBase(type
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var intValue = (int)value!;
-        var result = Must.Be.HasAnyBits(intValue, Mask.ToString(), paramName: null);
+        var result = Must.Be.HasAnyBits(intValue, Mask.ToString(CultureInfo.InvariantCulture), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -198,7 +199,7 @@ public sealed class HasNoBitsAttribute(int mask) : ValidationAttributeBase(typeo
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var intValue = (int)value!;
-        var result = Must.Be.HasNoBits(intValue, Mask.ToString(), paramName: null);
+        var result = Must.Be.HasNoBits(intValue, Mask.ToString(CultureInfo.InvariantCulture), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -239,7 +240,7 @@ public sealed class HasOnlyBitsAttribute(int mask) : ValidationAttributeBase(typ
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var intValue = (int)value!;
-        var result = Must.Be.HasOnlyBits(intValue, Mask.ToString(), paramName: null);
+        var result = Must.Be.HasOnlyBits(intValue, Mask.ToString(CultureInfo.InvariantCulture), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }

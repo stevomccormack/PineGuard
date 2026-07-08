@@ -5,5 +5,15 @@
   <!-- Test projects are executables — cannot target netstandard2.1 -->
   <PropertyGroup>
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <!-- Test assemblies don't ship — no XML doc file, no CS1591 on public test classes -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Test code follows xUnit conventions (underscored test names, fixture types named for the
+         member under test) that conflict with the Recommended analysis mode used for src/ —
+         keep the default analyzer set here instead -->
+    <AnalysisMode>Default</AnalysisMode>
+    <!-- Fixture conventions are intentional in test code:
+         CA1805 — explicit defaults (e.g. `Null = null`) name the scenario being pinned
+         CA1711 — fixture types deliberately end in the suffix under test (SimpleEnum, ExpectedException) -->
+    <NoWarn>$(NoWarn);CA1805;CA1711</NoWarn>
   </PropertyGroup>
 </Project>

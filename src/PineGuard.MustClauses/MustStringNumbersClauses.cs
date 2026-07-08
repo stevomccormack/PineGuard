@@ -51,7 +51,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsPositive<decimal>(parsed);
@@ -87,7 +87,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsNegative<decimal>(parsed);
@@ -123,7 +123,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsZero<decimal>(parsed);
@@ -159,7 +159,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsZeroOrPositive<decimal>(parsed);
@@ -195,7 +195,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsZeroOrNegative<decimal>(parsed);
@@ -233,7 +233,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value);
 
         var ok = NumberRules.IsGreaterThan(parsed, min);
@@ -271,7 +271,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value);
 
         var ok = NumberRules.IsGreaterThanOrEqual(parsed, min);
@@ -309,7 +309,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value);
 
         var ok = NumberRules.IsLessThan(parsed, max);
@@ -347,7 +347,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value);
 
         var ok = NumberRules.IsLessThanOrEqual(parsed, max);
@@ -392,7 +392,7 @@ public static class MustStringNumbersClauses
 
 
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsInRange(parsed, min, max, inclusion);
@@ -435,7 +435,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must not be between '{Min}' and '{Max}'.";
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)).Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value);
 
         var ok = !NumberRules.IsInRange(parsed, min, max, inclusion);
@@ -476,7 +476,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must be approximately '{Target}'.";
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value);
 
         var ok = NumberRules.IsApproximately(parsed, target, tolerance);
@@ -515,7 +515,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must be a multiple of '{Factor}'.";
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value);
 
         var ok = NumberRules.IsMultipleOf(parsed, factor);
@@ -549,7 +549,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must be even.";
 
-        if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<int>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsEven(parsed);
@@ -583,7 +583,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must be odd.";
 
-        if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<int>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsOdd(parsed);
@@ -617,7 +617,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must be finite.";
 
-        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsFinite(parsed);
@@ -651,7 +651,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must not be zero.";
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsNotZero<decimal>(parsed);
@@ -692,7 +692,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must not be approximately '{Target}'.";
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value);
 
         var ok = !NumberRules.IsApproximately(parsed, target, tolerance);
@@ -731,7 +731,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must not be a multiple of '{Factor}'.";
 
-        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value);
 
         var ok = !NumberRules.IsMultipleOf(parsed, factor);
@@ -765,7 +765,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must not be finite.";
 
-        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = !NumberRules.IsFinite(parsed);
@@ -799,7 +799,7 @@ public static class MustStringNumbersClauses
 
         const string messageTemplate = "{paramName} must not be NaN.";
 
-        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = !NumberRules.IsNaN(parsed);

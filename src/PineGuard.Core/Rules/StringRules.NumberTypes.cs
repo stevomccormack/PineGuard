@@ -48,7 +48,7 @@ public static partial class StringRules
             string? value,
             int decimalPlaces = 2,
             NumberStyles styles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, decimalPlaces, out _, styles);
+            StringUtility.NumberTypes.TryParseDecimal(value, decimalPlaces, out _, styles, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Determines whether the specified string parses to a decimal with exactly <paramref name="exactDecimalPlaces"/> fractional digits.
@@ -61,7 +61,7 @@ public static partial class StringRules
             string? value,
             int exactDecimalPlaces = 2,
             NumberStyles styles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite) =>
-            StringUtility.NumberTypes.TryParseExactDecimal(value, exactDecimalPlaces, out _, styles);
+            StringUtility.NumberTypes.TryParseExactDecimal(value, exactDecimalPlaces, out _, styles, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Determines whether the specified string parses to a valid 32-bit signed integer.
@@ -70,7 +70,7 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if <paramref name="value"/> is a valid <see cref="int"/>; otherwise, <see langword="false"/>.</returns>
         public static bool IsInt32(string? value, NumberStyles styles = NumberStyles.Integer) =>
-            StringUtility.NumberTypes.TryParseInt32(value, out _, styles);
+            StringUtility.NumberTypes.TryParseInt32(value, out _, styles, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Determines whether the specified string parses to a valid 64-bit signed integer.
@@ -79,7 +79,7 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if <paramref name="value"/> is a valid <see cref="long"/>; otherwise, <see langword="false"/>.</returns>
         public static bool IsInt64(string? value, NumberStyles styles = NumberStyles.Integer) =>
-            StringUtility.NumberTypes.TryParseInt64(value, out _, styles);
+            StringUtility.NumberTypes.TryParseInt64(value, out _, styles, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Determines whether the specified string parses to a 32-bit integer within [<paramref name="min"/>, <paramref name="max"/>].
@@ -91,7 +91,7 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed integer is within the range; otherwise, <see langword="false"/>.</returns>
         public static bool IsInt32InRange(string? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive, NumberStyles styles = NumberStyles.Integer) =>
-            StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles) && RuleComparison.IsBetween(parsed, min, max, inclusion);
+            StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture) && RuleComparison.IsBetween(parsed, min, max, inclusion);
 
         /// <summary>
         /// Determines whether the specified string parses to a 64-bit integer within [<paramref name="min"/>, <paramref name="max"/>].
@@ -103,6 +103,6 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed integer is within the range; otherwise, <see langword="false"/>.</returns>
         public static bool IsInt64InRange(string? value, long min, long max, Inclusion inclusion = Inclusion.Inclusive, NumberStyles styles = NumberStyles.Integer) =>
-            StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles) && RuleComparison.IsBetween(parsed, min, max, inclusion);
+            StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles, CultureInfo.InvariantCulture) && RuleComparison.IsBetween(parsed, min, max, inclusion);
     }
 }

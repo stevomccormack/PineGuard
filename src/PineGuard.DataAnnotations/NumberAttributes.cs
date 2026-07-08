@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Reflection;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
@@ -517,7 +518,7 @@ public sealed class GreaterThanOrEqualNumberAttribute(double min) : NumberAttrib
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMin = Convert.ChangeType(Min, type);
+        var typedMin = Convert.ChangeType(Min, type, CultureInfo.InvariantCulture);
         return InvokeAndMap(nameof(MustNumberClauses.GreaterThanOrEqual), value, validationContext, typedMin);
     }
 }
@@ -554,7 +555,7 @@ public sealed class LessThanOrEqualNumberAttribute(double max) : NumberAttribute
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMax = Convert.ChangeType(Max, type);
+        var typedMax = Convert.ChangeType(Max, type, CultureInfo.InvariantCulture);
         return InvokeAndMap(nameof(MustNumberClauses.LessThanOrEqual), value, validationContext, typedMax);
     }
 }
@@ -600,8 +601,8 @@ public sealed class InRangeNumberAttribute(double min, double max, Inclusion inc
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMin = Convert.ChangeType(Min, type);
-        var typedMax = Convert.ChangeType(Max, type);
+        var typedMin = Convert.ChangeType(Min, type, CultureInfo.InvariantCulture);
+        var typedMax = Convert.ChangeType(Max, type, CultureInfo.InvariantCulture);
         return InvokeAndMap(nameof(MustNumberClauses.InRange), value, validationContext, typedMin, typedMax, Inclusion);
     }
 }
@@ -646,8 +647,8 @@ public sealed class OutOfRangeNumberAttribute(double min, double max, Inclusion 
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMin = Convert.ChangeType(Min, type);
-        var typedMax = Convert.ChangeType(Max, type);
+        var typedMin = Convert.ChangeType(Min, type, CultureInfo.InvariantCulture);
+        var typedMax = Convert.ChangeType(Max, type, CultureInfo.InvariantCulture);
         return InvokeAndMap(nameof(MustNumberClauses.OutOfRange), value, validationContext, typedMin, typedMax, Inclusion);
     }
 }
@@ -684,7 +685,7 @@ public sealed class MultipleOfNumberAttribute(double factor) : NumberAttributeBa
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedFactor = Convert.ChangeType(Factor, type);
+        var typedFactor = Convert.ChangeType(Factor, type, CultureInfo.InvariantCulture);
         return InvokeAndMap(nameof(MustNumberClauses.MultipleOf), value, validationContext, typedFactor);
     }
 }
@@ -721,7 +722,7 @@ public sealed class NotMultipleOfNumberAttribute(double factor) : NumberAttribut
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedFactor = Convert.ChangeType(Factor, type);
+        var typedFactor = Convert.ChangeType(Factor, type, CultureInfo.InvariantCulture);
         return InvokeAndMap(nameof(MustNumberClauses.NotMultipleOf), value, validationContext, typedFactor);
     }
 }
@@ -763,8 +764,8 @@ public sealed class ApproximatelyNumberAttribute(double target) : NumberAttribut
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedTarget = Convert.ChangeType(Target, type);
-        var typedTolerance = Tolerance is null ? null : Convert.ChangeType(Tolerance.Value, type);
+        var typedTarget = Convert.ChangeType(Target, type, CultureInfo.InvariantCulture);
+        var typedTolerance = Tolerance is null ? null : Convert.ChangeType(Tolerance.Value, type, CultureInfo.InvariantCulture);
         return InvokeAndMap(nameof(MustNumberClauses.Approximately), value, validationContext, typedTarget, typedTolerance);
     }
 }
@@ -806,8 +807,8 @@ public sealed class NotApproximatelyNumberAttribute(double target) : NumberAttri
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedTarget = Convert.ChangeType(Target, type);
-        var typedTolerance = Tolerance is null ? null : Convert.ChangeType(Tolerance.Value, type);
+        var typedTarget = Convert.ChangeType(Target, type, CultureInfo.InvariantCulture);
+        var typedTolerance = Tolerance is null ? null : Convert.ChangeType(Tolerance.Value, type, CultureInfo.InvariantCulture);
         return InvokeAndMap(nameof(MustNumberClauses.NotApproximately), value, validationContext, typedTarget, typedTolerance);
     }
 }

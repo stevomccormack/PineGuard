@@ -1,4 +1,5 @@
 #if NET8_0_OR_GREATER
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using PineGuard.Rules;
 using PineGuard.Utils;
@@ -40,7 +41,7 @@ public static class MustStringGeoLocationClauses
 
         const string messageTemplate = "{paramName} must be a valid latitude.";
 
-        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed))
+        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, provider: CultureInfo.InvariantCulture))
             return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = GeoLocationRules.IsLatitude(parsed);
@@ -72,7 +73,7 @@ public static class MustStringGeoLocationClauses
 
         const string messageTemplate = "{paramName} must be a valid longitude.";
 
-        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed))
+        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, provider: CultureInfo.InvariantCulture))
             return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = GeoLocationRules.IsLongitude(parsed);
@@ -99,10 +100,10 @@ public static class MustStringGeoLocationClauses
 
         const string messageTemplate = "{paramName} must be a valid geo location.";
 
-        if (!StringUtility.NumberTypes.TryParseDouble(latitude, out var parsedLat))
+        if (!StringUtility.NumberTypes.TryParseDouble(latitude, out var parsedLat, provider: CultureInfo.InvariantCulture))
             return MustResult<(double Latitude, double Longitude)>.FromBool(false, messageTemplate, paramName, (latitude, longitude));
 
-        if (!StringUtility.NumberTypes.TryParseDouble(longitude, out var parsedLon))
+        if (!StringUtility.NumberTypes.TryParseDouble(longitude, out var parsedLon, provider: CultureInfo.InvariantCulture))
             return MustResult<(double Latitude, double Longitude)>.FromBool(false, messageTemplate, nameof(longitude), (latitude, longitude));
 
         var ok = GeoLocationRules.IsGeoLocation(parsedLat, parsedLon);

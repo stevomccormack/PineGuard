@@ -53,7 +53,7 @@ public static class MustStringNumberTypesClauses
 
         const string messageTemplate = "{paramName} must be a decimal number.";
 
-        return StringUtility.NumberTypes.TryParseDecimal(value, decimalPlaces, out var parsed, styles)
+        return StringUtility.NumberTypes.TryParseDecimal(value, decimalPlaces, out var parsed, styles, CultureInfo.InvariantCulture)
             ? MustResult<decimal>.FromBool(true, messageTemplate, paramName, value, parsed)
             : MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
     }
@@ -90,7 +90,7 @@ public static class MustStringNumberTypesClauses
 
         const string messageTemplate = "{paramName} must be an exact decimal number.";
 
-        return StringUtility.NumberTypes.TryParseExactDecimal(value, exactDecimalPlaces, out var parsed, styles)
+        return StringUtility.NumberTypes.TryParseExactDecimal(value, exactDecimalPlaces, out var parsed, styles, CultureInfo.InvariantCulture)
             ? MustResult<decimal>.FromBool(true, messageTemplate, paramName, value, parsed)
             : MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
     }
@@ -122,7 +122,7 @@ public static class MustStringNumberTypesClauses
 
         const string messageTemplate = "{paramName} must be a 32-bit integer.";
 
-        return StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles)
+        return StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture)
             ? MustResult<int>.FromBool(true, messageTemplate, paramName, value, parsed)
             : MustResult<int>.FromBool(false, messageTemplate, paramName, value);
     }
@@ -154,7 +154,7 @@ public static class MustStringNumberTypesClauses
 
         const string messageTemplate = "{paramName} must be a 64-bit integer.";
 
-        return StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles)
+        return StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles, CultureInfo.InvariantCulture)
             ? MustResult<long>.FromBool(true, messageTemplate, paramName, value, parsed)
             : MustResult<long>.FromBool(false, messageTemplate, paramName, value);
     }
@@ -195,7 +195,7 @@ public static class MustStringNumberTypesClauses
 
         const string messageTemplate = "{paramName} must be a 32-bit integer within the expected range.";
 
-        if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<int>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsInRange(parsed, min, max, inclusion);
@@ -238,7 +238,7 @@ public static class MustStringNumberTypesClauses
 
         const string messageTemplate = "{paramName} must be a 32-bit integer out of the expected range.";
 
-        if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<int>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = !NumberRules.IsInRange(parsed, min, max, inclusion);
@@ -281,7 +281,7 @@ public static class MustStringNumberTypesClauses
 
         const string messageTemplate = "{paramName} must be a 64-bit integer within the expected range.";
 
-        if (!StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<long>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = NumberRules.IsInRange(parsed, min, max, inclusion);
@@ -324,7 +324,7 @@ public static class MustStringNumberTypesClauses
 
         const string messageTemplate = "{paramName} must be a 64-bit integer out of the expected range.";
 
-        if (!StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles))
+        if (!StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<long>.FromBool(false, messageTemplate, paramName, value);
 
         var ok = !NumberRules.IsInRange(parsed, min, max, inclusion);

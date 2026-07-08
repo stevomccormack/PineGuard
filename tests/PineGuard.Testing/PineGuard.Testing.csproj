@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <IsTestProject>false</IsTestProject>
+    <!-- Shipped package — re-enable the XML doc file that tests/Directory.Build.props turns off.
+         CS1591 stays off: the public surface is thousands of self-describing fixture constants;
+         docs that do exist (base classes, helpers) still ship in the doc file. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <!-- TFMs inherited from tests/Directory.Build.props: net8.0;net10.0. netstandard2.1 is intentionally excluded — fixtures reference TimeOnly (net6.0+) unconditionally. -->
     <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
     <Description>Shared fixtures, base test classes, and assertion helpers for consumers writing PineGuard-based validation tests.</Description>

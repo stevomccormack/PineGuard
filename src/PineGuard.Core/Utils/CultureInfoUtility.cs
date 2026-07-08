@@ -18,9 +18,53 @@ public static class CultureInfoUtility
     private static readonly ConcurrentDictionary<string, IReadOnlyCollection<CultureInfo>> CulturesByIsoLanguageAlpha2CodeCache =
         new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Attempts to resolve a well-formed, predefined culture name for the specified ISO language code.
+    /// </summary>
+    /// <param name="isoLanguageAlpha2Code">
+    /// The ISO 639-1 two-letter language code (e.g., <c>"en"</c>). If <see langword="null"/> or whitespace,
+    /// returns <see langword="false"/>.
+    /// </param>
+    /// <param name="cultureName">
+    /// When this method returns <see langword="true"/>, contains the resolved culture name (e.g., <c>"en"</c>).
+    /// When <see langword="false"/>, contains <see cref="string.Empty"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="isoLanguageAlpha2Code"/> resolves to a predefined culture;
+    /// otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CultureInfoUtility.TryGetCultureName("en", out var cultureName); // true, cultureName = "en"
+    /// </code>
+    /// </example>
     public static bool TryGetCultureName(string? isoLanguageAlpha2Code, out string cultureName) =>
         TryGetCultureName(isoLanguageAlpha2Code, regionCode: null, out cultureName);
 
+    /// <summary>
+    /// Attempts to resolve a well-formed, predefined culture name for the specified ISO language and region codes.
+    /// </summary>
+    /// <param name="isoLanguageAlpha2Code">
+    /// The ISO 639-1 two-letter language code (e.g., <c>"en"</c>). If <see langword="null"/> or whitespace,
+    /// returns <see langword="false"/>.
+    /// </param>
+    /// <param name="regionCode">
+    /// An optional ISO 3166-1 region code (e.g., <c>"US"</c>) combined with the language code as
+    /// <c>"{language}-{region}"</c>. If <see langword="null"/> or whitespace, only the language code is used.
+    /// </param>
+    /// <param name="cultureName">
+    /// When this method returns <see langword="true"/>, contains the resolved culture name (e.g., <c>"en-US"</c>).
+    /// When <see langword="false"/>, contains <see cref="string.Empty"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the combined language/region name resolves to a predefined culture;
+    /// otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CultureInfoUtility.TryGetCultureName("en", "US", out var cultureName); // true, cultureName = "en-US"
+    /// </code>
+    /// </example>
     public static bool TryGetCultureName(string? isoLanguageAlpha2Code, string? regionCode, out string cultureName)
     {
         cultureName = string.Empty;
@@ -31,6 +75,28 @@ public static class CultureInfoUtility
         return !StringUtility.TryGetTrimmed(regionCode, out var reg) ? TryValidateCultureName(lang, out cultureName) : TryValidateCultureName($"{lang}-{reg}", out cultureName);
     }
 
+    /// <summary>
+    /// Attempts to resolve a culture name for the specified ISO language code, preferring a well-known
+    /// default region for that language when a valid one is available.
+    /// </summary>
+    /// <param name="isoLanguageAlpha2Code">
+    /// The ISO 639-1 two-letter language code (e.g., <c>"pt"</c>). If <see langword="null"/> or whitespace,
+    /// returns <see langword="false"/>.
+    /// </param>
+    /// <param name="cultureName">
+    /// When this method returns <see langword="true"/>, contains the resolved culture name — the
+    /// language's default region combination (e.g., <c>"pt-BR"</c>) if one is known and valid, otherwise
+    /// the language-only culture name. When <see langword="false"/>, contains <see cref="string.Empty"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if either the default-region culture or the language-only culture resolves
+    /// to a predefined culture; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CultureInfoUtility.TryGetCultureNameWithDefaultRegion("pt", out var cultureName); // true, cultureName = "pt-BR"
+    /// </code>
+    /// </example>
     public static bool TryGetCultureNameWithDefaultRegion(string? isoLanguageAlpha2Code, out string cultureName)
     {
         cultureName = string.Empty;
@@ -44,9 +110,53 @@ public static class CultureInfoUtility
         return TryGetCultureName(lang, regionCode: null, out cultureName);
     }
 
+    /// <summary>
+    /// Attempts to resolve a <see cref="CultureInfo"/> for the specified ISO language code.
+    /// </summary>
+    /// <param name="isoLanguageAlpha2Code">
+    /// The ISO 639-1 two-letter language code (e.g., <c>"en"</c>). If <see langword="null"/> or whitespace,
+    /// returns <see langword="false"/>.
+    /// </param>
+    /// <param name="cultureInfo">
+    /// When this method returns <see langword="true"/>, contains the resolved <see cref="CultureInfo"/>.
+    /// When <see langword="false"/>, contains <see langword="null"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="isoLanguageAlpha2Code"/> resolves to a predefined culture;
+    /// otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CultureInfoUtility.TryGetCultureInfo("en", out var cultureInfo); // true, cultureInfo.Name = "en"
+    /// </code>
+    /// </example>
     public static bool TryGetCultureInfo(string? isoLanguageAlpha2Code, out CultureInfo? cultureInfo) =>
         TryGetCultureInfo(isoLanguageAlpha2Code, regionCode: null, out cultureInfo);
 
+    /// <summary>
+    /// Attempts to resolve a <see cref="CultureInfo"/> for the specified ISO language and region codes.
+    /// </summary>
+    /// <param name="isoLanguageAlpha2Code">
+    /// The ISO 639-1 two-letter language code (e.g., <c>"en"</c>). If <see langword="null"/> or whitespace,
+    /// returns <see langword="false"/>.
+    /// </param>
+    /// <param name="regionCode">
+    /// An optional ISO 3166-1 region code (e.g., <c>"US"</c>) combined with the language code. If
+    /// <see langword="null"/> or whitespace, only the language code is used.
+    /// </param>
+    /// <param name="cultureInfo">
+    /// When this method returns <see langword="true"/>, contains the resolved <see cref="CultureInfo"/>.
+    /// When <see langword="false"/>, contains <see langword="null"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the combined language/region name resolves to a predefined culture;
+    /// otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CultureInfoUtility.TryGetCultureInfo("en", "US", out var cultureInfo); // true, cultureInfo.Name = "en-US"
+    /// </code>
+    /// </example>
     public static bool TryGetCultureInfo(string? isoLanguageAlpha2Code, string? regionCode, out CultureInfo? cultureInfo)
     {
         cultureInfo = null;
@@ -58,6 +168,23 @@ public static class CultureInfoUtility
         return true;
     }
 
+    /// <summary>
+    /// Gets the distinct ISO 3166-1 two-letter region codes of all specific cultures for the specified
+    /// ISO language code. Results are cached per language after the first lookup.
+    /// </summary>
+    /// <param name="isoLanguageAlpha2Code">
+    /// The ISO 639-1 two-letter language code (e.g., <c>"en"</c>). If <see langword="null"/> or whitespace,
+    /// returns an empty collection.
+    /// </param>
+    /// <returns>
+    /// A read-only collection of region codes associated with <paramref name="isoLanguageAlpha2Code"/>, or
+    /// an empty collection if the language code is invalid or has no specific cultures.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// var regions = CultureInfoUtility.GetRegionCodes("en"); // ["US", "GB", "AU", ...]
+    /// </code>
+    /// </example>
     public static IReadOnlyCollection<string> GetRegionCodes(string? isoLanguageAlpha2Code)
     {
         if (!StringUtility.TryGetTrimmed(isoLanguageAlpha2Code, out var lang))
@@ -92,6 +219,24 @@ public static class CultureInfoUtility
         }
     }
 
+    /// <summary>
+    /// Gets all specific <see cref="CultureInfo"/> instances for the specified ISO language code, sorted by
+    /// culture name. Results are cached per language after the first lookup.
+    /// </summary>
+    /// <param name="isoLanguageAlpha2Code">
+    /// The ISO 639-1 two-letter language code (e.g., <c>"en"</c>). If <see langword="null"/> or whitespace,
+    /// returns an empty collection.
+    /// </param>
+    /// <returns>
+    /// A read-only collection of <see cref="CultureInfo"/> instances for
+    /// <paramref name="isoLanguageAlpha2Code"/>, sorted ordinally by culture name (case-insensitive), or an
+    /// empty collection if the language code is invalid or has no specific cultures.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// var cultures = CultureInfoUtility.GetCultures("en"); // [en-AU, en-GB, en-US, ...]
+    /// </code>
+    /// </example>
     public static IReadOnlyCollection<CultureInfo> GetCultures(string? isoLanguageAlpha2Code)
     {
         if (!StringUtility.TryGetTrimmed(isoLanguageAlpha2Code, out var lang))

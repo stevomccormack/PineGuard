@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using PineGuard.Common;
 
@@ -9,6 +10,26 @@ namespace PineGuard.Utils;
 /// <seealso href="https://pineguard.ai/docs/utils/csv">CSV Utility documentation</seealso>
 public static class CsvUtility
 {
+    /// <summary>
+    /// Attempts to parse a single line of RFC 4180-style CSV text into its constituent fields.
+    /// </summary>
+    /// <param name="value">
+    /// The CSV line to parse. If <see langword="null"/> or empty/whitespace, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="fields">
+    /// When this method returns <see langword="true"/>, contains the parsed fields in order.
+    /// When <see langword="false"/>, contains <see langword="null"/>.
+    /// </param>
+    /// <param name="separator">The field separator character. Defaults to <c>,</c>.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> was successfully parsed as a well-formed CSV line
+    /// (no embedded line breaks and no unterminated quoted field); otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CsvUtility.TryParseCsvLine("a,b,\"c,d\"", out var fields); // true, fields = ["a", "b", "c,d"]
+    /// </code>
+    /// </example>
     public static bool TryParseCsvLine(string? value, out IReadOnlyList<string>? fields, char separator = ',')
     {
         fields = null;
@@ -114,6 +135,27 @@ public static class CsvUtility
         return true;
     }
 
+    /// <summary>
+    /// Attempts to parse a single line of CSV text into a header row of trimmed, non-empty column names.
+    /// </summary>
+    /// <param name="value">
+    /// The CSV header line to parse. If not a well-formed CSV line (see <see cref="TryParseCsvLine"/>),
+    /// returns <see langword="false"/>.
+    /// </param>
+    /// <param name="header">
+    /// When this method returns <see langword="true"/>, contains the parsed and trimmed header names in order.
+    /// When <see langword="false"/>, contains <see langword="null"/>.
+    /// </param>
+    /// <param name="separator">The field separator character. Defaults to <c>,</c>.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> was successfully parsed and every field trims to a
+    /// non-empty header name; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CsvUtility.TryParseCsvHeaderLine("Name, Age ,Email", out var header); // true, header = ["Name", "Age", "Email"]
+    /// </code>
+    /// </example>
     public static bool TryParseCsvHeaderLine(string? value, out IReadOnlyList<string>? header, char separator = ',')
     {
         header = null;
@@ -135,6 +177,34 @@ public static class CsvUtility
         return true;
     }
 
+    /// <summary>
+    /// Attempts to parse a CSV header line and verify that it matches an expected set of column names.
+    /// </summary>
+    /// <param name="value">
+    /// The CSV header line to parse. If not a well-formed CSV line, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="expectedHeader">
+    /// The expected header names, in order. If <see langword="null"/> or empty, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="header">
+    /// When this method returns <see langword="true"/>, contains the parsed header names in order.
+    /// When <see langword="false"/>, contains <see langword="null"/>.
+    /// </param>
+    /// <param name="separator">The field separator character. Defaults to <c>,</c>.</param>
+    /// <param name="comparison">
+    /// The <see cref="StringComparison"/> used to compare parsed header names against
+    /// <paramref name="expectedHeader"/>. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> parses to the same number of fields as
+    /// <paramref name="expectedHeader"/> and each parsed field matches the corresponding expected name
+    /// under <paramref name="comparison"/>; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CsvUtility.TryParseCsvHeaderLine("name,age", ["Name", "Age"], out var header); // true
+    /// </code>
+    /// </example>
     public static bool TryParseCsvHeaderLine(
         string? value,
         IReadOnlyList<string>? expectedHeader,
@@ -166,6 +236,29 @@ public static class CsvUtility
         return true;
     }
 
+    /// <summary>
+    /// Attempts to parse a CSV row line and verify that it contains an exact number of fields.
+    /// </summary>
+    /// <param name="value">
+    /// The CSV row line to parse. If not a well-formed CSV line, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="expectedFieldCount">
+    /// The exact number of fields required. Must be positive; if zero or negative, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="fields">
+    /// When this method returns <see langword="true"/>, contains the parsed fields in order.
+    /// When <see langword="false"/>, contains <see langword="null"/>.
+    /// </param>
+    /// <param name="separator">The field separator character. Defaults to <c>,</c>.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> was successfully parsed into exactly
+    /// <paramref name="expectedFieldCount"/> fields; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CsvUtility.TryParseCsvRowLine("a,b,c", 3, out var fields); // true
+    /// </code>
+    /// </example>
     public static bool TryParseCsvRowLine(
         string? value,
         int expectedFieldCount,
@@ -187,6 +280,31 @@ public static class CsvUtility
         return true;
     }
 
+    /// <summary>
+    /// Attempts to parse a CSV row line and validate each field against a column schema.
+    /// </summary>
+    /// <param name="value">
+    /// The CSV row line to parse. If not a well-formed CSV line, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="schema">
+    /// The per-column schema describing the name, type, and constraints expected for each field, in order.
+    /// If <see langword="null"/> or empty, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="fields">
+    /// When this method returns <see langword="true"/>, contains the parsed fields in order.
+    /// When <see langword="false"/>, contains <see langword="null"/>.
+    /// </param>
+    /// <param name="separator">The field separator character. Defaults to <c>,</c>.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> parses to <c>schema.Count</c> fields and every
+    /// field satisfies its corresponding <see cref="CsvColumnSchema"/> (required, max length, and value
+    /// type); otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CsvUtility.TryParseCsvRowLine("1,John", schema, out var fields);
+    /// </code>
+    /// </example>
     public static bool TryParseCsvRowLine(
         string? value,
         IReadOnlyList<CsvColumnSchema>? schema,
@@ -208,6 +326,41 @@ public static class CsvUtility
         return true;
     }
 
+    /// <summary>
+    /// Attempts to parse a CSV row line, building a column schema from a header and a map of column types.
+    /// </summary>
+    /// <param name="value">
+    /// The CSV row line to parse. If not a well-formed CSV line, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="header">
+    /// The column names for the row, in order. If <see langword="null"/> or empty, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="types">
+    /// A map of column name to <see cref="CsvColumnType"/>. Columns whose name is not found in the map
+    /// default to <see cref="CsvColumnType.String"/>. If <see langword="null"/> or empty, returns
+    /// <see langword="false"/>.
+    /// </param>
+    /// <param name="fields">
+    /// When this method returns <see langword="true"/>, contains the parsed fields in order.
+    /// When <see langword="false"/>, contains <see langword="null"/>.
+    /// </param>
+    /// <param name="separator">The field separator character. Defaults to <c>,</c>.</param>
+    /// <param name="headerNameComparison">
+    /// The <see cref="StringComparison"/> used to match <paramref name="header"/> names against the keys of
+    /// <paramref name="types"/>. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>. When
+    /// <see cref="StringComparison.Ordinal"/> is used, matching is an exact dictionary key lookup;
+    /// otherwise, each header name is compared in turn against every key in <paramref name="types"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if a column schema could be built from <paramref name="header"/> and
+    /// <paramref name="types"/> and <paramref name="value"/> satisfies that schema; otherwise,
+    /// <see langword="false"/>.
+    /// </returns>
+    /// <example>
+    /// <code>
+    /// CsvUtility.TryParseCsvRowLine("1,John", ["Id", "Name"], types, out var fields);
+    /// </code>
+    /// </example>
     public static bool TryParseCsvRowLine(
         string? value,
         IReadOnlyList<string>? header,
@@ -308,11 +461,11 @@ public static class CsvUtility
         {
             case CsvColumnType.String: return true;
 
-            case CsvColumnType.Int32: return StringUtility.NumberTypes.TryParseInt32(trimmedValue, out _);
-            case CsvColumnType.Int64: return StringUtility.NumberTypes.TryParseInt64(trimmedValue, out _);
-            case CsvColumnType.Decimal: return StringUtility.NumberTypes.TryParseDecimal(trimmedValue, out _);
-            case CsvColumnType.Single: return StringUtility.NumberTypes.TryParseSingle(trimmedValue, out _);
-            case CsvColumnType.Double: return StringUtility.NumberTypes.TryParseDouble(trimmedValue, out _);
+            case CsvColumnType.Int32: return StringUtility.NumberTypes.TryParseInt32(trimmedValue, out _, provider: CultureInfo.InvariantCulture);
+            case CsvColumnType.Int64: return StringUtility.NumberTypes.TryParseInt64(trimmedValue, out _, provider: CultureInfo.InvariantCulture);
+            case CsvColumnType.Decimal: return StringUtility.NumberTypes.TryParseDecimal(trimmedValue, out _, provider: CultureInfo.InvariantCulture);
+            case CsvColumnType.Single: return StringUtility.NumberTypes.TryParseSingle(trimmedValue, out _, provider: CultureInfo.InvariantCulture);
+            case CsvColumnType.Double: return StringUtility.NumberTypes.TryParseDouble(trimmedValue, out _, provider: CultureInfo.InvariantCulture);
 
             case CsvColumnType.Guid: return StringUtility.Guid.TryParse(trimmedValue, out Guid _);
             case CsvColumnType.Bool: return StringUtility.Bool.TryParse(trimmedValue, out _);
