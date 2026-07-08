@@ -15,7 +15,7 @@ namespace PineGuard.DataAnnotations;
 /// </para>
 /// <para>
 /// An empty GUID is <c>00000000-0000-0000-0000-000000000000</c>. This attribute ensures the value is a
-/// non-empty GUID. For <see cref="string"/> GUID validation, use <see cref="GuidStringAttribute"/>.
+/// non-empty GUID. For <see cref="string"/> GUID validation, use <see cref="StringGuidAttribute"/>.
 /// </para>
 /// </remarks>
 /// <example>
@@ -27,7 +27,7 @@ namespace PineGuard.DataAnnotations;
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="GuidStringAttribute"/>
+/// <seealso cref="StringGuidAttribute"/>
 /// <seealso cref="MustGuidClauses.NotEmpty"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/guid">GUID Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
