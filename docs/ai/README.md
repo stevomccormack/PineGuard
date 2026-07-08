@@ -47,12 +47,12 @@ version: 2.0
 
 | Plan | Status |
 |------|--------|
-| [v2 Master Plan](plans/v2-masterplan.md) | **Active** |
-| [v2 PineGuard](plans/v2-pineguard.md) | **Active** |
 | [Cross-Platform Tools Migration](plans/cross-platform-tools-migration.md) | Planned |
-| [Multi-Target Framework](plans/multi-target-framework.md) | Planned |
-| [Guard Exception Policy Uplift](plans/guard-exception-policy-uplift.md) | Planned |
-| [Adapter Naming Collision Review](plans/adapter-naming-collision-review.md) | Planned |
+| [Competitive Analysis](plans/competitive-analysis.md) | Planned |
+| [Future Language](plans/future-language.md) | Planned |
+
+Completed plans (v2 Master Plan, v2 PineGuard, Multi-Target Framework, Guard Exception
+Policy Uplift, Adapter Naming Collision Review, and others) live in [plans/completed/](plans/completed/).
 
 ## How To Use This (in any AI tool)
 
@@ -120,7 +120,6 @@ docs/ai/rules/global.md          (always applies — invariants, file hygiene)
 | Scaffold Quality Tool | `skills/scaffold-quality-tool/` | Meta-skill: add a new quality/inspection tool |
 | Create Workflow | `skills/scaffold-workflow/` | Agent playbook generation |
 | Ask Council | `skills/ask-council/` | Pressure-test a decision via 5 advisors + peer review + chairman synthesis |
-| Skills Format (Template) | `skills/meta-template/` | Meta-template defining skill structure |
 
 ## Roles Inventory
 
@@ -181,11 +180,11 @@ Claude Code supports native features that **reference** the Brain without duplic
 | Feature | Directory | How It Maps to Brain |
 |---------|-----------|---------------------|
 | Rules | `.claude/rules/` (10 files) | Path-scoped adapters → `docs/ai/rules/` |
-| Skills | `.claude/skills/` (15 dirs) | `context: fork` wrappers → `docs/ai/skills/` |
+| Skills | `.claude/skills/` (18 dirs) | `context: fork` wrappers → `docs/ai/skills/` |
 | Agents | `.claude/agents/` (5 files) | Native subagents with memory, referencing Brain roles + specs |
 | Agent Memory | `.claude/agent-memory/` (4 dirs) | Persistent knowledge, seeded from Brain patterns + role directives |
 | Hooks | `.claude/hooks/` (8 scripts) | Enforcement of file hygiene rules from Brain specs |
-| Commands | `.claude/commands/` (77 files) | Slash commands → `docs/ai/agents/` playbooks |
+| Commands | `.claude/commands/` (85 files) | Slash commands → `docs/ai/agents/` playbooks |
 | Settings | `.claude/settings.json` | Whitelisted commands (all `tools/` scripts) |
 
 **Direction of dependency:** `.claude/` → `docs/ai/` (never the reverse).
@@ -210,5 +209,5 @@ Adapters MUST NOT embed logic; they should point to `docs/ai/`.
 - Document template: `docs/ai/meta/template-spec.md`
 
 <!-- footer
-last_verified: 2026-03-12
+last_verified: 2026-07-08
 -->

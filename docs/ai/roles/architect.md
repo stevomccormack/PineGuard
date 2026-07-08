@@ -32,7 +32,6 @@ It is responsible for keeping Clean Architecture boundaries clear and ensuring t
 
 ### Skills
 - [Create Workflow](../skills/scaffold-workflow/SKILL.md)
-- [Skills Format (Template)](../skills/meta-template/SKILL.md)
 
 ### Workflows
 - [Engineering Standards](../workflows/standard.md)

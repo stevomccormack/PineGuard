@@ -16,7 +16,7 @@ Read these files completely:
 1. `docs/ai/specs/spec.md` (root invariants)
 2. `docs/ai/specs/testing/unit-test.md` (coverage targets, folder structure, TestData patterns)
 3. `docs/ai/meta/template-unit-test.md` (code-level examples of nested Operation Groups)
-4. `docs/ai/specs/testing/fixture-architecture.md` (current Expected type hierarchy: MustExpected, GuardExpected, FluentExpected, DataAnnotationExpected, RuleExpected)
+4. `docs/ai/specs/testing/fixture.md` (current Expected type hierarchy: MustExpected, GuardExpected, FluentExpected, DataAnnotationExpected, RuleExpected)
 5. `docs/ai/specs/testing/coverage.md` (coverage enforcement rules)
 6. `docs/ai/skills/scaffold-unit-test/SKILL.md` (canonical implementation recipe)
 
