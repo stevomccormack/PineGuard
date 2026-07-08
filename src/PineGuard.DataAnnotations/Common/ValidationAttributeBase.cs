@@ -102,8 +102,8 @@ public abstract class ValidationAttributeBase(Type expectedType, bool allowNull 
     }
 
     /// <summary>
-    /// Invokes the specified must-clause method via reflection and maps the dynamic result to a
-    /// <see cref="ValidationResult"/>.
+    /// Invokes the specified must-clause method via reflection and maps the <see cref="MustResult{T}"/>
+    /// result to a <see cref="ValidationResult"/>, itself via reflection rather than <see langword="dynamic"/>.
     /// </summary>
     /// <param name="method">The must-clause <see cref="MethodInfo"/> to invoke.</param>
     /// <param name="invokeArgs">The argument array to pass to the method.</param>
@@ -111,12 +111,19 @@ public abstract class ValidationAttributeBase(Type expectedType, bool allowNull 
     /// <returns>
     /// <see langword="null"/> on success, or a <see cref="ValidationResult"/> describing the failure.
     /// </returns>
+    /// <remarks>
+    /// Reflection (rather than <see langword="dynamic"/>/the DLR) is used because the DLR fails to bind
+    /// members on a <see cref="MustResult{T}"/> parameterized with a non-public type argument.
+    /// </remarks>
     protected ValidationResult? InvokeAndMapResult(MethodInfo method, object?[] invokeArgs, ValidationContext ctx)
     {
-        dynamic result = method.Invoke(null, invokeArgs)!;
-        if (result.Success) return ValidationResult.Success;
+        var resultObj = method.Invoke(null, invokeArgs)!;
+        var resultType = resultObj.GetType();
 
-        string msg = result.Message;
+        var success = (bool)resultType.GetProperty(nameof(MustResult<object>.Success))!.GetValue(resultObj)!;
+        if (success) return ValidationResult.Success;
+
+        var msg = (string)resultType.GetProperty(nameof(MustResult<object>.Message))!.GetValue(resultObj)!;
         var errorTemplate = !string.IsNullOrWhiteSpace(ErrorMessage) || !string.IsNullOrWhiteSpace(ErrorMessageResourceName)
             ? FormatErrorMessage(ctx.DisplayName)
             : msg.Replace("{paramName}", ctx.DisplayName);

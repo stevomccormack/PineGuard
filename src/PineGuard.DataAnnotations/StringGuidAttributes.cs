@@ -22,7 +22,7 @@ namespace PineGuard.DataAnnotations;
 /// <code>
 /// public class EntityModel
 /// {
-///     [GuidString]
+///     [StringGuid]
 ///     public string CorrelationId { get; set; }
 /// }
 /// </code>
@@ -31,7 +31,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringGuidClauses.Guid"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/guid">GUID Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class GuidStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class StringGuidAttribute() : ValidationAttributeBase(typeof(string))
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

@@ -4,15 +4,15 @@ using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class GuidStringAttributeTests(ITestOutputHelper output)
+public sealed class StringGuidAttributeTests(ITestOutputHelper output)
     : BaseDataAnnotationUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(GuidStringAttributeTestData.GuidString.Cases), MemberType = typeof(GuidStringAttributeTestData.GuidString))]
+    [MemberData(nameof(StringGuidAttributeTestData.GuidString.Cases), MemberType = typeof(StringGuidAttributeTestData.GuidString))]
     public void GuidString_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new GuidStringAttribute();
+        var attr = new StringGuidAttribute();
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act

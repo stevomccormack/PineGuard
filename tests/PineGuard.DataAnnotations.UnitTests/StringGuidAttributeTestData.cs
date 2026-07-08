@@ -3,7 +3,7 @@ using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public static class GuidStringAttributeTestData
+public static class StringGuidAttributeTestData
 {
     public static class GuidString
     {

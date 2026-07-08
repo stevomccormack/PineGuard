@@ -320,22 +320,10 @@ public sealed class OfTypeAttribute(Type targetType) : ValidationAttributeBase(t
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        // Invoke Must.Be.OfType(value, TargetType) ? No, Must.Be.OfType<TTarget>(object value)
-
         var method = typeof(MustObjectClauses).GetMethod(nameof(MustObjectClauses.OfType))!
             .MakeGenericMethod(TargetType);
 
-        var resultObj = method.Invoke(null, [null, value, null])!;
-        dynamic result = resultObj;
-
-        if (result.Success) return ValidationResult.Success;
-
-        string msg = result.Message;
-        var errorTemplate = !string.IsNullOrWhiteSpace(ErrorMessage) || !string.IsNullOrWhiteSpace(ErrorMessageResourceName)
-            ? FormatErrorMessage(validationContext.DisplayName)
-            : msg.Replace("{paramName}", validationContext.DisplayName);
-
-        return new ValidationResult(errorTemplate, [validationContext.MemberName!]);
+        return InvokeAndMapResult(method, [null, value, null], validationContext);
     }
 }
 
@@ -373,16 +361,6 @@ public sealed class NotOfTypeAttribute(Type targetType) : ValidationAttributeBas
         var method = typeof(MustObjectClauses).GetMethod(nameof(MustObjectClauses.NotOfType))!
             .MakeGenericMethod(TargetType);
 
-        var resultObj = method.Invoke(null, [null, value, null])!;
-        dynamic result = resultObj;
-
-        if (result.Success) return ValidationResult.Success;
-
-        string msg = result.Message;
-        var errorTemplate = !string.IsNullOrWhiteSpace(ErrorMessage) || !string.IsNullOrWhiteSpace(ErrorMessageResourceName)
-            ? FormatErrorMessage(validationContext.DisplayName)
-            : msg.Replace("{paramName}", validationContext.DisplayName);
-
-        return new ValidationResult(errorTemplate, [validationContext.MemberName!]);
+        return InvokeAndMapResult(method, [null, value, null], validationContext);
     }
 }

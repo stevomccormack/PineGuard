@@ -3,7 +3,7 @@ using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public static class StringNumberAttributesTestData
+public static class StringNumbersAttributesTestData
 {
     public sealed record ValidCase(string Name, object? Value, bool Expected) : ReturnCase<object?, bool>(Name, Value, Expected);
 

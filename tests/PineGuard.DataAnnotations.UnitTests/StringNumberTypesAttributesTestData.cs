@@ -3,7 +3,7 @@ using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public static class StringNumberTypeAttributesTestData
+public static class StringNumberTypesAttributesTestData
 {
     public static class DecimalString
     {
