@@ -459,6 +459,74 @@ jobs:
         run: exit 1
 
   # ---------------------------------------------------------------------------
+  # 7. Audit — machine-checked test-file conventions (tools/audit-cli, Rule50)
+  #    Windows runner: repo tooling is PowerShell and the cross-platform tools
+  #    migration (docs/ai/plans/cross-platform-tools-migration.md) is still open.
+  #
+  #    Scoped to Rule50 only. Rule01 needs a naming-spec.json bootstrap file
+  #    that isn't part of the repo or Run-All.ps1's default flow — it fails on
+  #    every fresh checkout. Rule51-54 (excluding 50) currently fail with
+  #    3000+ pre-existing findings across the test suite (nested-group
+  #    structure, tuple-naming, orphan heuristics) — real debt, but a
+  #    separate, large remediation effort, not something to gate merges on
+  #    yet. Rule50 (Theory-only + Tests/TestData pairing) was verified clean
+  #    after allowlisting the two legitimate pre-existing exceptions in
+  #    tools/audit-cli/test-audit-exceptions.json. Widen RuleId here once
+  #    Rule51-54 are remediated.
+  # ---------------------------------------------------------------------------
+  audit:
+    needs: changes
+    if: needs.changes.outputs.any-src == 'true' || github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Run audit rules
+        id: audit
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          ./tools/audit-cli/Run-All.ps1 -Configuration Release -RuleId Rule50 2>&1 | Tee-Object ./audit-output.txt
+          exit $LASTEXITCODE
+
+      - name: Prepare audit failure report
+        if: steps.audit.outcome == 'failure' && github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          {
+            echo "## Audit rule violations"
+            echo ""
+            echo "Run \`./tools/audit-cli/Run-All.ps1\` locally to reproduce."
+            echo ""
+            echo "<details><summary>Details</summary>"
+            echo ""
+            echo '```'
+            tail -n 200 ./audit-output.txt
+            echo '```'
+            echo ""
+            echo "</details>"
+          } > ./audit-report.md
+
+      - name: Post audit failure to PR
+        if: steps.audit.outcome == 'failure' && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: audit
+          path: ./audit-report.md
+
+      - name: Fail if audit check failed
+        if: steps.audit.outcome == 'failure'
+        run: exit 1
+
+  # ---------------------------------------------------------------------------
   # 8. Qodana — JetBrains code inspection (opt-in via QODANA_ENABLED variable)
   # ---------------------------------------------------------------------------
   qodana:
