@@ -295,4 +295,17 @@ public static class EnumerationTestData
         public sealed record ValidCase(string Name, TestColor? Left, TestColor? Right, bool Expected)
             : IsCase<(TestColor? Left, TestColor? Right)>(Name, (Left, Right), Expected);
     }
+
+    public static class HashCode
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("Red", TestColor.Red, TestColor.Red.Value.GetHashCode()),
+            new("Green", TestColor.Green, TestColor.Green.Value.GetHashCode()),
+            new("Blue", TestColor.Blue, TestColor.Blue.Value.GetHashCode())
+        ];
+
+        public sealed record ValidCase(string Name, TestColor Input, int ExpectedValue)
+            : ReturnCase<TestColor, int>(Name, Input, ExpectedValue);
+    }
 }

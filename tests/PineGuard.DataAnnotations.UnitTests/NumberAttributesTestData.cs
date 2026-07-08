@@ -1,4 +1,5 @@
 using PineGuard.Testing.UnitTests;
+using F = PineGuard.Testing.Fixtures.NumberRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -13,44 +14,44 @@ public static class NumberAttributesTestData
 
     public static class Positive
     {
-        public static TheoryData<ValidCase> ValidCases => [new("positive int", 1, true), new("positive double", 1.5, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("positive int", F.IsPositive.Positive, true), new("positive double", 1.5, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("zero", 0, false), new("negative", -1, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("zero", F.IsPositive.Zero, false), new("negative", F.IsPositive.Negative, false)];
     }
 
     public static class Negative
     {
-        public static TheoryData<ValidCase> ValidCases => [new("negative int", -1, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("negative int", F.IsNegative.Negative, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("zero", 0, false), new("positive", 1, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("zero", F.IsNegative.Zero, false), new("positive", F.IsNegative.Positive, false)];
     }
 
     public static class Zero
     {
-        public static TheoryData<ValidCase> ValidCases => [new("zero", 0, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("zero", F.IsZero.Zero, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("one", 1, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("one", F.IsZero.NonZero, false)];
     }
 
     public static class NotZero
     {
-        public static TheoryData<ValidCase> ValidCases => [new("one", 1, true), new("negative", -1, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("one", F.IsNotZero.Positive, true), new("negative", F.IsNotZero.Negative, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("zero", 0, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("zero", F.IsNotZero.Zero, false)];
     }
 
     public static class ZeroOrPositive
     {
-        public static TheoryData<ValidCase> ValidCases => [new("zero", 0, true), new("positive", 1, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("zero", F.IsZeroOrPositive.Zero, true), new("positive", F.IsZeroOrPositive.Positive, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("negative", -1, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("negative", F.IsZeroOrPositive.Negative, false)];
     }
 
     public static class ZeroOrNegative
     {
-        public static TheoryData<ValidCase> ValidCases => [new("zero", 0, true), new("negative", -1, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("zero", F.IsZeroOrNegative.Zero, true), new("negative", F.IsZeroOrNegative.Negative, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("positive", 1, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("positive", F.IsZeroOrNegative.Positive, false)];
     }
 
     public static class Even
@@ -69,30 +70,30 @@ public static class NumberAttributesTestData
 
     public static class Finite
     {
-        public static TheoryData<ValidCase> ValidCases => [new("finite double", 1.0, true), new("finite float", 1.0f, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("finite double", F.IsFinite.FiniteDouble, true), new("finite float", F.IsFinite.FiniteFloat, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("infinity", double.PositiveInfinity, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("infinity", F.IsFinite.PositiveInfinityDouble, false)];
     }
 
     public static class NotFinite
     {
-        public static TheoryData<ValidCase> ValidCases => [new("infinity double", double.PositiveInfinity, true), new("infinity float", float.PositiveInfinity, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("infinity double", F.IsFinite.PositiveInfinityDouble, true), new("infinity float", F.IsFinite.PositiveInfinityFloat, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("finite", 1.0, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("finite", F.IsFinite.FiniteDouble, false)];
     }
 
     public static class NaN
     {
-        public static TheoryData<ValidCase> ValidCases => [new("NaN", double.NaN, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("NaN", F.IsNaN.NaNDouble, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("number", 1.0, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("number", F.IsNaN.FiniteDouble, false)];
     }
 
     public static class NotNaN
     {
-        public static TheoryData<ValidCase> ValidCases => [new("number double", 1.0, true), new("number float", 1.0f, true)];
+        public static TheoryData<ValidCase> ValidCases => [new("number double", F.IsNaN.FiniteDouble, true), new("number float", F.IsNaN.FiniteFloat, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("NaN", double.NaN, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("NaN", F.IsNaN.NaNDouble, false)];
     }
 
     // Config: Min=10.

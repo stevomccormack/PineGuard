@@ -1,5 +1,6 @@
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
+using F = PineGuard.Testing.Fixtures.IdentifierRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -9,7 +10,7 @@ public static class IdentifierAttributesTestData
 
     private static TheoryData<ValidCase> CommonEdgeCases() =>
     [
-        new("null", null, true)
+        new("null", F.IsSlug.Null, true)
     ];
 
     public static TheoryData<ThrowsCase> TypeMismatchCases =>
