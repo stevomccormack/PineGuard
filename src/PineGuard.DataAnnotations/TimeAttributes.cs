@@ -8,6 +8,14 @@ using PineGuard.MustClauses;
 
 namespace PineGuard.DataAnnotations;
 
+// This file is intentionally DataAnnotations-only, with no single matching Must*Clauses family:
+// Must/Guard/Fluent dispatch on compile-time type via strongly-typed overloads (separate
+// Must.Be.Past(DateOnly) / Must.Be.Past(DateTime) / Must.Be.Past(DateTimeOffset) methods), but a
+// ValidationAttribute is applied to a property whose runtime type isn't known until validation
+// time. PastAttribute/PastOrPresentAttribute/FutureAttribute/FutureOrPresentAttribute below give
+// callers one attribute that dispatches across all three temporal types at runtime — an ergonomic
+// convenience unique to this layer, not a gap to close.
+
 // Polymorphic attributes for DateOnly, DateTime, DateTimeOffset
 
 /// <summary>
