@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
+using PineGuard.Common;
 using PineGuard.MustClauses;
 
 namespace PineGuard.FluentValidation.Common;
