@@ -5,10 +5,10 @@ using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
+public sealed class StringNumberTypesAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.DecimalString.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.DecimalString))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.DecimalString.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.DecimalString))]
     public void DecimalString_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
@@ -23,7 +23,7 @@ public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.ExactDecimalString.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.ExactDecimalString))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.ExactDecimalString.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.ExactDecimalString))]
     public void ExactDecimalString_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
@@ -38,7 +38,7 @@ public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.Int32String.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.Int32String))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.Int32String.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int32String))]
     public void Int32String_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
@@ -53,7 +53,7 @@ public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.Int64String.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.Int64String))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.Int64String.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int64String))]
     public void Int64String_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
@@ -68,7 +68,7 @@ public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.Int32InRangeStringInclusive.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.Int32InRangeStringInclusive))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.Int32InRangeStringInclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int32InRangeStringInclusive))]
     public void Int32InRangeString_Inclusive_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
@@ -83,7 +83,7 @@ public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.Int32InRangeStringExclusive.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.Int32InRangeStringExclusive))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.Int32InRangeStringExclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int32InRangeStringExclusive))]
     public void Int32InRangeString_Exclusive_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
@@ -98,7 +98,7 @@ public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.Int32OutOfRangeString.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.Int32OutOfRangeString))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.Int32OutOfRangeString.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int32OutOfRangeString))]
     public void Int32OutOfRangeString_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
@@ -113,7 +113,7 @@ public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.Int64InRangeStringInclusive.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.Int64InRangeStringInclusive))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.Int64InRangeStringInclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int64InRangeStringInclusive))]
     public void Int64InRangeString_Inclusive_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
@@ -128,7 +128,7 @@ public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.Int64InRangeStringExclusive.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.Int64InRangeStringExclusive))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.Int64InRangeStringExclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int64InRangeStringExclusive))]
     public void Int64InRangeString_Exclusive_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
@@ -143,7 +143,7 @@ public sealed class StringNumberTypeAttributesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypeAttributesTestData.Int64OutOfRangeString.Cases), MemberType = typeof(StringNumberTypeAttributesTestData.Int64OutOfRangeString))]
+    [MemberData(nameof(StringNumberTypesAttributesTestData.Int64OutOfRangeString.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int64OutOfRangeString))]
     public void Int64OutOfRangeString_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
