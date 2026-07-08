@@ -1,4 +1,5 @@
 using PineGuard.Testing.UnitTests;
+using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -13,30 +14,30 @@ public static class StringNumberAttributesTestData
 
     public static class PositiveString
     {
-        public static TheoryData<ValidCase> ValidCases => [new("positive int", "1", true), new("positive float", "1.5", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("positive int", F.NumbersIsPositive.Positive, true), new("positive float", "1.5", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("zero", "0", false), new("negative", "-1", false), new("invalid", "abc", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("zero", F.NumbersIsPositive.Zero, false), new("negative", F.NumbersIsPositive.Negative, false), new("invalid", F.NumbersIsPositive.Letters, false)];
     }
 
     public static class NegativeString
     {
-        public static TheoryData<ValidCase> ValidCases => [new("negative", "-1", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("negative", F.NumbersIsNegative.Negative, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("zero", "0", false), new("positive", "1", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("zero", F.NumbersIsNegative.Zero, false), new("positive", F.NumbersIsNegative.Positive, false)];
     }
 
     public static class ZeroString
     {
-        public static TheoryData<ValidCase> ValidCases => [new("zero", "0", true), new("zero float", "0.0", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("zero", F.NumbersIsZero.Zero, true), new("zero float", "0.0", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("one", "1", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("one", F.NumbersIsZero.NonZero, false)];
     }
 
     public static class NotZeroString
     {
-        public static TheoryData<ValidCase> ValidCases => [new("one", "1", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("one", F.NumbersIsNotZero.Positive, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("zero", "0", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("zero", F.NumbersIsNotZero.Zero, false)];
     }
 
     public static class EvenString
@@ -56,16 +57,16 @@ public static class StringNumberAttributesTestData
 
     public static class ZeroOrPositiveString
     {
-        public static TheoryData<ValidCase> ValidCases => [new("zero", "0", true), new("positive", "1", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("zero", F.NumbersIsZeroOrPositive.Zero, true), new("positive", F.NumbersIsZeroOrPositive.Positive, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("negative", "-1", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("negative", F.NumbersIsZeroOrPositive.Negative, false)];
     }
 
     public static class ZeroOrNegativeString
     {
-        public static TheoryData<ValidCase> ValidCases => [new("zero", "0", true), new("negative", "-1", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("zero", F.NumbersIsZeroOrNegative.Zero, true), new("negative", F.NumbersIsZeroOrNegative.Negative, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("positive", "1", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("positive", F.NumbersIsZeroOrNegative.Positive, false)];
     }
 
     // Min=10
@@ -135,7 +136,7 @@ public static class StringNumberAttributesTestData
     {
         public static TheoryData<ValidCase> ValidCases => [new("finite", "1", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("infinity", "Infinity", false), new("nan", "NaN", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("infinity", "Infinity", false), new("nan", F.NumbersIsNaN.NaN, false)];
         // Note: "Infinity" parsing depends on NumberStyles and Culture.
         // Expecting PineGuard default setup allows Infinity parsing if Float style used.
     }
@@ -151,6 +152,6 @@ public static class StringNumberAttributesTestData
     {
         public static TheoryData<ValidCase> ValidCases => [new("finite", "1", true), new("infinity", "Infinity", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("nan", "NaN", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("nan", F.NumbersIsNaN.NaN, false)];
     }
 }

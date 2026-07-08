@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.Results;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
 
@@ -154,43 +155,11 @@ public sealed class FluentDictionaryExtensionsTests(ITestOutputHelper output) : 
         AssertResult(tc, result);
     }
 
-    [Fact]
-    public void Empty_IRuleBuilderOptions_IsCallable()
+    [Theory]
+    [MemberData(nameof(FluentDictionaryExtensionsTestData.OverloadResolution.Cases), MemberType = typeof(FluentDictionaryExtensionsTestData.OverloadResolution))]
+    public void OverloadResolution_BehavesAsExpected(FluentCase<Func<ValidationResult>> tc)
     {
-        var validator = new InlineValidator<Model>();
-        var opts = validator.RuleFor(x => x.Dict).NotEmpty();
-        opts.Empty();
-        var result = validator.Validate(new Model { Dict = new Dictionary<string, int> { { "a", 1 } } });
-        Assert.False(result.IsValid);
-    }
-
-    [Fact]
-    public void Empty_IRuleBuilder_IsCallable()
-    {
-        var validator = new InlineValidator<Model>();
-        IRuleBuilder<Model, IDictionary<string, int>?> rb = validator.RuleFor(x => x.Dict);
-        rb.Empty();
-        var result = validator.Validate(new Model { Dict = new Dictionary<string, int> { { "a", 1 } } });
-        Assert.False(result.IsValid);
-    }
-
-    [Fact]
-    public void NotEmpty_IRuleBuilderOptions_IsCallable()
-    {
-        var validator = new InlineValidator<Model>();
-        var opts = validator.RuleFor(x => x.Dict).Empty();
-        opts.NotEmpty();
-        var result = validator.Validate(new Model { Dict = new Dictionary<string, int>() });
-        Assert.False(result.IsValid);
-    }
-
-    [Fact]
-    public void NotEmpty_IRuleBuilder_IsCallable()
-    {
-        var validator = new InlineValidator<Model>();
-        IRuleBuilder<Model, IDictionary<string, int>?> rb = validator.RuleFor(x => x.Dict);
-        rb.NotEmpty();
-        var result = validator.Validate(new Model { Dict = new Dictionary<string, int>() });
-        Assert.False(result.IsValid);
+        var result = tc.Value();
+        AssertResult(tc, result);
     }
 }

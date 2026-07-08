@@ -1,0 +1,16 @@
+---
+name: fact-to-theory-conversion
+description: How to convert [Fact] overload-resolution/smoke tests to spec-compliant [Theory]+TheoryData without losing what they prove.
+metadata:
+  type: feedback
+---
+
+The testing spec (`docs/ai/specs/testing/unit-test.md`) forbids `[Fact]` everywhere except `PineGuard.Testing.UnitTests/**/RuleScenarioExtensionsTests.cs` (spec-exempt framework self-test). When a `[Fact]` exists purely to prove an **overload resolution** path is callable (e.g. `Empty()` on both `IRuleBuilderOptions` and `IRuleBuilder` receivers), it can't be parameterized by a plain scalar `Value` — the receiver's static type is what selects the overload, and that's a compile-time, not runtime, choice.
+
+**Fix pattern**: give the case record a `Value` of type `Func<TResult>` (e.g. `Func<ValidationResult>`) instead of a scalar. Each `new(...)` entry's lambda body is the literal call-site for one overload (receiver type declared inline, exact method call written out), and returns the same `TResult` the assertion helper already knows how to check. The test method becomes a one-liner: `var result = tc.Value(); AssertResult(tc, result);` — reusing the layer's existing `AssertResult` instead of ad-hoc `Assert.False(...)`. This is the "Action-based case, exceptional pattern" from unit-test.md §4.2 generalized to `Func<T>` so the uniform `AssertResult`/`Expected` machinery still applies.
+
+Multi-statement lambda bodies are fine on a single source line (e.g. `static () => { var v = ...; return v; }`) even though they read dense — this repo's convention (confirmed in `FluentDictionaryExtensionsTestData.cs`/`FluentReadOnlyDictionaryExtensionsTestData.cs`) favors one line per case over readability, staying under ~400 chars. If the call-site needs a model type not already in TestData, define a small `private sealed record Model { ... }` scoped inside the relevant nested Operation Group (a "test double", per §9.7) rather than reusing a `private` model nested in the Tests file — TestData must stay self-contained and not depend on Tests-file types.
+
+**Naming gotcha**: never name a nested nested TestData/Tests Operation Group `GetHashCode` (or any other `object` member name like `Equals`, `ToString`) — C# raises CS0108 "hides inherited member" because nested types count as members too. This repo's existing convention sidesteps this by naming the Equals-testing group `Equality` rather than `Equals`; follow the same pattern (e.g. `HashCode` instead of `GetHashCode`).
+
+Confirmed working end-to-end (2026-07-08) converting 9 production-layer `[Fact]`s: 4 in `FluentDictionaryExtensionsTests.cs`, 4 in `FluentReadOnlyDictionaryExtensionsTests.cs` (both collapsed into a single `OverloadResolution` Theory), and 1 in `PineGuard.Core.UnitTests/Common/EnumerationTests.cs` (`GetHashCode_ReturnsValueHashCode` → nested `HashCode` Operation Group). All three files mirror the file's own pre-existing conventions rather than the more verbose canonical nested-Operation-Group example in unit-test.md §5.2 — check sibling test methods/groups in the same file first, since several projects have drifted to a flatter "v2" pattern (see [[testing-base]] memory in the user's auto-memory for the base-class/Expected conventions this depends on).

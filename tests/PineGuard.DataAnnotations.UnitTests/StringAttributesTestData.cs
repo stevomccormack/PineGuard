@@ -1,4 +1,5 @@
 using PineGuard.Testing.UnitTests;
+using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -97,7 +98,7 @@ public static class StringAttributesTestData
 
     public static class DigitsOnly
     {
-        public static TheoryData<ValidCase> ValidCases => [new("digits", "123", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("digits", F.IsDigitsOnly.Digits, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases => [new("decimal", "12.3", false), new("alpha", "1a", false)];
     }
@@ -106,7 +107,7 @@ public static class StringAttributesTestData
     {
         public static TheoryData<ValidCase> ValidCases => [new("decimal", "12.3", true), new("alpha", "a", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("digits", "123", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("digits", F.IsDigitsOnly.Digits, false)];
     }
 
     public static class EmptyString
@@ -123,29 +124,29 @@ public static class StringAttributesTestData
 
     public static class NullOrEmptyString
     {
-        public static TheoryData<ValidCase> ValidCases => [new("null", null, true), new("empty", "", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("null", F.IsNullOrEmpty.NullValue, true), new("empty", F.IsNullOrEmpty.Empty, true)];
         public static TheoryData<ValidCase> InvalidCases => [new("value", "a", false)];
     }
 
     public static class NotNullOrEmptyString
     {
         public static TheoryData<ValidCase> ValidCases => [new("value", "a", true)];
-        public static TheoryData<ValidCase> EdgeCases => [new("null", null, false)]; // Not Null
-        public static TheoryData<ValidCase> InvalidCases => [new("empty", "", false)];
+        public static TheoryData<ValidCase> EdgeCases => [new("null", F.IsNotNullOrEmpty.NullValue, false)]; // Not Null
+        public static TheoryData<ValidCase> InvalidCases => [new("empty", F.IsNotNullOrEmpty.Empty, false)];
     }
 
     public static class NullOrWhiteSpaceString
     {
-        public static TheoryData<ValidCase> ValidCases => [new("null", null, true), new("empty", "", true), new("whitespace", " ", true)];
-        public static TheoryData<ValidCase> EdgeCases => [new("tab", "\t", true), new("newline", "\n", true), new("carriage return + newline", "\r\n", true), new("multiple spaces", "   ", true), new("mixed whitespace", " \t\n\r ", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("null", F.IsNullOrWhiteSpace.NullValue, true), new("empty", F.IsNullOrWhiteSpace.Empty, true), new("whitespace", " ", true)];
+        public static TheoryData<ValidCase> EdgeCases => [new("tab", "\t", true), new("newline", "\n", true), new("carriage return + newline", "\r\n", true), new("multiple spaces", F.IsNullOrWhiteSpace.Whitespace, true), new("mixed whitespace", " \t\n\r ", true)];
         public static TheoryData<ValidCase> InvalidCases => [new("value", "a", false)];
     }
 
     public static class NotNullOrWhiteSpaceString
     {
         public static TheoryData<ValidCase> ValidCases => [new("value", "a", true)];
-        public static TheoryData<ValidCase> EdgeCases => [new("null", null, false)];
-        public static TheoryData<ValidCase> InvalidCases => [new("empty", "", false), new("whitespace", " ", false)];
+        public static TheoryData<ValidCase> EdgeCases => [new("null", F.IsNotNullOrWhiteSpace.NullValue, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("empty", F.IsNotNullOrWhiteSpace.Empty, false), new("whitespace", " ", false)];
     }
 
     public static class LongerThanOrEqual
@@ -178,7 +179,7 @@ public static class StringAttributesTestData
 
     public static class ContainsWhitespace
     {
-        public static TheoryData<ValidCase> ValidCases => [new("space", "a b", true)];
+        public static TheoryData<ValidCase> ValidCases => [new("space", F.ContainsWhitespace.Between, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases => [new("no space", "ab", false)];
     }
@@ -187,7 +188,7 @@ public static class StringAttributesTestData
     {
         public static TheoryData<ValidCase> ValidCases => [new("no space", "ab", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
-        public static TheoryData<ValidCase> InvalidCases => [new("space", "a b", false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("space", F.ContainsWhitespace.Between, false)];
     }
 
     public static class ContainsControlChars

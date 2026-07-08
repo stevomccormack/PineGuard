@@ -193,13 +193,6 @@ public sealed class EnumerationTests : BaseUnitTest
         Assert.Equal(testCase.Expected, result);
     }
 
-    [Fact]
-    public void GetHashCode_ReturnsValueHashCode()
-    {
-        var red = EnumerationTestData.TestColor.Red;
-        Assert.Equal(red.Value.GetHashCode(), red.GetHashCode());
-    }
-
     [Theory]
     [MemberData(nameof(EnumerationTestData.StringConstructor.InvalidCases), MemberType = typeof(EnumerationTestData.StringConstructor))]
     public void StringEnumeration_Ctor_Throws_ForNullValueOrBadName(
@@ -289,6 +282,20 @@ public sealed class EnumerationTests : BaseUnitTest
             // Assert
             Assert.Equal(testCase.Expected, equal);
             Assert.Equal(!testCase.Expected, notEqual);
+        }
+    }
+
+    public static class HashCode
+    {
+        [Theory]
+        [MemberData(nameof(EnumerationTestData.HashCode.ValidCases), MemberType = typeof(EnumerationTestData.HashCode))]
+        public static void ShouldReturnValueHashCode(EnumerationTestData.HashCode.ValidCase testCase)
+        {
+            // Act
+            var result = testCase.Input.GetHashCode();
+
+            // Assert
+            Assert.Equal(testCase.ExpectedValue, result);
         }
     }
 
