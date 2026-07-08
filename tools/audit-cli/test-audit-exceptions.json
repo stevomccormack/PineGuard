@@ -2,9 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Allowlisted exceptions for unit test audits (Rule50-Rule54). Paths are repo-relative using forward slashes.",
   "Rule50": {
-    "AllowMissingTestData": [],
+    "AllowMissingTestData": [
+      "tests/PineGuard.DataAnnotations.UnitTests/ErrorMessageAttributesTests.cs"
+    ],
     "AllowOrphanTestData": [],
-    "AllowFact": []
+    "AllowFact": [
+      "tests/PineGuard.Testing.UnitTests/UnitTests/Rules/RuleScenarioExtensionsTests.cs"
+    ]
   },
   "Rule51": {
     "AllowMissingNestedStaticGroups": [],
