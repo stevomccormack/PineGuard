@@ -213,11 +213,11 @@ internal static class Program
         Console.WriteLine("  dotnet run --project tools/PineGuard.AuditCli/PineGuard.AuditCli.csproj -c Release -- --project MustClauses --spec artifacts/audit/naming-spec.json --report artifacts/audit/Rule01.json");
     }
 
+    private static readonly JsonSerializerOptions IndentedOptions = new(NamingJson.Options) { WriteIndented = true };
+    private static readonly JsonSerializerOptions CompactOptions = new(NamingJson.Options) { WriteIndented = false };
+
     private static string Serialize<T>(T value, bool indented)
-        => JsonSerializer.Serialize(value, new JsonSerializerOptions(NamingJson.Options)
-        {
-            WriteIndented = indented
-        });
+        => JsonSerializer.Serialize(value, indented ? IndentedOptions : CompactOptions);
 
     private static string ResolvePath(string repoRoot, string path)
         => Path.GetFullPath(Path.Combine(repoRoot, path.Replace('/', Path.DirectorySeparatorChar)));

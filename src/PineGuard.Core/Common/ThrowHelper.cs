@@ -3,6 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace PineGuard.Common;
 
+/// <summary>
+/// Provides shared argument-validation helpers that throw standard BCL exceptions on invalid input.
+/// </summary>
 public static class ThrowHelper
 {
     /// <summary>

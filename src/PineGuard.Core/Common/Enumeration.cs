@@ -157,6 +157,26 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
     public static bool operator !=(Enumeration<TValue>? left, Enumeration<TValue>? right) => !(left == right);
 
     /// <summary>
+    /// Determines whether one enumeration instance sorts before another by value.
+    /// </summary>
+    public static bool operator <(Enumeration<TValue>? left, Enumeration<TValue>? right) => left is null ? right is not null : left.CompareTo(right) < 0;
+
+    /// <summary>
+    /// Determines whether one enumeration instance sorts before or equal to another by value.
+    /// </summary>
+    public static bool operator <=(Enumeration<TValue>? left, Enumeration<TValue>? right) => left is null || left.CompareTo(right) <= 0;
+
+    /// <summary>
+    /// Determines whether one enumeration instance sorts after another by value.
+    /// </summary>
+    public static bool operator >(Enumeration<TValue>? left, Enumeration<TValue>? right) => left is not null && left.CompareTo(right) > 0;
+
+    /// <summary>
+    /// Determines whether one enumeration instance sorts after or equal to another by value.
+    /// </summary>
+    public static bool operator >=(Enumeration<TValue>? left, Enumeration<TValue>? right) => left is null ? right is null : left.CompareTo(right) >= 0;
+
+    /// <summary>
     /// Implicitly converts an enumeration member to its name string.
     /// </summary>
     /// <param name="enumeration">The enumeration member to convert.</param>

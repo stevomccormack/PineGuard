@@ -8,6 +8,15 @@
     <!-- CS8795: Partial method with [GeneratedRegex] — source generator provides the implementation at compile time.
          ReSharper's own parser doesn't execute source generators, so it false-positives this as a compiler error. -->
     <NoWarn>$(NoWarn);CS8795</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <!-- CS0419 (netstandard2.1 only): System.Text.Json's netstandard dependency chain ships an
+         internal CallerArgumentExpressionAttribute polyfill; cref binding sees it alongside the
+         PineGuard public polyfill and reports a phantom ambiguity while still resolving correctly. -->
+    <NoWarn Condition="'$(TargetFramework)' == 'netstandard2.1'">$(NoWarn);CS0419</NoWarn>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsPackable)' != 'false' and '$(IsTestProject)' != 'true'">

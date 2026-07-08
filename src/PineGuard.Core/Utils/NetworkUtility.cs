@@ -15,6 +15,14 @@ public static class NetworkUtility
     private const int Ipv4SegmentMinLength = 1;
     private const int Ipv4SegmentMaxLength = 3;
 
+    /// <summary>
+    /// Attempts to parse the specified string as an <see cref="IPAddress"/> of either family (IPv4 or IPv6).
+    /// </summary>
+    /// <param name="value">The string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <param name="ipAddress">
+    /// When this method returns, contains the parsed <see cref="IPAddress"/> if successful; otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> was successfully parsed; otherwise, <see langword="false"/>.</returns>
     public static bool TryParseIpAddress(string? value, out IPAddress? ipAddress)
     {
         ipAddress = null;
@@ -22,6 +30,17 @@ public static class NetworkUtility
         return StringUtility.TryGetTrimmed(value, out var trimmed) && IPAddress.TryParse(trimmed, out ipAddress);
     }
 
+    /// <summary>
+    /// Attempts to parse the specified string as a strict dotted-quad IPv4 <see cref="IPAddress"/>.
+    /// </summary>
+    /// <param name="value">
+    /// The string to parse. If <see langword="null"/> or whitespace, or if it does not consist of exactly
+    /// four numeric segments in the range 0-255, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="ipAddress">
+    /// When this method returns, contains the parsed IPv4 <see cref="IPAddress"/> if successful; otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a valid dotted-quad IPv4 address; otherwise, <see langword="false"/>.</returns>
     public static bool TryParseIpv4(string? value, out IPAddress? ipAddress)
     {
         ipAddress = null;
@@ -54,6 +73,16 @@ public static class NetworkUtility
         return true;
     }
 
+    /// <summary>
+    /// Attempts to parse the specified string as an IPv6 <see cref="IPAddress"/>.
+    /// </summary>
+    /// <param name="value">
+    /// The string to parse. If <see langword="null"/> or whitespace, or if it does not represent an IPv6 address, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="ipAddress">
+    /// When this method returns, contains the parsed IPv6 <see cref="IPAddress"/> if successful; otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a valid IPv6 address; otherwise, <see langword="false"/>.</returns>
     public static bool TryParseIpv6(string? value, out IPAddress? ipAddress)
     {
         ipAddress = null;
@@ -68,6 +97,22 @@ public static class NetworkUtility
         return true;
     }
 
+    /// <summary>
+    /// Attempts to parse the specified string as CIDR notation (an IP address followed by a slash and a prefix length),
+    /// masking the address down to its network portion.
+    /// </summary>
+    /// <param name="value">
+    /// The string to parse, in the form <c>address/prefixLength</c>. If <see langword="null"/> or whitespace, malformed,
+    /// or if the prefix length is out of range for the address family, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="network">
+    /// When this method returns, contains the network <see cref="IPAddress"/> with host bits masked to zero if successful;
+    /// otherwise, <see langword="null"/>.
+    /// </param>
+    /// <param name="prefixLength">
+    /// When this method returns, contains the parsed prefix length if successful; otherwise, <c>0</c>.
+    /// </param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> was successfully parsed as CIDR notation; otherwise, <see langword="false"/>.</returns>
     public static bool TryParseCidr(string? value, out IPAddress? network, out int prefixLength)
     {
         network = null;
@@ -101,6 +146,17 @@ public static class NetworkUtility
         return true;
     }
 
+    /// <summary>
+    /// Determines whether <paramref name="address"/> falls within the CIDR block described by <paramref name="network"/>
+    /// and <paramref name="prefixLength"/>.
+    /// </summary>
+    /// <param name="address">The address to test.</param>
+    /// <param name="network">The network address to test against. Must share the same <see cref="AddressFamily"/> as <paramref name="address"/>.</param>
+    /// <param name="prefixLength">The CIDR prefix length, in bits. Must be within the valid range for the address family (0-32 for IPv4, 0-128 for IPv6).</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="address"/> and <paramref name="network"/> share the same address family,
+    /// <paramref name="prefixLength"/> is in range, and <paramref name="address"/> lies within the network block; otherwise, <see langword="false"/>.
+    /// </returns>
     public static bool IsInCidr(IPAddress address, IPAddress network, int prefixLength)
     {
         if (address.AddressFamily != network.AddressFamily)
@@ -139,6 +195,18 @@ public static class NetworkUtility
         return true;
     }
 
+    /// <summary>
+    /// Attempts to convert the specified hostname to its ASCII-compatible encoding (Punycode), applying IDN mapping
+    /// for internationalized domain names.
+    /// </summary>
+    /// <param name="value">
+    /// The hostname to convert. If <see langword="null"/> or whitespace, or if it reduces to an empty string after
+    /// trimming a trailing root-domain dot, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="asciiHostname">
+    /// When this method returns, contains the ASCII-compatible hostname if successful; otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> was successfully converted to ASCII; otherwise, <see langword="false"/>.</returns>
     public static bool TryGetAsciiHostname(string? value, out string? asciiHostname)
     {
         asciiHostname = null;

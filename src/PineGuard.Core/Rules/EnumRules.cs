@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 using PineGuard.Utils;
@@ -186,7 +187,7 @@ public static class EnumRules
         HasAttribute<TEnum, EnumMemberAttribute>(value);
 
     /// <summary>
-    /// Determines whether the specified enum member is marked with <see cref="ObsoleteAttribute"/>.
+    /// Determines whether the specified enum member is marked with <c>[Obsolete]</c>.
     /// </summary>
     /// <typeparam name="TEnum">The enum type.</typeparam>
     /// <param name="value">The enum value to inspect. If <see langword="null"/>, returns <see langword="false"/>.</param>
@@ -206,5 +207,5 @@ public static class EnumRules
     }
 
     private static ulong ToUInt64<TEnum>(TEnum value) where TEnum : struct, Enum =>
-        Convert.ToUInt64(value);
+        Convert.ToUInt64(value, CultureInfo.InvariantCulture);
 }

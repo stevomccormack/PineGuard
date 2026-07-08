@@ -6,6 +6,14 @@ namespace PineGuard.Utils;
 /// <seealso href="https://pineguard.ai/docs/utils/http-security-header">HTTP Security Header Utility documentation</seealso>
 public static class HttpSecurityHeaderUtility
 {
+    /// <summary>
+    /// Attempts to split a semicolon-delimited HTTP header value (such as HSTS or CSP) into trimmed, non-empty segments.
+    /// </summary>
+    /// <param name="value">The header value to split. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <param name="segments">
+    /// When this method returns, contains the trimmed, non-empty segments if successful; otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> yielded at least one non-empty segment; otherwise, <see langword="false"/>.</returns>
     public static bool TrySplitSemicolonSeparatedSegments(string? value, out IReadOnlyList<string>? segments)
     {
         segments = null;

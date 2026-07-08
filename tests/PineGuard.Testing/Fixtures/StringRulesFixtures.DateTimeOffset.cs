@@ -1,3 +1,4 @@
+using System.Globalization;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.Rules;
 
@@ -35,10 +36,10 @@ public static partial class StringRulesFixtures
 
     public static class DateTimeOffsetIsBetween
     {
-        public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) InsideRange = ("2020-01-01T12:00:00Z", DateTimeOffset.Parse("2020-01-01T00:00:00Z"), DateTimeOffset.Parse("2020-01-02T00:00:00Z"), Inclusion.Inclusive);
-        public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) MinExclusive = ("2020-01-01T00:00:00Z", DateTimeOffset.Parse("2020-01-01T00:00:00Z"), DateTimeOffset.Parse("2020-01-02T00:00:00Z"), Inclusion.Exclusive);
-        public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) NotADate = ("not-a-date", DateTimeOffset.Parse("2020-01-01T00:00:00Z"), DateTimeOffset.Parse("2020-01-02T00:00:00Z"), Inclusion.Inclusive);
-        public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) NullValue = (null, DateTimeOffset.Parse("2020-01-01T00:00:00Z"), DateTimeOffset.Parse("2020-01-02T00:00:00Z"), Inclusion.Inclusive);
+        public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) InsideRange = ("2020-01-01T12:00:00Z", DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Inclusive);
+        public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) MinExclusive = ("2020-01-01T00:00:00Z", DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Exclusive);
+        public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) NotADate = ("not-a-date", DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Inclusive);
+        public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) NullValue = (null, DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Inclusive);
 
         public static RuleScenario<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[] ValidScenarios => [new(nameof(InsideRange), InsideRange, true)];
         public static RuleScenario<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[] ValidEdgeScenarios => [];
@@ -51,8 +52,8 @@ public static partial class StringRulesFixtures
 
     public static class DateTimeOffsetIsNotBetween
     {
-        private static readonly DateTimeOffset DtMin = DateTimeOffset.Parse("2020-01-01T00:00:00Z");
-        private static readonly DateTimeOffset DtMax = DateTimeOffset.Parse("2020-01-02T00:00:00Z");
+        private static readonly DateTimeOffset DtMin = DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture);
+        private static readonly DateTimeOffset DtMax = DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture);
 
         public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) OutsideRange = ("2020-01-03T00:00:00Z", DtMin, DtMax, Inclusion.Inclusive);
         public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) MinExclusive = ("2020-01-01T00:00:00Z", DtMin, DtMax, Inclusion.Exclusive);
@@ -67,7 +68,7 @@ public static partial class StringRulesFixtures
 
     public static class DateTimeOffsetIsWithin
     {
-        private static readonly DateTimeOffset DtRef = DateTimeOffset.Parse("2020-01-01T12:00:00Z");
+        private static readonly DateTimeOffset DtRef = DateTimeOffset.Parse("2020-01-01T12:00:00Z", CultureInfo.InvariantCulture);
 
         public static readonly (string? value, DateTimeOffset? reference, TimeSpan window) SameInstant = ("2020-01-01T12:00:00Z", DtRef, TimeSpan.FromHours(1));
         public static readonly (string? value, DateTimeOffset? reference, TimeSpan window) WithinWindow = ("2020-01-01T12:30:00Z", DtRef, TimeSpan.FromHours(1));
@@ -82,7 +83,7 @@ public static partial class StringRulesFixtures
 
     public static class DateTimeOffsetIsWithinCalendarMonths
     {
-        private static readonly DateTimeOffset DtRef = DateTimeOffset.Parse("2020-01-15T00:00:00Z");
+        private static readonly DateTimeOffset DtRef = DateTimeOffset.Parse("2020-01-15T00:00:00Z", CultureInfo.InvariantCulture);
 
         public static readonly (string? value, DateTimeOffset? reference, int months) SameMonth = ("2020-01-20T00:00:00Z", DtRef, 1);
         public static readonly (string? value, DateTimeOffset? reference, int months) WithinWindow = ("2020-02-10T00:00:00Z", DtRef, 1);

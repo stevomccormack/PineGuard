@@ -82,7 +82,7 @@ public abstract class ValidationAttributeBase(Type expectedType, bool allowNull 
     /// <param name="method">The <see cref="MethodInfo"/> to build arguments for.</param>
     /// <param name="value">The value being validated (placed at index 1).</param>
     /// <param name="args">Additional arguments to pass after the value.</param>
-    /// <returns>An object array ready for <see cref="MethodInfo.Invoke(object?, object?[])"/>.</returns>
+    /// <returns>An object array ready for <see cref="MethodBase.Invoke(object, object[])"/>.</returns>
     protected static object?[] BuildInvokeArgs(MethodInfo method, object? value, object?[] args)
     {
         var parameters = method.GetParameters();
