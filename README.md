@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 10.0" />
-  <img src="https://img.shields.io/badge/Coverage-100%25-brightgreen?style=for-the-badge" alt="100% Coverage" />
-  <img src="https://img.shields.io/badge/SonarQube-0%20Issues-4E9BCD?style=for-the-badge&logo=sonarqube&logoColor=white" alt="SonarQube Clean" />
-  <img src="https://img.shields.io/badge/Roslyn-0%20Warnings-blueviolet?style=for-the-badge" alt="Roslyn Clean" />
+  <img src="https://img.shields.io/badge/.NET-netstandard2.1%20%7C%20net8.0%20%7C%20net10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="netstandard2.1 | net8.0 | net10.0" />
+  <a href="https://github.com/stevomccormack/PineGuard/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/stevomccormack/PineGuard/ci.yml?branch=main&style=for-the-badge&label=CI" alt="CI" /></a>
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" />
 </p>
 
@@ -30,7 +28,7 @@ That means you don’t end up maintaining four different validation dialects for
 ### Why teams choose PineGuard
 
 - **One mental model, multiple delivery styles.** Write validation once, then use it as a result, a guard, a FluentValidation rule, or a DataAnnotations attribute.
-- **Broad coverage without a fragmented API.** Strings, numbers, dates, collections, URIs, OWASP-safe input, network identifiers, and more.
+- **Broad coverage without a fragmented API.** Strings, numbers, dates and date/time ranges, time spans, geo-locations, collections, URIs, OWASP-safe input, network identifiers, and more.
 - **Security built in.** PineGuard includes real OWASP, URI, hostname, and reference-data validations instead of stopping at trivial string checks.
 - **Exception policy without forking the library.** Guard exceptions can stay default, be replaced globally, be scoped to an operation, or be overridden per call.
 
@@ -44,6 +42,7 @@ That means you don’t end up maintaining four different validation dialects for
 | `Guard.Against.*()` | fail-fast validation and typed/parsed return values | `Guard.Against.NotHttpsUrl(callback)` |
 | `PineGuard.FluentValidation` | request validators that read naturally in pipelines | `RuleFor(x => x.Website).WebUrl()` |
 | `PineGuard.DataAnnotations` | attribute-driven validation on DTOs and models | `[WebUrl]` |
+| `PineGuard.Testing` | writing tests against PineGuard-based validation | `ReturnCase<string, bool>` fixtures |
 
 ---
 
@@ -52,7 +51,7 @@ That means you don’t end up maintaining four different validation dialects for
 ### Install
 
 ```bash
-# Core validation rules (zero dependencies)
+# Core validation rules (no third-party dependencies)
 dotnet add package PineGuard.Core
 
 # Must clauses — result-based fluent validation
@@ -66,7 +65,14 @@ dotnet add package PineGuard.FluentValidation
 
 # DataAnnotations attributes
 dotnet add package PineGuard.DataAnnotations
+
+# Test fixtures, base classes and assertion helpers
+dotnet add package PineGuard.Testing
 ```
+
+`PineGuard.Core` takes no third-party dependencies — only the Microsoft first-party
+`System.Text.Json` and `System.ComponentModel.Annotations` packages, which the .NET runtime already
+ships on modern targets.
 
 ### Must Clauses &mdash; result-based, explicit, composable
 
@@ -244,4 +250,44 @@ public sealed class CreateEndpointRequest
 > FluentValidation uses `Required()` / `NotRequired()` for presence checks to avoid built-in naming collisions. DataAnnotations uses `[NotNull]` / `[Null]` for the equivalent presence semantics today.
 
 ---
+
+## Architecture
+
+PineGuard is layered, and each layer adapts the one below it rather than restating its logic:
+
+```
+PineGuard.Core            pure boolean rules + parsing utilities
+  └─ PineGuard.MustClauses    result-returning, never throws
+       └─ PineGuard.GuardClauses    throws, returns parsed values
+            ├─ PineGuard.FluentValidation    IRuleBuilder extensions
+            └─ PineGuard.DataAnnotations     ValidationAttribute adapters
+
+PineGuard.Testing         fixtures, base test classes, assertion helpers
+```
+
+A new validation is implemented across *all* layers, plus tests, in that order.
+
+## Supported frameworks
+
+The five validation packages multi-target `netstandard2.1`, `net8.0`, and `net10.0`.
+`PineGuard.Testing` targets `net8.0` and `net10.0` only — its fixtures use `TimeOnly`.
+
+## Documentation
+
+The canonical engineering specs, conventions, and agent playbooks live in
+**[docs/ai/](docs/ai/README.md)** — start there before changing conventions.
+
+## Contributing
+
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for build, test, and formatting instructions and the
+quality gates every pull request must clear
+([CI workflow](https://github.com/stevomccormack/PineGuard/actions/workflows/ci.yml)).
+
+## Security
+
+Please do not open public issues for vulnerabilities — see **[SECURITY.md](SECURITY.md)**.
+
+## License
+
+MIT — see **[LICENSE](LICENSE)**.
 

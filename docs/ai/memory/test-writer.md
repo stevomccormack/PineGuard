@@ -4,8 +4,9 @@
 
 ## Durable Patterns
 
+- Every test is `[Theory]` + `TheoryData`/`[MemberData]` — `[Fact]` is prohibited and fails CI Rule50.
 - Mirror the source layout under `tests/PineGuard.*.UnitTests/`.
-- Keep `XxxTests.cs` and `XxxTestData.cs` side-by-side.
+- Keep `XxxTests.cs` and `XxxTestData.cs` side-by-side — the pairing is also gated by Rule50.
 - Use the testing specs before inventing any structure.
 - Treat 100% line and branch coverage as the target for any affected code.
 
@@ -15,6 +16,8 @@
 - Keep tuple property names as `Value`.
 - Keep tuple element names camelCase and aligned to source parameter names.
 - Use fixtures from `PineGuard.Testing.Fixtures` where the fixture architecture expects them.
+- Fixture partials mirror the source Rules partials — `XxxRules.Yyy.cs` gets `XxxRulesFixtures.Yyy.cs`;
+  a monolithic per-rule fixture file is drift.
 
 ## Assertion Heuristics
 
@@ -35,4 +38,6 @@
 - `../agents/test-all.md`
 - `../skills/scaffold-unit-test/SKILL.md`
 - `../specs/testing/unit-test.md`
+- `../specs/testing/fixture.md`
 - `../specs/testing/coverage.md`
+- `../rules/fixture-conventions.md`

@@ -32,4 +32,7 @@ Before implementing any feature, read these specifications:
 
 ## Multi-Session Coordination
 - Read and follow `docs/ai/rules/coordination.md` before running builds, tests, or coverage.
-- Write your status at start. Clear it at end. The lock system is automatic via hooks.
+- Announce the scope you are working on before starting; never run a build, test, or coverage pass
+  concurrently with another session; never clear another session's status or lock.
+- Claude Code sessions get this enforced automatically via `.claude/hooks/`. Other surfaces satisfy the
+  same contract by hand — see coordination.md §Universal Contract.

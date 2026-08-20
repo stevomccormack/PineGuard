@@ -6,6 +6,8 @@ version: 1.0
 
 # Role: Software Engineer
 
+> **Also known as:** Builder · `roles/builder.md` · `role-software-engineer`
+
 > [!NOTE]
 > You are the **Builder**. Your job is to translate specs into working, clean code.
 

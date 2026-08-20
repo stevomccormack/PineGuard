@@ -7,16 +7,21 @@
 
 Map these to your Agent's slash command palette:
 
-| Command        | Scope              | Auto-Approve | Description                                                                              |
-| :------------- | :----------------- | :----------- | :--------------------------------------------------------------------------------------- |
-| `/test-all`    | `All`              | ✅ Yes       | Run tests for all projects (sequential); builds PineGuard.Testing as a dependency.      |
-| `/test-core`   | `Core`             | ✅ Yes       | Run tests for PineGuard.Core.                                                            |
-| `/test-must`   | `MustClauses`      | ✅ Yes       | Run tests for MustClauses.                                                               |
-| `/test-guard`  | `GuardClauses`     | ✅ Yes       | Run tests for GuardClauses.                                                              |
-| `/test-fluent` | `FluentValidation` | ✅ Yes       | Run tests for FluentValidation.                                                          |
-| `/test-data`   | `DataAnnotations`  | ✅ Yes       | Run tests for DataAnnotations.                                                           |
+| Command            | Scope              | Auto-Approve | Description                                                                              |
+| :----------------- | :----------------- | :----------- | :--------------------------------------------------------------------------------------- |
+| `/test-all`        | `All`              | ✅ Yes       | Run tests for all projects (sequential).                                                 |
+| `/test-core`       | `Core`             | ✅ Yes       | Run tests for PineGuard.Core.                                                            |
+| `/test-must`       | `MustClauses`      | ✅ Yes       | Run tests for MustClauses.                                                               |
+| `/test-guard`      | `GuardClauses`     | ✅ Yes       | Run tests for GuardClauses.                                                              |
+| `/test-fluent`     | `FluentValidation` | ✅ Yes       | Run tests for FluentValidation.                                                          |
+| `/test-annotation` | `DataAnnotations`  | ✅ Yes       | Run tests for DataAnnotations.                                                           |
+| `/test-testing`    | `Testing`          | ✅ Yes       | Run `tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj`.               |
 
-> **PineGuard.Testing** (`tests/PineGuard.Testing/`) is the **shared test infrastructure library**. It has no own test methods and no `/test-testing` command. It is built automatically as a dependency of all `*.UnitTests` projects. To verify it compiles cleanly, use the solution run: `Run-Tests.ps1 -Solution "./PineGuard.slnx"`.
+`tests/PineGuard.Testing/` is the shared test infrastructure library consumed by every `*.UnitTests`
+project; its own tests live in `tests/PineGuard.Testing.UnitTests/` and are run by `/test-testing`.
+
+These commands **run** the tests. The `/fix-test-*` family that diagnoses and repairs the failures
+they report is contracted in [`fix.md`](fix.md) — it writes code and is never auto-approved.
 
 ## 2. Execution Logic
 
@@ -25,6 +30,8 @@ Map these to your Agent's slash command palette:
 
 ## 3. Auto-Approval Rules
 
-- **Gemini**: `// turbo-all` active in the adapter stub `.agent/workflows/test-[scope].md`.
-- **Claude**: Implicitly allowed via Project context.
-- **Cursor**: `cmd: dotnet test` allowed in `.cursorrules`.
+- **Claude Code**: implicitly allowed via project context.
+- **Antigravity**: `// turbo-all` active in the adapter stub `.agent/workflows/test-[scope].md`.
+- **Pi**: `.pi/prompts/test-[scope].md`.
+- **Copilot**: `.github/prompts/` carries one representative of this family (see
+  [`../meta/adapter-surfaces.md`](../meta/adapter-surfaces.md) §4).
