@@ -18,7 +18,11 @@ public static class NetworkUtility
     /// <summary>
     /// Attempts to parse the specified string as an <see cref="IPAddress"/> of either family (IPv4 or IPv6).
     /// </summary>
-    /// <param name="value">The string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <param name="value">
+    /// The string to parse. If <see langword="null"/> or whitespace, or if it is not a strict dotted-quad IPv4
+    /// address or a standard IPv6 address, returns <see langword="false"/>. Non-canonical inet_aton shorthand
+    /// (e.g. <c>"1"</c>, <c>"192.168.1"</c>) is rejected even though <c>IPAddress.TryParse</c> accepts it.
+    /// </param>
     /// <param name="ipAddress">
     /// When this method returns, contains the parsed <see cref="IPAddress"/> if successful; otherwise, <see langword="null"/>.
     /// </param>
@@ -27,7 +31,17 @@ public static class NetworkUtility
     {
         ipAddress = null;
 
-        return StringUtility.TryGetTrimmed(value, out var trimmed) && IPAddress.TryParse(trimmed, out ipAddress);
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            return false;
+
+        if (TryParseIpv4(trimmed, out ipAddress))
+            return true;
+
+        if (!IPAddress.TryParse(trimmed, out var parsed) || parsed.AddressFamily != AddressFamily.InterNetworkV6)
+            return false;
+
+        ipAddress = parsed;
+        return true;
     }
 
     /// <summary>
@@ -49,11 +63,7 @@ public static class NetworkUtility
             return false;
 
         // Strict dotted-quad segments 0..255
-#if NET8_0_OR_GREATER
-        var parts = trimmed.Split(Ipv4Separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-#else
         var parts = trimmed.Split(Ipv4Separator, StringSplitOptions.RemoveEmptyEntries);
-#endif
         if (parts.Length != Ipv4SegmentCount)
             return false;
 
@@ -131,11 +141,12 @@ public static class NetworkUtility
         if (!TryParseIpAddress(addressPart, out var parsed) || parsed is null)
             return false;
 
-        if (!int.TryParse(prefixPart, out var prefix))
+        if (!int.TryParse(prefixPart, NumberStyles.None, CultureInfo.InvariantCulture, out var prefix))
             return false;
 
+        // NumberStyles.None disallows a leading sign, so `prefix` can never be negative here.
         var maxPrefix = parsed.AddressFamily == AddressFamily.InterNetworkV6 ? 128 : 32;
-        if (prefix < 0 || prefix > maxPrefix)
+        if (prefix > maxPrefix)
             return false;
 
         var bytes = parsed.GetAddressBytes();
@@ -214,8 +225,12 @@ public static class NetworkUtility
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
 
-        trimmed = trimmed.TrimEnd('.');
-        if (trimmed.Length == 0)
+        // Only a single trailing root-domain dot is valid FQDN notation; consecutive trailing
+        // dots denote an empty label and must be rejected rather than silently trimmed away.
+        if (trimmed.EndsWith('.'))
+            trimmed = trimmed[..^1];
+
+        if (trimmed.Length == 0 || trimmed.EndsWith('.'))
             return false;
 
         try
@@ -235,11 +250,7 @@ public static class NetworkUtility
         if (asciiHostname.Length > 253)
             return false;
 
-#if NET8_0_OR_GREATER
-        var labels = asciiHostname.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-#else
         var labels = asciiHostname.Split('.', StringSplitOptions.RemoveEmptyEntries);
-#endif
 
         return labels.All(IsValidHostnameLabel);
     }

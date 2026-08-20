@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
@@ -73,7 +74,7 @@ public static partial class EmailUtility
     /// <param name="value">The email string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="email">When this method returns, contains the parsed address if successful; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the email was parsed successfully; otherwise, <see langword="false"/>.</returns>
-    public static bool TryCreate(string? value, out MailAddress? email)
+    public static bool TryCreate(string? value, [NotNullWhen(true)] out MailAddress? email)
     {
         email = null;
 
@@ -90,12 +91,15 @@ public static partial class EmailUtility
     }
 
     /// <summary>
-    /// Attempts to create a <see cref="MailAddress"/> from the specified string using strict RFC-compliant parsing.
+    /// Attempts to create a <see cref="MailAddress"/> from the specified string using a pragmatic subset of
+    /// RFC 5321/RFC 5322 parsing (single <c>@</c>, dotted IDN-normalizable domain, no whitespace, RFC length
+    /// limits). This is not full RFC compliance: quoted local parts, dotless domains, and address literals
+    /// (e.g. <c>user@[192.168.1.1]</c>) are rejected even though they are RFC-valid.
     /// </summary>
     /// <param name="value">The email string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="email">When this method returns, contains the parsed address if successful; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the email passed strict validation; otherwise, <see langword="false"/>.</returns>
-    public static bool TryStrictCreate(string? value, out MailAddress? email)
+    public static bool TryStrictCreate(string? value, [NotNullWhen(true)] out MailAddress? email)
     {
         email = null;
 
@@ -118,6 +122,10 @@ public static partial class EmailUtility
         if (local.Length > MaxLocalPartLength)
             return false;
 
+        // Note: MaxDomainLength (255) is not independently enforced here. Given the total-length
+        // cap of MaxEmailLength (254) above and the mandatory 1-char local part + '@' separator,
+        // domain.Length is already bounded to <= MaxEmailLength - 2, which is always <= MaxDomainLength;
+        // a standalone domain-length check here can never bind and would be dead code.
         if (!domain.Contains(DomainDotChar, StringComparison.Ordinal))
             return false;
 

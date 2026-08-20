@@ -9,6 +9,8 @@ public static class NetworkRulesFixtures
         public static readonly string? Ipv4Loopback = "127.0.0.1";
         public static readonly string? Ipv6Loopback = "::1";
         public static readonly string? NotAnIp = "not-an-ip";
+        public static readonly string? InetAtonShorthand = "1";
+        public static readonly string? Ipv4PartialDottedQuad = "192.168.1";
         public static readonly string? Null = null;
 
         public static RuleScenario<string?>[] ValidScenarios =>
@@ -20,6 +22,8 @@ public static class NetworkRulesFixtures
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
             new(nameof(NotAnIp), NotAnIp, false),
+            new(nameof(InetAtonShorthand), InetAtonShorthand, false),
+            new(nameof(Ipv4PartialDottedQuad), Ipv4PartialDottedQuad, false),
             new(nameof(Null),    Null,    false)
         ];
 
@@ -76,6 +80,7 @@ public static class NetworkRulesFixtures
         public static readonly (string? ip, string cidr) InvalidIp = ("x", "192.168.1.0/24");
         public static readonly (string? ip, string cidr) InvalidCidr = ("192.168.1.10", "x/24");
         public static readonly (string? ip, string cidr) EmptyCidr = ("192.168.1.10", "");
+        public static readonly (string? ip, string cidr) CidrPrefixWithSign = ("10.0.0.5", "10.0.0.0/+8");
 
         public static RuleScenario<(string? ip, string cidr)>[] ValidScenarios =>
         [
@@ -87,7 +92,8 @@ public static class NetworkRulesFixtures
             new(nameof(OutOfRange),  OutOfRange,  false),
             new(nameof(NullIp),      NullIp,      false),
             new(nameof(InvalidIp),   InvalidIp,   false),
-            new(nameof(InvalidCidr), InvalidCidr, false)
+            new(nameof(InvalidCidr), InvalidCidr, false),
+            new(nameof(CidrPrefixWithSign), CidrPrefixWithSign, false)
         ];
 
         public static RuleScenario<(string? ip, string cidr)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
@@ -99,11 +105,13 @@ public static class NetworkRulesFixtures
         public static readonly string? SingleLabel = "localhost";
         public static readonly string? Trimmed = "  example.com  ";
         public static readonly string? TrailingDot = "example.com.";
+        public static readonly string? MultipleTrailingDots = "example.com..";
         public static readonly string? WithHyphen = "a-b.example";
         public static readonly string? Null = null;
         public static readonly string? Empty = "";
         public static readonly string? DotOnly = ".";
         public static readonly string? InvalidSpace = "exa mple.com";
+        public static readonly string? LabelWithInteriorSpace = "a. b.com";
         public static readonly string? LeadingHyphen = "-a.com";
         public static readonly string? TrailingHyphen = "a-.com";
         public static readonly string? InvalidChar = "a_.com";
@@ -125,7 +133,9 @@ public static class NetworkRulesFixtures
             new(nameof(Null),                      Null,                      false),
             new(nameof(Empty),                     Empty,                     false),
             new(nameof(DotOnly),                   DotOnly,                   false),
+            new(nameof(MultipleTrailingDots),      MultipleTrailingDots,      false),
             new(nameof(InvalidSpace),              InvalidSpace,              false),
+            new(nameof(LabelWithInteriorSpace),    LabelWithInteriorSpace,    false),
             new(nameof(LeadingHyphen),             LeadingHyphen,             false),
             new(nameof(TrailingHyphen),             TrailingHyphen,             false),
             new(nameof(InvalidChar),               InvalidChar,               false),

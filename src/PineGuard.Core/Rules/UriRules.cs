@@ -70,10 +70,10 @@ public static class UriRules
         UriUtility.TryParseFileUri(value, out _);
 
     /// <summary>
-    /// Determines whether the specified value is a valid file system path.
+    /// Determines whether the specified value is a fully qualified (absolute) file system path.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is a valid file path; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a fully qualified file system path; otherwise, <see langword="false"/>. Relative paths return <see langword="false"/>.</returns>
     public static bool IsFilePath(string? value) =>
         UriUtility.TryParseFilePath(value, out _);
 
