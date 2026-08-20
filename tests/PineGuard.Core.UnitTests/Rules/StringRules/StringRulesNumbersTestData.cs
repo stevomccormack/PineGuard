@@ -73,12 +73,28 @@ public static class StringRulesNumbersTestData
 
     public static class IsEven
     {
-        public static TheoryData<RuleCase<string?>> Cases => F.NumbersIsEven.AllScenarios.ToRuleCases();
+        // Beyond Int32/Int64 range (Core-only regression case: parity is decided from the last digit, not a bounded parse).
+        private static readonly RuleScenario<string?> LargeEven = new("LargeEven", "123456789012345678901234567890", true);
+        private static readonly RuleScenario<string?> LargeOdd = new("LargeOdd", "123456789012345678901234567891", false);
+        // Beyond Int128 range (Core-only regression case: TryGetLastIntegerDigit has no upper bound on length).
+        private static readonly RuleScenario<string?> BeyondInt128Even = new("BeyondInt128Even", "170141183460469231731687303715884105728", true);
+        // NBSP is not a BCL-recognized numeric whitespace character, so it must be rejected outright rather than trimmed.
+        private static readonly RuleScenario<string?> NbspRejected = new("NbspRejected", " 4", false);
+
+        public static TheoryData<RuleCase<string?>> Cases => F.NumbersIsEven.AllScenarios.Concat([LargeEven, LargeOdd, BeyondInt128Even, NbspRejected]).ToArray().ToRuleCases();
     }
 
     public static class IsOdd
     {
-        public static TheoryData<RuleCase<string?>> Cases => F.NumbersIsOdd.AllScenarios.ToRuleCases();
+        // Beyond Int32/Int64 range (Core-only regression case: parity is decided from the last digit, not a bounded parse).
+        private static readonly RuleScenario<string?> LargeOdd = new("LargeOdd", "123456789012345678901234567891", true);
+        private static readonly RuleScenario<string?> LargeEven = new("LargeEven", "123456789012345678901234567890", false);
+        // Beyond Int128 range (Core-only regression case: TryGetLastIntegerDigit has no upper bound on length).
+        private static readonly RuleScenario<string?> BeyondInt128Even = new("BeyondInt128Even", "170141183460469231731687303715884105728", false);
+        // NBSP is not a BCL-recognized numeric whitespace character, so it must be rejected outright rather than trimmed.
+        private static readonly RuleScenario<string?> NbspRejected = new("NbspRejected", " 5", false);
+
+        public static TheoryData<RuleCase<string?>> Cases => F.NumbersIsOdd.AllScenarios.Concat([LargeOdd, LargeEven, BeyondInt128Even, NbspRejected]).ToArray().ToRuleCases();
     }
 
     public static class IsFinite

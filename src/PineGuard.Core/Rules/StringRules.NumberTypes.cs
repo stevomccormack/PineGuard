@@ -3,8 +3,6 @@ using System.Text.RegularExpressions;
 using PineGuard.Common;
 using PineGuard.Utils;
 
-#pragma warning disable CS8795 // Partial method must have an implementation part (source generator provides it)
-
 namespace PineGuard.Rules;
 
 public static partial class StringRules
@@ -40,6 +38,14 @@ public static partial class StringRules
         /// <summary>
         /// Determines whether the specified string parses to a decimal with at most <paramref name="decimalPlaces"/> fractional digits.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Unlike <see cref="IsInt32(string?, NumberStyles)"/> and <see cref="IsInt64(string?, NumberStyles)"/>, this is not a pure
+        /// "does it parse" predicate: <paramref name="decimalPlaces"/> defaults to <c>2</c>, so <c>IsDecimal("3.14159")</c> returns
+        /// <see langword="false"/> because it has more than 2 fractional digits, even though it is a perfectly valid decimal.
+        /// Pass <c>decimalPlaces: int.MaxValue</c> (or a sufficiently large value) to accept any number of fractional digits.
+        /// </para>
+        /// </remarks>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid decimal, returns <see langword="false"/>.</param>
         /// <param name="decimalPlaces">The maximum number of fractional digits allowed. Defaults to 2.</param>
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>

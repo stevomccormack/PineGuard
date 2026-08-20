@@ -12,12 +12,12 @@ public static class GuidRulesFixtures
 
         public static RuleScenario<Guid?>[] ValidScenarios =>
         [
-            new(nameof(Null),  Null,  true),
             new(nameof(Empty), Empty, true)
         ];
 
         public static RuleScenario<Guid?>[] InvalidScenarios =>
         [
+            new(nameof(Null),  Null,  false),
             new(nameof(NonEmpty), NonEmpty, false)
         ];
 
