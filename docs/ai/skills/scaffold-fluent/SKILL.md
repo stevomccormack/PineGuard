@@ -21,7 +21,7 @@ Adapt a **MustClause** into a **FluentValidation** extension method (`IRuleBuild
 ## 4. Execution Steps
 
 1.  **Identify Target File**
-    *   Folder: `src/PineGuard.FluentValidation/Extensions/`.
+    *   Folder: `src/PineGuard.FluentValidation/` (project root — there is no `Extensions/` subfolder).
     *   Class: `Fluent[Domain]Extensions` (e.g., `FluentStringExtensions`).
 
 2.  **Implement Extension Method**

@@ -23,7 +23,7 @@ Implement a new **MustClause** fluent validation method. A MustClause validates 
 
 1.  **Identify/Create Core Logic**
     *   Check `src/PineGuard.Core/Rules` or `Utils` for the validation logic.
-    *   *If missing*: Stop and implement the Rule/Util in Core first (see `implement-core-rule` skill).
+    *   *If missing*: Stop and implement the Rule/Util in Core first (see the `scaffold-rule` skill).
 
 2.  **Locate Target (Facade Pattern)**
     *   **Simple Domain**: `src/PineGuard.MustClauses/Must[Domain]Clauses.cs`.

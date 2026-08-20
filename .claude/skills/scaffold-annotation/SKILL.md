@@ -1,5 +1,5 @@
 ---
-name: implement-data-annotations
+name: scaffold-annotation
 description: Implement a DataAnnotations ValidationAttribute adapting a MustClause. Use when adding [Attribute] validators — whenever the user says "add a DataAnnotations attribute", "add [XxxAttribute]", "add attribute-based validation", or needs a ValidationAttribute for an existing Must clause. Do NOT use for Must clauses, Guard clauses, Core rules, or Fluent extensions.
 argument-hint: "[AttributeName]"
 context: fork

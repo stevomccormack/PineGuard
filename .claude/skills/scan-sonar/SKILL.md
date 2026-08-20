@@ -1,6 +1,6 @@
 ---
-name: scan-run
-description: Run SonarQube static analysis and report findings. Use whenever the user says "run Sonar", "run the scan", "check code quality", "check for code smells", "sonar analysis", or wants a SonarQube quality report. Do NOT use to fix issues; use scan-fix instead.
+name: scan-sonar
+description: Run SonarQube static analysis and report findings. Use whenever the user says "run Sonar", "run the scan", "check code quality", "check for code smells", "sonar analysis", or wants a SonarQube quality report. Do NOT use to fix issues; use fix-sonar instead.
 argument-hint: "[Scope]"
 context: fork
 allowed-tools: Read, Glob, Grep, Bash

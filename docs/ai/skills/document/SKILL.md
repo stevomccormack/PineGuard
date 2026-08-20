@@ -3,7 +3,7 @@
 **Version**: 1.0
 
 ## 1. Context & Goal
-Generate gold-standard XML documentation comments (`///`) for all public members in a PineGuard project. Each layer has distinct consumers and requires tailored doc patterns. The output must satisfy IntelliSense consumers, NuGet package browsing, and DocFX site generation.
+Generate gold-standard XML documentation comments (`///`) for all public members in a PineGuard project. Each layer has distinct consumers and requires tailored doc patterns. The output must satisfy IntelliSense consumers and NuGet package browsing, and stay within the tag set a DocFX-compatible generator can render.
 
 ## 2. Inputs
 - **Project**: Which project(s) to document (e.g., `PineGuard.Core`, `PineGuard.MustClauses`, or `all`)
@@ -358,7 +358,7 @@ Build `<see href>` and `<seealso href>` URLs using these patterns:
 | 2 | Cross-referenced | Every method links to its dependency chain (Rule ↔ Must ↔ Guard) |
 | 3 | Consumer-appropriate | Doc tone matches the layer's consumer (internal vs developer) |
 | 4 | Build clean | `dotnet build` with `GenerateDocumentationFile=true` exits 0, zero CS1591 |
-| 5 | DocFX ready | All tags render correctly in DocFX static site generation |
+| 5 | DocFX-compatible tags | Only tags a DocFX-compatible generator can render; no generator-specific extensions |
 
 ## 11. Reference Material
 - [Microsoft: Recommended XML documentation tags](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags)

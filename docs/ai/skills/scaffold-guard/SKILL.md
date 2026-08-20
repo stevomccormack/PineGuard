@@ -35,30 +35,36 @@ Implement a new **GuardClause** method (`Guard.Against.Xxx`). A GuardClause ensu
 
     public static class GuardDomainClauses
     {
-        public static void MyForbiddenCondition(
+        public static string MyForbiddenCondition(
             this IGuardClause _,
             string? value,
-            [CallerArgumentExpression(nameof(value))] string? paramName = null,
             string? message = null,
-            Func<Exception>? exceptionCreator = null)
+            Func<Exception>? exceptionCreator = null,
+            [CallerArgumentExpression(nameof(value))] string? paramName = null)
         {
             // Guard.Against.Negative => Must.Be.ZeroOrPositive (complement)
             var result = Must.Be.MyGoodCondition(value, paramName);
-
             if (result.Failed)
                 GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+
+            return result.Result!;
         }
     }
     ```
 
+    Parameter order is fixed: `value`, `message`, `exceptionCreator`, `paramName`. `paramName` is last
+    because `[CallerArgumentExpression]` must not be displaced by an explicit argument.
+
 4.  **Handling Typed Returns**
-    *   If the Guard acts as a parser (e.g. `Guard.Against.InvalidGuid`), return `TParsed`.
-    *   Return `result.Result!` on success.
+    *   Guards return the validated value for pass-through chaining — `result.Result!` on success.
+    *   If the Guard acts as a parser (e.g. `Guard.Against.InvalidGuid`), the return type is the parsed
+        type `TParsed` rather than the input type.
 
 ## 5. Definition of Done
 - [ ] Method calls `Must.Be.*`.
 - [ ] Method accepts `message` and `exceptionCreator`.
 - [ ] Method throws on failure.
+- [ ] Method returns the validated value (pass-through), never `void`.
 
 ## 6. Success Criteria
 
@@ -69,6 +75,7 @@ Implement a new **GuardClause** method (`Guard.Against.Xxx`). A GuardClause ensu
 | 3 | Delegates to Must | Every guard calls `Must.Be.*`; no inline validation logic |
 | 4 | Reuses Must message | Uses `result.Message` (no invented messages) |
 | 5 | Supports custom exception | Signature includes `Func<Exception>? exceptionCreator = null` |
+| 6 | Pass-through return | Returns the validated value (`result.Result!`); never `void` |
 
 ## 7. Reference Material
 - `docs/ai/specs/guard-clauses/project.md`

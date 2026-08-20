@@ -1,5 +1,5 @@
-﻿---
-name: implement-core-rule
+---
+name: scaffold-rule
 description: Implement a new Core Rule or Util in PineGuard.Core. Use when adding low-level validation primitives or parsing helpers — whenever the user says "add a Core rule", "add a utility method", "implement IsXxx", "implement TryXxx", or needs a new internal validation predicate or parsing helper. Do NOT use for Must/Guard/Fluent/DataAnnotations layer code.
 argument-hint: "[RuleName]"
 context: fork

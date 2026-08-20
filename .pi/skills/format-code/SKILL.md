@@ -11,12 +11,9 @@ Read these files:
 2. `docs/ai/skills/format-code/SKILL.md` (canonical recipe)
 
 ## Step 1: Follow the Recipe
-Execute `docs/ai/skills/format-code/SKILL.md` exactly as written.
+Execute `docs/ai/skills/format-code/SKILL.md` exactly as written — it owns the
+`Run-Format.ps1` scopes and the `dotnet format` fallback.
 
-## Step 2: Format
-- Scope-specific: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope [ScopeName]`
-- Or direct: `dotnet format [path-to-project-or-solution]`
-
-## Step 3: Verify
+## Step 2: Verify
 - `dotnet format --verify-no-changes [path]` exits with code 0
 - No formatting drift remains
