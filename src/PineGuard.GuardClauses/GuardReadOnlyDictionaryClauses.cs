@@ -35,7 +35,7 @@ public static class GuardReadOnlyDictionaryClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            throw new ArgumentNullException(paramName);
+            GuardFailure.Throw(message ?? Must.Be.NotNull(value, paramName).Message, paramName, value, exceptionCreator);
 
         var result = Must.Be.Empty(value, paramName); // Guard.Against.NotEmpty => Must.Be.Empty (complement)
         if (result.Failed)
