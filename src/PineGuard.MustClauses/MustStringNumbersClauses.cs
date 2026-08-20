@@ -537,6 +537,9 @@ public static class MustStringNumbersClauses
     /// </returns>
     /// <remarks>
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
+    /// Because the result carries the parsed value as an <see cref="int"/>, validation is bounded to
+    /// <see cref="int"/> range: integers outside that range fail here even though the unbounded
+    /// <see cref="StringRules.Numbers.IsEven"/> rule accepts them.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
     public static MustResult<int> Even(this IMustClause _,
@@ -571,6 +574,9 @@ public static class MustStringNumbersClauses
     /// </returns>
     /// <remarks>
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
+    /// Because the result carries the parsed value as an <see cref="int"/>, validation is bounded to
+    /// <see cref="int"/> range: integers outside that range fail here even though the unbounded
+    /// <see cref="StringRules.Numbers.IsOdd"/> rule accepts them.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
     public static MustResult<int> Odd(this IMustClause _,

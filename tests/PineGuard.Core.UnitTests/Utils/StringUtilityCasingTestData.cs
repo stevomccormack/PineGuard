@@ -70,7 +70,8 @@ public static class StringUtilityCasingTestData
             new("dot", (["Hello", "World"], StringCasing.DotCase), true, "hello.world"),
             new("train", (["hello", "world"], StringCasing.TrainCase), true, "Hello-World"),
             new("space", (["hello", "world"], StringCasing.SpaceCase), true, "Hello World"),
-            new("camel single-char", (["x"], StringCasing.CamelCase), true, "x")
+            new("camel single-char", (["x"], StringCasing.CamelCase), true, "x"),
+            new("camel single-char first word with more words", (["x", "ray", "machine"], StringCasing.CamelCase), true, "xRayMachine")
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>
@@ -78,6 +79,7 @@ public static class StringUtilityCasingTestData
             new("null words", (null, StringCasing.CamelCase), false, string.Empty),
             new("empty words", ([], StringCasing.CamelCase), false, string.Empty),
             new("whitespace word", (["hello", "  "], StringCasing.CamelCase), false, string.Empty),
+            new("word contains separator", (["foo bar", "baz"], StringCasing.SnakeCase), false, string.Empty),
             new("unknown style", (["hello"], (StringCasing)999), false, string.Empty)
         ];
 
