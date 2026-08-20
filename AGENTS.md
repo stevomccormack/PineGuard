@@ -21,6 +21,10 @@ All technical truths, conventions, and generation rules are stored in the `specs
 Rules provide scope-specific summaries that inherit from a global baseline:
 👉 **[docs/ai/rules/](docs/ai/rules/)**
 
+Nested `AGENTS.md` files apply **in addition to** this one: `src/PineGuard.*/AGENTS.md` (per layer),
+`tests/AGENTS.md`, `tools/AGENTS.md` and its subdirectories. Read the nearest one for the files you
+are editing.
+
 ## 4. Use Skills (Implementation Recipes)
 
 Reusable, step-by-step implementation procedures:
@@ -30,6 +34,14 @@ Reusable, step-by-step implementation procedures:
 
 Canonical agent playbooks for all workflows:
 👉 **[docs/ai/agents/](docs/ai/agents/)**
+
+To route an intent to a playbook, look it up in **[docs/ai/commands/](docs/ai/commands/)** where the
+command family has a contract file; otherwise take the command name from the palette in
+**[CLAUDE.md](CLAUDE.md)** §2, which lists every command with its role and its playbook. Multi-step
+orchestrations live in **[docs/ai/workflows/](docs/ai/workflows/)**.
+
+Each playbook declares its own role on a `roles:` line — that declaration is authoritative, and no
+adapter may override it.
 
 ## 6. Safety
 
@@ -47,6 +59,13 @@ Before executing commands, read the safety spec:
 - **Workflows**: `docs/ai/workflows/` (multi-step orchestration)
 - **Commands**: `docs/ai/commands/` (intent-to-agent mappings)
 - **Roles**: `docs/ai/roles/` (personas and responsibilities)
-- **Architecture**: `docs/ai/specs/` (structural design)
-- **Meta**: `docs/ai/meta/` (taxonomy, tooling alignment)
+- **Business Units**: `docs/ai/business-units/` (departments and the role roster)
+- **Memory**: `docs/ai/memory/` (per-subagent learned patterns)
+- **Meta**: `docs/ai/meta/` (taxonomy, tooling alignment, adapter-surface inventory)
 - **Plans**: `docs/ai/plans/` (implementation roadmaps)
+
+## 8. Adapter Surfaces
+
+This file is one of several adapter surfaces. The inventory of all of them — root boot files, full
+adapters, rules-only adapters, and the command-parity policy — lives in
+👉 **[docs/ai/meta/adapter-surfaces.md](docs/ai/meta/adapter-surfaces.md)**

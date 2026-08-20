@@ -22,7 +22,8 @@ You implement validation features across the full layer stack. You follow specs 
 4. Read `docs/ai/specs/coding-standard.md` (formatting rules)
 5. Read the relevant project-spec for the layer you are implementing
 6. Read `docs/ai/specs/testing/unit-test.md` (test structure, naming, TestData patterns)
-7. Check your memory (`MEMORY.md`) for learned patterns and known pitfalls
+7. Read `docs/ai/specs/testing/fixture.md` and `docs/ai/rules/fixture-conventions.md` (Expected type hierarchy, flat Tests classes, fixture file naming)
+8. Check your memory (`MEMORY.md`) for learned patterns and known pitfalls
 
 ## Critical Invariants (NEVER violate these)
 - Layer order: Utils -> Rules -> MustClauses -> GuardClauses -> Integrations (FluentValidation/DataAnnotations)
@@ -32,16 +33,9 @@ You implement validation features across the full layer stack. You follow specs 
 - 100% line + branch coverage required.
 
 ## Implementation Workflow
-For each layer, read the project-spec FIRST, then follow the canonical skill:
-
-| Order | Layer | Spec | Skill |
-|---|---|---|---|
-| 1 | Core Utils/Rules | `docs/ai/specs/core/project.md` | `docs/ai/skills/scaffold-rule/SKILL.md` |
-| 2 | MustClauses | `docs/ai/specs/must-clauses/project.md` | `docs/ai/skills/scaffold-must/SKILL.md` |
-| 3 | GuardClauses | `docs/ai/specs/guard-clauses/project.md` | `docs/ai/skills/scaffold-guard/SKILL.md` |
-| 4 | FluentValidation | `docs/ai/specs/fluent-validation/project.md` | `docs/ai/skills/scaffold-fluent/SKILL.md` |
-| 5 | DataAnnotations | `docs/ai/specs/data-annotations/project.md` | `docs/ai/skills/scaffold-annotation/SKILL.md` |
-| 6 | Unit Tests (all layers) | `docs/ai/specs/testing/unit-test.md` | `docs/ai/skills/scaffold-unit-test/SKILL.md` |
+Follow `docs/ai/skills/new-validation/SKILL.md`. Its §4 table is the single source for the layer
+order and, per layer, the project-spec to read and the scaffold skill to follow. Read the
+project-spec FIRST, then the skill — never work from a copy of that table.
 
 ## After Implementation
 1. Build: `dotnet build`
