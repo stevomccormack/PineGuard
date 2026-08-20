@@ -1,4 +1,4 @@
-# Reference Files: implement-core-rule
+# Reference Files: scaffold-rule
 
 > Read the exemplar files listed below before implementing. Do NOT copy them — follow the same patterns.
 

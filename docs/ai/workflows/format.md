@@ -10,13 +10,15 @@
 
 ## Parameters
 
-- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, All)
+- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All)
 
 ## Auto-Approval
 
-- **Gemini**: `// turbo-all`
-- **Claude**: `Project Rules` allow formatting.
+- **Antigravity**: `// turbo-all` in `.agent/workflows/`.
+- **Claude Code**: `Project Rules` allow formatting.
 - **Cursor**: `cmd: dotnet format` allowed.
+
+See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface inventory.
 
 ## Steps
 
@@ -37,6 +39,7 @@
    - GuardClauses: `src/PineGuard.GuardClauses/PineGuard.GuardClauses.csproj`
    - FluentValidation: `src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj`
    - DataAnnotations: `src/PineGuard.DataAnnotations/PineGuard.DataAnnotations.csproj`
+   - Testing: `tests/PineGuard.Testing/PineGuard.Testing.csproj`
    - All: `PineGuard.slnx` (entire solution including tests)
 
    **Verify mode** (CI/dry-run):

@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: meta
 id: ai-tooling-alignment
-version: 1.0
+version: 1.1
 -->
 
 # AI Tooling Alignment (GitHub + Microsoft)
@@ -16,7 +16,8 @@ version: 1.0
 - **Reusable procedures**: `docs/ai/skills/**` and `docs/ai/workflows/**`
 - **Canonical entrypoints**: `docs/ai/agents/**`
 - **Interface contracts**: `docs/ai/commands/**`
-- **Adapters** (thin pointers): `.github/copilot-instructions.md`, `CLAUDE.md`, `.agent/workflows/*.md`
+- **Adapters** (thin pointers): every surface is inventoried in `docs/ai/meta/adapter-surfaces.md` —
+  ten adapter surfaces plus three root boot files. Never maintain a second list here.
 
 ## GitHub-First Operating Model
 
@@ -39,20 +40,31 @@ VS Code tasks are the primary local automation surface.
   - Tasks should call repo scripts (e.g., `tools/testing/Run-Tests.ps1`) rather than embedding complex logic.
   - Prefer tasks that map 1:1 with `docs/ai/commands/*.md` “Command contracts”.
 
-Recommended DRY mapping:
+Recommended DRY mapping (label families as they exist in `.vscode/tasks.json`):
 
-- `docs/ai/commands/test.md` ↔ tasks labelled `Test:*`
-- `docs/ai/commands/coverage.md` ↔ tasks labelled `Coverage:*`
-- `docs/ai/commands/fix.md` ↔ tasks labelled `Debug:*` (often interactive; not auto-approved)
+| Label family | Command contract | Notes |
+|---|---|---|
+| `Test:*` | `docs/ai/commands/test.md` | Per-layer and sequential runs |
+| `Coverage:*` | `docs/ai/commands/coverage.md` | Also the local surface for `/fix-coverage-*` |
+| `Quality:*` | `docs/ai/commands/scan.md` | Qodana inspection per layer |
+| `Scanner:*` | `docs/ai/commands/scan.md` | SonarQube init, analysis, issue queries |
+| `Audit:*` | `docs/ai/commands/audit.md` | Rule-scoped audit-cli runs |
+| `Format:*` | `docs/ai/commands/format.md` | Per-layer `dotnet format` |
+| `Git:*` | `docs/ai/commands/commit.md` | Auto-message commits per scope |
+| `Clean:*` | `docs/ai/commands/clean.md` | Artifact and log removal |
+| `Verify:*` | `docs/ai/commands/test.md` | Whole-solution `dotnet test` (slow) |
 
-## Copilot / Claude / Gemini / Pi Agents
+`Inspect:*` tasks are thin `dependsOn` aliases of the matching `Quality:*` task, not duplicates —
+add new inspection work to `Quality:*` and let the alias follow.
 
-Adapters must remain thin and point to canonical agents.
+`docs/ai/commands/fix.md` has **no** dedicated task family. The `/fix-coverage-*` and `/fix-test-*`
+agents run through `Coverage:*` and `Test:*`; there is no `Debug:*` label and none should be added.
 
-- GitHub Copilot adapter: `.github/copilot-instructions.md`
-- Claude adapter: `CLAUDE.md`
-- Gemini adapter stubs: `.agent/workflows/*.md`
-- Pi adapter: `.pi/AGENTS.md` + `.pi/skills/*/SKILL.md`
+## Adapter Surfaces
+
+Adapters must remain thin and point to canonical agents. The authoritative inventory — which surface
+belongs to which tool, which ones are full adapters expected to hold command parity, which are
+rules-only, and which parity exceptions are deliberate — is `docs/ai/meta/adapter-surfaces.md`.
 
 ### Worked example: `ask-council`
 
@@ -68,8 +80,12 @@ Shows the full adapter fan-out from one Brain capability:
 | Brain workflow | `docs/ai/workflows/plan-with-council.md` |
 | Claude | `.claude/skills/ask-council/SKILL.md`, `.claude/commands/ask-council.md`, `.claude/commands/plan-with-council.md` |
 | Copilot | `.github/skills/ask-council/SKILL.md`, `.github/prompts/ask-council.prompt.md` |
-| Gemini | `.agent/workflows/ask-council.md` |
+| Antigravity | `.agent/workflows/ask-council.md` |
 | Pi | `.pi/skills/ask-council/SKILL.md` |
+
+Only the four **full adapters** appear here. The rules-only surfaces (Cline, Cursor, Windsurf,
+Junie, Amazon Q) carry no per-capability files, so a capability never fans out to them — see
+`docs/ai/meta/adapter-surfaces.md` §3.
 
 Best practice for portability (Claude Code / other tools):
 
@@ -91,7 +107,12 @@ But keep the canonical “what to do” in Brain docs; tools are just execution 
 Use automated gates that fit enterprise expectations:
 
 - Tests: `dotnet test` (targeted projects first)
-- Coverage: cross-platform collection with Cobertura output where applicable
+- Test shape: `tools/audit-cli/Run-All.ps1 -RuleId Rule50` gates every PR — `[Theory]` + `TheoryData`
+  only, and every `*Tests.cs` file must have a paired `*TestData.cs` file. See
+  `docs/ai/specs/tools/audit-cli/spec.md` and `docs/ai/specs/testing/unit-test.md` §1.
+- Coverage: Cobertura output from either supported engine — the cross-platform collector (`xplat`)
+  or JetBrains dotCover 2025.3.3. Both work on `net8.0` and `net10.0`; CI enforces the
+  `MIN_CODE_COVERAGE` threshold (default 100%).
 - Inspection: JetBrains Qodana (static analysis) integrated into CI
 - Auditing: repo audit CLI/tasks as defined in `tools/` and referenced by workflow docs
 
@@ -104,15 +125,16 @@ Use this order so the system stays DRY and portable:
 3. **Workflow** (orchestration): add under `docs/ai/workflows/**`
 4. **Agent** (canonical entrypoint): add under `docs/ai/agents/**`
 5. **Command contract** (interface mapping): add under `docs/ai/commands/**`
-6. **Adapters**: wire the command/agent into Copilot/Claude/Gemini stubs
+6. **Adapters**: cascade to every surface on the checklist in `docs/ai/meta/adapter-surfaces.md` §5
 7. **VS Code task**: optionally add a matching `.vscode/tasks.json` task
 
 ## References
 
 - Taxonomy: `docs/ai/meta/taxonomy.md`
+- Adapter inventory: `docs/ai/meta/adapter-surfaces.md`
 - Universal Protocol: `docs/ai/specs/protocol.md`
 - Root Spec precedence: `docs/ai/specs/spec.md`
 
 <!-- footer
-last_verified: 2026-02-05
+last_verified: 2026-08-20
 -->

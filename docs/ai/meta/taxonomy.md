@@ -1,14 +1,15 @@
 <!-- metadata_header
 type: meta
 id: ai-taxonomy
-version: 1.0
+version: 1.1
 -->
 
 # AI Brain Taxonomy (PineGuard)
 
 > [!IMPORTANT]
 > This document defines the **portable, DRY mental model** for `docs/ai/**`.
-> It is written to be reusable across tooling (GitHub Copilot, Claude Code, Gemini, Cursor, etc.).
+> It is written to be reusable across every adapter surface listed in
+> `docs/ai/meta/adapter-surfaces.md`.
 
 ## Goal
 
@@ -42,10 +43,20 @@ Make PineGuard’s AI documentation:
 - **Used by**: Skills, Workflows, Agents, and adapters.
 - **Rule**: Specs are the **source of truth** for code structure, layering, naming, determinism, testing and coverage.
 
+### Rules
+
+- **What**: A scope-scoped summary of the invariants that apply to a directory or layer.
+- **Where**: `docs/ai/rules/*.md`, all inheriting from `docs/ai/rules/global.md`.
+- **Used by**: Path-scoped adapters (`.claude/rules/`, `.github/instructions/`, `.clinerules/`,
+  `.cursor/rules/`, `.windsurf/rules/`, `.amazonq/rules/`).
+- **Rule**: Rules summarise and point at Specs. They never restate a Spec in full,
+  and they never carry intent-routing tables (that is what Commands are for).
+
 ### Skills
 
 - **What**: A reusable “how-to” for a **specific task**.
-- **Where**: `docs/ai/skills/*.md`
+- **Where**: `docs/ai/skills/{verb}[-{target}]/SKILL.md` — one directory per skill,
+  with an optional `references/` subdirectory. `docs/ai/skills/INDEX.md` lists them all.
 - **Used by**: Agents and sometimes Workflows.
 - **Rule**: Skills should be mostly self-contained with:
   - a clear goal,
@@ -74,21 +85,50 @@ Make PineGuard’s AI documentation:
 
 - **What**: Canonical, model-agnostic playbooks for doing a job end-to-end.
 - **Where**: `docs/ai/agents/*.md`
-- **Used by**: Adapters (Copilot/Claude/Gemini/etc.).
+- **Used by**: Adapters — the full inventory lives in `docs/ai/meta/adapter-surfaces.md`.
 - **Rule**: Agents should be **thin composition**:
   - declare **business unit** and **roles**,
   - point to the relevant **command contract** (if applicable),
   - reuse **skills/workflows** rather than duplicating steps.
+
+### Memory
+
+- **What**: Durable learned patterns a subagent accumulates across sessions.
+- **Where**: `docs/ai/memory/*.md`, one file per subagent (`test-writer.md`, `code-reviewer.md`, …).
+- **Used by**: Adapters that support persistent agent memory, seeded into `.claude/agent-memory/`.
+- **Rule**: Memory records **observations**, not normative rules. When a pattern hardens into a
+  rule, promote it to a Spec and leave a pointer behind.
+
+### Plans
+
+- **What**: A phased implementation roadmap for a piece of work larger than one session.
+- **Where**: `docs/ai/plans/*.md` while live; `docs/ai/plans/completed/*.md` once shipped.
+- **Used by**: Humans and agents scoping multi-step work.
+- **Rule**: Every plan carries a `metadata_header` with `type: plan`, a stable `id:`, and a
+  `status:` of `active`, `planned`, `living`, `non-binding` or `completed`. A plan filed under
+  `plans/completed/` is always `completed`.
+- **Rule**: Everything under `plans/completed/` is a **historical record** — read it for
+  provenance, never as a task list. When an archived plan has become misleading, add an archival
+  banner saying what actually shipped; do not rewrite it and do not repair its links.
+
+### Meta
+
+- **What**: The Brain’s own conventions — naming, document shapes, tool alignment, adapter inventory.
+- **Where**: `docs/ai/meta/*.md`
+- **Used by**: Anyone adding to or reorganising `docs/ai/**`.
+- **Rule**: Meta describes the Brain; it never contains engineering rules (those are Specs).
 
 ## Composition Rules (DRY)
 
 Use this direction of dependencies:
 
 - **Specs** are referenced by everything.
+- **Rules** summarise specs for a scope, and are what path-scoped adapters bind to.
 - **Skills/Workflows** reference specs, and are reused by agents.
 - **Agents** compose skills/workflows and bind roles.
 - **Commands** map triggers/intents to agents.
-- **Adapters** reference commands/agents (thin pointers only).
+- **Memory** records what agents learned; it never overrides specs or rules.
+- **Adapters** reference commands/agents/rules (thin pointers only).
 
 Brain NEVER depends on adapters.
 
@@ -119,7 +159,7 @@ All files in `docs/ai/` follow a strict naming convention to ensure consistency,
 - **verb**: Imperative mood, always singular. What the operation does.
 - **target**: What it operates on. Always singular (see §N.5).
 
-**Identity files** (roles, rules, specs):
+**Identity files** (roles, rules, specs, plans, meta, memory, business units):
 
 ```
 {noun}.md
@@ -148,6 +188,12 @@ Only these verbs may appear as the leading segment of an action filename. Any ve
 | `verify` | Check a condition |
 | `migrate` | Migration operation |
 | `refactor` | Restructure without behaviour change |
+| `improve` | Raise a measured metric toward its target (coverage only) |
+| `ask` | Put a question to an advisory body (`ask-council`) |
+| `plan` | Produce a plan rather than a change (`plan-with-council`) |
+
+Two further verbs are reserved for **vendor-prefixed operations** only — see §N.9:
+`publish` (`github-release-publish`) and `unlist` (`nuget-unlist`).
 
 ### §N.3 Retired Verbs (Do Not Use)
 
@@ -157,7 +203,6 @@ Only these verbs may appear as the leading segment of an action filename. Any ve
 | `debug-and-fix-` | `fix-` | Compound; `fix` implies debugging |
 | `debug-and-test-` | `fix-` | Same; testing is part of fix |
 | `implement-` | `scaffold-` | Canonical verb for "create new from recipe" |
-| `improve-` | _(use domain verb)_ | Too generic; use `coverage`, `fix`, etc. |
 | `create-` | `scaffold-` | Unified under one verb |
 | `rebuild-` | `build-` | Simpler |
 | `xml-docs-` | `document-` | Verb-first; `xml` is implementation detail |
@@ -198,17 +243,26 @@ When a filename targets a tool, use the tool's canonical short name:
 
 ### §N.6 Per-Directory Conventions
 
+Examples are repo-relative so they resolve from anywhere.
+
 | Directory | Pattern | Verb-first? | Example |
 |-----------|---------|-------------|---------|
-| `agents/` | `{verb}-{scope}.md` | Yes | `test-core.md` |
-| `workflows/` | `{verb}-{target}.md` | Yes | `coverage.md`, `scan-sonar.md` |
-| `skills/` | `{verb}/SKILL.md` (dir name) | Yes | `scaffold-rule/SKILL.md` |
-| `commands/` | `{verb}.md` | Yes | `test.md`, `fix.md` |
-| `roles/` | `{noun}.md` | No | `builder.md`, `reviewer.md` |
-| `rules/` | `{scope}.md` | No | `core.md`, `must.md`, `global.md` |
-| `specs/` | `{type}.md` or `{domain}/{type}.md` | No | `spec.md`, `core/project.md` |
-| `plans/` | `{topic}.md` | No | `naming-convention.md` |
-| `meta/` | `{topic}.md` | No | `taxonomy.md` |
+| `agents/` | `{verb}-{scope}.md` | Yes | `docs/ai/agents/test-core.md` |
+| `workflows/` | `{verb}-{target}.md` | Yes | `docs/ai/workflows/coverage.md`, `docs/ai/workflows/scan-sonar.md` |
+| `skills/` | `{verb}[-{target}]/SKILL.md` (dir name) | Yes | `docs/ai/skills/scaffold-rule/SKILL.md`, `docs/ai/skills/document/SKILL.md` |
+| `commands/` | `{verb}.md`, or `{noun}.md` for a domain contract | Mostly | `docs/ai/commands/test.md`, `docs/ai/commands/council.md` |
+| `roles/` | `{noun}.md` | No | `docs/ai/roles/builder.md`, `docs/ai/roles/reviewer.md` |
+| `rules/` | `{scope}.md` | No | `docs/ai/rules/core.md`, `docs/ai/rules/global.md` |
+| `specs/` | `{type}.md` or `{domain}/{type}.md` | No | `docs/ai/specs/spec.md`, `docs/ai/specs/core/project.md` |
+| `plans/` | `{topic}.md` | No | `docs/ai/plans/cross-platform-tools-migration.md` |
+| `meta/` | `{topic}.md` | No | `docs/ai/meta/taxonomy.md` |
+| `memory/` | `{agent-name}.md` | No | `docs/ai/memory/test-writer.md` |
+| `business-units/` | `{noun}.md` | No | `docs/ai/business-units/engineering.md` |
+
+Metadata convention for `meta/`: narrative meta documents (`taxonomy.md`, `tooling.md`,
+`adapter-surfaces.md`, `template-spec.md`) carry a `metadata_header` and a `last_verified` footer;
+the `template-*.md` spec templates carry YAML `spec:` front matter with `version` and
+`last_verified`. Use whichever form the document it governs uses.
 
 ### §N.7 Scan Tool Qualifier Convention
 
@@ -216,23 +270,44 @@ When `scan` or `fix` targets a specific tool, the tool name becomes the target:
 
 | Pattern | Example | Meaning |
 |---------|---------|---------|
-| `scan-{tool}` | `scan-roslyn.md` | Run Roslyn diagnostics |
-| `scan-{tool}` | `scan-sonar.md` | Run SonarQube scan |
-| `scan-{tool}` | `scan-qodana.md` | Run Qodana inspection |
-| `fix-{tool}` | `fix-roslyn.md` | Fix Roslyn warnings |
-| `fix-{tool}` | `fix-sonar.md` | Fix SonarQube issues |
+| `scan-{tool}` | `docs/ai/workflows/scan-roslyn.md` | Run Roslyn diagnostics |
+| `scan-{tool}` | `docs/ai/workflows/scan-sonar.md` | Run SonarQube scan |
+| `scan-{tool}` | `docs/ai/workflows/scan-qodana.md` | Run Qodana inspection |
+| `fix-{tool}` | `docs/ai/workflows/fix-roslyn.md` | Fix Roslyn warnings |
+| `fix-{tool}` | `docs/ai/workflows/fix-sonar.md` | Fix SonarQube issues |
 
-When severity is relevant, append as qualifier: `fix-sonar-blocker.md`, `fix-sonar-high.md`.
+When severity is relevant, append as qualifier: `docs/ai/agents/fix-sonar-blocker.md`,
+`docs/ai/agents/fix-sonar-high.md`.
 
 ### §N.8 Combining Verb + Scope + Tool
 
 When an action targets both a scope and a tool, use: `{verb}-{tool}-{scope}.md`
 
-Example: `scan-roslyn-core.md` (run Roslyn on Core).
+Example: `docs/ai/agents/scan-roslyn-core.md` (run Roslyn on Core).
 
-When only scope: `{verb}-{scope}.md` — `test-core.md`, `coverage-must.md`.
-When only tool: `{verb}-{tool}.md` — `scan-sonar.md`, `fix-roslyn.md`.
-When neither (all/default): `{verb}.md` — `format.md`, `coverage.md`.
+When only scope: `{verb}-{scope}.md` — `docs/ai/agents/test-core.md`, `docs/ai/agents/coverage-must.md`.
+When only tool: `{verb}-{tool}.md` — `docs/ai/agents/scan-sonar.md`, `docs/ai/workflows/fix-roslyn.md`.
+When neither (all/default): `{verb}.md` — `docs/ai/workflows/format.md`, `docs/ai/workflows/coverage.md`.
+
+### §N.9 Vendor-Prefixed Operations
+
+An operation that drives a **named external service** rather than this repository is prefixed with
+that vendor's short name, and the verb moves to the end:
+
+```
+{vendor}-{noun}-{verb}.md
+```
+
+| File | Vendor | Reads as |
+|------|--------|----------|
+| `docs/ai/agents/github-release-publish.md` | GitHub | Publish a GitHub release |
+| `docs/ai/agents/github-ruleset-enable.md` | GitHub | Enable a branch ruleset |
+| `docs/ai/agents/github-ruleset-disable.md` | GitHub | Disable a branch ruleset |
+| `docs/ai/agents/nuget-unlist.md` | nuget.org | Unlist a published package |
+
+The prefix is deliberate: it groups the operations that leave the repository, and every one of them
+is a Tier 0/1 operation under `docs/ai/specs/safety.md`. They are exposed on Claude Code only —
+see the parity exceptions in `docs/ai/meta/adapter-surfaces.md`.
 
 ## Best-Practice Guardrails
 
@@ -242,9 +317,12 @@ When neither (all/default): `{verb}.md` — `format.md`, `coverage.md`.
 
 ## References
 
+- Brain index: `docs/ai/README.md`
 - Universal Protocol: `docs/ai/specs/protocol.md`
 - Root Spec (cascading): `docs/ai/specs/spec.md`
+- Adapter inventory: `docs/ai/meta/adapter-surfaces.md`
+- Tooling alignment: `docs/ai/meta/tooling.md`
 
 <!-- footer
-last_verified: 2026-04-15
+last_verified: 2026-08-20
 -->

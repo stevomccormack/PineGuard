@@ -1,4 +1,4 @@
-# Reference Files: implement-data-annotations
+# Reference Files: scaffold-annotation
 
 > Read the exemplar files listed below before implementing. Do NOT copy them — follow the same patterns.
 

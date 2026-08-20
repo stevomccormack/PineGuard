@@ -1,17 +1,17 @@
 <!-- metadata_header
-type: agent
-id: agent-migrate-infrastructure
+type: plan
+id: plan-fixture-architecture-v2-infrastructure
 version: 1.0
 -->
 
 > [!WARNING]
-> **ARCHIVED** — Fixture migration completed Feb 2026 (commit bfec9ee). This agent is retained for reference only.
+> **ARCHIVED** — historical record of the Fixture Architecture v2 infrastructure phase, completed Feb 2026 (commit bfec9ee). The paths and steps below describe the plan as written, not the code as it shipped; read `docs/ai/specs/testing/fixture.md` for the current architecture.
 
-# Agent: Migrate Infrastructure (Fixture Architecture v2)
+# Plan: Migrate Infrastructure (Fixture Architecture v2)
 
 > [!IMPORTANT]
-> business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
-> roles: builder ([../roles/builder.md](../roles/builder.md))
+> business unit: engineering ([../../business-units/engineering.md](../../business-units/engineering.md))
+> roles: builder ([../../roles/builder.md](../../roles/builder.md))
 
 ## Context
 
@@ -19,7 +19,7 @@ version: 1.0
 - **Conventions**: `docs/ai/rules/fixture-conventions.md`
 - **Status**: Completed (Feb 2026)
 - **Model**: Opus
-- **Phase**: 2 (run after Phase 1 `/migrate-brain`)
+- **Phase**: 2 (ran after the Phase 1 Brain/spec rewrite; that phase was never given a command of its own)
 
 ## Pre-Work
 

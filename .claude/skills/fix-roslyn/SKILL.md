@@ -1,5 +1,5 @@
 ---
-name: roslyn-fix
+name: fix-roslyn
 description: Fix Roslyn compiler warnings. Use whenever the user says "fix warnings", "fix CS8600", "fix nullability issues", "clean up compiler warnings", "fix CS diagnostics", or wants compiler warnings resolved. Always fix the root cause — do NOT suppress. Trigger on any CS-prefixed warning fix request.
 argument-hint: "[Scope]"
 context: fork

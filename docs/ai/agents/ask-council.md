@@ -43,7 +43,7 @@ Convene a five-advisor council to pressure-test a decision, a plan recommendatio
    - Render the chairman's verdict in chat using the markdown schema.
 
 7. **Transcript (skill Step 6, conditional).**
-   - If plan-gated: write `docs/ai/plans/<plan>/council-transcript.md` and stamp the plan's `metadata_header` with `council_verdict_ref`.
+   - If plan-gated: write `docs/ai/plans/<plan-slug>.council-transcript.md` — a sibling of the plan file, since `docs/ai/plans/` holds flat `.md` files — and stamp the plan's `metadata_header` with `council_verdict_ref`.
    - If user requested: write `artifacts/council/council-transcript-<yyyyMMdd-HHmm>.md`.
    - Otherwise skip.
 

@@ -1,6 +1,15 @@
+<!-- metadata_header
+type: plan
+id: competitive-analysis
+version: 1.0
+status: living
+last_updated: 2026-08-20
+-->
+
 # PineGuard Competitive Analysis
 
-> **Status**: Living document | **Last updated**: 2026-03-05
+> **Status**: Living document — a standing reference, not a work item.
+> **Last updated**: 2026-08-20 (Fable intelligence pass)
 
 ## 1. The Competitive Landscape
 
@@ -41,7 +50,7 @@
 | jwt | **Gap** |
 | nanoid, cuid, cuid2, ulid | **Gap** |
 | emoji | **Gap** |
-| hostname | **Gap** (has URI but not bare hostname) |
+| hostname | Has (`NetworkRules.IsValidHostname`, `Must.Be.Hostname` / `Must.Not.Be.Hostname`) |
 | mac address | **Gap** |
 | hash (md5/sha256/etc.) | **Gap** |
 | regex, includes, startsWith, endsWith | Has (IsMatch) -- **Gap**: includes/startsWith/endsWith as first-class |
@@ -123,7 +132,7 @@
 
 #### ASP.NET Core Built-in DataAnnotations
 
-**Coverage**: ~12 attributes (Required, StringLength, Range, RegularExpression, Compare, EmailAddress, Phone, Url, CreditCard, DataType, Remote, ValidateNever).
+**Coverage**: ~12 attributes (Required, StringLength, Range, RegularExpression, Compare, EmailAddress, Phone, Url, CreditCard, DataType, Remote, ValidateNever). `CreditCard` has no PineGuard counterpart — payment-instrument validation left the repo with the v2 standards prune.
 **.NET 10 change**: Validation APIs moved to `Microsoft.Extensions.Validation` package.
 **Collision risks**: PineGuard attributes use PineGuard-specific names (e.g., `[PgEmail]` vs `[EmailAddress]`), avoiding namespace conflicts with built-in attributes.
 
@@ -142,6 +151,9 @@
 | SQL DateTime | SQL Server date range validation |
 | Geo Location | Latitude, Longitude, GeoLocation coordinate validation |
 | File Paths | Safe filename, file extension validation |
+| Temporal ranges | `DateOnlyRange`, `DateTimeRange`, `DateTimeOffsetRange`, `TimeOnlyRange` as first-class validated range types |
+| String-parse validators | `StringRules.TimeSpan`, `StringRules.GeoLocation` — validate the text form before parsing |
+| Default equality | `DefaultEqualityRules` / `NullOrDefault` — a single check for "null or `default(T)`" across value and reference types |
 
 ### Validations Zod Has That PineGuard Should Consider
 
@@ -153,7 +165,7 @@
 | Nano ID | `.nanoid()` | Gap | Low |
 | CUID/CUID2 | `.cuid()`, `.cuid2()` | Gap | Low |
 | Emoji | `.emoji()` | Gap | Low |
-| Hostname | `.hostname()` | Gap | Medium |
+| Hostname | `.hostname()` | Has (`NetworkRules.IsValidHostname`) | -- |
 | MAC address | `.mac()` | Gap | Medium |
 | Hash format | `.hash({algorithm})` | Gap | Low |
 | ISO Duration | `.iso.duration()` | Gap | Medium |
@@ -172,7 +184,7 @@
 | Validot | Template (all possible errors) | Gap -- useful for API documentation |
 | CheckValidators | AndIf/OrIf conditional chaining | Gap -- short-circuit conditional validation |
 | SimpleValidator | Type conversion (ToInt, ToBool) | Gap -- PineGuard validates, doesn't convert |
-| Nager | IBAN validation (international) | Gap -- PineGuard has payment cards but not IBAN |
+| Nager | IBAN validation (international) | Gap -- no payment-instrument validation at all since the v2 standards prune |
 | Nager | VAT number validation | Gap |
 
 ---
@@ -244,7 +256,7 @@ The ecosystem gap PineGuard fills:
 | `String.Contains`, `StartsWith`, `EndsWith` | First-class validators (not regex workarounds). Zod has them. Universal need. |
 | JWT format validation | Ubiquitous in modern APIs. Zod has `.jwt()`. |
 | IBAN validation (international) | Financial APIs. Nager does this. PakValidate does Pakistan-only. |
-| Hostname validation | Network/DNS APIs. Zod has `.hostname()`. |
+| Payment card / Luhn validation | Greenfield gap since the v2 standards prune removed the payment-card rules. ASP.NET ships `[CreditCard]`; PineGuard currently ships nothing. |
 | HTTP URL (scheme-restricted) | Zod's `.httpUrl()` -- only http/https, not ftp/mailto. |
 | ISO 8601 Duration parsing | ISO 8601 duration (`P1Y2M3D`). Zod has `.iso.duration()`. |
 
@@ -270,10 +282,53 @@ The ecosystem gap PineGuard fills:
 
 ---
 
-## 6. Next Steps
+## 6. Fable Intelligence (2026-08-20)
+
+Additions from a strategic review pass. These extend, not replace, the analysis above.
+
+### 6.1 The landscape is shifting under the incumbents
+
+Two platform-level changes reframe the competitive picture:
+
+1. **.NET 10's `Microsoft.Extensions.Validation`** (`AddValidation()`, `[ValidatableType]`, source-generated validation for Minimal APIs) is Microsoft entering the request-validation space directly. This is simultaneously a threat (built-in "good enough" validation) and PineGuard's biggest opportunity: the built-in layer validates *models* but ships almost no *rules*. A PineGuard integration that surfaces 300+ rules through the source-generated pipeline rides Microsoft's adoption wave instead of fighting it. It also solves trimming/AOT, where reflection-based DataAnnotations struggles.
+2. **FluentValidation dropped official auto-validation** (async validators cannot run inside sync model binding; DI lifetime issues). The community fills this with SharpGrip and hand-rolled filters. A first-party PineGuard ASP.NET Core integration that does auto-validation *correctly* (async-safe `IAsyncActionFilter` + minimal-API `IEndpointFilter`) captures demand FluentValidation deliberately abandoned.
+
+### 6.2 Gaps the matrix above misses (structural, not rule-level)
+
+The Zod parity table is rule-by-rule. The bigger competitive gaps are structural — these are what FluentValidation actually wins on:
+
+| Capability | Who has it | PineGuard status |
+|---|---|---|
+| Cross-property validation (`EndDate > StartDate`) | FluentValidation, ExpressiveAnnotations | Gap — Range rules validate a range object, not two model properties |
+| Conditional composition (`When`/`Unless`) | FluentValidation, CheckValidators (AndIf/OrIf) | Gap |
+| Collection element validation with indexed paths (`Items[2].Name`) | FluentValidation (`RuleForEach`) | Gap |
+| Async predicates (DB uniqueness checks) | FluentValidation (`MustAsync`) | Gap — Core can stay sync; Must layer needs the seam |
+| Stable machine-readable error codes (separate from messages) | FluentValidation (`ErrorCode`) | Gap — needed by API consumers and frontends |
+| Clock injection (`TimeProvider`) for in-past/in-future rules | Nobody does this well | Opportunity — testable temporal validation is a differentiator |
+
+These matter more than JWT or ULID: a team choosing between PineGuard and FluentValidation for request validation will hit "how do I compare two properties?" on day one.
+
+### 6.3 Rule-level gaps to add to Section 2 tables
+
+Non-ISO cases not yet in the matrix: SemVer, cron expression, slug, MIME/content-type, magic-bytes file signature (vs. extension spoofing), Luhn checksum (algorithmic — belongs here, not the ISO repo), decimal precision/scale (money), grapheme-count length (vs. `char` count — the classic emoji-length bug), no-control-characters / no-BOM / valid-surrogate-pairs, Unicode normalization (NFC/NFD), minimum-age from date of birth.
+
+### 6.4 Distribution strategy — the analyzer as growth channel
+
+Serilog's sinks were its distribution mechanism. PineGuard's equivalent is a **Roslyn analyzer + code-fix package**: flag hand-rolled `if (x is null) throw new ArgumentNullException(...)` and offer a one-click fix to `Guard.Against.Null(x)`. Every codebase that installs the analyzer gets a continuous, in-editor advertisement for the library. No competitor ships this.
+
+### 6.5 Revised priority view
+
+1. **Structural gaps first** (cross-property, conditional, collection element, error codes) — these decide head-to-head evaluations against FluentValidation.
+2. **Platform integrations second** (`IValidateOptions<T>` startup config validation, .NET 10 Minimal API validation, MediatR `IPipelineBehavior`) — these are where validation actually runs in 2026 apps; see `docs/ai/plans/new-surfaces-missing-vaidation-cases-fable.md`.
+3. **Zod string-format parity third** (Contains/StartsWith/EndsWith, JWT, hostname, MAC) — cheap wins, keep them flowing, but they don't win evaluations on their own.
+
+---
+
+## 7. Next Steps
 
 This competitive analysis feeds into:
 
 1. **Feature roadmap** -- prioritized enhancement backlog based on gap analysis
 2. **Positioning doc** -- how to communicate PineGuard's value vs. competitors
 3. **Brain docs** -- this file (`docs/ai/plans/competitive-analysis.md`) as permanent reference
+4. **New surfaces plan** -- `docs/ai/plans/new-surfaces-missing-vaidation-cases-fable.md` (integration packages, middleware, structural gaps)

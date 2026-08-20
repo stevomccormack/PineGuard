@@ -15,9 +15,11 @@ None — SonarQube is project-wide (no per-project scope).
 
 ## Auto-Approval
 
-- **Gemini**: `// turbo-all`
-- **Claude**: `Project Rules` allow scripts.
+- **Antigravity**: `// turbo-all` in `.agent/workflows/`.
+- **Claude Code**: `Project Rules` allow scripts.
 - **Cursor**: `cmd: powershell` allowed.
+
+See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface inventory.
 
 ## Steps
 

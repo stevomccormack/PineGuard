@@ -6,11 +6,12 @@ spec:
   template:
     - ../../meta/template-unit-test.md
   parent:
-    - ../../spec.md
+    - ../spec.md
     - ../testing/unit-test.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
+  - "src/PineGuard.DataAnnotations/**"
   - "tests/PineGuard.DataAnnotations.UnitTests/**"
 ---
 

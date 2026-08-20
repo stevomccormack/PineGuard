@@ -6,49 +6,12 @@
 > Do not add logic here. Add logic to the Brain.
 > 👉 Start at **[docs/ai/README.md](docs/ai/README.md)** for the full Brain index.
 
-## 1. Role Adoption
+All shared agent instructions — role adoption, specs, rules, skills, agents, safety, and the
+Knowledge Base index — live in **[AGENTS.md](AGENTS.md)**; read it first. Everything there applies
+to Gemini unchanged.
 
-Before acting, adopt a persona from the Engineering Business Unit:
-👉 **[docs/ai/business-units/engineering.md](docs/ai/business-units/engineering.md)**
+## Related surfaces
 
-## 2. Follow the Specs (Source of Truth)
-
-All technical truths, conventions, and generation rules are stored in the `specs` directory:
-👉 **[docs/ai/specs/](docs/ai/specs/)**
-
-## 3. Read the Rules (Scope-Specific)
-
-Rules provide scope-specific summaries that inherit from a global baseline:
-👉 **[docs/ai/rules/](docs/ai/rules/)**
-
-## 4. Use Skills (Implementation Recipes)
-
-Reusable, step-by-step implementation procedures:
-👉 **[docs/ai/skills/](docs/ai/skills/)**
-
-## 5. Execute via Agents
-
-Canonical agent playbooks for all workflows:
-👉 **[docs/ai/agents/](docs/ai/agents/)**
-
-Gemini workflow stubs are in `.agent/workflows/` — each delegates to the canonical Brain agent.
-
-## 6. Safety
-
-Before executing commands, read the safety spec:
-👉 **[docs/ai/specs/safety.md](docs/ai/specs/safety.md)**
-
-## 7. Knowledge Base
-
-- **Brain index**: `docs/ai/README.md`
-- **Specs**: `docs/ai/specs/` (normative engineering rules, coding standards, testing specs)
-- **Safety**: `docs/ai/specs/safety.md` (Tier 0/1/2 command classification)
-- **Rules**: `docs/ai/rules/` (scope-specific, inheriting from `global.md`)
-- **Skills**: `docs/ai/skills/` (reusable implementation recipes)
-- **Agents**: `docs/ai/agents/` (canonical playbooks)
-- **Workflows**: `docs/ai/workflows/` (multi-step orchestration)
-- **Commands**: `docs/ai/commands/` (intent-to-agent mappings)
-- **Roles**: `docs/ai/roles/` (personas and responsibilities)
-- **Architecture**: `docs/ai/specs/` (structural design)
-- **Meta**: `docs/ai/meta/` (taxonomy, tooling alignment)
-- **Plans**: `docs/ai/plans/` (implementation roadmaps)
+`.agent/workflows/` is the **Antigravity** adapter, not a Gemini surface — its stubs delegate to the
+same Brain agents this file points at. The full surface inventory is in
+👉 **[docs/ai/meta/adapter-surfaces.md](docs/ai/meta/adapter-surfaces.md)**

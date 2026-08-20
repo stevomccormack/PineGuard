@@ -1,2 +1,2 @@
-Act as **Software Engineer**. Read and execute `docs/ai/agents/clean-artifact.md`.
+Act as **DevOps Engineer**. Read and execute `docs/ai/agents/clean-artifact.md`.
 

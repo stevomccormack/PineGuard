@@ -1,10 +1,18 @@
----
-description: Refactor Nullability and Method Ordering
----
+<!-- metadata_header
+type: plan
+id: refactor-nullability-ordering
+version: 1.0
+status: completed
+-->
 
-This workflow automates the refactoring of PineGuard libraries to the "Hybrid Nullability" and "Method Ordering" standards.
+# Plan: Nullability and Method Ordering Refactor
 
-// turbo-all
+> [!NOTE]
+> **Archived — shipped.** The `string?` parameter shape and the Positive-before-Negative ordering
+> described below are in `src/PineGuard.MustClauses/` and
+> `src/PineGuard.FluentValidation/Extensions/`. Kept as the record of the refactor, not as a task list.
+
+This plan covers the refactoring of PineGuard libraries to the "Hybrid Nullability" and "Method Ordering" standards.
 
 1.  **MustClauses**: Refactor `string` parameters to `string?`.
     *   Target: `src/PineGuard.MustClauses/MustString*.cs` (and any file with `string value` inputs).

@@ -12,7 +12,13 @@ version: 1.0
 
 ## Steps
 
-1. Read the master workflow at "docs/ai/workflows/commit.md".
-2. Limit execution strictly to the $(System.Collections.Hashtable.arg) scope (e.g., -All -AutoMessage and -IncludeTests if applicable).
-3. Prefer a dry-run first (-DryRun) before making commits.
-4. Run the matching VS Code task if available (preferred), otherwise run the PowerShell command.
+1. Read the master workflow at `docs/ai/workflows/commit.md`.
+2. Limit execution strictly to the `-All` scope. `-All` expands to every scope and implicitly sets `-IncludeTests`.
+3. Dry-run the plan first, then create the commits:
+
+   ```powershell
+   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -All -DryRun
+   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -All -AutoMessage
+   ```
+
+4. `.vscode/tasks.json` carries equivalent tasks for human runs; an agent must invoke the PowerShell commands above directly.

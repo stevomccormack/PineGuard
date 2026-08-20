@@ -6,7 +6,7 @@
 ## Context
 
 - **Role**: [Test Engineer](../roles/verifier.md)
-- **Skill**: [Run Coverage](../skills/run-coverage.md)
+- **Skill**: [Improve Code Coverage](../skills/improve-coverage/SKILL.md)
 - **Spec**: [Code Coverage Spec](../specs/testing/coverage.md)
 
 ## Parameters
@@ -15,21 +15,23 @@ This workflow accepts a **Scope** parameter to determine which project to analyz
 
 | Scope              | Description                                                                                                       |
 | :----------------- | :---------------------------------------------------------------------------------------------------------------- |
-| `All`              | Runs coverage for the entire solution (all `*.UnitTests` projects, includes PineGuard.Testing execution data).    |
+| `All`              | Runs coverage for the entire solution (every `*.UnitTests` project).                                              |
 | `Core`             | PineGuard.Core                                                                                                    |
 | `MustClauses`      | PineGuard.MustClauses                                                                                             |
 | `GuardClauses`     | PineGuard.GuardClauses                                                                                            |
 | `FluentValidation` | PineGuard.FluentValidation                                                                                        |
 | `DataAnnotations`  | PineGuard.DataAnnotations                                                                                         |
-| `Testing`          | PineGuard.Testing — use `All` scope to collect data, then analyze via `Custom` scope (see coverage spec for cmd). |
-
-## Steps
+| `Testing`          | PineGuard.Testing — run directly with `-Scope Testing`.                                                           |
 
 ## Auto-Approval
 
-- **Gemini**: `// turbo-all`
-- **Claude**: `Project Rules` allow coverage.
+- **Antigravity**: `// turbo-all` in `.agent/workflows/`.
+- **Claude Code**: `Project Rules` allow coverage.
 - **Cursor**: `cmd: powershell` allowed.
+
+See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface inventory.
+
+## Steps
 
 // turbo-all
 
@@ -39,7 +41,7 @@ This workflow accepts a **Scope** parameter to determine which project to analyz
    **Command Template**:
 
    ```powershell
-   ./tools/code-coverage/Run-CodeCoverage.ps1 -Engine xplat -Mode GenerateAndAnalyze -Scope [SCOPE] -Top 30 -Isolated
+   ./tools/code-coverage/Run-CodeCoverage.ps1 -Mode GenerateAndAnalyze -Scope [SCOPE] -Top 30
    ```
 
    **Examples**:

@@ -6,10 +6,10 @@ spec:
   template:
     - ../../meta/template-unit-test.md
   parent:
-    - ../../spec.md
-    - ../../testing/unit-test.md
+    - ../spec.md
+    - ../testing/unit-test.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.MustClauses/**"
   - "tests/PineGuard.MustClauses.UnitTests/**"
@@ -63,6 +63,14 @@ public sealed record MustExpected(bool IsValid, string? Message = null, string? 
 - `new MustExpected(false, "value must be a valid CSV line.")` — failure, message checked, no paramName
 - `new MustExpected(false, "value must not be null.", "value")` — failure, message AND paramName checked
 
+### Required Imports
+
+TestData and Tests files require the MustClauses sub-namespace:
+
+```csharp
+using PineGuard.Testing.UnitTests.MustClauses;
+```
+
 ### TestData Pattern
 
 Two datasets per Op Group — **`ValidCases`** and **`InvalidCases`** (no `EdgeCases`):
@@ -98,7 +106,7 @@ When dealing with nullable reference types (`string?`), always let null reach th
 
 ```csharp
 using PineGuard.Common;
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.CsvRulesFixtures;
 
 namespace PineGuard.MustClauses.UnitTests;
@@ -122,7 +130,7 @@ public static class MustCsvClausesTestData
 
 ```csharp
 using PineGuard.Common;
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
 using Xunit.Abstractions;
 
 namespace PineGuard.MustClauses.UnitTests;

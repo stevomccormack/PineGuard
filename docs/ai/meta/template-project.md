@@ -2,11 +2,12 @@
 spec:
   id: pineguard.ai.templates.project-spec
   title: "AI Spec Template — Project Spec"
-  version: 2
+  version: 3
+  last_verified: 2026-08-20
   parent:
-    - ../project.md
+    - ../specs/project.md
   dependencies:
-    - ../dependencies.md
+    - ../specs/dependencies.md
 applies_to:
   - "docs/ai/specs/**/project.md"
 ---
@@ -23,6 +24,9 @@ Use this template when creating or normalizing any `docs/ai/specs/**/project.md`
 
 Every child `project.md` must start with YAML front matter.
 
+All relative paths below are written from the child spec's own location,
+`docs/ai/specs/<domain>/project.md`.
+
 Copy/paste skeleton (replace placeholders):
 
 ```yaml
@@ -32,11 +36,11 @@ spec:
   title: "<Project> Project Spec"
   version: 1
   template:
-    - ../template-project.md
+    - ../../meta/template-project.md
   parent:
     - ../project.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/<Project>/**"
 ---
@@ -44,8 +48,10 @@ applies_to:
 
 Header rules:
 - `spec.id` is stable and kebab/period cased.
-- `spec.template` must reference `docs/ai/meta/template-project.md`.
-- `parent` must reference `../project.md`.
+- `spec.template` must resolve to `docs/ai/meta/template-project.md`.
+- `parent` must resolve to `docs/ai/specs/project.md`.
+- `dependencies` must resolve to `docs/ai/specs/dependencies.md`.
+- Every path must resolve to a file that exists — check it before committing.
 
 ---
 

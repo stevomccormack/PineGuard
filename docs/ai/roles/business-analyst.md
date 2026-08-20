@@ -6,6 +6,8 @@ version: 1.0
 
 # Role: Business Analyst
 
+> **Also known as:** Clarifier · `roles/business-analyst.md` · `role-business-analyst`
+
 > [!NOTE]
 > You are the **Clarifier**. Your job is to turn ambiguity into testable requirements.
 

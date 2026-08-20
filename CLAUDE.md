@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 > **This file is an Adapter.**
-> It maps slash commands to the canonical Agents in `docs/ai/agents`.
+> It maps slash commands to the canonical Agents in `docs/ai/agents` and Workflows in `docs/ai/workflows`.
 > Do not add logic here. Add logic to the Brain.
 > 👉 Start at **[docs/ai/README.md](docs/ai/README.md)** for the full Brain index.
 
@@ -10,6 +10,10 @@
 
 Before acting, adopt a persona from the Engineering Business Unit:
 👉 **[docs/ai/business-units/engineering.md](docs/ai/business-units/engineering.md)**
+
+The persona named on each palette entry below is a canonical role in
+**[docs/ai/roles/](docs/ai/roles/)** — the same role the target playbook declares on its `roles:`
+line. The playbook is authoritative: if the two ever disagree, the playbook wins.
 
 ## 2. Command Palette (Slash Commands)
 
@@ -110,28 +114,28 @@ Before acting, adopt a persona from the Engineering Business Unit:
 
 ### Commit
 
-- `/commit-agent`: Act as **Builder**. Execute `docs/ai/agents/commit-agent.md`.
-- `/commit-all`: Act as **Builder**. Execute `docs/ai/agents/commit-all.md`.
-- `/commit-core`: Act as **Builder**. Execute `docs/ai/agents/commit-core.md`.
-- `/commit-must`: Act as **Builder**. Execute `docs/ai/agents/commit-must.md`.
-- `/commit-guard`: Act as **Builder**. Execute `docs/ai/agents/commit-guard.md`.
-- `/commit-fluent`: Act as **Builder**. Execute `docs/ai/agents/commit-fluent.md`.
-- `/commit-annotation`: Act as **Builder**. Execute `docs/ai/agents/commit-annotation.md`.
-- `/commit-testing`: Act as **Builder**. Execute `docs/ai/agents/commit-testing.md`.
-- `/commit-doc`: Act as **Builder**. Execute `docs/ai/agents/commit-doc.md`.
-- `/commit-solution`: Act as **Builder**. Execute `docs/ai/agents/commit-solution.md`.
-- `/commit-tool`: Act as **Builder**. Execute `docs/ai/agents/commit-tool.md`.
+- `/commit-agent`: Act as **Shipper**. Execute `docs/ai/agents/commit-agent.md`.
+- `/commit-all`: Act as **Shipper**. Execute `docs/ai/agents/commit-all.md`.
+- `/commit-core`: Act as **Shipper**. Execute `docs/ai/agents/commit-core.md`.
+- `/commit-must`: Act as **Shipper**. Execute `docs/ai/agents/commit-must.md`.
+- `/commit-guard`: Act as **Shipper**. Execute `docs/ai/agents/commit-guard.md`.
+- `/commit-fluent`: Act as **Shipper**. Execute `docs/ai/agents/commit-fluent.md`.
+- `/commit-annotation`: Act as **Shipper**. Execute `docs/ai/agents/commit-annotation.md`.
+- `/commit-testing`: Act as **Shipper**. Execute `docs/ai/agents/commit-testing.md`.
+- `/commit-doc`: Act as **Shipper**. Execute `docs/ai/agents/commit-doc.md`.
+- `/commit-solution`: Act as **Shipper**. Execute `docs/ai/agents/commit-solution.md`.
+- `/commit-tool`: Act as **Shipper**. Execute `docs/ai/agents/commit-tool.md`.
 
 ### Audit & Scaffold
 
-- `/audit-gap`: Act as **Builder**. Execute `docs/ai/agents/audit-gap.md`.
-- `/audit-cli`: Act as **Builder**. Execute `docs/ai/agents/audit-cli.md`.
-- `/scaffold-vertical-slice`: Act as **Builder**. Execute `docs/ai/agents/scaffold-vertical-slice.md`.
+- `/audit-gap`: Act as **Planner / Verifier**. Execute `docs/ai/agents/audit-gap.md`.
+- `/audit-cli`: Act as **Shipper**. Execute `docs/ai/agents/audit-cli.md`.
+- `/scaffold-vertical-slice`: Act as **Owner**. Execute `docs/ai/agents/scaffold-vertical-slice.md`.
 
 ### Council
 
-- `/ask-council`: Act as **Architect**. Execute `docs/ai/agents/ask-council.md`.
-- `/plan-with-council`: Act as **Architect**. Execute `docs/ai/workflows/plan-with-council.md`.
+- `/ask-council`: Act as **Architect / Council**. Execute `docs/ai/agents/ask-council.md`.
+- `/plan-with-council`: Act as **Architect / Council**. Execute `docs/ai/workflows/plan-with-council.md`.
 
 ### Release
 
@@ -153,6 +157,10 @@ Claude Code has native features in `.claude/` that **reference** the Brain (neve
 | Hooks | `.claude/hooks/` | File hygiene enforcement |
 | Commands | `.claude/commands/` | Slash command adapters → `docs/ai/agents/` |
 
+`.claude/` is one of several adapter surfaces in this repository. The full inventory — root boot
+files, full adapters, rules-only adapters, and the parity policy — lives in
+**[docs/ai/meta/adapter-surfaces.md](docs/ai/meta/adapter-surfaces.md)**.
+
 ## 4. Safety
 
 Before executing commands, read the safety spec:
@@ -169,6 +177,7 @@ Before executing commands, read the safety spec:
 - **Workflows**: `docs/ai/workflows/` (multi-step orchestration)
 - **Commands**: `docs/ai/commands/` (intent-to-agent mappings)
 - **Roles**: `docs/ai/roles/` (personas and responsibilities)
-- **Architecture**: `docs/ai/specs/` (structural design)
-- **Meta**: `docs/ai/meta/` (taxonomy, tooling alignment)
+- **Business Units**: `docs/ai/business-units/` (departments and the role roster)
+- **Memory**: `docs/ai/memory/` (per-subagent learned patterns)
+- **Meta**: `docs/ai/meta/` (taxonomy, tooling alignment, adapter-surface inventory)
 - **Plans**: `docs/ai/plans/` (implementation roadmaps)

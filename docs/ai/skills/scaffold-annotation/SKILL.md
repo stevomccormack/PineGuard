@@ -14,10 +14,10 @@ Adapt a **MustClause** into a **DataAnnotations** `ValidationAttribute`. This al
 > 1.  **Strict Adaptation**: Do NOT write validation logic here. You **MUST** call `Must.Be.Xxx`.
 > 2.  **Inherit Base**: All attributes **MUST** inherit from `ValidationAttributeBase` (`PineGuard.DataAnnotations.Common`).
 > 3.  **ParamName Null**: You **MUST** pass `paramName: null` to the MustClause. The base handles `FormatErrorMessage` substitution.
-> 4.  **Null Handling**: DataAnnotations uses "skip on null" by default. Presence checks use `[Required]`. Do NOT fail on null inside the attribute.
+> 4.  **Null & type handling**: `ValidationAttributeBase(Type expectedType, bool allowNull = true)` handles this for you. With the default `allowNull: true` the base returns `ValidationResult.Success` for null and throws `InvalidOperationException` on a type mismatch *before* `ValidateValue` is called — so do not re-guard; cast directly with `var x = (T)value!;`. Two deliberate exceptions: (a) presence-style attributes pass `allowNull: false` and therefore DO receive null in `ValidateValue` (see `NotNullAttribute`, `NotNullOrEmptyStringAttribute`, `NotNullOrWhiteSpaceStringAttribute`, `ObjectAttributeBase`, `OfTypeAttribute`, `NotOfTypeAttribute`) — they delegate the null to the Must clause; (b) polymorphic attributes registered as `typeof(object)` still `switch` on the runtime type and throw `InvalidOperationException` in the default arm (see `PastAttribute`, `PastOrPresentAttribute`, `FutureAttribute`, `FutureOrPresentAttribute`, `IpAddressAttribute`, `NumberAttributeBase`, `CollectionAttributeBase`). Presence checks otherwise belong on `[Required]`.
 > 5.  **Naming**: String validators suffix with `String` (e.g., `TrueStringAttribute`). General: `[MustClauseName]Attribute`. Collision avoidance: suffix Type/Domain (e.g., `PastDateOnlyAttribute`).
 > 6.  **Aggregation**: Prefer grouping related attributes into a single file named after the domain (e.g., `BoolAttributes.cs`, `EmailAttributes.cs`).
-> 7.  **Strict Coding**: File-scoped namespaces, single-line empty constructors, no comments unless exceptional.
+> 7.  **Strict Coding**: File-scoped namespaces, primary constructors forwarding to the base (`public sealed class XAttribute() : ValidationAttributeBase(typeof(T))`), `/// <inheritdoc/>` on the `ValidateValue` override, no comments unless exceptional.
 
 ## 4. Execution Steps
 
@@ -34,14 +34,13 @@ Adapt a **MustClause** into a **DataAnnotations** `ValidationAttribute`. This al
 
     namespace PineGuard.DataAnnotations;
 
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
-    public sealed class JsonAttribute : ValidationAttributeBase
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+    public sealed class JsonAttribute() : ValidationAttributeBase(typeof(string))
     {
-        public JsonAttribute() : base(typeof(string)) { }
-
+        /// <inheritdoc/>
         protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
         {
-            if (value is not string strValue) return ValidationResult.Success;
+            var strValue = (string)value!;
 
             var result = Must.Be.Json(strValue, paramName: null);
             return FromMustResult(result, validationContext);
@@ -50,7 +49,8 @@ Adapt a **MustClause** into a **DataAnnotations** `ValidationAttribute`. This al
     ```
 
 3.  **Handle Type Variations**
-    *   **Value types** (e.g., `DateOnly`): Cast with `value is not DateOnly dateValue`.
+    *   **Value types** (e.g., `DateOnly`): pass `typeof(DateOnly)` to the base and cast directly — `var dateValue = (DateOnly)value!;`.
+    *   **Polymorphic input**: register as `ValidationAttributeBase(typeof(object))` and `switch` on the runtime type, throwing `InvalidOperationException` in the default arm.
     *   **String validators**: If the Must clause name matches a non-string type, suffix with `String` (e.g., `TrueStringAttribute`).
 
 ## 5. Definition of Done
@@ -66,8 +66,8 @@ Adapt a **MustClause** into a **DataAnnotations** `ValidationAttribute`. This al
 | 1 | Build passes | `dotnet build` exits 0 with no warnings |
 | 2 | Inherits base | Class extends `ValidationAttributeBase`, not `ValidationAttribute` |
 | 3 | paramName null | Every Must call passes `paramName: null` |
-| 4 | No validation logic | No regex, parsing, or conditional logic beyond type-cast guard |
-| 5 | Null-safe | Returns `ValidationResult.Success` when value is null (presence via `[Required]`) |
+| 4 | No validation logic | No regex, parsing, or conditional logic beyond the direct cast |
+| 5 | Null-safe | Base returns `ValidationResult.Success` for null under the default `allowNull: true` — the attribute contains no null guard (presence via `[Required]`) |
 
 ## 7. Reference Material
 - `docs/ai/specs/data-annotations/project.md`
