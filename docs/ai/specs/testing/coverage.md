@@ -34,7 +34,7 @@ Libraries covered by this workflow:
 - `PineGuard.GuardClauses`
 - `PineGuard.DataAnnotations`
 - `PineGuard.FluentValidation`
-- `PineGuard.Testing` _(shared test infrastructure library; has no own test runner — its code is exercised via all other `*.UnitTests` projects)_
+- `PineGuard.Testing` _(shared test infrastructure library; exercised directly by `tests/PineGuard.Testing.UnitTests/` and indirectly by every other `*.UnitTests` run)_
 
 Per-library run notes live in:
 
@@ -71,26 +71,25 @@ Note:
 
 Use this loop until xplat enforcement is green.
 
-### Quick start (Auto-Approved Workflows)
+### Quick start (coverage agents)
 
-Instead of running raw PowerShell, **use the auto-approved workflows** to skip approval steps.
-Read the workflow file using `view_file` to execute it (it contains `// turbo-all`).
+Instead of running raw PowerShell, run the Brain's coverage agent for the scope you need. Each
+adapter surface exposes it under its own entry-point convention (slash command, prompt, workflow).
 
-- **Core**: `.agent/workflows/coverage-core.md`
-- **Must**: `.agent/workflows/coverage-must.md`
-- **Guard**: `.agent/workflows/coverage-guard.md`
-- **DataAnnotations**: `.agent/workflows/coverage-annotation.md`
-- **FluentValidation**: `.agent/workflows/coverage-fluent.md`
-- **All**: `.agent/workflows/coverage-all.md`
+- **Core**: `docs/ai/agents/coverage-core.md` (`/coverage-core`)
+- **Must**: `docs/ai/agents/coverage-must.md` (`/coverage-must`)
+- **Guard**: `docs/ai/agents/coverage-guard.md` (`/coverage-guard`)
+- **DataAnnotations**: `docs/ai/agents/coverage-annotation.md` (`/coverage-annotation`)
+- **FluentValidation**: `docs/ai/agents/coverage-fluent.md` (`/coverage-fluent`)
+- **Testing**: `docs/ai/agents/coverage-testing.md` (`/coverage-testing`)
+- **All**: `docs/ai/agents/coverage-all.md` (`/coverage-all`)
 
-Example execution (Core):
-
-1. `view_file .agent/workflows/coverage-core.md`
-2. (The workflow auto-executes the coverage run)
+Engine: xplat/Coverlet is the only engine wired into `tools/code-coverage/`; `Run-CodeCoverage.ps1`
+has no `-Engine` switch.
 
 ### Manual commands (fallback / custom args)
 
-Only use these if you need custom arguments not covered by the workflows.
+Only use these if you need custom arguments not covered by the agents.
 
 ```powershell
 # Generate (Cobertura XML + HTML)
@@ -159,22 +158,18 @@ Rule:
 
 Supported presets:
 
-- `Core`, `MustClauses`, `GuardClauses`, `DataAnnotations`, `FluentValidation`, `All`
+- `Core`, `MustClauses`, `GuardClauses`, `DataAnnotations`, `FluentValidation`, `Testing`, `All`
 - `Custom` (analyzer only)
 
 ### PineGuard.Testing scope
 
-`PineGuard.Testing` has no own `*.UnitTests` project and therefore has no dedicated scope preset in the scripts.
-
-To analyze its coverage, first run the `All` scope (which collects data from all `*.UnitTests` projects), then use `Custom` scope with a class name regex:
+`Testing` is a first-class preset in the `ValidateSet` of `Run-CodeCoverage.ps1`, `Gen-CoverageReport.ps1` and `Test-CoverageAnalysis.ps1`. Run it like any other scope:
 
 ```powershell
-# Step 1: generate All-scope coverage (collects PineGuard.Testing execution data)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode Generate -Scope All -Isolated
-
-# Step 2: analyze PineGuard.Testing specifically
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Custom -IncludeClassNameRegex "^PineGuard\.Testing\." -Top 30 -Enforce100
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope Testing
 ```
+
+Or run the coverage agent `docs/ai/agents/coverage-testing.md` (`/coverage-testing`).
 
 Notes:
 
@@ -207,17 +202,10 @@ Notes:
 
 ---
 
-## Next Session Prompt Template
-
-- Goal: xplat analyzer `-Enforce100` green for target scope.
-- Loop: generate -> analyze -> implement -> repeat.
-
----
-
 ## Reference
 
-- [tools/code-coverage/README.md](../../tools/code-coverage/README.md)
-- [tools/code-coverage/Run-CodeCoverage.ps1](../../tools/code-coverage/Run-CodeCoverage.ps1)
-- [tools/code-coverage/xplat/Gen-CoverageReport.ps1](../../tools/code-coverage/xplat/Gen-CoverageReport.ps1)
-- [tools/code-coverage/xplat/Test-CoverageAnalysis.ps1](../../tools/code-coverage/xplat/Test-CoverageAnalysis.ps1)
+- [tools/code-coverage/README.md](../../../tools/code-coverage/README.md)
+- [tools/code-coverage/Run-CodeCoverage.ps1](../../../tools/code-coverage/Run-CodeCoverage.ps1)
+- [tools/code-coverage/xplat/Gen-CoverageReport.ps1](../../../tools/code-coverage/xplat/Gen-CoverageReport.ps1)
+- [tools/code-coverage/xplat/Test-CoverageAnalysis.ps1](../../../tools/code-coverage/xplat/Test-CoverageAnalysis.ps1)
 - `tools/code-coverage/coverlet.runsettings`

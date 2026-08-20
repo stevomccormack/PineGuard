@@ -4,12 +4,12 @@ spec:
   title: "PineGuard.FluentValidation Code Coverage (Addendum)"
   version: 1
   template:
-    - ../template-coverage.md
+    - ../../meta/template-coverage.md
   parent:
-    - ../../spec.md
-    - ../../testing/coverage.md
+    - ../spec.md
+    - ../testing/coverage.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.FluentValidation/**"
   - "tests/PineGuard.FluentValidation.UnitTests/**"
@@ -21,7 +21,7 @@ This file contains **FluentValidation-specific** coverage notes only.
 
 Global rules and workflows:
 
-- `docs/ai/testing/coverage.md`
+- [Global coverage spec](../testing/coverage.md)
 
 ---
 
@@ -55,3 +55,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCov
 ## Default test project (fast loop)
 
 - `tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj`
+
+## Related specs
+
+- Unit tests addendum: `docs/ai/specs/fluent-validation/unit-test.md`

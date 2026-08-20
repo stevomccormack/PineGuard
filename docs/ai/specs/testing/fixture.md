@@ -11,7 +11,7 @@ applies_to:
 
 # Unified Fixture Architecture v2
 
-Compact reference for migration agents. All types live in `tests/PineGuard.Testing/`.
+Authoritative reference for the fixture / scenario architecture implemented in `tests/PineGuard.Testing/`. Where it differs from `unit-test.md` §4, §5 or §8, this file wins.
 
 ## 1. Expected Type Hierarchy
 
@@ -45,7 +45,7 @@ public sealed record GuardExpected(bool IsValid, Type? ExceptionType = null, str
 | Fluent | `FluentExpected` | `ReturnExpected` | `.PropertyName` |
 | DA | `DataAnnotationExpected` | `ReturnExpected` | `.MemberName` |
 
-Files: `UnitTests/Expected/` — one file per type. Modify existing `MustExpected.cs`, `FluentExpected.cs` to extend `ReturnExpected`.
+Files — one type per file, no `Expected/` folder. The abstract and shared types live under `Common/` (`IExpectedResult.cs`, `ReturnExpected.cs`, `ThrowExpected.cs`); each layer's `Expected`, `Case` and scenario-extension types live under `UnitTests/<Layer>/` (`UnitTests/Rules/RuleExpected.cs`, `UnitTests/MustClauses/MustExpected.cs`, `UnitTests/GuardClauses/GuardExpected.cs`, `UnitTests/FluentValidation/FluentExpected.cs`, `UnitTests/DataAnnotations/DataAnnotationExpected.cs`).
 
 ## 2. RuleScenario
 
@@ -83,7 +83,9 @@ public sealed record FluentCase<TValue>(string Name, TValue Value, FluentExpecte
 public sealed record DataAnnotationCase(string Name, object? Value, DataAnnotationExpected Expected) : ReturnCase<object?, DataAnnotationExpected>(Name, Value, Expected);
 ```
 
-`IsCase<T>`, `HasCase<T>` marked `[Obsolete("Use RuleCase<T> instead.")]` — kept for backward compat.
+`IsCase<T>`, `HasCase<T>` are annotated `[Description("Use RuleCase<T> for rules.")]` — soft-deprecated, no compiler warning; do not use in new tests. They are not `[Obsolete]`: `Directory.Build.props` sets `TreatWarningsAsErrors`, so promoting them would break the build at every existing derivation site. A hard deprecation has to be its own migration.
+
+Case files live beside their layer: `UnitTests/Rules/RuleCase.cs`, `UnitTests/MustClauses/MustCase.cs`, `UnitTests/GuardClauses/GuardCase.cs`, `UnitTests/FluentValidation/FluentCase.cs`, `UnitTests/DataAnnotations/DataAnnotationCase.cs`. `IsCase<T>` and `HasCase<T>` remain at `UnitTests/`.
 
 ## 4. Extension Methods
 
@@ -107,11 +109,14 @@ Auto-logic for `.ToGuardCases(string paramName)`: `IsValid` → valid, `IsNull` 
 ## 5. Filter Combinators
 
 ```csharp
-.WhereValid()                     // scenarios where IsValid == true
-.WhereInvalid()                   // scenarios where IsValid == false
-.Except(params string[] names)    // exclude by Name
-.Only(params string[] names)      // include only by Name
+.WhereValid()                       // scenarios where IsValid == true
+.WhereInvalid()                     // scenarios where IsValid == false
+.Except(params string[] names)      // exclude by Name
+.Only(params string[] names)        // include only by Name
+.Project(Func<T, TOut> selector)    // RuleScenario<T>[] -> RuleScenario<TOut>[]
 ```
+
+`Project` reshapes Core scenarios for a layer that consumes a differently-shaped input — e.g. wrapping a raw value in the model the Fluent or DataAnnotations test binds against. `Name` and `IsValid` carry through unchanged.
 
 ## 6. Base Test Classes
 
@@ -171,7 +176,8 @@ public static class CsvRulesTestData
 ```
 
 ```csharp
-public sealed class CsvRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(output)
+public sealed class CsvRulesTests(ITestOutputHelper output)
+    : BaseRuleUnitTest(output)
 {
     [Theory]
     [MemberData(nameof(CsvRulesTestData.IsCsvLine.Cases), MemberType = typeof(CsvRulesTestData.IsCsvLine))]
@@ -291,3 +297,24 @@ public static RuleScenario<string?>[] ValidEdgeScenarios =>
     new(nameof(AtMinLength), AtMinLength, true),  // uses PanAlgorithm.PanMinLength
     new(nameof(AtMaxLength), AtMaxLength, true),  // uses PanAlgorithm.PanMaxLength
 ];
+```
+
+## 10. File Layout & Partial Split
+
+Fixtures live in `tests/PineGuard.Testing/Fixtures/`, namespace `PineGuard.Testing.Fixtures`, one class per Core Rules class: `XxxRules` → `XxxRulesFixtures`.
+
+When the source Rules class is split across partial files, the fixture class mirrors it one-for-one:
+
+| Source | Fixture |
+|---|---|
+| `src/PineGuard.Core/Rules/StringRules.cs` | `tests/PineGuard.Testing/Fixtures/StringRulesFixtures.cs` |
+| `src/PineGuard.Core/Rules/StringRules.Bool.cs` | `tests/PineGuard.Testing/Fixtures/StringRulesFixtures.Bool.cs` |
+| `src/PineGuard.Core/Rules/StringRules.Casing.cs` | `tests/PineGuard.Testing/Fixtures/StringRulesFixtures.Casing.cs` |
+
+Each file declares `public static partial class XxxRulesFixtures`. Monolithic per-method fixture files are not used.
+
+Because every partial contributes to the same class, inner class names must be unique across the whole set — prefix them with the partial's sub-scope where a bare method name would collide (`BoolIsTrue`, `BoolIsFalse` in `StringRulesFixtures.Bool.cs`). TestData files still alias the whole class as `F`:
+
+```csharp
+using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
+```

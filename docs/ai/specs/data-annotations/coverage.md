@@ -4,12 +4,12 @@ spec:
   title: "PineGuard.DataAnnotations Code Coverage (Addendum)"
   version: 1
   template:
-    - ../template-coverage.md
+    - ../../meta/template-coverage.md
   parent:
-    - ../../spec.md
-    - ../../testing/coverage.md
+    - ../spec.md
+    - ../testing/coverage.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.DataAnnotations/**"
   - "tests/PineGuard.DataAnnotations.UnitTests/**"
@@ -21,7 +21,7 @@ This file contains **DataAnnotations-specific** coverage notes only.
 
 Global rules and workflows:
 
-- `docs/ai/testing/coverage.md`
+- [Global coverage spec](../testing/coverage.md)
 
 ---
 
@@ -32,7 +32,7 @@ Provide DataAnnotations-specific command lines and defaults while keeping the gl
 Important:
 
 - After xplat reaches **100% line + 100% branch** for DataAnnotations, the scope is complete.
-- If `src/PineGuard.DataAnnotations` currently contains no real `*.cs` files (outside `bin/`/`obj/`), the analyzer may skip this scope until code exists.
+- If the analyzer reports this scope as skipped, treat it as a tooling failure — the library has full source coverage under `src/PineGuard.DataAnnotations/`.
 
 ## Quick start (DataAnnotations only)
 
@@ -45,6 +45,18 @@ Use the auto-approved workflow:
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope DataAnnotations -SkipHtml -Enforce100
 ```
 
+## Broader run (all unit test projects)
+
+Use this when DataAnnotations coverage depends on behavior executed by other test projects:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope DataAnnotations -SkipHtml -ProjectFilter "*.UnitTests.csproj" -Top 30
+```
+
 ## Default test project (fast loop)
 
 - `tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj`
+
+## Related specs
+
+- Unit tests addendum: `docs/ai/specs/data-annotations/unit-test.md`
