@@ -1,8 +1,17 @@
-<!-- metadata_header
-type: spec
-id: spec-code-diagnostics
-version: 1.0
--->
+---
+spec:
+  id: pineguard.ai.tools.code-diagnostics.spec
+  title: "Code Diagnostics Specification (Roslyn Compiler Warnings)"
+  version: 1
+  template:
+    - ../../../meta/template-project.md
+  parent:
+    - ../spec.md
+  dependencies:
+    - ../../dependencies.md
+applies_to:
+  - "tools/code-diagnostics/**"
+---
 
 # Code Diagnostics Specification (Roslyn Compiler Warnings)
 
@@ -63,7 +72,7 @@ Warning codes use the `CS` prefix (e.g., CS8604, CS8619, CS0618).
 
 1. **One file at a time**: Fix warnings in a single file, then verify build.
 2. **Build after each fix**: Run `dotnet build PineGuard.slnx --no-incremental` after each file.
-3. **Never suppress warnings**: Do not add `#pragma warning disable` or `[SuppressMessage]` to hide issues.
+3. **Never suppress warnings to hide issues**: Do not reach for `#pragma warning disable` or `[SuppressMessage]` instead of fixing the cause. The only sanctioned suppression is the local CS0612 obsolete-member validation pattern in `docs/ai/specs/coding-standard.md`; any other suppression requires a documented justification.
 4. **Idiomatic C#**: Apply fixes using PineGuard coding standards (`docs/ai/specs/coding-standard.md`).
 5. **Understand the root cause**: Do not hot-fix. Investigate *why* the warning exists and fix correctly.
 6. **Report**: Summarize fixed vs skipped warnings when done.

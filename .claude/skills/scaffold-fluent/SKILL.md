@@ -1,5 +1,5 @@
 ---
-name: implement-fluent-validation
+name: scaffold-fluent
 description: Implement a FluentValidation extension method adapting a MustClause. Use when adding IRuleBuilder extensions — whenever the user says "add a Fluent extension", "add FluentValidation support for Xxx", "implement IRuleBuilder.Xxx", or needs a FluentValidation integration for an existing Must clause. Do NOT use for Must clauses, Guard clauses, Core rules, or DataAnnotations.
 argument-hint: "[MethodName]"
 context: fork

@@ -1,1 +1,1 @@
-Act as **Software Engineer**. Read and execute `docs/ai/agents/commit-agent.md`.
+Act as **DevOps Engineer**. Read and execute `docs/ai/agents/commit-agent.md`.

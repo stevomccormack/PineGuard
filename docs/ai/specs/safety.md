@@ -176,7 +176,7 @@ git status  # confirm the operation completed as expected
 | Operation | Protocol |
 |-----------|----------|
 | Creating new files in appropriate directories | Standard workflow |
-| Deleting files the agent created in the current session | Must pass provenance check (see §8) |
+| Deleting files the agent created in the current session | Must pass provenance check (see §7.1 and §7.4) |
 | Writing to `artifacts/` and `logs/` | These are safe zones (`.gitignore`d, ephemeral) |
 | Creating directories under `artifacts/` or `logs/` | Safe zones |
 
@@ -205,7 +205,7 @@ git status  # confirm the operation completed as expected
 | `dotnet build` / `dotnet test` / `dotnet restore` | Constructive — always safe |
 | `dotnet format` | Modifies files but in a controlled, reviewable way |
 | `dotnet add package` / `npm install` | Additive operations |
-| `pwsh -File ./tools/**/*.ps1` (vetted scripts) | See §9 for subagent rules |
+| `pwsh -File ./tools/**/*.ps1` (vetted scripts) | See §8 for subagent rules |
 
 ---
 
@@ -442,7 +442,7 @@ Real scenarios where AI agents have caused damage or nearly caused damage. Each 
 4. If a stash exists from the pre-destructive protocol, apply it with `git stash apply`.
 5. If no stash exists, use `git reflog` and `git fsck` to locate lost data.
 6. If filesystem data was lost outside git, check OS-level recovery (Recycle Bin, File History, Time Machine).
-7. Update `docs/todo.md` with any work that needs to be redone.
+7. Record any work that needs to be redone: update the relevant plan under `docs/ai/plans/`, and write the lesson to `.claude/agent-memory/` so the next session does not repeat it.
 
 ---
 

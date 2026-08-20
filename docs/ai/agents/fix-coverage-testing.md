@@ -14,4 +14,3 @@ version: 1.0
 
 1. Read the master workflow at `docs/ai/workflows/fix-coverage.md`.
 2. Execute it with parameter **Scope = Testing**.
-

@@ -25,7 +25,7 @@ You analyze code coverage reports, identify gaps, and provide specific, actionab
 
 ### Step 1: Run Coverage
 ```
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Engine xplat -Mode GenerateAndAnalyze -Scope [ProjectName] -Top 30 -Isolated -SkipHtml
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope [ProjectName] -Top 30 -SkipHtml -Format cobertura
 ```
 
 ### Step 2: Parse Results

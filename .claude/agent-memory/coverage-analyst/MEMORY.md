@@ -7,11 +7,11 @@
 ## Learned Patterns
 
 ### Coverage Tool Usage
-- Primary engine: xplat (cross-platform Coverlet)
+- Default engine: xplat (cross-platform Coverlet)
 - Command: `pwsh -NoProfile -ExecutionPolicy Bypass -Command "cd '...'; ./tools/code-coverage/Run-CodeCoverage.ps1 -Mode GenerateAndAnalyze -Scope [ProjectName] -Top 30 -SkipHtml -Format cobertura"`
 - Note: `-Format cobertura` MUST be supplied explicitly — omitting it causes `Gen-CoverageReport.ps1` ValidateSet failure (empty string fails validation).
 - Note: `-Engine` parameter does NOT exist on `Run-CodeCoverage.ps1` — remove it from any stored commands.
-- dotCover: Removed (Mar 2026) — both 2025.3.3 (report hangs) and 2024.3.9 (Windows 11 24H2 kernel bug) are broken. All dotCover scripts deleted.
+- dotCover: blocker resolved (Mar 2026) by adding Webroot AV exclusions — 2025.3.3 verified on net8.0 and net10.0, as is xplat. The driver script has not been re-added to `tools/code-coverage/`, so use xplat until it is.
 - Valid scopes: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All
 - Reports land in: `artifacts/code-coverage/xplat/`
 

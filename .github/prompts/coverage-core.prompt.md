@@ -6,6 +6,8 @@ argument-hint: Optional focus area, class, or report artifact.
 ---
 Read and execute [docs/ai/agents/coverage-core.md](../../docs/ai/agents/coverage-core.md).
 
+Adopt the role it declares: [verifier.md](../../docs/ai/roles/verifier.md).
+
 Start with:
 - [Engineering roles](../../docs/ai/business-units/engineering.md)
 - [safety.md](../../docs/ai/specs/safety.md)

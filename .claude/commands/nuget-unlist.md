@@ -1,1 +1,1 @@
-Act as **Shipper**. Read and execute `docs/ai/agents/nuget-unlist.md`.
+Act as **DevOps Engineer**. Read and execute `docs/ai/agents/nuget-unlist.md`.

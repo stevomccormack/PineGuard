@@ -4,12 +4,12 @@ spec:
   title: "PineGuard.GuardClauses Code Coverage (Addendum)"
   version: 1
   template:
-    - ../template-coverage.md
+    - ../../meta/template-coverage.md
   parent:
-    - ../../spec.md
-    - ../../testing/coverage.md
+    - ../spec.md
+    - ../testing/coverage.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.GuardClauses/**"
   - "tests/PineGuard.GuardClauses.UnitTests/**"
@@ -21,7 +21,7 @@ This file contains **GuardClauses-specific** coverage notes only.
 
 Global rules and workflows:
 
-- `docs/ai/testing/coverage.md`
+- [Global coverage spec](../testing/coverage.md)
 
 ---
 
@@ -55,3 +55,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCov
 ## Default test project (fast loop)
 
 - `tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj`
+
+## Related specs
+
+- Unit tests addendum: `docs/ai/specs/guard-clauses/unit-test.md`

@@ -1,4 +1,15 @@
-﻿# PineGuard AI Spec Dependencies
+﻿---
+spec:
+  id: pineguard.ai.dependencies
+  title: "PineGuard AI Spec Dependencies"
+  version: 1
+  parent:
+    - spec.md
+applies_to:
+  - "docs/ai/specs/**"
+---
+
+# PineGuard AI Spec Dependencies
 
 This document is the **dependency map** for PineGuard’s AI generation specs.
 
@@ -6,7 +17,6 @@ It answers:
 
 - “Which specs must be read before I change X?”
 - “Where is the canonical rule for Y?”
-- “What is legacy vs. target layout during migration?”
 
 This file should stay short and stable. Prefer links over duplicated rules.
 
@@ -44,14 +54,8 @@ Canonical locations:
 - Core Rules/Utils: `docs/ai/specs/core/project.md`
 - MustClauses: `docs/ai/specs/must-clauses/project.md`
 - GuardClauses: `docs/ai/specs/guard-clauses/project.md`
-
-Target locations (during restructure):
-
-- `docs/ai/specs/core/`
-- `docs/ai/specs/must-clauses/`
-- `docs/ai/specs/guard-clauses/`
-- `docs/ai/specs/data-annotations/`
-- `docs/ai/specs/fluent-validation/`
+- FluentValidation: `docs/ai/specs/fluent-validation/project.md`
+- DataAnnotations: `docs/ai/specs/data-annotations/project.md`
 
 ---
 
@@ -79,6 +83,8 @@ spec:
   id: pineguard.ai.<domain>.<name>
   title: "<Human readable title>"
   version: 1
+  template:
+    - ../../meta/template-project.md
   parent:
     - ../../spec.md
   dependencies:

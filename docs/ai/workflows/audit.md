@@ -17,18 +17,30 @@
 ## Parameters
 
 - **Scope**: (`All`, `Library`, `Testing`) — implemented via wrapper scripts under `tools/audit-cli/`.
-- **Rules**: (optional) any RuleId present in `tools/audit-cli/rules/Load-Catalog.ps1`.
+- **RuleId**: (optional, alias `-Rule`) any RuleId present in `tools/audit-cli/rules/Load-Catalog.ps1`.
   - Library rules: Rule01..Rule10
   - Testing rules: Rule50..Rule54
 - **Configuration**: (`Debug`, `Release`) — used by rules that build/analyze compiled output
 - **RepoRoot**: (optional) repo root path; defaults to auto-resolve
 - **AllowViolations**: (optional switch) applies to rules that support policy allowlists (e.g., Rule07 + Rule08)
 
+## CI Gate
+
+`.github/workflows/ci.yml` runs `Run-All.ps1 -Configuration Release -RuleId Rule50` on every PR.
+Rule50 (Theory-only + Tests/TestData pairing) is the only audit rule that gates merges, and a
+Rule50 violation is a merge blocker — reproduce it locally before pushing:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RuleId Rule50
+```
+
 ## Auto-Approval
 
-- **Gemini**: `// turbo-all`
-- **Claude**: `Project Rules` allow scripts.
+- **Antigravity**: `// turbo-all` in `.agent/workflows/`.
+- **Claude Code**: `Project Rules` allow scripts.
 - **Cursor**: `cmd: powershell` allowed.
+
+See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface inventory.
 
 ## Steps
 

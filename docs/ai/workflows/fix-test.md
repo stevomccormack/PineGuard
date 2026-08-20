@@ -5,13 +5,13 @@
 
 ## Context
 
-- **Role**: [Software Engineer](../roles/builder.md)
-- **Skill**: [Implement Unit Tests](../skills/scaffold-unit-test.md)
+- **Roles**: [Senior Engineer / Owner](../roles/owner.md), [Test Engineer / Verifier](../roles/verifier.md)
+- **Skill**: [Implement Unit Tests](../skills/scaffold-unit-test/SKILL.md)
 - **Spec**: [Unit Tests Spec](../specs/testing/unit-test.md)
 
 ## Parameters
 
-- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, All)
+- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All)
 
 ## Steps
 

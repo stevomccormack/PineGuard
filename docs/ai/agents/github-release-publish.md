@@ -10,6 +10,7 @@ version: 1.0
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
 > roles: shipper ([../roles/shipper.md](../roles/shipper.md))
 > safety tier: **1** — creates durable artifacts on GitHub and nuget.org. Confirm scope with the user before proceeding.
+> adapter surface: **Claude Code only** — declared release-family exception in [../meta/adapter-surfaces.md](../meta/adapter-surfaces.md) §4. Do not generate adapters for it on surfaces that apply blanket auto-approval.
 
 ## Purpose
 

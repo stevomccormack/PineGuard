@@ -8,7 +8,7 @@ Small PowerShell helpers for creating clean, scoped commits.
 tools/git/
 ├── Run-Commits.ps1              # Master orchestrator (preferred entrypoint)
 ├── Import-GitHelpers.ps1        # Aggregator that dot-sources shared helpers
-├── Commit-Agent.ps1             # Scoped commit: .claude/ agent files
+├── Commit-Agent.ps1             # Scoped commit: every assistant adapter surface (.agent, .claude, .pi, .github/*, .clinerules, .cursor, .windsurf, .junie, .amazonq, .vscode) + root AGENTS.md/CLAUDE.md/GEMINI.md + per-project AGENTS.md
 ├── Commit-Core.ps1              # Scoped commit: PineGuard.Core
 ├── Commit-DataAnnotations.ps1   # Scoped commit: PineGuard.DataAnnotations
 ├── Commit-Docs.ps1              # Scoped commit: docs/
@@ -58,7 +58,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -All -
 
 | Parameter | Description |
 |-----------|-------------|
-| `-Agent` | Include `.claude/` agent files |
+| `-Agent` | Include every assistant adapter surface and every `AGENTS.md` (see the `$paths` array in `Commit-Agent.ps1`, and `docs/ai/meta/adapter-surfaces.md` for the surface inventory). The Brain itself (`docs/`) is committed by `-Docs`. |
 | `-Core` | Include PineGuard.Core |
 | `-MustClauses` | Include PineGuard.MustClauses |
 | `-GuardClauses` | Include PineGuard.GuardClauses |

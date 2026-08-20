@@ -1,6 +1,6 @@
 ---
-name: roslyn-run
-description: Run Roslyn compiler diagnostics and report CS warnings. Use whenever the user says "check warnings", "what are the CS warnings", "run Roslyn", "show compiler diagnostics", "how many warnings", or wants a build diagnostic report before fixing. Do NOT use to fix warnings; use roslyn-fix instead.
+name: scan-roslyn
+description: Run Roslyn compiler diagnostics and report CS warnings. Use whenever the user says "check warnings", "what are the CS warnings", "run Roslyn", "show compiler diagnostics", "how many warnings", or wants a build diagnostic report before fixing. Do NOT use to fix warnings; use fix-roslyn instead.
 argument-hint: "[Scope]"
 context: fork
 allowed-tools: Read, Glob, Grep, Bash

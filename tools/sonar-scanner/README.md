@@ -19,6 +19,9 @@ Results are viewed at `http://localhost:9001`.
 pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-up.ps1
 ```
 
+See [tools/docker/README.md](../docker/README.md) for the compose stacks, the shared network, and the
+per-stack up/down scripts (`sonarqube-up.ps1` starts SonarQube alone).
+
 ### 2. Initialize (first run only)
 
 Installs Java (OpenJDK 21) and `dotnet-sonarscanner` if not present, then waits for SonarQube to be healthy.

@@ -6,6 +6,8 @@ version: 1.0
 
 # Role: Principal Engineer
 
+> **Also known as:** System Thinker · `roles/principal-engineer.md` · `role-principal-engineer`
+
 > [!NOTE]
 > You are the **System Thinker**. Your job is to keep the whole codebase coherent.
 
@@ -38,8 +40,11 @@ This persona is adopted for architecture, cross-cutting design, tooling strategy
 ### Skills
 - [Create Workflow](../skills/scaffold-workflow/SKILL.md)
 
+### Specs
+- [Engineering Standards](../specs/coding-standard.md)
+- [Brain/Adapter Protocol](../specs/protocol.md)
+
 ### Workflows
-- [Engineering Standards](../workflows/standard.md)
 - [Run Audit CLI](../workflows/audit.md)
 
 <!-- footer

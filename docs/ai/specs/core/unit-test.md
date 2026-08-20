@@ -54,7 +54,15 @@ public sealed record RuleCase<TValue>(string Name, TValue Value, RuleExpected Ex
     : ReturnCase<TValue, RuleExpected>(Name, Value, Expected);
 ```
 
-`IsCase<T>` and `HasCase<T>` are **obsolete** (`[Obsolete("Use RuleCase<T> instead.")]`). Do not use them.
+`IsCase<T>` and `HasCase<T>` are **deprecated** and carry `[Description("Use RuleCase<T> for rules.")]` — not `[Obsolete]`, so the compiler will not warn. Do not use them in new tests.
+
+### §2.1 Required Imports
+
+Fixture, TestData and Tests files all require the Rules sub-namespace:
+
+```csharp
+using PineGuard.Testing.UnitTests.Rules;
+```
 
 ### §3 Expected Type
 
@@ -125,25 +133,27 @@ This applies to methods with `ThrowIfNull` in: `PredicateRules.Satisfies`, `Coll
 **Fixture** (`tests/PineGuard.Testing/Fixtures/BoolRulesFixtures.cs`):
 
 ```csharp
+using PineGuard.Testing.UnitTests.Rules;
+
 namespace PineGuard.Testing.Fixtures;
 
 public static class BoolRulesFixtures
 {
     public static class IsTrue
     {
-        public static readonly bool? Valid       = true;
-        public static readonly bool? NullValue   = null;
-        public static readonly bool? False       = false;
+        public static readonly bool? True  = true;
+        public static readonly bool? Null  = null;
+        public static readonly bool? False = false;
 
         public static RuleScenario<bool?>[] ValidScenarios =>
         [
-            new(nameof(Valid), Valid, true),
+            new(nameof(True), True, true)
         ];
 
         public static RuleScenario<bool?>[] InvalidScenarios =>
         [
-            new(nameof(NullValue), NullValue, false),
-            new(nameof(False), False, false),
+            new(nameof(Null),  Null,  false),
+            new(nameof(False), False, false)
         ];
 
         public static RuleScenario<bool?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
@@ -151,10 +161,12 @@ public static class BoolRulesFixtures
 }
 ```
 
+> **Note**: the null-scenario field name is per-fixture — `Null` in `BoolRulesFixtures`, `NullValue` in others. Read the name from the fixture; never assume it.
+
 **TestData** (`tests/PineGuard.Core.UnitTests/Rules/BoolRulesTestData.cs`):
 
 ```csharp
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.BoolRulesFixtures;
 
 namespace PineGuard.Core.UnitTests.Rules;
@@ -177,7 +189,7 @@ public static class BoolRulesTestData
 
 ```csharp
 using PineGuard.Rules;
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
 
 namespace PineGuard.Core.UnitTests.Rules;

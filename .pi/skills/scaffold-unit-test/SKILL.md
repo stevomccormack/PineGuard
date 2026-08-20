@@ -1,5 +1,5 @@
 ---
-name: implement-unit-tests
+name: scaffold-unit-test
 description: Implement xUnit tests for any PineGuard class. Use when adding tests for rules, clauses, or utilities.
 ---
 

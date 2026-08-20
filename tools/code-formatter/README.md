@@ -51,7 +51,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format
 |-----------|------|---------|-------------|
 | `-Project` | string | — | Path to a specific `.csproj` file |
 | `-Solution` | string | — | Path to a specific `.sln`/`.slnx` file |
-| `-Scope` | string | — | Named scope: `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `All` |
+| `-Scope` | string | — | Named scope: `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`, `All` |
 | `-VerifyNoChanges` | switch | `$false` | Verification mode (`--verify-no-changes`). Exits non-zero if changes needed |
 | `-Severity` | string | — | Minimum severity: `info`, `warn`, `error` |
 | `-NoBuild` | switch | `$false` | Skip implicit restore/build (`--no-restore`) |
@@ -67,6 +67,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format
 | `GuardClauses` | `src/PineGuard.GuardClauses/PineGuard.GuardClauses.csproj` |
 | `FluentValidation` | `src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj` |
 | `DataAnnotations` | `src/PineGuard.DataAnnotations/PineGuard.DataAnnotations.csproj` |
+| `Testing` | `tests/PineGuard.Testing/PineGuard.Testing.csproj` |
 | `All` | `PineGuard.slnx` (src + tests) |
 
 ## Notes

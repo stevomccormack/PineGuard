@@ -1,6 +1,6 @@
 ---
-name: roslyn-run
-description: Run Roslyn compiler diagnostics. Use when asked to check compiler warnings, CS warning codes, or build diagnostics. Do NOT use to fix warnings; use roslyn-fix instead.
+name: scan-roslyn
+description: Run Roslyn compiler diagnostics. Use when asked to check compiler warnings, CS warning codes, or build diagnostics. Do NOT use to fix warnings; use fix-roslyn instead.
 ---
 
 # Skill: Run Roslyn Compiler Diagnostics

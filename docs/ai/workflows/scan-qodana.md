@@ -1,4 +1,3 @@
-````markdown
 # Workflow: Run Qodana
 
 > [!NOTE]
@@ -6,19 +5,21 @@
 
 ## Context
 
-- **Role**: [Software Engineer](../roles/builder.md)
+- **Role**: [Code Reviewer](../roles/reviewer.md)
 - **Reference**: `tools/code-inspection/Run-Qodana.ps1`
 - **Docs**: `docs/ai/specs/tools/code-inspection/qodana.md`
 
 ## Parameters
 
-- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`)
+- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`)
 
 ## Auto-Approval
 
-- **Gemini**: `// turbo-all`
-- **Claude**: `Project Rules` allow scripts.
+- **Antigravity**: `// turbo-all` in `.agent/workflows/`.
+- **Claude Code**: `Project Rules` allow scripts.
 - **Cursor**: `cmd: powershell` allowed.
+
+See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface inventory.
 
 ## Steps
 
@@ -48,4 +49,3 @@
    - Look for:
      - SARIF report: `*.sarif.json` (used for Code Scanning)
      - HTML report: `report/index.html`
-````

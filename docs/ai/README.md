@@ -23,17 +23,16 @@ version: 2.0
 
 | Directory | Purpose | Contents |
 |-----------|---------|----------|
-| `docs/ai/specs/` | Normative engineering rules | Root spec, project specs, coding standards, testing specs, [GOLD-STANDARD index](specs/testing/gold-standard.md) |
+| `docs/ai/specs/` | Normative engineering rules + structural design | Root spec, protocol, orchestration, dependencies, per-project specs, coding standards, testing specs, [GOLD-STANDARD index](specs/testing/gold-standard.md) |
 | `docs/ai/rules/` | Scope-specific rule summaries | Global invariants + per-project rules (inheriting from `global.md`) |
 | `docs/ai/skills/` | Reusable "how-to" procedures | Implementation recipes for each layer + meta templates |
 | `docs/ai/agents/` | Canonical playbooks / entrypoints | Agent definitions for all workflows |
 | `docs/ai/workflows/` | Reusable orchestration | Multi-step workflow definitions |
-| `docs/ai/commands/` | Interface contracts / triggers | Intent-to-agent mappings |
-| `docs/ai/roles/` | Personas and responsibilities | 10 roles (see Roles Inventory below) |
+| `docs/ai/commands/` | Interface contracts / triggers | Intent-to-agent mappings, one per command family |
+| `docs/ai/roles/` | Personas and responsibilities | 11 roles (see Roles Inventory below) |
 | `docs/ai/memory/` | Durable learned patterns | Portable, checked-in agent memory shared across tools |
 | `docs/ai/business-units/` | Organisational context | Engineering business unit |
-| `docs/ai/specs/` | Structural design docs | Universal protocol model |
-| `docs/ai/meta/` | Meta-documentation | Taxonomy, tooling alignment, document template |
+| `docs/ai/meta/` | Meta-documentation | Taxonomy, tooling alignment, [adapter surfaces](meta/adapter-surfaces.md), and the document templates (`template-spec.md`, `template-project.md`, `template-unit-test.md`, `template-coverage.md`) |
 | `docs/ai/plans/` | Implementation plans | Phased execution plans for major initiatives |
 
 
@@ -42,6 +41,8 @@ version: 2.0
 | File | Purpose |
 |------|---------|
 | `docs/ai/README.md` | This index |
+| [`docs/ai/skills/INDEX.md`](skills/INDEX.md) | Per-skill catalog across Brain and adapter tiers |
+| [`docs/ai/meta/adapter-surfaces.md`](meta/adapter-surfaces.md) | Single inventory of every AI-tool adapter surface |
 
 ### Active Plans
 
@@ -58,7 +59,11 @@ Policy Uplift, Adapter Naming Collision Review, and others) live in [plans/compl
 
 ### If you have an intent ("run tests", "check coverage", "run Qodana", "check Roslyn warnings", "audit")
 
-- Start with the matching command contract in `docs/ai/commands/`.
+- Start with the matching command contract in `docs/ai/commands/` — one per family:
+  [test](commands/test.md), [coverage](commands/coverage.md), [fix](commands/fix.md),
+  [scan](commands/scan.md), [format](commands/format.md), [document](commands/document.md),
+  [commit](commands/commit.md), [clean](commands/clean.md), [audit](commands/audit.md),
+  [release](commands/release.md), [council](commands/council.md).
 - Follow its canonical agent entrypoint in `docs/ai/agents/`.
 - Agents should reuse `docs/ai/workflows/` and `docs/ai/skills/`.
 
@@ -90,18 +95,22 @@ Rules use an inheritance model to avoid duplication:
 ```
 docs/ai/rules/global.md          (always applies — invariants, file hygiene)
     ├── core.md                   (inherits global, adds Core-specific specs)
-    ├── must-clauses.md           (inherits global, adds MustClauses specs)
-    ├── guard-clauses.md          (inherits global, adds GuardClauses + Must dependency)
-    ├── fluent-validation.md      (inherits global, adds FluentValidation + Must dependency)
-    ├── data-annotations.md       (inherits global, adds DataAnnotations + Must dependency)
-    ├── unit-tests.md             (inherits global, adds testing specs)
+    ├── must.md                   (inherits global, adds MustClauses specs)
+    ├── guard.md                  (inherits global, adds GuardClauses + Must dependency)
+    ├── fluent.md                 (inherits global, adds FluentValidation + Must dependency)
+    ├── annotation.md             (inherits global, adds DataAnnotations + Must dependency)
+    ├── testing.md                (inherits global, adds unit-test specs)
+    ├── fixture-conventions.md    (inherits global, adds fixture partial naming + shape conventions)
     ├── tools.md                  (inherits global, adds tooling specs)
     ├── scan.md                   (inherits global, adds SonarQube scan specs)
-    ├── code-diagnostics.md       (inherits global, adds Roslyn compiler diagnostics specs)
+    ├── roslyn.md                 (inherits global, adds Roslyn compiler diagnostics specs)
     ├── coordination.md           (inherits global, adds multi-session coordination rules)
 ```
 
 ## Skills Inventory
+
+The 16 Brain skills. [`skills/INDEX.md`](skills/INDEX.md) carries the same list with per-skill IDs
+and the adapter wrappers that delegate to each one.
 
 | Skill | Directory | Purpose |
 |-------|-----------|---------|
@@ -111,6 +120,7 @@ docs/ai/rules/global.md          (always applies — invariants, file hygiene)
 | Implement FluentValidation | `skills/scaffold-fluent/` | IRuleBuilder extensions |
 | Implement DataAnnotations | `skills/scaffold-annotation/` | ValidationAttribute adapters |
 | Implement Unit Tests | `skills/scaffold-unit-test/` | xUnit tests per spec |
+| Generate XML Docs | `skills/document/` | Layer-aware XML documentation for all public members |
 | Improve Code Coverage | `skills/improve-coverage/` | Coverage gap analysis and filling |
 | Format Code | `skills/format-code/` | dotnet format enforcement |
 | SonarQube Analysis | `skills/scan-sonar/` | Run SonarQube static analysis |
@@ -153,13 +163,19 @@ All roles are defined in `docs/ai/roles/` and registered in `docs/ai/business-un
 
 Adapters are thin pointers that map tool-specific features to the canonical Brain.
 
-### Minimal Adapters (pointers only)
+### Surface Inventory
 
-| Tool | Adapter | Purpose |
-|------|---------|---------|
-| GitHub Copilot | `.github/copilot-instructions.md` | Repo-wide adapter pointing to the Brain |
-| Cursor | `.cursorrules` | Points to Brain roles and workflows |
-| Gemini | `.agent/workflows/*.md` | Adapter stubs pointing to Brain agents |
+[`meta/adapter-surfaces.md`](meta/adapter-surfaces.md) is the **single inventory** of every surface,
+its tier, and where command parity is expected. Do not keep a second copy here — in summary:
+
+- **Root boot files** — `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`.
+- **Full adapters** (per-command file format; parity expected) — `.claude/`, `.agent/` (Antigravity),
+  `.pi/`, `.github/`.
+- **Rules-only adapters** (no command format; parity not expected) — `.clinerules/`, `.cursor/rules/`,
+  `.windsurf/rules/`, `.amazonq/rules/`, `.junie/guidelines.md`.
+
+The two sections below detail the native features of the two richest surfaces; every other surface is
+described in the inventory.
 
 ### GitHub Copilot Adapter (`.github/`)
 
@@ -179,12 +195,12 @@ Claude Code supports native features that **reference** the Brain without duplic
 
 | Feature | Directory | How It Maps to Brain |
 |---------|-----------|---------------------|
-| Rules | `.claude/rules/` (10 files) | Path-scoped adapters → `docs/ai/rules/` |
-| Skills | `.claude/skills/` (18 dirs) | `context: fork` wrappers → `docs/ai/skills/` |
-| Agents | `.claude/agents/` (5 files) | Native subagents with memory, referencing Brain roles + specs |
-| Agent Memory | `.claude/agent-memory/` (4 dirs) | Persistent knowledge, seeded from Brain patterns + role directives |
-| Hooks | `.claude/hooks/` (8 scripts) | Enforcement of file hygiene rules from Brain specs |
-| Commands | `.claude/commands/` (85 files) | Slash commands → `docs/ai/agents/` playbooks |
+| Rules | `.claude/rules/` | Path-scoped adapters → `docs/ai/rules/` |
+| Skills | `.claude/skills/` | `context: fork` wrappers → `docs/ai/skills/` |
+| Agents | `.claude/agents/` | Native subagents with memory, referencing Brain roles + specs |
+| Agent Memory | `.claude/agent-memory/` | Persistent knowledge, seeded from Brain patterns + role directives |
+| Hooks | `.claude/hooks/` | Enforcement of file hygiene rules from Brain specs |
+| Commands | `.claude/commands/` | Slash commands → `docs/ai/agents/` playbooks |
 | Settings | `.claude/settings.json` | Whitelisted commands (all `tools/` scripts) |
 
 **Direction of dependency:** `.claude/` → `docs/ai/` (never the reverse).
@@ -199,15 +215,16 @@ Adapters MUST NOT embed logic; they should point to `docs/ai/`.
 - **Skills/Workflows** are the only source of truth for procedures.
 - **Agents** are composed from Skills/Workflows (don't duplicate instructions).
 - **Commands** define the interface contract (intent/trigger → agent).
-- **Adapters** (`.claude/`, `.agent/`, `.github/`) reference the Brain — never the reverse.
+- **Adapters** (every surface in [`meta/adapter-surfaces.md`](meta/adapter-surfaces.md)) reference the Brain — never the reverse.
 - **Specs** reference tool READMEs for usage — they do not duplicate operational docs.
 - **Roles** are the source of truth for personas. Agents reference roles — never the reverse.
 
 ## References
 
 - Universal protocol: `docs/ai/specs/protocol.md`
+- Adapter surfaces: `docs/ai/meta/adapter-surfaces.md`
 - Document template: `docs/ai/meta/template-spec.md`
 
 <!-- footer
-last_verified: 2026-07-08
+last_verified: 2026-08-20
 -->

@@ -12,32 +12,40 @@ version: 2.0
 
 ## Strategy
 
-Use the **Agent tool** to launch one sub-agent per test project **in parallel**.
-Each sub-agent runs tests for a single project and reports pass/fail + failure details.
+Run one pass per test project. If the host supports parallel sub-agents, launch them
+concurrently — one per project; otherwise run them sequentially.
+Each run covers a single project and reports pass/fail + failure details.
 
 > [!NOTE]
 > All test commands are read-only (Tier 2 — safe without confirmation).
 
 ## Steps
 
-### 1. Launch parallel sub-agents
+### 1. Launch one run per project
 
-Spawn **all five** sub-agents in a **single message** (so they run concurrently):
+Start **all six** concurrently where the host allows it:
 
-| Sub-agent name | Project | Command |
-|:---|:---|:---|
-| `test-core` | Core | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Project "tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj"` |
-| `test-must` | MustClauses | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Project "tests/PineGuard.MustClauses.UnitTests/PineGuard.MustClauses.UnitTests.csproj"` |
-| `test-guard` | GuardClauses | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Project "tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj"` |
-| `test-fluent` | FluentValidation | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Project "tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj"` |
-| `test-da` | DataAnnotations | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Project "tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj"` |
+| Label | Scope |
+|:---|:---|
+| `test-core` | Core |
+| `test-must` | MustClauses |
+| `test-guard` | GuardClauses |
+| `test-fluent` | FluentValidation |
+| `test-annotation` | DataAnnotations |
+| `test-testing` | Testing |
 
-**Sub-agent prompt template** (use `subagent_type: general-purpose`):
+Resolve each scope to its `.csproj` using the **Project map** in
+[`../workflows/test.md`](../workflows/test.md); the command template is
+`pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Project "[TEST_PROJECT]"`.
+
+The **Label** column only identifies the run in your summary table — it is not a sub-agent type.
+
+**Per-project brief** (hand this to each worker, or follow it yourself once per project):
 
 ```
-Run unit tests for PineGuard.[Project].
+Run unit tests for PineGuard.[Scope].
 
-1. Run: `[command from table above]`
+1. Run: `[command resolved from the Project map]`
 2. Parse the output for test results.
 3. Report back with:
    - Total tests, passed, failed, skipped
@@ -47,7 +55,7 @@ Run unit tests for PineGuard.[Project].
 
 ### 2. Collect results
 
-Wait for all five sub-agents to complete. Collate their results into a single summary table:
+Wait for all six runs to complete. Collate their results into a single summary table:
 
 | Project | Total | Passed | Failed | Skipped | Status |
 |:---|:---|:---|:---|:---|:---|
@@ -56,17 +64,14 @@ Wait for all five sub-agents to complete. Collate their results into a single su
 | GuardClauses | ... | ... | ... | ... | PASS / FAILURES |
 | FluentValidation | ... | ... | ... | ... | PASS / FAILURES |
 | DataAnnotations | ... | ... | ... | ... | PASS / FAILURES |
-
-### 3. PineGuard.Testing (build verification)
+| Testing | ... | ... | ... | ... | PASS / FAILURES |
 
 > [!NOTE]
-> `PineGuard.Testing` is a shared test infrastructure library with no test methods.
-> It is built automatically as a dependency of all `*.UnitTests` projects above.
-> If all five sub-agents succeed, Testing is implicitly verified.
+> `tests/PineGuard.Testing/` is the shared test-infrastructure library, built automatically as a
+> dependency of every `*.UnitTests` project. `tests/PineGuard.Testing.UnitTests/` is the test
+> project that exercises it, and it is what the `Testing` scope runs.
 
-If any sub-agent reported a build failure, note that Testing may also be affected.
-
-### 4. Final report
+### 3. Final report
 
 Present the consolidated summary table to the user.
 If any project has failures, list the specific failing tests with error details.

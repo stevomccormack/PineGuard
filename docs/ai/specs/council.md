@@ -1,8 +1,16 @@
-<!-- metadata_header
-type: spec
-id: pineguard.ai.council
-version: 1.0
--->
+---
+spec:
+  id: pineguard.ai.council
+  title: "LLM Council (Normative)"
+  version: 1
+  parent:
+    - spec.md
+  dependencies:
+    - dependencies.md
+applies_to:
+  - "docs/ai/plans/**"
+  - "docs/ai/skills/ask-council/**"
+---
 
 # LLM Council (Normative)
 

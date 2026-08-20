@@ -4,11 +4,11 @@ spec:
   title: "PineGuard.MustClauses Project Spec"
   version: 2
   template:
-    - ../template-project.md
+    - ../../meta/template-project.md
   parent:
     - ../project.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.MustClauses/**"
   - "src/PineGuard.Core/MustClauses/**"
@@ -18,7 +18,31 @@ applies_to:
 
 This document is the **source-of-truth instruction set** for generating and maintaining **production MustClauses code** in this repository.
 
-**Inheritance**: Inherits from docs/ai/specs/project.md.
+**Inheritance**: Inherits from `docs/ai/specs/project.md`.
+
+## Feature Implementation Checklist
+
+See `docs/ai/specs/spec.md` §3 ("Feature Implementation Checklist (Master)").
+
+## Related specs
+
+- Unit tests addendum: `docs/ai/specs/must-clauses/unit-test.md`
+- Coverage addendum: `docs/ai/specs/must-clauses/coverage.md`
+- Naming collisions: `docs/ai/specs/language/naming-collisions.md`
+
+---
+
+## Layer pipeline
+
+PineGuard layers in one direction — each layer calls only the one before it:
+
+- **Core** (`Rules`/`Utils`) owns validation logic and parsing.
+- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
+- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
+- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
+- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
+
+Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none reimplements Core logic.
 
 ---
 
@@ -126,6 +150,20 @@ Rules:
 - Do not introduce `Non*`/`Invalid*` naming in MustClauses; use `Not*` and curated semantic opposites instead.
 - Negations must not treat invalid input as success (i.e., they must preserve the same “input validity” preconditions as the positive method).
 
+### Method ordering
+
+MustClauses is the vocabulary owner, so the canonical ordering rule lives here and the adapter layers cite it.
+
+- Within each domain file, a positive method appears immediately **before** its `Not*` complement (e.g. `Contains` then `NotContains`, `SubsetOf` then `NotSubsetOf`).
+- Methods with no complement keep their domain-grouped position.
+- Enforced by `tools/audit-cli/rules/Test-Rule08-Ordering.ps1`.
+
+Adapter layers inherit this rule:
+
+- `docs/ai/specs/fluent-validation/project.md` §1 — same positive-before-negative order.
+- `docs/ai/specs/data-annotations/project.md` §2.1 — same order within aggregated attribute files.
+- `docs/ai/specs/guard-clauses/project.md` §4 deliberately **inverts** it: Guard files are ordered by the Must clause each guard invokes, so the negative guard comes first. That inversion is an intentional exception to this section, not a contradiction of it.
+
 ---
 
 ## Signature conventions (strict)
@@ -149,7 +187,7 @@ Rules:
 
 ### Nullability
 
-MustClauses use a **hybrid nullability strategy** (Rule07):
+MustClauses use a **hybrid nullability strategy** (Rule07 — see `docs/ai/specs/tools/audit-cli/spec.md` and `tools/audit-cli/rules/Test-Rule07-Nullability.ps1`):
 
 - **Primary validated value (reference types)**: use nullable inputs.
   - Example: `string? value`, `object? value`.
@@ -284,5 +322,5 @@ var ok = NumberRules.IsPositive<decimal>(parsed);
 When asked to add a new MustClause feature, produce:
 
 - One or more new/updated MustXxxClauses.cs files under src/PineGuard.MustClauses/.
-- Methods that compile under net8.0 with nullable enabled.
+- Code that compiles under all repo target frameworks — `netstandard2.1`, `net8.0` and `net10.0` (see `Directory.Build.props`) — with nullable enabled. Guard any BCL API not present on `netstandard2.1` behind the existing conditional-compilation pattern rather than assuming net8.0+.
 - No unit tests (unless explicitly requested in a separate task).

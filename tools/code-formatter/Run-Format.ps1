@@ -18,7 +18,8 @@
 
 .PARAMETER Scope
     Named scope that resolves to a source project. Valid values:
-    Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, All.
+    Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All.
+    'Testing' targets the PineGuard.Testing support library under tests/.
     'All' targets the full PineGuard.slnx solution (src + tests).
 
 .PARAMETER VerifyNoChanges
@@ -55,7 +56,7 @@ param(
     [string]$Project,
     [string]$Solution,
 
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'All')]
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Testing', 'All')]
     [string]$Scope,
 
     [switch]$VerifyNoChanges,
@@ -99,6 +100,7 @@ if ($Scope) {
         'GuardClauses'     { Join-Path $repoRoot 'src/PineGuard.GuardClauses/PineGuard.GuardClauses.csproj' }
         'FluentValidation' { Join-Path $repoRoot 'src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj' }
         'DataAnnotations'  { Join-Path $repoRoot 'src/PineGuard.DataAnnotations/PineGuard.DataAnnotations.csproj' }
+        'Testing'          { Join-Path $repoRoot 'tests/PineGuard.Testing/PineGuard.Testing.csproj' }
         'All'              { Join-Path $repoRoot 'PineGuard.slnx' }
     }
     if (-not (Test-Path $target)) {

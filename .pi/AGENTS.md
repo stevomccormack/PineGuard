@@ -10,9 +10,16 @@
 Before acting, adopt a persona from the Engineering Business Unit:
 Read **docs/ai/business-units/engineering.md**
 
+Each prompt names the persona declared by its target playbook's `roles:` header. The playbook is
+authoritative — when the two disagree, the playbook wins and the prompt is the file to correct.
+
 ## 2. Prompt Templates (Slash Commands)
 
-PI prompt templates live in `.pi/prompts/`. Type `/templatename` to invoke.
+PI prompt templates live in `.pi/prompts/`. Type `/templatename` to invoke. Every bullet below is
+the basename of a file in that directory; the two must match exactly.
+
+Surface coverage and the declared parity exceptions (the Claude-Code-only release family) are
+recorded once in **docs/ai/meta/adapter-surfaces.md**.
 
 ### Coverage Workflows
 
@@ -38,20 +45,20 @@ PI prompt templates live in `.pi/prompts/`. Type `/templatename` to invoke.
 
 - `/fix-coverage-all`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-all.md`.
 - `/fix-coverage-core`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-core.md`.
-- `/fix-coverage-must-clauses`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-must.md`.
-- `/fix-coverage-guard-clauses`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-guard.md`.
-- `/fix-coverage-fluent-validation`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-fluent.md`.
-- `/fix-coverage-data-annotations`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-annotation.md`.
+- `/fix-coverage-must`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-must.md`.
+- `/fix-coverage-guard`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-guard.md`.
+- `/fix-coverage-fluent`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-fluent.md`.
+- `/fix-coverage-annotation`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-annotation.md`.
 - `/fix-coverage-testing`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-coverage-testing.md`.
 
 ### Debug & Test Workflows
 
 - `/fix-test-all`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-all.md`.
 - `/fix-test-core`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-core.md`.
-- `/fix-test-must-clauses`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-must.md`.
-- `/fix-test-guard-clauses`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-guard.md`.
-- `/fix-test-fluent-validation`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-fluent.md`.
-- `/fix-test-data-annotations`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-annotation.md`.
+- `/fix-test-must`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-must.md`.
+- `/fix-test-guard`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-guard.md`.
+- `/fix-test-fluent`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-fluent.md`.
+- `/fix-test-annotation`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-annotation.md`.
 - `/fix-test-testing`: Act as **Senior Engineer / Test Engineer**. Execute `docs/ai/agents/fix-test-testing.md`.
 
 ### Formatting Workflows
@@ -68,37 +75,37 @@ PI prompt templates live in `.pi/prompts/`. Type `/templatename` to invoke.
 
 - `/document-all`: Act as **Software Engineer**. Execute `docs/ai/agents/document-all.md`.
 - `/document-core`: Act as **Software Engineer**. Execute `docs/ai/agents/document-core.md`.
-- `/document-must-clauses`: Act as **Software Engineer**. Execute `docs/ai/agents/document-must.md`.
-- `/document-guard-clauses`: Act as **Software Engineer**. Execute `docs/ai/agents/document-guard.md`.
-- `/document-fluent-validation`: Act as **Software Engineer**. Execute `docs/ai/agents/document-fluent.md`.
-- `/document-data-annotations`: Act as **Software Engineer**. Execute `docs/ai/agents/document-annotation.md`.
+- `/document-must`: Act as **Software Engineer**. Execute `docs/ai/agents/document-must.md`.
+- `/document-guard`: Act as **Software Engineer**. Execute `docs/ai/agents/document-guard.md`.
+- `/document-fluent`: Act as **Software Engineer**. Execute `docs/ai/agents/document-fluent.md`.
+- `/document-annotation`: Act as **Software Engineer**. Execute `docs/ai/agents/document-annotation.md`.
 
 ### Qodana Workflows
 
 - `/scan-qodana-all`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-all.md`.
 - `/scan-qodana-core`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-core.md`.
-- `/scan-qodana-must-clauses`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-must.md`.
-- `/scan-qodana-guard-clauses`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-guard.md`.
-- `/scan-qodana-fluent-validation`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-fluent.md`.
-- `/scan-qodana-data-annotations`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-annotation.md`.
+- `/scan-qodana-must`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-must.md`.
+- `/scan-qodana-guard`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-guard.md`.
+- `/scan-qodana-fluent`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-fluent.md`.
+- `/scan-qodana-annotation`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-annotation.md`.
 - `/scan-qodana-testing`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-qodana-testing.md`.
 
 ### Roslyn Workflows
 
 - `/scan-roslyn-all`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-all.md`.
 - `/scan-roslyn-core`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-core.md`.
-- `/roslyn-must-clauses`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-must.md`.
-- `/roslyn-guard-clauses`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-guard.md`.
-- `/roslyn-fluent-validation`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-fluent.md`.
-- `/roslyn-data-annotations`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-annotation.md`.
-- `/roslyn-testing`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-testing.md`.
+- `/scan-roslyn-must`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-must.md`.
+- `/scan-roslyn-guard`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-guard.md`.
+- `/scan-roslyn-fluent`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-fluent.md`.
+- `/scan-roslyn-annotation`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-annotation.md`.
+- `/scan-roslyn-testing`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-roslyn-testing.md`.
 - `/fix-roslyn-all`: Act as **Senior Engineer**. Execute `docs/ai/agents/fix-roslyn-all.md`.
 
 ### Sonar Workflows
 
 - `/scan-sonar`: Act as **Code Reviewer**. Execute `docs/ai/agents/scan-sonar.md`.
 - `/fix-sonar-all`: Act as **Senior Engineer**. Execute `docs/ai/agents/fix-sonar-all.md`.
-- `/fix-sonar-blockers`: Act as **Senior Engineer**. Execute `docs/ai/agents/fix-sonar-blocker.md`.
+- `/fix-sonar-blocker`: Act as **Senior Engineer**. Execute `docs/ai/agents/fix-sonar-blocker.md`.
 - `/fix-sonar-high`: Act as **Senior Engineer**. Execute `docs/ai/agents/fix-sonar-high.md`.
 - `/fix-sonar-medium`: Act as **Senior Engineer**. Execute `docs/ai/agents/fix-sonar-medium.md`.
 - `/fix-sonar-low`: Act as **Senior Engineer**. Execute `docs/ai/agents/fix-sonar-low.md`.
@@ -111,23 +118,27 @@ PI prompt templates live in `.pi/prompts/`. Type `/templatename` to invoke.
 
 ### Git Commit Workflows
 
-- `/commit-agent`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-agent.md`.
-- `/commit-all`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-all.md`.
-- `/commit-core`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-core.md`.
-- `/commit-must-clauses`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-must.md`.
-- `/commit-guard-clauses`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-guard.md`.
-- `/commit-fluent-validation`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-fluent.md`.
-- `/commit-data-annotations`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-annotation.md`.
-- `/commit-testing`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-testing.md`.
-- `/commit-docs`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-doc.md`.
-- `/commit-solution`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-solution.md`.
-- `/commit-tools`: Act as **Software Engineer**. Execute `docs/ai/agents/commit-tool.md`.
+- `/commit-agent`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-agent.md`.
+- `/commit-all`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-all.md`.
+- `/commit-core`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-core.md`.
+- `/commit-must`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-must.md`.
+- `/commit-guard`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-guard.md`.
+- `/commit-fluent`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-fluent.md`.
+- `/commit-annotation`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-annotation.md`.
+- `/commit-testing`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-testing.md`.
+- `/commit-doc`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-doc.md`.
+- `/commit-solution`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-solution.md`.
+- `/commit-tool`: Act as **DevOps Engineer**. Execute `docs/ai/agents/commit-tool.md`.
 
 ### Analysis Workflows
 
-- `/audit-gap`: Act as **Software Engineer**. Execute `docs/ai/agents/audit-gap.md`.
-- `/audit-cli`: Act as **Software Engineer**. Execute `docs/ai/agents/audit-cli.md`.
-- `/scaffold-vertical-slice`: Act as **Software Engineer**. Execute `docs/ai/agents/scaffold-vertical-slice.md`.
+- `/audit-gap`: Act as **Test Analyst / Test Engineer**. Execute `docs/ai/agents/audit-gap.md`.
+- `/audit-cli`: Act as **DevOps Engineer**. Execute `docs/ai/agents/audit-cli.md`.
+- `/scaffold-vertical-slice`: Act as **Senior Engineer**. Execute `docs/ai/agents/scaffold-vertical-slice.md`.
+
+### Council Workflows
+
+- `/ask-council`: Act as **Architect**. Execute `docs/ai/agents/ask-council.md`.
 
 ## 3. PI-Native Features
 
@@ -157,17 +168,11 @@ Read **docs/ai/specs/safety.md** (Tier 0/1/2 command classification)
 - **Commands**: `docs/ai/commands/` (intent-to-agent mappings)
 - **Roles**: `docs/ai/roles/` (personas and responsibilities)
 - **Architecture**: `docs/ai/specs/` (structural design)
-- **Meta**: `docs/ai/meta/` (taxonomy, tooling alignment)
+- **Meta**: `docs/ai/meta/` (taxonomy, tooling alignment, adapter surfaces)
 - **Plans**: `docs/ai/plans/` (implementation roadmaps)
 
 ## 6. Global Rules
 
-Read `docs/ai/rules/global.md` for invariants that apply to all code in this repository.
-
-Key invariants:
-- Layer order: Core Utils -> Core Rules -> MustClauses -> GuardClauses -> Integrations
-- Must owns canonical messages; Guard/Fluent/Data reuse them (never duplicate)
-- Guard calls Must (never duplicate logic)
-- Deterministic: No IO in Core Rules/Utils
-- File-scoped namespaces, sorted usings, arrow functions for single-line expressions
-- All output files -> `artifacts/` or `logs/`, NEVER project root
+Read `docs/ai/rules/global.md` for invariants that apply to all code in this repository. It is
+authoritative and also covers workflow orchestration, engineering discipline, and multi-session
+coordination (`docs/ai/rules/coordination.md`) — read it before running builds, tests, or coverage.

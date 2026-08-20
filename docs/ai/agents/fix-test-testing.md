@@ -4,7 +4,7 @@ id: agent-fix-test-testing
 version: 1.0
 -->
 
-# Agent: Fix unit tests for Testing
+# Agent: Fix Unit Tests for Testing
 
 > [!IMPORTANT]
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
@@ -14,4 +14,3 @@ version: 1.0
 
 1. Read the master workflow at `docs/ai/workflows/fix-test.md`.
 2. Execute it with parameter **Scope = Testing**.
-

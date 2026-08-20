@@ -61,21 +61,26 @@ Core Utils -> Core Rules -> MustClauses -> GuardClauses
                                        -> DataAnnotations
 ```
 
-## Test Structure (per `docs/ai/specs/testing/unit-test.md`)
-- When writing tests, follow nested Operation Group pattern (§4–5)
+## Test Structure
+
+TestData shape per `docs/ai/specs/testing/unit-test.md` §4; Tests shape per
+`docs/ai/rules/fixture-conventions.md` §4 and `docs/ai/specs/testing/fixture.md`.
+
+- TestData files use nested Operation Group classes per method (§4.1)
+- Tests files are flat `sealed class` with one `MethodName_BehavesAsExpected` per op
 - Element ordering: datasets first, records last (§4.4)
-- Tests file mirrors TestData structure in same order (§4.5)
+- Tests methods mirror TestData group order (§4.5)
 - Tuple property MUST be `Value` (not `Input`), elements camelCase matching exact method param names (§4.3)
-- Method naming: `Valid_BehavesAsExpected` / `ValidAndEdge_BehavesAsExpected` / `ValidEdgeAndInvalid_BehavesAsExpected` / `Invalid_ThrowsAsExpected` (§5.1)
-- Test Fixtures: input values from `PineGuard.Testing.Fixtures/`, `nameof` for Name, alias `F` (§10)
-- Full canonical examples in §9
+- Test Fixtures: input values from `PineGuard.Testing.Fixtures/`, `nameof` for Name, alias `F` (§9 "Test Fixtures")
+- Full canonical examples in §8 "Full Canonical Examples"
 - Outer TestData class ordering (§4.6): shared fields → Op Groups → helper methods (at bottom)
 - Use `docs/ai/skills/scaffold-unit-test/SKILL.md` for test implementation recipe
 - **`Expected` property** on all test case records (NOT `ExpectedReturn`)
-- Layer-specific Expected types: Core=`bool`, Must=`MustExpected`, Guard=`string?`/`ExpectedException`, Fluent=`FluentExpected`, DA=`bool`
+- Layer-specific Expected types: Core=`RuleExpected`, Must=`MustExpected`, Guard=`GuardExpected`, Fluent=`FluentExpected`, DA=`DataAnnotationExpected` — all carry `IsValid`
 - `MustExpected(bool IsValid, string? Message = null, string? ParamName = null)` — composite for Must tests
 - `FluentExpected(bool IsValid, string? Message = null)` — composite for Fluent tests
 - `IsValid` is the uniform boolean name on all composite Expected types
+- Assert through `AssertResult(tc, result)` on the layer's `BaseXxxUnitTest`, never a hand-rolled `Assert.Equal` chain
 
 ## Fixture Architecture v2
 

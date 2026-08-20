@@ -4,11 +4,11 @@ spec:
   title: "PineGuard.FluentValidation Project Spec"
   version: 1
   template:
-    - ../template-project.md
+    - ../../meta/template-project.md
   parent:
-    - ../../spec.md
+    - ../spec.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.FluentValidation/**"
 ---
@@ -19,11 +19,15 @@ applies_to:
 
 Define **project-specific** rules for the `PineGuard.FluentValidation` integration.
 
-This integration must keep PineGuard’s layering intact:
+This integration must keep PineGuard’s layering intact. PineGuard layers in one direction — each layer calls only the one before it:
 
-- Core (`Rules`/`Utils`) owns validation + parsing.
-- MustClauses owns canonical messages.
-- FluentValidation integration adapts MustClauses into FluentValidation rules.
+- **Core** (`Rules`/`Utils`) owns validation logic and parsing.
+- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
+- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
+- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
+- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
+
+Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none reimplements Core logic.
 
 ## Scope
 
@@ -43,14 +47,14 @@ See `docs/ai/specs/spec.md` §3 ("Feature Implementation Checklist (Master)").
 
 - Root rules: `docs/ai/specs/spec.md`
 - Validated value vs configuration/dependency parameters: `docs/ai/specs/spec.md` (“Validated value vs configuration/dependency parameters”).
-- Dependency graph: `docs/ai/dependencies.md`
+- Dependency graph: `docs/ai/specs/dependencies.md`
 
 ---
 
 ## 1) Non-negotiables (integration contract)
 
 - Do not implement validation logic in this project.
-- **Method Ordering Rule**: Positive methods must appear BEFORE Negative methods in the file (matching MustClauses optimization).
+- **Method Ordering Rule**: Positive methods must appear BEFORE Negative methods in the file, matching `docs/ai/specs/must-clauses/project.md` ("Method ordering").
 - Do not call `PineGuard.Rules.*` or `PineGuard.Utils.*` from FluentValidation integration code.
 - Always validate by calling `PineGuard.MustClauses.Must.Be.*` and using the `MustResult`.
 - Do not embed datasets/tables/regex lists here; those belong in Core (`Rules`/`Utils`).
@@ -86,7 +90,8 @@ Rules:
 
 ### 4.1 Location + namespace
 
-- Place extension methods under: `src/PineGuard.FluentValidation/Extensions/**`
+- Place extension methods at the project root: `src/PineGuard.FluentValidation/Fluent{Domain}Extensions.cs`
+- `src/PineGuard.FluentValidation/Common/**` holds the shared `FluentExtension.MustBe(...)` adapter only.
 - Namespace must be: `PineGuard.FluentValidation`
 
 ### 4.2 Naming conventions
@@ -146,7 +151,7 @@ FluentValidation follows the standard "skip on null" behavior:
 
 This is intentionally different from Must/Guard behavior:
 
-- MustClauses follow Rule07 (hybrid nullability strategy): inputs may be declared nullable (especially reference types), but **null is invalid by default** unless the method name explicitly encodes null as acceptable (e.g., `NullOrXxx`).
+- MustClauses follow Rule07 (see `docs/ai/specs/tools/audit-cli/spec.md` and `tools/audit-cli/rules/Test-Rule07-Nullability.ps1`) — the hybrid nullability strategy: inputs may be declared nullable (especially reference types), but **null is invalid by default** unless the method name explicitly encodes null as acceptable (e.g., `NullOrXxx`).
 - The adapter layer is responsible for the FluentValidation UX: presence/required checks are expressed via FluentValidation chaining, not by failing on null in PineGuard rules.
 
 Rules:
