@@ -93,7 +93,18 @@ public static class GuardExceptionPolicyTestData
     {
         public static TheoryData<Case> ValidCases =>
         [
-            new("disposing a stale scope does not affect current scope")
+            new("disposing the outer lease out of order leaves the still-active inner scope's policy in effect, then unwinds to the global policy once the inner lease disposes too", GlobalReplaceDefaultExceptions: false, OuterReplaceDefaultExceptions: true, InnerReplaceDefaultExceptions: false)
+        ];
+
+        public sealed record Case(string Name, bool GlobalReplaceDefaultExceptions, bool OuterReplaceDefaultExceptions, bool InnerReplaceDefaultExceptions)
+            : BaseCase(Name);
+    }
+
+    public static class ScopeClearsInheritedReplacer
+    {
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("scope explicitly clearing the replacer disables the inherited global replacer")
         ];
 
         public sealed record Case(string Name)
