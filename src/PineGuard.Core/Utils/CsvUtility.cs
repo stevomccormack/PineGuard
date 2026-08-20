@@ -24,7 +24,14 @@ public static class CsvUtility
     /// <returns>
     /// <see langword="true"/> if <paramref name="value"/> was successfully parsed as a well-formed CSV line
     /// (no embedded line breaks and no unterminated quoted field); otherwise, <see langword="false"/>.
+    /// Whitespace immediately before an opening quote and whitespace immediately after a closing quote
+    /// are both permitted and discarded (e.g., <c>a, "b"</c> and <c>"a" ,b</c> parse identically); any
+    /// other non-whitespace content adjacent to a quote makes the line invalid.
     /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="separator"/> is <c>"</c>, <c>\r</c>, or <c>\n</c> — none of which can
+    /// ever function as a separator, since the quote and line-break checks always take precedence.
+    /// </exception>
     /// <example>
     /// <code>
     /// CsvUtility.TryParseCsvLine("a,b,\"c,d\"", out var fields); // true, fields = ["a", "b", "c,d"]
@@ -33,6 +40,9 @@ public static class CsvUtility
     public static bool TryParseCsvLine(string? value, out IReadOnlyList<string>? fields, char separator = ',')
     {
         fields = null;
+
+        if (separator is '"' or '\r' or '\n')
+            throw new ArgumentException("The separator cannot be a double quote or a line-break character.", nameof(separator));
 
         if (value is null)
             return false;
@@ -117,9 +127,10 @@ public static class CsvUtility
     {
         if (ch == '"')
         {
-            if (builder.Length != 0)
+            if (!IsWhiteSpaceOnly(builder))
                 return false;
 
+            builder.Clear();
             inQuotes = true;
             return true;
         }
@@ -132,6 +143,17 @@ public static class CsvUtility
         }
 
         builder.Append(ch);
+        return true;
+    }
+
+    private static bool IsWhiteSpaceOnly(StringBuilder builder)
+    {
+        for (var i = 0; i < builder.Length; i++)
+        {
+            if (!char.IsWhiteSpace(builder[i]))
+                return false;
+        }
+
         return true;
     }
 
@@ -319,8 +341,11 @@ public static class CsvUtility
         if (!TryParseCsvRowLine(value, schema.Count, out var parsedFields, separator) || parsedFields is null)
             return false;
 
-        if (parsedFields.Where((field, i) => !ValidateColumnField(field, schema[i])).Any())
-            return false;
+        for (var i = 0; i < parsedFields.Count; i++)
+        {
+            if (!ValidateColumnField(parsedFields[i], schema[i]))
+                return false;
+        }
 
         fields = parsedFields;
         return true;
@@ -346,15 +371,19 @@ public static class CsvUtility
     /// </param>
     /// <param name="separator">The field separator character. Defaults to <c>,</c>.</param>
     /// <param name="headerNameComparison">
-    /// The <see cref="StringComparison"/> used to match <paramref name="header"/> names against the keys of
-    /// <paramref name="types"/>. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>. When
-    /// <see cref="StringComparison.Ordinal"/> is used, matching is an exact dictionary key lookup;
-    /// otherwise, each header name is compared in turn against every key in <paramref name="types"/>.
+    /// The <see cref="StringComparison"/> used to match <paramref name="header"/> names against the (trimmed)
+    /// keys of <paramref name="types"/>. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>. Each
+    /// header name is compared in turn against every trimmed key in <paramref name="types"/> using
+    /// <paramref name="headerNameComparison"/>, regardless of the comparer <paramref name="types"/> itself was
+    /// constructed with.
     /// </param>
     /// <returns>
     /// <see langword="true"/> if a column schema could be built from <paramref name="header"/> and
     /// <paramref name="types"/> and <paramref name="value"/> satisfies that schema; otherwise,
-    /// <see langword="false"/>.
+    /// <see langword="false"/>. Every column built from <paramref name="header"/> and <paramref name="types"/>
+    /// is marked required (<see cref="CsvColumnSchema.IsRequired"/> is always <see langword="true"/>) and uses
+    /// <see cref="CsvColumnSchema.DefaultMaxLength"/>; use the schema-based overload directly for control over
+    /// either setting.
     /// </returns>
     /// <example>
     /// <code>
@@ -391,21 +420,11 @@ public static class CsvUtility
     {
         schema = null;
 
-        var allowExactKeyLookup = headerNameComparison == StringComparison.Ordinal;
-
         var result = new List<CsvColumnSchema>(capacity: header.Count);
 
         foreach (var headerName in header)
         {
             if (!StringUtility.TryGetTrimmed(headerName, out var normalizedHeaderName)) return false;
-
-            if (allowExactKeyLookup)
-            {
-                var type = types.GetValueOrDefault(normalizedHeaderName, CsvColumnType.String);
-
-                result.Add(new CsvColumnSchema(normalizedHeaderName, type, IsRequired: true));
-                continue;
-            }
 
             if (!TryGetTypeByName(types, normalizedHeaderName, headerNameComparison, out var match))
                 match = CsvColumnType.String;
@@ -448,10 +467,13 @@ public static class CsvUtility
         if (column.MaxLength <= 0)
             return false;
 
+        if (rawField.Length > column.MaxLength)
+            return false;
+
         if (!StringUtility.TryGetTrimmed(rawField, out var trimmed))
             return !column.IsRequired;
 
-        return trimmed.Length <= column.MaxLength && IsCsvFieldValueType(trimmed, column.Type);
+        return IsCsvFieldValueType(trimmed, column.Type);
     }
 
     private static bool IsCsvFieldValueType(string trimmedValue, CsvColumnType type)
@@ -473,10 +495,27 @@ public static class CsvUtility
 #if NET8_0_OR_GREATER
             case CsvColumnType.DateOnly: return StringUtility.DateOnly.TryParse(trimmedValue, out _);
             case CsvColumnType.TimeOnly: return StringUtility.TimeOnly.TryParse(trimmedValue, out _);
+#else
+            case CsvColumnType.DateOnly: return DateTime.TryParseExact(trimmedValue, DateOnlyFallbackFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+            case CsvColumnType.TimeOnly: return DateTime.TryParseExact(trimmedValue, TimeOnlyFallbackFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
 #endif
             case CsvColumnType.DateTimeOffset: return StringUtility.DateTimeOffset.TryParse(trimmedValue, out _);
 
             default: return false;
         }
     }
+
+#if !NET8_0_OR_GREATER
+    /// <summary>
+    /// Invariant-culture, exact-match date formats used to validate <see cref="CsvColumnType.DateOnly"/>
+    /// fields on targets that predate <c>System.DateOnly</c> (netstandard2.1).
+    /// </summary>
+    private static readonly string[] DateOnlyFallbackFormats = ["yyyy-MM-dd"];
+
+    /// <summary>
+    /// Invariant-culture, exact-match time formats used to validate <see cref="CsvColumnType.TimeOnly"/>
+    /// fields on targets that predate <c>System.TimeOnly</c> (netstandard2.1).
+    /// </summary>
+    private static readonly string[] TimeOnlyFallbackFormats = ["HH:mm:ss", "HH:mm:ss.fff", "HH:mm"];
+#endif
 }
