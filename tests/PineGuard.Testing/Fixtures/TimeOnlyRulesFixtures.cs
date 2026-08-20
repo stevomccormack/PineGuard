@@ -55,6 +55,24 @@ public static class TimeOnlyRulesFixtures
         public static RuleScenario<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class IsBeforeDefaultInclusion
+    {
+        public static readonly (TimeOnly? value, TimeOnly? other) StrictlyBefore = (new TimeOnly(9, 0), new TimeOnly(10, 0));
+        public static readonly (TimeOnly? value, TimeOnly? other) SameInstant = (new TimeOnly(10, 0), new TimeOnly(10, 0));
+
+        public static RuleScenario<(TimeOnly? value, TimeOnly? other)>[] ValidScenarios =>
+        [
+            new(nameof(StrictlyBefore), StrictlyBefore, true)
+        ];
+
+        public static RuleScenario<(TimeOnly? value, TimeOnly? other)>[] InvalidScenarios =>
+        [
+            new(nameof(SameInstant), SameInstant, false)
+        ];
+
+        public static RuleScenario<(TimeOnly? value, TimeOnly? other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class IsAfter
     {
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) AfterInclusive = (new TimeOnly(10, 0), new TimeOnly(9, 0), Inclusion.Inclusive, null);
@@ -81,6 +99,24 @@ public static class TimeOnlyRulesFixtures
         ];
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsAfterDefaultInclusion
+    {
+        public static readonly (TimeOnly? value, TimeOnly? other) StrictlyAfter = (new TimeOnly(10, 0), new TimeOnly(9, 0));
+        public static readonly (TimeOnly? value, TimeOnly? other) SameInstant = (new TimeOnly(10, 0), new TimeOnly(10, 0));
+
+        public static RuleScenario<(TimeOnly? value, TimeOnly? other)>[] ValidScenarios =>
+        [
+            new(nameof(StrictlyAfter), StrictlyAfter, true)
+        ];
+
+        public static RuleScenario<(TimeOnly? value, TimeOnly? other)>[] InvalidScenarios =>
+        [
+            new(nameof(SameInstant), SameInstant, false)
+        ];
+
+        public static RuleScenario<(TimeOnly? value, TimeOnly? other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
     public static class IsSame
@@ -121,12 +157,15 @@ public static class TimeOnlyRulesFixtures
         public static readonly (TimeOnly? value, TimeOnly? reference, TimeSpan window) WindowOverDay = (new TimeOnly(10, 0), new TimeOnly(10, 0), TimeSpan.FromDays(1) + TimeSpan.FromTicks(1));
         public static readonly (TimeOnly? value, TimeOnly? reference, TimeSpan window) NullValue = (null, new TimeOnly(10, 0), TimeSpan.FromSeconds(10));
         public static readonly (TimeOnly? value, TimeOnly? reference, TimeSpan window) NullReference = (new TimeOnly(10, 0), null, TimeSpan.FromSeconds(10));
+        public static readonly (TimeOnly? value, TimeOnly? reference, TimeSpan window) AcrossMidnightWithinWindow = (new TimeOnly(23, 30), new TimeOnly(0, 30), TimeSpan.FromHours(1));
+        public static readonly (TimeOnly? value, TimeOnly? reference, TimeSpan window) AcrossMidnightOutsideWindow = (new TimeOnly(23, 30), new TimeOnly(0, 30), TimeSpan.FromMinutes(59));
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? reference, TimeSpan window)>[] ValidScenarios =>
         [
             new(nameof(SameInstantZeroWindow), SameInstantZeroWindow, true),
             new(nameof(WithinWindow), WithinWindow, true),
-            new(nameof(WithinWindowEarlier), WithinWindowEarlier, true)
+            new(nameof(WithinWindowEarlier), WithinWindowEarlier, true),
+            new(nameof(AcrossMidnightWithinWindow), AcrossMidnightWithinWindow, true)
         ];
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? reference, TimeSpan window)>[] InvalidScenarios =>
@@ -135,7 +174,8 @@ public static class TimeOnlyRulesFixtures
             new(nameof(NegativeWindow), NegativeWindow, false),
             new(nameof(WindowOverDay), WindowOverDay, false),
             new(nameof(NullValue), NullValue, false),
-            new(nameof(NullReference), NullReference, false)
+            new(nameof(NullReference), NullReference, false),
+            new(nameof(AcrossMidnightOutsideWindow), AcrossMidnightOutsideWindow, false)
         ];
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? reference, TimeSpan window)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
@@ -178,6 +218,7 @@ public static class TimeOnlyRulesFixtures
         public static readonly (TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion) AllNull = (null, null, null, null, Inclusion.Exclusive);
         public static readonly (TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion) Start1Null = (null, new TimeOnly(10, 0), new TimeOnly(9, 30), new TimeOnly(9, 45), Inclusion.Exclusive);
         public static readonly (TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion) End1Null = (new TimeOnly(9, 0), null, new TimeOnly(9, 30), new TimeOnly(9, 45), Inclusion.Exclusive);
+        public static readonly (TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion) FirstRangeInverted = (new TimeOnly(20, 0), new TimeOnly(5, 0), new TimeOnly(1, 0), new TimeOnly(23, 0), Inclusion.Exclusive);
 
         public static RuleScenario<(TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion)>[] ValidScenarios =>
         [
@@ -193,7 +234,8 @@ public static class TimeOnlyRulesFixtures
             new(nameof(DisjointInclusive), DisjointInclusive, false),
             new(nameof(AllNull), AllNull, false),
             new(nameof(Start1Null), Start1Null, false),
-            new(nameof(End1Null), End1Null, false)
+            new(nameof(End1Null), End1Null, false),
+            new(nameof(FirstRangeInverted), FirstRangeInverted, false)
         ];
 
         public static RuleScenario<(TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

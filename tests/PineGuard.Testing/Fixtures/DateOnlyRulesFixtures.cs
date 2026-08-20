@@ -55,6 +55,24 @@ public static class DateOnlyRulesFixtures
         public static RuleScenario<(DateOnly? value, DateOnly? other, Inclusion inclusion, DatePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class IsBeforeDefaultInclusion
+    {
+        public static readonly (DateOnly? value, DateOnly? other) StrictlyBefore = (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02));
+        public static readonly (DateOnly? value, DateOnly? other) SameDay = (new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 02));
+
+        public static RuleScenario<(DateOnly? value, DateOnly? other)>[] ValidScenarios =>
+        [
+            new(nameof(StrictlyBefore), StrictlyBefore, true)
+        ];
+
+        public static RuleScenario<(DateOnly? value, DateOnly? other)>[] InvalidScenarios =>
+        [
+            new(nameof(SameDay), SameDay, false)
+        ];
+
+        public static RuleScenario<(DateOnly? value, DateOnly? other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class IsAfter
     {
         public static readonly (DateOnly? value, DateOnly? other, Inclusion inclusion, DatePrecision? precision) AfterInclusive = (new DateOnly(2024, 01, 03), new DateOnly(2024, 01, 02), Inclusion.Inclusive, null);
@@ -81,6 +99,24 @@ public static class DateOnlyRulesFixtures
         ];
 
         public static RuleScenario<(DateOnly? value, DateOnly? other, Inclusion inclusion, DatePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsAfterDefaultInclusion
+    {
+        public static readonly (DateOnly? value, DateOnly? other) StrictlyAfter = (new DateOnly(2024, 01, 03), new DateOnly(2024, 01, 02));
+        public static readonly (DateOnly? value, DateOnly? other) SameDay = (new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 02));
+
+        public static RuleScenario<(DateOnly? value, DateOnly? other)>[] ValidScenarios =>
+        [
+            new(nameof(StrictlyAfter), StrictlyAfter, true)
+        ];
+
+        public static RuleScenario<(DateOnly? value, DateOnly? other)>[] InvalidScenarios =>
+        [
+            new(nameof(SameDay), SameDay, false)
+        ];
+
+        public static RuleScenario<(DateOnly? value, DateOnly? other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
     public static class IsSame
@@ -145,6 +181,7 @@ public static class DateOnlyRulesFixtures
         public static readonly (DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, Inclusion inclusion) End1Null = (new DateOnly(2024, 01, 01), null, new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02), Inclusion.Exclusive);
         public static readonly (DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, Inclusion inclusion) Start2Null = (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02), null, new DateOnly(2024, 01, 02), Inclusion.Exclusive);
         public static readonly (DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, Inclusion inclusion) End2Null = (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 01), null, Inclusion.Exclusive);
+        public static readonly (DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, Inclusion inclusion) FirstRangeInverted = (new DateOnly(2024, 01, 10), new DateOnly(2024, 01, 05), new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 31), Inclusion.Exclusive);
 
         public static RuleScenario<(DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, Inclusion inclusion)>[] ValidScenarios =>
         [
@@ -157,7 +194,8 @@ public static class DateOnlyRulesFixtures
             new(nameof(AllNull), AllNull, false),
             new(nameof(End1Null), End1Null, false),
             new(nameof(Start2Null), Start2Null, false),
-            new(nameof(End2Null), End2Null, false)
+            new(nameof(End2Null), End2Null, false),
+            new(nameof(FirstRangeInverted), FirstRangeInverted, false)
         ];
 
         public static RuleScenario<(DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

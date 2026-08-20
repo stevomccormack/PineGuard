@@ -16,9 +16,19 @@ public static class TimeOnlyRulesTestData
         public static TheoryData<RuleCase<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)>> Cases => F.IsBefore.AllScenarios.ToRuleCases();
     }
 
+    public static class IsBeforeDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(TimeOnly? value, TimeOnly? other)>> Cases => F.IsBeforeDefaultInclusion.AllScenarios.ToRuleCases();
+    }
+
     public static class IsAfter
     {
         public static TheoryData<RuleCase<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)>> Cases => F.IsAfter.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsAfterDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(TimeOnly? value, TimeOnly? other)>> Cases => F.IsAfterDefaultInclusion.AllScenarios.ToRuleCases();
     }
 
     public static class IsSame

@@ -30,11 +30,33 @@ public sealed class TimeOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     }
 
     [Theory]
+    [MemberData(nameof(TimeOnlyRulesTestData.IsBeforeDefaultInclusion.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsBeforeDefaultInclusion))]
+    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(TimeOnly? value, TimeOnly? other)> tc)
+    {
+        // Act
+        var result = TimeOnlyRules.IsBefore(tc.Value.value, tc.Value.other);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(TimeOnlyRulesTestData.IsAfter.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsAfter))]
     public void IsAfter_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)> tc)
     {
         // Act
         var result = TimeOnlyRules.IsAfter(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TimeOnlyRulesTestData.IsAfterDefaultInclusion.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsAfterDefaultInclusion))]
+    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(TimeOnly? value, TimeOnly? other)> tc)
+    {
+        // Act
+        var result = TimeOnlyRules.IsAfter(tc.Value.value, tc.Value.other);
 
         // Assert
         AssertResult(tc, result);
