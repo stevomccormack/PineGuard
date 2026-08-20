@@ -105,19 +105,6 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: Last (auto)",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-NoProfile",
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "./tools/testing/auto/Run-Last.ps1"
-            ],
-            "problemMatcher": []
-        },
-        {
             "label": "Audit: List Rules",
             "type": "shell",
             "command": "pwsh",
@@ -227,6 +214,67 @@
                 "-Rule",
                 "Rule10",
                 "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Doc Links (Rule11)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule11",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Adapter Surface Parity (Rule12)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule12",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Audit: Docs Subset (Rule11,Rule12)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule11,Rule12",
+                "-ContinueOnError",
+                "-ShowFailures"
             ],
             "problemMatcher": []
         },
@@ -708,7 +756,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Coverage: Core (xplat, fast)",
+            "label": "Coverage: Core (fast)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -717,8 +765,6 @@
                 "Bypass",
                 "-File",
                 "./tools/code-coverage/Run-CodeCoverage.ps1",
-                "-Engine",
-                "xplat",
                 "-Mode",
                 "GenerateAndAnalyze",
                 "-Scope",
@@ -729,7 +775,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Coverage: MustClauses (xplat, fast)",
+            "label": "Coverage: MustClauses (fast)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -738,8 +784,6 @@
                 "Bypass",
                 "-File",
                 "./tools/code-coverage/Run-CodeCoverage.ps1",
-                "-Engine",
-                "xplat",
                 "-Mode",
                 "GenerateAndAnalyze",
                 "-Scope",
@@ -750,7 +794,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Coverage: GuardClauses (xplat, fast)",
+            "label": "Coverage: GuardClauses (fast)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -759,8 +803,6 @@
                 "Bypass",
                 "-File",
                 "./tools/code-coverage/Run-CodeCoverage.ps1",
-                "-Engine",
-                "xplat",
                 "-Mode",
                 "GenerateAndAnalyze",
                 "-Scope",
@@ -771,7 +813,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Coverage: FluentValidation (xplat, fast)",
+            "label": "Coverage: FluentValidation (fast)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -780,8 +822,6 @@
                 "Bypass",
                 "-File",
                 "./tools/code-coverage/Run-CodeCoverage.ps1",
-                "-Engine",
-                "xplat",
                 "-Mode",
                 "GenerateAndAnalyze",
                 "-Scope",
@@ -792,7 +832,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Coverage: DataAnnotations (xplat, fast)",
+            "label": "Coverage: DataAnnotations (fast)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -801,8 +841,6 @@
                 "Bypass",
                 "-File",
                 "./tools/code-coverage/Run-CodeCoverage.ps1",
-                "-Engine",
-                "xplat",
                 "-Mode",
                 "GenerateAndAnalyze",
                 "-Scope",
@@ -813,7 +851,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Coverage: Testing (xplat, fast)",
+            "label": "Coverage: Testing (fast)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -822,8 +860,6 @@
                 "Bypass",
                 "-File",
                 "./tools/code-coverage/Run-CodeCoverage.ps1",
-                "-Engine",
-                "xplat",
                 "-Mode",
                 "GenerateAndAnalyze",
                 "-Scope",
@@ -837,25 +873,12 @@
             "label": "Coverage: All (sequential)",
             "dependsOrder": "sequence",
             "dependsOn": [
-                "Coverage: Core (xplat, fast)",
-                "Coverage: MustClauses (xplat, fast)",
-                "Coverage: GuardClauses (xplat, fast)",
-                "Coverage: FluentValidation (xplat, fast)",
-                "Coverage: DataAnnotations (xplat, fast)",
-                "Coverage: Testing (xplat, fast)"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "Coverage: GuardClauses (auto)",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-NoProfile",
-                "-ExecutionPolicy",
-                "Bypass",
-                "-File",
-                "./tools/testing/auto/Run-Coverage.ps1"
+                "Coverage: Core (fast)",
+                "Coverage: MustClauses (fast)",
+                "Coverage: GuardClauses (fast)",
+                "Coverage: FluentValidation (fast)",
+                "Coverage: DataAnnotations (fast)",
+                "Coverage: Testing (fast)"
             ],
             "problemMatcher": []
         },
