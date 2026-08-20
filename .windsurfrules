@@ -1,55 +1,22 @@
-# PineGuard — Windsurf Rules
+# PineGuard — Windsurf Rules (Legacy)
 
-> **This file is an Adapter.**
-> It maps Windsurf interactions to the canonical Brain in `docs/ai/`.
-> Do not add logic here. Add logic to the Brain.
-> Start at **docs/ai/README.md** for the full Brain index.
+> **This file is a legacy pointer stub.**
+> Windsurf's current rules format is **`.windsurf/rules/`** (`global.md`, `layers.md`), which is
+> authoritative. This root file is retained only for older Windsurf builds. Do not grow it back:
+> see `docs/ai/meta/adapter-surfaces.md` §3.1.
+
+## Start Here
+
+- **Brain index**: `docs/ai/README.md`
+- **Global rules**: `docs/ai/rules/global.md`
+- **Intent → agent routing**: `docs/ai/commands/` — never duplicated in an adapter
+- **Agent playbooks**: `docs/ai/agents/`
 
 ## Role Adoption
 
 Before acting, adopt a persona from the Engineering Business Unit:
 Read **docs/ai/business-units/engineering.md**
 
-## Global Rules
-
-Read `docs/ai/rules/global.md` for invariants that apply to all code in this repository.
-
-<rules>
-<rule>Layer order: Core Utils → Core Rules → MustClauses → GuardClauses → Integrations</rule>
-<rule>Must owns canonical messages; Guard/Fluent/Data reuse them (never duplicate)</rule>
-<rule>Guard calls Must (never duplicate logic)</rule>
-<rule>Deterministic: No IO in Core Rules/Utils</rule>
-<rule>File-scoped namespaces, sorted usings, arrow functions for single-line expressions</rule>
-<rule>All output files → artifacts/ or logs/, NEVER project root</rule>
-</rules>
-
-## Per-Layer Context
-
-When working in a specific layer, read the corresponding rule file:
-- `src/PineGuard.Core/` → `docs/ai/rules/core.md`
-- `src/PineGuard.MustClauses/` → `docs/ai/rules/must-clauses.md`
-- `src/PineGuard.GuardClauses/` → `docs/ai/rules/guard-clauses.md`
-- `src/PineGuard.FluentValidation/` → `docs/ai/rules/fluent-validation.md`
-- `src/PineGuard.DataAnnotations/` → `docs/ai/rules/data-annotations.md`
-- `tests/` → `docs/ai/rules/unit-tests.md`
-- `tools/` → `docs/ai/rules/tools.md`
-
-## Coding Standards
-
-Read `docs/ai/specs/coding-standards.md` for formatting, naming, and style rules.
-
-## Testing
-
-Read `docs/ai/specs/testing/unit-tests-spec.md` for test patterns and coverage targets.
-
 ## Safety
 
 Read `docs/ai/specs/safety.md` for Tier 0/1/2 command classification.
-
-## Knowledge Base
-
-- **Brain index**: `docs/ai/README.md`
-- **Specs**: `docs/ai/specs/` — normative engineering rules
-- **Skills**: `docs/ai/skills/` — reusable implementation recipes
-- **Agents**: `docs/ai/agents/` — canonical playbooks
-- **Workflows**: `docs/ai/workflows/` — multi-step orchestration

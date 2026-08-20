@@ -1,9 +1,12 @@
 ---
 name: format-all
 description: Run the canonical formatting workflow for the repository.
+agent: validation-builder
 argument-hint: Optional scope or reason for formatting.
 ---
 Read and execute [docs/ai/agents/format-all.md](../../docs/ai/agents/format-all.md).
+
+Adopt the role it declares: [builder.md](../../docs/ai/roles/builder.md).
 
 Start with:
 - [safety.md](../../docs/ai/specs/safety.md)

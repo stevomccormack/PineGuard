@@ -1,1 +1,1 @@
-Act as **Software Engineer**. Read and execute `docs/ai/agents/scaffold-vertical-slice.md`.
+Act as **Senior Engineer**. Read and execute `docs/ai/agents/scaffold-vertical-slice.md`.

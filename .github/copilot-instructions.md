@@ -24,16 +24,20 @@ If the user asks to run coverage, check tests, or fix bugs, refer to the canonic
 | "Why is this test failing?" | `../docs/ai/agents/fix-test-all.md` | Senior Engineer / Test Engineer |
 | "Format the code" | `../docs/ai/agents/format-all.md` | Software Engineer |
 | "Clean workspace" | `../docs/ai/agents/clean-all.md` | DevOps Engineer |
-| "Generate references" | `../docs/ai/agents/generate-all.md` | Software Engineer |
-| "Run library audit" | `../docs/ai/agents/audit-cli.md` | Software Engineer |
+| "Run library audit" | `../docs/ai/agents/audit-cli.md` | DevOps Engineer |
+| "Find layer gaps" | `../docs/ai/agents/audit-gap.md` | Test Analyst / Test Engineer |
 | "Run SonarQube" | `../docs/ai/agents/scan-sonar.md` | Code Reviewer |
 | "Fix SonarQube issues" | `../docs/ai/agents/fix-sonar-all.md` | Senior Engineer |
 | "Check Roslyn warnings" | `../docs/ai/agents/scan-roslyn-all.md` | Code Reviewer |
 | "Fix Roslyn warnings" | `../docs/ai/agents/fix-roslyn-all.md` | Senior Engineer |
-| "Commit changes" | `../docs/ai/agents/commit-all.md` | Software Engineer |
-| "Implement new validation" | `../docs/ai/agents/scaffold-vertical-slice.md` | Software Engineer |
+| "Add XML docs" | `../docs/ai/agents/document-all.md` | Software Engineer |
+| "Commit changes" | `../docs/ai/agents/commit-all.md` | DevOps Engineer |
+| "Implement new validation" | `../docs/ai/agents/scaffold-vertical-slice.md` | Senior Engineer |
+| "Pressure-test a decision" | `../docs/ai/agents/ask-council.md` | Architect |
 
-*All scoped commands are available for: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing.*
+*All scoped commands are available for: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing — except the Document family, which has no Testing scope.*
+
+The Role column always matches the `roles:` header of the target agent; `../docs/ai/business-units/engineering.md` maps each persona name to its canonical role file.
 
 ## 3. Safety
 
@@ -65,12 +69,22 @@ When available, prefer the thin adapters in this repository instead of duplicati
 - **Prompt files**: `./prompts/*.prompt.md`
 - **Agent skills**: `./skills/*/SKILL.md`
 
+### Declared scope of this surface
+
+The Copilot adapter is a **curated subset**, not a mirror of the Brain. The surface inventory and the
+parity exceptions are recorded in **[docs/ai/meta/adapter-surfaces.md](../docs/ai/meta/adapter-surfaces.md)**:
+
+- **Prompts** — one representative per command family (coverage, test, fix-coverage, format, scan, audit, council). Every other agent is reached through the §2 intent table, which routes straight into `../docs/ai/agents/`. The subset is a decision, not a gap.
+- **Skills** — analysis, coverage and test recipes only; implementation and documentation skills stay on the Claude and Pi surfaces.
+- **Agents** — a small set of routing personas. A prompt sets `agent:` only when one of them fits the work; the persona actually adopted always comes from the `roles:` header of the Brain agent the prompt executes, and every prompt names that role explicitly.
+- **Instructions** — one file per path-scoped rule in `.claude/rules/` (`global.md` is inherited by all of them). Each carries the Brain pointer plus at most one invariant line drawn from `../docs/ai/rules/`; anything longer belongs in the Brain.
+
+The release agents (`github-release-publish`, `github-ruleset-enable`, `github-ruleset-disable`, `nuget-unlist`) are Claude-Code-only by policy — they are the Tier 0/1 irreversible operations of `../docs/ai/specs/safety.md` and are deliberately absent here.
+
 ## 6. Comments Policy
 
-- Production source code (src/**) must have XML doc comments (///) on public API.
-- Test projects (tests/**) should NOT have XML doc comments (///).
-- Tests can have comments but should be minimal and focused on clarifying complex logic.
-- Tests with existing comments already, are fine to keep them, but new comments should follow this guideline.
+Comment and XML-documentation discipline is a cross-cutting engineering rule, so it lives in the Brain:
+👉 **[docs/ai/specs/coding-standard.md](../docs/ai/specs/coding-standard.md)**
 
 ## 7. Tooling Workarounds
 
