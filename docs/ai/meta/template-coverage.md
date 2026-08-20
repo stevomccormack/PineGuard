@@ -2,11 +2,12 @@
 spec:
   id: pineguard.ai.templates.coverage
   title: "AI Spec Template — Code Coverage Spec (Addendum)"
-  version: 2
+  version: 3
+  last_verified: 2026-08-20
   parent:
-    - ../testing/coverage.md
+    - ../specs/testing/coverage.md
   dependencies:
-    - ../dependencies.md
+    - ../specs/dependencies.md
 applies_to:
   - "docs/ai/specs/**/coverage.md"
 ---
@@ -15,11 +16,14 @@ applies_to:
 
 Use this template when creating or normalizing any `docs/ai/specs/**/coverage.md`.
 
-**Inheritance**: Inherits from `docs/ai/specs/coverage.md`.
+**Inheritance**: Inherits from `docs/ai/specs/testing/coverage.md`.
 
 ---
 
 ## 1) YAML “Spec Header” (required)
+
+All relative paths below are written from the child spec's own location,
+`docs/ai/specs/<domain>/coverage.md`.
 
 ```yaml
 ---
@@ -28,15 +32,18 @@ spec:
   title: "<Project> Code Coverage (Addendum)"
   version: 1
   template:
-    - ../template-coverage.md
+    - ../../meta/template-coverage.md
   parent:
-    - ../coverage.md
+    - ../spec.md
+    - ../testing/coverage.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "tests/<Project>.UnitTests/**"
 ---
 ```
+
+Every path must resolve to a file that exists — check it before committing.
 
 ---
 

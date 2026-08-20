@@ -2,7 +2,8 @@
 type: plan
 id: v2-pineguard
 version: 1.0
-status: planned
+status: completed
+completed: 2026-04-16
 parent: v2-masterplan.md
 -->
 

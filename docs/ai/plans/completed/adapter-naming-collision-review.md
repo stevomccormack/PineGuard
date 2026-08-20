@@ -1,4 +1,21 @@
+<!-- metadata_header
+type: plan
+id: adapter-naming-collision-review
+version: 1.0
+status: completed
+-->
+
 # Adapter Naming Collision Review
+
+> [!WARNING]
+> **Archived — the recommended dialect below was NOT adopted.** This review proposed a
+> `String`-suffix dialect (`EmailStringAttribute`, `UrlString(...)`). What shipped instead was a
+> targeted collision-safe prefix applied only where a name actually collides: `WebUrlAttribute`,
+> `WebUrl(...)`, with `Url(...)` retained as a thin forwarder. `EmailAttribute` and `Email(...)`
+> were never renamed, and no `*String` names exist in `src/`.
+>
+> The normative rule is `docs/ai/specs/language/naming-collisions.md`. Read the sections below as
+> the reasoning that led there, never as a rename backlog.
 
 ## Context
 
@@ -275,7 +292,7 @@ These are the first symbols to inspect because they are already likely to collid
 
 Choose one explicit naming dialect and apply it consistently across adapter layers.
 
-### Recommended dialect
+### Recommended dialect (not adopted — see the banner at the top of this file)
 
 #### DataAnnotations
 
