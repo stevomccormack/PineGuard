@@ -6,10 +6,10 @@ spec:
   template:
     - ../../meta/template-unit-test.md
   parent:
-    - ../../spec.md
-    - ../../testing/unit-test.md
+    - ../spec.md
+    - ../testing/unit-test.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.FluentValidation/**"
   - "tests/PineGuard.FluentValidation.UnitTests/**"
@@ -68,6 +68,14 @@ public sealed record FluentExpected(bool IsValid, string? Message = null, string
 - `new FluentExpected(true)` — valid, no message checked
 - `new FluentExpected(false, "Value must be true.")` — invalid, message checked
 
+### Required Imports
+
+TestData and Tests files require the FluentValidation sub-namespace (TestData that projects rule scenarios also needs `PineGuard.Testing.UnitTests.Rules`):
+
+```csharp
+using PineGuard.Testing.UnitTests.FluentValidation;
+```
+
 ### TestData Pattern
 
 Single **`Cases`** property per Op Group using `AllScenarios.ToFluentCases(switch)`:
@@ -118,6 +126,12 @@ public sealed class FluentBoolExtensionsTests(ITestOutputHelper output) : BaseFl
 }
 ```
 
+Name the model for the value type it carries when a Tests file covers more than one — e.g. `IntModel` in `FluentNumberExtensionsTests`:
+
+```csharp
+private sealed record IntModel { public int? Value { get; init; } }
+```
+
 ### Test Structure
 
 - **Flat** — test methods live directly in the outer class, no nested `public static class`.
@@ -151,35 +165,37 @@ When a rule takes parameters (e.g. `InRange(min, max)`, `HasAllBits(mask)`, `Exa
 ```csharp
 public static class InRange
 {
-    public static TheoryData<FluentCase<(int? value, int min, int max)>> Cases =>
+    public static TheoryData<FluentCase<(int? value, int min, int max, Inclusion inclusion)>> Cases =>
         F.IsInRange.AllScenarios.ToFluentCases(s => s.Name switch
         {
             nameof(F.IsInRange.NullValue) => new FluentExpected(true),
             _ when s.IsValid              => new FluentExpected(true),
-            _                             => new FluentExpected(false, "Value must be within the specified range.")
+            _                             => new FluentExpected(false, "Value must be within the expected range.")
         });
 }
 ```
 
 **Tests:**
 ```csharp
-private sealed class InRangeValidator(int min, int max) : AbstractValidator<NullableModel>
+private sealed class InRangeValidator : AbstractValidator<IntModel>
 {
-    public InRangeValidator(int min, int max) => RuleFor(x => x.Value).InRange(min, max);
+    public InRangeValidator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).InRange(min, max, inclusion);
 }
 
 // FluentNumberExtensions.InRange
 [Theory]
 [MemberData(nameof(FluentNumberExtensionsTestData.InRange.Cases), MemberType = typeof(FluentNumberExtensionsTestData.InRange))]
-public void InRange_BehavesAsExpected(FluentCase<(int? value, int min, int max)> tc)
+public void InRange_BehavesAsExpected(FluentCase<(int? value, int min, int max, Inclusion inclusion)> tc)
 {
     // Act
-    var result = new InRangeValidator(tc.Value.min, tc.Value.max).Validate(new NullableModel { Value = tc.Value.value });
+    var result = new InRangeValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion).Validate(new IntModel { Value = tc.Value.value });
 
     // Assert
     AssertResult(tc, result);
 }
 ```
+
+> A parameterized validator takes its parameters through an ordinary constructor, not a primary constructor — the parameters are consumed by the `RuleFor` call, so a primary constructor would only collide with it (CS0111).
 
 Tuple element names must be **camelCase** and match the parameter names in the source method exactly.
 
@@ -255,7 +271,7 @@ public static class IsXxx
 **TestData** (`tests/PineGuard.FluentValidation.UnitTests/FluentBoolExtensionsTestData.cs`):
 
 ```csharp
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.BoolRulesFixtures;
 
 namespace PineGuard.FluentValidation.UnitTests;
@@ -288,7 +304,7 @@ public static class FluentBoolExtensionsTestData
 
 ```csharp
 using FluentValidation;
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
 
 namespace PineGuard.FluentValidation.UnitTests;

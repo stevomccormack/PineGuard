@@ -4,9 +4,9 @@ spec:
   title: "Base Project Spec (Production Code)"
   version: 1
   parent:
-    - ../spec.md
+    - spec.md
   dependencies:
-    - ../dependencies.md
+    - dependencies.md
 applies_to:
   - "src/**"
 ---

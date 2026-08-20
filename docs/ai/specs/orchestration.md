@@ -1,3 +1,16 @@
+---
+spec:
+  id: pineguard.ai.orchestration
+  title: "AI Working Instructions"
+  version: 1
+  parent:
+    - spec.md
+  dependencies:
+    - dependencies.md
+applies_to:
+  - "**/*"
+---
+
 # AI Working Instructions (PineGuard)
 
 This file governs **how agents work** — process, orchestration, discipline, and verification. It does not override the generator specs in `docs/ai/**` (which govern **what** to build).
@@ -26,7 +39,8 @@ Refresh checklist (non-negotiable to avoid summarising and losing context regula
 
 2. Rehydrate current state:
 
-- `docs/todo.md` (if present)
+- `docs/ai/plans/` — the active roadmap for the work in flight
+- `.claude/agent-memory/` — patterns and corrections learned in earlier sessions
 
 3. Load the local spec for the area you’re editing:
 
@@ -43,7 +57,7 @@ Notes:
 
 If the task is recovery/reconstruction-related:
 
-- Also update `docs/todo.md` with new discoveries, newly identified missing items, or changes in assumptions.
+- Also record new discoveries, newly identified missing items, or changes in assumptions in the relevant plan under `docs/ai/plans/`.
 - Prefer writing down _what we know_ vs. guessing.
 
 ## Safety rules (destructive operations)
@@ -61,13 +75,17 @@ You have the ability to use and create workflows.
 There are two layers:
 
 - **Canonical agent playbooks**: `docs/ai/agents/*.md` (model-agnostic)
-- **Adapter workflows**: `.agent/workflows/*.md` (Gemini adapter; must be thin pointers)
+- **Adapter surfaces**: the per-tool entry points that point at those playbooks
 
-### Adapter workflows (`.agent/workflows/*.md`)
+### Adapter surfaces
+
+Every adapter surface in the repo is inventoried in [`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md), which also records which tier each one belongs to. The thin-pointer rule is normative for all of them — see `docs/ai/specs/protocol.md` Rule #1.
+
+The `// turbo` / `// turbo-all` annotations below are specific to `.agent/workflows/*.md`; the other surfaces have no equivalent.
 
 - **Must be thin**: no embedded logic or command scripts.
-- **Format**: YAML frontmatter (`description`) + minimal markdown steps.
-- **Required behavior**: point to a canonical playbook in `docs/ai/agents` (and optionally include `// turbo` / `// turbo-all`).
+- **Format** (`.agent/workflows/*.md`): YAML frontmatter (`description`) + minimal markdown steps.
+- **Required behavior**: point to a canonical playbook in `docs/ai/agents` (and, on `.agent/workflows`, optionally include `// turbo` / `// turbo-all`).
 
 ### Turbo Mode (Auto-Approval)
 
@@ -78,26 +96,16 @@ To skip user confirmation for command execution:
 
 Use these annotations ONLY when you are confident the commands are safe or when the user explicitly requests full automation.
 
-### Zero-Friction Command Execution (Auto-Approval Hack)
+**Only Tier 2 commands per [`docs/ai/specs/safety.md`](safety.md) §8.4 may be placed in a `// turbo-all` workflow; never Tier 0 or Tier 1.** Writing a command into a script or playbook does not change its tier — see safety.md §8.3 ("No Laundry Pattern").
 
-When you need to run specific, ad-hoc commands (like `dotnet test` with specific filters) without waiting for user approval:
+### Reusable command workflows
 
-1. **Write** the command steps to a canonical agent playbook: `docs/ai/agents/run-custom.md`.
-2. **Create/update** the adapter workflow stub: `.agent/workflows/custom.md`:
+To re-run a specific, ad-hoc command (like `dotnet test` with a filter) without rebuilding the invocation each time, use the workflow that already exists rather than authoring a new playbook:
 
-```markdown
----
-description: Run Custom Command
----
+- Workflow: [`docs/ai/workflows/custom.md`](../workflows/custom.md)
+- Script: `tools/code-inspection/auto/Run-Last.ps1`
 
-// turbo-all
-
-1. Read and execute `docs/ai/agents/run-custom.md`.
-```
-
-3. **Execute** the adapter workflow: `view_file .agent/workflows/custom.md`
-
-This is the **preferred** way to run `dotnet build`, `dotnet test`, and safe `git` operations to maintain flow state.
+Parameterise the run through the script's `-Project` / `-Filter` parameters. Do not inline ad-hoc command scripts into an adapter workflow — that is logic in an adapter, which `docs/ai/specs/protocol.md` Rule #1 forbids.
 
 ## Honesty rule
 
