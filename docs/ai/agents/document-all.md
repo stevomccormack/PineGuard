@@ -17,7 +17,13 @@ Each sub-agent generates XML documentation for a single project using the layer-
 
 > [!NOTE]
 > All documentation commands are write operations (file edits) scoped to a single project.
-> Use `isolation: "worktree"` to prevent conflicts between parallel agents editing different projects.
+> Each sub-agent edits a disjoint `src/PineGuard.<Project>/` directory, so parallel writes cannot conflict.
+
+> [!NOTE]
+> `PineGuard.Testing` is intentionally excluded. It ships as a package but suppresses CS1591
+> (`<NoWarn>$(NoWarn);CS1591</NoWarn>` in `tests/PineGuard.Testing/PineGuard.Testing.csproj`):
+> its public surface is thousands of self-describing fixture constants, so there is no
+> `/document-testing` command and `docs/ai/skills/document/SKILL.md` §5 carries no Testing template.
 
 ## Steps
 
@@ -70,8 +76,8 @@ Wait for all five sub-agents to complete. Collate their results into a single su
 
 After all sub-agents complete, run a full solution build to verify no cross-project issues:
 
-```bash
-dotnet build PineGuard.sln
+```powershell
+dotnet build PineGuard.slnx --no-incremental
 ```
 
 ### 4. Final report

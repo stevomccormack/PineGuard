@@ -12,30 +12,35 @@ version: 2.0
 
 ## Strategy
 
-Use the **Agent tool** to launch one `coverage-analyst` sub-agent per project **in parallel**.
-Each sub-agent runs coverage for a single scope and reports back.
+Run one coverage pass per scope. If the host supports parallel sub-agents, launch them
+concurrently — one per scope; otherwise run the commands sequentially in the order listed.
+Each run covers a single scope and reports back.
 
 > [!NOTE]
 > All coverage commands are read-only (Tier 2 — safe without confirmation).
 
 ## Steps
 
-### 1. Launch parallel sub-agents
+### 1. Run the five layer scopes
 
-Spawn **all five** sub-agents in a **single message** (so they run concurrently):
+Start **all five** concurrently where the host allows it:
 
-| Sub-agent name | Scope | Command |
+| Label | Scope | Command |
 |:---|:---|:---|
-| `coverage-core` | Core | `./tools/code-coverage/Run-CodeCoverage.ps1 -Engine xplat -Mode GenerateAndAnalyze -Scope Core -Top 30 -Isolated -SkipHtml` |
-| `coverage-must` | MustClauses | `./tools/code-coverage/Run-CodeCoverage.ps1 -Engine xplat -Mode GenerateAndAnalyze -Scope MustClauses -Top 30 -Isolated -SkipHtml` |
-| `coverage-guard` | GuardClauses | `./tools/code-coverage/Run-CodeCoverage.ps1 -Engine xplat -Mode GenerateAndAnalyze -Scope GuardClauses -Top 30 -Isolated -SkipHtml` |
-| `coverage-fluent` | FluentValidation | `./tools/code-coverage/Run-CodeCoverage.ps1 -Engine xplat -Mode GenerateAndAnalyze -Scope FluentValidation -Top 30 -Isolated -SkipHtml` |
-| `coverage-da` | DataAnnotations | `./tools/code-coverage/Run-CodeCoverage.ps1 -Engine xplat -Mode GenerateAndAnalyze -Scope DataAnnotations -Top 30 -Isolated -SkipHtml` |
+| `coverage-core` | Core | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope Core -Top 30 -Isolated -SkipHtml` |
+| `coverage-must` | MustClauses | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope MustClauses -Top 30 -Isolated -SkipHtml` |
+| `coverage-guard` | GuardClauses | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope GuardClauses -Top 30 -Isolated -SkipHtml` |
+| `coverage-fluent` | FluentValidation | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope FluentValidation -Top 30 -Isolated -SkipHtml` |
+| `coverage-annotation` | DataAnnotations | `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope DataAnnotations -Top 30 -Isolated -SkipHtml` |
 
-**Sub-agent prompt template** (use `subagent_type: coverage-analyst`):
+The **Label** column only identifies the run in your summary table — it is not a sub-agent type.
+On a host that fans work out to sub-agents, every row uses the same worker; see the host's own
+adapter for the worker name.
+
+**Per-scope brief** (hand this to each worker, or follow it yourself once per scope):
 
 ```
-Run code coverage for PineGuard.[Project].
+Run code coverage for PineGuard.[Scope].
 
 1. Run: `[command from table above]`
 2. Parse the output for any classes below 100% line or branch coverage.
@@ -47,7 +52,7 @@ Run code coverage for PineGuard.[Project].
 
 ### 2. Collect results
 
-Wait for all five sub-agents to complete. Collate their results into a single summary table:
+Wait for all five runs to complete. Collate their results into a single summary table:
 
 | Project | Line % | Branch % | Status |
 |:---|:---|:---|:---|
@@ -57,23 +62,19 @@ Wait for all five sub-agents to complete. Collate their results into a single su
 | FluentValidation | ... | ... | PASS / GAPS FOUND |
 | DataAnnotations | ... | ... | PASS / GAPS FOUND |
 
-### 3. PineGuard.Testing (sequential — depends on All-scope data)
+### 3. PineGuard.Testing
 
-After the parallel runs complete, run Testing coverage:
-
-```powershell
-./tools/code-coverage/Run-CodeCoverage.ps1 -Engine xplat -Mode Generate -Scope All -Isolated
-```
-
-Then analyze:
+Run the Testing scope last:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Custom -IncludeClassNameRegex "^PineGuard\.Testing\." -Top 30 -Enforce100
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope Testing -Top 30 -Isolated -SkipHtml
 ```
 
 > [!NOTE]
-> `PineGuard.Testing` has no own test runner. Its code is exercised via the five projects above,
-> so its coverage data can only be collected via the `All` scope after those runs complete.
+> The `Testing` scope runs every `*.UnitTests` project and filters the report down to
+> `[PineGuard.Testing]*`, so its numbers combine its own suite in
+> `tests/PineGuard.Testing.UnitTests` with the incidental exercise the five layer suites give it.
+> It runs last because it rebuilds all test projects.
 
 ### 4. Final report
 

@@ -10,6 +10,7 @@ version: 1.0
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
 > roles: shipper ([../roles/shipper.md](../roles/shipper.md))
 > safety tier: **2** — restores protection; safe to run without confirmation.
+> adapter surface: **Claude Code only** — declared release-family exception in [../meta/adapter-surfaces.md](../meta/adapter-surfaces.md) §4. It ships with its Tier 1 counterpart, [`github-ruleset-disable.md`](github-ruleset-disable.md), and stays on the same surface.
 
 ## Purpose
 

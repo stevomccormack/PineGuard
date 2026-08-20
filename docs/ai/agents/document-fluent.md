@@ -14,5 +14,5 @@ version: 1.0
 
 1. Read the skill at `docs/ai/skills/document/SKILL.md`.
 2. Execute it with parameter **Project = PineGuard.FluentValidation**.
-3. Apply §5.6 (FluentValidation) template.
+3. Apply §5.5 (FluentValidation) template.
 4. Verify: `dotnet build src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj`.

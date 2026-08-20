@@ -14,5 +14,5 @@ version: 1.0
 
 1. Read the skill at `docs/ai/skills/document/SKILL.md`.
 2. Execute it with parameter **Project = PineGuard.Core** (Rules + Utils).
-3. Apply §5.1 (Rules), §5.2 (Standard Rules), and §5.3 (Utils) templates.
+3. Apply §5.1 (Core Rules) and §5.2 (Core Utils) templates.
 4. Verify: `dotnet build src/PineGuard.Core/PineGuard.Core.csproj`.
