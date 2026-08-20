@@ -36,18 +36,27 @@ public static class DateTimeRules
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is within the range; otherwise, <see langword="false"/>.</returns>
     public static bool IsBetween(DateTime? value, DateTime min, DateTime max,
-        Inclusion inclusion = Inclusion.Inclusive) =>
-        value is not null && RuleComparison.IsBetween(value.Value, min, max, inclusion);
+        Inclusion inclusion = Inclusion.Inclusive)
+    {
+        if (value is null)
+            return false;
+
+        var valueUtc = DateTimeUtility.ToUtc(value)!.Value;
+        var minUtc = DateTimeUtility.ToUtc(min)!.Value;
+        var maxUtc = DateTimeUtility.ToUtc(max)!.Value;
+
+        return RuleComparison.IsBetween(valueUtc, minUtc, maxUtc, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date/time is before the given reference date/time.
     /// </summary>
     /// <param name="value">The date/time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference date/time. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date/time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is before <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBefore(DateTime? value, DateTime? other, Inclusion inclusion = Inclusion.Inclusive,
+    public static bool IsBefore(DateTime? value, DateTime? other, Inclusion inclusion = Inclusion.Exclusive,
         DateTimePrecision? precision = null)
     {
         if (value is null || other is null)
@@ -74,10 +83,10 @@ public static class DateTimeRules
     /// </summary>
     /// <param name="value">The date/time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference date/time. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date/time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is after <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsAfter(DateTime? value, DateTime? other, Inclusion inclusion = Inclusion.Inclusive,
+    public static bool IsAfter(DateTime? value, DateTime? other, Inclusion inclusion = Inclusion.Exclusive,
         DateTimePrecision? precision = null)
     {
         if (value is null || other is null)
@@ -131,7 +140,7 @@ public static class DateTimeRules
     }
 
     /// <summary>
-    /// Determines whether the start date/time is chronologically before or equal to the end date/time.
+    /// Determines whether the start date/time precedes the end date/time (equality permitted when <paramref name="inclusion"/> is <see cref="Inclusion.Inclusive"/>).
     /// </summary>
     /// <param name="start">The start date/time. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end">The end date/time. If <see langword="null"/>, returns <see langword="false"/>.</param>
@@ -148,9 +157,11 @@ public static class DateTimeRules
     /// <param name="start2">The start of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end2">The end of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the boundaries are inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-    /// <returns><see langword="true"/> if the two ranges overlap; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if the two ranges overlap; otherwise, <see langword="false"/>. Returns <see langword="false"/> if either range is inverted (start after end).</returns>
     public static bool IsOverlapping(DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2,
         Inclusion inclusion = Inclusion.Exclusive) =>
+        RangeRules.IsChronological(start1, end1, Inclusion.Inclusive) &&
+        RangeRules.IsChronological(start2, end2, Inclusion.Inclusive) &&
         RangeRules.IsOverlapping(start1, end1, start2, end2, inclusion);
 
     /// <summary>
@@ -164,7 +175,8 @@ public static class DateTimeRules
         if (value is null || days < 0)
             return false;
 
-        var diffDays = Math.Abs((value.Value - DateTime.UtcNow).TotalDays);
+        var valueUtc = DateTimeUtility.ToUtc(value)!.Value;
+        var diffDays = Math.Abs((valueUtc - DateTime.UtcNow).TotalDays);
         return diffDays <= days;
     }
 
@@ -272,17 +284,20 @@ public static class DateTimeRules
     }
 
     /// <summary>
-    /// Determines whether two date/times fall on the same calendar day (ignoring time components).
+    /// Determines whether two date/times fall on the same calendar day in UTC (ignoring time components).
     /// </summary>
     /// <param name="value">The first date/time. If <see langword="null"/> and <paramref name="other"/> is also <see langword="null"/>, returns <see langword="true"/>.</param>
     /// <param name="other">The second date/time.</param>
-    /// <returns><see langword="true"/> if both values have the same date component; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if both values have the same UTC date component; otherwise, <see langword="false"/>.</returns>
     public static bool IsSameDay(DateTime? value, DateTime? other)
     {
         if (value is null && other is null) return true;
         if (value is null || other is null) return false;
 
-        return value.Value.Date == other.Value.Date;
+        var valueUtc = DateTimeUtility.ToUtc(value)!.Value;
+        var otherUtc = DateTimeUtility.ToUtc(other)!.Value;
+
+        return valueUtc.Date == otherUtc.Date;
     }
 
     /// <summary>

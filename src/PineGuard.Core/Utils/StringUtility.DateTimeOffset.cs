@@ -19,7 +19,10 @@ public static partial class StringUtility
         /// </param>
         /// <param name="styles">
         /// The <see cref="DateTimeStyles"/> to apply during parsing.
-        /// Defaults to <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
+        /// Defaults to <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AssumeUniversal"/> |
+        /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>. <see cref="DateTimeStyles.AssumeUniversal"/> makes
+        /// offset-less input strings (e.g. <c>"2024-01-15T10:30:00"</c>) parse deterministically as UTC instead of
+        /// being assigned the host machine's local UTC offset.
         /// </param>
         /// <returns><see langword="true"/> if <paramref name="value"/> was successfully parsed; otherwise, <see langword="false"/>.</returns>
         /// <example>
@@ -27,7 +30,7 @@ public static partial class StringUtility
         /// StringUtility.DateTimeOffset.TryParse("2024-01-15T10:30:00+00:00", out var dto); // true
         /// </code>
         /// </example>
-        public static bool TryParse(string? value, out System.DateTimeOffset? dateTimeOffset, DateTimeStyles styles = DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces)
+        public static bool TryParse(string? value, out System.DateTimeOffset? dateTimeOffset, DateTimeStyles styles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces)
         {
             dateTimeOffset = null;
 

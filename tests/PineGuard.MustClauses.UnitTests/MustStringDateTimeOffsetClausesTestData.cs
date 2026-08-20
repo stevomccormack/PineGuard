@@ -14,6 +14,7 @@ public static class MustStringDateTimeOffsetClausesTestData
         public static TheoryData<MustCase<string?>> Cases =>
         [
             new("past", "2000-01-01T00:00:00Z", new MustExpected(true)),
+            new("offset-less assumes utc deterministically", "2000-01-01T00:00:00", new MustExpected(true)),
             new("future", "2999-01-01T00:00:00Z", new MustExpected(false, "value must be a date/time in the past.")),
             new("null-value", null, new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", "not-a-date", new MustExpected(false, "value must be a date/time in the past."))
@@ -58,6 +59,7 @@ public static class MustStringDateTimeOffsetClausesTestData
         public static TheoryData<MustCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> Cases =>
         [
             new("in-range", ("2020-06-15T12:00:00Z", RefMin, RefMax, Inclusion.Inclusive), new MustExpected(true)),
+            new("offset-less assumes utc deterministically", ("2020-06-15T12:00:00", RefMin, RefMax, Inclusion.Inclusive), new MustExpected(true)),
             new("out-of-range", ("2019-01-01T00:00:00Z", RefMin, RefMax, Inclusion.Inclusive), new MustExpected(false, "value must be a date/time within the expected range.")),
             new("on-min-exclusive", ("2020-01-01T00:00:00Z", RefMin, RefMax, Inclusion.Exclusive), new MustExpected(false, "value must be a date/time within the expected range.")),
             new("null-value", (null, RefMin, RefMax, Inclusion.Inclusive), new MustExpected(false, "value must not be null.", "value")),

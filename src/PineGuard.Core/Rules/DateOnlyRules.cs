@@ -44,10 +44,10 @@ public static class DateOnlyRules
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference date. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is before <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBefore(DateOnly? value, DateOnly? other, Inclusion inclusion = Inclusion.Inclusive, DatePrecision? precision = null)
+    public static bool IsBefore(DateOnly? value, DateOnly? other, Inclusion inclusion = Inclusion.Exclusive, DatePrecision? precision = null)
     {
         if (value is null || other is null)
             return false;
@@ -73,10 +73,10 @@ public static class DateOnlyRules
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference date. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is after <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsAfter(DateOnly? value, DateOnly? other, Inclusion inclusion = Inclusion.Inclusive, DatePrecision? precision = null)
+    public static bool IsAfter(DateOnly? value, DateOnly? other, Inclusion inclusion = Inclusion.Exclusive, DatePrecision? precision = null)
     {
         if (value is null || other is null)
             return false;
@@ -129,7 +129,7 @@ public static class DateOnlyRules
     }
 
     /// <summary>
-    /// Determines whether the start date is chronologically before or equal to the end date.
+    /// Determines whether the start date precedes the end date (equality permitted when <paramref name="inclusion"/> is <see cref="Inclusion.Inclusive"/>).
     /// </summary>
     /// <param name="start">The start date. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end">The end date. If <see langword="null"/>, returns <see langword="false"/>.</param>
@@ -146,8 +146,10 @@ public static class DateOnlyRules
     /// <param name="start2">The start of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end2">The end of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the boundaries are inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-    /// <returns><see langword="true"/> if the two ranges overlap; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if the two ranges overlap; otherwise, <see langword="false"/>. Returns <see langword="false"/> if either range is inverted (start after end).</returns>
     public static bool IsOverlapping(DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, Inclusion inclusion = Inclusion.Exclusive) =>
+        RangeRules.IsChronological(start1, end1, Inclusion.Inclusive) &&
+        RangeRules.IsChronological(start2, end2, Inclusion.Inclusive) &&
         RangeRules.IsOverlapping(start1, end1, start2, end2, inclusion);
 
     /// <summary>

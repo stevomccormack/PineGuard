@@ -53,7 +53,13 @@ public static class DateTimeRulesTestData
                     new RuleCase<(DateTime? value, int days)>("WithinPast", (now.AddHours(-12), 1), new RuleExpected(true)),
                     new RuleCase<(DateTime? value, int days)>("OutsideWindow", (now.AddDays(5), 1), new RuleExpected(false)),
                     new RuleCase<(DateTime? value, int days)>("NullValue", (null, 1), new RuleExpected(false)),
-                    new RuleCase<(DateTime? value, int days)>("NegativeDays", (now, -1), new RuleExpected(false))
+                    new RuleCase<(DateTime? value, int days)>("NegativeDays", (now, -1), new RuleExpected(false)),
+                    // Regression pin for the ToUtc normalization: the value sits 5 minutes inside the 1-day
+                    // window once correctly converted from Local to UTC. Un-normalized (raw-ticks) comparison
+                    // adds the host's local UTC offset on top, which pushes the naive difference past 1 day
+                    // for any host whose local time zone is not exactly UTC+00:00. Derived from a UTC instant
+                    // via ToLocalTime() so it is correct (not flaky) on every host, regardless of local offset.
+                    new RuleCase<(DateTime? value, int days)>("LocalKindNearWindowBoundary", (now.Add(TimeSpan.FromHours(24) - TimeSpan.FromMinutes(5)).ToLocalTime(), 1), new RuleExpected(true))
                 ];
             }
         }
@@ -69,9 +75,19 @@ public static class DateTimeRulesTestData
         public static TheoryData<RuleCase<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsBefore.AllScenarios.ToRuleCases();
     }
 
+    public static class IsBeforeDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(DateTime? value, DateTime? other)>> Cases => F.IsBeforeDefaultInclusion.AllScenarios.ToRuleCases();
+    }
+
     public static class IsAfter
     {
         public static TheoryData<RuleCase<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsAfter.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsAfterDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(DateTime? value, DateTime? other)>> Cases => F.IsAfterDefaultInclusion.AllScenarios.ToRuleCases();
     }
 
     public static class IsSame
