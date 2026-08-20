@@ -19,6 +19,7 @@ public static class EnumerationTestData
 
     public sealed class TestStatus(int value, string name) : Enumeration<int>(value, name)
     {
+        public static readonly TestStatus None = new(0, "None");
         public static readonly TestStatus Active = new(1, "Active");
     }
 
@@ -178,6 +179,17 @@ public static class EnumerationTestData
             : TryCase<string?, TestStringColor?>(Name, Value, Expected, ExpectedOutValue);
     }
 
+    public static class TryFromValueDefault
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("default int value 0 is found when a member is registered for it", 0, true, TestStatus.None)
+        ];
+
+        public sealed record Case(string Name, int Input, bool Expected, TestStatus? ExpectedOut)
+            : TryCase<int, TestStatus?>(Name, Input, Expected, ExpectedOut);
+    }
+
     public sealed class TestStringColor(string value, string name) : StringEnumeration(value, name);
 
 
@@ -275,6 +287,17 @@ public static class EnumerationTestData
 
         public sealed record ValidCase(string Name, TestColor Left, TestColor? Right, int ExpectedResult)
             : ReturnCase<(TestColor Left, TestColor? Right), int>(Name, (Left, Right), ExpectedResult);
+    }
+
+    public static class CompareToOrdinalString
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("ordinal orders 'ch' before 'h' even under a culture that collates 'ch' after 'h'", "ch", "h", true)
+        ];
+
+        public sealed record Case(string Name, string LeftValue, string RightValue, bool ExpectedLessThanZero)
+            : BaseCase(Name);
     }
 
     public static class OperatorEquals

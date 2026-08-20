@@ -38,12 +38,16 @@ public static class DateTimeRangeTestData
             new("max-max unspecified", new DateTime(9999, 12, 31, 23, 59, 59, DateTimeKind.Unspecified), new DateTime(9999, 12, 31, 23, 59, 59, DateTimeKind.Unspecified), TimeSpan.Zero),
             new("utc with unspecified end", new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Unspecified), TimeSpan.Zero),
             new("unspecified with utc end", new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Unspecified), new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Utc), TimeSpan.Zero),
-            new("local with unspecified end", new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Local), new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Unspecified), TimeSpan.Zero),
-            new("unspecified with local end", new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Unspecified), new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Local), TimeSpan.Zero),
+            // Note: Local is intentionally NOT paired with Unspecified here. DateTimeUtility.ToUtc treats Unspecified
+            // as already-UTC (no conversion) while Local undergoes a real timezone conversion, so "same wall-clock
+            // reading, different Kind" no longer implies "same instant" once Contains/Equals normalize to UTC. Local's
+            // own Kind-compatibility and normalization is covered by the "local same"/"local +1 second" cases below.
+            new("utc with unspecified end (2)", new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Unspecified), TimeSpan.Zero),
+            new("unspecified with utc end (2)", new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Unspecified), new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Utc), TimeSpan.Zero),
             new("unspecified to utc +1 second", new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Unspecified), new DateTime(2020, 01, 01, 00, 00, 01, DateTimeKind.Utc), TimeSpan.FromSeconds(1)),
             new("utc to unspecified +1 second", new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2020, 01, 01, 00, 00, 01, DateTimeKind.Unspecified), TimeSpan.FromSeconds(1)),
             new("unspecified to utc +1 second (2021)", new DateTime(2021, 01, 01, 00, 00, 00, DateTimeKind.Unspecified), new DateTime(2021, 01, 01, 00, 00, 01, DateTimeKind.Utc), TimeSpan.FromSeconds(1)),
-            new("local to unspecified +1 second", new DateTime(2021, 01, 01, 00, 00, 00, DateTimeKind.Local), new DateTime(2021, 01, 01, 00, 00, 01, DateTimeKind.Unspecified), TimeSpan.FromSeconds(1)),
+            new("utc to unspecified +1 second (2)", new DateTime(2026, 02, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2026, 02, 01, 00, 00, 01, DateTimeKind.Unspecified), TimeSpan.FromSeconds(1)),
             new("unspecified to utc +1 hour", new DateTime(2022, 06, 01, 00, 00, 00, DateTimeKind.Unspecified), new DateTime(2022, 06, 01, 01, 00, 00, DateTimeKind.Utc), TimeSpan.FromHours(1)),
             new("utc to unspecified +1 hour", new DateTime(2022, 06, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2022, 06, 01, 01, 00, 00, DateTimeKind.Unspecified), TimeSpan.FromHours(1)),
             new("unspecified same", new DateTime(2023, 01, 01, 00, 00, 00, DateTimeKind.Unspecified), new DateTime(2023, 01, 01, 00, 00, 00, DateTimeKind.Unspecified), TimeSpan.Zero),
@@ -119,12 +123,26 @@ public static class DateTimeRangeTestData
                 var before = new DateTimeRange(start.AddDays(-9), start.AddDays(5));
                 var after = new DateTimeRange(start.AddDays(5), start.AddDays(20));
                 var nonOverlap = new DateTimeRange(start.AddDays(20), start.AddDays(30));
+                var touchingAtEnd = new DateTimeRange(start.AddDays(10), start.AddDays(15));
+                var point = new DateTimeRange(start.AddDays(30), start.AddDays(30));
+
+                var mixedLocalStartUtc = start.AddDays(5);
+                var mixedLocalRange = new DateTimeRange(mixedLocalStartUtc.ToLocalTime(), start.AddDays(20).ToLocalTime());
+                var mixedTouchUtc = start.AddDays(10);
+                var mixedTouchingLocalRange = new DateTimeRange(mixedTouchUtc.ToLocalTime(), mixedTouchUtc.ToLocalTime());
+                var localRangeA = new DateTimeRange(start.ToLocalTime(), start.AddDays(10).ToLocalTime());
+                var localRangeB = new DateTimeRange(start.AddDays(5).ToLocalTime(), start.AddDays(20).ToLocalTime());
 
                 return
                 [
                     new Case("Overlap Before", range, before, new DateTimeRange(start, start.AddDays(5))),
                     new Case("Overlap After", range, after, new DateTimeRange(start.AddDays(5), start.AddDays(10))),
-                    new Case("No Overlap", range, nonOverlap, null)
+                    new Case("No Overlap", range, nonOverlap, null),
+                    new Case("Touching Boundary Yields Zero-Length Intersection", range, touchingAtEnd, new DateTimeRange(start.AddDays(10), start.AddDays(10))),
+                    new Case("Degenerate Range Intersects Itself", point, point, point),
+                    new Case("Mixed Kind Overlap Normalizes To Utc", range, mixedLocalRange, new DateTimeRange(mixedLocalStartUtc, start.AddDays(10))),
+                    new Case("Mixed Kind Touching Boundary Yields Zero-Length Intersection", range, mixedTouchingLocalRange, new DateTimeRange(mixedTouchUtc, mixedTouchUtc)),
+                    new Case("Local Kind Overlap Preserves Local Kind", localRangeA, localRangeB, new DateTimeRange(start.AddDays(5).ToLocalTime(), start.AddDays(10).ToLocalTime()))
                 ];
             }
         }
@@ -144,10 +162,14 @@ public static class DateTimeRangeTestData
                 var before = new DateTimeRange(start.AddDays(-9), start.AddDays(5));
                 var after = new DateTimeRange(start.AddDays(5), start.AddDays(20));
 
+                var mixedLocalStartUtc = start.AddDays(-5);
+                var mixedLocalRange = new DateTimeRange(mixedLocalStartUtc.ToLocalTime(), start.AddDays(5).ToLocalTime());
+
                 return
                 [
                     new Case("Overlap Before", range, before, new DateTimeRange(start.AddDays(-9), start.AddDays(10))),
-                    new Case("Overlap After", range, after, new DateTimeRange(start, start.AddDays(20)))
+                    new Case("Overlap After", range, after, new DateTimeRange(start, start.AddDays(20))),
+                    new Case("Mixed Kind Union Normalizes To Utc", range, mixedLocalRange, new DateTimeRange(mixedLocalStartUtc, start.AddDays(10)))
                 ];
             }
         }
@@ -195,11 +217,15 @@ public static class DateTimeRangeTestData
                 var touchesAtEnd = new DateTimeRange(range.End, range.End);
                 var touchesAtStart = new DateTimeRange(range.Start, range.Start);
 
+                var utcRange = new DateTimeRange(new DateTime(2024, 1, 10, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 1, 20, 0, 0, 0, DateTimeKind.Utc));
+                var localTouchesAtEnd = new DateTimeRange(utcRange.End.ToLocalTime(), utcRange.End.ToLocalTime());
+
                 return
                 [
                     new Case("Touches at End", range, touchesAtEnd, true),
                     new Case("Touches at Start", range, touchesAtStart, true),
-                    new Case("Self (Empty)", range, range, false) // range duration > 0, so not adjacent to self
+                    new Case("Self (Empty)", range, range, false), // range duration > 0, so not adjacent to self
+                    new Case("Utc Touches Local At Same Instant", utcRange, localTouchesAtEnd, true)
                 ];
             }
         }

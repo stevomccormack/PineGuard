@@ -131,6 +131,18 @@ public sealed class EnumerationTests : BaseUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(EnumerationTestData.TryFromValueDefault.Cases), MemberType = typeof(EnumerationTestData.TryFromValueDefault))]
+    public void TryFromValue_FindsMember_WhenValueIsDefaultOfTValue(EnumerationTestData.TryFromValueDefault.Case testCase)
+    {
+        // Act
+        var ok = Enumeration<int>.TryFromValue<EnumerationTestData.TestStatus>(testCase.Input, out var result);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Same(testCase.ExpectedOut, result);
+    }
+
+    [Theory]
     [MemberData(nameof(EnumerationTestData.FromName.Cases), MemberType = typeof(EnumerationTestData.FromName))]
     public void FromName_ReturnsMatch_IgnoresCase(EnumerationTestData.FromName.Case testCase)
     {
@@ -266,6 +278,22 @@ public sealed class EnumerationTests : BaseUnitTest
             // Assert
             Assert.Equal(testCase.ExpectedResult, result);
         }
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.CompareToOrdinalString.Cases), MemberType = typeof(EnumerationTestData.CompareToOrdinalString))]
+    public void CompareTo_UsesOrdinalComparison_ForStringValues_RegardlessOfCurrentCulture(EnumerationTestData.CompareToOrdinalString.Case testCase)
+    {
+        // Arrange
+        using var _ = UseCulture("cs-CZ");
+        var left = new EnumerationTestData.DynamicStringEnumeration(testCase.LeftValue, testCase.Name + " (left)");
+        var right = new EnumerationTestData.DynamicStringEnumeration(testCase.RightValue, testCase.Name + " (right)");
+
+        // Act
+        var result = left.CompareTo(right);
+
+        // Assert
+        Assert.Equal(testCase.ExpectedLessThanZero, result < 0);
     }
 
     public static class OperatorEquals

@@ -1,5 +1,3 @@
-using PineGuard.Extensions;
-
 namespace PineGuard.Common;
 
 /// <summary>
@@ -26,7 +24,7 @@ public readonly struct DateTimeOffsetRange : IEquatable<DateTimeOffsetRange>
     public DateTimeOffsetRange(DateTimeOffset start, DateTimeOffset end)
     {
         if (start > end)
-            throw new ArgumentException($"{nameof(start).TitleCase()} must be less than or equal to {nameof(end).TitleCase()}.", nameof(start));
+            throw new ArgumentException("Start must be less than or equal to End.", nameof(start));
 
         Start = start;
         End = end;
@@ -102,10 +100,14 @@ public readonly struct DateTimeOffsetRange : IEquatable<DateTimeOffsetRange>
     /// Computes the intersection of this range with another range.
     /// </summary>
     /// <param name="other">The other range to intersect with.</param>
-    /// <returns>The intersecting <see cref="DateTimeOffsetRange"/>, or <see langword="null"/> if the ranges do not overlap.</returns>
+    /// <returns>
+    /// The intersecting <see cref="DateTimeOffsetRange"/>, or <see langword="null"/> if the ranges do not overlap.
+    /// Because this type represents an inclusive range, two ranges that only touch at a single instant
+    /// (e.g. one ends at the instant the other starts) produce a zero-length intersection rather than <see langword="null"/>.
+    /// </returns>
     public DateTimeOffsetRange? Intersect(DateTimeOffsetRange other)
     {
-        if (!Overlaps(other))
+        if (!Overlaps(other, Inclusion.Inclusive))
             return null;
 
         var start = Start > other.Start ? Start : other.Start;

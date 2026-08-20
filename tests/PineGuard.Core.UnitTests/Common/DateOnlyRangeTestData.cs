@@ -92,11 +92,15 @@ public static class DateOnlyRangeTestData
                 var range = new DateOnlyRange(new DateOnly(2024, 01, 10), new DateOnly(2024, 01, 20));
                 var before = new DateOnlyRange(new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 15));
                 var after = new DateOnlyRange(new DateOnly(2024, 01, 15), new DateOnly(2024, 01, 30));
+                var touchingAtEnd = new DateOnlyRange(new DateOnly(2024, 01, 20), new DateOnly(2024, 01, 25));
+                var point = new DateOnlyRange(new DateOnly(2024, 02, 01), new DateOnly(2024, 02, 01));
 
                 return
                 [
                     new Case("Overlap Before", range, before, new DateOnlyRange(new DateOnly(2024, 01, 10), new DateOnly(2024, 01, 15))),
-                    new Case("Overlap After", range, after, new DateOnlyRange(new DateOnly(2024, 01, 15), new DateOnly(2024, 01, 20)))
+                    new Case("Overlap After", range, after, new DateOnlyRange(new DateOnly(2024, 01, 15), new DateOnly(2024, 01, 20))),
+                    new Case("Touching Boundary Yields Single-Day Intersection", range, touchingAtEnd, new DateOnlyRange(new DateOnly(2024, 01, 20), new DateOnly(2024, 01, 20))),
+                    new Case("Degenerate Range Intersects Itself", point, point, point)
                 ];
             }
         }

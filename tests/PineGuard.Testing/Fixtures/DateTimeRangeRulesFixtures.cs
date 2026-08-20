@@ -85,12 +85,16 @@ public static class DateTimeRangeRulesFixtures
         public static readonly DateTime StartBoundaryValue = new(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc);
         public static readonly DateTime EndBoundaryValue = new(2024, 01, 10, 0, 0, 0, DateTimeKind.Utc);
         public static readonly DateTime OutsideValue = new(2024, 01, 11, 0, 0, 0, DateTimeKind.Utc);
+        public static readonly DateTime LocalStartBoundaryValue = new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc).ToLocalTime();
+        public static readonly DateTime LocalEndBoundaryValue = new DateTime(2024, 01, 10, 0, 0, 0, DateTimeKind.Utc).ToLocalTime();
 
         public static RuleScenario<(DateTimeRange? range, DateTime? value, Inclusion inclusion)>[] ValidScenarios =>
         [
             new(nameof(MiddleValue), (Range, MiddleValue, Inclusion.Inclusive), true),
             new(nameof(StartBoundaryValue), (Range, StartBoundaryValue, Inclusion.Inclusive), true),
-            new(nameof(EndBoundaryValue), (Range, EndBoundaryValue, Inclusion.Inclusive), true)
+            new(nameof(EndBoundaryValue), (Range, EndBoundaryValue, Inclusion.Inclusive), true),
+            new(nameof(LocalStartBoundaryValue), (Range, LocalStartBoundaryValue, Inclusion.Inclusive), true),
+            new(nameof(LocalEndBoundaryValue), (Range, LocalEndBoundaryValue, Inclusion.Inclusive), true)
         ];
 
         public static RuleScenario<(DateTimeRange? range, DateTime? value, Inclusion inclusion)>[] InvalidScenarios =>
@@ -99,6 +103,8 @@ public static class DateTimeRangeRulesFixtures
             new(nameof(OutsideValue), (Range, OutsideValue, Inclusion.Inclusive), false),
             new("StartBoundaryExclusive", (Range, StartBoundaryValue, Inclusion.Exclusive), false),
             new("EndBoundaryExclusive", (Range, EndBoundaryValue, Inclusion.Exclusive), false),
+            new("LocalStartBoundaryExclusive", (Range, LocalStartBoundaryValue, Inclusion.Exclusive), false),
+            new("LocalEndBoundaryExclusive", (Range, LocalEndBoundaryValue, Inclusion.Exclusive), false),
             new("NullRange", (null, MiddleValue, Inclusion.Inclusive), false),
             new("NullValue", (Range, null, Inclusion.Inclusive), false)
         ];
