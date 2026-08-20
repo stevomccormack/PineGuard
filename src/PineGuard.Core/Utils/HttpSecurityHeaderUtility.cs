@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace PineGuard.Utils;
 
 /// <summary>
@@ -71,14 +73,21 @@ public static class HttpSecurityHeaderUtility
     {
         maxAge = 0;
 
-        if (!segment.StartsWith("max-age", StringComparison.OrdinalIgnoreCase))
-            return false;
-
         var eq = segment.IndexOf('=');
         if (eq < 0)
             return false;
 
+        var name = segment[..eq].Trim();
+        if (!string.Equals(name, "max-age", StringComparison.OrdinalIgnoreCase))
+            return false;
+
         var raw = segment[(eq + 1)..].Trim();
-        return long.TryParse(raw, out maxAge) && maxAge >= 0;
+
+        // RFC 6797 §6.1 permits the directive value as a quoted-string (e.g. max-age="31536000").
+        if (raw.Length >= 2 && raw[0] == '"' && raw[^1] == '"')
+            raw = raw[1..^1];
+
+        // NumberStyles.None disallows a leading sign, so a successfully parsed `maxAge` can never be negative.
+        return long.TryParse(raw, NumberStyles.None, CultureInfo.InvariantCulture, out maxAge);
     }
 }

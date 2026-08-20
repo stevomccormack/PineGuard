@@ -238,13 +238,23 @@ public static class HttpSecurityHeaderRulesFixtures
         public static readonly IReadOnlyDictionary<string, IEnumerable<string>> MissingIncludeSubDomains =
             BuildHeaders("Strict-Transport-Security", "max-age=31536000");
 
+        public static readonly IReadOnlyDictionary<string, IEnumerable<string>> QuotedMaxAgeValue =
+            BuildHeaders("Strict-Transport-Security", "max-age=\"31536000\"; includeSubDomains");
+
+        public static readonly IReadOnlyDictionary<string, IEnumerable<string>> UnrelatedDirectivePrefixedWithMaxAge =
+            BuildHeaders("Strict-Transport-Security", "max-agex=31536000; includeSubDomains");
+
+        public static readonly IReadOnlyDictionary<string, IEnumerable<string>> MaxAgeLeadingPlusSign =
+            BuildHeaders("Strict-Transport-Security", "max-age=+31536000; includeSubDomains");
+
         public static readonly IReadOnlyDictionary<string, IEnumerable<string>>? Null = null;
 
         public static RuleScenario<IReadOnlyDictionary<string, IEnumerable<string>>?>[] ValidScenarios =>
         [
             new(nameof(MeetsDefaults), MeetsDefaults, true),
             new(nameof(IgnoresNullAndWhitespaceCandidates), IgnoresNullAndWhitespaceCandidates, true),
-            new(nameof(IgnoresEmptySegments), IgnoresEmptySegments, true)
+            new(nameof(IgnoresEmptySegments), IgnoresEmptySegments, true),
+            new(nameof(QuotedMaxAgeValue), QuotedMaxAgeValue, true)
         ];
 
         public static RuleScenario<IReadOnlyDictionary<string, IEnumerable<string>>?>[] InvalidScenarios =>
@@ -253,6 +263,8 @@ public static class HttpSecurityHeaderRulesFixtures
             new(nameof(MaxAgeMissingEquals), MaxAgeMissingEquals, false),
             new(nameof(EmptyHeaders), EmptyHeaders, false),
             new(nameof(MissingIncludeSubDomains), MissingIncludeSubDomains, false),
+            new(nameof(UnrelatedDirectivePrefixedWithMaxAge), UnrelatedDirectivePrefixedWithMaxAge, false),
+            new(nameof(MaxAgeLeadingPlusSign), MaxAgeLeadingPlusSign, false),
             new(nameof(Null), Null, false)
         ];
 
@@ -269,6 +281,9 @@ public static class HttpSecurityHeaderRulesFixtures
 
         public static readonly (IReadOnlyDictionary<string, IEnumerable<string>>? headers, string? requiredDefaultSrcValue, string? requiredObjectSrcValue, string? requiredBaseUriValue, string? requiredFrameAncestorsValue) OverrideDefaultSrc =
             (BuildHeaders("Content-Security-Policy", "default-src 'self'"), "'self'", null, null, null);
+
+        public static readonly (IReadOnlyDictionary<string, IEnumerable<string>>? headers, string? requiredDefaultSrcValue, string? requiredObjectSrcValue, string? requiredBaseUriValue, string? requiredFrameAncestorsValue) SubstringValueDoesNotMatch =
+            (BuildHeaders("Content-Security-Policy", "default-src evilexample.com"), "example.com", null, null, null);
     }
 
     public static class HasContentSecurityPolicyWithDefaults

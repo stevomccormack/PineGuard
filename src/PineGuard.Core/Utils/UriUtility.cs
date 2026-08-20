@@ -102,6 +102,13 @@ public static class UriUtility
     /// <param name="value">The path to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="path">When this method returns, contains the trimmed path if successful; otherwise, <see cref="string.Empty"/>.</param>
     /// <returns><see langword="true"/> if the path is fully qualified; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Windows-style paths (e.g. <c>"C:\..."</c> or <c>"\\server\share"</c>) are recognized as fully
+    /// qualified regardless of the host OS via an explicit fallback check. Unix-style paths (e.g.
+    /// <c>"/var/log/app.log"</c>) are not compensated the same way: <see cref="Path.IsPathFullyQualified(string)"/>
+    /// treats a leading <c>/</c> as fully qualified on Linux/macOS but only as drive-relative (not fully
+    /// qualified) on Windows, so this method's verdict for Unix-style input depends on the OS it runs on.
+    /// </remarks>
     public static bool TryParseFilePath(string? value, out string path)
     {
         path = string.Empty;
@@ -112,6 +119,10 @@ public static class UriUtility
         // Path.IsPathFullyQualified is platform-specific and returns false for Windows-style
         // paths (e.g. "C:\..." or "\\server\share") when running on Linux/macOS.
         // Check both the platform-native result and explicit Windows path patterns.
+        //
+        // NOTE: this compensation is one-directional. Unix-style paths (e.g. "/var/log/app.log")
+        // have no equivalent fallback, so Path.IsPathFullyQualified's own platform-dependence
+        // leaks through: such input validates as fully qualified on Linux/macOS but not on Windows.
         if (!Path.IsPathFullyQualified(trimmed) && !IsWindowsAbsolutePath(trimmed))
             return false;
 
