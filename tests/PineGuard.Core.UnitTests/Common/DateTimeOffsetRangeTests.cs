@@ -169,15 +169,15 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
             var range = new DateTimeOffsetRange(testCase.Start, testCase.End);
 
             var other = testCase.Start != DateTimeOffset.MinValue
-                ? new DateTimeOffsetRange(DateTimeOffset.MinValue, testCase.Start)
-                : new DateTimeOffsetRange(testCase.End, testCase.End);
+                ? new DateTimeOffsetRange(DateTimeOffset.MinValue, testCase.Start.AddTicks(-1))
+                : new DateTimeOffsetRange(testCase.End.AddTicks(1), testCase.End.AddTicks(1));
 
             // Act
             var intersection = range.Intersect(other);
 
             // Assert
             Assert.Null(intersection);
-            Assert.False(range.Overlaps(other, Inclusion.Inclusive) && range.Overlaps(other));
+            Assert.False(range.Overlaps(other, Inclusion.Inclusive));
         }
 
         [Theory]

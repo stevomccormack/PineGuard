@@ -29,6 +29,8 @@ public sealed class DateTimeRangeTests : BaseUnitTest
             Assert.NotNull(result);
             Assert.Equal(testCase.Expected.Value.Start, result.Value.Start);
             Assert.Equal(testCase.Expected.Value.End, result.Value.End);
+            Assert.Equal(testCase.Expected.Value.Start.Kind, result.Value.Start.Kind);
+            Assert.Equal(testCase.Expected.Value.End.Kind, result.Value.End.Kind);
         }
         else
         {
@@ -46,6 +48,8 @@ public sealed class DateTimeRangeTests : BaseUnitTest
         // Assert
         Assert.Equal(testCase.Expected.Start, result.Start);
         Assert.Equal(testCase.Expected.End, result.End);
+        Assert.Equal(testCase.Expected.Start.Kind, result.Start.Kind);
+        Assert.Equal(testCase.Expected.End.Kind, result.End.Kind);
     }
 
     [Theory]
@@ -177,15 +181,15 @@ public sealed class DateTimeRangeTests : BaseUnitTest
         var range = new DateTimeRange(testCase.Start, testCase.End);
 
         var other = testCase.Start != DateTime.MinValue
-            ? new DateTimeRange(DateTime.MinValue, testCase.Start)
-            : new DateTimeRange(testCase.End, testCase.End);
+            ? new DateTimeRange(DateTime.MinValue, testCase.Start - TimeSpan.FromTicks(1))
+            : new DateTimeRange(testCase.End + TimeSpan.FromTicks(1), testCase.End + TimeSpan.FromTicks(1));
 
         // Act
         var intersection = range.Intersect(other);
 
         // Assert
         Assert.Null(intersection);
-        Assert.False(range.Overlaps(other, Inclusion.Inclusive) && range.Overlaps(other));
+        Assert.False(range.Overlaps(other, Inclusion.Inclusive));
     }
 
     [Theory]
