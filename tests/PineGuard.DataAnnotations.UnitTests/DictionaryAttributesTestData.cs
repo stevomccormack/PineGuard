@@ -1,3 +1,4 @@
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using F = PineGuard.Testing.Fixtures.DictionaryRulesFixtures;
 
@@ -9,9 +10,12 @@ public static class DictionaryAttributesTestData
 
     private static TheoryData<ValidCase> CommonEdgeCases() =>
     [
-        new(nameof(F.IsEmpty.NullValue), F.IsEmpty.NullValue, true),
-        // Wrong type usually ignored or handled by GenericDictionaryAttributeBase?
-         new("string", "not a dict", true) // Should be skipped if not IDictionary
+        new(nameof(F.IsEmpty.NullValue), F.IsEmpty.NullValue, true)
+    ];
+
+    public static TheoryData<ThrowsCase> TypeMismatchCases =>
+    [
+        new("string", "not a dict", new ExpectedException(typeof(InvalidOperationException), null, "can only be applied to properties implementing"))
     ];
 
     public static class EmptyDictionary

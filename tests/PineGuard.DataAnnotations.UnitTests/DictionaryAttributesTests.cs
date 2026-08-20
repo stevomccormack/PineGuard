@@ -11,6 +11,10 @@ public sealed class DictionaryAttributesTests
         Assert.Equal(testCase.Expected, result == ValidationResult.Success);
     }
 
+    private static void VerifyThrows<TAttribute>(TAttribute attribute, ThrowsCase testCase)
+        where TAttribute : ValidationAttribute
+        => Assert.Throws<InvalidOperationException>(() => attribute.GetValidationResult(testCase.Value, new ValidationContext(new object())));
+
     [Theory]
     [MemberData(nameof(DictionaryAttributesTestData.EmptyDictionary.ValidCases), MemberType = typeof(DictionaryAttributesTestData.EmptyDictionary))]
     [MemberData(nameof(DictionaryAttributesTestData.EmptyDictionary.EdgeCases), MemberType = typeof(DictionaryAttributesTestData.EmptyDictionary))]
@@ -24,4 +28,14 @@ public sealed class DictionaryAttributesTests
     [MemberData(nameof(DictionaryAttributesTestData.NotEmptyDictionary.InvalidCases), MemberType = typeof(DictionaryAttributesTestData.NotEmptyDictionary))]
     public void NotEmptyDictionary_ShouldReturnExpected(DictionaryAttributesTestData.ValidCase testCase)
         => Verify(new NotEmptyDictionaryAttribute(), testCase);
+
+    [Theory]
+    [MemberData(nameof(DictionaryAttributesTestData.TypeMismatchCases), MemberType = typeof(DictionaryAttributesTestData))]
+    public void EmptyDictionary_ShouldThrow_WhenNotADictionary(ThrowsCase testCase)
+        => VerifyThrows(new EmptyDictionaryAttribute(), testCase);
+
+    [Theory]
+    [MemberData(nameof(DictionaryAttributesTestData.TypeMismatchCases), MemberType = typeof(DictionaryAttributesTestData))]
+    public void NotEmptyDictionary_ShouldThrow_WhenNotADictionary(ThrowsCase testCase)
+        => VerifyThrows(new NotEmptyDictionaryAttribute(), testCase);
 }
