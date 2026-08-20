@@ -1,5 +1,5 @@
-﻿---
-name: implement-core-rule
+---
+name: scaffold-rule
 description: Implement a new Core Rule or Util in PineGuard.Core. Use when adding low-level validation primitives or parsing helpers. Do NOT use for Must/Guard/Fluent/DataAnnotations layer code.
 ---
 

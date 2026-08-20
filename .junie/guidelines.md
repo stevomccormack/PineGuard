@@ -29,9 +29,9 @@ Read `docs/ai/specs/coding-standard.md` for formatting, naming, and style rules.
 ## Testing Standards
 
 Read `docs/ai/specs/testing/unit-test.md` for test patterns, coverage targets, and TestData structure.
+Read `docs/ai/specs/testing/coverage.md` for coverage engines and how to run them.
 - All tests: `[Theory]` + `TheoryData`, never `[Fact]`
 - 100% line and branch coverage enforced
-- Coverage tool: Coverlet xplat only (dotCover removed)
 
 ## Safety
 

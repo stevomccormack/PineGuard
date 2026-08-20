@@ -13,12 +13,20 @@ The workflow is:
 3. add deterministic tests / remove unreachable branches
 4. repeat
 
-**PineGuard.Testing** (`tests/PineGuard.Testing/`) is the shared test infrastructure library. It has no own test runner; its code is exercised via all other `*.UnitTests` runs. To analyze its coverage, run `All` scope then filter with `Custom` scope — see `docs/ai/specs/testing/coverage.md` for the exact commands.
+**PineGuard.Testing** (`tests/PineGuard.Testing/`) is the shared test-infrastructure library and a shipped package. It has its own runner, `tests/PineGuard.Testing.UnitTests` — use `-Scope Testing` to generate and analyze its coverage like any other project.
+
+## Engines
+
+These scripts wrap exactly one collector: coverlet's `XPlat Code Coverage`, which is why every generator and
+analyzer lives under `xplat/`. It collects on both test TFMs (`net8.0`, `net10.0`).
+
+There is deliberately no `dotcover/` folder here — JetBrains dotCover is driven from its own tooling, not from
+this directory, so its absence is not a missing file.
 
 ## Prerequisites
 
 - PowerShell 7+ (`pwsh`). (Windows PowerShell 5.1 may work for some commands, but the scripts are written/tested with `pwsh`.)
-- .NET SDK (repo targets .NET 10).
+- .NET 10 SDK — see [tools/README.md](../README.md#prerequisites).
 
 The HTML report uses ReportGenerator via `dotnet-reportgenerator-globaltool` installed as a repo-local tool under `.dotnet/tools` (ignored by git).
 
@@ -38,8 +46,14 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCov
 # Override which test projects run
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope Core -ProjectFilter "*.UnitTests.csproj"
 
-# PineGuard.Testing — collect via All, then analyze via Custom scope
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode Generate -Scope All -Isolated
+# Generate + analyze PineGuard.Testing
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope Testing -Enforce100
+```
+
+For ad-hoc slicing that no preset covers, generate with the widest scope you need and then re-filter the
+existing Cobertura files with `Custom`:
+
+```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Custom -IncludeClassNameRegex "^PineGuard\.Testing\." -Top 30 -Enforce100
 ```
 
@@ -47,7 +61,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-
 
 Generates fresh coverage output by:
 
-- discovering runnable unit test projects under `tests/**/*.UnitTests.csproj` (or narrowed to a single project for `-Scope Core|MustClauses|GuardClauses|DataAnnotations|FluentValidation|Testing` for speed; `PineGuard.Testing` has no own `*.UnitTests.csproj` — use `All` or `Testing` scope to collect its execution data)
+- discovering runnable unit test projects under `tests/**/*.UnitTests.csproj` (or narrowed to a single project for `-Scope Core|MustClauses|GuardClauses|DataAnnotations|FluentValidation|Testing` for speed)
 - running `dotnet test` with `--collect:"XPlat Code Coverage"`
 - generating a scope-specific runsettings file under `artifacts/code-coverage/xplat/coverlet.<Scope>.runsettings`
 - producing HTML under `artifacts/code-coverage/xplat/html`

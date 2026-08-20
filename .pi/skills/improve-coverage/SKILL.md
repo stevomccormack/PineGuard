@@ -14,14 +14,9 @@ Read these files completely:
 5. `docs/ai/skills/improve-coverage/SKILL.md` (canonical implementation recipe)
 
 ## Step 1: Follow the Recipe
-Execute `docs/ai/skills/improve-coverage/SKILL.md` exactly as written.
+Execute `docs/ai/skills/improve-coverage/SKILL.md` exactly as written — it owns the
+`Run-CodeCoverage.ps1` invocation and the analyze-gaps/add-tests loop.
 Do NOT improvise. Do NOT use `[ExcludeFromCodeCoverage]` unless truly unreachable.
 
-## Step 2: Iterative Loop
-1. Run coverage: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Engine xplat -Mode GenerateAndAnalyze -Scope [ProjectName] -Top 30 -Isolated -SkipHtml`
-2. Analyze gaps (red lines = uncovered, yellow = partial branches)
-3. Add test cases to fill gaps
-4. Repeat until 100%
-
-## Step 3: Verify
+## Step 2: Verify
 - Report shows 100% line AND branch coverage for the target

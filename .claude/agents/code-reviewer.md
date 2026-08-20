@@ -21,49 +21,29 @@ You review code against the canonical specifications. You catch drift — when c
 3. Read `docs/ai/specs/coding-standard.md` (formatting rules)
 4. Read `docs/ai/specs/dependencies.md` (layer dependency map)
 5. Read `docs/ai/specs/testing/unit-test.md` (test structure, naming, TestData patterns)
-6. Read the project-spec for the code being reviewed
-7. Check your memory (`MEMORY.md`) for known drift patterns and prior review findings
+6. Read `docs/ai/specs/testing/fixture.md` (current Expected type hierarchy and v2 flat-test-class pattern)
+7. Read `docs/ai/rules/fixture-conventions.md` (fixture file naming and Tests/TestData shape)
+8. Read the project-spec for the code being reviewed
+9. Check your memory (`MEMORY.md`) for known drift patterns and prior review findings
 
 ## Review Checklist
 
-### Architectural Compliance
-- [ ] Layer boundaries respected (Core has no user messages, Guard calls Must, etc.)
-- [ ] Dependencies flow downward only (per `docs/ai/specs/dependencies.md`)
-- [ ] No logic duplication across layers
-- [ ] Message ownership correct (Must owns, others reuse)
+The checklist is the Brain, not this file. Review against the specs you just read — never
+against a copy of them:
 
-### Signature Compliance
-- [ ] `this IMustClause _` / `this IGuardClause _` for extension methods
-- [ ] `value` parameter naming for validated input
-- [ ] `CallerArgumentExpression(nameof(value))` for `paramName`
-- [ ] Reference types nullable (`string?`), value types non-nullable (`DateOnly`)
-- [ ] Correct return types (`MustResult<T>`, `void` for Guard, `IRuleBuilderOptions` for Fluent)
+| Dimension | Authority |
+| :--- | :--- |
+| Architectural compliance (layer boundaries, dependency direction, message ownership) | `docs/ai/specs/dependencies.md` |
+| Signature and style compliance | `docs/ai/specs/coding-standard.md` + the layer's `docs/ai/specs/<layer>/project.md` |
+| Test structure, naming, TestData patterns | `docs/ai/specs/testing/unit-test.md` |
+| Expected type hierarchy, flat Tests classes, `AssertResult` | `docs/ai/specs/testing/fixture.md` |
+| Fixture file naming and partial layout | `docs/ai/rules/fixture-conventions.md` |
+| Integration adapters (Fluent `MustBe`, DA `ValidationAttributeBase`) | `docs/ai/specs/fluent-validation/project.md`, `docs/ai/specs/data-annotations/project.md` |
 
-### Coding Standards
-- [ ] File-scoped namespaces
-- [ ] Sorted usings
-- [ ] Arrow functions where possible
-- [ ] No comments unless exceptional value
-- [ ] Single-line constructors for DataAnnotations
+Where two specs disagree, the narrower one wins and the conflict is itself a finding to report.
 
-### Test Compliance (per `docs/ai/specs/testing/unit-test.md`)
-- [ ] Mirrored folder structure
-- [ ] Nested Operation Group pattern (outer class has NO test methods)
-- [ ] TestData class separate from Tests class
-- [ ] Element ordering: datasets first, records last within Op Groups (§4.4)
-- [ ] Outer TestData ordering: shared fields → Op Groups → helper methods at bottom (§4.6)
-- [ ] Structural correspondence: Tests groups mirror TestData groups in same order (§4.5)
-- [ ] Method naming: `Valid_BehavesAsExpected` / `ValidAndEdge_BehavesAsExpected` / `Invalid_ThrowsAsExpected` (§5.1)
-- [ ] Tuple property named `Value` (not `Input`/`Arguments`), camelCase elements matching exact method param names (§4.3)
-- [ ] No hardcoded data arrays in test methods
-- [ ] No named arguments in test case records
-- [ ] Test Fixtures: input values from `PineGuard.Testing.Fixtures/`, `nameof` for test case Name, alias `F` (§10)
-
-### Integration Compliance
-- [ ] FluentValidation uses `ruleBuilder.MustBe(...)` not `.Must(...)`
-- [ ] DataAnnotations inherits `ValidationAttributeBase`
-- [ ] Both pass `paramName: null` to MustClauses
-- [ ] Guard uses `GuardFailure.Throw(message ?? result.Message, ...)`
+### CI Gates (block on these)
+- [ ] No `[Fact]` / `[InlineData]` — `[Theory]` + `TheoryData` + `[MemberData]` only, and every `XxxTests.cs` has a paired `XxxTestData.cs` (audit-cli Rule50, per `docs/ai/agents/audit-cli.md`)
 
 ## Review Output Format
 For each issue found:

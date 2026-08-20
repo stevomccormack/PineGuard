@@ -53,4 +53,20 @@ public sealed class StringDateTimeOffsetAttributesTests(ITestOutputHelper output
         // Assert
         AssertResult(tc, result);
     }
+
+    // BetweenDateTimeOffsetStringAttribute — offset-less values are assumed UTC on any host time zone
+    [Theory]
+    [MemberData(nameof(StringDateTimeOffsetAttributesTestData.BetweenDateTimeOffsetStringAssumeUtc.Cases), MemberType = typeof(StringDateTimeOffsetAttributesTestData.BetweenDateTimeOffsetStringAssumeUtc))]
+    public void BetweenDateTimeOffsetString_OffsetLessValue_IsAssumedUtc(DataAnnotationCase tc)
+    {
+        // Arrange — a one-minute UTC window around the offset-less value; only UTC-assumed parsing lands inside it
+        var attr = new BetweenDateTimeOffsetStringAttribute("2024-01-15T10:29:30Z", "2024-01-15T10:30:30Z");
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

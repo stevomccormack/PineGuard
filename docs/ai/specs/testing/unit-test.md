@@ -20,6 +20,11 @@ All unit test specs (per domain/project) should treat this file as the baseline 
 
 Coverage workflow is documented in `docs/ai/specs/testing/coverage.md`.
 
+Related specs in this folder:
+
+- `docs/ai/specs/testing/fixture.md` — the fixture / scenario architecture. It is **authoritative** for fixtures, `Expected` types, layer `Case` records and dataset construction; where it differs from §4, §5 or §8 below, fixture.md wins.
+- `docs/ai/specs/testing/gold-standard.md` — the compliance index that tracks each test project against this spec.
+
 ## 1. Core Principles (Non-negotiables)
 
 - **Target**: **100% line** and **100% branch** coverage.
@@ -47,9 +52,10 @@ Coverage workflow is documented in `docs/ai/specs/testing/coverage.md`.
   | Data Annotations | `BaseDataAnnotationUnitTest(output)` | `AssertResult(DataAnnotationCase, ValidationResult?)` |
   | (Other) | `BaseUnitTest(output)` | — |
 
-  All classes use **primary constructor** syntax:
+  All classes use **primary constructor** syntax, with the inheritance clause wrapped per §1:
   ```csharp
-  public sealed class BoolRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(output)
+  public sealed class BoolRulesTests(ITestOutputHelper output)
+      : BaseRuleUnitTest(output)
   ```
 
 - **`UseCulture(...)`**: Use only if explicitly testing culture-specific behavior.
@@ -58,21 +64,19 @@ Coverage workflow is documented in `docs/ai/specs/testing/coverage.md`.
 
 ### 2.2 PineGuard.Testing — Shared Test Infrastructure Library
 
-`PineGuard.Testing` (`tests/PineGuard.Testing/`) is the **shared test helper library** referenced by all `*.UnitTests` projects. It has no own test runner; its code is exercised via all other `*.UnitTests` runs.
+`PineGuard.Testing` (`tests/PineGuard.Testing/`) is the **shared test helper library** referenced by all `*.UnitTests` projects. It is exercised directly by `tests/PineGuard.Testing.UnitTests/` and indirectly by every other `*.UnitTests` run.
 
-**Provided types** (all in `PineGuard.Testing.UnitTests` or `PineGuard.Testing.Common`):
+**Namespaces**: `PineGuard.Testing.Common`, `PineGuard.Testing.UnitTests`, `PineGuard.Testing.UnitTests.{Rules, MustClauses, GuardClauses, FluentValidation, DataAnnotations}`, `PineGuard.Testing.Fixtures`.
+
+**Roots & case bases**
 
 | Type | Purpose |
 | :--- | :--- |
 | `BaseUnitTest` | Abstract base for all test classes. Enforces `InvariantCulture`. |
 | `BaseCase` | Root abstract record; provides `Name` and `ToString()`. |
 | `ValueCase<TValue>` | Case with a single `Value` input. |
-| `ReturnCase<TValue, TExpected>` | Case for value-returning methods (`Expected`). Bridge property: `Expected => Expected`. |
+| `ReturnCase<TValue, TExpected>` | Case for value-returning methods; exposes `Expected`. |
 | `ReturnOutCase<TValue, TExpected, TOut>` | Case for methods with both a return value and an `out` parameter. |
-| `MustExpected` | Composite expected type for Must layer: `(bool IsValid, string? Message, string? ParamName)`. |
-| `FluentExpected` | Composite expected type for Fluent layer: `(bool IsValid, string? Message)`. |
-| `IsCase<TValue>` | Specialisation of `ReturnCase` for `bool`-returning `Is*` predicates. |
-| `HasCase<TValue>` | Specialisation of `ReturnCase` for `bool`-returning `Has*` predicates. |
 | `TryCase<TValue, TOut>` | Case for Try-pattern methods (`bool` return + `out TOut`). |
 | `ThrowsCase<TValue>` | Case for exception-throwing scenarios; supports `TValue = Action` for procedural inputs. |
 | `ThrowsCaseAssert` | Asserts `ThrowsCase` expectations against a caught exception. |
@@ -80,7 +84,36 @@ Coverage workflow is documented in `docs/ai/specs/testing/coverage.md`.
 | `IThrowsCase` | Interface used for `TheoryData<IThrowsCase>` datasets. |
 | `IReturnsCase<TExpected>` | Interface for return-value cases. |
 | `IReturnsOutCase<TExpected, TOut>` | Interface for out-value cases. |
-| `*Fixtures` (in `Fixtures/`) | Shared input constants for cross-layer validations (§9). |
+
+**Expected hierarchy** (see `fixture.md` §1 for the full tree)
+
+| Type | Shape |
+| :--- | :--- |
+| `IExpectedResult` | `bool IsValid` — the uniform success flag on every `Expected` type. |
+| `ReturnExpected` | `(bool IsValid, string? Message = null)` — abstract base for result-returning layers. |
+| `ThrowExpected` | `(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null)` — abstract base for throwing layers. |
+| `RuleExpected` | `(bool IsValid)` — Core rules. |
+| `MustExpected` | `(bool IsValid, string? Message = null, string? ParamName = null)` — Must layer. |
+| `GuardExpected` | `(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null)` — Guard layer. |
+| `FluentExpected` | `(bool IsValid, string? Message = null, string? PropertyName = null)` — Fluent layer. |
+| `DataAnnotationExpected` | `(bool IsValid, string? Message = null, string? MemberName = null)` — Data Annotations layer. |
+
+**Layer case records, scenarios & extensions**
+
+| Type | Purpose |
+| :--- | :--- |
+| `RuleCase<TValue>` / `MustCase<TValue>` / `GuardCase<TValue>` / `FluentCase<TValue>` / `DataAnnotationCase` | Sealed per-layer case records pairing a `Value` with the layer's `Expected`. |
+| `RuleScenario<TInputs>` | `(string Name, TInputs Inputs, bool IsValid)` — the layer-neutral scenario a fixture publishes. |
+| `RuleScenarioExtension` | Filter combinators (`WhereValid`, `WhereInvalid`, `Except`, `Only`), `Project`, and `.ToRuleCases()`. |
+| `MustScenarioExtension` / `GuardScenarioExtension` / `FluentScenarioExtension` / `DataAnnotationScenarioExtension` | `.ToMustCases()`, `.ToGuardCases()`, `.ToFluentCases()`, `.ToDataAnnotationCases()` — scenario arrays to `TheoryData`. |
+| `*Fixtures` (in `Fixtures/`) | Shared input constants and their scenario arrays for cross-layer validations (§9). |
+
+**Superseded**
+
+| Type | Status |
+| :--- | :--- |
+| `IsCase<TValue>` | Superseded — use `RuleCase<TValue>`. Annotated `[Description("Use RuleCase<T> for rules.")]`; soft-deprecated only, so it still compiles without warning and remains in use at many derivation sites. |
+| `HasCase<TValue>` | Superseded — use `RuleCase<TValue>` (same soft-deprecation). |
 
 ### 2.3 Folder Structure
 
@@ -88,7 +121,7 @@ Mirror the source layout exactly so navigation is obvious:
 
 - Source: `src/<Library>/<Subfolders>/<File>.cs`
 - Tests: `tests/<Library>.UnitTests/<Subfolders>/<File>Tests.cs`
-- Shared helpers: `tests/PineGuard.Testing/` _(no mirroring needed — not a test runner project)_
+- Shared helpers: `tests/PineGuard.Testing/` _(helper library; its own tests live in `tests/PineGuard.Testing.UnitTests/`)_
 
 ## 3. File Structure (Strict)
 
@@ -97,7 +130,7 @@ For each unit under test (e.g., `MyClass`), maintain exactly two files:
 1. `MyClassTestData.cs` (Data definitions — records, datasets, references to fixtures)
 2. `MyClassTests.cs` (Test execution)
 
-Shared input constants live in `PineGuard.Testing/Fixtures/` (see §10). TestData files reference these fixtures; they never duplicate the raw values.
+Shared input constants live in `PineGuard.Testing/Fixtures/` (see §9). TestData files reference these fixtures; they never duplicate the raw values.
 
 ## 4. Canonical TestData Pattern
 
@@ -111,6 +144,10 @@ Each Operation Group defines up to three datasets:
 - `EdgeCases` (`TheoryData<ValidCase>`) — Boundary/Null/Interesting scenarios.
 - `InvalidCases` (`TheoryData<IThrowsCase>`) — Exception-throwing scenarios.
 
+When the Operation Group is fed by a fixture's scenario arrays (§9, `fixture.md` §2), a single rollup dataset named `Cases` — built from `AllScenarios` via `.ToXxxCases()` — replaces the three-dataset split:
+
+- `Cases` (`TheoryData<RuleCase<T>>`, `TheoryData<MustCase<T>>`, …) — the whole scenario set for that member.
+
 Notes:
 
 - **Only include datasets that have test cases.** Omit a dataset entirely when no valid cases exist for that category (e.g., omit `InvalidCases` for pure boolean validators that never throw; omit `EdgeCases` when boundaries are already covered in `ValidCases`).
@@ -119,7 +156,7 @@ Notes:
 
 ### 4.2 Case Records
 
-Define case records inside each Operation Group.
+Scenario-backed groups need no records at all — they use the sealed layer case records (`RuleCase<T>`, `MustCase<T>`, …) directly. Everything else defines its case records inside its own Operation Group.
 
 Default rule: **keep TestData declarative** (inputs + expected outputs/exception metadata). The **test method owns the Act step**.
 
@@ -214,18 +251,15 @@ Canonical example:
 ```csharp
 public static class IsBetween
 {
-    public sealed record Case(string Name, (int value, int min, int max) Value, bool Expected)
-        : IsCase<(int value, int min, int max)>(Name, Value, Expected);
-
-    public static TheoryData<Case> ValidCases =>
+    public static TheoryData<RuleCase<(int value, int min, int max)>> ValidCases =>
     [
-        new("inside", (value: 5, min: 0, max: 10), true),
+        new("inside", (value: 5, min: 0, max: 10), new RuleExpected(true)),
     ];
 
-    public static TheoryData<Case> EdgeCases =>
+    public static TheoryData<RuleCase<(int value, int min, int max)>> EdgeCases =>
     [
-        new("on min", (value: 0, min: 0, max: 10), true),
-        new("on max", (value: 10, min: 0, max: 10), true),
+        new("on min", (value: 0, min: 0, max: 10), new RuleExpected(true)),
+        new("on max", (value: 10, min: 0, max: 10), new RuleExpected(true)),
     ];
 }
 ```
@@ -280,11 +314,11 @@ Datasets first, records last. This keeps the data (what agents and reviewers rea
 
 ### 4.5 Structural Correspondence (TestData ↔ Tests)
 
-The Tests file MUST mirror the TestData file's Operation Group structure:
+The Tests file MUST mirror the TestData file's Operation Group structure — as **test methods**, not as nested classes (§5.1):
 
-- For every `public static class Xxx` in `FooTestData`, there MUST be a corresponding `public static class Xxx` in `FooTests`.
-- Operation Groups in the Tests file MUST appear in the **same order** as in the TestData file.
-- Each Tests Operation Group consumes ONLY the datasets from its corresponding TestData Operation Group.
+- For every `public static class Xxx` in `FooTestData`, there MUST be a corresponding `Xxx_BehavesAsExpected` test method in `FooTests`.
+- Test methods MUST appear in the **same order** as their Operation Groups in the TestData file.
+- Each test method consumes ONLY the datasets from its corresponding TestData Operation Group.
 - No test method may reference datasets from a different Operation Group.
 
 ### 4.6 Outer TestData Class Element Ordering
@@ -319,63 +353,68 @@ When a TestData class has no shared fields or helpers, only Operation Groups app
 
 ### 5.1 Structure
 
-- Outer class `XxxTests` must be `sealed` and inherit `BaseUnitTest` via primary constructor.
-- Outer class must NOT contain test methods (enforces semantics).
-- Use nested `public static class` for each Operation Group.
-- Test methods must be `public static void`.
+- Test class `XxxTests` must be `sealed` and inherit the **layer-specific base from §2.1** via primary constructor.
+- The test class is **flat**: test methods are declared directly on it. Do **NOT** nest `public static class` Operation Groups inside the Tests file — Operation Groups exist in the TestData file only, and each one is consumed by exactly one test method (§4.5).
+- Test methods must be **instance** methods declared `public void` — the layer base supplies `AssertResult`.
+- Each test method takes a single layer case parameter named `tc` (`RuleCase<T>`, `MustCase<T>`, `GuardCase<T>`, `FluentCase<T>`, `DataAnnotationCase`) and delegates its assertion to `AssertResult(tc, result)`.
 
 #### Method Naming Convention (Strict)
 
+One method per Operation Group, named after the member under test:
+
+```
+public void <MemberUnderTest>_BehavesAsExpected(<Layer>Case<T> tc)
+```
+
 | Scenario | MemberData Datasets | Method Name |
 | :--- | :--- | :--- |
-| Valid only | `ValidCases` | `Valid_BehavesAsExpected` |
-| Valid + Edge | `ValidCases` + `EdgeCases` | `ValidAndEdge_BehavesAsExpected` |
-| Valid + Edge + Invalid (same record type) | `ValidCases` + `EdgeCases` + `InvalidCases` | `ValidEdgeAndInvalid_BehavesAsExpected` |
-| Invalid (throws) | `InvalidCases` | `Invalid_ThrowsAsExpected` |
+| Fixture rollup | `Cases` | `<MemberUnderTest>_BehavesAsExpected` |
+| Split datasets | any of `ValidCases`, `EdgeCases`, `InvalidCases` (stacked `[MemberData]` attributes) | `<MemberUnderTest>_BehavesAsExpected` |
+
+Where two Operation Groups exercise overloads of the same member, suffix the group and method name with the distinguishing argument shape (e.g. `IsCsvRowLineSchema_BehavesAsExpected`, `IsCsvRowLineHeaderTypes_BehavesAsExpected`).
 
 Do **NOT** use `ShouldReturnExpected`, `ShouldThrowExpected`, `ReturnsExpected`, or any other naming pattern.
 
-> **Migration note**: Some existing test files may still use a flat pattern where test methods appear directly in the outer class without nested Operation Groups. This is legacy drift. All **new** test files and all **refactored** files MUST use the nested Operation Group pattern defined above.
+Throwing behaviour is **not** a separate method: the Guard layer expresses it through `GuardExpected` and `AssertResult(tc, () => act())`. Only tests that are outside the layer-base architecture (e.g. `ThrowHelper` in Core) still use raw `ThrowsCase` / `ThrowsCaseAssert` datasets.
 
 ### 5.2 Example Implementation
 
 ```csharp
-public sealed class MyClassTests(ITestOutputHelper output) : BaseUnitTest(output)
+public sealed class FooRulesTests(ITestOutputHelper output)
+    : BaseRuleUnitTest(output)
 {
-    public static class MyMethod
+    [Theory]
+    [MemberData(nameof(FooRulesTestData.IsBar.Cases), MemberType = typeof(FooRulesTestData.IsBar))]
+    public void IsBar_BehavesAsExpected(RuleCase<string?> tc)
     {
-        [Theory]
-        [MemberData(nameof(MyClassTestData.MyMethod.ValidCases), MemberType = typeof(MyClassTestData.MyMethod))]
-        [MemberData(nameof(MyClassTestData.MyMethod.EdgeCases), MemberType = typeof(MyClassTestData.MyMethod))]
-        public static void ValidAndEdge_BehavesAsExpected(MyClassTestData.MyMethod.ValidCase testCase)
-        {
-            // Act
-            var result = MyClass.MyMethod(testCase.Value);
+        // Act
+        var result = FooRules.IsBar(tc.Value);
 
-            // Assert
-            Assert.Equal(testCase.Expected, result);
-        }
+        // Assert
+        AssertResult(tc, result);
+    }
 
-        [Theory]
-        [MemberData(nameof(MyClassTestData.MyMethod.InvalidCases), MemberType = typeof(MyClassTestData.MyMethod))]
-        public static void Invalid_ThrowsAsExpected(IThrowsCase testCase)
-        {
-            // Arrange
-            var t = (ThrowsCase<string?>)testCase;
-            var value = t.Value;
+    [Theory]
+    [MemberData(nameof(FooRulesTestData.IsBaz.Cases), MemberType = typeof(FooRulesTestData.IsBaz))]
+    public void IsBaz_BehavesAsExpected(RuleCase<(string? value, int threshold)> tc)
+    {
+        // Arrange
+        var (value, threshold) = tc.Value;
 
-            // Act & Assert
-            var ex = Assert.Throws(testCase.ExpectedException.Type, () => MyClass.MyMethod(value));
-            ThrowsCaseAssert.Expected(ex, testCase);
-        }
+        // Act
+        var result = FooRules.IsBaz(value, threshold);
+
+        // Assert
+        AssertResult(tc, result);
     }
 }
 ```
 
 ## 6. Helper Types (Reference)
 
-- **`IsCase<T>` / `HasCase<T>`**: Boolean-returning rules.
-- **`ReturnCase<TValue, TExpected>`**: Value-returning methods. Bridge: `Expected => Expected`.
+- **`RuleCase<T>` / `MustCase<T>` / `GuardCase<T>` / `FluentCase<T>` / `DataAnnotationCase`**: the per-layer case records — the default choice (§2.2).
+- **`IsCase<T>` / `HasCase<T>`**: superseded predecessors for boolean-returning rules; use `RuleCase<T>` instead.
+- **`ReturnCase<TValue, TExpected>`**: Value-returning methods; exposes `Expected`.
 - **`TryCase<TValue, TOut>`**: Try-pattern methods.
 - **`ThrowsCase<T>`**: Exception-throwing scenarios (supports `T=Action` for exceptional cases only!!).
 - **`ExpectedException`**: Use positional args only: `new(typeof(ArgumentException), "paramName")`.
@@ -392,9 +431,11 @@ These examples show a **complete, file-level** Fixtures + TestData + Tests trio 
 
 ### 8.1 Complete Fixtures File
 
-Fixtures provide **input constants only** — no records, no datasets. Each project's TestData references these values and wraps them in layer-specific records.
+Fixtures provide **input constants and the `RuleScenario<T>[]` arrays derived from them** — no case records, no `TheoryData`. Each project's TestData turns those scenarios into its own layer's cases via `.ToXxxCases()`.
 
 ```csharp
+using PineGuard.Testing.UnitTests.Rules;
+
 namespace PineGuard.Testing.Fixtures;
 
 public static class FooRulesFixtures
@@ -405,6 +446,20 @@ public static class FooRulesFixtures
         public static readonly string? Null       = null;
         public static readonly string? Empty      = "";
         public static readonly string? Whitespace = "   ";
+
+        public static RuleScenario<string?>[] ValidScenarios =>
+        [
+            new(nameof(Valid), Valid, true)
+        ];
+
+        public static RuleScenario<string?>[] InvalidScenarios =>
+        [
+            new(nameof(Null), Null, false),
+            new(nameof(Empty), Empty, false),
+            new(nameof(Whitespace), Whitespace, false)
+        ];
+
+        public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
     public static class IsBaz
@@ -413,6 +468,30 @@ public static class FooRulesFixtures
         public static readonly (string? value, int threshold) AtThreshold    = ("ab", 2);
         public static readonly (string? value, int threshold) BelowThreshold = ("a", 2);
         public static readonly (string? value, int threshold) NullValue      = (null, 0);
+
+        public static RuleScenario<(string? value, int threshold)>[] ValidScenarios =>
+        [
+            new(nameof(AboveThreshold), AboveThreshold, true)
+        ];
+
+        public static RuleScenario<(string? value, int threshold)>[] ValidEdgeScenarios =>
+        [
+            new(nameof(AtThreshold), AtThreshold, true)
+        ];
+
+        public static RuleScenario<(string? value, int threshold)>[] InvalidScenarios =>
+        [
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<(string? value, int threshold)>[] InvalidEdgeScenarios =>
+        [
+            new(nameof(BelowThreshold), BelowThreshold, false)
+        ];
+
+        public static RuleScenario<(string? value, int threshold)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<(string? value, int threshold)>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<(string? value, int threshold)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
     public static class Parse
@@ -427,13 +506,16 @@ public static class FooRulesFixtures
 }
 ```
 
+`IsBar` is a **format** rule — two scenario arrays plus `AllScenarios`. `IsBaz` has a numeric boundary parameter, so it is a **boundary** rule — four arrays plus the rollups. `Parse` throws, so it publishes constants only and its TestData builds `ThrowsCase` datasets by hand. The selection rule is stated in `fixture.md` §2.
+
 ### 8.2 Complete TestData File
 
-References fixtures via `nameof` + alias `F`. Each project defines its **own records and datasets** — fixtures provide input values only.
+Scenario-backed groups project the fixture arrays through `.ToRuleCases()`. Groups that fall outside the scenario architecture (throwing methods, non-boolean return values) still define their **own records and datasets** and reference fixture constants via `nameof` + alias `F`.
 
 ```csharp
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.FooRulesFixtures;
 
 namespace PineGuard.Core.UnitTests.Rules;
@@ -442,42 +524,12 @@ public static class FooRulesTestData
 {
     public static class IsBar
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new(nameof(F.IsBar.Valid), F.IsBar.Valid, true)
-        ];
-
-        public static TheoryData<Case> EdgeCases =>
-        [
-            new(nameof(F.IsBar.Null), F.IsBar.Null, false),
-            new(nameof(F.IsBar.Empty), F.IsBar.Empty, false),
-            new(nameof(F.IsBar.Whitespace), F.IsBar.Whitespace, false)
-        ];
-
-        // InvalidCases omitted — IsBar is a pure boolean predicate, never throws
-
-        public sealed record Case(string Name, string? Value, bool Expected)
-            : IsCase<string?>(Name, Value, Expected);
+        public static TheoryData<RuleCase<string?>> Cases => F.IsBar.AllScenarios.ToRuleCases();
     }
 
     public static class IsBaz
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new(nameof(F.IsBaz.AboveThreshold), F.IsBaz.AboveThreshold, true)
-        ];
-
-        public static TheoryData<Case> EdgeCases =>
-        [
-            new(nameof(F.IsBaz.AtThreshold), F.IsBaz.AtThreshold, true),
-            new(nameof(F.IsBaz.BelowThreshold), F.IsBaz.BelowThreshold, false),
-            new(nameof(F.IsBaz.NullValue), F.IsBaz.NullValue, false)
-        ];
-
-        public static TheoryData<IThrowsCase> InvalidCases => [];
-
-        public sealed record Case(string Name, (string? value, int threshold) Value, bool Expected)
-            : IsCase<(string? value, int threshold)>(Name, Value, Expected);
+        public static TheoryData<RuleCase<(string? value, int threshold)>> Cases => F.IsBaz.AllScenarios.ToRuleCases();
     }
 
     public static class Parse
@@ -511,110 +563,106 @@ public static class FooRulesTestData
 
 ### 8.3 Complete Tests File
 
-Tests reference TestData only — never fixtures directly. Unchanged from previous versions.
+Tests reference TestData only — never fixtures directly. The class is flat: one test method per Operation Group, in the same order (§4.5, §5.1).
 
 ```csharp
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace PineGuard.Core.UnitTests.Rules;
 
-public sealed class FooRulesTests(ITestOutputHelper output) : BaseUnitTest(output)
+public sealed class FooRulesTests(ITestOutputHelper output)
+    : BaseRuleUnitTest(output)
 {
-    public static class IsBar
+    [Theory]
+    [MemberData(nameof(FooRulesTestData.IsBar.Cases), MemberType = typeof(FooRulesTestData.IsBar))]
+    public void IsBar_BehavesAsExpected(RuleCase<string?> tc)
     {
-        [Theory]
-        [MemberData(nameof(FooRulesTestData.IsBar.ValidCases), MemberType = typeof(FooRulesTestData.IsBar))]
-        [MemberData(nameof(FooRulesTestData.IsBar.EdgeCases), MemberType = typeof(FooRulesTestData.IsBar))]
-        public static void ValidAndEdge_BehavesAsExpected(FooRulesTestData.IsBar.Case testCase)
-        {
-            // Act
-            var result = FooRules.IsBar(testCase.Value);
+        // Act
+        var result = FooRules.IsBar(tc.Value);
 
-            // Assert
-            Assert.Equal(testCase.Expected, result);
-        }
+        // Assert
+        AssertResult(tc, result);
     }
 
-    public static class IsBaz
+    [Theory]
+    [MemberData(nameof(FooRulesTestData.IsBaz.Cases), MemberType = typeof(FooRulesTestData.IsBaz))]
+    public void IsBaz_BehavesAsExpected(RuleCase<(string? value, int threshold)> tc)
     {
-        [Theory]
-        [MemberData(nameof(FooRulesTestData.IsBaz.ValidCases), MemberType = typeof(FooRulesTestData.IsBaz))]
-        [MemberData(nameof(FooRulesTestData.IsBaz.EdgeCases), MemberType = typeof(FooRulesTestData.IsBaz))]
-        public static void ValidAndEdge_BehavesAsExpected(FooRulesTestData.IsBaz.Case testCase)
-        {
-            // Arrange
-            var (value, threshold) = testCase.Value;
+        // Arrange
+        var (value, threshold) = tc.Value;
 
-            // Act
-            var result = FooRules.IsBaz(value, threshold);
+        // Act
+        var result = FooRules.IsBaz(value, threshold);
 
-            // Assert
-            Assert.Equal(testCase.Expected, result);
-        }
+        // Assert
+        AssertResult(tc, result);
     }
 
-    public static class Parse
+    [Theory]
+    [MemberData(nameof(FooRulesTestData.Parse.ValidCases), MemberType = typeof(FooRulesTestData.Parse))]
+    [MemberData(nameof(FooRulesTestData.Parse.EdgeCases), MemberType = typeof(FooRulesTestData.Parse))]
+    public void Parse_BehavesAsExpected(FooRulesTestData.Parse.ValidCase tc)
     {
-        [Theory]
-        [MemberData(nameof(FooRulesTestData.Parse.ValidCases), MemberType = typeof(FooRulesTestData.Parse))]
-        [MemberData(nameof(FooRulesTestData.Parse.EdgeCases), MemberType = typeof(FooRulesTestData.Parse))]
-        public static void ValidAndEdge_BehavesAsExpected(FooRulesTestData.Parse.ValidCase testCase)
-        {
-            // Act
-            var result = FooRules.Parse(testCase.Value!);
+        // Act
+        var result = FooRules.Parse(tc.Value!);
 
-            // Assert
-            Assert.Equal(testCase.Expected, result);
-        }
+        // Assert
+        Assert.Equal(tc.Expected, result);
+    }
 
-        [Theory]
-        [MemberData(nameof(FooRulesTestData.Parse.InvalidCases), MemberType = typeof(FooRulesTestData.Parse))]
-        public static void Invalid_ThrowsAsExpected(IThrowsCase testCase)
-        {
-            // Arrange
-            var t = (FooRulesTestData.Parse.InvalidCase)testCase;
+    [Theory]
+    [MemberData(nameof(FooRulesTestData.Parse.InvalidCases), MemberType = typeof(FooRulesTestData.Parse))]
+    public void Parse_ThrowsAsExpected(IThrowsCase tc)
+    {
+        // Arrange
+        var t = (FooRulesTestData.Parse.InvalidCase)tc;
 
-            // Act & Assert
-            var ex = Assert.Throws(testCase.ExpectedException.Type, () => FooRules.Parse(t.Value!));
-            ThrowsCaseAssert.Expected(ex, testCase);
-        }
+        // Act & Assert
+        var ex = Assert.Throws(tc.ExpectedException.Type, () => FooRules.Parse(t.Value!));
+        ThrowsCaseAssert.Expected(ex, tc);
     }
 }
 ```
+
+`Parse` is the exception to the uniform shape: it throws and has no layer base to delegate to, so it keeps hand-built `ThrowsCase` datasets and splits into a `_BehavesAsExpected` / `_ThrowsAsExpected` pair. Scenario-backed groups never need that split.
 
 ### 8.4 Structural Rules Demonstrated
 
 | Rule | Where Demonstrated |
 | :--- | :--- |
-| Fixtures provide input constants only (§9) | `FooRulesFixtures` — raw values, no records, no datasets |
+| Fixtures hold constants + scenario arrays, never cases (§9) | `FooRulesFixtures` — `readonly` values plus `RuleScenario<T>[]` |
+| Format vs boundary scenario shape (`fixture.md` §2) | `IsBar` (2 arrays) vs `IsBaz` (4 arrays + rollups) |
 | Fixture alias convention (§4.3) | `using F = PineGuard.Testing.Fixtures.FooRulesFixtures;` |
-| `nameof` for test case Name (§4.3) | `nameof(F.IsBar.Valid)` returns `"Valid"` |
+| `nameof` for test case Name (§4.3) | `nameof(Valid)` in the fixture becomes the case display name |
 | Zero magic strings in TestData (§9) | Every `new(...)` uses `nameof` + fixture reference |
-| Datasets before records (§4.4) | Every Operation Group in TestData |
-| Dataset order: Valid → Edge → Invalid (§4.4) | `IsBar`, `IsBaz`, `Parse` |
-| Empty dataset syntax (§4.1) | `IsBar.InvalidCases => []` |
+| Scenario projection into layer cases (§4.1) | `F.IsBar.AllScenarios.ToRuleCases()` |
+| Datasets before records (§4.4) | `Parse` in TestData |
+| Dataset order: Valid → Edge → Invalid (§4.4) | `Parse` |
+| No empty datasets (§4.1, §10.3) | `IsBar` and `IsBaz` declare only `Cases`; `Parse.EdgeCases` is populated or omitted |
 | Two-line record format (§4.2) | All record definitions |
-| Tuple property named `Value`, not `Input` (§4.3) | `IsBaz.Case` — `(string? value, int threshold) Value` |
-| Tuple elements camelCase, exact param names (§4.3) | `IsBaz.Case` — `value`, `threshold` match method signature |
-| Tuple deconstruction in test (§4.3) | `IsBaz.ValidAndEdge_BehavesAsExpected` |
-| Nested static classes mirror TestData (§4.5) | `IsBar`, `IsBaz`, `Parse` in both files |
+| Tuple property named `Value`, not `Input` (§4.3) | `RuleCase<(string? value, int threshold)>` |
+| Tuple elements camelCase, exact param names (§4.3) | `value`, `threshold` match the method signature |
+| Tuple deconstruction in test (§4.3) | `IsBaz_BehavesAsExpected` |
+| One test method per TestData Operation Group (§4.5) | `IsBar`, `IsBaz`, `Parse` |
 | Same group order in both files (§4.5) | `IsBar` → `IsBaz` → `Parse` |
-| Method naming convention (§5.1) | `ValidAndEdge_BehavesAsExpected`, `Invalid_ThrowsAsExpected` |
-| `public static void` methods (§5.1) | All test methods |
-| Outer class sealed + primary constructor (§2.1) | `FooRulesTests(ITestOutputHelper output)` |
-| Outer class has NO test methods (§5.1) | All tests live in nested classes |
+| Method naming convention (§5.1) | `IsBar_BehavesAsExpected`, `IsBaz_BehavesAsExpected` |
+| Flat test class, instance `public void` methods (§5.1) | All test methods |
+| Test class sealed + primary constructor + layer base (§2.1) | `FooRulesTests(ITestOutputHelper output)` : `BaseRuleUnitTest(output)` |
+| Inheritance clause wrapped onto its own line (§1) | `FooRulesTests` declaration |
+| Assertion delegated to the layer base (§5.1) | `AssertResult(tc, result)` |
 | `MemberData` with `nameof` + `MemberType` (§5.2) | All `[MemberData]` attributes |
-| Throws pattern: cast → extract → assert → verify (§5.2) | `Parse.Invalid_ThrowsAsExpected` |
+| Throws pattern: cast → extract → assert → verify (§5.2) | `Parse_ThrowsAsExpected` |
 | AAA section markers (§1) | `// Arrange`, `// Act`, `// Assert`, `// Act & Assert` |
 
 ## 9. Test Fixtures (Shared Input Constants)
 
 ### 9.1 Purpose
 
-Test Fixtures provide **shared, reusable input constants** for validations tested across multiple layers (Core → Must → Guard → Fluent → Data). Fixtures hold **input values only** — no records, no datasets, no test infrastructure. Each project's TestData owns its records and datasets.
+Test Fixtures provide **shared, reusable input constants** for validations tested across multiple layers (Core → Must → Guard → Fluent → Data), together with the `RuleScenario<T>[]` arrays (`ValidScenarios`, `ValidEdgeScenarios`, `InvalidScenarios`, `InvalidEdgeScenarios` and the rollups) derived from those constants. Fixtures hold **no case records and no `TheoryData`** — each project's TestData turns the scenarios into its own layer's cases via `.ToXxxCases()` (`fixture.md` §4).
 
 ### 9.2 Location & Naming
 
@@ -625,6 +673,9 @@ Test Fixtures provide **shared, reusable input constants** for validations teste
 | **Class name** | `[CoreRulesClassName]Fixtures` — mirrors the Core Rules class where the validation originates |
 | **Inner class** | Matches the Core Rules method name (e.g., `IsExactLength`, `IsBetween`, `Parse`) |
 | **Alias** | `using F = PineGuard.Testing.Fixtures.[Class]Fixtures;` — standard alias in TestData files |
+| **Partial split** | When the source Rules class is split across `XxxRules.Yyy.cs` files, the fixture class mirrors it one-for-one as `XxxRulesFixtures.Yyy.cs`, each declaring `public static partial class XxxRulesFixtures` |
+
+**Partial split**: `src/PineGuard.Core/Rules/StringRules.Bool.cs` → `tests/PineGuard.Testing/Fixtures/StringRulesFixtures.Bool.cs`, and so on for every partial. Monolithic per-method fixture files are not used. Because all partials contribute to one class, inner class names must be unique across the whole set — prefix them with the partial's sub-scope where a bare method name would collide (e.g. `BoolIsTrue`, `BoolIsFalse` in `StringRulesFixtures.Bool.cs`). The alias in TestData stays `F` and points at the whole partial class, not a single file.
 
 ### 9.3 Field Conventions
 
@@ -659,7 +710,7 @@ Fixtures define **validation inputs only**. Layer-specific concerns (expected me
 
 | Layer | How Fixtures Are Used |
 | :--- | :--- |
-| **Core** | TestData references fixture values for IsCase/ReturnCase/ThrowsCase records |
+| **Core** | TestData projects scenario arrays into `RuleCase<T>` via `.ToRuleCases()`; non-scenario groups reference fixture values for `ReturnCase`/`ThrowsCase` records |
 | **Must** | TestData references fixture values; adds `ExpectedMessage` in edge/invalid records |
 | **Guard** | TestData references fixture values; uses ReturnCase (valid) + ThrowsCase (invalid) |
 | **Fluent** | TestData destructures fixture tuples into model value + config params |
@@ -696,9 +747,9 @@ The **GOLD-STANDARD** is the target quality level for all PineGuard test classes
 
 | Tier | Criteria |
 |------|----------|
-| **GOLD** | All 3 datasets exist and are populated (or legitimately empty with justification). 100% line+branch coverage confirmed. |
-| **SILVER** | Structure correct, all datasets populated or justified, coverage not yet verified. |
-| **BRONZE** | Structure correct, some datasets still scaffolded (`=> [];` without justification). |
+| **GOLD** | Only datasets with real cases are present — no `=> [];` anywhere. 100% line+branch coverage confirmed. |
+| **SILVER** | Structure correct, no empty datasets, coverage not yet verified. |
+| **BRONZE** | Structure correct, some empty `=> [];` datasets remain. |
 | **SCAFFOLD** | Empty test data, no coverage verification. |
 
 ### 10.3 Empty Dataset Policy
@@ -727,3 +778,18 @@ Compliance is tracked in `docs/ai/specs/testing/gold-standard.md`. Update the in
 - New test classes are added
 - Empty arrays are populated or justified
 - Coverage is verified for a project
+
+## 11. Enforcement
+
+Two of this spec's rules are machine-checked, not merely conventions:
+
+- §1 — `[Theory]`-only parameterization (no `[Fact]` in `*Tests.cs`)
+- §3 — the `*Tests.cs` ↔ `*TestData.cs` pairing (no orphans on either side)
+
+Both are enforced by **audit-cli Rule50** (`Unit Test File Normalization`), which runs in CI and **gates pull requests**. A violation fails the build, so fix it rather than working around it. Legitimate pre-existing exceptions are allowlisted in `tools/audit-cli/test-audit-exceptions.json`.
+
+- Tool spec: `docs/ai/specs/tools/audit-cli/spec.md`
+- Agent: `docs/ai/agents/audit-cli.md` (exposed as `/audit-cli`)
+- Reproduce locally: `./tools/audit-cli/Run-All.ps1 -RuleId Rule50`
+
+The remaining unit-test rules in this spec (§4, §5, §9) are reviewed by agents and humans, not gated.

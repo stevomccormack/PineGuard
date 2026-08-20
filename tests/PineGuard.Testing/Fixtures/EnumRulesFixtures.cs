@@ -9,8 +9,13 @@ public static class EnumRulesFixtures
 {
     public enum SimpleEnum { One = 1, Two = 2, Three = 3 }
 
+    public enum ByteBackedEnum : byte { Alpha = 1, Beta = 2 }
+
     [Flags]
     public enum FlagsEnum { None = 0, A = 1, B = 2, C = 4 }
+
+    [Flags]
+    public enum SignedFlagsEnum { None = 0, Read = 1, Write = 2, All = -1 }
 
     public enum AttributedEnum
     {
@@ -82,6 +87,30 @@ public static class EnumRulesFixtures
         public static RuleScenario<int?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class IsDefinedValueByteBacked
+    {
+        public static readonly int? Alpha = 1;
+        public static readonly int? Beta = 2;
+        public static readonly int? Undefined = 99;
+        public static readonly int? WrapsOntoAlpha = 257;
+        public static readonly int? NegativeOutOfRange = -1;
+
+        public static RuleScenario<int?>[] ValidScenarios =>
+        [
+            new(nameof(Alpha), Alpha, true),
+            new(nameof(Beta), Beta, true)
+        ];
+
+        public static RuleScenario<int?>[] InvalidScenarios =>
+        [
+            new(nameof(Undefined), Undefined, false),
+            new(nameof(WrapsOntoAlpha), WrapsOntoAlpha, false),
+            new(nameof(NegativeOutOfRange), NegativeOutOfRange, false)
+        ];
+
+        public static RuleScenario<int?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class IsDefinedValueNonNullable
     {
         public static readonly int ValueOne = 1;
@@ -104,6 +133,8 @@ public static class EnumRulesFixtures
         public static readonly (string? name, bool ignoreCase) Whitespace = (" ", true);
         public static readonly (string? name, bool ignoreCase) LowerCaseSensitive = ("one", false);
         public static readonly (string? name, bool ignoreCase) Missing = ("Missing", true);
+        public static readonly (string? name, bool ignoreCase) NumericString = ("1", true);
+        public static readonly (string? name, bool ignoreCase) CommaSeparatedList = ("One, Two", true);
 
         public static RuleScenario<(string? name, bool ignoreCase)>[] ValidScenarios =>
         [
@@ -118,7 +149,9 @@ public static class EnumRulesFixtures
             new(nameof(NullValue), NullValue, false),
             new(nameof(Whitespace), Whitespace, false),
             new(nameof(LowerCaseSensitive), LowerCaseSensitive, false),
-            new(nameof(Missing), Missing, false)
+            new(nameof(Missing), Missing, false),
+            new(nameof(NumericString), NumericString, false),
+            new(nameof(CommaSeparatedList), CommaSeparatedList, false)
         ];
 
         public static RuleScenario<(string? name, bool ignoreCase)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
@@ -133,6 +166,7 @@ public static class EnumRulesFixtures
         public static readonly FlagsEnum? NullValue = null;
         public static readonly FlagsEnum? UndefinedBit = (FlagsEnum)8;
         public static readonly FlagsEnum? UndefinedMix = (FlagsEnum)9;
+        public static readonly FlagsEnum? NegativeValue = (FlagsEnum)(-1);
 
         public static RuleScenario<FlagsEnum?>[] ValidScenarios =>
         [
@@ -146,10 +180,31 @@ public static class EnumRulesFixtures
         [
             new(nameof(NullValue), NullValue, false),
             new(nameof(UndefinedBit), UndefinedBit, false),
-            new(nameof(UndefinedMix), UndefinedMix, false)
+            new(nameof(UndefinedMix), UndefinedMix, false),
+            new(nameof(NegativeValue), NegativeValue, false)
         ];
 
         public static RuleScenario<FlagsEnum?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsFlagsEnumCombinationNegativeMember
+    {
+        public static readonly SignedFlagsEnum? Read = SignedFlagsEnum.Read;
+        public static readonly SignedFlagsEnum? All = SignedFlagsEnum.All;
+        public static readonly SignedFlagsEnum? NullValue = null;
+
+        public static RuleScenario<SignedFlagsEnum?>[] ValidScenarios =>
+        [
+            new(nameof(Read), Read, true),
+            new(nameof(All), All, true)
+        ];
+
+        public static RuleScenario<SignedFlagsEnum?>[] InvalidScenarios =>
+        [
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<SignedFlagsEnum?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
     public static class IsFlagsEnumCombinationNonNullable

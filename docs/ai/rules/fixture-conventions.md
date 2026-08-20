@@ -67,15 +67,21 @@ public sealed class CsvRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(o
 
 Method naming: `MethodName_BehavesAsExpected` — the method name provides the grouping.
 
+> This matches `docs/ai/specs/testing/unit-test.md` §4.5/§5.1: the Tests file mirrors the TestData
+> Operation Groups **as test methods, not as nested classes**. TestData files keep their Op Groups
+> (see §9 below); only the Tests file is flat. `docs/ai/specs/testing/fixture.md` carries the canonical example.
+
 ## 5. Partial Fixture Classes
 
-Fixture classes mirror the partial structure of Rule classes. If `StringRules` is split across `StringRules.cs`, `StringRules.Casing.cs`, `StringRules.Numbers.cs`, the fixture is split across matching partials:
+Fixture files mirror the source Rules file naming exactly: `XxxRules.Yyy.cs` gets `XxxRulesFixtures.Yyy.cs`. If `StringRules` is split across `StringRules.cs`, `StringRules.Casing.cs`, `StringRules.Numbers.cs`, the fixture is split across matching partials:
 
 ```
 StringRulesFixtures.cs
 StringRulesFixtures.Casing.cs
 StringRulesFixtures.Numbers.cs
 ```
+
+A monolithic fixture file standing alone beside a partial Rules class is drift — fold it into the matching partial. Because all partials share one class scope, inner group names must stay unique across the set: the groups in `StringRulesFixtures.Numbers.cs` carry the partial's qualifier (`NumbersIsPositive`, `NumbersIsInRange`, …).
 
 ## 6. Naming Precision
 

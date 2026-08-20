@@ -1,3 +1,5 @@
+using PineGuard.Common;
+
 namespace PineGuard.MustClauses;
 
 /// <summary>
@@ -81,6 +83,19 @@ public sealed class MustResult<T>
         new(false, FormatMessage(messageTemplate, paramName), paramName, value, default);
 
     /// <summary>
+    /// Creates a failed <see cref="MustResult{T}"/> from a message that is already fully formatted
+    /// and must not be passed through <c>{paramName}</c> placeholder substitution again — e.g. when
+    /// joining the already-formatted <see cref="Message"/> values of several other results, as in
+    /// <see cref="MustResultExtension.Combine{T}"/>.
+    /// </summary>
+    /// <param name="message">The final, already-formatted failure message.</param>
+    /// <param name="paramName">The name of the parameter that failed validation.</param>
+    /// <param name="value">The original untyped value that failed validation.</param>
+    /// <returns>A <see cref="MustResult{T}"/> with <see cref="Failed"/> set to <see langword="true"/>.</returns>
+    internal static MustResult<T> FailPreformatted(string message, string? paramName, object? value) =>
+        new(false, message, paramName, value, default);
+
+    /// <summary>
     /// Implicitly converts a <see cref="MustResult{T}"/> to <see cref="bool"/> by returning <see cref="Success"/>.
     /// </summary>
     /// <param name="mustResult">The result to convert.</param>
@@ -156,10 +171,13 @@ public sealed class MustResult<T>
     /// <param name="exceptionFactory">
     /// A factory that creates the exception from the failure <see cref="Message"/> and <see cref="ParamName"/>.
     /// </param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="exceptionFactory"/> is <see langword="null"/>.</exception>
     /// <exception cref="Exception">Thrown as <typeparamref name="TException"/> when <see cref="Failed"/> is <see langword="true"/>.</exception>
     public void ThrowIfFailed<TException>(Func<string, string?, TException> exceptionFactory)
         where TException : Exception
     {
+        ThrowHelper.ThrowIfNull(exceptionFactory);
+
         if (Failed) throw exceptionFactory(Message, ParamName);
     }
 
@@ -177,14 +195,18 @@ public sealed class MustResult<T>
     /// <summary>
     /// Returns <see cref="Result"/> if the validation succeeded, or throws if it failed.
     /// </summary>
-    /// <returns>The typed <see cref="Result"/> value.</returns>
+    /// <returns>
+    /// The typed <see cref="Result"/> value, which may be <see langword="null"/> when the operation
+    /// succeeded but carries no result (e.g. <see cref="MustResultExtension.Combine{T}"/> on an empty
+    /// sequence, or a successful result explicitly constructed with a <see langword="null"/> result).
+    /// </returns>
     /// <exception cref="ArgumentException">
     /// Thrown when <see cref="Failed"/> is <see langword="true"/>.
     /// </exception>
-    public T OrThrow()
+    public T? OrThrow()
     {
         ThrowIfFailed();
-        return Result!;
+        return Result;
     }
 
     /// <summary>
@@ -233,7 +255,7 @@ public static class MustResultExtension
         var first = failures[0];
         var message = string.Join("; ", failures.Select(f => f.Message));
 
-        return MustResult<T>.Fail(message, first.ParamName, first.Value);
+        return MustResult<T>.FailPreformatted(message, first.ParamName, first.Value);
     }
 
     /// <summary>

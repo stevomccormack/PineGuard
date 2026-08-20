@@ -1,4 +1,31 @@
-﻿# Multi-Target Framework Support for PineGuard
+﻿<!-- metadata_header
+type: plan
+id: multi-target-framework
+version: 1.0
+status: completed
+-->
+
+# Multi-Target Framework Support for PineGuard
+
+## Outcome (as shipped)
+
+> [!IMPORTANT]
+> **Archived.** Several decisions changed during execution. What actually shipped:
+>
+> - **TFMs**: `netstandard2.1;net8.0;net10.0` (`Directory.Build.props`). `net6.0` was dropped —
+>   the `DateOnly`/`TimeOnly` gate moved from `net6.0+` to `net8.0+`.
+> - **FluentValidation**: pinned to `11.12.0` repo-wide (`Directory.Packages.props`), not `11.11.0`.
+> - **PineGuard.Testing**: ships `net8.0;net10.0` only — `dotnet test` cannot run a
+>   `netstandard2.1` assembly, so an ns2.1 asset would be a ghost TFM.
+> - **Polyfills**: hand-rolled and `internal`, source-gated behind `#if !NET8_0_OR_GREATER`.
+>   No PolySharp, no leakage (verified by metadata inspection — see `nuget-publishing.md`).
+>
+> The three **Open Questions** were settled by the multi-TFM build going green across all three
+> targets — the conditional guards, the SqlDateTime surface and `ImplicitUsings` all resolve as
+> shipped, and no `GlobalUsings.cs` fallback was needed.
+>
+> The **Locked Decisions**, **Open Questions** and **Implementation Order** sections below are
+> superseded and kept for historical reasoning only. Read this section for what is true today.
 
 ## Context
 

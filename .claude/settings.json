@@ -27,7 +27,6 @@
       "Bash(where:*)",
       "Bash(xargs -I {} basename {})",
       "Bash(mkdir:*)",
-      "Bash(rm:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
       "Bash(chmod:*)",
@@ -36,13 +35,11 @@
       "Bash(clear:*)",
       "Bash(git add:*)",
       "Bash(git branch:*)",
-      "Bash(git checkout:*)",
+      "Bash(git checkout -b:*)",
       "Bash(git commit:*)",
       "Bash(git diff:*)",
       "Bash(git fetch:*)",
       "Bash(git log:*)",
-      "Bash(git merge:*)",
-      "Bash(git rebase:*)",
       "Bash(git show:*)",
       "Bash(git stash:*)",
       "Bash(git status:*)",
@@ -67,11 +64,19 @@
       "Edit(/.claude/skills/ask-council/**)"
     ],
     "deny": [
-      ".etc/powershell/.env"
+      ".etc/powershell/.env",
+      "Bash(rm -r:*)",
+      "Bash(rm -rf:*)",
+      "Bash(git checkout -- .)",
+      "Bash(git restore .)"
     ],
     "ask": [
+      "Bash(rm:*)",
       "Bash(git push:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)"
     ]
   },
   "hooks": {

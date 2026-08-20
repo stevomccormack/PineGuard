@@ -38,6 +38,7 @@ public static class ThrowHelper
 #if NET8_0_OR_GREATER
         ArgumentException.ThrowIfNullOrWhiteSpace(argument, paramName);
 #else
+        if (argument is null) throw new ArgumentNullException(paramName);
         if (string.IsNullOrWhiteSpace(argument)) throw new ArgumentException("The value cannot be null or whitespace.", paramName);
 #endif
     }

@@ -82,14 +82,14 @@ public static class BufferRulesFixtures
 
         public static RuleScenario<string?>[] ValidEdgeScenarios =>
         [
-            new(nameof(Trimmed), Trimmed, true)
+            new(nameof(Trimmed),      Trimmed,      true),
+            new(nameof(EmbeddedSpace), EmbeddedSpace, true)
         ];
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
             new(nameof(BadPadding),      BadPadding,      false),
             new(nameof(TooMuchPadding),  TooMuchPadding,  false),
-            new(nameof(EmbeddedSpace),   EmbeddedSpace,   false),
             new(nameof(InvalidChars),    InvalidChars,    false)
         ];
 

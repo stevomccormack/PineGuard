@@ -11,16 +11,16 @@ public static partial class HttpRules
     /// <summary>
     /// Determines whether the specified value is a valid HTTP header name (RFC 7230 token characters only).
     /// </summary>
-    /// <param name="name">The header name to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <param name="name">The header name to validate, as-is (not trimmed). If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="name"/> contains only valid token characters; otherwise, <see langword="false"/>.</returns>
     public static bool IsHeaderName(string? name) =>
-        StringUtility.TryGetTrimmed(name, out var trimmed) && trimmed.All(IsTokenChar);
+        !string.IsNullOrEmpty(name) && name.All(IsTokenChar);
 
     /// <summary>
-    /// Determines whether the specified value is a valid HTTP header value (no CR, LF, or control characters).
+    /// Determines whether the specified value is a valid HTTP header value (no CR, LF, or control characters other than horizontal tab).
     /// </summary>
     /// <param name="value">The header value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> contains no control characters; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if <paramref name="value"/> contains no control characters (horizontal tab is permitted per RFC 9110 field-content); otherwise, <see langword="false"/>.</returns>
     public static bool IsHeaderValue(string? value)
     {
         if (value is null)
@@ -31,7 +31,7 @@ public static partial class HttpRules
             if (ch is '\r' or '\n')
                 return false;
 
-            if (char.IsControl(ch))
+            if (ch != '\t' && char.IsControl(ch))
                 return false;
         }
 

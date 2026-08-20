@@ -17,6 +17,6 @@ Runs static analysis using the specified tool.
 | Scan with Qodana (all) | `docs/ai/agents/scan-qodana-all.md` |
 | Scan with Qodana ({scope}) | `docs/ai/agents/scan-qodana-{scope}.md` |
 | Scan with SonarQube | `docs/ai/agents/scan-sonar.md` |
-| Fix Roslyn warnings | `docs/ai/agents/fix-roslyn-all.md` |
-| Fix SonarQube issues | `docs/ai/agents/fix-sonar-all.md` |
-| Fix SonarQube by severity | `docs/ai/agents/fix-sonar-{severity}.md` |
+
+Scanning is read-only. Repairing what a scan reports is contracted in [`fix.md`](fix.md)
+(`/fix-roslyn-all`, `/fix-sonar-{severity}`).

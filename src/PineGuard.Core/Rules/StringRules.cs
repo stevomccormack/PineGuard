@@ -57,9 +57,9 @@ public static partial class StringRules
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="length">The length threshold.</param>
-    /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <returns><see langword="true"/> if the string length satisfies the condition; otherwise, <see langword="false"/>.</returns>
-    public static bool IsLongerThan(string? value, int length, Inclusion inclusion = Inclusion.Inclusive) =>
+    public static bool IsLongerThan(string? value, int length, Inclusion inclusion = Inclusion.Exclusive) =>
         value is not null && RuleComparison.IsGreaterThan(value.Length, length, inclusion);
 
     /// <summary>
@@ -67,9 +67,9 @@ public static partial class StringRules
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="length">The length threshold.</param>
-    /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <returns><see langword="true"/> if the string length satisfies the condition; otherwise, <see langword="false"/>.</returns>
-    public static bool IsShorterThan(string? value, int length, Inclusion inclusion = Inclusion.Inclusive) =>
+    public static bool IsShorterThan(string? value, int length, Inclusion inclusion = Inclusion.Exclusive) =>
         value is not null && RuleComparison.IsLessThan(value.Length, length, inclusion);
 
     /// <summary>
@@ -96,11 +96,16 @@ public static partial class StringRules
         value is not null && AllCharsAreAllowed(value, char.IsLetter, inclusions);
 
     /// <summary>
-    /// Determines whether the specified string contains only decimal digit characters, with optional additional allowed characters.
+    /// Determines whether the specified string contains only ASCII decimal digit characters (<c>0</c>–<c>9</c>), with optional additional allowed characters.
     /// </summary>
+    /// <remarks>
+    /// Digit detection is ASCII-only (<see cref="CharRules.IsDigit(char?)"/>), unlike <see cref="IsAlphanumeric(string, char[])"/>, which
+    /// accepts any Unicode decimal-digit character (e.g., Arabic-Indic or fullwidth digits). A string of non-ASCII digits therefore fails
+    /// <see cref="IsNumeric(string, char[])"/> while passing <see cref="IsAlphanumeric(string, char[])"/>.
+    /// </remarks>
     /// <param name="value">The value to validate. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
     /// <param name="inclusions">Optional additional characters that are also permitted.</param>
-    /// <returns><see langword="true"/> if every character is a digit or an allowed inclusion; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if every character is an ASCII digit (<c>0</c>–<c>9</c>) or an allowed inclusion; otherwise, <see langword="false"/>.</returns>
     public static bool IsNumeric(string? value, char[]? inclusions = null) =>
         value is not null && AllCharsAreAllowed(value, ch => CharRules.IsDigit(ch), inclusions);
 
@@ -125,10 +130,13 @@ public static partial class StringRules
     /// Determines whether the specified string contains only decimal digit characters, with optional additional allowed non-digit characters.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
-    /// <param name="allowedNonDigitChars">Optional non-digit characters that are also permitted (e.g., <c>-</c>, <c>+</c>).</param>
+    /// <param name="allowedNonDigitChars">
+    /// Non-digit characters that are also permitted (e.g., <c>-</c>, <c>+</c>). <see langword="null"/> means no non-digit characters
+    /// are permitted (digits only) — it does <em>not</em> fall back to a default separator set.
+    /// </param>
     /// <returns><see langword="true"/> if every character is a decimal digit or an allowed non-digit character; otherwise, <see langword="false"/>.</returns>
     public static bool IsDigitsOnly(string? value, char[]? allowedNonDigitChars) =>
-        StringUtility.TryParseDigits(value, out _, allowedNonDigitChars);
+        StringUtility.TryParseDigits(value, out _, allowedNonDigitChars ?? []);
 
     /// <summary>
     /// Determines whether the specified string is entirely uppercase.
@@ -223,8 +231,19 @@ public static partial class StringRules
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if every character has a code point within the ASCII range; otherwise, <see langword="false"/>.</returns>
-    public static bool IsAscii(string? value) =>
-        value is not null && value.All(ch => ch <= CharRules.AsciiMaxValue);
+    public static bool IsAscii(string? value)
+    {
+        if (value is null)
+            return false;
+
+        foreach (var ch in value)
+        {
+            if (ch > CharRules.AsciiMaxValue)
+                return false;
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// Determines whether the specified string contains only printable ASCII characters (code points 32–126).
@@ -259,32 +278,76 @@ public static partial class StringRules
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if every character is a whitespace character; otherwise, <see langword="false"/>.</returns>
-    public static bool IsWhitespace(string? value) =>
-        value is not null && value.All(char.IsWhiteSpace);
+    public static bool IsWhitespace(string? value)
+    {
+        if (value is null)
+            return false;
+
+        foreach (var ch in value)
+        {
+            if (!char.IsWhiteSpace(ch))
+                return false;
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// Determines whether the specified string contains at least one whitespace character.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the string contains one or more whitespace characters; otherwise, <see langword="false"/>.</returns>
-    public static bool ContainsWhitespace(string? value) =>
-        value is not null && value.Any(char.IsWhiteSpace);
+    public static bool ContainsWhitespace(string? value)
+    {
+        if (value is null)
+            return false;
+
+        foreach (var ch in value)
+        {
+            if (char.IsWhiteSpace(ch))
+                return true;
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Determines whether the specified string contains at least one control character.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the string contains one or more control characters; otherwise, <see langword="false"/>.</returns>
-    public static bool ContainsControlChars(string? value) =>
-        value is not null && value.Any(char.IsControl);
+    public static bool ContainsControlChars(string? value)
+    {
+        if (value is null)
+            return false;
+
+        foreach (var ch in value)
+        {
+            if (char.IsControl(ch))
+                return true;
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Determines whether the specified string contains no control characters.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if no character in the string is a control character; otherwise, <see langword="false"/>.</returns>
-    public static bool NotContainsControlChars(string? value) =>
-        value is not null && value.All(ch => !char.IsControl(ch));
+    public static bool NotContainsControlChars(string? value)
+    {
+        if (value is null)
+            return false;
+
+        foreach (var ch in value)
+        {
+            if (char.IsControl(ch))
+                return false;
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// Determines whether the specified string contains only characters from the provided allowed set.
@@ -300,9 +363,13 @@ public static partial class StringRules
         if (value is null)
             return false;
 
-        var allowed = new HashSet<char>(allowedChars);
+        foreach (var ch in value)
+        {
+            if (Array.IndexOf(allowedChars, ch) < 0)
+                return false;
+        }
 
-        return value.All(ch => allowed.Contains(ch));
+        return true;
     }
 
     /// <summary>
@@ -319,9 +386,13 @@ public static partial class StringRules
         if (value is null)
             return false;
 
-        var disallowed = new HashSet<char>(disallowedChars);
+        foreach (var ch in value)
+        {
+            if (Array.IndexOf(disallowedChars, ch) >= 0)
+                return true;
+        }
 
-        return value.Any(ch => disallowed.Contains(ch));
+        return false;
     }
 
     private static bool AllCharsAreAllowed(string value, Func<char, bool> allowedCharPredicate,
@@ -331,10 +402,22 @@ public static partial class StringRules
             return false;
 
         if (additionalAllowedChars is null || additionalAllowedChars.Length == 0)
-            return value.All(allowedCharPredicate);
+        {
+            foreach (var ch in value)
+            {
+                if (!allowedCharPredicate(ch))
+                    return false;
+            }
 
-        var additionalAllowedSet = new HashSet<char>(additionalAllowedChars);
+            return true;
+        }
 
-        return value.All(ch => allowedCharPredicate(ch) || additionalAllowedSet.Contains(ch));
+        foreach (var ch in value)
+        {
+            if (!allowedCharPredicate(ch) && Array.IndexOf(additionalAllowedChars, ch) < 0)
+                return false;
+        }
+
+        return true;
     }
 }

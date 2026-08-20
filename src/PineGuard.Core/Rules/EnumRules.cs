@@ -43,12 +43,48 @@ public static class EnumRules
     /// <typeparam name="TEnum">The enum type to validate against.</typeparam>
     /// <param name="value">The integer value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> maps to a defined enum member; otherwise, <see langword="false"/>.</returns>
-    public static bool IsDefinedValue<TEnum>(int? value) where TEnum : struct, Enum =>
+    /// <remarks>
+    /// Converts <paramref name="value"/> to <typeparamref name="TEnum"/> via <see cref="Enum.ToObject(Type, int)"/>
+    /// so that enums with a non-<see cref="int"/> underlying type (e.g. <see cref="byte"/>, <see cref="long"/>) are
+    /// handled correctly instead of throwing <see cref="InvalidCastException"/>. Because <c>ToObject</c> truncates
+    /// rather than range-checks, <paramref name="value"/> is first verified to fit within the underlying type's
+    /// range; an out-of-range value that would otherwise wrap onto a defined member's bit pattern (e.g. <c>257</c>
+    /// wrapping to <c>1</c> for a <see cref="byte"/>-backed enum) returns <see langword="false"/> instead of a
+    /// false positive.
+    /// </remarks>
+    public static bool IsDefinedValue<TEnum>(int? value) where TEnum : struct, Enum
+    {
+        if (value is null)
+            return false;
+
+        if (!IsWithinUnderlyingRange<TEnum>(value.Value))
+            return false;
+
+        var boxed = Enum.ToObject(typeof(TEnum), value.Value);
 #if NET8_0_OR_GREATER
-        value is not null && Enum.IsDefined((TEnum)(object)value.Value);
+        return Enum.IsDefined((TEnum)boxed);
 #else
-        value is not null && Enum.IsDefined(typeof(TEnum), (TEnum)(object)value.Value);
+        return Enum.IsDefined(typeof(TEnum), boxed);
 #endif
+    }
+
+    /// <summary>
+    /// Determines whether <paramref name="value"/> fits within the numeric range of <typeparamref name="TEnum"/>'s
+    /// underlying integral type, so that <see cref="Enum.ToObject(Type, int)"/> cannot silently truncate an
+    /// out-of-range value onto a defined member's bit pattern.
+    /// </summary>
+    private static bool IsWithinUnderlyingRange<TEnum>(int value) where TEnum : struct, Enum
+    {
+        try
+        {
+            Convert.ChangeType(value, Enum.GetUnderlyingType(typeof(TEnum)), CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
+    }
 
     /// <summary>
     /// Determines whether the specified string is a valid member name of the enumeration.
@@ -59,10 +95,17 @@ public static class EnumRules
     /// When <see langword="true"/> (default), performs a case-insensitive comparison.
     /// </param>
     /// <returns><see langword="true"/> if <paramref name="name"/> is a valid enum member name; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Compares <paramref name="name"/> against the enumeration's declared member names directly rather than via
+    /// <see cref="Enum.TryParse{TEnum}(string, bool, out TEnum)"/>, because <c>TryParse</c> also accepts numeric
+    /// strings (e.g. <c>"1"</c>) and comma-separated value lists (e.g. <c>"Monday, Tuesday"</c>), neither of which
+    /// is a member name.
+    /// </remarks>
     /// <example>
     /// <code><![CDATA[
     /// bool valid = EnumRules.IsDefinedName<DayOfWeek>("monday");   // true (case-insensitive)
     /// bool invalid = EnumRules.IsDefinedName<DayOfWeek>("Holiday"); // false
+    /// bool invalid = EnumRules.IsDefinedName<DayOfWeek>("1");       // false (not a member name)
     /// ]]></code>
     /// </example>
     public static bool IsDefinedName<TEnum>(string? name, bool ignoreCase = true)
@@ -71,12 +114,21 @@ public static class EnumRules
         if (!StringUtility.TryGetTrimmed(name, out var trimmed))
             return false;
 
-        return Enum.TryParse<TEnum>(trimmed, ignoreCase, out var parsed)
+        var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+
 #if NET8_0_OR_GREATER
-               && Enum.IsDefined(parsed);
+        var names = Enum.GetNames<TEnum>();
 #else
-               && Enum.IsDefined(typeof(TEnum), parsed);
+        var names = Enum.GetNames(typeof(TEnum));
 #endif
+
+        foreach (var candidate in names)
+        {
+            if (string.Equals(candidate, trimmed, comparison))
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -84,8 +136,12 @@ public static class EnumRules
     /// </summary>
     /// <typeparam name="TEnum">The enum type to check.</typeparam>
     /// <returns><see langword="true"/> if <typeparamref name="TEnum"/> has the <see cref="FlagsAttribute"/>; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// The reflection lookup is performed once per closed <typeparamref name="TEnum"/> and cached in
+    /// <see cref="DefinedBitsCache{TEnum}"/>.
+    /// </remarks>
     public static bool IsFlagsEnum<TEnum>() where TEnum : struct, Enum =>
-        typeof(TEnum).IsDefined(typeof(FlagsAttribute), inherit: false);
+        DefinedBitsCache<TEnum>.IsFlags;
 
     /// <summary>
     /// Determines whether the specified value is a valid combination of defined flags for a <see cref="FlagsAttribute"/> enum.
@@ -125,6 +181,15 @@ public static class EnumRules
     /// <typeparam name="TAttribute">The attribute type to check for.</typeparam>
     /// <param name="value">The enum value to inspect. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the member has the specified attribute; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// The member is resolved via <see cref="Enum.GetName(Type, object)"/>. If <typeparamref name="TEnum"/> declares
+    /// multiple constants sharing the same underlying value (aliases), <c>GetName</c> can only return one alias's
+    /// name for that value, so this method (and <see cref="HasDescription{TEnum}"/>, <see cref="HasDisplay{TEnum}"/>,
+    /// <see cref="HasEnumMember{TEnum}"/>, <see cref="IsObsolete{TEnum}"/>) inspects that resolved alias rather than
+    /// the specific constant the caller may have had in mind. This mirrors the runtime's own <c>Enum.GetName</c>/
+    /// <c>ToString</c> behavior for aliased values and cannot be distinguished by any API that accepts only the
+    /// enum value.
+    /// </remarks>
     public static bool HasAttribute<TEnum, TAttribute>(TEnum? value)
         where TEnum : struct, Enum
         where TAttribute : Attribute
@@ -195,17 +260,35 @@ public static class EnumRules
     public static bool IsObsolete<TEnum>(TEnum? value) where TEnum : struct, Enum =>
         HasAttribute<TEnum, ObsoleteAttribute>(value);
 
-    private static ulong GetDefinedBits<TEnum>() where TEnum : struct, Enum
+    private static ulong GetDefinedBits<TEnum>() where TEnum : struct, Enum =>
+        DefinedBitsCache<TEnum>.Bits;
+
+    /// <summary>
+    /// Reinterprets an enum member's underlying value as a <see cref="ulong"/> bit pattern, sign-extending
+    /// negative signed-underlying values (e.g. <c>-1</c>) instead of throwing <see cref="OverflowException"/>.
+    /// </summary>
+    private static ulong ToUInt64<TEnum>(TEnum value) where TEnum : struct, Enum =>
+        Type.GetTypeCode(typeof(TEnum)) switch
+        {
+            TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64 =>
+                unchecked((ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture)),
+            _ => Convert.ToUInt64(value, CultureInfo.InvariantCulture)
+        };
+
+    private static class DefinedBitsCache<TEnum> where TEnum : struct, Enum
     {
+        public static readonly ulong Bits = Compute();
+        public static readonly bool IsFlags = typeof(TEnum).IsDefined(typeof(FlagsAttribute), inherit: false);
+
+        private static ulong Compute()
+        {
 #if NET8_0_OR_GREATER
-        var values = Enum.GetValues<TEnum>();
+            var values = Enum.GetValues<TEnum>();
 #else
-        var values = (TEnum[])Enum.GetValues(typeof(TEnum));
+            var values = (TEnum[])Enum.GetValues(typeof(TEnum));
 #endif
 
-        return values.Aggregate<TEnum, ulong>(0, (current, v) => current | ToUInt64(v));
+            return values.Aggregate<TEnum, ulong>(0, (current, v) => current | ToUInt64(v));
+        }
     }
-
-    private static ulong ToUInt64<TEnum>(TEnum value) where TEnum : struct, Enum =>
-        Convert.ToUInt64(value, CultureInfo.InvariantCulture);
 }

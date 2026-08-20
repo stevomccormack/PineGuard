@@ -4,10 +4,9 @@ spec:
   title: "PineGuard Audit CLI Specification"
   version: 1
   template:
-    - ../../template-project.md
+    - ../../../meta/template-project.md
   parent:
     - ../spec.md
-    - ./spec.md
   dependencies:
     - ../../dependencies.md
 applies_to:

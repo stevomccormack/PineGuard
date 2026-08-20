@@ -142,9 +142,16 @@ public abstract class ObjectAttributeBase() : ValidationAttributeBase(typeof(obj
     private static ValidationResult? CheckArgCompatibility(Type type, object?[] args, ValidationContext ctx)
     {
         var mismatch = args.FirstOrDefault(arg => arg != null && !type.IsInstanceOfType(arg));
-        return mismatch is not null
-            ? new ValidationResult($"Type mismatch: Expected {type.Name}, got {mismatch.GetType().Name}.", [ctx.MemberName!])
-            : null;
+        if (mismatch is null)
+            return null;
+
+        var message = $"Type mismatch: Expected {type.Name}, got {mismatch.GetType().Name}.";
+
+        // Mirrors ValidationAttributeBase.BuildFailureResult: a member-less ValidationContext must not
+        // produce MemberNames == [null].
+        return ctx.MemberName is { } memberName
+            ? new ValidationResult(message, [memberName])
+            : new ValidationResult(message);
     }
 }
 

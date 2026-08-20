@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Reflection;
-using PineGuard.Extensions;
 
 namespace PineGuard.Common;
 
@@ -38,13 +37,13 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
 
         var type = GetType();
         var nameRegistry = NameRegistries.GetOrAdd(type, _ => new ConcurrentDictionary<string, Enumeration<TValue>>(StringComparer.OrdinalIgnoreCase));
-        if (!nameRegistry.TryAdd(name, this)) throw new ArgumentException($"{nameof(name).TitleCase()} '{name}' already exists in {type.Name}.", nameof(name));
+        if (!nameRegistry.TryAdd(name, this)) throw new ArgumentException($"Name '{name}' already exists in {type.Name}.", nameof(name));
 
         var valueRegistry = ValueRegistries.GetOrAdd(type, _ => new ConcurrentDictionary<TValue, Enumeration<TValue>>());
         if (!valueRegistry.TryAdd(value, this))
         {
             nameRegistry.TryRemove(name, out _); // Rollback name registration
-            throw new ArgumentException($"{nameof(value).TitleCase()} '{value}' already exists in {type.Name}.", nameof(value));
+            throw new ArgumentException($"Value '{value}' already exists in {type.Name}.", nameof(value));
         }
 
         Value = value;
@@ -83,13 +82,13 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
     /// <returns><see langword="true"/> if a matching member was found; otherwise, <see langword="false"/>.</returns>
     public static bool TryFromValue<T>(TValue? value, out T? result) where T : Enumeration<TValue>
     {
-        if (EqualityComparer<TValue>.Default.Equals(value!, default!))
+        if (value is null)
         {
             result = null;
             return false;
         }
 
-        result = FromValue<T>(value!);
+        result = FromValue<T>(value);
         return result != null;
     }
 
@@ -144,7 +143,20 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
     public override string ToString() => Name;
 
     /// <inheritdoc />
-    public int CompareTo(Enumeration<TValue>? other) => other is null ? 1 : Value.CompareTo(other.Value);
+    /// <remarks>
+    /// String-valued members are compared with <see cref="string.CompareOrdinal(string?, string?)"/> rather than
+    /// <see cref="IComparable{T}.CompareTo(T)"/>, so ordering is deterministic and independent of the current culture.
+    /// </remarks>
+    public int CompareTo(Enumeration<TValue>? other)
+    {
+        if (other is null)
+            return 1;
+
+        if (Value is string left && other.Value is string right)
+            return string.CompareOrdinal(left, right);
+
+        return Value.CompareTo(other.Value);
+    }
 
     /// <summary>
     /// Determines whether two enumeration instances are equal.

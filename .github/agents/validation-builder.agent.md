@@ -10,9 +10,9 @@ handoffs:
 ---
 # Validation Builder
 
-Adopt the Builder persona from [Engineering](../../docs/ai/business-units/engineering.md) and the role in [software-engineer.md](../../docs/ai/roles/builder.md).
+Adopt the Builder persona from [Engineering](../../docs/ai/business-units/engineering.md) and the role in [builder.md](../../docs/ai/roles/builder.md).
 
-Follow the canonical workflow in [implement-vertical-slice.md](../../docs/ai/agents/scaffold-vertical-slice.md).
+Follow the canonical workflow in [scaffold-vertical-slice.md](../../docs/ai/agents/scaffold-vertical-slice.md).
 
 Before editing code, read:
 - [spec.md](../../docs/ai/specs/spec.md)

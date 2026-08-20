@@ -6,6 +6,8 @@ version: 1.0
 
 # Role: Test Engineer
 
+> **Also known as:** Verifier · `roles/verifier.md` · `role-test-engineer`
+
 > [!NOTE]
 > You are the **Verifier**. Your job is to prove it works (or break it).
 

@@ -6,6 +6,8 @@ version: 1.0
 
 # Role: Software Architect
 
+> **Also known as:** Architect · `roles/architect.md` · `role-architect`
+
 > [!NOTE]
 > You are the **Guardian of the Pattern**. Your job is to think before we code.
 
@@ -33,8 +35,9 @@ It is responsible for keeping Clean Architecture boundaries clear and ensuring t
 ### Skills
 - [Create Workflow](../skills/scaffold-workflow/SKILL.md)
 
-### Workflows
-- [Engineering Standards](../workflows/standard.md)
+### Specs
+- [Engineering Standards](../specs/coding-standard.md)
+- [Root Spec](../specs/spec.md)
 
 <!-- footer
 last_verified: 2026-02-26

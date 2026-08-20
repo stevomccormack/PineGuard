@@ -101,4 +101,14 @@ public sealed class EnumAttributesTests
             Assert.Contains("Custom:", result.ErrorMessage!);
         }
     }
+
+    [Theory]
+    [MemberData(nameof(EnumAttributesTestData.DefinedWithMemberName.Cases), MemberType = typeof(EnumAttributesTestData.DefinedWithMemberName))]
+    public void Defined_WithMemberName_ShouldReportMemberNames(EnumAttributesTestData.ValidCase testCase)
+    {
+        var ctx = new ValidationContext(new object()) { MemberName = "SomeMember" };
+        var result = new DefinedAttribute().GetValidationResult(testCase.Value, ctx);
+        Assert.NotEqual(ValidationResult.Success, result);
+        Assert.Contains("SomeMember", result!.MemberNames);
+    }
 }

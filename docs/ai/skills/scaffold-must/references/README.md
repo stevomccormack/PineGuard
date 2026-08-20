@@ -1,4 +1,4 @@
-# Reference Files: scaffold-musts
+# Reference Files: scaffold-must
 
 > Read the exemplar files listed below before implementing. Do NOT copy them — follow the same patterns.
 

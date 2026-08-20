@@ -52,11 +52,33 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     }
 
     [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsBeforeDefaultInclusion.Cases), MemberType = typeof(DateOnlyRulesTestData.IsBeforeDefaultInclusion))]
+    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(DateOnly? value, DateOnly? other)> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsBefore(tc.Value.value, tc.Value.other);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(DateOnlyRulesTestData.IsAfter.Cases), MemberType = typeof(DateOnlyRulesTestData.IsAfter))]
     public void IsAfter_BehavesAsExpected(RuleCase<(DateOnly? value, DateOnly? other, Inclusion inclusion, DatePrecision? precision)> tc)
     {
         // Act
         var result = DateOnlyRules.IsAfter(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsAfterDefaultInclusion.Cases), MemberType = typeof(DateOnlyRulesTestData.IsAfterDefaultInclusion))]
+    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(DateOnly? value, DateOnly? other)> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsAfter(tc.Value.value, tc.Value.other);
 
         // Assert
         AssertResult(tc, result);

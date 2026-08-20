@@ -1,6 +1,6 @@
 <!-- metadata_header
 type: agent
-id: agent-fix-sonar-blockers
+id: agent-fix-sonar-blocker
 version: 1.0
 -->
 

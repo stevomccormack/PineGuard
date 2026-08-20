@@ -110,6 +110,20 @@ public static class CollectionUtility
 
                     return false;
                 }
+            case IReadOnlyList<T> roList:
+                {
+                    for (var i = 0; i < roList.Count; i++)
+                    {
+                        if (!EqualityComparer<T>.Default.Equals(roList[i], item)) continue;
+                        index = i;
+                        return true;
+                    }
+
+                    return false;
+                }
+            case ICollection<T> { Count: 0 }:
+            case IReadOnlyCollection<T> { Count: 0 }:
+                return false;
         }
 
         var idx = 0;

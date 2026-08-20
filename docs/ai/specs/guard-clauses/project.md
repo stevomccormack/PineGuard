@@ -4,11 +4,11 @@ spec:
   title: "PineGuard.GuardClauses Project Spec"
   version: 1
   template:
-    - ../template-project.md
+    - ../../meta/template-project.md
   parent:
-    - ../../spec.md
+    - ../spec.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.GuardClauses/**"
 ---
@@ -30,6 +30,11 @@ Out of scope:
 
 See `docs/ai/specs/spec.md` §3 ("Feature Implementation Checklist (Master)").
 
+## Related specs
+
+- Unit tests addendum: `docs/ai/specs/guard-clauses/unit-test.md`
+- Coverage addendum: `docs/ai/specs/guard-clauses/coverage.md`
+- Naming collisions: `docs/ai/specs/language/naming-collisions.md`
 
 ---
 
@@ -61,7 +66,17 @@ Semantics:
 
 ### 1.1 Relationship to MustClauses (analogous by design)
 
-PineGuard has two fluent validation surfaces that intentionally share implementation:
+PineGuard layers in one direction — each layer calls only the one before it:
+
+- **Core** (`Rules`/`Utils`) owns validation logic and parsing.
+- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
+- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
+- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
+- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
+
+Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none reimplements Core logic.
+
+Must and Guard are two fluent validation surfaces that intentionally share implementation:
 
 - `Must.Be.*` returns a `MustResult<T>`.
 - `Guard.Against.*` throws.
@@ -118,6 +133,7 @@ Folder conventions (strict):
 - **Method Ordering Rule**: Negative methods must appear BEFORE Positive methods in the file.
   - Example: `Against.Null` (Negative) comes before `Against.NotNull` (Positive).
   - Rationale: Guard clauses are inherently defensive ("Guard Against Bad Thing").
+  - This deliberately **inverts** `docs/ai/specs/must-clauses/project.md` ("Method ordering"), which is the canonical rule for the other layers. The inversion is intentional: ordering by the Must clause each guard invokes keeps Guard aligned with Must's file order.
   - Complement ordering convention (required): when Guard methods are implemented via Must complements, order Guard methods by the **Must clause they invoke** so they stay aligned with Must’s canonical ordering.
     - Example (complement pair):
       - `Must.Be.True(...)` appears before `Must.Be.False(...)`.
@@ -208,7 +224,7 @@ Hard rule:
 
 Guard naming must be consistent across all API families. Use the patterns below.
 
-#### 5.4.1 “NonX” (complement set)
+#### 5.4.1 “NotX” (complement set)
 
 Use `NotX` when the forbidden set is “anything that is not X”.
 
@@ -263,11 +279,37 @@ Reasoning:
 - “NotInPast” often means “present or future”, not “future”.
 - “NotBefore” often means “on or after”, not “after”.
 
+#### 5.4.5 Ranges: “OutOfRange / InRange” over “NotBetween / Between”
+
+When the intent is numeric/time ranges, prefer:
+
+- `OutOfRange(...)` (forbid out-of-range)
+- `InRange(...)` only when the forbidden state is clearly “in range” (less common)
+
+Reasoning:
+
+- `NotBetween` tends to be read backwards.
+- `OutOfRange` is the natural bad-state.
+
+#### 5.4.6 Membership/contains: keep both when both are common
+
+Both directions are common in real code:
+
+- Forbid “contains disallowed X”
+- Forbid “missing required X”
+
+Naming guidance:
+
+- Prefer `ContainsX` as a bad-state when it reads naturally (e.g., `ContainsControlChars`).
+- Otherwise prefer Must-derived complements like `NotHasX` / `NotHasAnyX` when the intent is “must contain”.
+
 #### 5.4.7 Temporal comparisons: Inclusion mapping (required)
 
 Core time/date rules may expose boundary inclusion via `PineGuard.Common.Inclusion`.
 
-GuardClauses must not accept an `Inclusion` parameter. The generator must split Guard methods into explicit names per inclusion case.
+Guard methods for *relative-to-now* temporal comparisons (`Past`/`PastOrPresent`/`Future`/`FutureOrPresent`) and for string-length comparisons (§5.4.8) must not accept an `Inclusion` parameter; they are split into explicit names per inclusion case.
+
+- Range, chronology and overlap clauses (`Between`/`NotBetween`, `Chronological`/`NotChronological`, `Overlapping`, `OutOfRange`, `InRange`) DO forward an `Inclusion inclusion = Inclusion.Inclusive|Exclusive` parameter to the corresponding Must clause, because the boundary set is caller-supplied rather than fixed.
 
 Required vocabulary:
 
@@ -328,41 +370,16 @@ Notes:
 
 - Do not generate `NotHasDistinctItems` as a Must clause; prefer `HasDuplicateItems`.
 
-#### 5.4.5 Ranges: “OutOfRange / InRange” over “NotBetween / Between”
-
-When the intent is numeric/time ranges, prefer:
-
-- `OutOfRange(...)` (forbid out-of-range)
-- `InRange(...)` only when the forbidden state is clearly “in range” (less common)
-
-Reasoning:
-
-- `NotBetween` tends to be read backwards.
-- `OutOfRange` is the natural bad-state.
-
-#### 5.4.6 Membership/contains: keep both when both are common
-
-Both directions are common in real code:
-
-- Forbid “contains disallowed X”
-- Forbid “missing required X”
-
-Naming guidance:
-
-- Prefer `ContainsX` as a bad-state when it reads naturally (e.g., `ContainsControlChars`).
-- Otherwise prefer Must-derived complements like `NotHasX` / `NotHasAnyX` when the intent is “must contain”.
-
-#### 5.4.7 Tasks: forbidden states are state names
+#### 5.4.10 Tasks: forbidden states are state names
 
 For tasks, name forbidden states directly:
 
-- `Incomplete(task)` (forbid incomplete → enforce completed)
 - `Canceled(task)` (forbid canceled)
 - `Faulted(task)` (forbid faulted)
 
-Avoid `NotCompleted/NotCanceled/NotFaulted`.
+`Not*` task names are permitted here, because `MustTaskClauses` exposes both directions (`Completed`/`NotCompleted`, `Canceled`/`NotCanceled`, `Faulted`/`NotFaulted`) and §4's coverage rule requires a Guard for each. `GuardTaskClauses` therefore carries the full six.
 
-#### 5.4.8 URIs/schemes: do not confuse logical complements with alternate schemes
+#### 5.4.11 URIs/schemes: do not confuse logical complements with alternate schemes
 
 Do **not** treat `!Https` as `Http`.
 
@@ -398,7 +415,7 @@ Examples:
 
 ```csharp
 // Forbid non-ASCII => enforce ASCII
-var result = Must.Be.Ascii(value, paramName); // Guard.Against.NonAscii => Must.Be.Ascii (complement)
+var result = Must.Be.Ascii(value, paramName); // Guard.Against.NotAscii => Must.Be.Ascii (complement)
 if (result.Failed)
   GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
 return result.Result;
@@ -410,7 +427,7 @@ Inline mapping comment (required when using complements):
 
 #### 5.5.1 Permitted exception: when Must does not (yet) expose the complement
 
-Sometimes the forbidden bad-state does not have an existing Must clause that represents its complement (e.g., forbidding `Canceled` when Must only provides `Canceled`).
+Sometimes the forbidden bad-state has no existing Must clause representing its complement: Must exposes the positive property but no `Not*` counterpart, so there is nothing to call for the Guard's success condition.
 
 In that case you have two options:
 
@@ -493,7 +510,7 @@ Rules:
 
 ### 6.0 Nullability
 
-GuardClauses follow Rule07 (hybrid nullability strategy): use nullable reference inputs for ergonomic call sites and correct exception typing, but treat null as invalid unless the method name explicitly encodes null as acceptable.
+GuardClauses follow Rule07 (see `docs/ai/specs/tools/audit-cli/spec.md` and `tools/audit-cli/rules/Test-Rule07-Nullability.ps1`) — the hybrid nullability strategy: use nullable reference inputs for ergonomic call sites and correct exception typing, but treat null as invalid unless the method name explicitly encodes null as acceptable.
 
 Rules:
 
@@ -512,7 +529,7 @@ Rules:
   - `string? message = null`
   - `Func<Exception>? exceptionCreator = null`
 
-### 6.3 Optional custom message/exception
+### 6.1 Optional custom message/exception
 
 GuardClauses may optionally accept:
 
@@ -535,23 +552,7 @@ GuardClauses also supports a global replacement policy via `GuardExceptionPolicy
 `GuardExceptionPolicy.BeginScope(...)` provides a scoped override on top of the global policy.
 `GuardFailure.ThrowAndReplace(...)` remains the explicit per-call replacement path and takes precedence over scoped/global policy replacement.
 
-### 11.5 Example: custom exception type + message
-
-```csharp
-public static void NotValidEmail(
-  this IGuardClause _,
-  string? value,
-  [CallerArgumentExpression(nameof(value))] string? paramName = null)
-{
-  var result = Must.Be.Email(value, paramName);
-  if (result.Failed)
-    GuardFailure.Throw(
-      "Email format is invalid.",
-      paramName,
-      value,
-      () => new BusinessException("Email format is invalid."));
-}
-```
+See §11.5 for a copy/paste example combining a custom exception type and message.
 
 ---
 
@@ -613,7 +614,7 @@ Exception:
 
 - If `Must.Be.<Clause>(...)` produces an ambiguity compile error (multiple extension methods with the same name/signature), use the disambiguation rule below.
 
-### 8.1 Ambiguous Must extension methods (critical outlier)
+### 8.2 Ambiguous Must extension methods (critical outlier)
 
 Some Must clauses previously existed in multiple places with the same method name/signature,
 which could make calls ambiguous depending on `using` directives.
@@ -655,7 +656,7 @@ For `IEnumerable<T>` inputs where you return a collection or need stable inspect
 When asked to add GuardClauses, produce:
 
 - One or more new/updated `GuardXxxClauses.cs` files under `src/PineGuard.GuardClauses/**`.
-- Code that compiles under `net8.0` with nullable enabled.
+- Code that compiles under all repo target frameworks — `netstandard2.1`, `net8.0` and `net10.0` (see `Directory.Build.props`) — with nullable enabled. Guard any BCL API not present on `netstandard2.1` behind the existing conditional-compilation pattern rather than assuming net8.0+.
 - No unit tests (unless explicitly requested in a separate task).
 
 ---

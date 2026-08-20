@@ -1,5 +1,5 @@
 ---
-description: "PineGuard unit test rules — Theory+TheoryData, 100% coverage, nested Op Groups"
+description: "PineGuard unit test rules — Theory+TheoryData only, 100% line and branch coverage, fixture-backed TestData"
 globs: ["tests/**"]
 alwaysApply: false
 ---

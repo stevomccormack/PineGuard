@@ -15,13 +15,17 @@ public static class FilePathRules
     /// <returns>
     /// <see langword="true"/> if <paramref name="value"/> is a non-empty string that does not contain
     /// invalid file name characters, is not a Windows reserved device name (e.g., <c>CON</c>, <c>NUL</c>),
-    /// is not <c>.</c> or <c>..</c>, and does not end with a period; otherwise, <see langword="false"/>.
+    /// is not <c>.</c> or <c>..</c>, has no leading or trailing whitespace, and does not end with a
+    /// period; otherwise, <see langword="false"/>. Leading/trailing whitespace and a trailing period
+    /// are both silently stripped by Win32 file name normalization, so both are rejected here rather
+    /// than validated as if already normalized.
     /// </returns>
     /// <example>
     /// <code>
     /// bool safe = FilePathRules.IsSafeFileName("my-document.pdf"); // true
     /// bool unsafe = FilePathRules.IsSafeFileName("CON");           // false (reserved)
     /// bool unsafe = FilePathRules.IsSafeFileName("file?.txt");     // false (invalid char)
+    /// bool unsafe = FilePathRules.IsSafeFileName("file.txt ");     // false (trailing whitespace)
     /// </code>
     /// </example>
     public static bool IsSafeFileName(string? value)
@@ -32,7 +36,7 @@ public static class FilePathRules
         if (trimmed is "." or "..")
             return false;
 
-        if (trimmed.EndsWith('.'))
+        if (trimmed.EndsWith('.') || trimmed.Length != value!.Length)
             return false;
 
         if (FilePathUtility.ContainsInvalidFileNameChars(trimmed))

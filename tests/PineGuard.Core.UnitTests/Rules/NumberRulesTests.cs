@@ -139,6 +139,28 @@ public sealed class NumberRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
     }
 
     [Theory]
+    [MemberData(nameof(NumberRulesTestData.IsApproximatelyUnsignedUnderflow.Cases), MemberType = typeof(NumberRulesTestData.IsApproximatelyUnsignedUnderflow))]
+    public void IsApproximately_UnsignedUnderflow_BehavesAsExpected(RuleCase<(uint? value, uint target, uint? tolerance)> tc)
+    {
+        // Act
+        var result = NumberRules.IsApproximately(tc.Value.value, tc.Value.target, tc.Value.tolerance);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(NumberRulesTestData.IsApproximatelySignedOverflowGuard.Cases), MemberType = typeof(NumberRulesTestData.IsApproximatelySignedOverflowGuard))]
+    public void IsApproximately_SignedOverflowGuard_BehavesAsExpected(RuleCase<(int? value, int target, int? tolerance)> tc)
+    {
+        // Act
+        var result = NumberRules.IsApproximately(tc.Value.value, tc.Value.target, tc.Value.tolerance);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(NumberRulesTestData.IsMultipleOf.Cases), MemberType = typeof(NumberRulesTestData.IsMultipleOf))]
     public void IsMultipleOf_BehavesAsExpected(RuleCase<(int? value, int factor)> tc)
     {

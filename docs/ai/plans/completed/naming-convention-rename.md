@@ -1,4 +1,17 @@
-﻿# Naming Convention Rename Plan
+﻿<!-- metadata_header
+type: plan
+id: naming-convention-rename
+version: 1.0
+status: completed
+-->
+
+# Naming Convention Rename Plan
+
+> [!WARNING]
+> **Archived — do not reuse the Phase 8 cascade table below.** It omits `.cursorrules`,
+> `.windsurfrules` and `.junie/guidelines.md`, and those three are exactly the surfaces that were
+> left holding pre-rename names. The living, complete inventory is
+> `docs/ai/meta/adapter-surfaces.md`; use its §5 cascade checklist for any future rename.
 
 ## Convention Rules (from taxonomy.md §N.1–N.8)
 

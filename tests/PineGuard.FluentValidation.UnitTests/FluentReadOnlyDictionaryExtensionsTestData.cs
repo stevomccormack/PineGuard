@@ -12,6 +12,7 @@ public static class FluentReadOnlyDictionaryExtensionsTestData
         public static TheoryData<FluentCase<IReadOnlyDictionary<string, int>?>> Cases => F.IsEmpty.AllScenarios.ToFluentCases(s => s.Name switch
         {
             nameof(F.IsEmpty.PopulatedValue) => new FluentExpected(false, "Dict must be empty."),
+            nameof(F.IsEmpty.NullValue) => new FluentExpected(false, "Dict must be empty."),
             _ => new FluentExpected(true)
         });
     }

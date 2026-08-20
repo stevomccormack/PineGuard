@@ -13,8 +13,8 @@ namespace PineGuard.MustClauses;
 public static class MustSqlDateTimeClauses
 {
     /// <summary>
-    /// Validates that the specified <see cref="DateOnly"/> value falls within the SQL Server <c>date</c> column range
-    /// (0001-01-01 to 9999-12-31).
+    /// Validates that the specified <see cref="DateOnly"/> value falls within the conservative SQL Server
+    /// <c>datetime</c> range enforced by this clause (1753-01-01 to 9999-12-31).
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The <see cref="DateOnly"/> value to validate.</param>
@@ -51,8 +51,8 @@ public static class MustSqlDateTimeClauses
     }
 
     /// <summary>
-    /// Validates that the specified <see cref="DateTimeOffset"/> value falls within the SQL Server <c>datetime2</c>
-    /// column range (0001-01-01 to 9999-12-31).
+    /// Validates that the specified <see cref="DateTimeOffset"/> value falls within the SQL Server <c>datetime</c>
+    /// column range (1753-01-01 to 9999-12-31).
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The <see cref="DateTimeOffset"/> value to validate.</param>
@@ -89,8 +89,8 @@ public static class MustSqlDateTimeClauses
     }
 
     /// <summary>
-    /// Validates that the specified <see cref="DateTime"/> value falls within the SQL Server <c>datetime2</c>
-    /// column range (0001-01-01 to 9999-12-31).
+    /// Validates that the specified <see cref="DateTime"/> value falls within the SQL Server <c>datetime</c>
+    /// column range (1753-01-01 to 9999-12-31).
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The <see cref="DateTime"/> value to validate.</param>
