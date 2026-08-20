@@ -16,12 +16,12 @@ public static class DictionaryRulesFixtures
 
         public static RuleScenario<IDictionary<string, int>?>[] ValidScenarios =>
         [
-            new(nameof(NullValue), NullValue, true),
             new(nameof(EmptyValue), EmptyValue, true)
         ];
 
         public static RuleScenario<IDictionary<string, int>?>[] InvalidScenarios =>
         [
+            new(nameof(NullValue), NullValue, false),
             new(nameof(PopulatedValue), PopulatedValue, false)
         ];
 
@@ -54,6 +54,7 @@ public static class DictionaryRulesFixtures
         public static readonly (IDictionary<string, int>? dictionary, string key) NullDictionary = (Null, "a");
         public static readonly (IDictionary<string, int>? dictionary, string key) EmptyDictionary = (Empty, "a");
         public static readonly (IDictionary<string, int>? dictionary, string key) MissingKey = (Populated, "missing");
+        public static readonly (IDictionary<string, int>? dictionary, string key) NullKey = (Populated, null!);
 
         public static RuleScenario<(IDictionary<string, int>? dictionary, string key)>[] ValidScenarios =>
         [
@@ -64,7 +65,8 @@ public static class DictionaryRulesFixtures
         [
             new(nameof(NullDictionary), NullDictionary, false),
             new(nameof(EmptyDictionary), EmptyDictionary, false),
-            new(nameof(MissingKey), MissingKey, false)
+            new(nameof(MissingKey), MissingKey, false),
+            new(nameof(NullKey), NullKey, false)
         ];
 
         public static RuleScenario<(IDictionary<string, int>? dictionary, string key)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
@@ -99,6 +101,7 @@ public static class DictionaryRulesFixtures
         public static readonly (IDictionary<string, int>? dictionary, string key, int value) EmptyDictionary = (Empty, "a", 1);
         public static readonly (IDictionary<string, int>? dictionary, string key, int value) WrongKey = (Populated, "missing", 1);
         public static readonly (IDictionary<string, int>? dictionary, string key, int value) WrongValue = (Populated, "a", 999);
+        public static readonly (IDictionary<string, int>? dictionary, string key, int value) NullKey = (Populated, null!, 1);
 
         public static RuleScenario<(IDictionary<string, int>? dictionary, string key, int value)>[] ValidScenarios =>
         [
@@ -110,7 +113,8 @@ public static class DictionaryRulesFixtures
             new(nameof(NullDictionary), NullDictionary, false),
             new(nameof(EmptyDictionary), EmptyDictionary, false),
             new(nameof(WrongKey), WrongKey, false),
-            new(nameof(WrongValue), WrongValue, false)
+            new(nameof(WrongValue), WrongValue, false),
+            new(nameof(NullKey), NullKey, false)
         ];
 
         public static RuleScenario<(IDictionary<string, int>? dictionary, string key, int value)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

@@ -8,9 +8,9 @@ public static class GuardReadOnlyDictionaryClausesTestData
 {
     public static class NotEmpty
     {
-        public static TheoryData<GuardCase<IReadOnlyDictionary<string, int>?>> ValidCases => F.IsEmpty.ValidScenarios.Except(nameof(F.IsEmpty.NullValue)).ToGuardCases();
-        public static TheoryData<GuardCase<IReadOnlyDictionary<string, int>?>> NullCases => F.IsEmpty.ValidScenarios.Only(nameof(F.IsEmpty.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value"));
-        public static TheoryData<GuardCase<IReadOnlyDictionary<string, int>?>> InvalidCases => F.IsEmpty.InvalidScenarios.ToGuardCases("value");
+        public static TheoryData<GuardCase<IReadOnlyDictionary<string, int>?>> ValidCases => F.IsEmpty.ValidScenarios.ToGuardCases();
+        public static TheoryData<GuardCase<IReadOnlyDictionary<string, int>?>> NullCases => F.IsEmpty.InvalidScenarios.Only(nameof(F.IsEmpty.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value"));
+        public static TheoryData<GuardCase<IReadOnlyDictionary<string, int>?>> InvalidCases => F.IsEmpty.InvalidScenarios.Except(nameof(F.IsEmpty.NullValue)).ToGuardCases("value");
     }
 
     public static class Empty
