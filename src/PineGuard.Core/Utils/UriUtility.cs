@@ -112,7 +112,8 @@ public static class UriUtility
         // Path.IsPathFullyQualified is platform-specific and returns false for Windows-style
         // paths (e.g. "C:\..." or "\\server\share") when running on Linux/macOS.
         // Check both the platform-native result and explicit Windows path patterns.
-        if (!Path.IsPathFullyQualified(trimmed) && !IsWindowsAbsolutePath(trimmed))
+        var isWindowsAbsolute = IsWindowsAbsolutePath(trimmed);
+        if (!Path.IsPathFullyQualified(trimmed) && !isWindowsAbsolute)
             return false;
 
         path = trimmed;

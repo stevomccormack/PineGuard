@@ -194,14 +194,22 @@ public static class CultureInfoUtility
         {
             var regions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            ForEachSpecificCultureForLanguage(l, c =>
-            {
-                if (TryGetTwoLetterIsoRegionName(c, out var regionCode))
-                    regions.Add(regionCode);
-            });
+            ForEachSpecificCultureForLanguage(l, c => AddRegionCode(regions, c));
 
             return [.. regions];
         });
+    }
+
+    /// <summary>
+    /// Adds the two-letter ISO region code of <paramref name="cultureInfo"/> to <paramref name="regions"/>,
+    /// skipping cultures that have no associated region.
+    /// </summary>
+    /// <param name="regions">The set collecting the discovered region codes.</param>
+    /// <param name="cultureInfo">The culture to resolve a region code for.</param>
+    internal static void AddRegionCode(HashSet<string> regions, CultureInfo cultureInfo)
+    {
+        if (TryGetTwoLetterIsoRegionName(cultureInfo, out var regionCode))
+            regions.Add(regionCode);
     }
 
     internal static bool TryGetTwoLetterIsoRegionName(CultureInfo cultureInfo, out string regionCode)
@@ -306,7 +314,10 @@ public static class CultureInfoUtility
 
     private static void ForEachSpecificCultureForLanguage(string isoLanguageAlpha2Code, Action<CultureInfo> action)
     {
-        foreach (var culture in SpecificCulturesCache.Value.Where(c => string.Equals(c.TwoLetterISOLanguageName, isoLanguageAlpha2Code, StringComparison.OrdinalIgnoreCase)))
+        var cultures = SpecificCulturesCache.Value
+            .Where(c => string.Equals(c.TwoLetterISOLanguageName, isoLanguageAlpha2Code, StringComparison.OrdinalIgnoreCase));
+
+        foreach (var culture in cultures)
             action(culture);
     }
 }

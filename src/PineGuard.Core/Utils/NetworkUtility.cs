@@ -59,10 +59,7 @@ public static class NetworkUtility
 
         foreach (var part in parts)
         {
-            if (part.Length is < Ipv4SegmentMinLength or > Ipv4SegmentMaxLength)
-                return false;
-
-            if (!byte.TryParse(part, out _))
+            if (!IsValidIpv4Segment(part))
                 return false;
         }
 
@@ -71,6 +68,24 @@ public static class NetworkUtility
 
         ipAddress = parsed;
         return true;
+    }
+
+    /// <summary>
+    /// Determines whether a single dotted-quad segment is a well-formed 0-255 value.
+    /// </summary>
+    /// <param name="part">The segment to validate.</param>
+    /// <returns><see langword="true"/> if the segment is 1-3 digits and parses as a <see cref="byte"/>; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Internal rather than private so the zero-length guard can be exercised directly.
+    /// <see cref="TryParseIpv4"/> splits with <see cref="StringSplitOptions.RemoveEmptyEntries"/>,
+    /// so an empty segment is unreachable through that path.
+    /// </remarks>
+    internal static bool IsValidIpv4Segment(string part)
+    {
+        if (part.Length is < Ipv4SegmentMinLength or > Ipv4SegmentMaxLength)
+            return false;
+
+        return byte.TryParse(part, out _);
     }
 
     /// <summary>
@@ -186,10 +201,10 @@ public static class NetworkUtility
             }
 
             var mask = (byte)~((1 << (8 - bitsRemaining)) - 1);
-            if ((addressBytes[i] & mask) != (networkBytes[i] & mask))
-                return false;
+            if ((addressBytes[i] & mask) == (networkBytes[i] & mask))
+                break;
 
-            break;
+            return false;
         }
 
         return true;
@@ -244,7 +259,12 @@ public static class NetworkUtility
         return labels.All(IsValidHostnameLabel);
     }
 
-    private static bool IsValidHostnameLabel(string label)
+    /// <remarks>
+    /// Internal rather than private so the empty-label guard can be exercised directly.
+    /// <see cref="ValidateHostnameLabels"/> splits with <see cref="StringSplitOptions.RemoveEmptyEntries"/>,
+    /// so a zero-length label is unreachable through that path.
+    /// </remarks>
+    internal static bool IsValidHostnameLabel(string label)
     {
         if (label.Length is < 1 or > 63)
             return false;
