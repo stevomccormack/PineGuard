@@ -177,3 +177,31 @@ Recommended process for a naming upgrade:
 2. Add/rename Must clauses first (canonical vocabulary).
 3. Update Guard mappings and specs.
 4. Run full build + tests.
+
+---
+
+## 7. Fable Intelligence (2026-08-20)
+
+### 7.1 The greenfield window is closing — this document has a deadline
+
+Section 6's "direct rename, no `[Obsolete]` shims" strategy is only valid **until the first stable NuGet publish**. The release pipeline (`.github/workflows/publish.yml`, MinVer tag-driven) is live; the moment a `v1.0.0` package ships, every name in this document becomes a breaking-change negotiation. Recommendation: convert this document from "non-binding ideas" into a **go/no-go checklist gated on the 1.0 release**. Decide each numbered item (aliases, `Non*`, bad-state names, `Invalid*`, symmetry) explicitly before tagging 1.0 — even if the decision is "no, closed." Deferring by default silently decides "never" once the API is public.
+
+### 7.2 On alias sets (Section 0/1): the cost is the test and doc matrix, not the code
+
+Thin forwarding methods are cheap to write, but under this repo's own invariants each public method needs 100% coverage, XML docs, fixture files, and audit-rule compliance. An alias layer over ~300 clauses roughly doubles the Must/Guard test surface for zero new behavior. If adopted:
+
+- Keep the allowlist **small and curated** (the dictionary/URI `Missing*` cases carry most of the value; resist systematic generation).
+- Consider making aliases **Guard-only**. Guard call sites read as bad-state prose (`Guard.Against.MissingKey`) while Must reads as positive assertion (`Must.Be`/`Must.Have`) — the semantic-alias need is asymmetrical, and confining it to Guard halves the surface.
+- A **Roslyn analyzer** can serve the discoverability goal at zero API cost: user types `Guard.Against.MissingKey`, analyzer suggests `NotHasKey`. Worth weighing before committing to forwarding methods at all.
+
+### 7.3 On `Non*` vs `Not*` (Section 2): the misread risk is real but one-sided
+
+`NotAscii` genuinely misparses as "ASCII is forbidden" — but only in *Must* position. In Guard position (`Guard.Against.NotAscii`) the double negative is the problem instead. This suggests the rule should be **layer-aware**: `Non*` for classification complements where the complement is itself a recognized set (`NonDigit`, `NonAscii` — established in regex/Unicode culture), `Not*` everywhere the complement is purely mechanical. Keep the allowlist to character classes exactly as the current policy hints; do not expand to formats (`NonEmail` is worse than `NotEmail`).
+
+### 7.4 On symmetry (Section 5): generate, don't hand-author
+
+If both `Guard.Against.X` and `Guard.Against.NotX` are exposed systematically, that is a mechanical mapping over Must — exactly what this repo's generator specs and audit-cli exist for. Hand-authoring symmetry invites the drift the deterministic-generation rules were designed to prevent. Rule of thumb: symmetry is safe to adopt *because* it is deterministic; alias vocabularies (7.2) are risky *because* they are editorial.
+
+### 7.5 One missing consideration: error-message vocabulary must move with names
+
+Every naming option above changes the user-visible words in exception messages and validation failures (canonical messages are owned by Must). If `MissingKey` forwards to `NotHasKey`, does the message say "must have key" or "key is missing"? A forwarding method that throws a message in different vocabulary than its own name is a support-ticket generator. Whichever vocabulary wins, messages and method names must be renamed as one unit — add this to the Section 6 migration steps.
