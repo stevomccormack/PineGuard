@@ -8,8 +8,11 @@ namespace PineGuard.GuardClauses;
 /// <remarks>
 /// <para>
 /// By default, guards throw <see cref="ArgumentException"/> or <see cref="ArgumentNullException"/>.
-/// Use <see cref="ExceptionReplacer"/> to redirect all guard failures to a different exception type
-/// (e.g., a custom domain exception).
+/// Use <see cref="ExceptionReplacer"/> together with <see cref="ReplaceDefaultExceptions"/> set to
+/// <see langword="true"/> to redirect these default guard failures to a different exception type
+/// (e.g., a custom domain exception). When <see cref="ReplaceDefaultExceptions"/> is <see langword="false"/>
+/// (the default), <see cref="ExceptionReplacer"/> has no effect on the built-in
+/// <see cref="ArgumentException"/> / <see cref="ArgumentNullException"/> failures.
 /// </para>
 /// <para>
 /// Use <see cref="BeginScope"/> to override the policy within a bounded ambient scope (e.g., per-request
@@ -19,7 +22,10 @@ namespace PineGuard.GuardClauses;
 /// <example>
 /// <code>
 /// using (GuardExceptionPolicy.BeginScope(o =>
-///     o.ExceptionReplacer = ex => new DomainException(ex.Message)))
+/// {
+///     o.ExceptionReplacer = ex => new DomainException(ex.Message);
+///     o.ReplaceDefaultExceptions = true;
+/// }))
 /// {
 ///     Guard.Against.Null(value);  // throws DomainException instead of ArgumentNullException
 /// }
@@ -36,16 +42,22 @@ public static class GuardExceptionPolicy
     /// Gets or sets the global exception-replacement factory.
     /// </summary>
     /// <remarks>
-    /// When set, the factory maps the default <see cref="ArgumentException"/> / <see cref="ArgumentNullException"/>
-    /// to a custom exception. If an ambient scope is active, the scope-local value is used instead.
-    /// If <see langword="null"/>, no replacement occurs.
+    /// When set, and <see cref="ReplaceDefaultExceptions"/> is <see langword="true"/>, the factory maps
+    /// the default <see cref="ArgumentException"/> / <see cref="ArgumentNullException"/> to a custom exception.
+    /// If an ambient scope is active, the scope-local value is used instead — including a scope that
+    /// explicitly sets it back to <see langword="null"/> to disable an inherited replacer for that scope.
+    /// If <see langword="null"/> and no scope is active, no replacement occurs.
     /// </remarks>
     public static Func<Exception, Exception>? ExceptionReplacer
     {
-        get => CurrentScope.Value?.Options.ExceptionReplacer ?? Volatile.Read(ref field);
+        get
+        {
+            var currentScope = ActiveScope();
+            return currentScope is not null ? currentScope.Options.ExceptionReplacer : Volatile.Read(ref field);
+        }
         set
         {
-            var currentScope = CurrentScope.Value;
+            var currentScope = ActiveScope();
             if (currentScope is null)
             {
                 Volatile.Write(ref field, value);
@@ -67,10 +79,10 @@ public static class GuardExceptionPolicy
     /// </remarks>
     public static bool ReplaceDefaultExceptions
     {
-        get => CurrentScope.Value?.Options.ReplaceDefaultExceptions ?? Volatile.Read(ref field);
+        get => ActiveScope()?.Options.ReplaceDefaultExceptions ?? Volatile.Read(ref field);
         set
         {
-            var currentScope = CurrentScope.Value;
+            var currentScope = ActiveScope();
             if (currentScope is null)
             {
                 Volatile.Write(ref field, value);
@@ -102,7 +114,7 @@ public static class GuardExceptionPolicy
                 ExceptionReplacer = ExceptionReplacer,
                 ReplaceDefaultExceptions = ReplaceDefaultExceptions
             },
-            CurrentScope.Value);
+            ActiveScope());
 
         configure(scope.Options);
         CurrentScope.Value = scope;
@@ -113,10 +125,34 @@ public static class GuardExceptionPolicy
     internal static bool ShouldReplace(Exception exception) =>
         ReplaceDefaultExceptions || exception is not ArgumentException;
 
+    /// <summary>
+    /// Resolves the innermost scope frame that is still active, skipping any frames already disposed
+    /// out of order. Returns <see langword="null"/> when no active scope remains.
+    /// </summary>
+    private static ScopeFrame? ActiveScope()
+    {
+        var frame = CurrentScope.Value;
+        while (frame is not null && frame.IsDisposed)
+            frame = frame.Previous;
+
+        return frame;
+    }
+
     private sealed class ScopeFrame(GuardExceptionPolicyOptions options, ScopeFrame? previous)
     {
+        private int _disposed;
+
         public GuardExceptionPolicyOptions Options { get; } = options;
         public ScopeFrame? Previous { get; } = previous;
+
+        /// <summary>
+        /// Gets a value indicating whether the lease for this frame has been disposed. Disposed frames stay
+        /// linked in the chain but are skipped when resolving the ambient policy, so out-of-order disposal
+        /// never restores a dead frame's options.
+        /// </summary>
+        public bool IsDisposed => Volatile.Read(ref _disposed) != 0;
+
+        public void MarkDisposed() => Volatile.Write(ref _disposed, 1);
     }
 
     private sealed class ScopeLease(ScopeFrame scope) : IDisposable
@@ -129,8 +165,12 @@ public static class GuardExceptionPolicy
             if (currentScope is null)
                 return;
 
-            if (ReferenceEquals(CurrentScope.Value, currentScope))
-                CurrentScope.Value = currentScope.Previous;
+            // Frames are never unlinked — the chain is shared across execution contexts via AsyncLocal, so
+            // mutating it would race. Marking the frame instead makes every stale reference to it inert, and
+            // resolution simply walks past disposed frames regardless of the order leases are disposed in.
+            currentScope.MarkDisposed();
+
+            CurrentScope.Value = ActiveScope();
         }
     }
 }

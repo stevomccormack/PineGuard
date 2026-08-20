@@ -24,9 +24,19 @@ public static class StringRulesTestData
         public static TheoryData<RuleCase<(string? value, int length, Inclusion inclusion)>> Cases => F.IsLongerThan.AllScenarios.ToRuleCases();
     }
 
+    public static class IsLongerThanDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(string? value, int length)>> Cases => F.IsLongerThanDefaultInclusion.AllScenarios.ToRuleCases();
+    }
+
     public static class IsShorterThan
     {
         public static TheoryData<RuleCase<(string? value, int length, Inclusion inclusion)>> Cases => F.IsShorterThan.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsShorterThanDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(string? value, int length)>> Cases => F.IsShorterThanDefaultInclusion.AllScenarios.ToRuleCases();
     }
 
     public static class IsDigitsOnly
@@ -37,6 +47,11 @@ public static class StringRulesTestData
     public static class IsDigitsOnlyWithAllowedNonDigitChars
     {
         public static TheoryData<RuleCase<(string value, char[] allowedNonDigitChars)>> Cases => F.IsDigitsOnlyWithAllowedNonDigitChars.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsDigitsOnlyWithNullAllowedNonDigitChars
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.IsDigitsOnlyWithNullAllowedNonDigitChars.AllScenarios.ToRuleCases();
     }
 
     public static class IsUppercase

@@ -7,7 +7,9 @@ public static class FilePathRulesFixtures
     public static class IsSafeFileName
     {
         public static readonly string? Normal = "file.txt";
-        public static readonly string? TrimOk = "  file.txt  ";
+        public static readonly string? LeadingTrailingSpace = "  file.txt  ";
+        public static readonly string? TrailingSpace = "file.txt ";
+        public static readonly string? LeadingSpace = " file.txt";
         public static readonly string? Dot = ".";
         public static readonly string? DotDot = "..";
         public static readonly string? EndsWithDot = "file.";
@@ -22,12 +24,14 @@ public static class FilePathRulesFixtures
 
         public static RuleScenario<string?>[] ValidScenarios =>
         [
-            new(nameof(Normal), Normal, true),
-            new(nameof(TrimOk), TrimOk, true)
+            new(nameof(Normal), Normal, true)
         ];
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
+            new(nameof(LeadingTrailingSpace), LeadingTrailingSpace, false),
+            new(nameof(TrailingSpace),  TrailingSpace, false),
+            new(nameof(LeadingSpace),   LeadingSpace,  false),
             new(nameof(Dot),        Dot,        false),
             new(nameof(DotDot),     DotDot,     false),
             new(nameof(EndsWithDot),EndsWithDot,false),

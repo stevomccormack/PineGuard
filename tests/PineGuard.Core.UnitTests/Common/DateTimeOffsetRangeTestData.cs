@@ -61,6 +61,22 @@ public static class DateTimeOffsetRangeTestData
                 var union2 = range.Union(otherStartsAfter);
                 Assert.Equal(start, union2.Start);
                 Assert.Equal(start.AddDays(20), union2.End);
+            }),
+            new("other touches at boundary", () =>
+            {
+                var start = new DateTimeOffset(2024, 01, 10, 0, 0, 0, TimeSpan.Zero);
+                var range = new DateTimeOffsetRange(start, start.AddDays(10));
+                var touchingAtEnd = new DateTimeOffsetRange(start.AddDays(10), start.AddDays(15));
+                var intersect3 = range.Intersect(touchingAtEnd);
+                Assert.NotNull(intersect3);
+                Assert.Equal(start.AddDays(10), intersect3.Value.Start);
+                Assert.Equal(start.AddDays(10), intersect3.Value.End);
+
+                var point = new DateTimeOffsetRange(start.AddDays(30), start.AddDays(30));
+                var selfIntersect = point.Intersect(point);
+                Assert.NotNull(selfIntersect);
+                Assert.Equal(point.Start, selfIntersect.Value.Start);
+                Assert.Equal(point.End, selfIntersect.Value.End);
             })
         ];
 

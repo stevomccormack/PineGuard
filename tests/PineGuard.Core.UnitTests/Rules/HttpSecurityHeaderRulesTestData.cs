@@ -122,7 +122,8 @@ public static class HttpSecurityHeaderRulesTestData
         [
             new(nameof(F.HasContentSecurityPolicy.AllRequiredWhitespace), F.HasContentSecurityPolicy.AllRequiredWhitespace, new RuleExpected(true)),
             new(nameof(F.HasContentSecurityPolicy.AllNullRequirements), F.HasContentSecurityPolicy.AllNullRequirements, new RuleExpected(true)),
-            new(nameof(F.HasContentSecurityPolicy.OverrideDefaultSrc), F.HasContentSecurityPolicy.OverrideDefaultSrc, new RuleExpected(true))
+            new(nameof(F.HasContentSecurityPolicy.OverrideDefaultSrc), F.HasContentSecurityPolicy.OverrideDefaultSrc, new RuleExpected(true)),
+            new(nameof(F.HasContentSecurityPolicy.SubstringValueDoesNotMatch), F.HasContentSecurityPolicy.SubstringValueDoesNotMatch, new RuleExpected(false))
         ];
     }
 

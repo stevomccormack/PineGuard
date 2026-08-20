@@ -17,7 +17,11 @@ public static partial class StringUtility
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="int"/>.
         /// When <see langword="false"/>, contains <c>0</c>.
         /// </param>
-        /// <param name="styles">The <see cref="NumberStyles"/> to apply. Defaults to <see cref="NumberStyles.Integer"/>.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply. Defaults to <see cref="NumberStyles.Integer"/>.
+        /// Style combinations unsupported by the BCL parser (e.g. hex/binary specifiers combined with
+        /// incompatible flags) return <see langword="false"/> rather than throwing.
+        /// </param>
         /// <param name="provider">
         /// An optional <see cref="IFormatProvider"/> for culture-specific formatting.
         /// If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
@@ -40,7 +44,16 @@ public static partial class StringUtility
                 return false;
 
             provider ??= CultureInfo.InvariantCulture;
-            return int.TryParse(value, styles, provider, out result);
+
+            try
+            {
+                return int.TryParse(value, styles, provider, out result);
+            }
+            catch (ArgumentException)
+            {
+                result = 0;
+                return false;
+            }
         }
 
         /// <summary>
@@ -51,7 +64,11 @@ public static partial class StringUtility
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="long"/>.
         /// When <see langword="false"/>, contains <c>0</c>.
         /// </param>
-        /// <param name="styles">The <see cref="NumberStyles"/> to apply. Defaults to <see cref="NumberStyles.Integer"/>.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply. Defaults to <see cref="NumberStyles.Integer"/>.
+        /// Style combinations unsupported by the BCL parser (e.g. hex/binary specifiers combined with
+        /// incompatible flags) return <see langword="false"/> rather than throwing.
+        /// </param>
         /// <param name="provider">
         /// An optional <see cref="IFormatProvider"/> for culture-specific formatting.
         /// If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
@@ -74,7 +91,16 @@ public static partial class StringUtility
                 return false;
 
             provider ??= CultureInfo.InvariantCulture;
-            return long.TryParse(value, styles, provider, out result);
+
+            try
+            {
+                return long.TryParse(value, styles, provider, out result);
+            }
+            catch (ArgumentException)
+            {
+                result = 0;
+                return false;
+            }
         }
 
         /// <summary>
@@ -85,7 +111,11 @@ public static partial class StringUtility
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="decimal"/>.
         /// When <see langword="false"/>, contains <c>0</c>.
         /// </param>
-        /// <param name="styles">The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.
+        /// Hex/binary specifier styles are unsupported for this floating-point type and return
+        /// <see langword="false"/> rather than throwing.
+        /// </param>
         /// <param name="provider">
         /// An optional <see cref="IFormatProvider"/> for culture-specific formatting.
         /// If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
@@ -108,7 +138,16 @@ public static partial class StringUtility
                 return false;
 
             provider ??= CultureInfo.InvariantCulture;
-            return decimal.TryParse(value, styles, provider, out result);
+
+            try
+            {
+                return decimal.TryParse(value, styles, provider, out result);
+            }
+            catch (ArgumentException)
+            {
+                result = 0;
+                return false;
+            }
         }
 
         /// <summary>
@@ -122,7 +161,11 @@ public static partial class StringUtility
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="decimal"/> with at most
         /// <paramref name="decimalPlaces"/> fractional digits. When <see langword="false"/>, contains <c>0</c>.
         /// </param>
-        /// <param name="styles">The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.
+        /// Hex/binary specifier styles are unsupported for this floating-point type and return
+        /// <see langword="false"/> rather than throwing.
+        /// </param>
         /// <param name="provider">
         /// An optional <see cref="IFormatProvider"/> for culture-specific formatting.
         /// If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
@@ -151,8 +194,16 @@ public static partial class StringUtility
 
             provider ??= CultureInfo.InvariantCulture;
 
-            if (!decimal.TryParse(value, styles, provider, out result))
+            try
+            {
+                if (!decimal.TryParse(value, styles, provider, out result))
+                    return false;
+            }
+            catch (ArgumentException)
+            {
+                result = 0;
                 return false;
+            }
 
             var bits = decimal.GetBits(result);
             var scale = (bits[3] >> 16) & 0xFF;
@@ -171,7 +222,11 @@ public static partial class StringUtility
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="decimal"/> with exactly
         /// <paramref name="exactDecimalPlaces"/> fractional digits. When <see langword="false"/>, contains <c>0</c>.
         /// </param>
-        /// <param name="styles">The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.
+        /// Hex/binary specifier styles are unsupported for this floating-point type and return
+        /// <see langword="false"/> rather than throwing.
+        /// </param>
         /// <param name="provider">
         /// An optional <see cref="IFormatProvider"/> for culture-specific formatting.
         /// If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
@@ -200,8 +255,16 @@ public static partial class StringUtility
 
             provider ??= CultureInfo.InvariantCulture;
 
-            if (!decimal.TryParse(value, styles, provider, out result))
+            try
+            {
+                if (!decimal.TryParse(value, styles, provider, out result))
+                    return false;
+            }
+            catch (ArgumentException)
+            {
+                result = 0;
                 return false;
+            }
 
             var bits = decimal.GetBits(result);
             var scale = (bits[3] >> 16) & 0xFF;
@@ -217,7 +280,11 @@ public static partial class StringUtility
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="float"/>.
         /// When <see langword="false"/>, contains <c>0</c>.
         /// </param>
-        /// <param name="styles">The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.
+        /// Hex/binary specifier styles are unsupported for this floating-point type and return
+        /// <see langword="false"/> rather than throwing.
+        /// </param>
         /// <param name="provider">
         /// An optional <see cref="IFormatProvider"/> for culture-specific formatting.
         /// If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
@@ -240,7 +307,16 @@ public static partial class StringUtility
                 return false;
 
             provider ??= CultureInfo.InvariantCulture;
-            return float.TryParse(value, styles, provider, out result);
+
+            try
+            {
+                return float.TryParse(value, styles, provider, out result);
+            }
+            catch (ArgumentException)
+            {
+                result = 0;
+                return false;
+            }
         }
 
         /// <summary>
@@ -251,7 +327,11 @@ public static partial class StringUtility
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="double"/>.
         /// When <see langword="false"/>, contains <c>0</c>.
         /// </param>
-        /// <param name="styles">The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply. Defaults to sign, decimal point, and whitespace styles.
+        /// Hex/binary specifier styles are unsupported for this floating-point type and return
+        /// <see langword="false"/> rather than throwing.
+        /// </param>
         /// <param name="provider">
         /// An optional <see cref="IFormatProvider"/> for culture-specific formatting.
         /// If <see langword="null"/>, uses <see cref="CultureInfo.InvariantCulture"/>.
@@ -274,7 +354,95 @@ public static partial class StringUtility
                 return false;
 
             provider ??= CultureInfo.InvariantCulture;
-            return double.TryParse(value, styles, provider, out result);
+
+            try
+            {
+                return double.TryParse(value, styles, provider, out result);
+            }
+            catch (ArgumentException)
+            {
+                result = 0;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Validates that the specified string is a well-formed signed decimal integer and, if so, returns its
+        /// last digit character without parsing the full magnitude. This allows parity and last-digit checks on
+        /// integers of unbounded length, beyond <see cref="int"/> or <see cref="long"/> range.
+        /// </summary>
+        /// <param name="value">The string to inspect. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply. Only <see cref="NumberStyles.AllowLeadingWhite"/>,
+        /// <see cref="NumberStyles.AllowTrailingWhite"/> and <see cref="NumberStyles.AllowLeadingSign"/> are honored;
+        /// any other flag (thousands separators, decimal points, hex specifiers, currency symbols) is not supported and
+        /// causes <see langword="false"/> to be returned for values that rely on it.
+        /// </param>
+        /// <param name="lastDigit">
+        /// When this method returns <see langword="true"/>, contains the final digit character of the integer.
+        /// When <see langword="false"/>, contains <c>'\0'</c>.
+        /// </param>
+        /// <returns><see langword="true"/> if <paramref name="value"/> is a well-formed integer; otherwise, <see langword="false"/>.</returns>
+        public static bool TryGetLastIntegerDigit(string? value, NumberStyles styles, out char lastDigit)
+        {
+            lastDigit = '\0';
+
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            var span = value.AsSpan();
+
+            if ((styles & NumberStyles.AllowLeadingWhite) != 0)
+                span = TrimStartAsciiWhite(span);
+
+            if ((styles & NumberStyles.AllowTrailingWhite) != 0)
+                span = TrimEndAsciiWhite(span);
+
+            if (span.Length > 0 && (styles & NumberStyles.AllowLeadingSign) != 0 && (span[0] == '+' || span[0] == '-'))
+                span = span[1..];
+
+            if (span.IsEmpty)
+                return false;
+
+            foreach (var c in span)
+            {
+                if (c is < '0' or > '9')
+                    return false;
+            }
+
+            lastDigit = span[^1];
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether the specified character is one of the whitespace characters the BCL numeric parsers
+        /// accept for <see cref="NumberStyles.AllowLeadingWhite"/> and <see cref="NumberStyles.AllowTrailingWhite"/>
+        /// (U+0009 through U+000D and U+0020). Unicode whitespace outside this set is not accepted.
+        /// </summary>
+        private static bool IsAsciiWhite(char c) => c == ' ' || c is >= '\t' and <= '\r';
+
+        /// <summary>
+        /// Removes leading BCL-recognized numeric whitespace from the specified span.
+        /// </summary>
+        private static ReadOnlySpan<char> TrimStartAsciiWhite(ReadOnlySpan<char> span)
+        {
+            var index = 0;
+            while (index < span.Length && IsAsciiWhite(span[index]))
+                index++;
+
+            return span[index..];
+        }
+
+        /// <summary>
+        /// Removes trailing BCL-recognized numeric whitespace from the specified span.
+        /// </summary>
+        private static ReadOnlySpan<char> TrimEndAsciiWhite(ReadOnlySpan<char> span)
+        {
+            var end = span.Length;
+            while (end > 0 && IsAsciiWhite(span[end - 1]))
+                end--;
+
+            return span[..end];
         }
     }
 }

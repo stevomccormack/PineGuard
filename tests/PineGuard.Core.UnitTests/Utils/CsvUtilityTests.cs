@@ -27,6 +27,14 @@ public sealed class CsvUtilityTests : BaseUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(CsvUtilityTestData.TryParseCsvLineInvalidSeparator.Separators), MemberType = typeof(CsvUtilityTestData.TryParseCsvLineInvalidSeparator))]
+    public void TryParseCsvLine_ThrowsArgumentException_WhenSeparatorIsPathological(char separator)
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => CsvUtility.TryParseCsvLine("a,b", out _, separator));
+    }
+
+    [Theory]
     [MemberData(nameof(CsvUtilityTestData.TryParseCsvHeaderLine.ValidCases), MemberType = typeof(CsvUtilityTestData.TryParseCsvHeaderLine))]
     [MemberData(nameof(CsvUtilityTestData.TryParseCsvHeaderLine.EdgeCases), MemberType = typeof(CsvUtilityTestData.TryParseCsvHeaderLine))]
     public void TryParseCsvHeaderLine_ReturnsExpected(CsvUtilityTestData.TryParseCsvHeaderLine.ValidCase testCase)

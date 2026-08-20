@@ -20,8 +20,10 @@ public static class FluentDictionaryExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustDictionaryClauses.Empty"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustDictionaryClauses.Empty"/>, which delegates to
+    /// <see cref="PineGuard.Rules.DictionaryRules.IsEmpty{TKey,TValue}"/>. If the value is <see langword="null"/>,
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -45,8 +47,10 @@ public static class FluentDictionaryExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustDictionaryClauses.Empty"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustDictionaryClauses.Empty"/>, which delegates to
+    /// <see cref="PineGuard.Rules.DictionaryRules.IsEmpty{TKey,TValue}"/>. If the value is <see langword="null"/>,
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -70,8 +74,10 @@ public static class FluentDictionaryExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustDictionaryClauses.Empty"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustDictionaryClauses.Empty"/>, which delegates to
+    /// <see cref="PineGuard.Rules.DictionaryRules.IsEmpty{TKey,TValue}"/>. If the value is <see langword="null"/>,
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>

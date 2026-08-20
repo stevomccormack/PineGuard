@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Utils;
 
 namespace PineGuard.Rules;
 
@@ -60,8 +61,11 @@ public static class DateTimeRangeRules
             return false;
 
         var r = range.Value;
-        var v = value.Value;
 
-        return inclusion == Inclusion.Exclusive ? v > r.Start && v < r.End : v >= r.Start && v <= r.End;
+        var v = DateTimeUtility.ToUtc(value)!.Value;
+        var start = DateTimeUtility.ToUtc(r.Start)!.Value;
+        var end = DateTimeUtility.ToUtc(r.End)!.Value;
+
+        return inclusion == Inclusion.Exclusive ? v > start && v < end : v >= start && v <= end;
     }
 }

@@ -24,12 +24,14 @@ public static class SqlDateTimeRules
 
 #if NET8_0_OR_GREATER
     /// <summary>
-    /// Determines whether the specified date falls within the SQL Server <c>date</c> type range.
+    /// Determines whether the specified date falls within the SQL Server <c>datetime</c> type's date range
+    /// (1753-01-01 to 9999-12-31), the conservative bound enforced by this rule.
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <returns>
-    /// <see langword="true"/> if <paramref name="value"/> is a valid SQL Server <c>date</c> value;
-    /// otherwise, <see langword="false"/>.
+    /// <see langword="true"/> if <paramref name="value"/> is on or after 1753-01-01, the SQL Server <c>datetime</c>
+    /// minimum; otherwise, <see langword="false"/>. Note this is stricter than the SQL Server <c>date</c> type
+    /// itself, which supports 0001-01-01 through 9999-12-31.
     /// </returns>
     /// <example>
     /// <code>

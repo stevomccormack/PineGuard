@@ -61,13 +61,13 @@ public static class ObjectRules
         value is T;
 
     /// <summary>
-    /// Determines whether <paramref name="a"/> and <paramref name="b"/> refer to the same object instance.
+    /// Determines whether <paramref name="value"/> and <paramref name="other"/> refer to the same object instance.
     /// </summary>
     /// <typeparam name="T">The reference type of the values.</typeparam>
-    /// <param name="a">The first value to compare. May be <see langword="null"/>.</param>
-    /// <param name="b">The second value to compare. May be <see langword="null"/>.</param>
+    /// <param name="value">The first value to compare. May be <see langword="null"/>.</param>
+    /// <param name="other">The second value to compare. May be <see langword="null"/>.</param>
     /// <returns>
-    /// <see langword="true"/> if <paramref name="a"/> and <paramref name="b"/> are the same object reference;
+    /// <see langword="true"/> if <paramref name="value"/> and <paramref name="other"/> are the same object reference;
     /// otherwise, <see langword="false"/>.
     /// </returns>
     /// <example>
@@ -76,6 +76,6 @@ public static class ObjectRules
     /// bool same = ObjectRules.IsSameReferenceAs(obj, obj); // true
     /// </code>
     /// </example>
-    public static bool IsSameReferenceAs<T>(T? a, T? b) where T : class =>
-        ReferenceEquals(a, b);
+    public static bool IsSameReferenceAs<T>(T? value, T? other) where T : class =>
+        ReferenceEquals(value, other);
 }

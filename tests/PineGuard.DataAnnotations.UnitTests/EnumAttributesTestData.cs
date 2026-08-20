@@ -121,4 +121,11 @@ public static class EnumAttributesTestData
             new("undefined invalid", (SimpleEnum)99, false)
         ];
     }
+
+    // Covers EnumResultMapper.InvokeAndMap: a ValidationContext with a MemberName set must report it in
+    // ValidationResult.MemberNames rather than always building a member-less result.
+    public static class DefinedWithMemberName
+    {
+        public static TheoryData<ValidCase> Cases => [new("undefined", (SimpleEnum)99, false)];
+    }
 }

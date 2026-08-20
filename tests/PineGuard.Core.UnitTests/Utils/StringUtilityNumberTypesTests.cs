@@ -1,3 +1,4 @@
+using System.Globalization;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Utils;
 
@@ -77,5 +78,102 @@ public sealed class StringUtilityNumberTypesTests : BaseUnitTest
         // Assert
         Assert.Equal(testCase.Expected, ok);
         Assert.Equal(testCase.ExpectedDouble, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.TryGetLastIntegerDigit.ValidCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryGetLastIntegerDigit))]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.TryGetLastIntegerDigit.EdgeCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryGetLastIntegerDigit))]
+    public void TryGetLastIntegerDigit_ReturnsExpected(StringUtilityNumberTypesTestData.TryGetLastIntegerDigit.ValidCase testCase)
+    {
+        // Act
+        var ok = StringUtility.NumberTypes.TryGetLastIntegerDigit(testCase.Value.value, testCase.Value.styles, out var lastDigit);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Equal(testCase.ExpectedLastDigit, lastDigit);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.InvalidStyles.Int32IncompatibleHexStyles), MemberType = typeof(StringUtilityNumberTypesTestData.InvalidStyles))]
+    public void TryParseInt32_ReturnsFalse_ForIncompatibleHexStyles(NumberStyles styles)
+    {
+        // Act
+        var ok = StringUtility.NumberTypes.TryParseInt32("FF", out var result, styles);
+
+        // Assert
+        Assert.False(ok);
+        Assert.Equal(0, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.InvalidStyles.Int64IncompatibleHexStyles), MemberType = typeof(StringUtilityNumberTypesTestData.InvalidStyles))]
+    public void TryParseInt64_ReturnsFalse_ForIncompatibleHexStyles(NumberStyles styles)
+    {
+        // Act
+        var ok = StringUtility.NumberTypes.TryParseInt64("FF", out var result, styles);
+
+        // Assert
+        Assert.False(ok);
+        Assert.Equal(0, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.InvalidStyles.DecimalUnsupportedStyles), MemberType = typeof(StringUtilityNumberTypesTestData.InvalidStyles))]
+    public void TryParseDecimal_ReturnsFalse_ForUnsupportedStyles(NumberStyles styles)
+    {
+        // Act
+        var ok = StringUtility.NumberTypes.TryParseDecimal("FF", out var result, styles);
+
+        // Assert
+        Assert.False(ok);
+        Assert.Equal(0, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.InvalidStyles.DecimalWithPlacesUnsupportedStyles), MemberType = typeof(StringUtilityNumberTypesTestData.InvalidStyles))]
+    public void TryParseDecimal_WithDecimalPlaces_ReturnsFalse_ForUnsupportedStyles(NumberStyles styles)
+    {
+        // Act
+        var ok = StringUtility.NumberTypes.TryParseDecimal("FF", 2, out var result, styles);
+
+        // Assert
+        Assert.False(ok);
+        Assert.Equal(0, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.InvalidStyles.ExactDecimalUnsupportedStyles), MemberType = typeof(StringUtilityNumberTypesTestData.InvalidStyles))]
+    public void TryParseExactDecimal_ReturnsFalse_ForUnsupportedStyles(NumberStyles styles)
+    {
+        // Act
+        var ok = StringUtility.NumberTypes.TryParseExactDecimal("FF", 2, out var result, styles);
+
+        // Assert
+        Assert.False(ok);
+        Assert.Equal(0, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.InvalidStyles.SingleUnsupportedStyles), MemberType = typeof(StringUtilityNumberTypesTestData.InvalidStyles))]
+    public void TryParseSingle_ReturnsFalse_ForUnsupportedStyles(NumberStyles styles)
+    {
+        // Act
+        var ok = StringUtility.NumberTypes.TryParseSingle("FF", out var result, styles);
+
+        // Assert
+        Assert.False(ok);
+        Assert.Equal(0, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.InvalidStyles.DoubleUnsupportedStyles), MemberType = typeof(StringUtilityNumberTypesTestData.InvalidStyles))]
+    public void TryParseDouble_ReturnsFalse_ForUnsupportedStyles(NumberStyles styles)
+    {
+        // Act
+        var ok = StringUtility.NumberTypes.TryParseDouble("FF", out var result, styles);
+
+        // Assert
+        Assert.False(ok);
+        Assert.Equal(0, result);
     }
 }

@@ -102,7 +102,11 @@ public static partial class StringUtility
     /// <summary>
     /// Attempts to join the specified words into a string using the given casing convention.
     /// </summary>
-    /// <param name="words">The words to join. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
+    /// <param name="words">
+    /// The words to join. If <see langword="null"/> or empty, returns <see langword="false"/>. Each word must consist entirely
+    /// of letters and/or digits (no whitespace, separators, or other punctuation) — otherwise returns <see langword="false"/>,
+    /// since such a word could not be re-parsed by the matching <see cref="TryCreateWords"/> style.
+    /// </param>
     /// <param name="outputStyle">The <see cref="StringCasing"/> convention for the output.</param>
     /// <param name="cased">
     /// When this method returns <see langword="true"/>, contains the joined string.
@@ -116,8 +120,17 @@ public static partial class StringUtility
         if (words is null || words.Count == 0)
             return false;
 
-        if (words.Any(string.IsNullOrWhiteSpace))
-            return false;
+        foreach (var word in words)
+        {
+            if (string.IsNullOrWhiteSpace(word))
+                return false;
+
+            foreach (var ch in word)
+            {
+                if (!char.IsLetterOrDigit(ch))
+                    return false;
+            }
+        }
 
         cased = outputStyle switch
         {
@@ -304,7 +317,7 @@ public static partial class StringUtility
 
     private static bool AreAllLettersLowerInvariant(string value) => value.Where(char.IsLetter).All(ch => char.ToLowerInvariant(ch) == ch);
 
-    private static bool AreAllLettersUpperInvariant(string value) => value.Where(char.IsLetter).All(ch => char.ToUpperInvariant(ch) == ch);
+    private static bool AreAllLettersUpperInvariant(string value) => value.Where(char.IsLetter).All(ch => !char.IsLower(ch));
 
     private static bool IsTitleCaseWord(string value)
     {
@@ -332,10 +345,9 @@ public static partial class StringUtility
         var firstWord = ToTitleWord(first);
 
         // Make first character lower-case.
-        if (firstWord.Length == 1)
-            return char.ToLowerInvariant(firstWord[0]).ToString();
-
-        firstWord = char.ToLowerInvariant(firstWord[0]) + firstWord[1..];
+        firstWord = firstWord.Length == 1
+            ? char.ToLowerInvariant(firstWord[0]).ToString()
+            : char.ToLowerInvariant(firstWord[0]) + firstWord[1..];
 
         if (words.Count == 1)
             return firstWord;
