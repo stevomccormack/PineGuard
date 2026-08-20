@@ -61,7 +61,6 @@ Create clean, scoped commits using the repo’s PowerShell helpers under `tools/
 If available in `.vscode/tasks.json`, prefer using the built-in tasks:
 
 - `Git: Run Commits (all, dry run)`
-- `Git: Run Commits (all, interactive)`
 - `Git: Run Commits (all, auto message)`
 - `Git: Run Commits (all, auto message, safe push)`
 
