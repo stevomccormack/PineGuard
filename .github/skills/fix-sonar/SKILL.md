@@ -1,5 +1,5 @@
 ---
-name: scan-fix
+name: fix-sonar
 description: Fix SonarQube findings for PineGuard by following the canonical Brain workflow.
 ---
 # Skill: Fix SonarQube Findings
@@ -9,7 +9,7 @@ description: Fix SonarQube findings for PineGuard by following the canonical Bra
 Read these files before editing code:
 1. [scan/spec.md](../../../docs/ai/specs/scan/spec.md)
 2. [scan.md](../../../docs/ai/rules/scan.md)
-3. [scan-fix/SKILL.md](../../../docs/ai/skills/fix-sonar/SKILL.md)
+3. [fix-sonar/SKILL.md](../../../docs/ai/skills/fix-sonar/SKILL.md)
 4. [validation-builder memory](../../../docs/ai/memory/validation-builder.md)
 5. [code-reviewer memory](../../../docs/ai/memory/code-reviewer.md)
 

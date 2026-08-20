@@ -24,7 +24,7 @@ Execute `docs/ai/skills/improve-coverage/SKILL.md` exactly as written.
 Do NOT improvise. Do NOT use `[ExcludeFromCodeCoverage]` unless truly unreachable.
 
 ## Step 2: Iterative Loop
-1. Run coverage (console + JSON output, no HTML): `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Engine xplat -Mode GenerateAndAnalyze -Scope [ProjectName] -Top 30 -Isolated -SkipHtml`
+1. Run coverage (console + JSON output, no HTML): `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope [ProjectName] -Top 30 -SkipHtml -Format cobertura`
 2. Analyze gaps from console output: 0-hit lines = uncovered, < 100% branch = partial branches
 3. Add test cases to fill gaps (null inputs, edge values, both `true`/`false` branch paths)
 4. Repeat until 100%

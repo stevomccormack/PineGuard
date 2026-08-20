@@ -1,5 +1,5 @@
 ---
-name: implement-unit-tests
+name: scaffold-unit-test
 description: Implement xUnit tests for any PineGuard class. Use whenever the user says "add tests", "write tests", "test the X class", "add unit tests for X", or needs test coverage for rules, clauses, utilities, or any PineGuard layer. Trigger on any request to write or add test code.
 argument-hint: "[TargetClass]"
 context: fork

@@ -1,5 +1,5 @@
 ---
-name: implement-unit-tests
+name: scaffold-unit-test
 description: Implement xUnit tests for PineGuard classes by reusing the canonical test-writing recipe from the Brain.
 ---
 # Skill: Implement Unit Tests
@@ -9,9 +9,9 @@ description: Implement xUnit tests for PineGuard classes by reusing the canonica
 Read these files before writing tests:
 1. [spec.md](../../../docs/ai/specs/spec.md)
 2. [unit-test.md](../../../docs/ai/specs/testing/unit-test.md)
-3. [unit-tests-spec-template.md](../../../docs/ai/meta/template-unit-test.md)
+3. [template-unit-test.md](../../../docs/ai/meta/template-unit-test.md)
 4. [coverage.md](../../../docs/ai/specs/testing/coverage.md)
-5. [implement-unit-tests/SKILL.md](../../../docs/ai/skills/scaffold-unit-test/SKILL.md)
+5. [scaffold-unit-test/SKILL.md](../../../docs/ai/skills/scaffold-unit-test/SKILL.md)
 6. [test-writer memory](../../../docs/ai/memory/test-writer.md)
 
 Also read the project-specific unit test spec for the target layer.

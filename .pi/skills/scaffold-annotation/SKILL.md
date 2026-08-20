@@ -1,5 +1,5 @@
 ---
-name: implement-data-annotations
+name: scaffold-annotation
 description: Implement a DataAnnotations ValidationAttribute adapting a MustClause. Use when adding [Attribute] validators. Do NOT use for Must clauses, Guard clauses, Core rules, or Fluent extensions.
 ---
 

@@ -1,6 +1,6 @@
 ---
-name: scan-run
-description: Run SonarQube static analysis. Use when asked to scan, analyze code quality, or check for code smells. Do NOT use to fix issues; use scan-fix instead.
+name: scan-sonar
+description: Run SonarQube static analysis. Use when asked to scan, analyze code quality, or check for code smells. Do NOT use to fix issues; use fix-sonar instead.
 ---
 
 # Skill: Run SonarQube Analysis

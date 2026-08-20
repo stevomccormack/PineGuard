@@ -1,4 +1,4 @@
-# Reference Files: implement-fluent-validation
+# Reference Files: scaffold-fluent
 
 > Read the exemplar files listed below before implementing. Do NOT copy them — follow the same patterns.
 

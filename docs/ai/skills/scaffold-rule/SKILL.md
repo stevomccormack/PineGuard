@@ -32,11 +32,11 @@ Implement a low-level validation primitive (`Rule`) or parsing helper (`Util`) i
     *   Simple: `src/PineGuard.Core/Rules/[Domain]Rules.cs`.
     *   Complex: `src/PineGuard.Core/Rules/[Domain]/[Name]Rules.cs` (Internal).
 
-2.  **Implement Util (if parsing needed)**
+3.  **Implement Util (if parsing needed)**
     ```csharp
     using System.Diagnostics.CodeAnalysis;
 
-    namespace PineGuard.Core.Utils;
+    namespace PineGuard.Utils;
 
     public static class MyUtility
     {
@@ -52,11 +52,11 @@ Implement a low-level validation primitive (`Rule`) or parsing helper (`Util`) i
     }
     ```
 
-3.  **Implement Rule (Predicate)**
+4.  **Implement Rule (Predicate)**
     ```csharp
-    using PineGuard.Core.Utils;
+    using PineGuard.Utils;
 
-    namespace PineGuard.Core.Rules;
+    namespace PineGuard.Rules;
 
     public static class MyRules
     {

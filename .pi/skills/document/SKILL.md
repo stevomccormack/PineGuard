@@ -1,5 +1,5 @@
 ---
-name: generate-xml-docs
+name: document
 description: Generate gold-standard XML documentation comments for all public members in a PineGuard project. Layer-aware templates with cross-references, examples, and doc site links.
 ---
 
