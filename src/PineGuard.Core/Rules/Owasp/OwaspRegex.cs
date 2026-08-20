@@ -50,7 +50,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="NoAngleBracketsPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(NoAngleBracketsPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(NoAngleBracketsPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex NoAngleBracketsRegex();
 #else
         public static Regex NoAngleBracketsRegex() => CompiledNoAngleBracketsRegex;
@@ -62,7 +62,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="HtmlTagPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(HtmlTagPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(HtmlTagPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex HtmlTagRegex();
 #else
         public static Regex HtmlTagRegex() => CompiledHtmlTagRegex;
@@ -74,7 +74,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="HtmlEntityEncodedAngleBracketPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(HtmlEntityEncodedAngleBracketPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(HtmlEntityEncodedAngleBracketPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex HtmlEntityEncodedAngleBracketRegex();
 #else
         public static Regex HtmlEntityEncodedAngleBracketRegex() => CompiledHtmlEntityEncodedAngleBracketRegex;
@@ -86,7 +86,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="ScriptProtocolPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(ScriptProtocolPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(ScriptProtocolPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex ScriptProtocolRegex();
 #else
         public static Regex ScriptProtocolRegex() => CompiledScriptProtocolRegex;
@@ -98,7 +98,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="HtmlEventHandlerAttributePattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(HtmlEventHandlerAttributePattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(HtmlEventHandlerAttributePattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex HtmlEventHandlerAttributeRegex();
 #else
         public static Regex HtmlEventHandlerAttributeRegex() => CompiledHtmlEventHandlerAttributeRegex;
@@ -146,7 +146,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="SqlKeywordPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(SqlKeywordPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(SqlKeywordPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex SqlKeywordRegex();
 #else
         public static Regex SqlKeywordRegex() => CompiledSqlKeywordRegex;
@@ -158,7 +158,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="SqlCommentPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(SqlCommentPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(SqlCommentPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex SqlCommentRegex();
 #else
         public static Regex SqlCommentRegex() => CompiledSqlCommentRegex;
@@ -170,7 +170,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="SqlBooleanPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(SqlBooleanPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(SqlBooleanPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex SqlBooleanRegex();
 #else
         public static Regex SqlBooleanRegex() => CompiledSqlBooleanRegex;
@@ -182,7 +182,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="SqlStatementTerminatorPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(SqlStatementTerminatorPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(SqlStatementTerminatorPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex SqlStatementTerminatorRegex();
 #else
         public static Regex SqlStatementTerminatorRegex() => CompiledSqlStatementTerminatorRegex;
@@ -194,7 +194,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="SqlQuotePattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(SqlQuotePattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(SqlQuotePattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex SqlQuoteRegex();
 #else
         public static Regex SqlQuoteRegex() => CompiledSqlQuoteRegex;
@@ -206,7 +206,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="SqlUnionSelectPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(SqlUnionSelectPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(SqlUnionSelectPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex SqlUnionSelectRegex();
 #else
         public static Regex SqlUnionSelectRegex() => CompiledSqlUnionSelectRegex;
@@ -222,7 +222,7 @@ public static partial class OwaspRegex
         /// <summary>
         /// A pattern that matches dot-dot path traversal segments (e.g., <c>../</c>, <c>..\</c>, URL-encoded variants).
         /// </summary>
-        public const string DotDotSegmentPattern = @"(\.\.(?:/|\\)|%2e%2e(?:%2f|%5c)|%2e%2e/)";
+        public const string DotDotSegmentPattern = @"(\.\.(?:/|\\|%2f|%5c)|%2e%2e(?:/|\\|%2f|%5c)|(?:^|[/\\])\.\.$)";
 
         /// <summary>
         /// A pattern that matches absolute Unix paths starting with <c>/</c>.
@@ -244,7 +244,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="DotDotSegmentPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(DotDotSegmentPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(DotDotSegmentPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex DotDotSegmentRegex();
 #else
         public static Regex DotDotSegmentRegex() => CompiledDotDotSegmentRegex;
@@ -256,7 +256,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="AbsoluteUnixPathPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(AbsoluteUnixPathPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(AbsoluteUnixPathPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex AbsoluteUnixPathRegex();
 #else
         public static Regex AbsoluteUnixPathRegex() => CompiledAbsoluteUnixPathRegex;
@@ -268,7 +268,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="WindowsDriveAbsolutePathPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(WindowsDriveAbsolutePathPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(WindowsDriveAbsolutePathPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex WindowsDriveAbsolutePathRegex();
 #else
         public static Regex WindowsDriveAbsolutePathRegex() => CompiledWindowsDriveAbsolutePathRegex;
@@ -280,7 +280,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="UncPathPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(UncPathPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(UncPathPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex UncPathRegex();
 #else
         public static Regex UncPathRegex() => CompiledUncPathRegex;
@@ -313,7 +313,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="ShellMetacharactersPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(ShellMetacharactersPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(ShellMetacharactersPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex ShellMetacharactersRegex();
 #else
         public static Regex ShellMetacharactersRegex() => CompiledShellMetacharactersRegex;
@@ -325,7 +325,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="NewlinePattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(NewlinePattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(NewlinePattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex NewlineRegex();
 #else
         public static Regex NewlineRegex() => CompiledNewlineRegex;
@@ -337,7 +337,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="CommandChainingPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(CommandChainingPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(CommandChainingPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex CommandChainingRegex();
 #else
         public static Regex CommandChainingRegex() => CompiledCommandChainingRegex;
@@ -360,7 +360,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="CrLfPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(CrLfPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(CrLfPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex CrLfRegex();
 #else
         public static Regex CrLfRegex() => CompiledCrLfRegex;
@@ -383,7 +383,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="LdapFilterSpecialCharsPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(LdapFilterSpecialCharsPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(LdapFilterSpecialCharsPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex LdapFilterSpecialCharsRegex();
 #else
         public static Regex LdapFilterSpecialCharsRegex() => CompiledLdapFilterSpecialCharsRegex;
@@ -406,7 +406,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="AbsoluteOrProtocolRelativeUrlPattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(AbsoluteOrProtocolRelativeUrlPattern, RegexOptions.CultureInvariant)]
+        [GeneratedRegex(AbsoluteOrProtocolRelativeUrlPattern, RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex AbsoluteOrProtocolRelativeUrlRegex();
 #else
         public static Regex AbsoluteOrProtocolRelativeUrlRegex() => CompiledAbsoluteOrProtocolRelativeUrlRegex;
@@ -429,7 +429,7 @@ public static partial class OwaspRegex
         /// </summary>
         /// <returns>A <see cref="Regex"/> compiled from <see cref="DangerousSchemePattern"/>.</returns>
 #if NET8_0_OR_GREATER
-        [GeneratedRegex(DangerousSchemePattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        [GeneratedRegex(DangerousSchemePattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
         public static partial Regex DangerousSchemeRegex();
 #else
         public static Regex DangerousSchemeRegex() => CompiledDangerousSchemeRegex;
