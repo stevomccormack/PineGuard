@@ -1,0 +1,71 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\block-sln-edit.sh'"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\enforce-output-dirs.sh'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\pre-bash-lock.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\pre-bash-destructive-guard.sh'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\post-edit-format-check.sh'"
+          },
+          {
+            "type": "command",
+            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\post-edit-testdata-check.sh'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\post-bash-lock.sh'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\on-stop.sh'"
+          }
+        ]
+      }
+    ]
+  }
+}
