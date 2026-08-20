@@ -14,6 +14,13 @@ public static class CollectionUtilityTestData
         IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
     }
 
+    private sealed class ReadOnlyCollectionOnly<T>(params T[] items) : IReadOnlyCollection<T>
+    {
+        public int Count => items.Length;
+        public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)items).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
+    }
+
     private static IEnumerable<int> Iterator()
     {
         yield return 10;
@@ -85,6 +92,10 @@ public static class CollectionUtilityTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("List valid", (new List<int> { 10, 20, 30 }, 20), true, 1),
+            new("Custom ReadOnlyList valid", (new ReadOnlyListOnly<int>(10, 20, 30), 20), true, 1),
+            new("ReadOnlyCollection valid", (new ReadOnlyCollection<int>([10, 20]), 20), true, 1),
+            new("HashSet valid (enumerated)", (new HashSet<int> { 42 }, 42), true, 0),
+            new("Custom ReadOnlyCollection valid (enumerated)", (new ReadOnlyCollectionOnly<int>(7), 7), true, 0),
             new("Iterator valid", (IntIterator(), 6), true, 1)
         ];
 
@@ -92,6 +103,10 @@ public static class CollectionUtilityTestData
         [
             new("Null", (null, 10), false, -1),
             new("List not found", (new List<int> { 10, 20, 30 }, 99), false, -1),
+            new("Custom ReadOnlyList not found", (new ReadOnlyListOnly<int>(10, 20, 30), 99), false, -1),
+            new("Empty ICollection (short circuit)", (new HashSet<int>(), 10), false, -1),
+            new("Empty custom ReadOnlyCollection (short circuit)", (new ReadOnlyCollectionOnly<int>(), 10), false, -1),
+            new("HashSet not found (enumerated)", (new HashSet<int> { 42 }, 10), false, -1),
             new("Iterator not found", (IntIterator(), 7), false, -1)
         ];
 

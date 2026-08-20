@@ -257,9 +257,18 @@ public static class CultureInfoUtility
         }
     }
 
-    // TwoLetterISORegionName returns UN M.49 numeric codes (e.g. "001", "419") for region-group
-    // cultures such as "en-001" or "es-419"; those are not ISO 3166-1 alpha-2 codes.
-    private static bool IsIsoAlpha2RegionCode(string code) =>
+    /// <summary>
+    /// Determines whether the specified region code is a well-formed ISO 3166-1 alpha-2 code (two uppercase
+    /// ASCII letters).
+    /// </summary>
+    /// <remarks>
+    /// <see cref="RegionInfo.TwoLetterISORegionName"/> returns UN M.49 numeric codes (e.g. <c>"001"</c>,
+    /// <c>"419"</c>) for region-group cultures such as <c>"en-001"</c> or <c>"es-419"</c>; those are not
+    /// ISO 3166-1 alpha-2 codes.
+    /// </remarks>
+    /// <param name="code">The candidate region code.</param>
+    /// <returns><see langword="true"/> if <paramref name="code"/> is two uppercase ASCII letters; otherwise, <see langword="false"/>.</returns>
+    internal static bool IsIsoAlpha2RegionCode(string code) =>
         code.Length == 2 && code[0] is >= 'A' and <= 'Z' && code[1] is >= 'A' and <= 'Z';
 
     /// <summary>

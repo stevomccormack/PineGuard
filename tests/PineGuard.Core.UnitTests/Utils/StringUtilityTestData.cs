@@ -5,6 +5,8 @@ namespace PineGuard.Core.UnitTests.Utils;
 
 public static class StringUtilityTestData
 {
+    private static readonly string LongDigits = new('7', 300);
+
     public static class TryGetTrimmed
     {
         public static TheoryData<ValidCase> ValidCases =>
@@ -62,7 +64,8 @@ public static class StringUtilityTestData
             new("spaces", "12 34", null, true, "1234"),
             new("dashes", "12-34", null, true, "1234"),
             new("trim", "  12- 34  ", null, true, "1234"),
-            new("custom sep", "12_34", ['_'], true, "1234")
+            new("custom sep", "12_34", ['_'], true, "1234"),
+            new("long value exceeds stack allocation", LongDigits, null, true, LongDigits)
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>
