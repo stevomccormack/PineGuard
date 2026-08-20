@@ -13,6 +13,7 @@ public sealed class GuardTimeSpanClausesTests(ITestOutputHelper output) : BaseGu
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotDurationBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotDurationBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -23,6 +24,7 @@ public sealed class GuardTimeSpanClausesTests(ITestOutputHelper output) : BaseGu
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.DurationBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.DurationBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -33,6 +35,7 @@ public sealed class GuardTimeSpanClausesTests(ITestOutputHelper output) : BaseGu
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.LessThan(value, tc.Value.threshold, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.LessThan(value, tc.Value.threshold, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -43,6 +46,7 @@ public sealed class GuardTimeSpanClausesTests(ITestOutputHelper output) : BaseGu
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.GreaterThan(value, tc.Value.threshold, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.GreaterThan(value, tc.Value.threshold, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

@@ -12,6 +12,7 @@ public sealed class GuardStringGuidClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.NotGuid(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotGuid(value, message: CustomMessage));
     }
 
     [Theory]
@@ -21,5 +22,6 @@ public sealed class GuardStringGuidClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.EmptyGuid(value));
+        AssertCustomMessage(tc, () => Guard.Against.EmptyGuid(value, message: CustomMessage));
     }
 }

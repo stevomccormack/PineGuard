@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
@@ -13,6 +14,9 @@ public sealed class BaseAttributesTests : BaseUnitTest
 
         public ValidationResult? TestInvokeGenericMust(string methodName, object? value, ValidationContext ctx, params object?[] args)
             => InvokeGenericMust(methodName, value, ctx, args);
+
+        public static object?[] TestBuildInvokeArgs(MethodInfo method, object? value, params object?[] args)
+            => BuildInvokeArgs(method, value, args);
     }
 
     private sealed class TestImplementationNumberAttribute : NumberAttributeBase
@@ -76,6 +80,27 @@ public sealed class BaseAttributesTests : BaseUnitTest
 
         // Assert
         ThrowsCaseAssert.Expected(ex, testCase);
+    }
+
+    [Theory]
+    [MemberData(
+        nameof(BaseAttributesTestData.ValidationAttributeBaseBuildInvokeArgs.ValidCases),
+        MemberType = typeof(BaseAttributesTestData.ValidationAttributeBaseBuildInvokeArgs))]
+    [MemberData(
+        nameof(BaseAttributesTestData.ValidationAttributeBaseBuildInvokeArgs.EdgeCases),
+        MemberType = typeof(BaseAttributesTestData.ValidationAttributeBaseBuildInvokeArgs))]
+    public void ValidationAttributeBase_BuildInvokeArgs_ShouldReturnExpected(BaseAttributesTestData.ValidationAttributeBaseBuildInvokeArgs.ValidCase testCase)
+    {
+        // Arrange
+        var value = new object();
+
+        // Act
+        var invokeArgs = TestImplementationObjectAttribute.TestBuildInvokeArgs(testCase.Value, value);
+
+        // Assert
+        Assert.Equal(testCase.Expected, invokeArgs.Length);
+        if (testCase.Expected > 0) Assert.Null(invokeArgs[0]);
+        if (testCase.Expected > 1) Assert.Same(value, invokeArgs[1]);
     }
 
     [Theory]

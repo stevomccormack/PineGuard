@@ -12,6 +12,7 @@ public sealed class GuardNullClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.NotNull(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotNull(value, message: CustomMessage));
     }
 
     [Theory]
@@ -21,5 +22,6 @@ public sealed class GuardNullClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.Null(value));
+        AssertCustomMessage(tc, () => Guard.Against.Null(value, message: CustomMessage));
     }
 }

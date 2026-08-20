@@ -13,6 +13,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var name = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHeaderName(name));
+        AssertCustomMessage(tc, () => Guard.Against.NotHeaderName(name, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(name, result);
     }
 
@@ -23,6 +24,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHeaderValue(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotHeaderValue(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -33,6 +35,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHttpStatusCode(status));
+        AssertCustomMessage(tc, () => Guard.Against.NotHttpStatusCode(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -43,6 +46,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHttpStatusInformational(status));
+        AssertCustomMessage(tc, () => Guard.Against.NotHttpStatusInformational(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -53,6 +57,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHttpStatusSuccess(status));
+        AssertCustomMessage(tc, () => Guard.Against.NotHttpStatusSuccess(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -63,6 +68,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHttpStatusRedirect(status));
+        AssertCustomMessage(tc, () => Guard.Against.NotHttpStatusRedirect(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -73,6 +79,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHttpStatusClientError(status));
+        AssertCustomMessage(tc, () => Guard.Against.NotHttpStatusClientError(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -83,6 +90,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHttpStatusServerError(status));
+        AssertCustomMessage(tc, () => Guard.Against.NotHttpStatusServerError(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -93,6 +101,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.NotHasHeader(headers, tc.Value.name));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasHeader(headers, tc.Value.name, message: CustomMessage));
     }
 
     [Theory]
@@ -102,6 +111,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.NotHasHeaderValue(headers, tc.Value.name));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasHeaderValue(headers, tc.Value.name, message: CustomMessage));
     }
 
     [Theory]
@@ -111,6 +121,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.NotHasHeaderValueEqualTo(headers, tc.Value.name, tc.Value.expectedValue));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasHeaderValueEqualTo(headers, tc.Value.name, tc.Value.expectedValue, message: CustomMessage));
     }
 
     [Theory]
@@ -120,6 +131,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.NotHasSingleHeaderValue(headers, tc.Value.name));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasSingleHeaderValue(headers, tc.Value.name, message: CustomMessage));
     }
 
     [Theory]
@@ -129,6 +141,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.NotHasContentType(headers, tc.Value.allowed));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasContentType(headers, tc.Value.allowed, message: CustomMessage));
     }
 
     [Theory]
@@ -138,6 +151,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.NotHasHeaderValue(headers, tc.Value.name, expectedValue: tc.Value.expectedValue));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasHeaderValue(headers, tc.Value.name, expectedValue: tc.Value.expectedValue, message: CustomMessage));
     }
 
     [Theory]
@@ -147,6 +161,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var name = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HeaderName(name));
+        AssertCustomMessage(tc, () => Guard.Against.HeaderName(name, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(name, result);
     }
 
@@ -157,6 +172,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HeaderValue(value!));
+        AssertCustomMessage(tc, () => Guard.Against.HeaderValue(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -167,6 +183,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HttpStatusCode(status));
+        AssertCustomMessage(tc, () => Guard.Against.HttpStatusCode(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -177,6 +194,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HttpStatusInformational(status));
+        AssertCustomMessage(tc, () => Guard.Against.HttpStatusInformational(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -187,6 +205,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HttpStatusSuccess(status));
+        AssertCustomMessage(tc, () => Guard.Against.HttpStatusSuccess(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -197,6 +216,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HttpStatusRedirect(status));
+        AssertCustomMessage(tc, () => Guard.Against.HttpStatusRedirect(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -207,6 +227,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HttpStatusClientError(status));
+        AssertCustomMessage(tc, () => Guard.Against.HttpStatusClientError(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -217,6 +238,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var status = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HttpStatusServerError(status));
+        AssertCustomMessage(tc, () => Guard.Against.HttpStatusServerError(status, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(status, result);
     }
 
@@ -227,6 +249,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.HasHeader(headers, tc.Value.name));
+        AssertCustomMessage(tc, () => Guard.Against.HasHeader(headers, tc.Value.name, message: CustomMessage));
     }
 
     [Theory]
@@ -236,6 +259,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.HasHeaderValue(headers, tc.Value.name));
+        AssertCustomMessage(tc, () => Guard.Against.HasHeaderValue(headers, tc.Value.name, message: CustomMessage));
     }
 
     [Theory]
@@ -245,6 +269,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.HasHeaderValueEqualTo(headers, tc.Value.name, tc.Value.expectedValue));
+        AssertCustomMessage(tc, () => Guard.Against.HasHeaderValueEqualTo(headers, tc.Value.name, tc.Value.expectedValue, message: CustomMessage));
     }
 
     [Theory]
@@ -254,6 +279,7 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.HasSingleHeaderValue(headers, tc.Value.name));
+        AssertCustomMessage(tc, () => Guard.Against.HasSingleHeaderValue(headers, tc.Value.name, message: CustomMessage));
     }
 
     [Theory]
@@ -263,5 +289,6 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var headers = tc.Value.headers;
         AssertResult(tc, () => Guard.Against.HasContentType(headers, tc.Value.allowed));
+        AssertCustomMessage(tc, () => Guard.Against.HasContentType(headers, tc.Value.allowed, message: CustomMessage));
     }
 }

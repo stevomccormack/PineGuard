@@ -13,6 +13,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotEmpty(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotEmpty(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Same(value, result);
     }
 
@@ -23,6 +24,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Empty(value));
+        AssertCustomMessage(tc, () => Guard.Against.Empty(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Same(value, result);
     }
 
@@ -33,6 +35,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.dictionary;
         AssertResult(tc, () => Guard.Against.NotHasKey(value, tc.Value.key));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasKey(value, tc.Value.key, message: CustomMessage));
     }
 
     [Theory]
@@ -42,6 +45,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.dictionary;
         AssertResult(tc, () => Guard.Against.HasKey(value, tc.Value.key));
+        AssertCustomMessage(tc, () => Guard.Against.HasKey(value, tc.Value.key, message: CustomMessage));
     }
 
     [Theory]
@@ -51,6 +55,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
     {
         var dict = tc.Value.dictionary;
         AssertResult(tc, () => Guard.Against.NotHasValue(dict, tc.Value.value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasValue(dict, tc.Value.value, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -60,6 +65,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
     {
         var dict = tc.Value.dictionary;
         AssertResult(tc, () => Guard.Against.HasValue(dict, tc.Value.value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.HasValue(dict, tc.Value.value, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -69,6 +75,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
     {
         var dict = tc.Value.dictionary;
         AssertResult(tc, () => Guard.Against.NotHasKeyValue(dict, tc.Value.key, tc.Value.value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasKeyValue(dict, tc.Value.key, tc.Value.value, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -78,6 +85,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
     {
         var dict = tc.Value.dictionary;
         AssertResult(tc, () => Guard.Against.HasKeyValue(dict, tc.Value.key, tc.Value.value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.HasKeyValue(dict, tc.Value.key, tc.Value.value, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -88,6 +96,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
         var dict = tc.Value.dictionary;
         var predicate = tc.Value.predicate;
         AssertResult(tc, () => Guard.Against.NotHasAnyKey(dict, predicate, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasAnyKey(dict, predicate, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -98,6 +107,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
         var dict = tc.Value.dictionary;
         var predicate = tc.Value.predicate;
         AssertResult(tc, () => Guard.Against.HasAnyKey(dict, predicate, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.HasAnyKey(dict, predicate, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -108,6 +118,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
         var dict = tc.Value.dictionary;
         var predicate = tc.Value.predicate;
         AssertResult(tc, () => Guard.Against.NotHasAnyValue(dict, predicate, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasAnyValue(dict, predicate, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -118,6 +129,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
         var dict = tc.Value.dictionary;
         var predicate = tc.Value.predicate;
         AssertResult(tc, () => Guard.Against.HasAnyValue(dict, predicate, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.HasAnyValue(dict, predicate, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -128,6 +140,7 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
         var dict = tc.Value.dictionary;
         var predicate = tc.Value.predicate;
         AssertResult(tc, () => Guard.Against.NotHasAnyItem(dict, predicate, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasAnyItem(dict, predicate, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -138,5 +151,6 @@ public sealed class GuardDictionaryClausesTests(ITestOutputHelper output) : Base
         var dict = tc.Value.dictionary;
         var predicate = tc.Value.predicate;
         AssertResult(tc, () => Guard.Against.HasAnyItem(dict, predicate, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.HasAnyItem(dict, predicate, paramName: "value", message: CustomMessage));
     }
 }

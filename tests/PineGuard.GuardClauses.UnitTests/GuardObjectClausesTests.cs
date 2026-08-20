@@ -13,6 +13,7 @@ public sealed class GuardObjectClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var other = tc.Value.other;
         var result = AssertResult(tc, () => Guard.Against.NotEqualTo(value, other));
+        AssertCustomMessage(tc, () => Guard.Against.NotEqualTo(value, other, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -24,6 +25,7 @@ public sealed class GuardObjectClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var other = tc.Value.other;
         var result = AssertResult(tc, () => Guard.Against.EqualTo(value, other));
+        AssertCustomMessage(tc, () => Guard.Against.EqualTo(value, other, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -34,6 +36,7 @@ public sealed class GuardObjectClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotOfType<string>(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotOfType<string>(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -44,6 +47,7 @@ public sealed class GuardObjectClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.OfType<string>(value));
+        AssertCustomMessage(tc, () => Guard.Against.OfType<string>(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -54,6 +58,7 @@ public sealed class GuardObjectClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotAssignableToType<string>(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotAssignableToType<string>(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -64,6 +69,7 @@ public sealed class GuardObjectClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.AssignableToType<string>(value));
+        AssertCustomMessage(tc, () => Guard.Against.AssignableToType<string>(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -75,6 +81,7 @@ public sealed class GuardObjectClausesTests(ITestOutputHelper output) : BaseGuar
         var a = tc.Value.a;
         var b = tc.Value.b;
         var result = AssertResult(tc, () => Guard.Against.NotSameReferenceAs(a, b));
+        AssertCustomMessage(tc, () => Guard.Against.NotSameReferenceAs(a, b, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Same(a, result);
     }
 
@@ -86,6 +93,7 @@ public sealed class GuardObjectClausesTests(ITestOutputHelper output) : BaseGuar
         var a = tc.Value.a;
         var b = tc.Value.b;
         var result = AssertResult(tc, () => Guard.Against.SameReferenceAs(a, b));
+        AssertCustomMessage(tc, () => Guard.Against.SameReferenceAs(a, b, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Same(a, result);
     }
 }

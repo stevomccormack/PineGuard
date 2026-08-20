@@ -14,6 +14,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.ZeroOrNegative(value));
+        AssertCustomMessage(tc, () => Guard.Against.ZeroOrNegative(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -25,6 +26,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.ZeroOrPositive(value));
+        AssertCustomMessage(tc, () => Guard.Against.ZeroOrPositive(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -36,6 +38,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotZero(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotZero(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -47,6 +50,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Zero(value));
+        AssertCustomMessage(tc, () => Guard.Against.Zero(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -58,6 +62,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Negative(value));
+        AssertCustomMessage(tc, () => Guard.Against.Negative(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -69,6 +74,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Positive(value));
+        AssertCustomMessage(tc, () => Guard.Against.Positive(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -80,6 +86,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.LessThanOrEqual(value, tc.Value.min));
+        AssertCustomMessage(tc, () => Guard.Against.LessThanOrEqual(value, tc.Value.min, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -91,6 +98,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.LessThan(value, tc.Value.min));
+        AssertCustomMessage(tc, () => Guard.Against.LessThan(value, tc.Value.min, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -102,6 +110,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.GreaterThanOrEqual(value, tc.Value.max));
+        AssertCustomMessage(tc, () => Guard.Against.GreaterThanOrEqual(value, tc.Value.max, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -113,6 +122,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.GreaterThan(value, tc.Value.min));
+        AssertCustomMessage(tc, () => Guard.Against.GreaterThan(value, tc.Value.min, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -124,6 +134,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -135,6 +146,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -146,6 +158,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotApproximately(value, tc.Value.target, tc.Value.tolerance));
+        AssertCustomMessage(tc, () => Guard.Against.NotApproximately(value, tc.Value.target, tc.Value.tolerance, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -157,6 +170,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.Approximately(value, tc.Value.target, tc.Value.tolerance));
+        AssertCustomMessage(tc, () => Guard.Against.Approximately(value, tc.Value.target, tc.Value.tolerance, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -168,6 +182,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotMultipleOf(value, tc.Value.factor));
+        AssertCustomMessage(tc, () => Guard.Against.NotMultipleOf(value, tc.Value.factor, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -179,6 +194,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.MultipleOf(value, tc.Value.factor));
+        AssertCustomMessage(tc, () => Guard.Against.MultipleOf(value, tc.Value.factor, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -190,6 +206,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Odd(value));
+        AssertCustomMessage(tc, () => Guard.Against.Odd(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -201,6 +218,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Odd(value));
+        AssertCustomMessage(tc, () => Guard.Against.Odd(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -212,6 +230,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Even(value));
+        AssertCustomMessage(tc, () => Guard.Against.Even(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -223,6 +242,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Even(value));
+        AssertCustomMessage(tc, () => Guard.Against.Even(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -234,6 +254,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotFinite(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotFinite(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -245,6 +266,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotFinite(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotFinite(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -256,6 +278,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Finite(value));
+        AssertCustomMessage(tc, () => Guard.Against.Finite(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -267,6 +290,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Finite(value));
+        AssertCustomMessage(tc, () => Guard.Against.Finite(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -278,6 +302,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NaN(value));
+        AssertCustomMessage(tc, () => Guard.Against.NaN(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -289,6 +314,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NaN(value));
+        AssertCustomMessage(tc, () => Guard.Against.NaN(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -300,6 +326,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotNaN(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotNaN(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -311,6 +338,7 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotNaN(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotNaN(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

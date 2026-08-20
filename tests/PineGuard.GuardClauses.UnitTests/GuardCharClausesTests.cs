@@ -11,6 +11,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void NotLetter_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.NotLetter(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotLetter(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -20,6 +21,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void NotDigit_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.NotDigit(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotDigit(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -29,6 +31,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void Digit_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.Digit(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.Digit(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -38,6 +41,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void NotLetterOrDigit_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.NotLetterOrDigit(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotLetterOrDigit(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -47,6 +51,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void LetterOrDigit_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.LetterOrDigit(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.LetterOrDigit(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -56,6 +61,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void NotAscii_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.NotAscii(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotAscii(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -65,6 +71,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void Ascii_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.Ascii(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.Ascii(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -74,6 +81,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void NotPrintableAscii_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.NotPrintableAscii(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotPrintableAscii(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -83,6 +91,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void PrintableAscii_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.PrintableAscii(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.PrintableAscii(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -92,6 +101,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void Whitespace_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.Whitespace(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.Whitespace(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -101,6 +111,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void NotControl_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.NotControl(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotControl(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -110,6 +121,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void Control_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.Control(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.Control(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -119,6 +131,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void Letter_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.Letter(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.Letter(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -128,6 +141,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void HexDigit_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.HexDigit(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.HexDigit(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -137,6 +151,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void NotHexDigit_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.NotHexDigit(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotHexDigit(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -146,6 +161,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void Lowercase_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.Lowercase(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.Lowercase(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 
@@ -155,6 +171,7 @@ public sealed class GuardCharClausesTests(ITestOutputHelper output) : BaseGuardU
     public void Uppercase_BehavesAsExpected(GuardCase<char?> tc)
     {
         var result = AssertResult(tc, () => Guard.Against.Uppercase(tc.Value!.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.Uppercase(tc.Value!.Value, paramName: "value", message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(tc.Value!.Value, result);
     }
 }

@@ -103,6 +103,7 @@ public static class CollectionRulesTestData
             new("Non-count exclusive ok", (Enumerate("a", "b", "c"), 2, 5, Inclusion.Exclusive), new RuleExpected(true)),
             new("Exclusive equal bounds false", (["a", "b", "c"], 3, 3, Inclusion.Exclusive), new RuleExpected(false)),
             new("NegativeMin", (["a"], -1, 3, Inclusion.Inclusive), new RuleExpected(false)),
+            new("NegativeMax", (["a"], 0, -1, Inclusion.Inclusive), new RuleExpected(false)),
             new("MinGtMax", (["a"], 4, 2, Inclusion.Inclusive), new RuleExpected(false)),
             new("ExclusiveUpperZero", (Enumerate("a"), 0, 0, Inclusion.Exclusive), new RuleExpected(false)),
             new("Non-count exceeds max", (Enumerate("a", "b", "c", "d", "e"), 1, 3, Inclusion.Inclusive), new RuleExpected(false))

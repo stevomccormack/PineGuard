@@ -12,6 +12,7 @@ public sealed class GuardStringBoolClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.False(value));
+        AssertCustomMessage(tc, () => Guard.Against.False(value, message: CustomMessage));
     }
 
     [Theory]
@@ -21,5 +22,6 @@ public sealed class GuardStringBoolClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.True(value));
+        AssertCustomMessage(tc, () => Guard.Against.True(value, message: CustomMessage));
     }
 }

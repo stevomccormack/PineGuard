@@ -14,6 +14,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
         var value = tc.Value.value;
         var style = tc.Value.style;
         var result = AssertResult(tc, () => Guard.Against.NotCaseStyle(value, style));
+        AssertCustomMessage(tc, () => Guard.Against.NotCaseStyle(value, style, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -26,6 +27,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
         var value = tc.Value.value;
         var style = tc.Value.style;
         var result = AssertResult(tc, () => Guard.Against.CaseStyle(value, style));
+        AssertCustomMessage(tc, () => Guard.Against.CaseStyle(value, style, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -36,6 +38,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotCamelCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotCamelCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -46,6 +49,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.CamelCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.CamelCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -56,6 +60,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotPascalCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotPascalCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -66,6 +71,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.PascalCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.PascalCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -76,6 +82,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotSnakeCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotSnakeCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -86,6 +93,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.SnakeCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.SnakeCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -96,6 +104,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotUpperSnakeCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotUpperSnakeCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -106,6 +115,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.UpperSnakeCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.UpperSnakeCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -116,6 +126,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotKebabCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotKebabCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -126,6 +137,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.KebabCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.KebabCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -136,6 +148,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotTrainCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotTrainCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -146,6 +159,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.TrainCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.TrainCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -156,6 +170,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotDotCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotDotCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -166,6 +181,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.DotCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.DotCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -176,6 +192,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotSpaceCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotSpaceCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -186,6 +203,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.SpaceCase(value));
+        AssertCustomMessage(tc, () => Guard.Against.SpaceCase(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -196,6 +214,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotUpperInvariant(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotUpperInvariant(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -207,6 +226,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.UpperInvariant(value));
+        AssertCustomMessage(tc, () => Guard.Against.UpperInvariant(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -217,6 +237,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotLowerInvariant(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotLowerInvariant(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -228,6 +249,7 @@ public sealed class GuardStringCasingClausesTests(ITestOutputHelper output) : Ba
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.LowerInvariant(value));
+        AssertCustomMessage(tc, () => Guard.Against.LowerInvariant(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

@@ -143,4 +143,25 @@ public sealed class CultureInfoUtilityTests : BaseUnitTest
         Assert.Equal(testCase.Expected, result);
         Assert.Equal(testCase.ExpectedRegion, region);
     }
+
+    [Theory]
+    [MemberData(nameof(CultureInfoUtilityTestData.AddRegionCode.ValidCases), MemberType = typeof(CultureInfoUtilityTestData.AddRegionCode))]
+    [MemberData(nameof(CultureInfoUtilityTestData.AddRegionCode.EdgeCases), MemberType = typeof(CultureInfoUtilityTestData.AddRegionCode))]
+    public void AddRegionCode_CollectsOnlyResolvableRegions(CultureInfoUtilityTestData.AddRegionCode.ValidCase testCase)
+    {
+        // Arrange
+        var regions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // Act
+        CultureInfoUtility.AddRegionCode(regions, testCase.Culture);
+
+        // Assert
+        if (testCase.Expected is null)
+        {
+            Assert.Empty(regions);
+            return;
+        }
+
+        Assert.Equal([testCase.Expected], regions);
+    }
 }

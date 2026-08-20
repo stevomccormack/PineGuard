@@ -2,7 +2,7 @@
 spec:
   id: pineguard.ai.guard-clauses.unit-test
   title: "PineGuard.GuardClauses Unit Tests (Addendum)"
-  version: 3
+  version: 4
   template:
     - ../../meta/template-unit-test.md
   parent:
@@ -48,11 +48,32 @@ public sealed class GuardBoolClausesTests(ITestOutputHelper output) : BaseGuardU
 `BaseGuardUnitTest` provides:
 
 ```csharp
+protected const string CustomMessage = "Custom guard message.";
 protected static TReturn AssertResult<TValue, TReturn>(GuardCase<TValue> testCase, Func<TReturn> act)
+protected static void AssertCustomMessage<TValue, TReturn>(GuardCase<TValue> testCase, Func<TReturn> act)
 ```
 
 - If `tc.Expected.IsValid` is `true`: invokes the action and returns the result.
 - If `tc.Expected.IsValid` is `false`: asserts the action throws the expected exception type, ParamName, and MessageContains.
+
+### Custom Message Assertion (Required)
+
+Every `Guard.Against.*` clause exposes an optional `message` parameter that overrides the default
+`MustResult.Message`. That override is part of the public contract, so **every** guard test method
+MUST assert it — immediately after `AssertResult`, repeat the same call with `message: CustomMessage`:
+
+```csharp
+var result = AssertResult(tc, () => Guard.Against.False(value));
+AssertCustomMessage(tc, () => Guard.Against.False(value, message: CustomMessage));
+if (tc.Expected.IsValid) Assert.Equal(value, result);
+```
+
+`AssertCustomMessage` no-ops for pass-through (valid) cases and asserts that the thrown exception
+message contains `CustomMessage` for throwing cases. Pass `message:` as a **named** argument so the
+call site stays valid regardless of the clause's other optional parameters.
+
+Without this assertion the `message ?? result.Message` branch inside each clause is never exercised,
+which blocks the 100% branch-coverage target.
 
 ### Case Type
 
@@ -152,6 +173,7 @@ public sealed class GuardBoolClausesTests(ITestOutputHelper output) : BaseGuardU
 
         // Act + Assert
         var result = AssertResult(tc, () => Guard.Against.False(value));
+        AssertCustomMessage(tc, () => Guard.Against.False(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
     
@@ -165,6 +187,7 @@ public sealed class GuardBoolClausesTests(ITestOutputHelper output) : BaseGuardU
 
         // Act + Assert
         var result = AssertResult(tc, () => Guard.Against.True(value));
+        AssertCustomMessage(tc, () => Guard.Against.True(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

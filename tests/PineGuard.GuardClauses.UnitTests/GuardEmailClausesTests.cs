@@ -12,6 +12,7 @@ public sealed class GuardEmailClausesTests(ITestOutputHelper output) : BaseGuard
     {
         // Act + Assert
         var result = AssertResult(tc, () => Guard.Against.NotEmail(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotEmail(tc.Value!, paramName: "value", message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.Equal(tc.Value, result);
     }
@@ -23,6 +24,7 @@ public sealed class GuardEmailClausesTests(ITestOutputHelper output) : BaseGuard
     {
         // Act + Assert
         var result = AssertResult(tc, () => Guard.Against.NotStrictEmail(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotStrictEmail(tc.Value!, paramName: "value", message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.Equal(tc.Value, result);
     }
@@ -34,6 +36,7 @@ public sealed class GuardEmailClausesTests(ITestOutputHelper output) : BaseGuard
     {
         // Act + Assert
         var result = AssertResult(tc, () => Guard.Against.NotHasEmailAlias(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasEmailAlias(tc.Value!, paramName: "value", message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.Equal(tc.Value, result);
     }
@@ -45,6 +48,7 @@ public sealed class GuardEmailClausesTests(ITestOutputHelper output) : BaseGuard
     {
         // Act + Assert
         var result = AssertResult(tc, () => Guard.Against.HasEmailAlias(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.HasEmailAlias(tc.Value!, paramName: "value", message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.Equal(tc.Value, result);
     }

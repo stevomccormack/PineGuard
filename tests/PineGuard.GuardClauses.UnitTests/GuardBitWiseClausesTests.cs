@@ -13,6 +13,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.BitwiseEqualTo(value, tc.Value.other, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.BitwiseEqualTo(value, tc.Value.other, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -23,6 +24,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotBitwiseEqualTo(value, tc.Value.other, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.NotBitwiseEqualTo(value, tc.Value.other, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -33,6 +35,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotHasAllBits(value, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasAllBits(value, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -43,6 +46,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotHasAnyBits(value, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasAnyBits(value, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -53,6 +57,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotHasNoBits(value, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasNoBits(value, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -63,6 +68,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotHasOnlyBits(value, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasOnlyBits(value, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -73,6 +79,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotPowerOfTwo(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotPowerOfTwo(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -83,6 +90,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.PowerOfTwo(value));
+        AssertCustomMessage(tc, () => Guard.Against.PowerOfTwo(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -93,6 +101,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.HasAllBits(value, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.HasAllBits(value, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -103,6 +112,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.HasAnyBits(value, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.HasAnyBits(value, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -113,6 +123,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.HasNoBits(value, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.HasNoBits(value, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -123,6 +134,7 @@ public sealed class GuardBitWiseClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.HasOnlyBits(value, tc.Value.mask));
+        AssertCustomMessage(tc, () => Guard.Against.HasOnlyBits(value, tc.Value.mask, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

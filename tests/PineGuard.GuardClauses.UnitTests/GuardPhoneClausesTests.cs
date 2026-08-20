@@ -14,6 +14,7 @@ public sealed class GuardPhoneClausesTests(ITestOutputHelper output) : BaseGuard
         // Act + Assert
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotPhoneNumber(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotPhoneNumber(value, message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
@@ -27,6 +28,7 @@ public sealed class GuardPhoneClausesTests(ITestOutputHelper output) : BaseGuard
         // Act + Assert
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotPhoneNumberString(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotPhoneNumberString(value, message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }

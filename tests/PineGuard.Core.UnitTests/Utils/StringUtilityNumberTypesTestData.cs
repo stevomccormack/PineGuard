@@ -98,6 +98,46 @@ public static class StringUtilityNumberTypesTestData
             : TryCase<string?, double>(Name, Value, Expected, ExpectedDouble);
     }
 
+    public static class TryParseDecimalPlaces
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("within places", " 12.34 ", 2, null, true, 12.34m),
+            new("fr-FR comma", "12,34", 2, "fr-FR", true, 12.34m)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("too many places", "12.345", 2, null, false, 12.345m),
+            new("negative places", "12.34", -1, null, false, 0),
+            new("null", null, 2, null, false, 0),
+            new("not a number", "not", 2, null, false, 0)
+        ];
+
+        public sealed record ValidCase(string Name, string? Value, int DecimalPlaces, string? CultureName, bool Expected, decimal ExpectedDecimal)
+            : TryCase<string?, decimal>(Name, Value, Expected, ExpectedDecimal);
+    }
+
+    public static class TryParseExactDecimal
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("exact places", " 12.34 ", 2, null, true, 12.34m),
+            new("fr-FR comma", "12,34", 2, "fr-FR", true, 12.34m)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("fewer places", "12.3", 2, null, false, 12.3m),
+            new("negative places", "12.34", -1, null, false, 0),
+            new("null", null, 2, null, false, 0),
+            new("not a number", "not", 2, null, false, 0)
+        ];
+
+        public sealed record ValidCase(string Name, string? Value, int ExactDecimalPlaces, string? CultureName, bool Expected, decimal ExpectedDecimal)
+            : TryCase<string?, decimal>(Name, Value, Expected, ExpectedDecimal);
+    }
+
     public static IFormatProvider? GetProvider(string? cultureName)
     {
         return string.IsNullOrWhiteSpace(cultureName) ? null : CultureInfo.GetCultureInfo(cultureName);

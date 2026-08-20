@@ -78,4 +78,36 @@ public sealed class StringUtilityNumberTypesTests : BaseUnitTest
         Assert.Equal(testCase.Expected, ok);
         Assert.Equal(testCase.ExpectedDouble, result);
     }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseDecimalPlaces.ValidCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseDecimalPlaces))]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseDecimalPlaces.EdgeCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseDecimalPlaces))]
+    public void TryParseDecimalPlaces_ReturnsExpected(StringUtilityNumberTypesTestData.TryParseDecimalPlaces.ValidCase testCase)
+    {
+        // Arrange
+        var provider = StringUtilityNumberTypesTestData.GetProvider(testCase.CultureName);
+
+        // Act
+        var ok = StringUtility.NumberTypes.TryParseDecimal(testCase.Value, testCase.DecimalPlaces, out var result, provider: provider);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Equal(testCase.ExpectedDecimal, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseExactDecimal.ValidCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseExactDecimal))]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseExactDecimal.EdgeCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseExactDecimal))]
+    public void TryParseExactDecimal_ReturnsExpected(StringUtilityNumberTypesTestData.TryParseExactDecimal.ValidCase testCase)
+    {
+        // Arrange
+        var provider = StringUtilityNumberTypesTestData.GetProvider(testCase.CultureName);
+
+        // Act
+        var ok = StringUtility.NumberTypes.TryParseExactDecimal(testCase.Value, testCase.ExactDecimalPlaces, out var result, provider: provider);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Equal(testCase.ExpectedDecimal, result);
+    }
 }

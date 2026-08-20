@@ -12,6 +12,7 @@ public sealed class GuardFilePathClausesTests(ITestOutputHelper output) : BaseGu
     {
         var fileName = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotSafeFileName(fileName!));
+        AssertCustomMessage(tc, () => Guard.Against.NotSafeFileName(fileName!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(fileName, result);
     }
 
@@ -22,6 +23,7 @@ public sealed class GuardFilePathClausesTests(ITestOutputHelper output) : BaseGu
     {
         var path = tc.Value.path;
         var result = AssertResult(tc, () => Guard.Against.NotHasFileExtension(path, tc.Value.allowed));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasFileExtension(path, tc.Value.allowed, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(path, result);
     }
 }

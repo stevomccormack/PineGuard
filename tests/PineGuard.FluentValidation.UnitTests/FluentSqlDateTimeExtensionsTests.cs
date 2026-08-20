@@ -27,8 +27,8 @@ public sealed class FluentSqlDateTimeExtensionsTests(ITestOutputHelper output) :
     }
 
     [Theory]
-    [MemberData(nameof(FluentSqlDateTimeExtensionsTestData.InSqlDateRange.NullCases), MemberType = typeof(FluentSqlDateTimeExtensionsTestData.InSqlDateRange))]
-    public void InSqlDateRange_NullIsValid(FluentCase<DateOnly?> tc)
+    [MemberData(nameof(FluentSqlDateTimeExtensionsTestData.InSqlDateRange.NullableCases), MemberType = typeof(FluentSqlDateTimeExtensionsTestData.InSqlDateRange))]
+    public void InSqlDateRange_NullableBehavesAsExpected(FluentCase<DateOnly?> tc)
     {
         var result = new NullableDateOnlyValidator().Validate(new NullableDateOnlyModel { Value = tc.Value });
         AssertResult(tc, result);
@@ -43,8 +43,8 @@ public sealed class FluentSqlDateTimeExtensionsTests(ITestOutputHelper output) :
     }
 
     [Theory]
-    [MemberData(nameof(FluentSqlDateTimeExtensionsTestData.InSqlDateTimeRangeOffset.NullCases), MemberType = typeof(FluentSqlDateTimeExtensionsTestData.InSqlDateTimeRangeOffset))]
-    public void InSqlDateTimeRangeOffset_NullIsValid(FluentCase<DateTimeOffset?> tc)
+    [MemberData(nameof(FluentSqlDateTimeExtensionsTestData.InSqlDateTimeRangeOffset.NullableCases), MemberType = typeof(FluentSqlDateTimeExtensionsTestData.InSqlDateTimeRangeOffset))]
+    public void InSqlDateTimeRangeOffset_NullableBehavesAsExpected(FluentCase<DateTimeOffset?> tc)
     {
         var result = new NullableDateTimeOffsetValidator().Validate(new NullableDateTimeOffsetModel { Value = tc.Value });
         AssertResult(tc, result);

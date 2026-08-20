@@ -12,6 +12,7 @@ public sealed class GuardIdentifierClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotSlug(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotSlug(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

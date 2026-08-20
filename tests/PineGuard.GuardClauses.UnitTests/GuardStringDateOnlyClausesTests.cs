@@ -14,6 +14,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.FutureOrPresentDateOnly(value));
+        AssertCustomMessage(tc, () => Guard.Against.FutureOrPresentDateOnly(value, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.FutureDateOnly
@@ -24,6 +25,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.FutureDateOnly(value));
+        AssertCustomMessage(tc, () => Guard.Against.FutureDateOnly(value, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.PastOrPresentDateOnly
@@ -34,6 +36,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.PastOrPresentDateOnly(value));
+        AssertCustomMessage(tc, () => Guard.Against.PastOrPresentDateOnly(value, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.PastDateOnly
@@ -44,6 +47,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.PastDateOnly(value));
+        AssertCustomMessage(tc, () => Guard.Against.PastDateOnly(value, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.NotBetweenDateOnly
@@ -54,6 +58,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotBetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotBetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.BetweenDateOnly
@@ -64,6 +69,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.BetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.BetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.NotWithinDaysDateOnly
@@ -73,6 +79,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotWithinDaysDateOnly(value, tc.Value.reference, tc.Value.days));
+        AssertCustomMessage(tc, () => Guard.Against.NotWithinDaysDateOnly(value, tc.Value.reference, tc.Value.days, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.WithinDaysDateOnly
@@ -82,6 +89,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.WithinDaysDateOnly(value, tc.Value.reference, tc.Value.days));
+        AssertCustomMessage(tc, () => Guard.Against.WithinDaysDateOnly(value, tc.Value.reference, tc.Value.days, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.NotWithinCalendarMonthsDateOnly
@@ -91,6 +99,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotWithinCalendarMonthsDateOnly(value, tc.Value.reference, tc.Value.months));
+        AssertCustomMessage(tc, () => Guard.Against.NotWithinCalendarMonthsDateOnly(value, tc.Value.reference, tc.Value.months, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.WithinCalendarMonthsDateOnly
@@ -100,6 +109,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.WithinCalendarMonthsDateOnly(value, tc.Value.reference, tc.Value.months));
+        AssertCustomMessage(tc, () => Guard.Against.WithinCalendarMonthsDateOnly(value, tc.Value.reference, tc.Value.months, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.BeforeDateOnly
@@ -109,6 +119,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.BeforeDateOnly(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.BeforeDateOnly(value, tc.Value.other, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.OnOrBeforeDateOnly
@@ -118,6 +129,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.OnOrBeforeDateOnly(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.OnOrBeforeDateOnly(value, tc.Value.other, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.AfterDateOnly
@@ -127,6 +139,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.AfterDateOnly(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.AfterDateOnly(value, tc.Value.other, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.OnOrAfterDateOnly
@@ -136,6 +149,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.OnOrAfterDateOnly(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.OnOrAfterDateOnly(value, tc.Value.other, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.SameDateOnly
@@ -145,6 +159,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.SameDateOnly(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.SameDateOnly(value, tc.Value.other, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.NotSameDateOnly
@@ -154,6 +169,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotSameDateOnly(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.NotSameDateOnly(value, tc.Value.other, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.ChronologicalDateOnly
@@ -163,6 +179,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var start = tc.Value.start;
         AssertResult(tc, () => Guard.Against.ChronologicalDateOnly(start!, tc.Value.end!));
+        AssertCustomMessage(tc, () => Guard.Against.ChronologicalDateOnly(start!, tc.Value.end!, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.OverlappingDateOnly
@@ -172,6 +189,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var start1 = tc.Value.start1;
         AssertResult(tc, () => Guard.Against.OverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!));
+        AssertCustomMessage(tc, () => Guard.Against.OverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.NotOverlappingDateOnly
@@ -181,5 +199,6 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     {
         var start1 = tc.Value.start1;
         AssertResult(tc, () => Guard.Against.NotOverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!));
+        AssertCustomMessage(tc, () => Guard.Against.NotOverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, message: CustomMessage));
     }
 }

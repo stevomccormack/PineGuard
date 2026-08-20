@@ -12,6 +12,7 @@ public sealed class GuardStringGeoLocationClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.NotLatitude(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotLatitude(value, message: CustomMessage));
     }
 
     [Theory]
@@ -21,6 +22,7 @@ public sealed class GuardStringGeoLocationClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.NotLongitude(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotLongitude(value, message: CustomMessage));
     }
 
     [Theory]
@@ -31,5 +33,6 @@ public sealed class GuardStringGeoLocationClausesTests(ITestOutputHelper output)
         var latitude = tc.Value.latitude;
         var longitude = tc.Value.longitude;
         AssertResult(tc, () => Guard.Against.NotGeoLocation(latitude, longitude));
+        AssertCustomMessage(tc, () => Guard.Against.NotGeoLocation(latitude, longitude, message: CustomMessage));
     }
 }

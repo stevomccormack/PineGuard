@@ -56,6 +56,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
     [Theory]
     [MemberData(nameof(MustCollectionClausesTestData.HasMaxCount.ValidCases), MemberType = typeof(MustCollectionClausesTestData.HasMaxCount))]
+    [MemberData(nameof(MustCollectionClausesTestData.HasMaxCount.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.HasMaxCount))]
     [MemberData(nameof(MustCollectionClausesTestData.HasMaxCount.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.HasMaxCount))]
     public void HasMaxCount_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int max)> tc)
     {
@@ -68,6 +69,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
     [Theory]
     [MemberData(nameof(MustCollectionClausesTestData.HasCountBetween.ValidCases), MemberType = typeof(MustCollectionClausesTestData.HasCountBetween))]
+    [MemberData(nameof(MustCollectionClausesTestData.HasCountBetween.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.HasCountBetween))]
     [MemberData(nameof(MustCollectionClausesTestData.HasCountBetween.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.HasCountBetween))]
     public void HasCountBetween_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
@@ -128,6 +130,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
     [Theory]
     [MemberData(nameof(MustCollectionClausesTestData.HasDistinctItems.ValidCases), MemberType = typeof(MustCollectionClausesTestData.HasDistinctItems))]
+    [MemberData(nameof(MustCollectionClausesTestData.HasDistinctItems.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.HasDistinctItems))]
     [MemberData(nameof(MustCollectionClausesTestData.HasDistinctItems.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.HasDistinctItems))]
     public void HasDistinctItems_BehavesAsExpected(MustCase<IEnumerable<string>> tc)
     {
@@ -140,6 +143,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
     [Theory]
     [MemberData(nameof(MustCollectionClausesTestData.HasDuplicateItems.ValidCases), MemberType = typeof(MustCollectionClausesTestData.HasDuplicateItems))]
+    [MemberData(nameof(MustCollectionClausesTestData.HasDuplicateItems.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.HasDuplicateItems))]
     [MemberData(nameof(MustCollectionClausesTestData.HasDuplicateItems.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.HasDuplicateItems))]
     public void HasDuplicateItems_BehavesAsExpected(MustCase<IEnumerable<string>> tc)
     {
@@ -152,6 +156,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
     [Theory]
     [MemberData(nameof(MustCollectionClausesTestData.NotContainsNullItems.ValidCases), MemberType = typeof(MustCollectionClausesTestData.NotContainsNullItems))]
+    [MemberData(nameof(MustCollectionClausesTestData.NotContainsNullItems.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.NotContainsNullItems))]
     [MemberData(nameof(MustCollectionClausesTestData.NotContainsNullItems.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.NotContainsNullItems))]
     public void NotContainsNullItems_BehavesAsExpected(MustCase<IEnumerable<string?>> tc)
     {
@@ -188,6 +193,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
     [Theory]
     [MemberData(nameof(MustCollectionClausesTestData.SubsetOf.ValidCases), MemberType = typeof(MustCollectionClausesTestData.SubsetOf))]
+    [MemberData(nameof(MustCollectionClausesTestData.SubsetOf.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.SubsetOf))]
     [MemberData(nameof(MustCollectionClausesTestData.SubsetOf.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.SubsetOf))]
     public void SubsetOf_BehavesAsExpected(MustCase<(IEnumerable<string>? value, IEnumerable<string>? other)> tc)
     {
@@ -200,6 +206,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
     [Theory]
     [MemberData(nameof(MustCollectionClausesTestData.NotSubsetOf.ValidCases), MemberType = typeof(MustCollectionClausesTestData.NotSubsetOf))]
+    [MemberData(nameof(MustCollectionClausesTestData.NotSubsetOf.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.NotSubsetOf))]
     [MemberData(nameof(MustCollectionClausesTestData.NotSubsetOf.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.NotSubsetOf))]
     public void NotSubsetOf_BehavesAsExpected(MustCase<(IEnumerable<string>? value, IEnumerable<string>? other)> tc)
     {
@@ -260,6 +267,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
     [Theory]
     [MemberData(nameof(MustCollectionClausesTestData.NotHasMaxCount.ValidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasMaxCount))]
+    [MemberData(nameof(MustCollectionClausesTestData.NotHasMaxCount.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.NotHasMaxCount))]
     [MemberData(nameof(MustCollectionClausesTestData.NotHasMaxCount.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasMaxCount))]
     public void NotHasMaxCount_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int max)> tc)
     {
@@ -272,6 +280,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
     [Theory]
     [MemberData(nameof(MustCollectionClausesTestData.NotHasCountBetween.ValidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountBetween))]
+    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountBetween.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountBetween))]
     [MemberData(nameof(MustCollectionClausesTestData.NotHasCountBetween.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountBetween))]
     public void NotHasCountBetween_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {

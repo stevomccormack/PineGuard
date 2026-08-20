@@ -14,6 +14,7 @@ public sealed class GuardTimeOnlyRangeClausesTests(ITestOutputHelper output) : B
     {
         var range = tc.Value.range;
         var result = AssertResult(tc, () => Guard.Against.NotChronological(range, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotChronological(range, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(range, result);
     }
 
@@ -24,6 +25,7 @@ public sealed class GuardTimeOnlyRangeClausesTests(ITestOutputHelper output) : B
     {
         var range1 = tc.Value.range1;
         var result = AssertResult(tc, () => Guard.Against.Overlapping(range1, tc.Value.range2, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.Overlapping(range1, tc.Value.range2, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(range1, result);
     }
 
@@ -34,6 +36,7 @@ public sealed class GuardTimeOnlyRangeClausesTests(ITestOutputHelper output) : B
     {
         var range1 = tc.Value.range1;
         var result = AssertResult(tc, () => Guard.Against.NotOverlapping(range1, tc.Value.range2, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotOverlapping(range1, tc.Value.range2, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(range1, result);
     }
 
@@ -44,6 +47,7 @@ public sealed class GuardTimeOnlyRangeClausesTests(ITestOutputHelper output) : B
     {
         var range = tc.Value.range;
         var result = AssertResult(tc, () => Guard.Against.NotContains(range, tc.Value.value, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotContains(range, tc.Value.value, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(range, result);
     }
 
@@ -54,6 +58,7 @@ public sealed class GuardTimeOnlyRangeClausesTests(ITestOutputHelper output) : B
     {
         var range = tc.Value.range;
         var result = AssertResult(tc, () => Guard.Against.Contains(range, tc.Value.value, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.Contains(range, tc.Value.value, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(range, result);
     }
 }

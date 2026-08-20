@@ -69,7 +69,8 @@ public static class FluentExtensionTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("Fail uses result message template", "test", MustResult<bool>.Fail("Failed {paramName}", null, "test"), null, null, false, "Failed Value")
+            new("Fail uses result message template", "test", MustResult<bool>.Fail("Failed {paramName}", null, "test"), null, null, false, "Failed Value"),
+            new("Fail uses custom message template", "test", MustResult<bool>.Fail("Failed", "param", "test"), "Custom {paramName}", null, false, "Custom Value")
         ];
 
         public static TheoryData<IThrowsCase> InvalidCases =>

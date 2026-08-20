@@ -13,6 +13,7 @@ public sealed class GuardPredicateClausesTests(ITestOutputHelper output) : BaseG
         var value = tc.Value.value;
         var predicate = tc.Value.predicate;
         var result = AssertResult(tc, () => Guard.Against.NotSatisfies(value, predicate));
+        AssertCustomMessage(tc, () => Guard.Against.NotSatisfies(value, predicate, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -24,6 +25,7 @@ public sealed class GuardPredicateClausesTests(ITestOutputHelper output) : BaseG
         var value = tc.Value.value;
         var predicate = tc.Value.predicate;
         var result = AssertResult(tc, () => Guard.Against.Satisfies(value, predicate));
+        AssertCustomMessage(tc, () => Guard.Against.Satisfies(value, predicate, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

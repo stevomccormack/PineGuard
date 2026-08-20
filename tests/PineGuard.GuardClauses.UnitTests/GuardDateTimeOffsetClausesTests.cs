@@ -14,6 +14,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.FutureOrPresent(value));
+        AssertCustomMessage(tc, () => Guard.Against.FutureOrPresent(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -24,6 +25,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Future(value));
+        AssertCustomMessage(tc, () => Guard.Against.Future(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -34,6 +36,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.PastOrPresent(value));
+        AssertCustomMessage(tc, () => Guard.Against.PastOrPresent(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -44,6 +47,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Past(value));
+        AssertCustomMessage(tc, () => Guard.Against.Past(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -54,6 +58,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -64,6 +69,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.Between(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.Between(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -74,6 +80,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.OnOrAfter(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.OnOrAfter(value, tc.Value.other, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -84,6 +91,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.After(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.After(value, tc.Value.other, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -94,6 +102,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.OnOrBefore(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.OnOrBefore(value, tc.Value.other, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -104,6 +113,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.Before(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.Before(value, tc.Value.other, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -114,6 +124,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotSame(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.NotSame(value, tc.Value.other, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -124,6 +135,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.Same(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.Same(value, tc.Value.other, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -134,6 +146,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var start = tc.Value.start;
         var result = AssertResult(tc, () => Guard.Against.NotChronological(start, tc.Value.end, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotChronological(start, tc.Value.end, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(start, result);
     }
 
@@ -144,6 +157,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var start1 = tc.Value.start1;
         var result = AssertResult(tc, () => Guard.Against.Overlapping(start1, tc.Value.end1, tc.Value.start2, tc.Value.end2, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.Overlapping(start1, tc.Value.end1, tc.Value.start2, tc.Value.end2, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(start1, result);
     }
 
@@ -154,6 +168,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var start1 = tc.Value.start1;
         var result = AssertResult(tc, () => Guard.Against.NotOverlapping(start1, tc.Value.end1, tc.Value.start2, tc.Value.end2, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotOverlapping(start1, tc.Value.end1, tc.Value.start2, tc.Value.end2, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(start1, result);
     }
 
@@ -164,6 +179,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotWithin(value, tc.Value.reference, tc.Value.window));
+        AssertCustomMessage(tc, () => Guard.Against.NotWithin(value, tc.Value.reference, tc.Value.window, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -174,6 +190,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.Within(value, tc.Value.reference, tc.Value.window));
+        AssertCustomMessage(tc, () => Guard.Against.Within(value, tc.Value.reference, tc.Value.window, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -184,6 +201,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotWithinCalendarMonths(value, tc.Value.reference, tc.Value.months));
+        AssertCustomMessage(tc, () => Guard.Against.NotWithinCalendarMonths(value, tc.Value.reference, tc.Value.months, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -194,6 +212,7 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.WithinCalendarMonths(value, tc.Value.reference, tc.Value.months));
+        AssertCustomMessage(tc, () => Guard.Against.WithinCalendarMonths(value, tc.Value.reference, tc.Value.months, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

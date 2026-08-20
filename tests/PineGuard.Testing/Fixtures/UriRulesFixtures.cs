@@ -185,15 +185,20 @@ public static class UriRulesFixtures
     public static class IsFilePath
     {
         public static readonly string? WindowsPath = @"C:\Temp\file.txt";
+        public static readonly string? WindowsForwardSlashPath = "C:/Temp/file.txt";
         public static readonly string? UncPath = @"\\server\share\file.txt";
         public static readonly string? NullValue = null;
         public static readonly string? EmptyString = "";
         public static readonly string? HttpsUrl = "https://example.com";
         public static readonly string? InvalidChars = "C:|Foo";
+        public static readonly string? DriveRelativePath = "C:file.txt";
+        public static readonly string? RelativeParentPath = @"..\file.txt";
+        public static readonly string? ShorterThanDrivePrefix = "ab";
 
         public static RuleScenario<string?>[] ValidScenarios =>
         [
             new(nameof(WindowsPath), WindowsPath, true),
+            new(nameof(WindowsForwardSlashPath), WindowsForwardSlashPath, true),
             new(nameof(UncPath), UncPath, true)
         ];
 
@@ -202,7 +207,10 @@ public static class UriRulesFixtures
             new(nameof(NullValue), NullValue, false),
             new(nameof(EmptyString), EmptyString, false),
             new(nameof(HttpsUrl), HttpsUrl, false),
-            new(nameof(InvalidChars), InvalidChars, false)
+            new(nameof(InvalidChars), InvalidChars, false),
+            new(nameof(DriveRelativePath), DriveRelativePath, false),
+            new(nameof(RelativeParentPath), RelativeParentPath, false),
+            new(nameof(ShorterThanDrivePrefix), ShorterThanDrivePrefix, false)
         ];
 
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

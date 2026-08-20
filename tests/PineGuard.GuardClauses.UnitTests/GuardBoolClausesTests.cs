@@ -16,6 +16,7 @@ public sealed class GuardBoolClausesTests(ITestOutputHelper output) : BaseGuardU
 
         // Act + Assert
         var result = AssertResult(tc, () => Guard.Against.False(value));
+        AssertCustomMessage(tc, () => Guard.Against.False(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -30,6 +31,7 @@ public sealed class GuardBoolClausesTests(ITestOutputHelper output) : BaseGuardU
 
         // Act + Assert
         var result = AssertResult(tc, () => Guard.Against.True(value));
+        AssertCustomMessage(tc, () => Guard.Against.True(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

@@ -1,3 +1,4 @@
+using System.Reflection;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
@@ -28,6 +29,23 @@ public static class BaseAttributesTestData
 
         public sealed record InvalidCase(string Name, (string MethodName, object? Value, string? MemberName) Value, ExpectedException ExpectedException)
             : ThrowsCase<(string MethodName, object? Value, string? MemberName)>(Name, Value, ExpectedException);
+    }
+
+    public static class ValidationAttributeBaseBuildInvokeArgs
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("two or more parameters", typeof(string).GetMethod(nameof(string.Substring), [typeof(int), typeof(int)])!, 2)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("no parameters", typeof(object).GetMethod(nameof(ToString), Type.EmptyTypes)!, 0),
+            new("single parameter", typeof(string).GetMethod(nameof(string.Contains), [typeof(string)])!, 1)
+        ];
+
+        public sealed record ValidCase(string Name, MethodInfo Value, int Expected)
+            : ReturnCase<MethodInfo, int>(Name, Value, Expected);
     }
 
     public static class NumberAttributeBaseInvokeAndMap
