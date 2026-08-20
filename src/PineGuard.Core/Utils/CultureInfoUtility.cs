@@ -18,6 +18,13 @@ public static class CultureInfoUtility
     private static readonly ConcurrentDictionary<string, IReadOnlyCollection<CultureInfo>> CulturesByIsoLanguageAlpha2CodeCache =
         new(StringComparer.OrdinalIgnoreCase);
 
+#if !NET8_0_OR_GREATER
+    private static readonly Lazy<HashSet<string>> AllCultureNamesCache =
+        new(() => new HashSet<string>(
+            CultureInfo.GetCultures(CultureTypes.AllCultures).Select(c => c.Name),
+            StringComparer.OrdinalIgnoreCase));
+#endif
+
     /// <summary>
     /// Attempts to resolve a well-formed, predefined culture name for the specified ISO language code.
     /// </summary>
@@ -60,6 +67,14 @@ public static class CultureInfoUtility
     /// <see langword="true"/> if the combined language/region name resolves to a predefined culture;
     /// otherwise, <see langword="false"/>.
     /// </returns>
+    /// <remarks>
+    /// On net8.0 and later, resolution uses <c>CultureInfo.GetCultureInfo(string, bool)</c> with
+    /// <c>predefinedOnly: true</c>. On netstandard2.1, no such overload exists, so resolution instead checks
+    /// membership in <see cref="CultureInfo.GetCultures(CultureTypes)"/> with <see cref="CultureTypes.AllCultures"/>,
+    /// which may additionally accept culture names registered on the host (e.g., via
+    /// <c>CultureAndRegionInfoBuilder</c> on Windows) that are not predefined by the runtime itself. This is a
+    /// polyfill, not an exact match; results may differ between targets for host-registered culture names.
+    /// </remarks>
     /// <example>
     /// <code>
     /// CultureInfoUtility.TryGetCultureName("en", "US", out var cultureName); // true, cultureName = "en-US"
@@ -190,18 +205,25 @@ public static class CultureInfoUtility
         if (!StringUtility.TryGetTrimmed(isoLanguageAlpha2Code, out var lang))
             return [];
 
-        return RegionCodesByIsoLanguageAlpha2CodeCache.GetOrAdd(lang, static l =>
+        if (RegionCodesByIsoLanguageAlpha2CodeCache.TryGetValue(lang, out var cached))
+            return cached;
+
+        var regions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        ForEachSpecificCultureForLanguage(lang, c =>
         {
-            var regions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            ForEachSpecificCultureForLanguage(l, c =>
-            {
-                if (TryGetTwoLetterIsoRegionName(c, out var regionCode))
-                    regions.Add(regionCode);
-            });
-
-            return [.. regions];
+            if (TryGetTwoLetterIsoRegionName(c, out var regionCode))
+                regions.Add(regionCode);
         });
+
+        IReadOnlyCollection<string> result = [.. regions];
+
+        // Only cache languages that resolved to at least one region, so caller-supplied garbage
+        // (invalid or unbounded-length language codes) can never grow the cache without limit.
+        if (result.Count > 0)
+            RegionCodesByIsoLanguageAlpha2CodeCache.TryAdd(lang, result);
+
+        return result;
     }
 
     internal static bool TryGetTwoLetterIsoRegionName(CultureInfo cultureInfo, out string regionCode)
@@ -209,7 +231,15 @@ public static class CultureInfoUtility
         try
         {
             var region = new RegionInfo(cultureInfo.Name);
-            regionCode = region.TwoLetterISORegionName;
+            var code = region.TwoLetterISORegionName;
+
+            if (!IsIsoAlpha2RegionCode(code))
+            {
+                regionCode = string.Empty;
+                return false;
+            }
+
+            regionCode = code;
             return true;
         }
         catch (ArgumentException)
@@ -218,6 +248,11 @@ public static class CultureInfoUtility
             return false;
         }
     }
+
+    // TwoLetterISORegionName returns UN M.49 numeric codes (e.g. "001", "419") for region-group
+    // cultures such as "en-001" or "es-419"; those are not ISO 3166-1 alpha-2 codes.
+    private static bool IsIsoAlpha2RegionCode(string code) =>
+        code.Length == 2 && code[0] is >= 'A' and <= 'Z' && code[1] is >= 'A' and <= 'Z';
 
     /// <summary>
     /// Gets all specific <see cref="CultureInfo"/> instances for the specified ISO language code, sorted by
@@ -242,15 +277,23 @@ public static class CultureInfoUtility
         if (!StringUtility.TryGetTrimmed(isoLanguageAlpha2Code, out var lang))
             return [];
 
-        return CulturesByIsoLanguageAlpha2CodeCache.GetOrAdd(lang, static l =>
-        {
-            var result = new List<CultureInfo>();
+        if (CulturesByIsoLanguageAlpha2CodeCache.TryGetValue(lang, out var cached))
+            return cached;
 
-            ForEachSpecificCultureForLanguage(l, result.Add);
+        var list = new List<CultureInfo>();
 
-            result.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Name, b.Name));
-            return [.. result];
-        });
+        ForEachSpecificCultureForLanguage(lang, list.Add);
+
+        list.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Name, b.Name));
+
+        IReadOnlyCollection<CultureInfo> result = [.. list];
+
+        // Only cache languages that resolved to at least one culture, so caller-supplied garbage
+        // (invalid or unbounded-length language codes) can never grow the cache without limit.
+        if (result.Count > 0)
+            CulturesByIsoLanguageAlpha2CodeCache.TryAdd(lang, result);
+
+        return result;
     }
 
     private static bool TryValidateCultureName(string candidateCultureName, out string validatedCultureName)
@@ -259,14 +302,14 @@ public static class CultureInfoUtility
 
         try
         {
-#if NET6_0_OR_GREATER
-            _ = CultureInfo.GetCultureInfo(candidateCultureName, predefinedOnly: true);
+#if NET8_0_OR_GREATER
+            var culture = CultureInfo.GetCultureInfo(candidateCultureName, predefinedOnly: true);
 #else
-            _ = CultureInfo.GetCultureInfo(candidateCultureName);
-            if (!CultureInfo.GetCultures(CultureTypes.AllCultures).Any(c => string.Equals(c.Name, candidateCultureName, StringComparison.OrdinalIgnoreCase)))
+            var culture = CultureInfo.GetCultureInfo(candidateCultureName);
+            if (!AllCultureNamesCache.Value.Contains(candidateCultureName))
                 return false;
 #endif
-            validatedCultureName = candidateCultureName;
+            validatedCultureName = culture.Name;
             return true;
         }
         catch (CultureNotFoundException)

@@ -5,6 +5,15 @@ namespace PineGuard.Utils;
 /// <summary>
 /// Provides OWASP security risk detection utility methods.
 /// </summary>
+/// <remarks>
+/// <b>Null contract:</b> every method here treats <see langword="null"/> or whitespace-only input as
+/// <b>risk-free</b> (returns <see langword="false"/>), since there is no content to match a risk pattern
+/// against. This is the opposite convention from the safety predicates in
+/// <see cref="PineGuard.Rules.OwaspRules"/>, where <c>Is*Safe(null)</c> returns <see langword="false"/>
+/// meaning "unsafe". The two are not interchangeable: <c>!ContainsSqlInjectionRisk(value)</c> is
+/// <b>not</b> equivalent to <see cref="PineGuard.Rules.OwaspRules.IsSqlInjectionSafe"/> for
+/// <see langword="null"/> or whitespace input.
+/// </remarks>
 /// <seealso href="https://pineguard.ai/docs/utils/owasp">OWASP Utility documentation</seealso>
 public static class OwaspUtility
 {
@@ -69,8 +78,12 @@ public static class OwaspUtility
     /// </summary>
     /// <param name="value">The value to check. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> contains a CR or LF character; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Unlike the other risk checks, the value is matched untrimmed: CR/LF at the very start or end of the input is
+    /// exactly the header-injection payload being screened for, so trimming it away would report a false negative.
+    /// </remarks>
     public static bool ContainsCrLfRisk(string? value) =>
-        StringUtility.TryGetTrimmed(value, out var trimmed) && OwaspRegex.HeaderInjection.CrLfRegex().IsMatch(trimmed);
+        !string.IsNullOrWhiteSpace(value) && OwaspRegex.HeaderInjection.CrLfRegex().IsMatch(value!);
 
     /// <summary>
     /// Performs a heuristic pattern check for input that resembles LDAP filter injection (special filter
@@ -93,11 +106,11 @@ public static class OwaspUtility
 
     /// <summary>
     /// Performs a heuristic pattern check for input that resembles a server-side request forgery (SSRF) target
-    /// (a dangerous URI scheme such as <c>file</c>, <c>gopher</c>, or <c>dict</c>). This is a best-effort
-    /// heuristic, not a guarantee that the input is safe or unsafe.
+    /// (a dangerous URI scheme such as <c>file</c>, <c>gopher</c>, <c>ftp</c>, <c>data</c>, or <c>javascript</c>).
+    /// This is a best-effort heuristic, not a guarantee that the input is safe or unsafe.
     /// </summary>
     /// <param name="value">The value to check. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> starts with a known dangerous URI scheme; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if <paramref name="value"/> contains a known dangerous URI scheme anywhere in the string; otherwise, <see langword="false"/>.</returns>
     public static bool ContainsSsrfSchemeRisk(string? value) =>
         StringUtility.TryGetTrimmed(value, out var trimmed) && OwaspRegex.Ssrf.DangerousSchemeRegex().IsMatch(trimmed);
 }

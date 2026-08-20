@@ -106,6 +106,28 @@ public static class StringUtilityTestData
             : TryCase<string?, string>(Name, Value, Expected, ExpectedOutValue);
     }
 
+    public static class Bool
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("true", "true", true, true),
+            new("false", "false", true, false),
+            new("trim", " true ", true, true),
+            new("case-insensitive", "True", true, true)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("null", null, false, null),
+            new("empty", "", false, null),
+            new("whitespace", "   ", false, null),
+            new("not a bool", "yes", false, null)
+        ];
+
+        public sealed record ValidCase(string Name, string? Value, bool Expected, bool? ExpectedOutValue)
+            : TryCase<string?, bool?>(Name, Value, Expected, ExpectedOutValue);
+    }
+
     public static class TimeOnlyTryParse
     {
         public static TheoryData<ValidCase> ValidCases =>
@@ -146,6 +168,27 @@ public static class StringUtilityTestData
 
         public sealed record ValidCase(string Name, string? Value, bool Expected, TimeSpan? ExpectedOutValue)
             : TryCase<string?, TimeSpan?>(Name, Value, Expected, ExpectedOutValue);
+    }
+
+    public static class DateTimeOffsetTryParse
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("offset-less assumes utc deterministically", "2024-01-15T10:30:00", true, new DateTimeOffset(2024, 01, 15, 10, 30, 00, TimeSpan.Zero)),
+            new("z suffix stays utc", "2024-01-15T10:30:00Z", true, new DateTimeOffset(2024, 01, 15, 10, 30, 00, TimeSpan.Zero)),
+            new("explicit offset preserved", "2024-01-15T10:30:00+05:00", true, new DateTimeOffset(2024, 01, 15, 10, 30, 00, TimeSpan.FromHours(5)))
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("null", null, false, null),
+            new("empty", string.Empty, false, null),
+            new("whitespace", "\t\r\n", false, null),
+            new("invalid", "not-a-datetimeoffset", false, null)
+        ];
+
+        public sealed record ValidCase(string Name, string? Value, bool Expected, DateTimeOffset? ExpectedOutValue)
+            : TryCase<string?, DateTimeOffset?>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class DateOnlyRangeTryParse
@@ -199,7 +242,9 @@ public static class StringUtilityTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("ok utc", ("2020-01-01T00:00:00.0000000Z", "2020-01-01T00:00:01.0000000Z"), true, new DateTimeRange(new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2020, 01, 01, 00, 00, 01, DateTimeKind.Utc))),
-            new("trim utc", (" 2020-01-01T00:00:00.0000000Z ", " 2020-01-01T00:00:00.0000000Z "), true, new DateTimeRange(new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Utc)))
+            new("trim utc", (" 2020-01-01T00:00:00.0000000Z ", " 2020-01-01T00:00:00.0000000Z "), true, new DateTimeRange(new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2020, 01, 01, 00, 00, 00, DateTimeKind.Utc))),
+            new("z and explicit zero offset both normalize to utc", ("2024-01-01T00:00:00Z", "2024-12-31T23:59:59+00:00"), true, new DateTimeRange(new DateTime(2024, 01, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2024, 12, 31, 23, 59, 59, DateTimeKind.Utc))),
+            new("explicit offset normalizes deterministically to utc", ("2024-06-01T05:00:00+05:00", "2024-06-01T10:00:00Z"), true, new DateTimeRange(new DateTime(2024, 06, 01, 00, 00, 00, DateTimeKind.Utc), new DateTime(2024, 06, 01, 10, 00, 00, DateTimeKind.Utc)))
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>
@@ -222,7 +267,8 @@ public static class StringUtilityTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("ok", ("2020-01-01T00:00:00.0000000+00:00", "2020-01-01T00:00:01.0000000+00:00"), true, new DateTimeOffsetRange(new DateTimeOffset(2020, 01, 01, 00, 00, 00, TimeSpan.Zero), new DateTimeOffset(2020, 01, 01, 00, 00, 01, TimeSpan.Zero))),
-            new("trim", (" 2020-01-01T00:00:00.0000000+00:00 ", " 2020-01-01T00:00:00.0000000+00:00 "), true, new DateTimeOffsetRange(new DateTimeOffset(2020, 01, 01, 00, 00, 00, TimeSpan.Zero), new DateTimeOffset(2020, 01, 01, 00, 00, 00, TimeSpan.Zero)))
+            new("trim", (" 2020-01-01T00:00:00.0000000+00:00 ", " 2020-01-01T00:00:00.0000000+00:00 "), true, new DateTimeOffsetRange(new DateTimeOffset(2020, 01, 01, 00, 00, 00, TimeSpan.Zero), new DateTimeOffset(2020, 01, 01, 00, 00, 00, TimeSpan.Zero))),
+            new("offset-less assumes utc deterministically", ("2024-01-15T10:30:00", "2024-01-15T11:30:00"), true, new DateTimeOffsetRange(new DateTimeOffset(2024, 01, 15, 10, 30, 00, TimeSpan.Zero), new DateTimeOffset(2024, 01, 15, 11, 30, 00, TimeSpan.Zero)))
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>

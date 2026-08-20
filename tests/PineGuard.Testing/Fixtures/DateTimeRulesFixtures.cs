@@ -11,11 +11,13 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? value, DateTime min, DateTime max, Inclusion inclusion) AtMinInclusive = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 03, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive);
         public static readonly (DateTime? value, DateTime min, DateTime max, Inclusion inclusion) AtMinExclusive = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 03, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive);
         public static readonly (DateTime? value, DateTime min, DateTime max, Inclusion inclusion) NullValue = (null, new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 03, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive);
+        public static readonly (DateTime? value, DateTime min, DateTime max, Inclusion inclusion) MixedKindWithinBounds = (new DateTime(2024, 01, 02, 12, 0, 0, DateTimeKind.Utc).ToLocalTime(), new DateTime(2024, 01, 02, 11, 59, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 12, 1, 0, DateTimeKind.Utc), Inclusion.Inclusive);
 
         public static RuleScenario<(DateTime? value, DateTime min, DateTime max, Inclusion inclusion)>[] ValidScenarios =>
         [
             new(nameof(MiddleInclusive), MiddleInclusive, true),
-            new(nameof(AtMinInclusive), AtMinInclusive, true)
+            new(nameof(AtMinInclusive), AtMinInclusive, true),
+            new(nameof(MixedKindWithinBounds), MixedKindWithinBounds, true)
         ];
 
         public static RuleScenario<(DateTime? value, DateTime min, DateTime max, Inclusion inclusion)>[] InvalidScenarios =>
@@ -57,6 +59,24 @@ public static class DateTimeRulesFixtures
         public static RuleScenario<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class IsBeforeDefaultInclusion
+    {
+        public static readonly (DateTime? value, DateTime? other) StrictlyBefore = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc));
+        public static readonly (DateTime? value, DateTime? other) SameInstant = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc));
+
+        public static RuleScenario<(DateTime? value, DateTime? other)>[] ValidScenarios =>
+        [
+            new(nameof(StrictlyBefore), StrictlyBefore, true)
+        ];
+
+        public static RuleScenario<(DateTime? value, DateTime? other)>[] InvalidScenarios =>
+        [
+            new(nameof(SameInstant), SameInstant, false)
+        ];
+
+        public static RuleScenario<(DateTime? value, DateTime? other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class IsAfter
     {
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) AfterInclusive = (new DateTime(2024, 01, 03, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
@@ -83,6 +103,24 @@ public static class DateTimeRulesFixtures
         ];
 
         public static RuleScenario<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsAfterDefaultInclusion
+    {
+        public static readonly (DateTime? value, DateTime? other) StrictlyAfter = (new DateTime(2024, 01, 03, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc));
+        public static readonly (DateTime? value, DateTime? other) SameInstant = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc));
+
+        public static RuleScenario<(DateTime? value, DateTime? other)>[] ValidScenarios =>
+        [
+            new(nameof(StrictlyAfter), StrictlyAfter, true)
+        ];
+
+        public static RuleScenario<(DateTime? value, DateTime? other)>[] InvalidScenarios =>
+        [
+            new(nameof(SameInstant), SameInstant, false)
+        ];
+
+        public static RuleScenario<(DateTime? value, DateTime? other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
     public static class IsSame
@@ -151,6 +189,7 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion) End1Null = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive);
         public static readonly (DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion) Start2Null = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive);
         public static readonly (DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion) End2Null = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), null, Inclusion.Exclusive);
+        public static readonly (DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion) FirstRangeInverted = (new DateTime(2024, 01, 10, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 05, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 31, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive);
 
         public static RuleScenario<(DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion)>[] ValidScenarios =>
         [
@@ -165,7 +204,8 @@ public static class DateTimeRulesFixtures
             new(nameof(AllNull), AllNull, false),
             new(nameof(End1Null), End1Null, false),
             new(nameof(Start2Null), Start2Null, false),
-            new(nameof(End2Null), End2Null, false)
+            new(nameof(End2Null), End2Null, false),
+            new(nameof(FirstRangeInverted), FirstRangeInverted, false)
         ];
 
         public static RuleScenario<(DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
@@ -311,6 +351,7 @@ public static class DateTimeRulesFixtures
     {
         public static readonly (DateTime? value, DateTime? other) SameDay = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 23, 59, 59, DateTimeKind.Utc));
         public static readonly (DateTime? value, DateTime? other) DifferentDay = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc));
+        public static readonly (DateTime? value, DateTime? other) SameInstantDifferentKind = (new DateTime(2024, 01, 01, 12, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 12, 0, 0, DateTimeKind.Utc).ToLocalTime());
         public static readonly (DateTime? value, DateTime? other) BothNull = (null, null);
         public static readonly (DateTime? value, DateTime? other) NullValue = (null, new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc));
         public static readonly (DateTime? value, DateTime? other) NullOther = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), null);
@@ -318,6 +359,7 @@ public static class DateTimeRulesFixtures
         public static RuleScenario<(DateTime? value, DateTime? other)>[] ValidScenarios =>
         [
             new(nameof(SameDay), SameDay, true),
+            new(nameof(SameInstantDifferentKind), SameInstantDifferentKind, true),
             new(nameof(BothNull), BothNull, true)
         ];
 

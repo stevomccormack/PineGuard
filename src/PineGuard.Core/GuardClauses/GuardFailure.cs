@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PineGuard.GuardClauses;
 
 /// <summary>
@@ -5,8 +7,9 @@ namespace PineGuard.GuardClauses;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Guards call <see cref="Throw"/> or <see cref="ThrowAndReplace"/> after a failed
-/// <see cref="MustClauses.MustResult{T}"/> to raise an appropriate exception.
+/// Guards call <see cref="Throw"/> after a failed <see cref="MustClauses.MustResult{T}"/> to raise
+/// an appropriate exception. <see cref="ThrowAndReplace"/> is a public extension point for callers
+/// that need a per-call exception replacer; it is not called by any built-in guard clause.
 /// </para>
 /// <para>
 /// When the value is <see langword="null"/>, an <see cref="ArgumentNullException"/> is raised;
@@ -33,6 +36,7 @@ public static class GuardFailure
     /// Always thrown. The exact type depends on <paramref name="exceptionCreator"/>, the configured
     /// <see cref="GuardExceptionPolicy"/>, and whether <paramref name="value"/> is <see langword="null"/>.
     /// </exception>
+    [DoesNotReturn]
     public static void Throw(
         string message,
         string? paramName,
@@ -42,20 +46,24 @@ public static class GuardFailure
 
     /// <summary>
     /// Throws an exception for the given failure message, applying a caller-supplied replacer
-    /// in addition to any active <see cref="GuardExceptionPolicy"/> replacer.
+    /// instead of any active <see cref="GuardExceptionPolicy"/> replacer.
     /// </summary>
     /// <param name="message">The human-readable failure message.</param>
     /// <param name="paramName">The name of the parameter that failed validation.</param>
     /// <param name="value">The original value that failed validation.</param>
     /// <param name="exceptionCreator">
-    /// An optional factory that returns a custom exception. If <see langword="null"/>,
-    /// the default exception type is used.
+    /// An optional factory that returns a custom exception. If it returns non-<see langword="null"/>,
+    /// that exception is thrown directly and neither <paramref name="exceptionReplacer"/> nor the
+    /// global <see cref="GuardExceptionPolicy"/> replacer is applied.
     /// </param>
     /// <param name="exceptionReplacer">
-    /// An optional factory that maps the default exception to a replacement. Applied after
-    /// <paramref name="exceptionCreator"/>, before the global <see cref="GuardExceptionPolicy"/> replacer.
+    /// An optional factory that maps the default exception to a replacement. When supplied, it takes
+    /// precedence over the global/scoped <see cref="GuardExceptionPolicy.ExceptionReplacer"/> — the
+    /// policy replacer and its <see cref="GuardExceptionPolicy.ReplaceDefaultExceptions"/> gate are
+    /// not consulted.
     /// </param>
     /// <exception cref="Exception">Always thrown.</exception>
+    [DoesNotReturn]
     public static void ThrowAndReplace(
         string message,
         string? paramName,
@@ -64,6 +72,7 @@ public static class GuardFailure
         Func<Exception, Exception>? exceptionReplacer = null)
         => ThrowCore(message, paramName, value, exceptionCreator, exceptionReplacer);
 
+    [DoesNotReturn]
     private static void ThrowCore(
         string message,
         string? paramName,

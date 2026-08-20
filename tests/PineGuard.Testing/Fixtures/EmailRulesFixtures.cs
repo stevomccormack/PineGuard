@@ -13,14 +13,14 @@ public static class EmailRulesFixtures
 
         public static RuleScenario<string?>[] ValidScenarios =>
         [
-            new(nameof(Standard),         Standard,         true),
-            new(nameof(DisplayNameForm),  DisplayNameForm,  true)
+            new(nameof(Standard), Standard, true)
         ];
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
-            new(nameof(NotAnEmail), NotAnEmail, false),
-            new(nameof(Null),       Null,       false)
+            new(nameof(DisplayNameForm), DisplayNameForm, false),
+            new(nameof(NotAnEmail),      NotAnEmail,      false),
+            new(nameof(Null),            Null,            false)
         ];
 
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

@@ -23,9 +23,13 @@ public static class BufferRules
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns>
-    /// <see langword="true"/> if <paramref name="value"/> contains only hex digits (0–9, a–f, A–F)
-    /// with an even length; otherwise, <see langword="false"/>.
+    /// <see langword="true"/> if <paramref name="value"/> contains only hex digits (0–9, a–f, A–F);
+    /// otherwise, <see langword="false"/>.
     /// </returns>
+    /// <remarks>
+    /// Leading and trailing whitespace is trimmed before validation; the original, untrimmed
+    /// <paramref name="value"/> should not be assumed to be directly decodable.
+    /// </remarks>
     /// <example>
     /// <code>
     /// bool valid = BufferRules.IsHex("deadbeef"); // true
@@ -42,6 +46,11 @@ public static class BufferRules
     /// <returns>
     /// <see langword="true"/> if <paramref name="value"/> is a valid Base64 string; otherwise, <see langword="false"/>.
     /// </returns>
+    /// <remarks>
+    /// Leading and trailing whitespace is trimmed before validation, and any amount of whitespace embedded
+    /// within the value is ignored; the original, untrimmed <paramref name="value"/> should not be assumed
+    /// to be directly decodable.
+    /// </remarks>
     /// <example>
     /// <code>
     /// bool valid = BufferRules.IsBase64("SGVsbG8="); // true

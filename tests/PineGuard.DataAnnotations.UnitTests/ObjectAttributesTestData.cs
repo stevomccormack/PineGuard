@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using F = PineGuard.Testing.Fixtures.ObjectRulesFixtures;
 
@@ -71,5 +73,28 @@ public static class ObjectAttributesTestData
         public static TheoryData<ValidCase> ValidCases => [new("int", 1, true), new(nameof(F.IsAssignableToType.ObjectValue), F.IsAssignableToType.ObjectValue, true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases => [new(nameof(F.IsOfType.StringValue), F.IsOfType.StringValue, false)];
+    }
+
+    // Covers ValidationAttributeBase.BuildInvokeArgs: a null value inferred to a non-nullable value-type
+    // parameter (int, via the int ComparisonValue) must throw rather than silently coerce to default(int).
+    public static class EqualToNullValueType
+    {
+        public static TheoryData<IThrowsCase> InvalidCases =>
+        [
+            new InvalidCase(
+                "null-value-int-comparison",
+                () => new EqualToAttribute(0).GetValidationResult(null, new ValidationContext(new object())),
+                new ExpectedException(typeof(InvalidOperationException), null, "non-nullable value-type parameter"))
+        ];
+
+        public sealed record InvalidCase(string Name, Action Value, ExpectedException ExpectedException)
+            : ThrowsCase<Action>(Name, Value, ExpectedException);
+    }
+
+    // Covers ObjectAttributeBase.CheckArgCompatibility: a ValidationContext with a MemberName set must
+    // report it in ValidationResult.MemberNames rather than always building a member-less result.
+    public static class EqualToWithMemberName
+    {
+        public static TheoryData<ValidCase> Cases => [new("int", 1, false)];
     }
 }

@@ -60,9 +60,10 @@ public static partial class StringRulesFixtures
     {
         public static readonly string ValidUpperSnake = "HELLO_WORLD";
         public static readonly string InvalidLowerSnake = "hello_world";
+        public static readonly string InvalidLowercaseWithNoUppercaseMapping = "STRAßE_TEST";
 
         public static RuleScenario<string>[] ValidScenarios => [new(nameof(ValidUpperSnake), ValidUpperSnake, true)];
-        public static RuleScenario<string>[] InvalidScenarios => [new(nameof(InvalidLowerSnake), InvalidLowerSnake, false)];
+        public static RuleScenario<string>[] InvalidScenarios => [new(nameof(InvalidLowerSnake), InvalidLowerSnake, false), new(nameof(InvalidLowercaseWithNoUppercaseMapping), InvalidLowercaseWithNoUppercaseMapping, false)];
         public static RuleScenario<string>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
@@ -113,9 +114,10 @@ public static partial class StringRulesFixtures
         public static readonly string? NotUpper = "AbC";
         public static readonly string? NullValue = null;
         public static readonly string? Whitespace = "  ";
+        public static readonly string? LowercaseWithNoUppercaseMapping = "STRAßE";
 
         public static RuleScenario<string?>[] ValidScenarios => [new(nameof(Upper), Upper, true), new(nameof(UpperWithPunctuation), UpperWithPunctuation, true)];
-        public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(NotUpper), NotUpper, false), new(nameof(NullValue), NullValue, false), new(nameof(Whitespace), Whitespace, false)];
+        public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(NotUpper), NotUpper, false), new(nameof(NullValue), NullValue, false), new(nameof(Whitespace), Whitespace, false), new(nameof(LowercaseWithNoUppercaseMapping), LowercaseWithNoUppercaseMapping, false)];
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 

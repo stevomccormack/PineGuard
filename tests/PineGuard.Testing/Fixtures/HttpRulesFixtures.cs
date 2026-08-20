@@ -37,7 +37,6 @@ public static class HttpRulesFixtures
         [
             new(nameof(Simple), Simple, true),
             new(nameof(AllowedSymbols), AllowedSymbols, true),
-            new(nameof(Trimmed), Trimmed, true),
             new(nameof(TokenBang), TokenBang, true),
             new(nameof(TokenHash), TokenHash, true),
             new(nameof(TokenDollar), TokenDollar, true),
@@ -57,6 +56,7 @@ public static class HttpRulesFixtures
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
+            new(nameof(Trimmed), Trimmed, false),
             new(nameof(InvalidSpace), InvalidSpace, false),
             new(nameof(InvalidNewline), InvalidNewline, false),
             new(nameof(Null), Null, false),
@@ -74,6 +74,7 @@ public static class HttpRulesFixtures
     {
         public static readonly string? Simple = "abc";
         public static readonly string? Quoted = "\"value\"";
+        public static readonly string? ContainsTab = "token1\ttoken2";
         public static readonly string? RejectCr = "a\rb";
         public static readonly string? RejectLf = "a\nb";
         public static readonly string? RejectControl = "a\u0001b";
@@ -85,7 +86,8 @@ public static class HttpRulesFixtures
 
         public static RuleScenario<string?>[] ValidScenarios =>
         [
-            new(nameof(Simple), Simple, true)
+            new(nameof(Simple), Simple, true),
+            new(nameof(ContainsTab), ContainsTab, true)
         ];
 
         public static RuleScenario<string?>[] InvalidScenarios =>

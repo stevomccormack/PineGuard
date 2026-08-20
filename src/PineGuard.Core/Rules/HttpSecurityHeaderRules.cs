@@ -359,8 +359,15 @@ public static class HttpSecurityHeaderRules
                 continue;
 
             var remainder = segment.Length == directiveName.Length ? string.Empty : segment[directiveName.Length..].Trim();
+            if (remainder.Length == 0)
+                continue;
 
-            if (remainder.Contains(trimmedRequired, StringComparison.OrdinalIgnoreCase)) return true;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var token in remainder.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (string.Equals(token, trimmedRequired, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
         }
 
         return false;

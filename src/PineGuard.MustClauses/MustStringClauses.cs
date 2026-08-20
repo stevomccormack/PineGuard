@@ -324,7 +324,7 @@ public static class MustStringClauses
     /// </returns>
     /// <remarks>
     /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
-    /// Delegates to <see cref="StringRules.IsLongerThan"/> with default inclusion.
+    /// Delegates to <see cref="StringRules.IsLongerThan"/> with <see cref="Inclusion.Inclusive"/>.
     /// The failure message follows the pattern <c>"{paramName} must be longer than or equal to the specified length."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
@@ -341,7 +341,7 @@ public static class MustStringClauses
 
         const string messageTemplate = "{paramName} must be longer than or equal to the specified length.";
 
-        var ok = StringRules.IsLongerThan(value, length);
+        var ok = StringRules.IsLongerThan(value, length, Inclusion.Inclusive);
         return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
     }
 
@@ -400,7 +400,7 @@ public static class MustStringClauses
     /// </returns>
     /// <remarks>
     /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
-    /// Delegates to <see cref="StringRules.IsShorterThan"/> with default inclusion.
+    /// Delegates to <see cref="StringRules.IsShorterThan"/> with <see cref="Inclusion.Inclusive"/>.
     /// The failure message follows the pattern <c>"{paramName} must be shorter than or equal to the specified length."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
@@ -417,7 +417,7 @@ public static class MustStringClauses
 
         const string messageTemplate = "{paramName} must be shorter than or equal to the specified length.";
 
-        var ok = StringRules.IsShorterThan(value, length);
+        var ok = StringRules.IsShorterThan(value, length, Inclusion.Inclusive);
         return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
     }
 

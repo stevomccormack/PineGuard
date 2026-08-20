@@ -14,8 +14,10 @@ public static class IdentifierRules
     /// <see langword="true"/> if <paramref name="value"/> is a valid kebab-case slug; otherwise, <see langword="false"/>.
     /// </returns>
     /// <remarks>
-    /// Delegates to <see cref="StringRules.IsKebabCase"/>. A valid slug consists of lowercase
-    /// words separated by hyphens with no leading or trailing hyphens.
+    /// Validates the conventional ASCII URL-slug grammar <c>[a-z0-9]+(-[a-z0-9]+)*</c>: lowercase
+    /// ASCII letters and digits, grouped into words separated by single hyphens, with no leading
+    /// or trailing hyphens and no consecutive hyphens. Unlike <see cref="StringRules.IsKebabCase"/>,
+    /// non-ASCII letters and digits are rejected.
     /// </remarks>
     /// <example>
     /// <code>
@@ -23,7 +25,29 @@ public static class IdentifierRules
     /// bool invalid = IdentifierRules.IsSlug("My Page");    // false
     /// </code>
     /// </example>
-    /// <seealso cref="StringRules.IsKebabCase"/>
-    public static bool IsSlug(string? value) =>
-        StringRules.IsKebabCase(value);
+    public static bool IsSlug(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value) || value[0] == '-' || value[^1] == '-')
+            return false;
+
+        var previousWasHyphen = false;
+        foreach (var ch in value)
+        {
+            if (ch == '-')
+            {
+                if (previousWasHyphen)
+                    return false;
+
+                previousWasHyphen = true;
+                continue;
+            }
+
+            if (ch is < 'a' or > 'z' && ch is < '0' or > '9')
+                return false;
+
+            previousWasHyphen = false;
+        }
+
+        return true;
+    }
 }

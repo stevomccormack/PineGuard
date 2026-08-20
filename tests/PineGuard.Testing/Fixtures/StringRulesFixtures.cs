@@ -103,6 +103,16 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, int length, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
+    public static class IsLongerThanDefaultInclusion
+    {
+        public static readonly (string? value, int length) Longer = ("abc", 2);
+        public static readonly (string? value, int length) SameLength = ("abc", 3);
+
+        public static RuleScenario<(string? value, int length)>[] ValidScenarios => [new(nameof(Longer), Longer, true)];
+        public static RuleScenario<(string? value, int length)>[] InvalidScenarios => [new(nameof(SameLength), SameLength, false)];
+        public static RuleScenario<(string? value, int length)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class IsShorterThan
     {
         public static readonly (string? value, int length, Inclusion inclusion) ShorterExclusive = ("abc", 4, Inclusion.Exclusive);
@@ -119,6 +129,16 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, int length, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
+    public static class IsShorterThanDefaultInclusion
+    {
+        public static readonly (string? value, int length) Shorter = ("abc", 4);
+        public static readonly (string? value, int length) SameLength = ("abc", 3);
+
+        public static RuleScenario<(string? value, int length)>[] ValidScenarios => [new(nameof(Shorter), Shorter, true)];
+        public static RuleScenario<(string? value, int length)>[] InvalidScenarios => [new(nameof(SameLength), SameLength, false)];
+        public static RuleScenario<(string? value, int length)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class IsDigitsOnly
     {
         public static readonly string? Digits = "123";
@@ -128,6 +148,16 @@ public static partial class StringRulesFixtures
 
         public static RuleScenario<string?>[] ValidScenarios => [new(nameof(Digits), Digits, true), new(nameof(Trimmed), Trimmed, true)];
         public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(WithDash), WithDash, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsDigitsOnlyWithNullAllowedNonDigitChars
+    {
+        public static readonly string? Digits = "123";
+        public static readonly string? WithDashAndSpace = "12-34 56";
+
+        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(Digits), Digits, true)];
+        public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(WithDashAndSpace), WithDashAndSpace, false)];
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 

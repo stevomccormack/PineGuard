@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 namespace PineGuard.Rules;
 
 /// <summary>
@@ -35,7 +34,7 @@ public static class GeoLocationRules
     /// </example>
     public static bool IsLatitude(double? latitude)
     {
-        if (!NumberRules.IsFinite(latitude))
+        if (latitude is null || !double.IsFinite(latitude.Value))
             return false;
 
         return latitude is >= MinLatitude and <= MaxLatitude;
@@ -57,7 +56,7 @@ public static class GeoLocationRules
     /// </example>
     public static bool IsLongitude(double? longitude)
     {
-        if (!NumberRules.IsFinite(longitude))
+        if (longitude is null || !double.IsFinite(longitude.Value))
             return false;
 
         return longitude is >= MinLongitude and <= MaxLongitude;
@@ -80,4 +79,3 @@ public static class GeoLocationRules
     public static bool IsGeoLocation(double? latitude, double? longitude) =>
         IsLatitude(latitude) && IsLongitude(longitude);
 }
-#endif

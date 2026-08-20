@@ -65,7 +65,10 @@ public static partial class StringUtility
 
         var allowed = new HashSet<char>(allowedNonDigitChars);
 
-        Span<char> buffer = stackalloc char[trimmed.Length];
+        const int maxStackAllocLength = 256;
+        Span<char> buffer = trimmed.Length <= maxStackAllocLength
+            ? stackalloc char[maxStackAllocLength]
+            : new char[trimmed.Length];
         var written = 0;
 
         foreach (var ch in trimmed)
@@ -90,7 +93,8 @@ public static partial class StringUtility
     }
 
     /// <summary>
-    /// Attempts to convert the specified string to title case using invariant culture rules.
+    /// Converts the specified string to title case using invariant culture rules. Unlike a plain predicate,
+    /// this overload performs the actual transformation and hands the result back through <paramref name="titleCased"/>.
     /// </summary>
     /// <param name="value">The string to convert. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="titleCased">When this method returns, contains the title-cased string if successful; otherwise, <see cref="string.Empty"/>.</param>
@@ -112,7 +116,10 @@ public static partial class StringUtility
     }
 
     /// <summary>
-    /// Determines whether the specified string can be converted to title case.
+    /// Determines whether the specified string can be converted to title case. This is a convertibility check, not a
+    /// "is this string already title case" check — it returns <see langword="true"/> for any non-null, non-whitespace
+    /// <paramref name="value"/>, regardless of its current casing. Use the <see cref="TitleCase(string?, out string)"/>
+    /// overload to obtain the actual title-cased result.
     /// </summary>
     /// <param name="value">The string to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the conversion would succeed; otherwise, <see langword="false"/>.</returns>

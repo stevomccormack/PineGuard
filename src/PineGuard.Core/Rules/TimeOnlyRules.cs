@@ -26,10 +26,10 @@ public static class TimeOnlyRules
     /// </summary>
     /// <param name="value">The time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference time. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is before <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBefore(TimeOnly? value, TimeOnly? other, Inclusion inclusion = Inclusion.Inclusive, TimePrecision? precision = null)
+    public static bool IsBefore(TimeOnly? value, TimeOnly? other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null)
     {
         if (value is null || other is null)
             return false;
@@ -55,10 +55,10 @@ public static class TimeOnlyRules
     /// </summary>
     /// <param name="value">The time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference time. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is after <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsAfter(TimeOnly? value, TimeOnly? other, Inclusion inclusion = Inclusion.Inclusive, TimePrecision? precision = null)
+    public static bool IsAfter(TimeOnly? value, TimeOnly? other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null)
     {
         if (value is null || other is null)
             return false;
@@ -116,7 +116,7 @@ public static class TimeOnlyRules
     /// <param name="value">The time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="reference">The reference time. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="window">The maximum allowed time difference. If negative or greater than one day, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if the time difference is within the window; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if the minimal clock distance between the two times, wrapping across midnight, is within the window; otherwise, <see langword="false"/>.</returns>
     public static bool IsWithin(TimeOnly? value, TimeOnly? reference, TimeSpan window)
     {
         if (value is null || reference is null)
@@ -130,12 +130,13 @@ public static class TimeOnlyRules
             return false;
 
         var diffTicks = (value.Value.ToTimeSpan() - reference.Value.ToTimeSpan()).Ticks;
-        var absTicks = diffTicks < 0 ? -diffTicks : diffTicks;
-        return absTicks <= window.Ticks;
+        var linearTicks = diffTicks < 0 ? -diffTicks : diffTicks;
+        var circularTicks = Math.Min(linearTicks, TimeSpan.TicksPerDay - linearTicks);
+        return circularTicks <= window.Ticks;
     }
 
     /// <summary>
-    /// Determines whether the start time is chronologically before or equal to the end time.
+    /// Determines whether the start time precedes the end time (equality permitted when <paramref name="inclusion"/> is <see cref="Inclusion.Inclusive"/>).
     /// </summary>
     /// <param name="start">The start time. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end">The end time. If <see langword="null"/>, returns <see langword="false"/>.</param>
@@ -157,10 +158,13 @@ public static class TimeOnlyRules
     /// <param name="start2">The start of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end2">The end of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the boundaries are inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-    /// <returns><see langword="true"/> if the two time ranges overlap; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if the two time ranges overlap; otherwise, <see langword="false"/>. Returns <see langword="false"/> if either range is inverted (start after end).</returns>
     public static bool IsOverlapping(TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion = Inclusion.Exclusive)
     {
         if (start1 is null || end1 is null || start2 is null || end2 is null)
+            return false;
+
+        if (start1.Value > end1.Value || start2.Value > end2.Value)
             return false;
 
         return inclusion == Inclusion.Exclusive

@@ -154,20 +154,40 @@ public static partial class StringRules
         /// <summary>
         /// Determines whether the specified string parses to an even integer.
         /// </summary>
+        /// <remarks>
+        /// Parity is determined from the last digit of the integer, so this is not bounded to
+        /// <see cref="int"/> or <see cref="long"/> range: arbitrarily large integer strings (e.g. 64-bit
+        /// identifiers) are supported.
+        /// </remarks>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid integer, returns <see langword="false"/>.</param>
-        /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply when validating the integer format. Only
+        /// <see cref="NumberStyles.AllowLeadingWhite"/>, <see cref="NumberStyles.AllowTrailingWhite"/> and
+        /// <see cref="NumberStyles.AllowLeadingSign"/> are honored; values relying on any other flag
+        /// (thousands separators, decimal points, hex specifiers, currency symbols) return <see langword="false"/>.
+        /// </param>
         /// <returns><see langword="true"/> if the parsed integer is even; otherwise, <see langword="false"/>.</returns>
         public static bool IsEven(string? value, NumberStyles styles = NumberStyles.Integer) =>
-            StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsEven(parsed);
+            StringUtility.NumberTypes.TryGetLastIntegerDigit(value, styles, out var lastDigit) && (lastDigit - '0') % 2 == 0;
 
         /// <summary>
         /// Determines whether the specified string parses to an odd integer.
         /// </summary>
+        /// <remarks>
+        /// Parity is determined from the last digit of the integer, so this is not bounded to
+        /// <see cref="int"/> or <see cref="long"/> range: arbitrarily large integer strings (e.g. 64-bit
+        /// identifiers) are supported.
+        /// </remarks>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid integer, returns <see langword="false"/>.</param>
-        /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
+        /// <param name="styles">
+        /// The <see cref="NumberStyles"/> to apply when validating the integer format. Only
+        /// <see cref="NumberStyles.AllowLeadingWhite"/>, <see cref="NumberStyles.AllowTrailingWhite"/> and
+        /// <see cref="NumberStyles.AllowLeadingSign"/> are honored; values relying on any other flag
+        /// (thousands separators, decimal points, hex specifiers, currency symbols) return <see langword="false"/>.
+        /// </param>
         /// <returns><see langword="true"/> if the parsed integer is odd; otherwise, <see langword="false"/>.</returns>
         public static bool IsOdd(string? value, NumberStyles styles = NumberStyles.Integer) =>
-            StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsOdd(parsed);
+            StringUtility.NumberTypes.TryGetLastIntegerDigit(value, styles, out var lastDigit) && (lastDigit - '0') % 2 != 0;
 
         /// <summary>
         /// Determines whether the specified string parses to a finite number (not NaN, not infinite).

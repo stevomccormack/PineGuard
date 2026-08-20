@@ -70,6 +70,19 @@ public sealed class StringUtilityTests : BaseUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(StringUtilityTestData.Bool.ValidCases), MemberType = typeof(StringUtilityTestData.Bool))]
+    [MemberData(nameof(StringUtilityTestData.Bool.EdgeCases), MemberType = typeof(StringUtilityTestData.Bool))]
+    public void BoolTryParse_ReturnsExpected(StringUtilityTestData.Bool.ValidCase testCase)
+    {
+        // Act
+        var ok = StringUtility.Bool.TryParse(testCase.Value, out var boolean);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Equal(testCase.ExpectedOutValue, boolean);
+    }
+
+    [Theory]
     [MemberData(nameof(StringUtilityTestData.TimeOnlyTryParse.ValidCases), MemberType = typeof(StringUtilityTestData.TimeOnlyTryParse))]
     [MemberData(nameof(StringUtilityTestData.TimeOnlyTryParse.EdgeCases), MemberType = typeof(StringUtilityTestData.TimeOnlyTryParse))]
     public void TimeOnlyTryParse_ReturnsExpected(StringUtilityTestData.TimeOnlyTryParse.ValidCase testCase)
@@ -93,6 +106,19 @@ public sealed class StringUtilityTests : BaseUnitTest
         // Assert
         Assert.Equal(testCase.Expected, ok);
         Assert.Equal(testCase.ExpectedOutValue, timeSpan);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityTestData.DateTimeOffsetTryParse.ValidCases), MemberType = typeof(StringUtilityTestData.DateTimeOffsetTryParse))]
+    [MemberData(nameof(StringUtilityTestData.DateTimeOffsetTryParse.EdgeCases), MemberType = typeof(StringUtilityTestData.DateTimeOffsetTryParse))]
+    public void DateTimeOffsetTryParse_ReturnsExpected(StringUtilityTestData.DateTimeOffsetTryParse.ValidCase testCase)
+    {
+        // Act
+        var ok = StringUtility.DateTimeOffset.TryParse(testCase.Value, out var dateTimeOffset);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Equal(testCase.ExpectedOutValue, dateTimeOffset);
     }
 
     [Theory]

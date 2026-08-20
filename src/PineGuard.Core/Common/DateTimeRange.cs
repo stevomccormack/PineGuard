@@ -1,10 +1,18 @@
-using PineGuard.Extensions;
+using PineGuard.Utils;
 
 namespace PineGuard.Common;
 
 /// <summary>
 /// Represents an immutable, inclusive date/time range defined by a start and end <see cref="DateTime"/>.
 /// </summary>
+/// <remarks>
+/// <see cref="Contains(DateTime)"/>, <see cref="Overlaps(DateTimeRange)"/>, <see cref="Overlaps(DateTimeRange, Inclusion)"/>,
+/// and equality (<see cref="Equals(DateTimeRange)"/> and <see cref="GetHashCode"/>) normalize both operands to UTC via
+/// <see cref="DateTimeUtility.ToUtc(DateTime?)"/> before comparing, so <see cref="DateTimeKind.Utc"/> and
+/// <see cref="DateTimeKind.Local"/> values are compared by absolute instant rather than by raw ticks.
+/// <see cref="DateTimeKind.Unspecified"/> values are treated as UTC, matching the convention used throughout
+/// <c>PineGuard.Core</c>.
+/// </remarks>
 public readonly struct DateTimeRange : IEquatable<DateTimeRange>
 {
     /// <summary>
@@ -26,13 +34,13 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     public DateTimeRange(DateTime start, DateTime end)
     {
         if (start > end)
-            throw new ArgumentException($"{nameof(start).TitleCase()} must be less than or equal to {nameof(end).TitleCase()}.", nameof(start));
+            throw new ArgumentException("Start must be less than or equal to End.", nameof(start));
 
         if (start.Kind != end.Kind &&
             start.Kind != DateTimeKind.Unspecified &&
             end.Kind != DateTimeKind.Unspecified)
             throw new ArgumentException(
-                $"DateTime values must have compatible Kind. {nameof(start).TitleCase()}.Kind={start.Kind}, {nameof(end).TitleCase()}.Kind={end.Kind}.",
+                $"DateTime values must have compatible Kind. Start.Kind={start.Kind}, End.Kind={end.Kind}.",
                 nameof(start));
 
         Start = start;
@@ -72,11 +80,25 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     public TimeSpan Duration => End - Start;
 
     /// <summary>
+    /// Gets <see cref="Start"/> normalized to UTC (see the type-level remarks).
+    /// </summary>
+    private DateTime StartUtc => DateTimeUtility.ToUtc(Start)!.Value;
+
+    /// <summary>
+    /// Gets <see cref="End"/> normalized to UTC (see the type-level remarks).
+    /// </summary>
+    private DateTime EndUtc => DateTimeUtility.ToUtc(End)!.Value;
+
+    /// <summary>
     /// Determines whether the specified date/time falls within this range (inclusive).
     /// </summary>
     /// <param name="value">The date/time to check.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is within the range; otherwise, <see langword="false"/>.</returns>
-    public bool Contains(DateTime value) => value >= Start && value <= End;
+    public bool Contains(DateTime value)
+    {
+        var valueUtc = DateTimeUtility.ToUtc(value)!.Value;
+        return valueUtc >= StartUtc && valueUtc <= EndUtc;
+    }
 
     /// <summary>
     /// Determines whether this range overlaps with another range (exclusive boundaries).
@@ -84,7 +106,7 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     /// <param name="other">The other range to compare.</param>
     /// <returns><see langword="true"/> if the ranges overlap; otherwise, <see langword="false"/>.</returns>
     public bool Overlaps(DateTimeRange other)
-        => Start < other.End && other.Start < End;
+        => StartUtc < other.EndUtc && other.StartUtc < EndUtc;
 
     /// <summary>
     /// Determines whether this range overlaps with another range using the specified boundary inclusion.
@@ -95,9 +117,9 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     public bool Overlaps(DateTimeRange other, Inclusion inclusion)
     {
         if (inclusion == Inclusion.Exclusive)
-            return Start < other.End && other.Start < End;
+            return StartUtc < other.EndUtc && other.StartUtc < EndUtc;
 
-        return Start <= other.End && other.Start <= End;
+        return StartUtc <= other.EndUtc && other.StartUtc <= EndUtc;
     }
 
     /// <summary>
@@ -106,22 +128,26 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     /// <param name="other">The other range to compare.</param>
     /// <returns><see langword="true"/> if the ranges are adjacent; otherwise, <see langword="false"/>.</returns>
     public bool IsAdjacentTo(DateTimeRange other)
-        => Start == other.End || End == other.Start;
+        => StartUtc == other.EndUtc || EndUtc == other.StartUtc;
 
     /// <summary>
     /// Computes the intersection of this range with another range.
     /// </summary>
     /// <param name="other">The other range to intersect with.</param>
-    /// <returns>The intersecting <see cref="DateTimeRange"/>, or <see langword="null"/> if the ranges do not overlap.</returns>
+    /// <returns>
+    /// The intersecting <see cref="DateTimeRange"/>, or <see langword="null"/> if the ranges do not overlap.
+    /// Because this type represents an inclusive range, two ranges that only touch at a single instant
+    /// (e.g. one ends at the instant the other starts) produce a zero-length intersection rather than <see langword="null"/>.
+    /// </returns>
     public DateTimeRange? Intersect(DateTimeRange other)
     {
-        if (!Overlaps(other))
+        if (!Overlaps(other, Inclusion.Inclusive))
             return null;
 
-        var start = Start > other.Start ? Start : other.Start;
-        var end = End < other.End ? End : other.End;
+        var start = StartUtc > other.StartUtc ? Start : other.Start;
+        var end = EndUtc < other.EndUtc ? End : other.End;
 
-        return new DateTimeRange(start, end);
+        return CreateNormalized(start, end, this, other);
     }
 
     /// <summary>
@@ -131,15 +157,32 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     /// <returns>A <see cref="DateTimeRange"/> encompassing both ranges.</returns>
     public DateTimeRange Union(DateTimeRange other)
     {
-        var start = Start < other.Start ? Start : other.Start;
-        var end = End > other.End ? End : other.End;
+        var start = StartUtc < other.StartUtc ? Start : other.Start;
+        var end = EndUtc > other.EndUtc ? End : other.End;
 
-        return new DateTimeRange(start, end);
+        return CreateNormalized(start, end, this, other);
+    }
+
+    /// <summary>
+    /// Creates a range from endpoints selected across two operands. The result preserves the operands'
+    /// <see cref="DateTimeKind"/> only when all four endpoints share it; otherwise both endpoints are normalized
+    /// to UTC. Keying the decision on the operands rather than on the selected endpoints keeps the resulting
+    /// <see cref="DateTimeKind"/> a function of the inputs' kinds rather than of their values, and guarantees the
+    /// endpoints stay ordered and Kind-compatible for the constructor.
+    /// </summary>
+    private static DateTimeRange CreateNormalized(DateTime start, DateTime end, DateTimeRange first, DateTimeRange second)
+    {
+        var kind = first.Start.Kind;
+
+        if (first.End.Kind == kind && second.Start.Kind == kind && second.End.Kind == kind)
+            return new DateTimeRange(start, end);
+
+        return new DateTimeRange(DateTimeUtility.ToUtc(start)!.Value, DateTimeUtility.ToUtc(end)!.Value);
     }
 
     /// <inheritdoc />
     public bool Equals(DateTimeRange other)
-        => Start == other.Start && End == other.End;
+        => StartUtc == other.StartUtc && EndUtc == other.EndUtc;
 
     /// <inheritdoc />
     public override bool Equals(object? obj)
@@ -147,7 +190,7 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
 
     /// <inheritdoc />
     public override int GetHashCode()
-        => HashCode.Combine(Start, End);
+        => HashCode.Combine(StartUtc, EndUtc);
 
     /// <inheritdoc />
     public override string ToString()

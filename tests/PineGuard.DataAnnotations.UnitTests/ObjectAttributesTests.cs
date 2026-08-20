@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -74,6 +76,27 @@ public sealed class ObjectAttributesTests
     {
         var result = new EqualToAttribute(null!).GetValidationResult("hello", new ValidationContext(new object()));
         Assert.Equal(expected, result == ValidationResult.Success);
+    }
+
+    // Covers ValidationAttributeBase.BuildInvokeArgs: null value inferred to a non-nullable value-type parameter.
+    [Theory]
+    [MemberData(nameof(ObjectAttributesTestData.EqualToNullValueType.InvalidCases), MemberType = typeof(ObjectAttributesTestData.EqualToNullValueType))]
+    public void EqualTo_WithNullValueAndValueTypeComparison_ThrowsExpected(IThrowsCase testCase)
+    {
+        var action = ((ThrowsCase<Action>)testCase).Value;
+        var ex = Assert.Throws(testCase.ExpectedException.Type, action);
+        ThrowsCaseAssert.Expected(ex, testCase);
+    }
+
+    // Covers CheckArgCompatibility: MemberName set on the ValidationContext must appear in MemberNames.
+    [Theory]
+    [MemberData(nameof(ObjectAttributesTestData.EqualToWithMemberName.Cases), MemberType = typeof(ObjectAttributesTestData.EqualToWithMemberName))]
+    public void EqualTo_WithTypeMismatchAndMemberName_ShouldReportMemberNames(ObjectAttributesTestData.ValidCase testCase)
+    {
+        var ctx = new ValidationContext(new object()) { MemberName = "SomeMember" };
+        var result = new EqualToAttribute("abc").GetValidationResult(testCase.Value, ctx);
+        Assert.NotEqual(ValidationResult.Success, result);
+        Assert.Contains("SomeMember", result!.MemberNames);
     }
 
     // Covers InferValueType: MemberName set + property found on model.

@@ -35,6 +35,9 @@ public static class OwaspRulesFixtures
     {
         public static readonly string? Safe = "hello";
         public static readonly string? ScriptTag = "<script>alert(1)</script>";
+        public static readonly string? ScriptProtocol = "javascript:alert(1)";
+        public static readonly string? EventHandler = "x onload=alert(1)";
+        public static readonly string? EntityEncoded = "&lt;script&gt;alert(1)&lt;/script&gt;";
         public static readonly string? Null = null;
         public static readonly string? Space = " ";
 
@@ -45,9 +48,12 @@ public static class OwaspRulesFixtures
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
-            new(nameof(ScriptTag), ScriptTag, false),
-            new(nameof(Null),      Null,      false),
-            new(nameof(Space),     Space,     false)
+            new(nameof(ScriptTag),      ScriptTag,      false),
+            new(nameof(ScriptProtocol), ScriptProtocol, false),
+            new(nameof(EventHandler),   EventHandler,   false),
+            new(nameof(EntityEncoded),  EntityEncoded,  false),
+            new(nameof(Null),           Null,           false),
+            new(nameof(Space),          Space,          false)
         ];
 
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
@@ -88,6 +94,8 @@ public static class OwaspRulesFixtures
         public static readonly string? AbsoluteUnix = "/etc/passwd";
         public static readonly string? AbsoluteWindows = @"C:\Windows\System32";
         public static readonly string? Unc = @"\\server\share\file.txt";
+        public static readonly string? EncodedSlashDotDot = "..%2f..%2fetc%2fpasswd";
+        public static readonly string? TrailingDotDotSegment = "uploads/..";
         public static readonly string? Null = null;
         public static readonly string? Space = " ";
 
@@ -98,12 +106,14 @@ public static class OwaspRulesFixtures
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
-            new(nameof(DotDot),          DotDot,          false),
-            new(nameof(AbsoluteUnix),    AbsoluteUnix,    false),
-            new(nameof(AbsoluteWindows), AbsoluteWindows, false),
-            new(nameof(Unc),             Unc,             false),
-            new(nameof(Null),            Null,            false),
-            new(nameof(Space),           Space,           false)
+            new(nameof(DotDot),                DotDot,                false),
+            new(nameof(AbsoluteUnix),          AbsoluteUnix,          false),
+            new(nameof(AbsoluteWindows),       AbsoluteWindows,       false),
+            new(nameof(Unc),                   Unc,                   false),
+            new(nameof(EncodedSlashDotDot),    EncodedSlashDotDot,    false),
+            new(nameof(TrailingDotDotSegment), TrailingDotDotSegment, false),
+            new(nameof(Null),                  Null,                  false),
+            new(nameof(Space),                 Space,                 false)
         ];
 
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
@@ -139,6 +149,8 @@ public static class OwaspRulesFixtures
     {
         public static readonly string? Safe = "Header: ok";
         public static readonly string? CrLf = "Header: ok\r\nInjected: yes";
+        public static readonly string? LeadingCrLf = "\r\nHeader: ok";
+        public static readonly string? TrailingCrLf = "sessiontoken\r\n\r\n";
         public static readonly string? Null = null;
         public static readonly string? Space = " ";
 
@@ -149,9 +161,11 @@ public static class OwaspRulesFixtures
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
-            new(nameof(CrLf),  CrLf,  false),
-            new(nameof(Null),  Null,  false),
-            new(nameof(Space), Space, false)
+            new(nameof(CrLf),         CrLf,         false),
+            new(nameof(LeadingCrLf),  LeadingCrLf,  false),
+            new(nameof(TrailingCrLf), TrailingCrLf, false),
+            new(nameof(Null),         Null,         false),
+            new(nameof(Space),        Space,        false)
         ];
 
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

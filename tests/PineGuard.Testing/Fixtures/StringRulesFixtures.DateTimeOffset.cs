@@ -11,12 +11,13 @@ public static partial class StringRulesFixtures
     public static class DateTimeOffsetIsInPast
     {
         public static readonly string? PastDate = "2000-01-01T00:00:00Z";
+        public static readonly string? OffsetLessPastDate = "2000-01-01T00:00:00";
         public static readonly string? FutureDate = "2999-01-01T00:00:00Z";
         public static readonly string? NotADate = "not-a-date";
         public static readonly string? NullValue = null;
         public static readonly string? Space = " ";
 
-        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(PastDate), PastDate, true)];
+        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(PastDate), PastDate, true), new(nameof(OffsetLessPastDate), OffsetLessPastDate, true)];
         public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(FutureDate), FutureDate, false), new(nameof(NotADate), NotADate, false), new(nameof(NullValue), NullValue, false), new(nameof(Space), Space, false)];
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
@@ -24,12 +25,13 @@ public static partial class StringRulesFixtures
     public static class DateTimeOffsetIsInFuture
     {
         public static readonly string? FutureDate = "2999-01-01T00:00:00Z";
+        public static readonly string? OffsetLessFutureDate = "2999-01-01T00:00:00";
         public static readonly string? PastDate = "2000-01-01T00:00:00Z";
         public static readonly string? NotADate = "not-a-date";
         public static readonly string? NullValue = null;
         public static readonly string? Space = " ";
 
-        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(FutureDate), FutureDate, true)];
+        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(FutureDate), FutureDate, true), new(nameof(OffsetLessFutureDate), OffsetLessFutureDate, true)];
         public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(PastDate), PastDate, false), new(nameof(NotADate), NotADate, false), new(nameof(NullValue), NullValue, false), new(nameof(Space), Space, false)];
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
@@ -38,11 +40,12 @@ public static partial class StringRulesFixtures
     {
         public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) InsideRange = ("2020-01-01T12:00:00Z", DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Inclusive);
         public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) MinExclusive = ("2020-01-01T00:00:00Z", DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Exclusive);
+        public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) OffsetLessAssumedUtc = ("2024-01-15T10:30:00", DateTimeOffset.Parse("2024-01-15T10:30:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2024-01-15T10:30:00Z", CultureInfo.InvariantCulture), Inclusion.Inclusive);
         public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) NotADate = ("not-a-date", DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Inclusive);
         public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) NullValue = (null, DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Inclusive);
 
         public static RuleScenario<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[] ValidScenarios => [new(nameof(InsideRange), InsideRange, true)];
-        public static RuleScenario<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[] ValidEdgeScenarios => [];
+        public static RuleScenario<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[] ValidEdgeScenarios => [new(nameof(OffsetLessAssumedUtc), OffsetLessAssumedUtc, true)];
         public static RuleScenario<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[] InvalidScenarios => [new(nameof(NotADate), NotADate, false), new(nameof(NullValue), NullValue, false)];
         public static RuleScenario<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[] InvalidEdgeScenarios => [new(nameof(MinExclusive), MinExclusive, false)];
         public static RuleScenario<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
