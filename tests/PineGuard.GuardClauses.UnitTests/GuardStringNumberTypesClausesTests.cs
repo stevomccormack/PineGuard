@@ -14,6 +14,7 @@ public sealed class GuardStringNumberTypesClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotDecimal(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotDecimal(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
@@ -24,6 +25,7 @@ public sealed class GuardStringNumberTypesClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotExactDecimal(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotExactDecimal(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
@@ -34,6 +36,7 @@ public sealed class GuardStringNumberTypesClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotInt32(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotInt32(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
@@ -44,6 +47,7 @@ public sealed class GuardStringNumberTypesClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotInt64(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotInt64(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
@@ -54,6 +58,7 @@ public sealed class GuardStringNumberTypesClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value.text;
         var result = AssertResult(tc, () => Guard.Against.Int32OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.Int32OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
@@ -64,6 +69,7 @@ public sealed class GuardStringNumberTypesClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value.text;
         var result = AssertResult(tc, () => Guard.Against.Int32InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.Int32InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
@@ -74,6 +80,7 @@ public sealed class GuardStringNumberTypesClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value.text;
         var result = AssertResult(tc, () => Guard.Against.Int64OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.Int64OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
@@ -84,6 +91,7 @@ public sealed class GuardStringNumberTypesClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value.text;
         var result = AssertResult(tc, () => Guard.Against.Int64InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.Int64InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 }

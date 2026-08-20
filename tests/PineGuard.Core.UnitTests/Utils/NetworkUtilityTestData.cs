@@ -175,4 +175,57 @@ public static class NetworkUtilityTestData
         public sealed record ValidCase(string Name, string Value, bool Expected)
             : IsCase<string>(Name, Value, Expected);
     }
+
+    /// <summary>
+    /// Exercises <see cref="NetworkUtility.IsValidHostnameLabel"/> directly. The empty-label case is
+    /// unreachable via <see cref="NetworkUtility.ValidateHostnameLabels"/>, which splits with
+    /// <see cref="StringSplitOptions.RemoveEmptyEntries"/>.
+    /// </summary>
+    public static class IsValidHostnameLabel
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("single character", "a", true),
+            new("max length (63)", new string('a', 63), true),
+            new("digits and hyphen", "a-1", true)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("empty label", "", false),
+            new("over max length (64)", new string('a', 64), false),
+            new("leading hyphen", "-abc", false),
+            new("trailing hyphen", "abc-", false),
+            new("invalid char underscore", "ab_c", false)
+        ];
+
+        public sealed record ValidCase(string Name, string Value, bool Expected)
+            : IsCase<string>(Name, Value, Expected);
+    }
+
+    /// <summary>
+    /// Exercises <see cref="NetworkUtility.IsValidIpv4Segment"/> directly. The empty-segment case is
+    /// unreachable via <see cref="NetworkUtility.TryParseIpv4"/>, which splits with
+    /// <see cref="StringSplitOptions.RemoveEmptyEntries"/>.
+    /// </summary>
+    public static class IsValidIpv4Segment
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("single digit", "0", true),
+            new("two digits", "42", true),
+            new("max value", "255", true)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("empty segment", "", false),
+            new("four digits", "1234", false),
+            new("above byte range", "256", false),
+            new("non-numeric", "abc", false)
+        ];
+
+        public sealed record ValidCase(string Name, string Value, bool Expected)
+            : IsCase<string>(Name, Value, Expected);
+    }
 }

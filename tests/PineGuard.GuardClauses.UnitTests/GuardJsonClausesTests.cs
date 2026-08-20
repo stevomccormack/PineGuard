@@ -13,6 +13,7 @@ public sealed class GuardJsonClausesTests(ITestOutputHelper output)
     {
         // Act
         var result = AssertResult(tc, () => Guard.Against.NotJson(tc.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotJson(tc.Value, paramName: "value", message: CustomMessage));
 
         // Assert
         if (tc.Expected.IsValid)
@@ -26,6 +27,7 @@ public sealed class GuardJsonClausesTests(ITestOutputHelper output)
     {
         // Act
         var result = AssertResult(tc, () => Guard.Against.NotJsonObject(tc.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotJsonObject(tc.Value, paramName: "value", message: CustomMessage));
 
         // Assert
         if (tc.Expected.IsValid)
@@ -39,6 +41,7 @@ public sealed class GuardJsonClausesTests(ITestOutputHelper output)
     {
         // Act
         var result = AssertResult(tc, () => Guard.Against.NotJsonArray(tc.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotJsonArray(tc.Value, paramName: "value", message: CustomMessage));
 
         // Assert
         if (tc.Expected.IsValid)
@@ -52,6 +55,7 @@ public sealed class GuardJsonClausesTests(ITestOutputHelper output)
     {
         // Act
         var result = AssertResult(tc, () => Guard.Against.NotJsonContentType(tc.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.NotJsonContentType(tc.Value, paramName: "value", message: CustomMessage));
 
         // Assert
         if (tc.Expected.IsValid)

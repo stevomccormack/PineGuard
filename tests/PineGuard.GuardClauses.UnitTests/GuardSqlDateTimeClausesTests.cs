@@ -12,6 +12,7 @@ public sealed class GuardSqlDateTimeClausesTests(ITestOutputHelper output) : Bas
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotInSqlDateRange(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotInSqlDateRange(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -22,6 +23,7 @@ public sealed class GuardSqlDateTimeClausesTests(ITestOutputHelper output) : Bas
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotInSqlDateTimeOffsetRange(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotInSqlDateTimeOffsetRange(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -32,6 +34,7 @@ public sealed class GuardSqlDateTimeClausesTests(ITestOutputHelper output) : Bas
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotInSqlDateTimeRange(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotInSqlDateTimeRange(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

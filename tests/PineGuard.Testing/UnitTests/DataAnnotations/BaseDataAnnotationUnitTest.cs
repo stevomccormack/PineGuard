@@ -18,7 +18,10 @@ public abstract class BaseDataAnnotationUnitTest(ITestOutputHelper output) : Bas
     {
         var isValid = result == ValidationResult.Success;
         AssertReturn(testCase.Expected, isValid, isValid ? null : result!.ErrorMessage);
-        if (testCase.Expected.MemberName is not null && !isValid)
+        // Order matters: testing !isValid first keeps both operands reachable. With the
+        // MemberName check leading, a null MemberName short-circuits and the isValid
+        // operand is never evaluated for pass-through cases.
+        if (!isValid && testCase.Expected.MemberName is not null)
             Assert.Contains(testCase.Expected.MemberName, result!.MemberNames);
     }
 }

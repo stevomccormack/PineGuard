@@ -166,4 +166,48 @@ public sealed class NetworkUtilityTests : BaseUnitTest
         // Assert
         Assert.False(result);
     }
+
+    [Theory]
+    [MemberData(nameof(NetworkUtilityTestData.IsValidHostnameLabel.ValidCases), MemberType = typeof(NetworkUtilityTestData.IsValidHostnameLabel))]
+    public void IsValidHostnameLabel_ReturnsTrue_ForValidLabels(NetworkUtilityTestData.IsValidHostnameLabel.ValidCase testCase)
+    {
+        // Act
+        var result = NetworkUtility.IsValidHostnameLabel(testCase.Value);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Theory]
+    [MemberData(nameof(NetworkUtilityTestData.IsValidHostnameLabel.EdgeCases), MemberType = typeof(NetworkUtilityTestData.IsValidHostnameLabel))]
+    public void IsValidHostnameLabel_ReturnsFalse_ForInvalidLabels(NetworkUtilityTestData.IsValidHostnameLabel.ValidCase testCase)
+    {
+        // Act
+        var result = NetworkUtility.IsValidHostnameLabel(testCase.Value);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Theory]
+    [MemberData(nameof(NetworkUtilityTestData.IsValidIpv4Segment.ValidCases), MemberType = typeof(NetworkUtilityTestData.IsValidIpv4Segment))]
+    public void IsValidIpv4Segment_ReturnsTrue_ForValidSegments(NetworkUtilityTestData.IsValidIpv4Segment.ValidCase testCase)
+    {
+        // Act
+        var result = NetworkUtility.IsValidIpv4Segment(testCase.Value);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Theory]
+    [MemberData(nameof(NetworkUtilityTestData.IsValidIpv4Segment.EdgeCases), MemberType = typeof(NetworkUtilityTestData.IsValidIpv4Segment))]
+    public void IsValidIpv4Segment_ReturnsFalse_ForInvalidSegments(NetworkUtilityTestData.IsValidIpv4Segment.ValidCase testCase)
+    {
+        // Act
+        var result = NetworkUtility.IsValidIpv4Segment(testCase.Value);
+
+        // Assert
+        Assert.False(result);
+    }
 }

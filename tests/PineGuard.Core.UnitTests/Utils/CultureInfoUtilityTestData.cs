@@ -159,4 +159,20 @@ public static class CultureInfoUtilityTestData
         public sealed record ValidCase(string Name, CultureInfo Culture, bool Expected, string ExpectedRegion)
             : TryCase<CultureInfo, string>(Name, Culture, Expected, ExpectedRegion);
     }
+
+    public static class AddRegionCode
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("en-US", CultureInfo.GetCultureInfo("en-US"), "US")
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("invariant", CultureInfo.InvariantCulture, null)
+        ];
+
+        public sealed record ValidCase(string Name, CultureInfo Culture, string? Expected)
+            : ReturnCase<CultureInfo, string?>(Name, Culture, Expected);
+    }
 }

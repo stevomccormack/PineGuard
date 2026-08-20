@@ -178,6 +178,8 @@ public static class TimeOnlyRulesFixtures
         public static readonly (TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion) AllNull = (null, null, null, null, Inclusion.Exclusive);
         public static readonly (TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion) Start1Null = (null, new TimeOnly(10, 0), new TimeOnly(9, 30), new TimeOnly(9, 45), Inclusion.Exclusive);
         public static readonly (TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion) End1Null = (new TimeOnly(9, 0), null, new TimeOnly(9, 30), new TimeOnly(9, 45), Inclusion.Exclusive);
+        public static readonly (TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion) Start2Null = (new TimeOnly(9, 0), new TimeOnly(10, 0), null, new TimeOnly(9, 45), Inclusion.Exclusive);
+        public static readonly (TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion) End2Null = (new TimeOnly(9, 0), new TimeOnly(10, 0), new TimeOnly(9, 30), null, Inclusion.Exclusive);
 
         public static RuleScenario<(TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion)>[] ValidScenarios =>
         [
@@ -193,7 +195,9 @@ public static class TimeOnlyRulesFixtures
             new(nameof(DisjointInclusive), DisjointInclusive, false),
             new(nameof(AllNull), AllNull, false),
             new(nameof(Start1Null), Start1Null, false),
-            new(nameof(End1Null), End1Null, false)
+            new(nameof(End1Null), End1Null, false),
+            new(nameof(Start2Null), Start2Null, false),
+            new(nameof(End2Null), End2Null, false)
         ];
 
         public static RuleScenario<(TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

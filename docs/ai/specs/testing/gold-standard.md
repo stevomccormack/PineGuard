@@ -2,7 +2,7 @@
 spec:
   id: pineguard.ai.specs.testing.gold-standard
   title: "GOLD-STANDARD Compliance Index"
-  version: 2
+  version: 3
   parent:
     - unit-test.md
 applies_to:
@@ -36,14 +36,32 @@ A test operation group reaches **GOLD** when:
 
 | Project | TestData Files | Op Groups | Fixture-Based | Status |
 |---------|---------------|-----------|--------------|--------|
-| PineGuard.Core.UnitTests | 129 | 751 | 346 (46%) | SILVER |
-| PineGuard.MustClauses.UnitTests | 59 | 592 | 196 (33%) | SILVER |
-| PineGuard.GuardClauses.UnitTests | 53 | 620 | 112 (18%) | SILVER |
-| PineGuard.FluentValidation.UnitTests | 54 | 597 | 13 (2%) | SILVER |
-| PineGuard.DataAnnotations.UnitTests | 45 | 353 | 0 (0%) | SILVER |
-| PineGuard.Testing.UnitTests | 15 | 52 | 0 (0%) | SILVER |
+| PineGuard.Core.UnitTests | 129 | 751 | 346 (46%) | GOLD |
+| PineGuard.MustClauses.UnitTests | 59 | 592 | 196 (33%) | GOLD |
+| PineGuard.GuardClauses.UnitTests | 53 | 620 | 112 (18%) | GOLD |
+| PineGuard.FluentValidation.UnitTests | 54 | 597 | 13 (2%) | GOLD |
+| PineGuard.DataAnnotations.UnitTests | 45 | 353 | 0 (0%) | GOLD |
+| PineGuard.Testing.UnitTests | 15 | 52 | 0 (0%) | GOLD |
 
-**All projects are SILVER** — structure is correct, empty scaffolding removed, but coverage has not been verified against the 100% target.
+**All projects are GOLD** — structure is correct, empty scaffolding removed, and coverage is verified at the 100% target.
+
+## Coverage Verification (2026-08-21)
+
+`Test-CoverageAnalysis.ps1 -Enforce100` exits 0 for every scope against a full
+`Gen-CoverageReport.ps1 -Scope All` run (net8.0 + net10.0, 13,250 tests per TFM):
+
+| Scope | Line | Branch |
+|-------|------|--------|
+| All | 100.00% (15158/15158) | 100.00% (6914/6914) |
+| Core | 100.00% (2533/2533) | 100.00% (2324/2324) |
+| MustClauses | 100.00% (2286/2286) | 100.00% (1190/1190) |
+| GuardClauses | 100.00% (2156/2156) | 100.00% (2152/2152) |
+| DataAnnotations | 100.00% (1750/1750) | 100.00% (138/138) |
+| FluentValidation | 100.00% (1435/1435) | 100.00% (1020/1020) |
+| Testing | 100.00% (4998/4998) | 100.00% (90/90) |
+
+Scope figures are filtered per-scope and do not sum to the `All` row, which applies
+its own class filter (969 classes).
 
 ## Empty Array Audit (2026-03-04)
 
@@ -95,21 +113,19 @@ Projects using the `RuleScenario<T>` → `.ToXxxCases()` fixture pattern:
 
 ## Coverage Status
 
-Coverage verification is **deferred** — to be run in a separate session using:
+Coverage is **verified at 100% line and 100% branch** for every scope (see the table above). Reproduce with:
 
-```bash
-dotnet test --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Scope All -Configuration Release -Clean -SkipHtml
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope All -Enforce100
 ```
-
-When coverage is verified, update each project's status from SILVER → GOLD.
 
 ## Next Steps
 
-1. **Run coverage analysis** per `coverage.md` to identify remaining gaps
-2. **Promote to GOLD** as each project achieves 100% line+branch coverage
-3. **Increase fixture adoption** in FluentValidation and DataAnnotations projects
-4. **Maintain this index** — update when new test classes are added
+1. **Hold the line** — run `-Enforce100` for the touched scope before every merge
+2. **Increase fixture adoption** in FluentValidation and DataAnnotations projects
+3. **Maintain this index** — update when new test classes are added
 
 <!-- footer
-last_verified: 2026-03-04
+last_verified: 2026-08-21
 -->

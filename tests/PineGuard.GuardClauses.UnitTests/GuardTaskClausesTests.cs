@@ -12,6 +12,7 @@ public sealed class GuardTaskClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var task = tc.Value();
         var result = AssertResult(tc, () => Guard.Against.Completed(task));
+        AssertCustomMessage(tc, () => Guard.Against.Completed(task, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(task, result);
     }
 
@@ -22,6 +23,7 @@ public sealed class GuardTaskClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var task = tc.Value();
         var result = AssertResult(tc, () => Guard.Against.NotCompleted(task));
+        AssertCustomMessage(tc, () => Guard.Against.NotCompleted(task, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(task, result);
     }
 
@@ -32,6 +34,7 @@ public sealed class GuardTaskClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var task = tc.Value();
         var result = AssertResult(tc, () => Guard.Against.Canceled(task));
+        AssertCustomMessage(tc, () => Guard.Against.Canceled(task, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(task, result);
     }
 
@@ -42,6 +45,7 @@ public sealed class GuardTaskClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var task = tc.Value();
         var result = AssertResult(tc, () => Guard.Against.NotCanceled(task));
+        AssertCustomMessage(tc, () => Guard.Against.NotCanceled(task, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(task, result);
     }
 
@@ -52,6 +56,7 @@ public sealed class GuardTaskClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var task = tc.Value();
         var result = AssertResult(tc, () => Guard.Against.Faulted(task));
+        AssertCustomMessage(tc, () => Guard.Against.Faulted(task, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(task, result);
     }
 
@@ -62,6 +67,7 @@ public sealed class GuardTaskClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var task = tc.Value();
         var result = AssertResult(tc, () => Guard.Against.NotFaulted(task));
+        AssertCustomMessage(tc, () => Guard.Against.NotFaulted(task, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(task, result);
     }
 }

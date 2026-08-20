@@ -13,6 +13,7 @@ public sealed class GuardCsvClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotCsvLine(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotCsvLine(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -23,6 +24,7 @@ public sealed class GuardCsvClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value.line;
         var result = AssertResult(tc, () => Guard.Against.NotCsvHeaderLine(value, tc.Value.expectedHeader));
+        AssertCustomMessage(tc, () => Guard.Against.NotCsvHeaderLine(value, tc.Value.expectedHeader, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -33,6 +35,7 @@ public sealed class GuardCsvClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value.line;
         var result = AssertResult(tc, () => Guard.Against.NotCsvRowLine(value, tc.Value.schema));
+        AssertCustomMessage(tc, () => Guard.Against.NotCsvRowLine(value, tc.Value.schema, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -43,6 +46,7 @@ public sealed class GuardCsvClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value.line;
         var result = AssertResult(tc, () => Guard.Against.NotCsvRowLine(value, tc.Value.header, tc.Value.types));
+        AssertCustomMessage(tc, () => Guard.Against.NotCsvRowLine(value, tc.Value.header, tc.Value.types, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

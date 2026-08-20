@@ -285,6 +285,30 @@ public sealed class EnumerationTests : BaseUnitTest
         }
     }
 
+    public static class OperatorComparison
+    {
+        [Theory]
+        [MemberData(nameof(EnumerationTestData.OperatorComparison.ValidCases), MemberType = typeof(EnumerationTestData.OperatorComparison))]
+        [MemberData(nameof(EnumerationTestData.OperatorComparison.EdgeCases), MemberType = typeof(EnumerationTestData.OperatorComparison))]
+        public static void ShouldReturnExpected(EnumerationTestData.OperatorComparison.ValidCase testCase)
+        {
+            // Arrange
+            var (left, right) = testCase.Value;
+
+            // Act
+            var lessThan = left < right;
+            var lessThanOrEqual = left <= right;
+            var greaterThan = left > right;
+            var greaterThanOrEqual = left >= right;
+
+            // Assert
+            Assert.Equal(testCase.ExpectedLessThan, lessThan);
+            Assert.Equal(testCase.ExpectedLessThanOrEqual, lessThanOrEqual);
+            Assert.Equal(testCase.ExpectedGreaterThan, greaterThan);
+            Assert.Equal(testCase.ExpectedGreaterThanOrEqual, greaterThanOrEqual);
+        }
+    }
+
     public static class HashCode
     {
         [Theory]

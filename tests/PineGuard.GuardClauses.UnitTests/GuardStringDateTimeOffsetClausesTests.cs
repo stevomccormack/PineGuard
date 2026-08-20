@@ -13,6 +13,7 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.FutureOrPresentDateTimeOffset(value));
+        AssertCustomMessage(tc, () => Guard.Against.FutureOrPresentDateTimeOffset(value, message: CustomMessage));
     }
 
     [Theory]
@@ -22,6 +23,7 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.FutureDateTimeOffset(value));
+        AssertCustomMessage(tc, () => Guard.Against.FutureDateTimeOffset(value, message: CustomMessage));
     }
 
     [Theory]
@@ -31,6 +33,7 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.PastOrPresentDateTimeOffset(value));
+        AssertCustomMessage(tc, () => Guard.Against.PastOrPresentDateTimeOffset(value, message: CustomMessage));
     }
 
     [Theory]
@@ -40,6 +43,7 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value;
         AssertResult(tc, () => Guard.Against.PastDateTimeOffset(value));
+        AssertCustomMessage(tc, () => Guard.Against.PastDateTimeOffset(value, message: CustomMessage));
     }
 
     [Theory]
@@ -49,6 +53,7 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotBetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotBetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]
@@ -58,6 +63,7 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.BetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.BetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]
@@ -67,6 +73,7 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotWithinDateTimeOffset(value, tc.Value.reference, tc.Value.window));
+        AssertCustomMessage(tc, () => Guard.Against.NotWithinDateTimeOffset(value, tc.Value.reference, tc.Value.window, message: CustomMessage));
     }
 
     [Theory]
@@ -76,6 +83,7 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.WithinDateTimeOffset(value, tc.Value.reference, tc.Value.window));
+        AssertCustomMessage(tc, () => Guard.Against.WithinDateTimeOffset(value, tc.Value.reference, tc.Value.window, message: CustomMessage));
     }
 
     [Theory]
@@ -85,6 +93,7 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotWithinCalendarMonthsDateTimeOffset(value, tc.Value.reference, tc.Value.months));
+        AssertCustomMessage(tc, () => Guard.Against.NotWithinCalendarMonthsDateTimeOffset(value, tc.Value.reference, tc.Value.months, message: CustomMessage));
     }
 
     [Theory]
@@ -94,5 +103,6 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.WithinCalendarMonthsDateTimeOffset(value, tc.Value.reference, tc.Value.months));
+        AssertCustomMessage(tc, () => Guard.Against.WithinCalendarMonthsDateTimeOffset(value, tc.Value.reference, tc.Value.months, message: CustomMessage));
     }
 }

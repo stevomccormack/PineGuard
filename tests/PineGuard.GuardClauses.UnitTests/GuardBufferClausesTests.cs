@@ -14,6 +14,7 @@ public sealed class GuardBufferClausesTests(ITestOutputHelper output) : BaseGuar
         // Act + Assert
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHex(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotHex(value, message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
@@ -27,6 +28,7 @@ public sealed class GuardBufferClausesTests(ITestOutputHelper output) : BaseGuar
         // Act + Assert
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotBase64(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotBase64(value, message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
@@ -41,6 +43,7 @@ public sealed class GuardBufferClausesTests(ITestOutputHelper output) : BaseGuar
         // Act + Assert
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Hex(value));
+        AssertCustomMessage(tc, () => Guard.Against.Hex(value, message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
@@ -55,6 +58,7 @@ public sealed class GuardBufferClausesTests(ITestOutputHelper output) : BaseGuar
         // Act + Assert
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Base64(value));
+        AssertCustomMessage(tc, () => Guard.Against.Base64(value, message: CustomMessage));
 
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }

@@ -13,6 +13,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.RelativeUri(value!));
+        AssertCustomMessage(tc, () => Guard.Against.RelativeUri(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -23,6 +24,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.AbsoluteUri(value!));
+        AssertCustomMessage(tc, () => Guard.Against.AbsoluteUri(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -33,6 +35,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotUrl(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotUrl(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -43,6 +46,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHttpsUrl(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotHttpsUrl(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -53,6 +57,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHttpUrl(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotHttpUrl(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -63,6 +68,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotFileUri(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotFileUri(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -73,6 +79,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotFilePath(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotFilePath(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -83,6 +90,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.FilePath(value!));
+        AssertCustomMessage(tc, () => Guard.Against.FilePath(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -93,6 +101,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.NotHasScheme(value!, tc.Value.scheme));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasScheme(value!, tc.Value.scheme, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -103,6 +112,7 @@ public sealed class GuardUriClausesTests(ITestOutputHelper output) : BaseGuardUn
     {
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.HasScheme(value!, tc.Value.scheme));
+        AssertCustomMessage(tc, () => Guard.Against.HasScheme(value!, tc.Value.scheme, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 }

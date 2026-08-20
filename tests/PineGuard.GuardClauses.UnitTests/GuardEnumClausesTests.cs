@@ -14,6 +14,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotDefined(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotDefined(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -24,6 +25,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Defined(value));
+        AssertCustomMessage(tc, () => Guard.Against.Defined(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -34,6 +36,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotDefinedValue<F.SimpleEnum>(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotDefinedValue<F.SimpleEnum>(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -44,6 +47,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.DefinedValue<F.SimpleEnum>(value));
+        AssertCustomMessage(tc, () => Guard.Against.DefinedValue<F.SimpleEnum>(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -55,6 +59,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
         var name = tc.Value.name;
         var ignoreCase = tc.Value.ignoreCase;
         var result = AssertResult(tc, () => Guard.Against.NotDefinedName<F.SimpleEnum>(name, ignoreCase));
+        AssertCustomMessage(tc, () => Guard.Against.NotDefinedName<F.SimpleEnum>(name, ignoreCase, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(name, result);
     }
 
@@ -66,6 +71,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
         var name = tc.Value.name;
         var ignoreCase = tc.Value.ignoreCase;
         var result = AssertResult(tc, () => Guard.Against.DefinedName<F.SimpleEnum>(name, ignoreCase));
+        AssertCustomMessage(tc, () => Guard.Against.DefinedName<F.SimpleEnum>(name, ignoreCase, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(name, result);
     }
 
@@ -76,6 +82,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotFlagsEnumCombination(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotFlagsEnumCombination(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -86,6 +93,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.FlagsEnumCombination(value));
+        AssertCustomMessage(tc, () => Guard.Against.FlagsEnumCombination(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -96,6 +104,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHasAttribute<F.AttributedEnum, System.ComponentModel.DescriptionAttribute>(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasAttribute<F.AttributedEnum, System.ComponentModel.DescriptionAttribute>(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -106,6 +115,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HasAttribute<F.AttributedEnum, System.ComponentModel.DescriptionAttribute>(value));
+        AssertCustomMessage(tc, () => Guard.Against.HasAttribute<F.AttributedEnum, System.ComponentModel.DescriptionAttribute>(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -117,6 +127,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
         var value = tc.Value.value;
         var flag = tc.Value.flag;
         var result = AssertResult(tc, () => Guard.Against.NotHasFlag(value, flag));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasFlag(value, flag, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -128,6 +139,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
         var value = tc.Value.value;
         var flag = tc.Value.flag;
         var result = AssertResult(tc, () => Guard.Against.HasFlag(value, flag));
+        AssertCustomMessage(tc, () => Guard.Against.HasFlag(value, flag, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -138,6 +150,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHasDescription(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasDescription(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -148,6 +161,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HasDescription(value));
+        AssertCustomMessage(tc, () => Guard.Against.HasDescription(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -158,6 +172,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHasDisplay(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasDisplay(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -168,6 +183,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HasDisplay(value));
+        AssertCustomMessage(tc, () => Guard.Against.HasDisplay(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -178,6 +194,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHasEnumMember(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasEnumMember(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -188,6 +205,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HasEnumMember(value));
+        AssertCustomMessage(tc, () => Guard.Against.HasEnumMember(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -199,6 +217,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Obsolete(value));
+        AssertCustomMessage(tc, () => Guard.Against.Obsolete(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 #pragma warning restore CS0618
@@ -211,6 +230,7 @@ public sealed class GuardEnumClausesTests(ITestOutputHelper output) : BaseGuardU
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotObsolete(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotObsolete(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 #pragma warning restore CS0618

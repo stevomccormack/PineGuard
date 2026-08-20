@@ -7,6 +7,11 @@ namespace PineGuard.MustClauses.UnitTests;
 
 public static class MustCollectionClausesTestData
 {
+    private static readonly string[] ArrayBacked = ["a", "b", "c"];
+    private static readonly string[] ArrayBackedWithDuplicate = ["a", "b", "a"];
+    private static readonly string[] ArrayBackedSubset = ["a", "b"];
+    private static readonly string[] ArrayBackedDisjoint = ["z"];
+
     public static class Empty
     {
         public static TheoryData<MustCase<IEnumerable<string>>> ValidCases => F.IsEmpty.ValidScenarios.ToMustCases();
@@ -64,6 +69,11 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int max)>> ValidCases => F.HasMaxCount.ValidScenarios.ToMustCases();
 
+        public static TheoryData<MustCase<(IEnumerable<string>? value, int max)>> EdgeCases =>
+        [
+            new(nameof(ArrayBacked), (ArrayBacked, 3), new MustExpected(true))
+        ];
+
         public static TheoryData<MustCase<(IEnumerable<string>? value, int max)>> InvalidCases
         {
             get
@@ -82,6 +92,11 @@ public static class MustCollectionClausesTestData
     public static class HasCountBetween
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases => F.HasCountBetween.ValidScenarios.ToMustCases();
+
+        public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> EdgeCases =>
+        [
+            new(nameof(ArrayBacked), (ArrayBacked, 2, 4, Inclusion.Inclusive), new MustExpected(true))
+        ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> InvalidCases
         {
@@ -174,6 +189,11 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<IEnumerable<string>>> ValidCases => F.HasDistinctItems.ValidScenarios.ToMustCases();
 
+        public static TheoryData<MustCase<IEnumerable<string>>> EdgeCases =>
+        [
+            new(nameof(ArrayBacked), ArrayBacked, new MustExpected(true))
+        ];
+
         public static TheoryData<MustCase<IEnumerable<string>>> InvalidCases => F.HasDistinctItems.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             "Null" => new MustExpected(false, "value must not be null.", "value"),
@@ -185,6 +205,11 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<IEnumerable<string>>> ValidCases => F.HasDuplicateItems.ValidScenarios.ToMustCases();
 
+        public static TheoryData<MustCase<IEnumerable<string>>> EdgeCases =>
+        [
+            new(nameof(ArrayBackedWithDuplicate), ArrayBackedWithDuplicate, new MustExpected(true))
+        ];
+
         public static TheoryData<MustCase<IEnumerable<string>>> InvalidCases => F.HasDuplicateItems.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             "Null" => new MustExpected(false, "value must not be null.", "value"),
@@ -195,6 +220,11 @@ public static class MustCollectionClausesTestData
     public static class NotContainsNullItems
     {
         public static TheoryData<MustCase<IEnumerable<string?>>> ValidCases => F.ContainsNullItems.InvalidScenarios.Except("NullCollection").ToMustCases(_ => new MustExpected(true));
+
+        public static TheoryData<MustCase<IEnumerable<string?>>> EdgeCases =>
+        [
+            new(nameof(ArrayBacked), ArrayBacked, new MustExpected(true))
+        ];
 
         public static TheoryData<MustCase<IEnumerable<string?>>> InvalidCases
         {
@@ -236,6 +266,11 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> ValidCases => F.IsSubsetOf.ValidScenarios.ToMustCases();
 
+        public static TheoryData<MustCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> EdgeCases =>
+        [
+            new(nameof(ArrayBackedSubset), (ArrayBackedSubset, ArrayBacked), new MustExpected(true))
+        ];
+
         public static TheoryData<MustCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> InvalidCases => F.IsSubsetOf.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             nameof(F.IsSubsetOf.NullMultiple) => new MustExpected(false, "value must not be null.", "value"),
@@ -249,6 +284,11 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> ValidCases =>
         [
             new("Not subset", (["z"], ["a", "b"]), new MustExpected(true))
+        ];
+
+        public static TheoryData<MustCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> EdgeCases =>
+        [
+            new(nameof(ArrayBackedDisjoint), (ArrayBackedDisjoint, ArrayBacked), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> InvalidCases =>
@@ -323,6 +363,11 @@ public static class MustCollectionClausesTestData
             new("Above max", (["a", "b", "c"], 2), new MustExpected(true))
         ];
 
+        public static TheoryData<MustCase<(IEnumerable<string>? value, int max)>> EdgeCases =>
+        [
+            new(nameof(ArrayBacked), (ArrayBacked, 2), new MustExpected(true))
+        ];
+
         public static TheoryData<MustCase<(IEnumerable<string>? value, int max)>> InvalidCases =>
         [
             new(nameof(F.HasMaxCount.NullThree), (null, 3), new MustExpected(false, "value must not be null.", "value")),
@@ -336,6 +381,11 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases =>
         [
             new("Out of range", (["a", "b", "c"], 4, 6, Inclusion.Inclusive), new MustExpected(true))
+        ];
+
+        public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> EdgeCases =>
+        [
+            new(nameof(ArrayBacked), (ArrayBacked, 4, 6, Inclusion.Inclusive), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> InvalidCases =>

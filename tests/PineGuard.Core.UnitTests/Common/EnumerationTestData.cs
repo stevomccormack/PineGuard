@@ -296,6 +296,26 @@ public static class EnumerationTestData
             : IsCase<(TestColor? Left, TestColor? Right)>(Name, (Left, Right), Expected);
     }
 
+    public static class OperatorComparison
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("lesser sorts before greater", TestColor.Red, TestColor.Blue, true, true, false, false),
+            new("greater sorts after lesser", TestColor.Blue, TestColor.Red, false, false, true, true),
+            new("same value sorts equal", TestColor.Red, TestColor.Red, false, true, false, true)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("null sorts before non-null", null, TestColor.Red, true, true, false, false),
+            new("non-null sorts after null", TestColor.Red, null, false, false, true, true),
+            new("null sorts equal to null", null, null, false, true, false, true)
+        ];
+
+        public sealed record ValidCase(string Name, TestColor? Left, TestColor? Right, bool ExpectedLessThan, bool ExpectedLessThanOrEqual, bool ExpectedGreaterThan, bool ExpectedGreaterThanOrEqual)
+            : ValueCase<(TestColor? Left, TestColor? Right)>(Name, (Left, Right));
+    }
+
     public static class HashCode
     {
         public static TheoryData<ValidCase> ValidCases =>

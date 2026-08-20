@@ -13,6 +13,7 @@ public sealed class GuardXmlClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotXml(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotXml(value, message: CustomMessage));
 
         if (tc.Expected.IsValid)
             Assert.Equal(tc.Value, result);
@@ -25,6 +26,7 @@ public sealed class GuardXmlClausesTests(ITestOutputHelper output)
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotXmlDocument(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotXmlDocument(value, message: CustomMessage));
 
         if (tc.Expected.IsValid)
             Assert.Equal(tc.Value, result);
@@ -37,6 +39,7 @@ public sealed class GuardXmlClausesTests(ITestOutputHelper output)
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotXmlContentType(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotXmlContentType(headers, message: CustomMessage));
 
         if (tc.Expected.IsValid)
             Assert.Equal(tc.Value, result);

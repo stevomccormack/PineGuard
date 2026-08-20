@@ -14,6 +14,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Empty(value));
+        AssertCustomMessage(tc, () => Guard.Against.Empty(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -24,6 +25,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotEmpty(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotEmpty(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -34,6 +36,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotHasExactCount(value, tc.Value.count));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasExactCount(value, tc.Value.count, message: CustomMessage));
     }
 
     [Theory]
@@ -43,6 +46,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.HasExactCount(value, tc.Value.count));
+        AssertCustomMessage(tc, () => Guard.Against.HasExactCount(value, tc.Value.count, message: CustomMessage));
     }
 
     [Theory]
@@ -52,6 +56,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotHasMinCount(value, tc.Value.min));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasMinCount(value, tc.Value.min, message: CustomMessage));
     }
 
     [Theory]
@@ -61,6 +66,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.HasMinCount(value, tc.Value.min));
+        AssertCustomMessage(tc, () => Guard.Against.HasMinCount(value, tc.Value.min, message: CustomMessage));
     }
 
     [Theory]
@@ -70,6 +76,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotHasMaxCount(value, tc.Value.max));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasMaxCount(value, tc.Value.max, message: CustomMessage));
     }
 
     [Theory]
@@ -79,6 +86,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.HasMaxCount(value, tc.Value.max));
+        AssertCustomMessage(tc, () => Guard.Against.HasMaxCount(value, tc.Value.max, message: CustomMessage));
     }
 
     [Theory]
@@ -88,6 +96,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotHasCountBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasCountBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]
@@ -97,6 +106,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.HasCountBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.HasCountBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]
@@ -106,6 +116,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.DuplicateItems(value));
+        AssertCustomMessage(tc, () => Guard.Against.DuplicateItems(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -116,6 +127,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.DistinctItems(value));
+        AssertCustomMessage(tc, () => Guard.Against.DistinctItems(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -126,6 +138,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.ContainsNullItems(value));
+        AssertCustomMessage(tc, () => Guard.Against.ContainsNullItems(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -136,6 +149,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotContains(value, tc.Value.item));
+        AssertCustomMessage(tc, () => Guard.Against.NotContains(value, tc.Value.item, message: CustomMessage));
     }
 
     [Theory]
@@ -145,6 +159,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.Contains(value, tc.Value.item));
+        AssertCustomMessage(tc, () => Guard.Against.Contains(value, tc.Value.item, message: CustomMessage));
     }
 
     [Theory]
@@ -154,6 +169,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotSubsetOf(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.NotSubsetOf(value, tc.Value.other, message: CustomMessage));
     }
 
     [Theory]
@@ -163,6 +179,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.SubsetOf(value, tc.Value.other));
+        AssertCustomMessage(tc, () => Guard.Against.SubsetOf(value, tc.Value.other, message: CustomMessage));
     }
 
     [Theory]
@@ -172,6 +189,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.NotHasIndex(value, tc.Value.index));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasIndex(value, tc.Value.index, message: CustomMessage));
     }
 
     [Theory]
@@ -181,6 +199,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value.value;
         AssertResult(tc, () => Guard.Against.HasIndex(value, tc.Value.index));
+        AssertCustomMessage(tc, () => Guard.Against.HasIndex(value, tc.Value.index, message: CustomMessage));
     }
 
     [Theory]
@@ -190,6 +209,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHasAny(value, TD.NotHasAny.Predicate));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasAny(value, TD.NotHasAny.Predicate, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -200,6 +220,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HasAny(value, TD.HasAny.Predicate));
+        AssertCustomMessage(tc, () => Guard.Against.HasAny(value, TD.HasAny.Predicate, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -210,6 +231,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHasAll(value, TD.NotHasAll.Predicate));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasAll(value, TD.NotHasAll.Predicate, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -220,6 +242,7 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.HasAll(value, TD.HasAll.Predicate));
+        AssertCustomMessage(tc, () => Guard.Against.HasAll(value, TD.HasAll.Predicate, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

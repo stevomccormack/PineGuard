@@ -12,6 +12,7 @@ public sealed class GuardDefaultEqualityClausesTests(ITestOutputHelper output) :
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Default(value));
+        AssertCustomMessage(tc, () => Guard.Against.Default(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -22,6 +23,7 @@ public sealed class GuardDefaultEqualityClausesTests(ITestOutputHelper output) :
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotDefault(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotDefault(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -32,6 +34,7 @@ public sealed class GuardDefaultEqualityClausesTests(ITestOutputHelper output) :
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NullOrDefault(value));
+        AssertCustomMessage(tc, () => Guard.Against.NullOrDefault(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -42,6 +45,7 @@ public sealed class GuardDefaultEqualityClausesTests(ITestOutputHelper output) :
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotNullOrDefault(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotNullOrDefault(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

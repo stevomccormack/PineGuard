@@ -13,6 +13,7 @@ public sealed class GuardGuidClausesTests(ITestOutputHelper output)
     {
         // Act
         var result = AssertResult(tc, () => Guard.Against.Empty(tc.Value, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.Empty(tc.Value, paramName: "value", message: CustomMessage));
 
         // Assert
         if (tc.Expected.IsValid)

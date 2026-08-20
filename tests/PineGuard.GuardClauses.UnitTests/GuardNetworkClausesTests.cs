@@ -14,6 +14,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotIpAddress(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotIpAddress(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -25,6 +26,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotIpv4(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotIpv4(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -36,6 +38,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotIpv6(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotIpv6(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -47,6 +50,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotIpAddressString(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotIpAddressString(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -58,6 +62,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotIpv4String(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotIpv4String(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -69,6 +74,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotIpv6String(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotIpv6String(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -80,6 +86,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.ip;
         var result = AssertResult(tc, () => Guard.Against.NotInCidrRange(value!, tc.Value.cidr));
+        AssertCustomMessage(tc, () => Guard.Against.NotInCidrRange(value!, tc.Value.cidr, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -91,6 +98,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotHostname(value!));
+        AssertCustomMessage(tc, () => Guard.Against.NotHostname(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
@@ -102,6 +110,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotPortNumber(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotPortNumber(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -113,6 +122,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.IpAddress(value!));
+        AssertCustomMessage(tc, () => Guard.Against.IpAddress(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -124,6 +134,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Ipv4(value!));
+        AssertCustomMessage(tc, () => Guard.Against.Ipv4(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -135,6 +146,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Ipv6(value!));
+        AssertCustomMessage(tc, () => Guard.Against.Ipv6(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -146,6 +158,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.IpAddressString(value!));
+        AssertCustomMessage(tc, () => Guard.Against.IpAddressString(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -157,6 +170,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Ipv4String(value!));
+        AssertCustomMessage(tc, () => Guard.Against.Ipv4String(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -168,6 +182,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Ipv6String(value!));
+        AssertCustomMessage(tc, () => Guard.Against.Ipv6String(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -179,6 +194,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value.ip;
         var result = AssertResult(tc, () => Guard.Against.InCidrRange(value!, tc.Value.cidr));
+        AssertCustomMessage(tc, () => Guard.Against.InCidrRange(value!, tc.Value.cidr, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -190,6 +206,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Hostname(value!));
+        AssertCustomMessage(tc, () => Guard.Against.Hostname(value!, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -201,6 +218,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.PortNumber(value));
+        AssertCustomMessage(tc, () => Guard.Against.PortNumber(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

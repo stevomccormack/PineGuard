@@ -13,6 +13,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotNullOrEmpty(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotNullOrEmpty(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -23,6 +24,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NullOrEmpty(value));
+        AssertCustomMessage(tc, () => Guard.Against.NullOrEmpty(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -33,6 +35,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotNullOrWhiteSpace(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotNullOrWhiteSpace(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -43,6 +46,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NullOrWhiteSpace(value));
+        AssertCustomMessage(tc, () => Guard.Against.NullOrWhiteSpace(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -54,6 +58,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var length = tc.Value.length;
         var result = AssertResult(tc, () => Guard.Against.NotExactLength(value, length));
+        AssertCustomMessage(tc, () => Guard.Against.NotExactLength(value, length, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -66,6 +71,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var min = tc.Value.min;
         var max = tc.Value.max;
         var result = AssertResult(tc, () => Guard.Against.NotLengthBetween(value, min, max));
+        AssertCustomMessage(tc, () => Guard.Against.NotLengthBetween(value, min, max, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -77,6 +83,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var length = tc.Value.length;
         var result = AssertResult(tc, () => Guard.Against.ShorterThanOrEqual(value, length));
+        AssertCustomMessage(tc, () => Guard.Against.ShorterThanOrEqual(value, length, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -88,6 +95,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var length = tc.Value.length;
         var result = AssertResult(tc, () => Guard.Against.ShorterThan(value, length));
+        AssertCustomMessage(tc, () => Guard.Against.ShorterThan(value, length, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -99,6 +107,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var length = tc.Value.length;
         var result = AssertResult(tc, () => Guard.Against.LongerThanOrEqual(value, length));
+        AssertCustomMessage(tc, () => Guard.Against.LongerThanOrEqual(value, length, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -110,6 +119,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var length = tc.Value.length;
         var result = AssertResult(tc, () => Guard.Against.LongerThan(value, length));
+        AssertCustomMessage(tc, () => Guard.Against.LongerThan(value, length, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -121,6 +131,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var pattern = tc.Value.pattern;
         var result = AssertResult(tc, () => Guard.Against.NotMatch(value, pattern));
+        AssertCustomMessage(tc, () => Guard.Against.NotMatch(value, pattern, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -132,6 +143,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var pattern = tc.Value.pattern;
         var result = AssertResult(tc, () => Guard.Against.Match(value, pattern));
+        AssertCustomMessage(tc, () => Guard.Against.Match(value, pattern, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -142,6 +154,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotAlphabetic(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotAlphabetic(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -152,6 +165,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotNumeric(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotNumeric(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -162,6 +176,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotAlphanumeric(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotAlphanumeric(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -172,6 +187,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotDigitsOnly(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotDigitsOnly(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -183,6 +199,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var allowedNonDigitChars = tc.Value.allowedNonDigitChars;
         var result = AssertResult(tc, () => Guard.Against.NotDigitsOnly(value, allowedNonDigitChars));
+        AssertCustomMessage(tc, () => Guard.Against.NotDigitsOnly(value, allowedNonDigitChars, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -193,6 +210,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Alphabetic(value));
+        AssertCustomMessage(tc, () => Guard.Against.Alphabetic(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -203,6 +221,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Numeric(value));
+        AssertCustomMessage(tc, () => Guard.Against.Numeric(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -213,6 +232,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Alphanumeric(value));
+        AssertCustomMessage(tc, () => Guard.Against.Alphanumeric(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -223,6 +243,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.DigitsOnly(value));
+        AssertCustomMessage(tc, () => Guard.Against.DigitsOnly(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -234,6 +255,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var allowedNonDigitChars = tc.Value.allowedNonDigitChars;
         var result = AssertResult(tc, () => Guard.Against.DigitsOnly(value, allowedNonDigitChars));
+        AssertCustomMessage(tc, () => Guard.Against.DigitsOnly(value, allowedNonDigitChars, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -245,6 +267,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var lettersOnly = tc.Value.lettersOnly;
         var result = AssertResult(tc, () => Guard.Against.Uppercase(value, lettersOnly));
+        AssertCustomMessage(tc, () => Guard.Against.Uppercase(value, lettersOnly, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -256,6 +279,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var lettersOnly = tc.Value.lettersOnly;
         var result = AssertResult(tc, () => Guard.Against.Lowercase(value, lettersOnly));
+        AssertCustomMessage(tc, () => Guard.Against.Lowercase(value, lettersOnly, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -266,6 +290,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotAscii(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotAscii(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -276,6 +301,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Ascii(value));
+        AssertCustomMessage(tc, () => Guard.Against.Ascii(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -287,6 +313,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var allowCommonWhitespace = tc.Value.allowCommonWhitespace;
         var result = AssertResult(tc, () => Guard.Against.NotPrintableAscii(value, allowCommonWhitespace));
+        AssertCustomMessage(tc, () => Guard.Against.NotPrintableAscii(value, allowCommonWhitespace, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -298,6 +325,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var allowCommonWhitespace = tc.Value.allowCommonWhitespace;
         var result = AssertResult(tc, () => Guard.Against.PrintableAscii(value, allowCommonWhitespace));
+        AssertCustomMessage(tc, () => Guard.Against.PrintableAscii(value, allowCommonWhitespace, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -308,6 +336,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.IsWhitespace(value));
+        AssertCustomMessage(tc, () => Guard.Against.IsWhitespace(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -318,6 +347,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.Whitespace(value));
+        AssertCustomMessage(tc, () => Guard.Against.Whitespace(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -328,6 +358,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotContainsWhitespace(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotContainsWhitespace(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -338,6 +369,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.ContainsWhitespace(value));
+        AssertCustomMessage(tc, () => Guard.Against.ContainsWhitespace(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -348,6 +380,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotContainsControlChars(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotContainsControlChars(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -358,6 +391,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     {
         var value = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.ContainsControlChars(value));
+        AssertCustomMessage(tc, () => Guard.Against.ContainsControlChars(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -369,6 +403,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var allowedChars = tc.Value.allowedChars;
         var result = AssertResult(tc, () => Guard.Against.NotContainsAllowedOnly(value, allowedChars));
+        AssertCustomMessage(tc, () => Guard.Against.NotContainsAllowedOnly(value, allowedChars, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -380,6 +415,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var allowedChars = tc.Value.allowedChars;
         var result = AssertResult(tc, () => Guard.Against.ContainsAllowedOnly(value, allowedChars));
+        AssertCustomMessage(tc, () => Guard.Against.ContainsAllowedOnly(value, allowedChars, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -391,6 +427,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var disallowedChars = tc.Value.disallowedChars;
         var result = AssertResult(tc, () => Guard.Against.ContainsDisallowed(value, disallowedChars));
+        AssertCustomMessage(tc, () => Guard.Against.ContainsDisallowed(value, disallowedChars, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -402,6 +439,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var characters = tc.Value.characters;
         var result = AssertResult(tc, () => Guard.Against.NotContainsAny(value, characters));
+        AssertCustomMessage(tc, () => Guard.Against.NotContainsAny(value, characters, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -413,6 +451,7 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var value = tc.Value.value;
         var disallowedChars = tc.Value.disallowedChars;
         var result = AssertResult(tc, () => Guard.Against.NotContainsDisallowed(value, disallowedChars));
+        AssertCustomMessage(tc, () => Guard.Against.NotContainsDisallowed(value, disallowedChars, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

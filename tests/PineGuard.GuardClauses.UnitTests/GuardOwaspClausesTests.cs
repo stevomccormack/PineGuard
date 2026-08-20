@@ -11,6 +11,7 @@ public sealed class GuardOwaspClausesTests(ITestOutputHelper output) : BaseGuard
     public void OwaspUnsafe_BehavesAsExpected(GuardCase<string?> tc)
     {
         AssertResult(tc, () => Guard.Against.OwaspUnsafe(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.OwaspUnsafe(tc.Value!, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -19,6 +20,7 @@ public sealed class GuardOwaspClausesTests(ITestOutputHelper output) : BaseGuard
     public void Xss_BehavesAsExpected(GuardCase<string?> tc)
     {
         AssertResult(tc, () => Guard.Against.Xss(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.Xss(tc.Value!, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -27,6 +29,7 @@ public sealed class GuardOwaspClausesTests(ITestOutputHelper output) : BaseGuard
     public void SqlInjection_BehavesAsExpected(GuardCase<string?> tc)
     {
         AssertResult(tc, () => Guard.Against.SqlInjection(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.SqlInjection(tc.Value!, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -35,6 +38,7 @@ public sealed class GuardOwaspClausesTests(ITestOutputHelper output) : BaseGuard
     public void PathTraversal_BehavesAsExpected(GuardCase<string?> tc)
     {
         AssertResult(tc, () => Guard.Against.PathTraversal(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.PathTraversal(tc.Value!, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -43,6 +47,7 @@ public sealed class GuardOwaspClausesTests(ITestOutputHelper output) : BaseGuard
     public void CommandInjection_BehavesAsExpected(GuardCase<string?> tc)
     {
         AssertResult(tc, () => Guard.Against.CommandInjection(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.CommandInjection(tc.Value!, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -51,6 +56,7 @@ public sealed class GuardOwaspClausesTests(ITestOutputHelper output) : BaseGuard
     public void CrLf_BehavesAsExpected(GuardCase<string?> tc)
     {
         AssertResult(tc, () => Guard.Against.CrLf(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.CrLf(tc.Value!, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -59,6 +65,7 @@ public sealed class GuardOwaspClausesTests(ITestOutputHelper output) : BaseGuard
     public void LdapFilter_BehavesAsExpected(GuardCase<string?> tc)
     {
         AssertResult(tc, () => Guard.Against.LdapFilter(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.LdapFilter(tc.Value!, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -67,6 +74,7 @@ public sealed class GuardOwaspClausesTests(ITestOutputHelper output) : BaseGuard
     public void OpenRedirect_BehavesAsExpected(GuardCase<string?> tc)
     {
         AssertResult(tc, () => Guard.Against.OpenRedirect(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.OpenRedirect(tc.Value!, paramName: "value", message: CustomMessage));
     }
 
     [Theory]
@@ -75,5 +83,6 @@ public sealed class GuardOwaspClausesTests(ITestOutputHelper output) : BaseGuard
     public void SsrfScheme_BehavesAsExpected(GuardCase<string?> tc)
     {
         AssertResult(tc, () => Guard.Against.SsrfScheme(tc.Value!, paramName: "value"));
+        AssertCustomMessage(tc, () => Guard.Against.SsrfScheme(tc.Value!, paramName: "value", message: CustomMessage));
     }
 }

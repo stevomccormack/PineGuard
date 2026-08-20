@@ -157,10 +157,10 @@ public static class FluentReadOnlyDictionaryExtensionsTestData
     {
         public static TheoryData<FluentCase<Func<ValidationResult>>> Cases =>
         [
-            new("Empty-IRuleBuilderOptions", static () => { var validator = new InlineValidator<Model>(); var opts = validator.RuleFor(x => x.Dict).NotEmpty(); opts.Empty(); return validator.Validate(new Model { Dict = new Dictionary<string, int> { { "a", 1 } } }); }, new FluentExpected(false)),
-            new("Empty-IRuleBuilder", static () => { var validator = new InlineValidator<Model>(); IRuleBuilder<Model, IReadOnlyDictionary<string, int>?> rb = validator.RuleFor(x => x.Dict); rb.Empty(); return validator.Validate(new Model { Dict = new Dictionary<string, int> { { "a", 1 } } }); }, new FluentExpected(false)),
-            new("NotEmpty-IRuleBuilderOptions", static () => { var validator = new InlineValidator<Model>(); var opts = validator.RuleFor(x => x.Dict).Empty(); opts.NotEmpty(); return validator.Validate(new Model { Dict = new Dictionary<string, int>() }); }, new FluentExpected(false)),
-            new("NotEmpty-IRuleBuilder", static () => { var validator = new InlineValidator<Model>(); IRuleBuilder<Model, IReadOnlyDictionary<string, int>?> rb = validator.RuleFor(x => x.Dict); rb.NotEmpty(); return validator.Validate(new Model { Dict = new Dictionary<string, int>() }); }, new FluentExpected(false))
+            new("Empty-IRuleBuilderOptions", static () => { var validator = new InlineValidator<Model>(); var opts = validator.RuleFor(x => x.Dict).NotEmpty(); opts.Empty(); opts.Empty(); return validator.Validate(new Model { Dict = new Dictionary<string, int> { { "a", 1 } } }); }, new FluentExpected(false)),
+            new("Empty-IRuleBuilder", static () => { var validator = new InlineValidator<Model>(); IRuleBuilder<Model, IReadOnlyDictionary<string, int>?> rb = validator.RuleFor(x => x.Dict); rb.Empty(); rb.Empty(); return validator.Validate(new Model { Dict = new Dictionary<string, int> { { "a", 1 } } }); }, new FluentExpected(false)),
+            new("NotEmpty-IRuleBuilderOptions", static () => { var validator = new InlineValidator<Model>(); var opts = validator.RuleFor(x => x.Dict).Empty(); opts.NotEmpty(); opts.NotEmpty(); return validator.Validate(new Model { Dict = new Dictionary<string, int>() }); }, new FluentExpected(false)),
+            new("NotEmpty-IRuleBuilder", static () => { var validator = new InlineValidator<Model>(); IRuleBuilder<Model, IReadOnlyDictionary<string, int>?> rb = validator.RuleFor(x => x.Dict); rb.NotEmpty(); rb.NotEmpty(); return validator.Validate(new Model { Dict = new Dictionary<string, int>() }); }, new FluentExpected(false))
         ];
 
         private sealed record Model

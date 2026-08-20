@@ -6,6 +6,11 @@ namespace PineGuard.Testing.UnitTests.GuardClauses;
 
 public abstract class BaseGuardUnitTest(ITestOutputHelper output) : BaseUnitTest(output)
 {
+    /// <summary>
+    /// The canonical custom message used to verify the optional <c>message</c> argument on every guard clause.
+    /// </summary>
+    protected const string CustomMessage = "Custom guard message.";
+
     protected static TReturn AssertThrow<TReturn>(ThrowExpected expected, Func<TReturn> act)
     {
         if (expected.IsValid)
@@ -21,4 +26,17 @@ public abstract class BaseGuardUnitTest(ITestOutputHelper output) : BaseUnitTest
 
     protected static TReturn AssertResult<TValue, TReturn>(GuardCase<TValue> testCase, Func<TReturn> act) =>
         AssertThrow(testCase.Expected, act);
+
+    /// <summary>
+    /// Asserts that a guard invoked with an explicit <c>message</c> argument surfaces that message
+    /// instead of the default <c>MustResult.Message</c>. No-ops for pass-through (valid) cases.
+    /// </summary>
+    protected static void AssertCustomMessage<TValue, TReturn>(GuardCase<TValue> testCase, Func<TReturn> act)
+    {
+        if (testCase.Expected.IsValid)
+            return;
+
+        var ex = Assert.Throws(testCase.Expected.ExceptionType!, () => act());
+        Assert.Contains(CustomMessage, ex.Message, StringComparison.Ordinal);
+    }
 }

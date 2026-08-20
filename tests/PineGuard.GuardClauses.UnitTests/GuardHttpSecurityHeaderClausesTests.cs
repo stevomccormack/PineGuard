@@ -13,6 +13,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotContentSecurityPolicyHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotContentSecurityPolicyHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -23,6 +24,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotContentSecurityPolicyWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotContentSecurityPolicyWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -33,6 +35,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value.headers;
         var result = AssertResult(tc, () => Guard.Against.NotContentSecurityPolicy(headers, tc.Value.requiredDefaultSrcValue, tc.Value.requiredObjectSrcValue, tc.Value.requiredBaseUriValue, tc.Value.requiredFrameAncestorsValue));
+        AssertCustomMessage(tc, () => Guard.Against.NotContentSecurityPolicy(headers, tc.Value.requiredDefaultSrcValue, tc.Value.requiredObjectSrcValue, tc.Value.requiredBaseUriValue, tc.Value.requiredFrameAncestorsValue, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -43,6 +46,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotStrictTransportSecurityHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotStrictTransportSecurityHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -53,6 +57,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotStrictTransportSecurityWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotStrictTransportSecurityWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -63,6 +68,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value.headers;
         var result = AssertResult(tc, () => Guard.Against.NotStrictTransportSecurity(headers, tc.Value.minMaxAgeSeconds, tc.Value.requireIncludeSubDomains, tc.Value.requirePreload));
+        AssertCustomMessage(tc, () => Guard.Against.NotStrictTransportSecurity(headers, tc.Value.minMaxAgeSeconds, tc.Value.requireIncludeSubDomains, tc.Value.requirePreload, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -73,6 +79,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotXContentTypeOptionsHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotXContentTypeOptionsHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -83,6 +90,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotXContentTypeOptionsWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotXContentTypeOptionsWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -93,6 +101,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value.headers;
         var result = AssertResult(tc, () => Guard.Against.NotXContentTypeOptions(headers, tc.Value.expectedValue));
+        AssertCustomMessage(tc, () => Guard.Against.NotXContentTypeOptions(headers, tc.Value.expectedValue, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -103,6 +112,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotXFrameOptionsHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotXFrameOptionsHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -113,6 +123,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotXFrameOptionsWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotXFrameOptionsWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -123,6 +134,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value.headers;
         var result = AssertResult(tc, () => Guard.Against.NotXFrameOptions(headers, tc.Value.expectedValue));
+        AssertCustomMessage(tc, () => Guard.Against.NotXFrameOptions(headers, tc.Value.expectedValue, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -133,6 +145,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotReferrerPolicyHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotReferrerPolicyHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -143,6 +156,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotReferrerPolicyWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotReferrerPolicyWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -153,6 +167,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value.headers;
         var result = AssertResult(tc, () => Guard.Against.NotReferrerPolicy(headers, tc.Value.expectedValue));
+        AssertCustomMessage(tc, () => Guard.Against.NotReferrerPolicy(headers, tc.Value.expectedValue, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -163,6 +178,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotPermissionsPolicyHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotPermissionsPolicyHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -173,6 +189,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.NotPermissionsPolicyWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.NotPermissionsPolicyWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -183,6 +200,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value.headers;
         var result = AssertResult(tc, () => Guard.Against.NotPermissionsPolicy(headers, tc.Value.expectedValue));
+        AssertCustomMessage(tc, () => Guard.Against.NotPermissionsPolicy(headers, tc.Value.expectedValue, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -194,6 +212,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
         var headers = tc.Value.headers;
         var requiredFragments = tc.Value.requiredFragments is not null ? new[] { tc.Value.requiredFragments } : null;
         var result = AssertResult(tc, () => Guard.Against.NotPermissionsPolicyContaining(headers, requiredFragments));
+        AssertCustomMessage(tc, () => Guard.Against.NotPermissionsPolicyContaining(headers, requiredFragments, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -204,6 +223,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.ContentSecurityPolicyHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.ContentSecurityPolicyHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -214,6 +234,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.ContentSecurityPolicyWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.ContentSecurityPolicyWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -224,6 +245,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.StrictTransportSecurityHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.StrictTransportSecurityHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -234,6 +256,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.StrictTransportSecurityWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.StrictTransportSecurityWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -244,6 +267,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.XContentTypeOptionsHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.XContentTypeOptionsHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -254,6 +278,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.XContentTypeOptionsWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.XContentTypeOptionsWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -264,6 +289,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.XFrameOptionsHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.XFrameOptionsHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -274,6 +300,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.XFrameOptionsWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.XFrameOptionsWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -284,6 +311,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.ReferrerPolicyHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.ReferrerPolicyHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -294,6 +322,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.ReferrerPolicyWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.ReferrerPolicyWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -304,6 +333,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.PermissionsPolicyHeader(headers));
+        AssertCustomMessage(tc, () => Guard.Against.PermissionsPolicyHeader(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 
@@ -314,6 +344,7 @@ public sealed class GuardHttpSecurityHeaderClausesTests(ITestOutputHelper output
     {
         var headers = tc.Value;
         var result = AssertResult(tc, () => Guard.Against.PermissionsPolicyWithDefaults(headers));
+        AssertCustomMessage(tc, () => Guard.Against.PermissionsPolicyWithDefaults(headers, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(headers, result);
     }
 }
