@@ -29,8 +29,9 @@ public static class EmailUtilityTestData
 
     public static class TryStrictCreate
     {
-        // EmailUtility.MaxDomainLength = 255; a domain exceeding this cannot produce a valid email
-        // within the MaxEmailLength constraint, so we verify rejection using this constant.
+        // EmailUtility.MaxDomainLength = 255; a domain exceeding this always exceeds the overall
+        // MaxEmailLength (254) cap as well (local part + '@' add at least 2 more characters), so
+        // this case is rejected via the total-length check rather than a standalone domain-length check.
         private static readonly string TooLongDomain = new string('a', EmailUtility.MaxDomainLength - 2) + ".com";
 
         public static TheoryData<ValidCase> ValidCases =>
@@ -59,7 +60,7 @@ public static class EmailUtilityTestData
             new("missing at", "userexample.com", false, string.Empty),
             new("local too long", new string('a', 65) + "@example.com", false, string.Empty),
             new("overall too long", new string('a', 64) + "@" + new string('b', 189) + ".com", false, string.Empty),
-            new("domain exceeds MaxDomainLength", "user@" + TooLongDomain, false, string.Empty),
+            new("domain exceeds MaxDomainLength (caught by overall length cap)", "user@" + TooLongDomain, false, string.Empty),
             new("idn arg exception", "user@\u0000.com", false, string.Empty),
             new("invalid local", "\u0000user@example.com", false, string.Empty),
             new("angle brackets without space", "User<user@example.com>", false, string.Empty),

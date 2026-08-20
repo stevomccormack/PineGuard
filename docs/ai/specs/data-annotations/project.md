@@ -4,11 +4,11 @@ spec:
   title: "PineGuard.DataAnnotations Project Spec"
   version: 2
   template:
-    - ../template-project.md
+    - ../../meta/template-project.md
   parent:
-    - ../../spec.md
+    - ../spec.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.DataAnnotations/**"
 ---
@@ -19,11 +19,15 @@ applies_to:
 
 Define **project-specific** rules for the `PineGuard.DataAnnotations` integration.
 
-This integration must keep PineGuard’s layering intact:
+This integration must keep PineGuard’s layering intact. PineGuard layers in one direction — each layer calls only the one before it:
 
-- Core (`Rules`/`Utils`) owns validation + parsing.
-- MustClauses owns canonical messages.
-- DataAnnotations integration adapts MustClauses into `ValidationAttribute`s.
+- **Core** (`Rules`/`Utils`) owns validation logic and parsing.
+- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
+- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
+- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
+- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
+
+Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none reimplements Core logic.
 
 ## Scope
 
@@ -43,7 +47,7 @@ See `docs/ai/specs/spec.md` §3 ("Feature Implementation Checklist (Master)").
 
 - Root rules: `docs/ai/specs/spec.md`
 - Validated value vs configuration/dependency parameters: `docs/ai/specs/spec.md` (“Validated value vs configuration/dependency parameters”).
-- Dependency graph: `docs/ai/dependencies.md`
+- Dependency graph: `docs/ai/specs/dependencies.md`
 
 ---
 
@@ -69,12 +73,13 @@ Required pattern:
 ## 2.1 Formatting Rules (Strict)
 
 - **Base Class**: Use `ValidationAttributeBase` (Namespace: `PineGuard.DataAnnotations.Common`).
-- **Constructors**: Single line empty constructors successfully.
-  - Example: `public TrueAttribute() : base(typeof(bool)) { }`
+- **Constructors**: Use a single-line primary constructor per `docs/ai/specs/coding-standard.md` ("Primary Constructors (C# 12)").
+  - Example: `public sealed class TrueAttribute() : ValidationAttributeBase(typeof(bool))`
 - **Naming Collisions**: If an attribute name would collide across domains (e.g., `Past` for `DateOnly` vs `DateTime`), suffix the Type/Domain to the attribute name for the **entire class** of that domain.
   - Example: `PastDateOnlyAttribute`, `FutureDateOnlyAttribute` (for DateOnly domain).
   - Example: `TrueStringAttribute` (for String domain if `True` exists for Bool).
-- **Comments**: No comments allowed unless exceptional value.
+- **Method Ordering**: Within an aggregated attribute file, the positive attribute precedes its `Not*` complement — matching `docs/ai/specs/must-clauses/project.md` ("Method ordering").
+- **Comments**: XML documentation comments (`<summary>`, `<remarks>`, `<example>`, `<seealso>`) are REQUIRED on every public attribute — `<GenerateDocumentationFile>` is on in `Directory.Build.props` and the templates live in `docs/ai/skills/document/SKILL.md` §5.6. Inline `//` implementation comments are not allowed unless they carry exceptional value.
 - **Structure**: Clean, minimal implementations.
 
 ## 3) Structure & Naming (New Requirements)
@@ -87,7 +92,7 @@ Required organization rules:
 
 - Keep attribute types in the root namespace: `namespace PineGuard.DataAnnotations;`
 - Prefer **aggregated, domain-named files** at the project root (no required domain subfolders).
-- Use `src/PineGuard.DataAnnotations/Common/**` for shared base classes and helpers.
+- Use `src/PineGuard.DataAnnotations/Common/**` for shared base classes and helpers — today `ValidationAttributeBase` and `GenericDictionaryAttributeBase`. The one exception is `ObjectAttributeBase`, which sits in `ObjectAttributes.cs` alongside the object attributes it serves.
 
 Rationale:
 
@@ -115,7 +120,7 @@ DataAnnotations follows the standard "skip on null" behavior:
 
 This is intentionally different from Must/Guard behavior:
 
-- MustClauses follow Rule07 (hybrid nullability strategy): inputs may be declared nullable (especially reference types), but **null is invalid by default** unless the method name explicitly encodes null as acceptable (e.g., `NullOrXxx`).
+- MustClauses follow Rule07 (see `docs/ai/specs/tools/audit-cli/spec.md` and `tools/audit-cli/rules/Test-Rule07-Nullability.ps1`) — the hybrid nullability strategy: inputs may be declared nullable (especially reference types), but **null is invalid by default** unless the method name explicitly encodes null as acceptable (e.g., `NullOrXxx`).
 - The adapter layer is responsible for DataAnnotations UX: null handling is controlled by `[Required]` / `allowNull`, not by failing on null inside PineGuard validation attributes.
 
 Implementation rule:
@@ -125,42 +130,55 @@ Implementation rule:
 Standard pattern:
 
 ```csharp
-// Constructor defaults to allowNull: true
-public PastDateOnlyAttribute() : base(typeof(DateOnly)) { }
-
-protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+// Primary constructor defaults to allowNull: true
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class PastDateOnlyAttribute() : ValidationAttributeBase(typeof(DateOnly))
 {
-    // Base handles null check before calling this
-    if (value is not DateOnly dateValue) return ValidationResult.Success;
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        // Base has already returned Success for null and thrown on a type mismatch
+        var dateValue = (DateOnly)value!;
 
-    var result = Must.Be.Past(dateValue, paramName: null);
-    return FromMustResult(result, validationContext);
+        var result = Must.Be.Past(dateValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
 }
 ```
 
+> **No defensive type guard.** When the attribute declares a concrete expected type AND `allowNull` is
+> left at its default (`true`), do NOT re-check the CLR type inside `ValidateValue` —
+> `ValidationAttributeBase.IsValid` has already returned `Success` for `null` and thrown
+> `InvalidOperationException` on a type mismatch, so an `is not T` guard is an uncoverable dead branch
+> and breaks the 100% line + branch gate. Two exceptions:
+>
+> - Attributes constructed with `typeof(object)` for a polymorphic family (`TimeAttributes.cs`,
+>   `NumberAttributes.cs`, `CollectionAttributes.cs`) must `switch` on the runtime type with a throwing
+>   `default:` arm.
+> - Attributes constructed with `allowNull: false` (`ObjectAttributes.cs`, `StringAttributes.cs`) still
+>   receive `null` and must handle it explicitly.
+
 ### 4.1 The Rule
 
-`ValidationAttribute`s must strictly inherit from `ValidationAttributeBase`.
+`ValidationAttribute`s must inherit from `ValidationAttributeBase` or one of its shared derived bases
+(`ObjectAttributeBase`, `GenericDictionaryAttributeBase`).
 
 ## 5) Required adapter strategy
 
 Each `ValidationAttribute` implementation must adapt a specific Must clause:
 
-- Extend `PineGuardValidationAttribute`.
+- Extend `PineGuard.DataAnnotations.Common.ValidationAttributeBase` (or one of its derived bases — `ObjectAttributeBase`, `GenericDictionaryAttributeBase`).
 - Pass expected type to base constructor.
 - Override `ValidateValue(object? value, ValidationContext context)`.
 
 ### 5.1 Implementation Pattern (Template)
 
 ```csharp
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
-public sealed class TrueAttribute : ValidationAttributeBase
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class TrueAttribute() : ValidationAttributeBase(typeof(bool))
 {
-    public TrueAttribute() : base(typeof(bool)) { }
-
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        if (value is not bool boolValue) return ValidationResult.Success;
+        var boolValue = (bool)value!;
 
         var result = Must.Be.True(boolValue, paramName: null);
         return FromMustResult(result, validationContext);
@@ -168,9 +186,32 @@ public sealed class TrueAttribute : ValidationAttributeBase
 }
 ```
 
+### 5.2 Generic / open-type attributes
+
+When the Must clause is generic and the value's type is only known at runtime, adapt it through the
+reflection path — never through `dynamic`:
+
+```csharp
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotDefaultAttribute : ObjectAttributeBase
+{
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
+        InvokeGenericMust(nameof(MustDefaultEqualityClauses.NotDefault), value, validationContext);
+}
+```
+
+- `ObjectAttributeBase.InvokeGenericMust(...)` infers the value type, closes the generic Must method
+  over it, and calls the shared `BuildInvokeArgs` + `InvokeAndMapResult` helpers on
+  `ValidationAttributeBase`.
+- `GenericDictionaryAttributeBase.InvokeDictionaryMust(...)` does the same for dictionary-shaped values,
+  resolving `TKey`/`TValue` from the runtime type.
+- **`dynamic` and `Microsoft.CSharp` must never be reintroduced.** The DLR fails to bind members on a
+  `MustResult<T>` parameterized with a non-public type argument; reflection is the deliberate
+  replacement, not an accident.
+
 ## 6) Output expectations
 
 When asked to add a new DataAnnotation:
 
 - Prefer adding the attribute to the appropriate aggregated file (e.g., `BoolAttributes.cs`).
-- Ensure it compiles and inherits from `ValidationAttributeBase`.
+- Ensure it compiles and inherits from `ValidationAttributeBase` or one of its derived bases (`ObjectAttributeBase`, `GenericDictionaryAttributeBase`).

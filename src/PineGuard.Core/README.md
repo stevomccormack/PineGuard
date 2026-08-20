@@ -1,6 +1,6 @@
 # PineGuard.Core
 
-**The validation engine behind every PineGuard layer — zero dependencies, zero exceptions on the happy path, zero IO.**
+**The validation engine behind every PineGuard layer — no third-party dependencies, zero exceptions on the happy path, zero IO.**
 
 Core gives you pure static predicates and parsers for the data your app actually deals with: strings, numbers, dates, collections, URIs, emails, network identifiers, and OWASP-safe input. Fast, allocation-light, and safe to call from anywhere — hot paths, constructors, loops.
 
@@ -12,7 +12,7 @@ Most apps don't install Core directly. They install a higher layer (Must, Guard,
 dotnet add package PineGuard.Core
 ```
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`.
+Targets `net8.0`, `net10.0`, and `netstandard2.1`. The only package references are the Microsoft first-party BCL packages `System.ComponentModel.Annotations` and `System.Text.Json`.
 
 ## Examples
 

@@ -1,6 +1,15 @@
+<!-- metadata_header
+type: plan
+id: competitive-analysis
+version: 1.0
+status: living
+last_updated: 2026-08-20
+-->
+
 # PineGuard Competitive Analysis
 
-> **Status**: Living document | **Last updated**: 2026-08-20 (Fable intelligence pass)
+> **Status**: Living document — a standing reference, not a work item.
+> **Last updated**: 2026-08-20 (Fable intelligence pass)
 
 ## 1. The Competitive Landscape
 
@@ -41,7 +50,7 @@
 | jwt | **Gap** |
 | nanoid, cuid, cuid2, ulid | **Gap** |
 | emoji | **Gap** |
-| hostname | **Gap** (has URI but not bare hostname) |
+| hostname | Has (`NetworkRules.IsValidHostname`, `Must.Be.Hostname` / `Must.Not.Be.Hostname`) |
 | mac address | **Gap** |
 | hash (md5/sha256/etc.) | **Gap** |
 | regex, includes, startsWith, endsWith | Has (IsMatch) -- **Gap**: includes/startsWith/endsWith as first-class |
@@ -123,7 +132,7 @@
 
 #### ASP.NET Core Built-in DataAnnotations
 
-**Coverage**: ~12 attributes (Required, StringLength, Range, RegularExpression, Compare, EmailAddress, Phone, Url, CreditCard, DataType, Remote, ValidateNever).
+**Coverage**: ~12 attributes (Required, StringLength, Range, RegularExpression, Compare, EmailAddress, Phone, Url, CreditCard, DataType, Remote, ValidateNever). `CreditCard` has no PineGuard counterpart — payment-instrument validation left the repo with the v2 standards prune.
 **.NET 10 change**: Validation APIs moved to `Microsoft.Extensions.Validation` package.
 **Collision risks**: PineGuard attributes use PineGuard-specific names (e.g., `[PgEmail]` vs `[EmailAddress]`), avoiding namespace conflicts with built-in attributes.
 
@@ -142,6 +151,9 @@
 | SQL DateTime | SQL Server date range validation |
 | Geo Location | Latitude, Longitude, GeoLocation coordinate validation |
 | File Paths | Safe filename, file extension validation |
+| Temporal ranges | `DateOnlyRange`, `DateTimeRange`, `DateTimeOffsetRange`, `TimeOnlyRange` as first-class validated range types |
+| String-parse validators | `StringRules.TimeSpan`, `StringRules.GeoLocation` — validate the text form before parsing |
+| Default equality | `DefaultEqualityRules` / `NullOrDefault` — a single check for "null or `default(T)`" across value and reference types |
 
 ### Validations Zod Has That PineGuard Should Consider
 
@@ -153,7 +165,7 @@
 | Nano ID | `.nanoid()` | Gap | Low |
 | CUID/CUID2 | `.cuid()`, `.cuid2()` | Gap | Low |
 | Emoji | `.emoji()` | Gap | Low |
-| Hostname | `.hostname()` | Gap | Medium |
+| Hostname | `.hostname()` | Has (`NetworkRules.IsValidHostname`) | -- |
 | MAC address | `.mac()` | Gap | Medium |
 | Hash format | `.hash({algorithm})` | Gap | Low |
 | ISO Duration | `.iso.duration()` | Gap | Medium |
@@ -172,7 +184,7 @@
 | Validot | Template (all possible errors) | Gap -- useful for API documentation |
 | CheckValidators | AndIf/OrIf conditional chaining | Gap -- short-circuit conditional validation |
 | SimpleValidator | Type conversion (ToInt, ToBool) | Gap -- PineGuard validates, doesn't convert |
-| Nager | IBAN validation (international) | Gap -- PineGuard has payment cards but not IBAN |
+| Nager | IBAN validation (international) | Gap -- no payment-instrument validation at all since the v2 standards prune |
 | Nager | VAT number validation | Gap |
 
 ---
@@ -244,7 +256,7 @@ The ecosystem gap PineGuard fills:
 | `String.Contains`, `StartsWith`, `EndsWith` | First-class validators (not regex workarounds). Zod has them. Universal need. |
 | JWT format validation | Ubiquitous in modern APIs. Zod has `.jwt()`. |
 | IBAN validation (international) | Financial APIs. Nager does this. PakValidate does Pakistan-only. |
-| Hostname validation | Network/DNS APIs. Zod has `.hostname()`. |
+| Payment card / Luhn validation | Greenfield gap since the v2 standards prune removed the payment-card rules. ASP.NET ships `[CreditCard]`; PineGuard currently ships nothing. |
 | HTTP URL (scheme-restricted) | Zod's `.httpUrl()` -- only http/https, not ftp/mailto. |
 | ISO 8601 Duration parsing | ISO 8601 duration (`P1Y2M3D`). Zod has `.iso.duration()`. |
 

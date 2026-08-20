@@ -1,10 +1,18 @@
+<!-- metadata_header
+type: plan
+id: future-language
+version: 1.0
+status: non-binding
+last_updated: 2026-08-20
+-->
+
 # PineGuard — Future Language Considerations (Must/Guard)
 
 This document captures **non-binding** ideas for future naming/vocabulary improvements in PineGuard.
 
 Status:
 
-- Non-binding (does not override any generator specs).
+- Non-binding (does not override any generator specs). An idea backlog, not scheduled work.
 
 It exists because we have two competing goals:
 

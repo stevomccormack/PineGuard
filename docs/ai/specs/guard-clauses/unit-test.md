@@ -6,10 +6,10 @@ spec:
   template:
     - ../../meta/template-unit-test.md
   parent:
-    - ../../spec.md
-    - ../../testing/unit-test.md
+    - ../spec.md
+    - ../testing/unit-test.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.GuardClauses/**"
   - "tests/PineGuard.GuardClauses.UnitTests/**"
@@ -95,6 +95,14 @@ public sealed record GuardExpected(bool IsValid, Type? ExceptionType = null, str
 - `new GuardExpected(false, typeof(ArgumentException), "value")` — throws `ArgumentException` with ParamName "value"
 - `new GuardExpected(false, typeof(ArgumentNullException), "value")` — throws `ArgumentNullException` with ParamName "value"
 
+### Required Imports
+
+TestData and Tests files require the GuardClauses sub-namespace:
+
+```csharp
+using PineGuard.Testing.UnitTests.GuardClauses;
+```
+
 ### Semantic Inversion
 
 Guard methods are **negated** — they guard **against** the condition. A Guard "valid" case is typically a Core Rules "invalid" scenario:
@@ -132,7 +140,7 @@ public static TheoryData<GuardCase<bool>> InvalidCases => F.TrueRule.ValidScenar
 **TestData** (`tests/PineGuard.GuardClauses.UnitTests/GuardBoolClausesTestData.cs`):
 
 ```csharp
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.GuardClauses;
 using F = PineGuard.Testing.Fixtures.BoolRulesFixtures;
 
 namespace PineGuard.GuardClauses.UnitTests;
@@ -156,7 +164,7 @@ public static class GuardBoolClausesTestData
 **Tests** (`tests/PineGuard.GuardClauses.UnitTests/GuardBoolClausesTests.cs`):
 
 ```csharp
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.GuardClauses;
 using Xunit.Abstractions;
 
 namespace PineGuard.GuardClauses.UnitTests;

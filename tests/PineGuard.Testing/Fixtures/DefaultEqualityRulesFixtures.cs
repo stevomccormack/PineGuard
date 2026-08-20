@@ -88,15 +88,17 @@ public static class DefaultEqualityRulesFixtures
     {
         public static readonly int? Null = null;
         public static readonly int? Zero = 0;
+        public static readonly int? One = 1;
 
         public static RuleScenario<int?>[] ValidScenarios =>
         [
-            new(nameof(Null), Null, true)
+            new(nameof(Null), Null, true),
+            new(nameof(Zero), Zero, true)
         ];
 
         public static RuleScenario<int?>[] InvalidScenarios =>
         [
-            new(nameof(Zero), Zero, false)
+            new(nameof(One), One, false)
         ];
 
         public static RuleScenario<int?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

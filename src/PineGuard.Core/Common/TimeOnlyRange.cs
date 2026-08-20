@@ -1,6 +1,4 @@
 #if NET8_0_OR_GREATER
-using PineGuard.Extensions;
-
 namespace PineGuard.Common;
 
 /// <summary>
@@ -27,7 +25,7 @@ public readonly struct TimeOnlyRange : IEquatable<TimeOnlyRange>
     public TimeOnlyRange(TimeOnly start, TimeOnly end)
     {
         if (start > end)
-            throw new ArgumentException($"{nameof(start).TitleCase()} must be less than or equal to {nameof(end).TitleCase()}.", nameof(start));
+            throw new ArgumentException("Start must be less than or equal to End.", nameof(start));
 
         Start = start;
         End = end;

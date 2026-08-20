@@ -4,12 +4,12 @@ spec:
   title: "PineGuard.Core Code Coverage (Addendum)"
   version: 1
   template:
-    - ../template-coverage.md
+    - ../../meta/template-coverage.md
   parent:
-    - ../../spec.md
-    - ../../testing/coverage.md
+    - ../spec.md
+    - ../testing/coverage.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.Core/**"
   - "tests/PineGuard.Core.UnitTests/**"
@@ -21,7 +21,7 @@ This file contains **Core-specific** coverage notes only.
 
 Global rules and workflows:
 
-- `docs/ai/testing/coverage.md`
+- [Global coverage spec](../testing/coverage.md)
 
 ---
 

@@ -89,6 +89,12 @@ public static class MustResultTestData
             new("ok with nulls", MustResult<int>.Ok(0))
         ];
 
+        public static TheoryData<ValidCase> NullFactoryCases =>
+        [
+            new("successful result", MustResult<int>.Ok(1, "original", "value")),
+            new("failed result", MustResult<int>.Fail("{paramName} must be valid.", "value", 123))
+        ];
+
         public sealed record ValidCase(string Name, MustResult<int> MustResult)
             : ValueCase<MustResult<int>>(Name, MustResult);
 
@@ -117,6 +123,11 @@ public static class MustResultTestData
             new("result not null returns result", (MustResult<string?>.Ok("result", "original", "value"), "fallback"), "result")
         ];
 
+        public static TheoryData<NullResultCase> NullResultCases =>
+        [
+            new("successful with null result returns null", MustResult<string?>.Ok(null, "original", "value"))
+        ];
+
         public sealed record ValidCase(string Name, MustResult<int> Value, int Expected)
             : ReturnCase<MustResult<int>, int>(Name, Value, Expected);
 
@@ -125,6 +136,9 @@ public static class MustResultTestData
 
         public sealed record FallbackValidCase(string Name, (MustResult<string?> MustResult, string Fallback) Value, string? Expected)
             : ReturnCase<(MustResult<string?> MustResult, string Fallback), string?>(Name, Value, Expected);
+
+        public sealed record NullResultCase(string Name, MustResult<string?> Value)
+            : ValueCase<MustResult<string?>>(Name, Value);
     }
 
     public static class Combine
@@ -169,7 +183,21 @@ public static class MustResultTestData
                     Value: 1,
                     ParamName: "a",
                     ExpectedMessage: null,
-                    MessageContains: ["a failed.", "b failed.", "; "]))
+                    MessageContains: ["a failed.", "b failed.", "; "])),
+
+            new(
+                "does not re-substitute a leftover placeholder from a failure with no param name",
+                [
+                    MustResult<int>.Fail("{paramName} must be positive.", "age", -1),
+                    MustResult<int>.Fail("{paramName} must not be empty.", null, "")
+                ],
+                (
+                    Success: false,
+                    Result: 0,
+                    Value: -1,
+                    ParamName: "age",
+                    ExpectedMessage: null,
+                    MessageContains: ["age must be positive.", "{paramName} must not be empty.", "; "]))
         ];
 
         public static TheoryData<NullCase> NullCases =>

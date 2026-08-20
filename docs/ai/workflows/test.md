@@ -6,19 +6,20 @@
 ## Context
 
 - **Role**: [Test Engineer](../roles/verifier.md)
-- **Skill**: [Implement Unit Tests](../skills/scaffold-unit-test.md)
+- **Skill**: [Implement Unit Tests](../skills/scaffold-unit-test/SKILL.md)
 - **Spec**: [Unit Tests Spec](../specs/testing/unit-test.md)
 
 ## Parameters
 
-- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, All, Testing*)
-  - *Testing = `PineGuard.Testing` is a shared library; build-only via solution run, not a runnable test project.
+- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All)
 
 ## Auto-Approval
 
-- **Gemini**: `// turbo-all`
-- **Claude**: `Project Rules` allow tests.
+- **Antigravity**: `// turbo-all` in `.agent/workflows/`.
+- **Claude Code**: `Project Rules` allow tests.
 - **Cursor**: `cmd: dotnet test` allowed.
+
+See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface inventory.
 
 ## Steps
 
@@ -39,11 +40,11 @@
    - GuardClauses: `tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj`
    - FluentValidation: `tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj`
    - DataAnnotations: `tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj`
-   - Testing: `tests/PineGuard.Testing/PineGuard.Testing.csproj` _(shared library — build-only; no test runner)_
+   - Testing: `tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj`
 
-   > **PineGuard.Testing** is a shared test infrastructure library. It has no test methods and cannot be run directly. It is built automatically as a dependency of all other `*.UnitTests` projects. To verify it builds cleanly, include it via the solution run below.
+   > `tests/PineGuard.Testing/` is the shared test-infrastructure library itself — it has no test methods and is never run directly. Its tests live in `tests/PineGuard.Testing.UnitTests/`, which is what the `Testing` scope runs.
 
-   **All**: run the five project commands above (sequentially).
+   **All**: run the six project commands above (sequentially).
 
    Optional (final verification): run the solution (slower).
 

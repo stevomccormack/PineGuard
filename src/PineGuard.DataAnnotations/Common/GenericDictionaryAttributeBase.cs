@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
@@ -16,6 +17,11 @@ namespace PineGuard.DataAnnotations.Common;
 /// <para>
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
+/// <para>
+/// If the value is non-<see langword="null"/> but its runtime type does not implement the configured
+/// open generic interface, the attribute is misapplied and an <see cref="InvalidOperationException"/>
+/// is thrown rather than silently reporting the value as valid.
+/// </para>
 /// </remarks>
 /// <param name="interfaceType">The open generic dictionary interface (e.g., <c>typeof(IDictionary&lt;,&gt;)</c>).</param>
 /// <param name="mustClausesType">The static class containing the must-clause methods to invoke.</param>
@@ -23,6 +29,9 @@ namespace PineGuard.DataAnnotations.Common;
 /// <seealso href="https://pineguard.ai/docs/annotations">Annotation documentation</seealso>
 public abstract class GenericDictionaryAttributeBase(Type interfaceType, Type mustClausesType) : ValidationAttributeBase(typeof(object), allowNull: true)
 {
+    private static readonly ConcurrentDictionary<(Type RuntimeType, Type InterfaceType), Type?> InterfaceCache = new();
+    private static readonly ConcurrentDictionary<(Type MustClausesType, string MethodName, Type TKey, Type TValue), MethodInfo> MethodCache = new();
+
     /// <summary>
     /// Invokes the named must-clause method on the configured must-clauses type,
     /// resolving generic type arguments from the runtime dictionary type.
@@ -34,19 +43,27 @@ public abstract class GenericDictionaryAttributeBase(Type interfaceType, Type mu
     /// <returns>
     /// <see langword="null"/> on success, or a <see cref="ValidationResult"/> describing the failure.
     /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="value"/>'s runtime type does not implement the configured open generic
+    /// dictionary interface.
+    /// </exception>
     protected ValidationResult? InvokeDictionaryMust(string methodName, object? value, ValidationContext ctx, params object?[] args)
     {
         var type = value!.GetType();
-        var iDict = type.GetInterfaces()
-            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
+        var iDict = InterfaceCache.GetOrAdd((type, interfaceType), key =>
+            key.RuntimeType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == key.InterfaceType));
 
-        if (iDict == null) return ValidationResult.Success;
+        if (iDict == null)
+            throw new InvalidOperationException(
+                $"[{GetType().Name}] can only be applied to properties implementing {interfaceType.Name}. " +
+                $"Property '{ctx.DisplayName}' is of type {type.Name}.");
 
         var argsType = iDict.GetGenericArguments();
 
-        var method = mustClausesType.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static)!;
+        var genericMethod = MethodCache.GetOrAdd((mustClausesType, methodName, argsType[0], argsType[1]), key =>
+            key.MustClausesType.GetMethod(key.MethodName, BindingFlags.Public | BindingFlags.Static)!
+                .MakeGenericMethod(key.TKey, key.TValue));
 
-        var genericMethod = method.MakeGenericMethod(argsType[0], argsType[1]);
         var invokeArgs = BuildInvokeArgs(genericMethod, value, args);
         return InvokeAndMapResult(genericMethod, invokeArgs, ctx);
     }

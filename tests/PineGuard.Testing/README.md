@@ -12,7 +12,7 @@ Use this package when you're writing tests for custom Must, Guard, Fluent, or Da
 dotnet add package PineGuard.Testing
 ```
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`. Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core), [xunit](https://www.nuget.org/packages/xunit), and [FluentValidation](https://www.nuget.org/packages/FluentValidation).
+Targets `net8.0` and `net10.0`. Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core), [xunit](https://www.nuget.org/packages/xunit), and [FluentValidation](https://www.nuget.org/packages/FluentValidation).
 
 ## Example
 

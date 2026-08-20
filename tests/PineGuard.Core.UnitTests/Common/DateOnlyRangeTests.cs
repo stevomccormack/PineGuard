@@ -184,15 +184,15 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
         var range = new DateOnlyRange(testCase.Start, testCase.End);
 
         var other = testCase.Start > DateOnly.MinValue
-            ? new DateOnlyRange(DateOnly.MinValue, testCase.Start)
-            : new DateOnlyRange(testCase.End, testCase.End);
+            ? new DateOnlyRange(DateOnly.MinValue, testCase.Start.AddDays(-1))
+            : new DateOnlyRange(testCase.End.AddDays(1), testCase.End.AddDays(1));
 
         // Act
         var intersection = range.Intersect(other);
 
         // Assert
         Assert.Null(intersection);
-        Assert.False(range.Overlaps(other, Inclusion.Inclusive) && range.Overlaps(other));
+        Assert.False(range.Overlaps(other, Inclusion.Inclusive));
     }
 
     [Theory]

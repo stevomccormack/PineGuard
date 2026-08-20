@@ -2,9 +2,9 @@
 
 ## Supported Versions
 
-Security fixes ship in the **latest stable minor version** on nuget.org.
-Pre-1.0 preview/alpha versions are supported only at the current latest;
-earlier alpha revisions are not patched.
+PineGuard is pre-1.0. Security fixes ship only in the **latest `0.x` alpha**
+on nuget.org; earlier alpha revisions are not patched. Once 1.0 ships, fixes
+will land in the latest stable minor.
 
 | Version                        | Supported |
 |--------------------------------|-----------|

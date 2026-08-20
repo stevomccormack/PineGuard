@@ -68,6 +68,8 @@ public static class OwaspUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
+            new(@"\r\nHeader: value (leading) => true", "\r\nHeader: value", true),
+            new(@"Header: value\r\n (trailing) => true", "Header: value\r\n", true),
             new("null => false", null, false),
             new("whitespace => false", " ", false)
         ];

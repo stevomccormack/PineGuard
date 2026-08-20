@@ -28,12 +28,24 @@ The Engineering department is responsible for the design, implementation, testin
 | **Code Reviewer**        | Critic           | PR review, static analysis, catching drift from specs.                 | [reviewer.md](../roles/reviewer.md)                         |
 | **DevOps Engineer**      | Shipper          | CI/CD, packaging, release automation, repo tooling.                    | [shipper.md](../roles/shipper.md)               |
 | **Business Analyst**     | Clarifier        | Requirements, acceptance criteria, traceability.                       | [business-analyst.md](../roles/business-analyst.md)             |
+| **Council**              | Multi-perspective Reviewer | Stateless advisor personas (Contrarian / First Principles / Expansionist / Outsider / Executor / Chairman) used only by the ask-council procedure. | [council.md](../roles/council.md)                               |
+
+> [!NOTE]
+> **Council** is not a standing persona for general work. Its six personas are adopted only by the
+> sub-agents spawned during [ask-council](../skills/ask-council/SKILL.md), and they never accumulate memory.
+> **Principal Engineer**, **Lead Engineer**, and **Business Analyst** are reference personas:
+> no agent playbook adopts them, and they are used only on explicit user request.
 
 ## References
 
 - [Brain Index](../README.md)
-- [Gemini Master Instructions](../../GEMINI.md)
-- [Claude Master Instructions](../../CLAUDE.md)
+- [Adapter Surfaces](../meta/adapter-surfaces.md)
+- [Claude Master Instructions](../../../CLAUDE.md)
+- [Gemini Master Instructions](../../../GEMINI.md)
+- [Generic Agent Instructions](../../../AGENTS.md)
+- [Copilot Instructions](../../../.github/copilot-instructions.md)
+- [Pi Instructions](../../../.pi/AGENTS.md)
+- [Cline Rules](../../../.clinerules/01-global.md)
 
 <!-- footer
 last_verified: 2026-04-15

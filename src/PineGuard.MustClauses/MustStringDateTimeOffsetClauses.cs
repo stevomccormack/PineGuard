@@ -15,7 +15,7 @@ namespace PineGuard.MustClauses;
 public static class MustStringDateTimeOffsetClauses
 {
     private const string NullMessage = "{paramName} must not be null.";
-    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces;
+    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
     /// <summary>
     /// Validates that the specified value must be a date/time in the past.

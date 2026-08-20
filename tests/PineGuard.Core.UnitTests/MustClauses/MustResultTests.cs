@@ -162,6 +162,17 @@ public sealed class MustResultTests : BaseUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(MustResultTestData.ThrowIfFailed.NullFactoryCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
+    public void ThrowIfFailed_Generic_NullExceptionFactory_ThrowsArgumentNullException(MustResultTestData.ThrowIfFailed.ValidCase testCase)
+    {
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(() => testCase.MustResult.ThrowIfFailed<InvalidOperationException>(null!));
+
+        // Assert
+        Assert.Equal("exceptionFactory", ex.ParamName);
+    }
+
+    [Theory]
     [MemberData(nameof(MustResultTestData.ThrowIfFailed.ValidCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
     public void ThrowIfFailed_Generic_DoesNotThrow_WhenSuccessful(MustResultTestData.ThrowIfFailed.ValidCase testCase)
     {
@@ -201,6 +212,17 @@ public sealed class MustResultTests : BaseUnitTest
 
         // Assert
         ThrowsCaseAssert.Expected(ex, testCase);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustResultTestData.OrThrow.NullResultCases), MemberType = typeof(MustResultTestData.OrThrow))]
+    public void OrThrow_ReturnsNull_WhenSuccessfulWithNoResult(MustResultTestData.OrThrow.NullResultCase testCase)
+    {
+        // Act
+        var result = testCase.Value.OrThrow();
+
+        // Assert
+        Assert.Null(result);
     }
 
     [Theory]

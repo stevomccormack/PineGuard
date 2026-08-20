@@ -99,6 +99,7 @@ public static class CharRulesFixtures
         public static readonly char? PrintableMax = '~';
         public static readonly char? UnitSeparator = '\u001F';
         public static readonly char? C1Control = '\u0080';
+        public static readonly char? ArabicIndicDigit = '٥';
         public static readonly char? Null = null;
 
         public static RuleScenario<char?>[] ValidScenarios =>
@@ -114,7 +115,8 @@ public static class CharRulesFixtures
         [
             new(nameof(PrintableMin), PrintableMin, false),
             new(nameof(PrintableMax), PrintableMax, false),
-            new(nameof(UnitSeparator), UnitSeparator, false)
+            new(nameof(UnitSeparator), UnitSeparator, false),
+            new(nameof(ArabicIndicDigit), ArabicIndicDigit, false)
         ];
 
         public static RuleScenario<char?>[] InvalidEdgeScenarios =>

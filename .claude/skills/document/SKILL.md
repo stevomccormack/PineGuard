@@ -1,5 +1,5 @@
 ---
-name: generate-xml-docs
+name: document
 description: Generate gold-standard XML documentation comments for all public members in a PineGuard project. Use whenever the user says "add XML docs", "document the X class", "generate docs", "add doc comments", "fix CS1591 warnings", or wants layer-aware documentation with cross-references, examples, and doc site links.
 argument-hint: "[ProjectName] (e.g., PineGuard.Core, PineGuard.MustClauses, or all)"
 context: fork
@@ -24,7 +24,7 @@ Read these files completely:
 
 ## Step 2: Follow the Recipe
 Execute `docs/ai/skills/document/SKILL.md` exactly as written.
-- Apply the correct layer-specific template (§5.1-5.7) for each file
+- Apply the correct layer-specific template (§5.1-5.6) for each file
 - Use Rico Suter phrasing conventions (§8)
 - Add `<see cref>` cross-references following the dependency chain
 - Add `<see href>` links using the URL patterns (§7)

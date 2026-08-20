@@ -40,11 +40,33 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
     }
 
     [Theory]
+    [MemberData(nameof(StringRulesTestData.IsLongerThanDefaultInclusion.Cases), MemberType = typeof(StringRulesTestData.IsLongerThanDefaultInclusion))]
+    public void IsLongerThan_DefaultInclusion_IsExclusive(RuleCase<(string? value, int length)> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.IsLongerThan(tc.Value.value, tc.Value.length);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(StringRulesTestData.IsShorterThan.Cases), MemberType = typeof(StringRulesTestData.IsShorterThan))]
     public void IsShorterThan_BehavesAsExpected(RuleCase<(string? value, int length, PineGuard.Common.Inclusion inclusion)> tc)
     {
         // Act
         var result = PineGuard.Rules.StringRules.IsShorterThan(tc.Value.value, tc.Value.length, tc.Value.inclusion);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.IsShorterThanDefaultInclusion.Cases), MemberType = typeof(StringRulesTestData.IsShorterThanDefaultInclusion))]
+    public void IsShorterThan_DefaultInclusion_IsExclusive(RuleCase<(string? value, int length)> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.IsShorterThan(tc.Value.value, tc.Value.length);
 
         // Assert
         AssertResult(tc, result);
@@ -70,6 +92,17 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
 
         // Act
         var result = PineGuard.Rules.StringRules.IsDigitsOnly(value, allowedNonDigitChars: allowedNonDigitChars);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.IsDigitsOnlyWithNullAllowedNonDigitChars.Cases), MemberType = typeof(StringRulesTestData.IsDigitsOnlyWithNullAllowedNonDigitChars))]
+    public void IsDigitsOnly_WithNullAllowedNonDigitChars_MeansDigitsOnly(RuleCase<string?> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.IsDigitsOnly(tc.Value, allowedNonDigitChars: null);
 
         // Assert
         AssertResult(tc, result);

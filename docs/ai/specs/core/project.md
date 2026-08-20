@@ -4,11 +4,11 @@ spec:
   title: "PineGuard.Core Project Spec (Rules & Utils)"
   version: 2
   template:
-    - ../template-project.md
+    - ../../meta/template-project.md
   parent:
     - ../project.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "src/PineGuard.Core/Rules/**"
   - "src/PineGuard.Core/Utils/**"
@@ -20,8 +20,17 @@ This document is the **source-of-truth instruction set** for generating and main
 
 **Inheritance**: Inherits from `docs/ai/specs/project.md`.
 
-- Feature Checklist: Inherited.
-- Coding Standards: Inherited.
+Coding standards are inherited from `docs/ai/specs/coding-standard.md`.
+
+## Feature Implementation Checklist
+
+See `docs/ai/specs/spec.md` §3 ("Feature Implementation Checklist (Master)").
+
+## Related specs
+
+- Unit tests addendum: `docs/ai/specs/core/unit-test.md`
+- Coverage addendum: `docs/ai/specs/core/coverage.md`
+- Naming collisions: `docs/ai/specs/language/naming-collisions.md`
 
 ---
 
@@ -62,11 +71,15 @@ Canonical definition: see `docs/ai/specs/spec.md` (“Validated value vs configu
 
 ### 1.1 Relationship to MustClauses and GuardClauses
 
-Single source of truth (strict):
+Single source of truth (strict). PineGuard layers in one direction — each layer calls only the one before it:
 
-- `Rules` and `Utils` are the core logic.
-- MustClauses call `Rules`/`Utils` and own user-facing messages.
-- GuardClauses call MustClauses and throw using `MustResult.Message`.
+- **Core** (`Rules`/`Utils`) owns validation logic and parsing.
+- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
+- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
+- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
+- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
+
+Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none reimplements Core logic.
 
 Do not duplicate parsing/validation logic across layers.
 
@@ -89,7 +102,7 @@ Do not duplicate parsing/validation logic across layers.
 Folder conventions (strict):
 
 - Everything lives directly under `Rules/` and `Utils/` unless a domain folder is defined.
-- OWASP-related types go under `Rules/Owasp/` and `Utils/Owasp/`.
+- OWASP public facades stay at the folder root — `Rules/OwaspRules.cs` (`namespace PineGuard.Rules`) and `Utils/OwaspUtility.cs` (`namespace PineGuard.Utils`). Supporting OWASP pattern/regex types live in the `Rules/Owasp/` domain folder under `namespace PineGuard.Rules.Owasp` (today: `Rules/Owasp/OwaspRegex.cs`, which is public — the domain folder denotes a sub-namespace, not reduced visibility). There is no `Utils/Owasp/` folder; create one only when a supporting OWASP utility type actually needs it. See §3.1.1 for the facade-over-implementation idea, noting Owasp differs in that its supporting types are public.
 
 ---
 
@@ -99,7 +112,7 @@ Folder conventions (strict):
 
 - One file per domain (simple case): `XxxRules.cs` containing `public static class XxxRules`.
 - One file per utility: `XxxUtility.cs` containing `public static class XxxUtility`.
-- File name must match the public class name.
+- File name must match the public class name, optionally suffixed with `.<SubDomain>` for partial splits (e.g. `StringRules.Guid.cs`).
 
 Examples:
 
@@ -115,6 +128,14 @@ Additional note: `StringRules` is also a public facade
 - `src/PineGuard.Core/Rules/StringRules*.cs` defines `public static partial class StringRules` with nested public types.
 - This surface is intended to be used by external consumers (not just Core-internal call sites).
 - Do not make `StringRules` nested types `internal` to “reduce noise” in mapping audits; if a member is public in `PineGuard.Rules`, treat it as part of the supported public surface.
+
+### 3.1.2 Partial-file split
+
+When a domain class grows beyond one file, declare it `public static partial class XxxRules` and split it across `XxxRules.cs` (shared/entry members) plus one `XxxRules.<SubDomain>.cs` per sub-domain. The same applies to utilities: `XxxUtility.cs` plus `XxxUtility.<SubDomain>.cs`.
+
+Today: `Rules/StringRules.cs` + `StringRules.Bool.cs`, `StringRules.Casing.cs`, `StringRules.Guid.cs`, … and `Utils/StringUtility.cs` + its `StringUtility.<SubDomain>.cs` partials.
+
+Test fixtures MUST mirror the source split one-for-one — see `docs/ai/specs/testing/fixture.md`.
 
 ### 3.2 Method naming
 
@@ -261,6 +282,6 @@ This spec supports generating Rules/Utils for common validation inputs such as:
 - URI parsing and host/scheme allowlisting (`UriRules`, `UriUtility`)
 - IP/CIDR membership (`NetworkRules` + `NetworkUtility`)
 - JSON validity and root-kind checks (`JsonRules` + `JsonUtility`)
-- safe file names (`FilePathRules` + `FileFilePathUtility`)
+- safe file names (`FilePathRules` + `FilePathUtility`)
 - password validation (`PasswordRules` + `PasswordUtility`)
 - HTTP header syntax and header-dictionary helpers (`HttpRules` + `HttpUtility`)

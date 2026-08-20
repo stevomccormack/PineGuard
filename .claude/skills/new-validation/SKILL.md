@@ -12,31 +12,20 @@ metadata:
 # New Validation: Vertical Slice Implementation
 
 ## Step 0: Load Root Specifications (MANDATORY — read before writing ANY code)
-Read these files completely before writing ANY code:
-1. `docs/ai/specs/spec.md` (root invariants — especially "Feature Implementation Checklist")
+Read these files completely:
+1. `docs/ai/specs/spec.md` (root invariants — especially §3 "Feature Implementation Checklist")
 2. `docs/ai/specs/dependencies.md` (layer dependency map)
 3. `docs/ai/specs/coding-standard.md` (formatting rules)
 4. `docs/ai/specs/orchestration.md` (process/logging)
+5. `docs/ai/skills/new-validation/SKILL.md` (canonical orchestration recipe)
 
-## Step 1: Implement Vertical Slice
-Follow `docs/ai/specs/spec.md` Section "Feature Implementation Checklist" EXACTLY.
+## Step 1: Follow the Recipe
+Execute `docs/ai/skills/new-validation/SKILL.md` exactly as written.
+Its §4 table is the single source for the per-layer spec and scaffold-skill routing — do not
+restate it here, and do not improvise a layer order.
 
-For each layer, read the project-spec FIRST, then the canonical skill:
-
-| Order | Layer | Spec to Read | Skill to Follow |
-|---|---|---|---|
-| 1 | Core Utils | `docs/ai/specs/core/project.md` | `docs/ai/skills/scaffold-rule/SKILL.md` |
-| 2 | Core Rules | `docs/ai/specs/core/project.md` | `docs/ai/skills/scaffold-rule/SKILL.md` |
-| 3 | MustClauses | `docs/ai/specs/must-clauses/project.md` | `docs/ai/skills/scaffold-must/SKILL.md` |
-| 4 | GuardClauses | `docs/ai/specs/guard-clauses/project.md` | `docs/ai/skills/scaffold-guard/SKILL.md` |
-| 5 | FluentValidation | `docs/ai/specs/fluent-validation/project.md` | `docs/ai/skills/scaffold-fluent/SKILL.md` |
-| 6 | DataAnnotations | `docs/ai/specs/data-annotations/project.md` | `docs/ai/skills/scaffold-annotation/SKILL.md` |
-| 7 | Unit Tests (all) | `docs/ai/specs/testing/unit-test.md` | `docs/ai/skills/scaffold-unit-test/SKILL.md` |
-
-## Step 2: Build & Test
-- Build entire solution: `dotnet build`
-- Run all tests: `dotnet test`
-- Verify 100% coverage for new code
-
-## Step 3: Summary
-Return a summary of all files created/modified, organized by layer.
+## Step 2: Verify
+- Solution builds clean and all tests pass
+- 100% line AND branch coverage for the new code
+- No validation logic outside `PineGuard.Core`
+- Summary lists every file created or modified, grouped by layer

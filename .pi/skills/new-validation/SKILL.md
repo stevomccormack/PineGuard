@@ -12,20 +12,9 @@ Read these files completely before writing ANY code:
 3. `docs/ai/specs/coding-standard.md` (formatting rules)
 4. `docs/ai/specs/orchestration.md` (process/logging)
 
-## Step 1: Implement Vertical Slice
-Follow `docs/ai/specs/spec.md` Section "Feature Implementation Checklist" EXACTLY.
-
-For each layer, read the project-spec FIRST, then the canonical skill:
-
-| Order | Layer | Spec to Read | Skill to Follow |
-|---|---|---|---|
-| 1 | Core Utils | `docs/ai/specs/core/project.md` | `docs/ai/skills/scaffold-rule/SKILL.md` |
-| 2 | Core Rules | `docs/ai/specs/core/project.md` | `docs/ai/skills/scaffold-rule/SKILL.md` |
-| 3 | MustClauses | `docs/ai/specs/must-clauses/project.md` | `docs/ai/skills/scaffold-must/SKILL.md` |
-| 4 | GuardClauses | `docs/ai/specs/guard-clauses/project.md` | `docs/ai/skills/scaffold-guard/SKILL.md` |
-| 5 | FluentValidation | `docs/ai/specs/fluent-validation/project.md` | `docs/ai/skills/scaffold-fluent/SKILL.md` |
-| 6 | DataAnnotations | `docs/ai/specs/data-annotations/project.md` | `docs/ai/skills/scaffold-annotation/SKILL.md` |
-| 7 | Unit Tests (all) | `docs/ai/specs/testing/unit-test.md` | `docs/ai/skills/scaffold-unit-test/SKILL.md` |
+## Step 1: Follow the Recipe
+Execute `docs/ai/skills/new-validation/SKILL.md` exactly as written. It owns the layer order and
+the per-layer spec/skill mapping; do not restate them here.
 
 ## Step 2: Build & Test
 - Build entire solution: `dotnet build`

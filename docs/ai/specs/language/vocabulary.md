@@ -11,7 +11,6 @@ spec:
     - ../dependencies.md
 applies_to:
   - "docs/ai/specs/**"
-  - "tools/audit/**"
   - "tools/audit-cli/**"
 ---
 
@@ -110,7 +109,7 @@ The library also exposes:
 
 For parity purposes, both are normalized to the shared concept `Owasp` via `aliases`.
 
-## 5) Updating this map
+## 6) Updating this map
 
 When a new naming question arises:
 

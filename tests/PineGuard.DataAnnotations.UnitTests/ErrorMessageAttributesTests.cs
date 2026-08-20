@@ -27,6 +27,25 @@ public sealed class ErrorMessageAttributesTests
         Assert.StartsWith("Custom error for", result.ErrorMessage!);
     }
 
+    // --- FormatErrorMessage {paramName} substitution path (ValidationAttributeBase.FormatErrorMessage) ---
+
+    [Theory]
+    [InlineData("The {paramName} must be a valid email.")]
+    public void SimpleAttribute_WithParamNameToken_ShouldSubstituteParamName(string errorMessage)
+    {
+        // Arrange — a custom ErrorMessage reusing the library's {paramName} convention takes the
+        // FormatErrorMessage override's substitution branch instead of the string.Format base fallback.
+        var attribute = new EmailAttribute { ErrorMessage = errorMessage };
+        var context = new ValidationContext(new object()) { DisplayName = "Email" };
+
+        // Act
+        var result = attribute.GetValidationResult("not-an-email", context);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("The Email must be a valid email.", result.ErrorMessage);
+    }
+
     // --- InvokeAndMapResult ErrorMessage path (Number attributes using reflection + InvokeAndMapResult) ---
 
     [Theory]

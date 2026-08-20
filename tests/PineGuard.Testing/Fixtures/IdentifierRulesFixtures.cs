@@ -16,6 +16,7 @@ public static class IdentifierRulesFixtures
         public static readonly string? LeadingDash = "-hello";
         public static readonly string? TrailingDash = "hello-";
         public static readonly string? DoubleDash = "hello--world";
+        public static readonly string? UnicodeLetters = "crème-brûlée";
 
         public static RuleScenario<string?>[] ValidScenarios =>
         [
@@ -32,7 +33,8 @@ public static class IdentifierRulesFixtures
             new(nameof(SpacesNotAllowed), SpacesNotAllowed, false),
             new(nameof(LeadingDash), LeadingDash, false),
             new(nameof(TrailingDash), TrailingDash, false),
-            new(nameof(DoubleDash), DoubleDash, false)
+            new(nameof(DoubleDash), DoubleDash, false),
+            new(nameof(UnicodeLetters), UnicodeLetters, false)
         ];
 
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

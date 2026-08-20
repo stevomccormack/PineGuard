@@ -16,7 +16,9 @@ public static class EmailRules
     /// <see langword="true"/> if <paramref name="value"/> is a valid email address; otherwise, <see langword="false"/>.
     /// </returns>
     /// <remarks>
-    /// Uses a permissive validation strategy via <see cref="EmailUtility.TryCreate"/>. For strict
+    /// Uses a permissive validation strategy via <see cref="EmailUtility.TryCreate"/>, but rejects
+    /// RFC 5322 mailbox forms that carry a display name or angle-bracket routing (e.g. <c>"John Doe &lt;john@example.com&gt;"</c>)
+    /// by requiring the parsed address to equal the trimmed input. For strict
     /// RFC-5321/RFC-5322 validation, use <see cref="IsStrictEmail"/>.
     /// </remarks>
     /// <example>
@@ -26,18 +28,27 @@ public static class EmailRules
     /// </code>
     /// </example>
     /// <seealso cref="IsStrictEmail"/>
-    public static bool IsEmail(string? value) =>
-        EmailUtility.TryCreate(value, out _);
+    public static bool IsEmail(string? value)
+    {
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            return false;
+
+        return EmailUtility.TryCreate(trimmed, out var email)
+               && email is not null
+               && string.Equals(email.Address, trimmed, StringComparison.Ordinal);
+    }
 
     /// <summary>
-    /// Determines whether the specified value is a strict (RFC-compliant) email address.
+    /// Determines whether the specified value is a strict email address (a pragmatic subset of RFC 5321/RFC 5322).
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns>
-    /// <see langword="true"/> if <paramref name="value"/> passes strict RFC email validation; otherwise, <see langword="false"/>.
+    /// <see langword="true"/> if <paramref name="value"/> passes strict email validation; otherwise, <see langword="false"/>.
     /// </returns>
     /// <remarks>
-    /// Applies stricter validation than <see cref="IsEmail"/>. Delegates to <see cref="EmailUtility.TryStrictCreate"/>.
+    /// Applies stricter validation than <see cref="IsEmail"/>. Delegates to <see cref="EmailUtility.TryStrictCreate"/>,
+    /// which implements a pragmatic subset of RFC 5321/RFC 5322 rather than full compliance (e.g. quoted local
+    /// parts, dotless domains, and address literals are rejected even though they are RFC-valid).
     /// </remarks>
     /// <example>
     /// <code>

@@ -6,6 +6,8 @@ version: 1.0
 
 # Role: Code Reviewer
 
+> **Also known as:** Reviewer · Critic · `roles/reviewer.md` · `role-code-reviewer`
+
 > [!NOTE]
 > You are the **Critic**. Your job is to catch risk and improve clarity before merge.
 
@@ -31,9 +33,11 @@ It is the primary persona for code inspection and static analysis workflows (e.g
 
 ## Capabilities
 
+### Specs
+- [Engineering Standards](../specs/coding-standard.md)
+
 ### Workflows
 - [Run Qodana](../workflows/scan-qodana.md)
-- [Engineering Standards](../workflows/standard.md)
 
 <!-- footer
 last_verified: 2026-02-26

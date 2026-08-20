@@ -22,12 +22,19 @@ Run code coverage analysis and improve unit tests to reach 100% line and branch 
 ## 4. Execution Steps
 
 1.  **Run Coverage Command**
-    - Run the script: `tools/code-coverage/Run-CodeCoverage.ps1 -Scope [ProjectName]`
-    - _Or_ use dotnet: `dotnet test --collect:"XPlat Code Coverage"` (but use the script if available).
+    - One-shot: `tools/code-coverage/Run-CodeCoverage.ps1 -Scope [Scope]`
+      (`-Mode Generate|Analyze|GenerateAndAnalyze`; scopes: `Core`, `MustClauses`, `GuardClauses`,
+      `DataAnnotations`, `FluentValidation`, `Testing`, `All`).
+    - Or drive the two stages directly, which is the loop the coverage spec defines:
+      - `tools/code-coverage/xplat/Gen-CoverageReport.ps1 -Scope [Scope]`
+      - `tools/code-coverage/xplat/Test-CoverageAnalysis.ps1 -Scope [Scope] -Top 30`
 
 2.  **Analyze Report**
-    - Open the generated HTML report (usually in `artifacts/coverage/`).
+    - HTML: `artifacts/code-coverage/xplat/html/index.html`
+      (stable redirect: `artifacts/code-coverage/xplat-report.html`).
     - Identify red lines (uncovered) and yellow diamonds (partial branches).
+    - For a fast console-only pass, add `-SkipHtml` and read the ranked gap table from
+      `Test-CoverageAnalysis.ps1` instead of opening the report.
 
 3.  **Fill Gaps**
     - **Null Checks**: Did you test passing `null`?
@@ -35,11 +42,12 @@ Run code coverage analysis and improve unit tests to reach 100% line and branch 
     - **Conditions**: Did you hit both `true` and `false` paths for every `if`?
 
 4.  **Verification**
-    - Re-run step 1 and confirm 100%.
+    - Re-run step 1 with `-Enforce100` and confirm it exits 0.
 
 ## 5. Definition of Done
 
 - [ ] Report shows 100% coverage for the target class/project.
+- [ ] `Run-CodeCoverage.ps1 -Scope [Scope] -Enforce100` (or `Test-CoverageAnalysis.ps1 -Enforce100`) exits 0.
 
 ## 6. Troubleshooting
 

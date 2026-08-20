@@ -13,7 +13,7 @@ namespace PineGuard.FluentValidation;
 /// <seealso href="https://pineguard.ai/docs/fluent/string-datetimeoffset">Fluent String DateTimeOffset Extensions documentation</seealso>
 public static class FluentStringDateTimeOffsetExtensions
 {
-    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces;
+    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> in the past.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>

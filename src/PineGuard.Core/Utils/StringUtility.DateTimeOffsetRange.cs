@@ -19,6 +19,11 @@ public static partial class StringUtility
         /// When <see langword="false"/>, contains <see langword="null"/>.
         /// </param>
         /// <returns><see langword="true"/> if both values were parsed and form a valid range; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// Parses using <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AssumeUniversal"/> |
+        /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>, so offset-less <paramref name="start"/>/<paramref name="end"/>
+        /// values are treated as UTC regardless of the host time zone.
+        /// </remarks>
         /// <example>
         /// <code>
         /// StringUtility.DateTimeOffsetRange.TryParse("2024-01-01T00:00:00+00:00", "2024-12-31T23:59:59+00:00", out var range); // true
@@ -29,7 +34,7 @@ public static partial class StringUtility
                 start,
                 end,
                 static (value, out parsed)
-                    => System.DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out parsed),
+                    => System.DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces, out parsed),
                 static (System.DateTimeOffset s, System.DateTimeOffset e, out Common.DateTimeOffsetRange created)
                     => Common.DateTimeOffsetRange.TryCreate(s, e, out created),
                 out range);

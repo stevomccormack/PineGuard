@@ -13,6 +13,11 @@ public static class XmlRules
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is parseable as well-formed XML; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// DTD processing is prohibited as a secure-by-default XXE/DoS hardening measure, so any otherwise
+    /// well-formed document containing a <c>&lt;!DOCTYPE ...&gt;</c> declaration (e.g., legacy XHTML,
+    /// DOCTYPE-bearing SVG exports) is rejected, not just documents that attempt entity expansion.
+    /// </remarks>
     /// <example>
     /// <code><![CDATA[
     /// bool valid = XmlRules.IsXml("<root/>");   // true

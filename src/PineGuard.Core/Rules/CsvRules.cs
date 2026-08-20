@@ -30,6 +30,10 @@ public static class CsvRules
     /// <param name="separator">The field separator character. Defaults to <see cref="DefaultCsvSeparator"/>.</param>
     /// <param name="comparison">The string comparison for column name matching. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>.</param>
     /// <returns><see langword="true"/> if the header line matches the expected columns; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="separator"/> is <c>"</c>, <c>\r</c>, or <c>\n</c> — none of which can
+    /// ever function as a separator, since the quote and line-break checks always take precedence.
+    /// </exception>
     public static bool IsCsvHeaderLine(
         string? line,
         IReadOnlyList<string>? expectedHeader,
@@ -44,6 +48,10 @@ public static class CsvRules
     /// <param name="schema">The column schema defining expected column types. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="separator">The field separator character. Defaults to <see cref="DefaultCsvSeparator"/>.</param>
     /// <returns><see langword="true"/> if the row conforms to the schema; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="separator"/> is <c>"</c>, <c>\r</c>, or <c>\n</c> — none of which can
+    /// ever function as a separator, since the quote and line-break checks always take precedence.
+    /// </exception>
     public static bool IsCsvRowLine(
         string? line,
         IReadOnlyList<CsvColumnSchema>? schema,
@@ -59,6 +67,10 @@ public static class CsvRules
     /// <param name="separator">The field separator character. Defaults to <see cref="DefaultCsvSeparator"/>.</param>
     /// <param name="headerNameComparison">The string comparison for header name matching. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>.</param>
     /// <returns><see langword="true"/> if the row conforms to the header and type definitions; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="separator"/> is <c>"</c>, <c>\r</c>, or <c>\n</c> — none of which can
+    /// ever function as a separator, since the quote and line-break checks always take precedence.
+    /// </exception>
     public static bool IsCsvRowLine(
         string? line,
         IReadOnlyList<string>? header,

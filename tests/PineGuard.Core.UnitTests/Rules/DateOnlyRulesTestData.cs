@@ -52,9 +52,19 @@ public static class DateOnlyRulesTestData
         public static TheoryData<RuleCase<(DateOnly? value, DateOnly? other, Inclusion inclusion, DatePrecision? precision)>> Cases => F.IsBefore.AllScenarios.ToRuleCases();
     }
 
+    public static class IsBeforeDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(DateOnly? value, DateOnly? other)>> Cases => F.IsBeforeDefaultInclusion.AllScenarios.ToRuleCases();
+    }
+
     public static class IsAfter
     {
         public static TheoryData<RuleCase<(DateOnly? value, DateOnly? other, Inclusion inclusion, DatePrecision? precision)>> Cases => F.IsAfter.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsAfterDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(DateOnly? value, DateOnly? other)>> Cases => F.IsAfterDefaultInclusion.AllScenarios.ToRuleCases();
     }
 
     public static class IsSame

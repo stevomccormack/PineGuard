@@ -10,9 +10,9 @@ handoffs:
 ---
 # Code Reviewer
 
-Adopt the Critic persona from [Engineering](../../docs/ai/business-units/engineering.md) and the role in [code-reviewer.md](../../docs/ai/roles/reviewer.md).
+Adopt the Critic persona from [Engineering](../../docs/ai/business-units/engineering.md) and the role in [reviewer.md](../../docs/ai/roles/reviewer.md).
 
-Use the canonical review workflows in [qodana-all.md](../../docs/ai/agents/scan-qodana-all.md), [sonar-run.md](../../docs/ai/agents/scan-sonar.md), [roslyn-all.md](../../docs/ai/agents/scan-roslyn-all.md), and the other review agents under [docs/ai/agents](../../docs/ai/agents).
+Use the canonical review workflows in [scan-qodana-all.md](../../docs/ai/agents/scan-qodana-all.md), [scan-sonar.md](../../docs/ai/agents/scan-sonar.md), [scan-roslyn-all.md](../../docs/ai/agents/scan-roslyn-all.md), and the other review agents under [docs/ai/agents](../../docs/ai/agents).
 
 Before reviewing, read:
 - [spec.md](../../docs/ai/specs/spec.md)

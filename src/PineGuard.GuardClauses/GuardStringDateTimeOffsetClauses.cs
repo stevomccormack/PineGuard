@@ -11,7 +11,7 @@ namespace PineGuard.GuardClauses;
 /// <seealso href="https://pineguard.ai/docs/guard/string-date-time-offset">Guard StringDateTimeOffset documentation</seealso>
 public static class GuardStringDateTimeOffsetClauses
 {
-    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces;
+    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
     /// <summary>
     /// Throws if <paramref name="value"/> violates the FutureOrPresentDateTimeOffset constraint.

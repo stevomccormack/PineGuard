@@ -49,7 +49,7 @@ public static class BufferUtilityTestData
             new("whitespace", " ", false),
             new("bad padding", "TQ=", false),
             new("too much padding", "TQ===", false),
-            new("embedded space", "T Q==", false),
+            new("embedded space", "T Q==", true),
             new("invalid chars", "****", false),
             new("length 1", "A", false),
             new("length 3", "AAA", false),

@@ -4,7 +4,7 @@ id: agent-fix-test-core
 version: 1.0
 -->
 
-# Agent: Fix unit tests for Core
+# Agent: Fix Unit Tests for Core
 
 > [!IMPORTANT]
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))

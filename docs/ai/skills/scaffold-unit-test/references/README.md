@@ -1,4 +1,4 @@
-# Reference Files: implement-unit-tests
+# Reference Files: scaffold-unit-test
 
 > Read the exemplar files listed below before implementing. Do NOT copy them — follow the same patterns.
 
@@ -19,4 +19,4 @@ Consult `docs/ai/specs/testing/gold-standard.md` for a complete list of referenc
 - **Always** `[Theory]` + `TheoryData<T>` — never `[Fact]`
 - **Nested Operation Groups** in TestData: `public static class IsJson { public static TheoryData<...> Data => ... }`
 - **Side-by-side** placement: `XxxTests.cs` + `XxxTestData.cs` in the same folder
-- **Composite expected types**: `MustExpected(bool IsValid, string? Message?, string? ParamName?)`, `FluentExpected(bool IsValid, string? Message?)`
+- **Expected types**: see `docs/ai/specs/testing/fixture.md` §1 for the full hierarchy (`RuleExpected`, `MustExpected`, `GuardExpected`, `FluentExpected`, `DataAnnotationExpected`) — do not restate the record shapes here

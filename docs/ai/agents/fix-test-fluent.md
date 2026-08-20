@@ -4,7 +4,7 @@ id: agent-fix-test-fluent
 version: 1.0
 -->
 
-# Agent: Fix unit tests for Fluent
+# Agent: Fix Unit Tests for FluentValidation
 
 > [!IMPORTANT]
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))

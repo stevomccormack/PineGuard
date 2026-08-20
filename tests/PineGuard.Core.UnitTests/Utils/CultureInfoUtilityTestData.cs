@@ -20,7 +20,8 @@ public static class CultureInfoUtilityTestData
             new("trim region", "en", " US ", true, "en-US"),
             new("whitespace region ignored", "en", "   ", true, "en"),
             new("empty region ignored", "en", "", true, "en"),
-            new("whitespace region ignored 2", "en", "\t\r\n", true, "en")
+            new("whitespace region ignored 2", "en", "\t\r\n", true, "en"),
+            new("mixed case normalizes to canonical", "EN", "us", true, "en-US")
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>
@@ -48,7 +49,8 @@ public static class CultureInfoUtilityTestData
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
-            new("en", "en", true, "en")
+            new("en", "en", true, "en"),
+            new("uppercase normalizes to canonical", "EN", true, "en")
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>
@@ -153,7 +155,8 @@ public static class CultureInfoUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("invariant", CultureInfo.InvariantCulture, false, string.Empty)
+            new("invariant", CultureInfo.InvariantCulture, false, string.Empty),
+            new("en-001 UN M.49 world code rejected", CultureInfo.GetCultureInfo("en-001"), false, string.Empty)
         ];
 
         public sealed record ValidCase(string Name, CultureInfo Culture, bool Expected, string ExpectedRegion)

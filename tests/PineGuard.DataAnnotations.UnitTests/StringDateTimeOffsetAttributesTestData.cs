@@ -34,8 +34,19 @@ public static class StringDateTimeOffsetAttributesTestData
                 {
                     nameof(F.DateTimeOffsetIsBetween.NullValue) => new DataAnnotationExpected(true),
                     nameof(F.DateTimeOffsetIsBetween.MinExclusive) => new DataAnnotationExpected(true), // DA uses Inclusion.Inclusive by default; at min = valid
+                    nameof(F.DateTimeOffsetIsBetween.OffsetLessAssumedUtc) => new DataAnnotationExpected(false, "Value must be a date/time within the expected range."), // this test pins a fixed 2020 window; the fixture's 2024 value falls outside it (assume-UTC parsing is pinned by BetweenDateTimeOffsetString_OffsetLessValue_IsAssumedUtc)
                     _ when s.IsValid => new DataAnnotationExpected(true),
                     _ => new DataAnnotationExpected(false, "Value must be a date/time within the expected range.")
                 });
+    }
+
+    public static class BetweenDateTimeOffsetStringAssumeUtc
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("offset-less value assumed utc", F.DateTimeOffsetIsBetween.OffsetLessAssumedUtc.value, new DataAnnotationExpected(true)),
+            new("explicit utc offset", "2024-01-15T10:30:00Z", new DataAnnotationExpected(true)),
+            new("explicit non-utc offset outside window", "2024-01-15T10:30:00+05:00", new DataAnnotationExpected(false, "Value must be a date/time within the expected range."))
+        ];
     }
 }

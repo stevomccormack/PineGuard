@@ -17,7 +17,9 @@ namespace PineGuard.DataAnnotations;
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
-/// <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
+/// <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AssumeUniversal"/> |
+/// <see cref="DateTimeStyles.AllowWhiteSpaces"/>, so offset-less input is treated as UTC regardless of
+/// the host time zone.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
 /// </remarks>
@@ -36,7 +38,7 @@ namespace PineGuard.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string))
 {
-    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces;
+    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
     /// <summary>Gets or sets the <see cref="DateTimeStyles"/> used when parsing the string value.</summary>
     public DateTimeStyles Styles { get; set; } = DefaultStyles;
@@ -61,7 +63,9 @@ public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBas
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
-/// <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
+/// <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AssumeUniversal"/> |
+/// <see cref="DateTimeStyles.AllowWhiteSpaces"/>, so offset-less input is treated as UTC regardless of
+/// the host time zone.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
 /// </remarks>
@@ -80,7 +84,7 @@ public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBas
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class FutureDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string))
 {
-    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces;
+    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
     /// <summary>Gets or sets the <see cref="DateTimeStyles"/> used when parsing the string value.</summary>
     public DateTimeStyles Styles { get; set; } = DefaultStyles;
@@ -107,7 +111,9 @@ public sealed class FutureDateTimeOffsetStringAttribute() : ValidationAttributeB
 /// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
 /// <see cref="DateTimeOffset"/> string format using invariant culture. The <see cref="Styles"/> property
 /// controls how the annotated value is parsed; defaults to
-/// <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
+/// <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AssumeUniversal"/> |
+/// <see cref="DateTimeStyles.AllowWhiteSpaces"/>, so offset-less input is treated as UTC regardless of
+/// the host time zone.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
 /// </remarks>
@@ -138,7 +144,7 @@ public sealed class BetweenDateTimeOffsetStringAttribute(
     /// <summary>Gets whether the boundary values are included or excluded in the valid range.</summary>
     public Inclusion Inclusion { get; } = inclusion;
 
-    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces;
+    private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
     /// <summary>Gets or sets the <see cref="DateTimeStyles"/> used when parsing the string value.</summary>
     public DateTimeStyles Styles { get; set; } = DefaultStyles;

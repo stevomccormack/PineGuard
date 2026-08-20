@@ -14,6 +14,7 @@ public static class CsvUtilityTestData
             new("quoted field", "\"a,b\",c", true, ["a,b", "c"]),
             new("escaped quote", "\"a\"\"b\",c", true, ["a\"b", "c"]),
             new("after quote whitespace", "\"a\" ,b", true, ["a", "b"]),
+            new("before quote whitespace", "a, \"b,c\"", true, ["a", "b,c"]),
             new("quoted field at end", "a,\"b,c\"", true, ["a", "b,c"])
         ];
 
@@ -29,6 +30,16 @@ public static class CsvUtilityTestData
 
         public sealed record ValidCase(string Name, string? Value, bool Expected, IReadOnlyList<string>? ExpectedOutValue)
             : TryCase<string?, IReadOnlyList<string>?>(Name, Value, Expected, ExpectedOutValue);
+    }
+
+    public static class TryParseCsvLineInvalidSeparator
+    {
+        public static TheoryData<char> Separators =>
+        [
+            '"',
+            '\r',
+            '\n'
+        ];
     }
 
     public static class TryParseCsvHeaderLine
@@ -120,7 +131,9 @@ public static class CsvUtilityTestData
             new("required field whitespace", ("   ", [new CsvColumnSchema("Col1", CsvColumnType.String, IsRequired: true)]), false),
             new("too long", ("abcdef", [new CsvColumnSchema("a", CsvColumnType.String, MaxLength: 3)]), false),
             new("type mismatch", ("nope", [new CsvColumnSchema("a", CsvColumnType.Int32)]), false),
-            new("unknown type", ("a", [new CsvColumnSchema("a", (CsvColumnType)123)]), false)
+            new("unknown type", ("a", [new CsvColumnSchema("a", (CsvColumnType)123)]), false),
+            new("maxlength enforced on raw padded field", ("\"     ab\"", [new CsvColumnSchema("a", CsvColumnType.String, MaxLength: 3)]), false),
+            new("maxlength enforced on raw whitespace-only optional field", ("\"      \"", [new CsvColumnSchema("a", CsvColumnType.String, MaxLength: 3, IsRequired: false)]), false)
         ];
 
         public sealed record ValidCase(string Name, (string? Line, IReadOnlyList<CsvColumnSchema>? Schema) Value, bool Expected)
@@ -133,7 +146,8 @@ public static class CsvUtilityTestData
         [
             new("exact key lookup", ("1", ["a"], new Dictionary<string, CsvColumnType> { ["a"] = CsvColumnType.Int32 }, StringComparison.Ordinal), true),
             new("non-exact match", ("1", ["A"], new Dictionary<string, CsvColumnType> { ["a"] = CsvColumnType.Int32 }, StringComparison.OrdinalIgnoreCase), true),
-            new("fallback to string on missing key", ("1", ["a"], new Dictionary<string, CsvColumnType> { ["b"] = CsvColumnType.Int32 }, StringComparison.Ordinal), true)
+            new("fallback to string on missing key", ("1", ["a"], new Dictionary<string, CsvColumnType> { ["b"] = CsvColumnType.Int32 }, StringComparison.Ordinal), true),
+            new("ordinal ignores dictionary's own comparer", ("abc", ["ID"], new Dictionary<string, CsvColumnType>(StringComparer.OrdinalIgnoreCase) { ["id"] = CsvColumnType.Int32 }, StringComparison.Ordinal), true)
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>

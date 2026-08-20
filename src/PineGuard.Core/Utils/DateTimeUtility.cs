@@ -13,6 +13,14 @@ public static class DateTimeUtility
     /// </summary>
     /// <param name="value">The date/time to convert. If <see langword="null"/>, returns <see langword="null"/>.</param>
     /// <returns>The UTC-converted value, or <see langword="null"/> if <paramref name="value"/> is <see langword="null"/>.</returns>
+    /// <remarks>
+    /// <see cref="DateTimeKind.Local"/> values are converted via <see cref="DateTime.ToUniversalTime"/>.
+    /// <see cref="DateTimeKind.Unspecified"/> values are deliberately assumed to already represent UTC and are
+    /// relabeled via <see cref="DateTime.SpecifyKind(DateTime, DateTimeKind)"/> rather than converted —
+    /// the opposite of <see cref="DateTime.ToUniversalTime"/>, which treats <see cref="DateTimeKind.Unspecified"/>
+    /// as local. This convention underpins every comparison in <see cref="PineGuard.Rules.DateTimeRules"/> that
+    /// normalizes via this method.
+    /// </remarks>
     public static DateTime? ToUtc(DateTime? value)
     {
         if (value is null) return null;

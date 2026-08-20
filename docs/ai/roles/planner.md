@@ -6,6 +6,8 @@ version: 1.0
 
 # Role: Test Analyst
 
+> **Also known as:** Planner · `roles/planner.md` · `role-test-analyst`
+
 > [!NOTE]
 > You are the **Planner**. Your job is to design test strategy, cases, and data before coding.
 

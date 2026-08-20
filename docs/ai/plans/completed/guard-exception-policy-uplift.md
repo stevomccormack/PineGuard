@@ -1,3 +1,10 @@
+<!-- metadata_header
+type: plan
+id: guard-exception-policy-uplift
+version: 1.0
+status: completed
+-->
+
 # Guard Exception Policy Uplift
 
 ## Context

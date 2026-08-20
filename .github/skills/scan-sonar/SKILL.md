@@ -1,5 +1,5 @@
 ---
-name: scan-run
+name: scan-sonar
 description: Run SonarQube analysis for PineGuard by following the canonical Brain workflow.
 ---
 # Skill: Run SonarQube Analysis
@@ -9,7 +9,7 @@ description: Run SonarQube analysis for PineGuard by following the canonical Bra
 Read these files before running analysis:
 1. [scan/spec.md](../../../docs/ai/specs/scan/spec.md)
 2. [scan.md](../../../docs/ai/rules/scan.md)
-3. [scan-run/SKILL.md](../../../docs/ai/skills/scan-sonar/SKILL.md)
+3. [scan-sonar/SKILL.md](../../../docs/ai/skills/scan-sonar/SKILL.md)
 4. [code-reviewer memory](../../../docs/ai/memory/code-reviewer.md)
 
 ## Execute

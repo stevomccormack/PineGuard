@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
 using PineGuard.Common;
 using PineGuard.MustClauses;
@@ -116,17 +115,16 @@ public static class FluentExtension
         where TProp : struct
         => ruleBuilder.MustBe<T, TProp?, TProp?>(check, message);
 
-    [ExcludeFromCodeCoverage]
     private static string FormatMessage(string template, string paramName) =>
         template.Replace(ParamNameToken, paramName, StringComparison.Ordinal);
 
-    [ExcludeFromCodeCoverage]
+    /// <remarks>
+    /// Falls back to <see cref="ValidationContext{T}.PropertyPath"/> (never <see langword="null"/> once a
+    /// property validator is initialized) when <see cref="ValidationContext{T}.DisplayName"/> is blank.
+    /// </remarks>
     private static string GetPropertyName<T>(ValidationContext<T> context)
     {
         var displayName = context.DisplayName;
-        if (!string.IsNullOrWhiteSpace(displayName))
-            return displayName;
-
-        return context.PropertyPath ?? "value";
+        return string.IsNullOrWhiteSpace(displayName) ? context.PropertyPath : displayName;
     }
 }

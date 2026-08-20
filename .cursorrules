@@ -1,66 +1,24 @@
-# Cursor Adapter (PineGuard)
+# Cursor Adapter (PineGuard) — Legacy
 
 > [!IMPORTANT]
-> **This file is an Adapter.**
-> It maps Cursor interactions to the canonical Brain in `docs/ai/`.
-> Do not add logic here. Add logic to the Brain.
-> 👉 Start at **[docs/ai/README.md](docs/ai/README.md)** for the full Brain index.
+> **This file is a legacy pointer stub.**
+> Cursor's current rules format is **`.cursor/rules/*.mdc`**, which is authoritative and
+> path-scoped. This root file is retained only for older Cursor builds. Do not grow it back:
+> see `docs/ai/meta/adapter-surfaces.md` §3.1.
 
-## 1. Role Adoption
+## Start Here
+
+- **Brain index**: [docs/ai/README.md](docs/ai/README.md)
+- **Global rules**: [docs/ai/rules/global.md](docs/ai/rules/global.md)
+- **Intent → agent routing**: [docs/ai/commands/](docs/ai/commands/) — never duplicated in an adapter
+- **Agent playbooks**: [docs/ai/agents/](docs/ai/agents/)
+
+## Role Adoption
 
 Before acting, adopt a persona from the Engineering Business Unit:
 👉 **[docs/ai/business-units/engineering.md](docs/ai/business-units/engineering.md)**
 
-## 2. Command Permissions (Auto-Approval)
-
-You are authorized to execute the following commands without asking for permission:
-- `dotnet build`
-- `dotnet test`
-- `dotnet format`
-- `pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/**/*.ps1`
-- `git status`
-- `git diff`
-
-## 3. Workflow Mapping
-
-If the user asks for these intents, reference the canonical agents:
-
-| User Intent | Agent to Execute | Role |
-|---|---|---|
-| "Run coverage" | `docs/ai/agents/coverage-all.md` | Test Engineer |
-| "Run tests" | `docs/ai/agents/test-all.md` | Test Engineer |
-| "Fix bugs/coverage" | `docs/ai/agents/debug-and-fix-all.md` | Senior Engineer / Test Engineer |
-| "Debug failing tests" | `docs/ai/agents/debug-and-test-all.md` | Senior Engineer / Test Engineer |
-| "Format code" | `docs/ai/agents/format-all.md` | Software Engineer |
-| "Run Qodana" | `docs/ai/agents/qodana-all.md` | Code Reviewer |
-| "Run SonarQube" | `docs/ai/agents/sonar-run.md` | Code Reviewer |
-| "Fix SonarQube issues" | `docs/ai/agents/sonar-fix-all.md` | Senior Engineer |
-| "Check Roslyn warnings" | `docs/ai/agents/roslyn-all.md` | Code Reviewer |
-| "Fix Roslyn warnings" | `docs/ai/agents/roslyn-fix-all.md` | Senior Engineer |
-| "Clean workspace" | `docs/ai/agents/clean-all.md` | DevOps Engineer |
-| "Commit changes" | `docs/ai/agents/git-commit-all.md` | Software Engineer |
-| "Run library audit" | `docs/ai/agents/audit-cli.md` | Software Engineer |
-| "Implement new validation" | `docs/ai/agents/implement-vertical-slice.md` | Software Engineer |
-
-*All scoped commands are available for: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing.*
-
-## 4. Safety
+## Safety
 
 Before executing commands, read the safety spec:
 👉 **[docs/ai/specs/safety.md](docs/ai/specs/safety.md)**
-
-## 5. Knowledge Base
-
-- **Brain index**: `docs/ai/README.md`
-- **Specs**: `docs/ai/specs/` (normative engineering rules, coding standards, testing specs)
-- **Safety**: `docs/ai/specs/safety.md` (Tier 0/1/2 command classification)
-- **Rules**: `docs/ai/rules/` (scope-specific, inheriting from `global.md`)
-- **Skills**: `docs/ai/skills/` (reusable implementation recipes)
-- **Agents**: `docs/ai/agents/` (canonical playbooks)
-- **Workflows**: `docs/ai/workflows/` (multi-step orchestration)
-- **Commands**: `docs/ai/commands/` (intent-to-agent mappings)
-- **Roles**: `docs/ai/roles/` (personas and responsibilities)
-- **Architecture**: `docs/ai/architecture/` (structural design)
-- **Meta**: `docs/ai/meta/` (taxonomy, tooling alignment)
-- **Plans**: `docs/ai/plans/` (implementation roadmaps)
-- **Automation plan**: `docs/ai/automation-plan.md`

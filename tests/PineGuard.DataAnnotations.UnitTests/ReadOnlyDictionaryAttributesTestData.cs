@@ -1,3 +1,4 @@
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using F = PineGuard.Testing.Fixtures.ReadOnlyDictionaryRulesFixtures;
 
@@ -9,8 +10,12 @@ public static class ReadOnlyDictionaryAttributesTestData
 
     private static TheoryData<ValidCase> CommonEdgeCases() =>
     [
-        new(nameof(F.IsEmpty.NullValue), F.IsEmpty.NullValue, true),
-        new("string", "not a dict", true)
+        new(nameof(F.IsEmpty.NullValue), F.IsEmpty.NullValue, true)
+    ];
+
+    public static TheoryData<ThrowsCase> TypeMismatchCases =>
+    [
+        new("string", "not a dict", new ExpectedException(typeof(InvalidOperationException), null, "can only be applied to properties implementing"))
     ];
 
     public static class EmptyReadOnlyDictionary
