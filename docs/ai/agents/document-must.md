@@ -14,5 +14,5 @@ version: 1.0
 
 1. Read the skill at `docs/ai/skills/document/SKILL.md`.
 2. Execute it with parameter **Project = PineGuard.MustClauses**.
-3. Apply §5.4 (MustClauses) template.
+3. Apply §5.3 (MustClauses) template.
 4. Verify: `dotnet build src/PineGuard.MustClauses/PineGuard.MustClauses.csproj`.

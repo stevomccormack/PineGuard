@@ -10,6 +10,7 @@ version: 1.0
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
 > roles: shipper ([../roles/shipper.md](../roles/shipper.md))
 > safety tier: **1** — opens a short window of no branch protection. Confirm intent and re-enable promptly.
+> adapter surface: **Claude Code only** — declared release-family exception in [../meta/adapter-surfaces.md](../meta/adapter-surfaces.md) §4. Do not generate adapters for it on surfaces that apply blanket auto-approval.
 
 ## Purpose
 

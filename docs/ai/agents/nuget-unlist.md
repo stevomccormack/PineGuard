@@ -10,6 +10,7 @@ version: 1.0
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
 > roles: shipper ([../roles/shipper.md](../roles/shipper.md))
 > safety tier: **1** — affects publicly-visible listings on nuget.org. Reversible via relist, but confirm scope first.
+> adapter surface: **Claude Code only** — declared release-family exception in [../meta/adapter-surfaces.md](../meta/adapter-surfaces.md) §4. Do not generate adapters for it on surfaces that apply blanket auto-approval.
 
 ## Purpose
 
@@ -23,10 +24,11 @@ Unlists older prerelease versions across the six PineGuard packages on nuget.org
 | `All` | | | Unlist every prerelease, including the latest. |
 | `DryRun` | | | Print the plan without calling the NuGet API. |
 | `Force` | | | Skip the interactive confirmation prompt. |
+| `EnvFile` | | `.etc/powershell/.env` | Alternate `.env` file supplying `NUGET_TOKEN`. |
 
 ## Auth
 
-Requires `NUGET_TOKEN` in `.etc/powershell/.env` with the `Unlist Package` scope on the `PineGuard.*` glob. The script loads the token via `tools/.shared/dotenv.ps1` — no CI / GitHub secret involved.
+Requires `NUGET_TOKEN` with the `Unlist Package` scope on the `PineGuard.*` glob. The script loads the token via `tools/.shared/dotenv.ps1` from `.etc/powershell/.env` by default, or from whatever `-EnvFile` points at — no CI / GitHub secret involved.
 
 ## Pre-flight
 

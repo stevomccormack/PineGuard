@@ -4,7 +4,7 @@ id: agent-format-testing
 version: 1.0
 -->
 
-# Agent: Format Code for Testing
+# Agent: Format Code for PineGuard.Testing
 
 > [!IMPORTANT]
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))

@@ -4,7 +4,7 @@ id: agent-fix-test-guard
 version: 1.0
 -->
 
-# Agent: Fix unit tests for Guard
+# Agent: Fix Unit Tests for GuardClauses
 
 > [!IMPORTANT]
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))

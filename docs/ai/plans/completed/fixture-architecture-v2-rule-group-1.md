@@ -1,17 +1,17 @@
 <!-- metadata_header
-type: agent
-id: agent-migrate-agent-1
+type: plan
+id: plan-fixture-architecture-v2-rule-group-1
 version: 1.0
 -->
 
 > [!WARNING]
-> **ARCHIVED** — Fixture migration completed Feb 2026 (commit bfec9ee). This agent is retained for reference only.
+> **ARCHIVED** — historical record of one of the three parallel rule-group tracks in the Fixture Architecture v2 migration, completed Feb 2026 (commit bfec9ee). Only groups 1 and 2 were written down; the third track's scope table never existed as a file.
 
-# Agent: Migration Agent 1 — Rule Group 1
+# Plan: Fixture Architecture v2 — Rule Group 1
 
 > [!IMPORTANT]
-> business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
-> roles: verifier ([../roles/verifier.md](../roles/verifier.md))
+> business unit: engineering ([../../business-units/engineering.md](../../business-units/engineering.md))
+> roles: verifier ([../../roles/verifier.md](../../roles/verifier.md))
 
 ## Context
 
