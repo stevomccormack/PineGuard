@@ -29,6 +29,8 @@ namespace PineGuard.DataAnnotations.Common;
 /// <seealso href="https://pineguard.ai/docs/annotations">Annotation documentation</seealso>
 public abstract class ValidationAttributeBase(Type expectedType, bool allowNull = true) : ValidationAttribute
 {
+    private const string ParamNameToken = "{paramName}";
+
     /// <inheritdoc/>
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
@@ -54,6 +56,43 @@ public abstract class ValidationAttributeBase(Type expectedType, bool allowNull 
     protected abstract ValidationResult? ValidateValue(object? value, ValidationContext validationContext);
 
     /// <summary>
+    /// Formats the attribute's error message, substituting the <c>{paramName}</c> token used by every
+    /// PineGuard message template when present, per <c>docs/ai/specs/data-annotations/project.md</c> §2.
+    /// </summary>
+    /// <param name="name">The display name to substitute into the error message.</param>
+    /// <returns>The formatted error message.</returns>
+    /// <remarks>
+    /// When <see cref="ValidationAttribute.ErrorMessageString"/> contains the <c>{paramName}</c> token
+    /// (e.g. a user-supplied <see cref="ValidationAttribute.ErrorMessage"/> reusing the library's
+    /// convention), it is replaced directly rather than passed through <see cref="string.Format(string, object?)"/>,
+    /// which would otherwise throw <see cref="FormatException"/> on the non-numeric token. Otherwise, this
+    /// falls back to the base <see cref="ValidationAttribute.FormatErrorMessage"/> behavior.
+    /// </remarks>
+    public override string FormatErrorMessage(string name) =>
+        ErrorMessageString.Contains(ParamNameToken, StringComparison.Ordinal)
+            ? ErrorMessageString.Replace(ParamNameToken, name, StringComparison.Ordinal)
+            : base.FormatErrorMessage(name);
+
+    /// <summary>
+    /// Builds the <see cref="ValidationResult"/> for a failed validation, applying the same
+    /// custom-message-vs-must-message priority and <c>{paramName}</c> substitution used by both
+    /// <see cref="FromMustResult{T}"/> and <see cref="InvokeAndMapResult"/>.
+    /// </summary>
+    /// <param name="mustMessage">The message template returned by the must-clause on failure.</param>
+    /// <param name="context">The validation context for the current member.</param>
+    /// <returns>A <see cref="ValidationResult"/> describing the failure.</returns>
+    private ValidationResult BuildFailureResult(string mustMessage, ValidationContext context)
+    {
+        var errorTemplate = !string.IsNullOrWhiteSpace(ErrorMessage) || !string.IsNullOrWhiteSpace(ErrorMessageResourceName)
+            ? FormatErrorMessage(context.DisplayName)
+            : mustMessage.Replace(ParamNameToken, context.DisplayName, StringComparison.Ordinal);
+
+        return context.MemberName is { } memberName
+            ? new ValidationResult(errorTemplate, [memberName])
+            : new ValidationResult(errorTemplate);
+    }
+
+    /// <summary>
     /// Converts a <see cref="MustResult{T}"/> to a <see cref="ValidationResult"/>, substituting the
     /// member display name into the error message template.
     /// </summary>
@@ -63,17 +102,8 @@ public abstract class ValidationAttributeBase(Type expectedType, bool allowNull 
     /// <returns>
     /// <see langword="null"/> on success, or a <see cref="ValidationResult"/> with the formatted error.
     /// </returns>
-    protected ValidationResult? FromMustResult<T>(MustResult<T> result, ValidationContext context)
-    {
-        if (result.Success)
-            return ValidationResult.Success;
-
-        var errorTemplate = !string.IsNullOrWhiteSpace(ErrorMessage) || !string.IsNullOrWhiteSpace(ErrorMessageResourceName)
-            ? FormatErrorMessage(context.DisplayName)
-            : result.Message.Replace("{paramName}", context.DisplayName);
-
-        return new ValidationResult(errorTemplate, [context.MemberName!]);
-    }
+    protected ValidationResult? FromMustResult<T>(MustResult<T> result, ValidationContext context) =>
+        result.Success ? ValidationResult.Success : BuildFailureResult(result.Message, context);
 
     /// <summary>
     /// Builds an argument array suitable for reflective invocation of a must-clause method, filling
@@ -83,13 +113,29 @@ public abstract class ValidationAttributeBase(Type expectedType, bool allowNull 
     /// <param name="value">The value being validated (placed at index 1).</param>
     /// <param name="args">Additional arguments to pass after the value.</param>
     /// <returns>An object array ready for <see cref="MethodBase.Invoke(object, object[])"/>.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="value"/> is <see langword="null"/> and the method's value parameter is a
+    /// non-nullable value type. <see cref="MethodBase.Invoke(object, object[])"/> would otherwise
+    /// silently coerce the <see langword="null"/> argument to <c>default</c>, flipping the validation
+    /// verdict instead of reporting the mismatch.
+    /// </exception>
     protected static object?[] BuildInvokeArgs(MethodInfo method, object? value, object?[] args)
     {
         var parameters = method.GetParameters();
         var invokeArgs = new object?[parameters.Length];
 
         if (parameters.Length > 0) invokeArgs[0] = null;
-        if (parameters.Length > 1) invokeArgs[1] = value;
+
+        if (parameters.Length > 1)
+        {
+            if (value is null && parameters[1].ParameterType.IsValueType && Nullable.GetUnderlyingType(parameters[1].ParameterType) is null)
+                throw new InvalidOperationException(
+                    $"Cannot invoke '{method.Name}' with a null value for its non-nullable value-type parameter " +
+                    $"'{parameters[1].Name}' ({parameters[1].ParameterType.Name}); reflective invocation would silently " +
+                    $"coerce null to default({parameters[1].ParameterType.Name}), producing an incorrect validation result.");
+
+            invokeArgs[1] = value;
+        }
 
         var argIndex = 2;
         for (var i = 0; i < args.Length && argIndex < parameters.Length; i++)
@@ -124,10 +170,6 @@ public abstract class ValidationAttributeBase(Type expectedType, bool allowNull 
         if (success) return ValidationResult.Success;
 
         var msg = (string)resultType.GetProperty(nameof(MustResult<object>.Message))!.GetValue(resultObj)!;
-        var errorTemplate = !string.IsNullOrWhiteSpace(ErrorMessage) || !string.IsNullOrWhiteSpace(ErrorMessageResourceName)
-            ? FormatErrorMessage(ctx.DisplayName)
-            : msg.Replace("{paramName}", ctx.DisplayName);
-
-        return new ValidationResult(errorTemplate, [ctx.MemberName!]);
+        return BuildFailureResult(msg, ctx);
     }
 }

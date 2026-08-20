@@ -203,6 +203,14 @@ public sealed class NotHasFlagAttribute(string flagName) : ValidationAttributeBa
 /// Maps MustResult via reflection instead of dynamic binding.
 /// The DLR fails when MustResult&lt;TEnum&gt; is parameterized with a non-public enum type.
 /// </summary>
+/// <remarks>
+/// The ErrorMessage-priority and <c>{paramName}</c> substitution logic below duplicates
+/// <see cref="ValidationAttributeBase"/>'s private <c>BuildFailureResult</c>/<see cref="ValidationAttributeBase.FormatErrorMessage"/>.
+/// It cannot delegate to that helper directly: <c>BuildFailureResult</c> is a private instance member of
+/// <see cref="ValidationAttributeBase"/>, and this mapper is invoked with only a <see cref="ValidationAttribute"/>
+/// reference plus a raw <see cref="MethodInfo"/> result via reflection. Any future change to the canonical
+/// message-formatting rules in <see cref="ValidationAttributeBase"/> must be mirrored here.
+/// </remarks>
 file static class EnumResultMapper
 {
     internal static ValidationResult? InvokeAndMap(
@@ -217,8 +225,12 @@ file static class EnumResultMapper
         var msg = (string)resultType.GetProperty("Message")!.GetValue(resultObj)!;
         var errorTemplate = !string.IsNullOrWhiteSpace(attr.ErrorMessage) || !string.IsNullOrWhiteSpace(attr.ErrorMessageResourceName)
             ? attr.FormatErrorMessage(ctx.DisplayName)
-            : msg.Replace("{paramName}", ctx.DisplayName);
+            : msg.Replace("{paramName}", ctx.DisplayName, StringComparison.Ordinal);
 
-        return new ValidationResult(errorTemplate, [ctx.MemberName!]);
+        // Mirrors ValidationAttributeBase.BuildFailureResult: a member-less ValidationContext must not
+        // produce MemberNames == [null].
+        return ctx.MemberName is { } memberName
+            ? new ValidationResult(errorTemplate, [memberName])
+            : new ValidationResult(errorTemplate);
     }
 }
