@@ -31,6 +31,17 @@ public sealed class EnumRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(
     }
 
     [Theory]
+    [MemberData(nameof(EnumRulesTestData.IsDefinedValueByteBacked.Cases), MemberType = typeof(EnumRulesTestData.IsDefinedValueByteBacked))]
+    public void IsDefinedValue_ByteBackedEnum_BehavesAsExpected(RuleCase<int?> tc)
+    {
+        // Act
+        var result = EnumRules.IsDefinedValue<F.ByteBackedEnum>(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(EnumRulesTestData.IsDefinedName.Cases), MemberType = typeof(EnumRulesTestData.IsDefinedName))]
     public void IsDefinedName_BehavesAsExpected(RuleCase<(string? name, bool ignoreCase)> tc)
     {
@@ -65,6 +76,17 @@ public sealed class EnumRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(
     [Theory]
     [MemberData(nameof(EnumRulesTestData.IsFlagsEnumCombinationNonFlags.Cases), MemberType = typeof(EnumRulesTestData.IsFlagsEnumCombinationNonFlags))]
     public void IsFlagsEnumCombinationNonFlags_BehavesAsExpected(RuleCase<F.SimpleEnum?> tc)
+    {
+        // Act
+        var result = EnumRules.IsFlagsEnumCombination(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumRulesTestData.IsFlagsEnumCombinationNegativeMember.Cases), MemberType = typeof(EnumRulesTestData.IsFlagsEnumCombinationNegativeMember))]
+    public void IsFlagsEnumCombinationNegativeMember_BehavesAsExpected(RuleCase<F.SignedFlagsEnum?> tc)
     {
         // Act
         var result = EnumRules.IsFlagsEnumCombination(tc.Value);

@@ -26,7 +26,13 @@ public static class BitWiseUtilityTestData
             new("binary invalid", "0b102", false, 0),
             new("overflow binary", "0b1_0000_0000", false, 0),
             new("invalid decimal", "abc", false, 0),
-            new("negative decimal", "-1", false, 0)];
+            new("negative decimal", "-1", false, 0),
+            new("underscore splits hex prefix", "0_xFF", false, 0),
+            new("underscore splits binary prefix", "0_b0001", false, 0),
+            new("double underscore splits hex prefix", "0__xFF", false, 0),
+            new("triple underscore splits binary prefix", "0___b0001", false, 0),
+            new("leading underscore", "_0xFF", false, 0),
+            new("trailing underscore", "0xFF_", false, 0)];
 
         public sealed record ValidCase(string Name, string? Value, bool Expected, byte ExpectedOutValue)
             : TryCase<string?, byte>(Name, Value, Expected, ExpectedOutValue);
