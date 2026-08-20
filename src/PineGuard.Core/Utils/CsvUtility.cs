@@ -54,9 +54,10 @@ public static class CsvUtility
 
             if (afterClosingQuote)
             {
-                if (!HandleAfterClosingQuote(ch, separator, builder, list, ref afterClosingQuote))
-                    return false;
-                continue;
+                if (HandleAfterClosingQuote(ch, separator, builder, list, ref afterClosingQuote))
+                    continue;
+
+                return false;
             }
 
             if (inQuotes)
