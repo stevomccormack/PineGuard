@@ -265,16 +265,50 @@ public static class NumberRulesFixtures
         public static RuleScenario<(decimal? value, decimal target, decimal? tolerance)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class IsApproximatelyUnsignedUnderflow
+    {
+        public static readonly (uint? value, uint target, uint? tolerance) BelowTargetWithinTolerance = (3u, 5u, 2u);
+        public static readonly (uint? value, uint target, uint? tolerance) BelowTargetOutsideTolerance = (3u, 10u, 2u);
+
+        public static RuleScenario<(uint? value, uint target, uint? tolerance)>[] ValidScenarios =>
+        [
+            new(nameof(BelowTargetWithinTolerance), BelowTargetWithinTolerance, true)
+        ];
+
+        public static RuleScenario<(uint? value, uint target, uint? tolerance)>[] InvalidScenarios =>
+        [
+            new(nameof(BelowTargetOutsideTolerance), BelowTargetOutsideTolerance, false)
+        ];
+
+        public static RuleScenario<(uint? value, uint target, uint? tolerance)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsApproximatelySignedOverflowGuard
+    {
+        public static readonly (int? value, int target, int? tolerance) ExtremeRange = (int.MaxValue, int.MinValue, 10);
+        public static readonly (int? value, int target, int? tolerance) MinValueVsZero = (int.MinValue, 0, 5);
+
+        public static RuleScenario<(int? value, int target, int? tolerance)>[] InvalidScenarios =>
+        [
+            new(nameof(ExtremeRange), ExtremeRange, false),
+            new(nameof(MinValueVsZero), MinValueVsZero, false)
+        ];
+
+        public static RuleScenario<(int? value, int target, int? tolerance)>[] AllScenarios => [.. InvalidScenarios];
+    }
+
     public static class IsMultipleOf
     {
         public static readonly (int? value, int factor) Multiple = (4, 2);
         public static readonly (int? value, int factor) NotMultiple = (5, 2);
         public static readonly (int? value, int factor) ZeroFactor = (4, 0);
         public static readonly (int? value, int factor) Null = (null, 2);
+        public static readonly (int? value, int factor) MinValueByNegativeOne = (int.MinValue, -1);
 
         public static RuleScenario<(int? value, int factor)>[] ValidScenarios =>
         [
-            new(nameof(Multiple), Multiple, true)
+            new(nameof(Multiple), Multiple, true),
+            new(nameof(MinValueByNegativeOne), MinValueByNegativeOne, true)
         ];
 
         public static RuleScenario<(int? value, int factor)>[] InvalidScenarios =>

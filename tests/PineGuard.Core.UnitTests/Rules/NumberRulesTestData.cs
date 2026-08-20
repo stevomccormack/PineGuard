@@ -65,6 +65,16 @@ public static class NumberRulesTestData
         public static TheoryData<RuleCase<(decimal? value, decimal target, decimal? tolerance)>> Cases => F.IsApproximately.AllScenarios.ToRuleCases();
     }
 
+    public static class IsApproximatelyUnsignedUnderflow
+    {
+        public static TheoryData<RuleCase<(uint? value, uint target, uint? tolerance)>> Cases => F.IsApproximatelyUnsignedUnderflow.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsApproximatelySignedOverflowGuard
+    {
+        public static TheoryData<RuleCase<(int? value, int target, int? tolerance)>> Cases => F.IsApproximatelySignedOverflowGuard.AllScenarios.ToRuleCases();
+    }
+
     public static class IsMultipleOf
     {
         public static TheoryData<RuleCase<(int? value, int factor)>> Cases => F.IsMultipleOf.AllScenarios.ToRuleCases();

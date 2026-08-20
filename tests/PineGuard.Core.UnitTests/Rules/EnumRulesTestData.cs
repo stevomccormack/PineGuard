@@ -15,6 +15,11 @@ public static class EnumRulesTestData
         public static TheoryData<RuleCase<int?>> Cases => F.IsDefinedValue.AllScenarios.ToRuleCases();
     }
 
+    public static class IsDefinedValueByteBacked
+    {
+        public static TheoryData<RuleCase<int?>> Cases => F.IsDefinedValueByteBacked.AllScenarios.ToRuleCases();
+    }
+
     public static class IsDefinedName
     {
         public static TheoryData<RuleCase<(string? name, bool ignoreCase)>> Cases => F.IsDefinedName.AllScenarios.ToRuleCases();
@@ -28,6 +33,11 @@ public static class EnumRulesTestData
     public static class IsFlagsEnumCombinationNonFlags
     {
         public static TheoryData<RuleCase<F.SimpleEnum?>> Cases => F.IsFlagsEnumCombinationNonFlags.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsFlagsEnumCombinationNegativeMember
+    {
+        public static TheoryData<RuleCase<F.SignedFlagsEnum?>> Cases => F.IsFlagsEnumCombinationNegativeMember.AllScenarios.ToRuleCases();
     }
 
     public static class HasFlag

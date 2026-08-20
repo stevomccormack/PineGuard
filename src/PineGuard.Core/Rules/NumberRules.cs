@@ -130,6 +130,13 @@ public static class NumberRules
     /// <returns>
     /// <see langword="true"/> if <c>|value - target| &lt;= tolerance</c>; otherwise, <see langword="false"/>.
     /// </returns>
+    /// <remarks>
+    /// The distance between <paramref name="value"/> and <paramref name="target"/> is computed by subtracting the
+    /// smaller from the larger (never <c>Abs</c> of a raw subtraction), which avoids wraparound for unsigned
+    /// <typeparamref name="T"/>. The subtraction runs in a checked context so that a true
+    /// difference too large to represent in <typeparamref name="T"/> (e.g. <see cref="int.MaxValue"/> vs.
+    /// <see cref="int.MinValue"/>) is treated as out of tolerance rather than throwing <see cref="OverflowException"/>.
+    /// </remarks>
     public static bool IsApproximately<T>(T? value, T target, T? tolerance) where T : struct, INumber<T>
     {
         if (value is null || tolerance is null)
@@ -138,7 +145,16 @@ public static class NumberRules
         if (tolerance.Value < T.Zero)
             return false;
 
-        var diff = T.Abs(value.Value - target);
+        T diff;
+        try
+        {
+            diff = checked(value.Value >= target ? value.Value - target : target - value.Value);
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
+
         return diff <= tolerance.Value;
     }
 
@@ -152,6 +168,12 @@ public static class NumberRules
     /// <see langword="true"/> if <paramref name="value"/> is evenly divisible by <paramref name="factor"/>;
     /// otherwise, <see langword="false"/>.
     /// </returns>
+    /// <remarks>
+    /// For signed integer <typeparamref name="T"/>, <c>T.MinValue % -1</c> overflows at the CLR level because the
+    /// internally computed quotient (<c>T.MinValue / -1</c>) exceeds <c>T.MaxValue</c>. Mathematically every value
+    /// is evenly divisible by <c>-1</c>, so that case is treated as <see langword="true"/> instead of throwing
+    /// <see cref="OverflowException"/>.
+    /// </remarks>
     public static bool IsMultipleOf<T>(T? value, T factor) where T : struct, INumber<T>
     {
         if (value is null)
@@ -160,7 +182,14 @@ public static class NumberRules
         if (factor == T.Zero)
             return false;
 
-        return value.Value % factor == T.Zero;
+        try
+        {
+            return value.Value % factor == T.Zero;
+        }
+        catch (OverflowException)
+        {
+            return true;
+        }
     }
 
     /// <summary>
