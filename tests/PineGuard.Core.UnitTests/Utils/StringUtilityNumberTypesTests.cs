@@ -94,6 +94,50 @@ public sealed class StringUtilityNumberTypesTests : BaseUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.IsAsciiWhite.Cases), MemberType = typeof(StringUtilityNumberTypesTestData.IsAsciiWhite))]
+    public void IsAsciiWhite_ReturnsExpected(StringUtilityNumberTypesTestData.IsAsciiWhite.Case testCase)
+    {
+        // Act
+        var result = StringUtility.NumberTypes.IsAsciiWhite(testCase.Value);
+
+        // Assert
+        Assert.Equal(testCase.Expected, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.TrimLeadingSign.Cases), MemberType = typeof(StringUtilityNumberTypesTestData.TrimLeadingSign))]
+    public void TrimLeadingSign_ReturnsExpected(StringUtilityNumberTypesTestData.TrimLeadingSign.Case testCase)
+    {
+        // Act
+        var result = StringUtility.NumberTypes.TrimLeadingSign(testCase.Value.value.AsSpan(), testCase.Value.styles);
+
+        // Assert
+        Assert.Equal(testCase.Expected, result.ToString());
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.TrimAsciiWhite.StartCases), MemberType = typeof(StringUtilityNumberTypesTestData.TrimAsciiWhite))]
+    public void TrimStartAsciiWhite_ReturnsExpected(StringUtilityNumberTypesTestData.TrimAsciiWhite.Case testCase)
+    {
+        // Act
+        var result = StringUtility.NumberTypes.TrimStartAsciiWhite(testCase.Value.AsSpan());
+
+        // Assert
+        Assert.Equal(testCase.Expected, result.ToString());
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.TrimAsciiWhite.EndCases), MemberType = typeof(StringUtilityNumberTypesTestData.TrimAsciiWhite))]
+    public void TrimEndAsciiWhite_ReturnsExpected(StringUtilityNumberTypesTestData.TrimAsciiWhite.Case testCase)
+    {
+        // Act
+        var result = StringUtility.NumberTypes.TrimEndAsciiWhite(testCase.Value.AsSpan());
+
+        // Assert
+        Assert.Equal(testCase.Expected, result.ToString());
+    }
+
+    [Theory]
     [MemberData(nameof(StringUtilityNumberTypesTestData.InvalidStyles.Int32IncompatibleHexStyles), MemberType = typeof(StringUtilityNumberTypesTestData.InvalidStyles))]
     public void TryParseInt32_ReturnsFalse_ForIncompatibleHexStyles(NumberStyles styles)
     {

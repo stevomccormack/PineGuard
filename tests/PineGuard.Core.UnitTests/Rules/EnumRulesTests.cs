@@ -1,6 +1,7 @@
 using PineGuard.Rules;
 using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
+using D = PineGuard.Core.UnitTests.Rules.EnumRulesTestData;
 using F = PineGuard.Testing.Fixtures.EnumRulesFixtures;
 
 namespace PineGuard.Core.UnitTests.Rules;
@@ -93,6 +94,28 @@ public sealed class EnumRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(
 
         // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumRulesTestData.IsFlagsEnumCombinationUnderlyingTypes.Cases), MemberType = typeof(EnumRulesTestData.IsFlagsEnumCombinationUnderlyingTypes))]
+    public void IsFlagsEnumCombination_HonorsEveryUnderlyingType(TypeCode underlyingTypeCode)
+    {
+        // Act
+        var result = underlyingTypeCode switch
+        {
+            TypeCode.SByte => EnumRules.IsFlagsEnumCombination<D.SByteFlags>(D.SByteFlags.A | D.SByteFlags.B),
+            TypeCode.Int16 => EnumRules.IsFlagsEnumCombination<D.Int16Flags>(D.Int16Flags.A | D.Int16Flags.B),
+            TypeCode.Int32 => EnumRules.IsFlagsEnumCombination<D.Int32Flags>(D.Int32Flags.A | D.Int32Flags.B),
+            TypeCode.Int64 => EnumRules.IsFlagsEnumCombination<D.Int64Flags>(D.Int64Flags.A | D.Int64Flags.B),
+            TypeCode.Byte => EnumRules.IsFlagsEnumCombination<D.ByteFlags>(D.ByteFlags.A | D.ByteFlags.B),
+            TypeCode.UInt16 => EnumRules.IsFlagsEnumCombination<D.UInt16Flags>(D.UInt16Flags.A | D.UInt16Flags.B),
+            TypeCode.UInt32 => EnumRules.IsFlagsEnumCombination<D.UInt32Flags>(D.UInt32Flags.A | D.UInt32Flags.B),
+            TypeCode.UInt64 => EnumRules.IsFlagsEnumCombination<D.UInt64Flags>(D.UInt64Flags.A | D.UInt64Flags.B),
+            _ => throw new ArgumentOutOfRangeException(nameof(underlyingTypeCode), underlyingTypeCode, null)
+        };
+
+        // Assert
+        Assert.True(result);
     }
 
     [Theory]

@@ -44,7 +44,10 @@ public static class HttpSecurityHeaderUtilityTestData
             new("case insensitive includeSubDomains", ["INCLUDESUBDOMAINS"], (MaxAgeSeconds: null, IncludeSubDomains: true, Preload: false)),
             new("case insensitive preload", ["PRELOAD"], (MaxAgeSeconds: null, IncludeSubDomains: false, Preload: true)),
             new("case insensitive max-age", ["MAX-AGE=600"], (MaxAgeSeconds: 600, IncludeSubDomains: false, Preload: false)),
-            new("max-age with whitespace value", ["max-age= 100 "], (MaxAgeSeconds: 100, IncludeSubDomains: false, Preload: false))
+            new("max-age with whitespace value", ["max-age= 100 "], (MaxAgeSeconds: 100, IncludeSubDomains: false, Preload: false)),
+            new("max-age quoted value", ["max-age=\"31536000\""], (MaxAgeSeconds: 31536000, IncludeSubDomains: false, Preload: false)),
+            new("max-age unterminated quote", ["max-age=\"31536000"], (MaxAgeSeconds: null, IncludeSubDomains: false, Preload: false)),
+            new("max-age trailing quote only", ["max-age=31536000\""], (MaxAgeSeconds: null, IncludeSubDomains: false, Preload: false))
         ];
 
         public sealed record Case(string Name, IReadOnlyList<string> Value, (long? MaxAgeSeconds, bool IncludeSubDomains, bool Preload) Expected)

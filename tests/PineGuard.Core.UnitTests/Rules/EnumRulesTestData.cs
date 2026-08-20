@@ -5,6 +5,48 @@ namespace PineGuard.Core.UnitTests.Rules;
 
 public static class EnumRulesTestData
 {
+    // Flags enums covering every underlying integral type, so the bit-pattern reinterpretation in
+    // EnumRules.ToUInt64 is exercised for both the signed (sign-extending) and unsigned arms.
+
+    [Flags]
+    public enum SByteFlags : sbyte { None = 0, A = 1, B = 2 }
+
+    [Flags]
+    public enum Int16Flags : short { None = 0, A = 1, B = 2 }
+
+    [Flags]
+    public enum Int32Flags { None = 0, A = 1, B = 2 }
+
+    [Flags]
+    public enum Int64Flags : long { None = 0, A = 1, B = 2 }
+
+    [Flags]
+    public enum ByteFlags : byte { None = 0, A = 1, B = 2 }
+
+    [Flags]
+    public enum UInt16Flags : ushort { None = 0, A = 1, B = 2 }
+
+    [Flags]
+    public enum UInt32Flags : uint { None = 0, A = 1, B = 2 }
+
+    [Flags]
+    public enum UInt64Flags : ulong { None = 0, A = 1, B = 2 }
+
+    public static class IsFlagsEnumCombinationUnderlyingTypes
+    {
+        public static TheoryData<TypeCode> Cases =>
+        [
+            TypeCode.SByte,
+            TypeCode.Int16,
+            TypeCode.Int32,
+            TypeCode.Int64,
+            TypeCode.Byte,
+            TypeCode.UInt16,
+            TypeCode.UInt32,
+            TypeCode.UInt64
+        ];
+    }
+
     public static class IsDefined
     {
         public static TheoryData<RuleCase<F.SimpleEnum?>> Cases => F.IsDefined.AllScenarios.ToRuleCases();

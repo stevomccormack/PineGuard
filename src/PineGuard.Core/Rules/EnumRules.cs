@@ -288,7 +288,14 @@ public static class EnumRules
             var values = (TEnum[])Enum.GetValues(typeof(TEnum));
 #endif
 
-            return values.Aggregate<TEnum, ulong>(0, (current, v) => current | ToUInt64(v));
+            var bits = 0UL;
+
+            // A plain loop (rather than LINQ Aggregate) keeps this allocation-free and avoids the cached-delegate
+            // branch the compiler emits for a lambda inside a static field initializer, which can never be taken.
+            foreach (var value in values)
+                bits |= ToUInt64(value);
+
+            return bits;
         }
     }
 }

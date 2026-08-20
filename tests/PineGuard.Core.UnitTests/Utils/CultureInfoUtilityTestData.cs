@@ -146,6 +146,32 @@ public static class CultureInfoUtilityTestData
             : ReturnCase<string?, bool>(Name, IsoLanguageAlpha2Code, ExpectedNonEmpty);
     }
 
+    public static class IsIsoAlpha2RegionCode
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("US", "US", true),
+            new("AA lower bound", "AA", true),
+            new("ZZ upper bound", "ZZ", true)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("empty", "", false),
+            new("single letter", "U", false),
+            new("UN M.49 numeric", "001", false),
+            new("lowercase first letter", "uS", false),
+            new("lowercase second letter", "Us", false),
+            new("digit first character", "1S", false),
+            new("digit second character", "U1", false),
+            new("first character below A", "@S", false),
+            new("second character below A", "U@", false)
+        ];
+
+        public sealed record ValidCase(string Name, string Code, bool Expected)
+            : ReturnCase<string, bool>(Name, Code, Expected);
+    }
+
     public static class TryGetTwoLetterIsoRegionName
     {
         public static TheoryData<ValidCase> ValidCases =>

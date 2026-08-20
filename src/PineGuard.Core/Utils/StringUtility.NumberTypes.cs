@@ -398,8 +398,7 @@ public static partial class StringUtility
             if ((styles & NumberStyles.AllowTrailingWhite) != 0)
                 span = TrimEndAsciiWhite(span);
 
-            if (span.Length > 0 && (styles & NumberStyles.AllowLeadingSign) != 0 && (span[0] == '+' || span[0] == '-'))
-                span = span[1..];
+            span = TrimLeadingSign(span, styles);
 
             if (span.IsEmpty)
                 return false;
@@ -419,12 +418,21 @@ public static partial class StringUtility
         /// accept for <see cref="NumberStyles.AllowLeadingWhite"/> and <see cref="NumberStyles.AllowTrailingWhite"/>
         /// (U+0009 through U+000D and U+0020). Unicode whitespace outside this set is not accepted.
         /// </summary>
-        private static bool IsAsciiWhite(char c) => c == ' ' || c is >= '\t' and <= '\r';
+        internal static bool IsAsciiWhite(char c) => c == ' ' || c is >= '\t' and <= '\r';
+
+        /// <summary>
+        /// Removes a single leading <c>+</c> or <c>-</c> sign from the specified span when
+        /// <see cref="NumberStyles.AllowLeadingSign"/> is set. An empty span is returned unchanged.
+        /// </summary>
+        internal static ReadOnlySpan<char> TrimLeadingSign(ReadOnlySpan<char> span, NumberStyles styles) =>
+            span.Length > 0 && (styles & NumberStyles.AllowLeadingSign) != 0 && (span[0] == '+' || span[0] == '-')
+                ? span[1..]
+                : span;
 
         /// <summary>
         /// Removes leading BCL-recognized numeric whitespace from the specified span.
         /// </summary>
-        private static ReadOnlySpan<char> TrimStartAsciiWhite(ReadOnlySpan<char> span)
+        internal static ReadOnlySpan<char> TrimStartAsciiWhite(ReadOnlySpan<char> span)
         {
             var index = 0;
             while (index < span.Length && IsAsciiWhite(span[index]))
@@ -436,7 +444,7 @@ public static partial class StringUtility
         /// <summary>
         /// Removes trailing BCL-recognized numeric whitespace from the specified span.
         /// </summary>
-        private static ReadOnlySpan<char> TrimEndAsciiWhite(ReadOnlySpan<char> span)
+        internal static ReadOnlySpan<char> TrimEndAsciiWhite(ReadOnlySpan<char> span)
         {
             var end = span.Length;
             while (end > 0 && IsAsciiWhite(span[end - 1]))

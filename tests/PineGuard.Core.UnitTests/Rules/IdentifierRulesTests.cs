@@ -16,4 +16,15 @@ public sealed class IdentifierRulesTests(ITestOutputHelper output) : BaseRuleUni
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(IdentifierRulesTestData.IsSlug.AdHocCases), MemberType = typeof(IdentifierRulesTestData.IsSlug))]
+    public void IsSlug_AdHoc_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = IdentifierRules.IsSlug(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

@@ -55,21 +55,27 @@ A test operation group reaches **GOLD** when:
 
 `Test-CoverageAnalysis.ps1 -Enforce100` exits 0 for `All` and for every individual
 scope, against a full `Gen-CoverageReport.ps1 -Scope All` run covering net8.0 and
-net10.0 (13,250 tests per target framework, 0 failures):
+net10.0 (13,698 tests per target framework, 0 failures):
 
 | Scope | Line | Branch |
 |-------|------|--------|
-| All | 100.00% (15158/15158) | 100.00% (6914/6914) |
-| Core | 100.00% (2533/2533) | 100.00% (2324/2324) |
+| All | 100.00% (15621/15621) | 100.00% (7192/7192) |
+| Core | 100.00% (2776/2776) | 100.00% (2588/2588) |
 | MustClauses | 100.00% (2286/2286) | 100.00% (1190/1190) |
 | GuardClauses | 100.00% (2156/2156) | 100.00% (2152/2152) |
-| DataAnnotations | 100.00% (1750/1750) | 100.00% (138/138) |
-| FluentValidation | 100.00% (1435/1435) | 100.00% (1020/1020) |
-| Testing | 100.00% (4998/4998) | 100.00% (90/90) |
+| DataAnnotations | 100.00% (1768/1768) | 100.00% (150/150) |
+| FluentValidation | 100.00% (1438/1438) | 100.00% (1022/1022) |
+| Testing | 100.00% (5197/5197) | 100.00% (90/90) |
 
 Per-scope figures apply their own class filters and are not expected to sum to the
-`All` row, which matches 969 classes. No `[ExcludeFromCodeCoverage]` attributes were
+`All` row, which matches 983 classes. No `[ExcludeFromCodeCoverage]` attributes were
 added to reach these numbers.
+
+Where a branch was genuinely unreachable through the public API, the enclosing private
+helper was widened to `internal` and tested directly rather than deleted or suppressed
+— see `NetworkUtility.IsValidIpv4Segment`, `NetworkUtility.IsValidHostnameLabel`,
+`CultureInfoUtility.IsIsoAlpha2RegionCode`, and the `StringUtility.NumberTypes` span
+helpers.
 
 ## Fixture-Based Testing Adoption
 

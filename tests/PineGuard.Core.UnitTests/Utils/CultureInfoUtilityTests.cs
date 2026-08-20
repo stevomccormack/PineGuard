@@ -132,6 +132,52 @@ public sealed class CultureInfoUtilityTests : BaseUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(CultureInfoUtilityTestData.GetRegionCodes.ValidCases), MemberType = typeof(CultureInfoUtilityTestData.GetRegionCodes))]
+    public void GetRegionCodes_RepeatedCall_ReturnsCachedInstance(CultureInfoUtilityTestData.GetRegionCodes.ValidCase testCase)
+    {
+        // Arrange
+        var first = CultureInfoUtility.GetRegionCodes(testCase.IsoLanguageAlpha2Code);
+
+        // Act
+        var second = CultureInfoUtility.GetRegionCodes(testCase.IsoLanguageAlpha2Code);
+        var third = CultureInfoUtility.GetRegionCodes(testCase.IsoLanguageAlpha2Code);
+
+        // Assert
+        Assert.NotEmpty(second);
+        Assert.Equal(first, second);
+        Assert.Same(second, third);
+    }
+
+    [Theory]
+    [MemberData(nameof(CultureInfoUtilityTestData.GetCultures.ValidCases), MemberType = typeof(CultureInfoUtilityTestData.GetCultures))]
+    public void GetCultures_RepeatedCall_ReturnsCachedInstance(CultureInfoUtilityTestData.GetCultures.ValidCase testCase)
+    {
+        // Arrange
+        var first = CultureInfoUtility.GetCultures(testCase.IsoLanguageAlpha2Code);
+
+        // Act
+        var second = CultureInfoUtility.GetCultures(testCase.IsoLanguageAlpha2Code);
+        var third = CultureInfoUtility.GetCultures(testCase.IsoLanguageAlpha2Code);
+
+        // Assert
+        Assert.NotEmpty(second);
+        Assert.Equal(first, second);
+        Assert.Same(second, third);
+    }
+
+    [Theory]
+    [MemberData(nameof(CultureInfoUtilityTestData.IsIsoAlpha2RegionCode.ValidCases), MemberType = typeof(CultureInfoUtilityTestData.IsIsoAlpha2RegionCode))]
+    [MemberData(nameof(CultureInfoUtilityTestData.IsIsoAlpha2RegionCode.EdgeCases), MemberType = typeof(CultureInfoUtilityTestData.IsIsoAlpha2RegionCode))]
+    public void IsIsoAlpha2RegionCode_ReturnsExpected(CultureInfoUtilityTestData.IsIsoAlpha2RegionCode.ValidCase testCase)
+    {
+        // Act
+        var result = CultureInfoUtility.IsIsoAlpha2RegionCode(testCase.Code);
+
+        // Assert
+        Assert.Equal(testCase.Expected, result);
+    }
+
+    [Theory]
     [MemberData(nameof(CultureInfoUtilityTestData.TryGetTwoLetterIsoRegionName.ValidCases), MemberType = typeof(CultureInfoUtilityTestData.TryGetTwoLetterIsoRegionName))]
     [MemberData(nameof(CultureInfoUtilityTestData.TryGetTwoLetterIsoRegionName.EdgeCases), MemberType = typeof(CultureInfoUtilityTestData.TryGetTwoLetterIsoRegionName))]
     public void TryGetTwoLetterIsoRegionName_ReturnsExpected(CultureInfoUtilityTestData.TryGetTwoLetterIsoRegionName.ValidCase testCase)

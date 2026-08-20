@@ -109,7 +109,9 @@ public static class StringUtilityNumberTypesTestData
             new("leading minus honored with AllowLeadingSign", ("-42", NumberStyles.AllowLeadingSign), true, '2'),
             new("leading white honored with AllowLeadingWhite", (" 42", NumberStyles.AllowLeadingWhite), true, '2'),
             new("trailing white honored with AllowTrailingWhite", ("42 ", NumberStyles.AllowTrailingWhite), true, '2'),
-            new("leading sign and both whites honored", (" +123 ", NumberStyles.Integer), true, '3')
+            new("leading sign and both whites honored", (" +123 ", NumberStyles.Integer), true, '3'),
+            new("tab leading white honored with AllowLeadingWhite", ("\t42", NumberStyles.AllowLeadingWhite), true, '2'),
+            new("tab trailing white honored with AllowTrailingWhite", ("42\t", NumberStyles.AllowTrailingWhite), true, '2')
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>
@@ -131,6 +133,62 @@ public static class StringUtilityNumberTypesTestData
 
         public sealed record ValidCase(string Name, (string? value, NumberStyles styles) Value, bool Expected, char ExpectedLastDigit)
             : TryCase<(string? value, NumberStyles styles), char>(Name, Value, Expected, ExpectedLastDigit);
+    }
+
+    public static class IsAsciiWhite
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("space", ' ', true),
+            new("tab", '\t', true),
+            new("line feed", '\n', true),
+            new("carriage return", '\r', true),
+            new("digit", '4', false),
+            new("null character", '\0', false),
+            new("non-breaking space", '\u00a0', false)
+        ];
+
+        public sealed record Case(string Name, char Value, bool Expected)
+            : ReturnCase<char, bool>(Name, Value, Expected);
+    }
+
+    public static class TrimLeadingSign
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("plus stripped", ("+42", NumberStyles.AllowLeadingSign), "42"),
+            new("minus stripped", ("-42", NumberStyles.AllowLeadingSign), "42"),
+            new("no sign present", ("42", NumberStyles.AllowLeadingSign), "42"),
+            new("sign kept without AllowLeadingSign", ("+42", NumberStyles.None), "+42"),
+            new("empty span", ("", NumberStyles.AllowLeadingSign), "")
+        ];
+
+        public sealed record Case(string Name, (string value, NumberStyles styles) Value, string Expected)
+            : ReturnCase<(string value, NumberStyles styles), string>(Name, Value, Expected);
+    }
+
+    public static class TrimAsciiWhite
+    {
+        public static TheoryData<Case> StartCases =>
+        [
+            new("no leading whitespace", "42", "42"),
+            new("space", " 42", "42"),
+            new("tab", "\t42", "42"),
+            new("all ascii whitespace", " \t\n\v\f\r ", ""),
+            new("non-ascii whitespace kept", "\u00a042", "\u00a042")
+        ];
+
+        public static TheoryData<Case> EndCases =>
+        [
+            new("no trailing whitespace", "42", "42"),
+            new("space", "42 ", "42"),
+            new("tab", "42\t", "42"),
+            new("all ascii whitespace", " \t\n\v\f\r ", ""),
+            new("non-ascii whitespace kept", "42\u00a0", "42\u00a0")
+        ];
+
+        public sealed record Case(string Name, string Value, string Expected)
+            : ReturnCase<string, string>(Name, Value, Expected);
     }
 
     public static IFormatProvider? GetProvider(string? cultureName)

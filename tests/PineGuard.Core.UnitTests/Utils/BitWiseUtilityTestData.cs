@@ -12,6 +12,9 @@ public static class BitWiseUtilityTestData
             new("hex underscores", "0x_FF", true, 255),
             new("binary", "0b1111_0000", true, 240),
             new("decimal", "10", true, 10),
+            new("bare zero", "0", true, 0),
+            new("binary zero", "0b0", true, 0),
+            new("underscore after leading zero is not a prefix split", "0_1", true, 1),
             new("trim", " 0b0001 ", true, 1)];
 
         public static TheoryData<ValidCase> EdgeCases =>
@@ -30,6 +33,8 @@ public static class BitWiseUtilityTestData
             new("underscore splits hex prefix", "0_xFF", false, 0),
             new("underscore splits binary prefix", "0_b0001", false, 0),
             new("double underscore splits hex prefix", "0__xFF", false, 0),
+            new("underscore splits uppercase hex prefix", "0_XFF", false, 0),
+            new("underscore splits uppercase binary prefix", "0_B0001", false, 0),
             new("triple underscore splits binary prefix", "0___b0001", false, 0),
             new("leading underscore", "_0xFF", false, 0),
             new("trailing underscore", "0xFF_", false, 0)];
