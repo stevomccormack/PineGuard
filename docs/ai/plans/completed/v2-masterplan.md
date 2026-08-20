@@ -2,7 +2,8 @@
 type: plan
 id: v2-masterplan
 version: 1.0
-status: active
+status: completed
+completed: 2026-04-16
 children:
   - v2-pineguard.md
 supersedes:
