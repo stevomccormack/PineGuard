@@ -51,7 +51,12 @@ public sealed class InSqlDateRangeAttribute() : ValidationAttributeBase(typeof(D
 /// parameters of type <see cref="DateTime"/> or <see cref="DateTimeOffset"/>.
 /// </para>
 /// <para>
-/// If the value is neither <see cref="DateTime"/> nor <see cref="DateTimeOffset"/>, validation passes silently.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// <para>
+/// If the value is non-<see langword="null"/> but is neither <see cref="DateTime"/> nor
+/// <see cref="DateTimeOffset"/>, the attribute is misapplied and an <see cref="InvalidOperationException"/>
+/// is thrown rather than silently reporting the value as valid.
 /// </para>
 /// </remarks>
 /// <example>
@@ -70,6 +75,9 @@ public sealed class InSqlDateRangeAttribute() : ValidationAttributeBase(typeof(D
 public sealed class InSqlDateTimeRangeAttribute() : ValidationAttributeBase(typeof(object))
 {
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="value"/> is neither <see cref="DateTime"/> nor <see cref="DateTimeOffset"/>.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         switch (value)
@@ -85,7 +93,7 @@ public sealed class InSqlDateTimeRangeAttribute() : ValidationAttributeBase(type
                     return FromMustResult(result, validationContext);
                 }
             default:
-                return ValidationResult.Success;
+                throw new InvalidOperationException($"[InSqlDateTimeRangeAttribute] does not support type {value!.GetType().Name}. Supported types: DateTime, DateTimeOffset.");
         }
     }
 }

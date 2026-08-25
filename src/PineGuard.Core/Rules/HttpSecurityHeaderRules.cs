@@ -83,6 +83,13 @@ public static class HttpSecurityHeaderRules
     /// <param name="requiredBaseUriValue">The required <c>base-uri</c> directive value. If <see langword="null"/> or whitespace, the directive is not checked.</param>
     /// <param name="requiredFrameAncestorsValue">The required <c>frame-ancestors</c> directive value. If <see langword="null"/> or whitespace, the directive is not checked.</param>
     /// <returns><see langword="true"/> if the CSP header satisfies all specified directives; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Only the first occurrence of a given directive name in the header value is evaluated; per the CSP
+    /// specification, browsers ignore any later duplicate of a directive that already appeared. When the
+    /// required value is the keyword-source <c>'none'</c>, it is only treated as satisfied when it is the
+    /// sole source in that directive's value, since a source list such as <c>'none' https://example.com</c>
+    /// is enforced by browsers as if <c>'none'</c> were absent.
+    /// </remarks>
     public static bool HasContentSecurityPolicy(
         IReadOnlyDictionary<string, IEnumerable<string>>? headers,
         string? requiredDefaultSrcValue,
@@ -344,12 +351,19 @@ public static class HttpSecurityHeaderRules
         return true;
     }
 
+    private const string NoneSourceKeyword = "'none'";
+
     private static bool HasCspDirective(IReadOnlyList<string> segments, string directiveName, string? requiredValue)
     {
         if (!StringUtility.TryGetTrimmed(requiredValue, out var trimmedRequired))
             return true;
 
-        // ReSharper disable once LoopCanBeConvertedToQuery
+        var requiresSoleNone = string.Equals(trimmedRequired, NoneSourceKeyword, StringComparison.OrdinalIgnoreCase);
+
+        // CSP mandates that only the first occurrence of a directive name is enforced by the user agent;
+        // any later duplicate of the same directive is ignored. Stop at the first matching segment instead
+        // of scanning every segment, so a duplicate cannot be used to satisfy a requirement the first
+        // (authoritative) occurrence does not actually meet.
         foreach (var segment in segments)
         {
             if (!segment.StartsWith(directiveName, StringComparison.OrdinalIgnoreCase))
@@ -360,14 +374,24 @@ public static class HttpSecurityHeaderRules
 
             var remainder = segment.Length == directiveName.Length ? string.Empty : segment[directiveName.Length..].Trim();
             if (remainder.Length == 0)
-                continue;
+                return false;
+
+            var tokens = remainder.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+
+            // 'none' only has meaning as the sole source in the list; combined with other sources it is
+            // ignored by the user agent and the remaining sources are enforced instead, so a match requires
+            // 'none' to be the only token present rather than merely one of several.
+            if (requiresSoleNone)
+                return tokens.Length == 1 && string.Equals(tokens[0], trimmedRequired, StringComparison.OrdinalIgnoreCase);
 
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var token in remainder.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var token in tokens)
             {
                 if (string.Equals(token, trimmedRequired, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
+
+            return false;
         }
 
         return false;

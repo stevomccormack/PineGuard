@@ -55,9 +55,12 @@ public static class SqlDateTimeAttributesTestData
 
     public static class InSqlDateTimeRangeWrongType
     {
-        public static TheoryData<DataAnnotationCase> Cases =>
+        private sealed record ActionThrowsCase(string Name, Action Value, ExpectedException ExpectedException)
+            : ThrowsCase<Action>(Name, Value, ExpectedException);
+
+        public static TheoryData<IThrowsCase> Cases =>
         [
-            new("string-value", "string", new DataAnnotationExpected(true))
+            new ActionThrowsCase("wrong-type", () => new InSqlDateTimeRangeAttribute().GetValidationResult("string", new ValidationContext(new object())), new ExpectedException(typeof(InvalidOperationException)))
         ];
     }
 }

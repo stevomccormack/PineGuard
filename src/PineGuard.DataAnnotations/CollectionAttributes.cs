@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using PineGuard.DataAnnotations.Common;
@@ -17,11 +18,19 @@ namespace PineGuard.DataAnnotations;
 /// the corresponding generic MustClause method via reflection.
 /// </para>
 /// <para>
-/// If the annotated value does not implement <see cref="IEnumerable{T}"/>, validation passes silently.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// <para>
+/// If the value is non-<see langword="null"/> but its runtime type does not implement
+/// <see cref="IEnumerable{T}"/>, the attribute is misapplied and an <see cref="InvalidOperationException"/>
+/// is thrown rather than silently reporting the value as valid.
 /// </para>
 /// </remarks>
 public abstract class CollectionAttributeBase() : ValidationAttributeBase(typeof(object), allowNull: true)
 {
+    private static readonly ConcurrentDictionary<Type, Type?> InterfaceCache = new();
+    private static readonly ConcurrentDictionary<(string MethodName, Type ItemType), MethodInfo> MethodCache = new();
+
     /// <summary>
     /// Invokes the specified <see cref="MustCollectionClauses"/> method against the annotated collection value.
     /// </summary>
@@ -30,23 +39,28 @@ public abstract class CollectionAttributeBase() : ValidationAttributeBase(typeof
     /// <param name="ctx">The current <see cref="ValidationContext"/>.</param>
     /// <param name="args">Optional extra arguments forwarded after the collection value (e.g., count, comparer).</param>
     /// <returns>
-    /// <see cref="ValidationResult.Success"/> if validation passes, or a <see cref="ValidationResult"/>
-    /// with an error message if it fails. Returns <see cref="ValidationResult.Success"/> if the value does
-    /// not implement <see cref="IEnumerable{T}"/>.
+    /// <see langword="null"/> on success, or a <see cref="ValidationResult"/> describing the failure.
     /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="value"/>'s runtime type does not implement <see cref="IEnumerable{T}"/>.
+    /// </exception>
     protected ValidationResult? InvokeCollectionMust(string methodName, object? value, ValidationContext ctx, params object?[] args)
     {
         var type = value!.GetType();
-        var iEnum = type.GetInterfaces()
-            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+        var iEnum = InterfaceCache.GetOrAdd(type, t =>
+            t.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)));
 
-        if (iEnum == null) return ValidationResult.Success;
+        if (iEnum == null)
+            throw new InvalidOperationException(
+                $"[{GetType().Name}] can only be applied to properties implementing IEnumerable<T>. " +
+                $"Property '{ctx.DisplayName}' is of type {type.Name}.");
 
         var itemType = iEnum.GetGenericArguments()[0];
 
-        var method = typeof(MustCollectionClauses).GetMethod(methodName, BindingFlags.Public | BindingFlags.Static)!;
+        var genericMethod = MethodCache.GetOrAdd((methodName, itemType), key =>
+            typeof(MustCollectionClauses).GetMethod(key.MethodName, BindingFlags.Public | BindingFlags.Static)!
+                .MakeGenericMethod(key.ItemType));
 
-        var genericMethod = method.MakeGenericMethod(itemType);
         var invokeArgs = BuildInvokeArgs(genericMethod, value, args);
         return InvokeAndMapResult(genericMethod, invokeArgs, ctx);
     }

@@ -147,7 +147,7 @@ public static class DateTimeRules
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="start"/> precedes <paramref name="end"/>; otherwise, <see langword="false"/>.</returns>
     public static bool IsChronological(DateTime? start, DateTime? end, Inclusion inclusion = Inclusion.Exclusive) =>
-        RangeRules.IsChronological(start, end, inclusion);
+        RangeRules.IsChronological(DateTimeUtility.ToUtc(start), DateTimeUtility.ToUtc(end), inclusion);
 
     /// <summary>
     /// Determines whether two date/time ranges overlap.
@@ -159,10 +159,17 @@ public static class DateTimeRules
     /// <param name="inclusion">Whether the boundaries are inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <returns><see langword="true"/> if the two ranges overlap; otherwise, <see langword="false"/>. Returns <see langword="false"/> if either range is inverted (start after end).</returns>
     public static bool IsOverlapping(DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2,
-        Inclusion inclusion = Inclusion.Exclusive) =>
-        RangeRules.IsChronological(start1, end1, Inclusion.Inclusive) &&
-        RangeRules.IsChronological(start2, end2, Inclusion.Inclusive) &&
-        RangeRules.IsOverlapping(start1, end1, start2, end2, inclusion);
+        Inclusion inclusion = Inclusion.Exclusive)
+    {
+        var start1Utc = DateTimeUtility.ToUtc(start1);
+        var end1Utc = DateTimeUtility.ToUtc(end1);
+        var start2Utc = DateTimeUtility.ToUtc(start2);
+        var end2Utc = DateTimeUtility.ToUtc(end2);
+
+        return RangeRules.IsChronological(start1Utc, end1Utc, Inclusion.Inclusive) &&
+            RangeRules.IsChronological(start2Utc, end2Utc, Inclusion.Inclusive) &&
+            RangeRules.IsOverlapping(start1Utc, end1Utc, start2Utc, end2Utc, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date/time is within the given number of days from UTC now.

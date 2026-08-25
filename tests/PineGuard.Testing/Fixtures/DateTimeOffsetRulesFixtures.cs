@@ -55,6 +55,24 @@ public static class DateTimeOffsetRulesFixtures
         public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class IsBeforeDefaultInclusion
+    {
+        public static readonly (DateTimeOffset? value, DateTimeOffset? other) StrictlyBefore = (new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero));
+        public static readonly (DateTimeOffset? value, DateTimeOffset? other) SameInstant = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero));
+
+        public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other)>[] ValidScenarios =>
+        [
+            new(nameof(StrictlyBefore), StrictlyBefore, true)
+        ];
+
+        public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other)>[] InvalidScenarios =>
+        [
+            new(nameof(SameInstant), SameInstant, false)
+        ];
+
+        public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class IsAfter
     {
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) AfterInclusive = (new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive, null);
@@ -81,6 +99,24 @@ public static class DateTimeOffsetRulesFixtures
         ];
 
         public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsAfterDefaultInclusion
+    {
+        public static readonly (DateTimeOffset? value, DateTimeOffset? other) StrictlyAfter = (new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero));
+        public static readonly (DateTimeOffset? value, DateTimeOffset? other) SameInstant = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero));
+
+        public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other)>[] ValidScenarios =>
+        [
+            new(nameof(StrictlyAfter), StrictlyAfter, true)
+        ];
+
+        public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other)>[] InvalidScenarios =>
+        [
+            new(nameof(SameInstant), SameInstant, false)
+        ];
+
+        public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
     public static class IsSame

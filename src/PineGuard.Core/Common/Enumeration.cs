@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace PineGuard.Common;
@@ -53,9 +54,13 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
     /// <summary>
     /// Gets all declared members of the specified enumeration type.
     /// </summary>
-    /// <typeparam name="T">The concrete enumeration type.</typeparam>
+    /// <typeparam name="T">
+    /// The concrete enumeration type. Annotated <see cref="DynamicallyAccessedMemberTypes.PublicFields"/> so
+    /// trimming tools preserve the static member fields this method discovers via reflection; without it, a
+    /// trimmed publish may remove those fields when <typeparamref name="T"/> is reached only through this API.
+    /// </typeparam>
     /// <returns>A read-only list of all declared members.</returns>
-    public static IReadOnlyList<T> GetAll<T>() where T : Enumeration<TValue> =>
+    public static IReadOnlyList<T> GetAll<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>() where T : Enumeration<TValue> =>
     [.. typeof(T)
         .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
         .Where(f => typeof(T).IsAssignableFrom(f.FieldType))
@@ -64,10 +69,13 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
     /// <summary>
     /// Finds an enumeration member by its value.
     /// </summary>
-    /// <typeparam name="T">The concrete enumeration type.</typeparam>
+    /// <typeparam name="T">
+    /// The concrete enumeration type. Annotated <see cref="DynamicallyAccessedMemberTypes.PublicFields"/>; see
+    /// <see cref="GetAll{T}"/> for why.
+    /// </typeparam>
     /// <param name="value">The value to search for.</param>
     /// <returns>The matching member, or <see langword="null"/> if not found.</returns>
-    public static T? FromValue<T>(TValue value) where T : Enumeration<TValue>
+    public static T? FromValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(TValue value) where T : Enumeration<TValue>
     {
         ThrowHelper.ThrowIfNull(value);
         return GetAll<T>().FirstOrDefault(e => EqualityComparer<TValue>.Default.Equals(e.Value, value));
@@ -76,11 +84,14 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
     /// <summary>
     /// Attempts to find an enumeration member by its value.
     /// </summary>
-    /// <typeparam name="T">The concrete enumeration type.</typeparam>
+    /// <typeparam name="T">
+    /// The concrete enumeration type. Annotated <see cref="DynamicallyAccessedMemberTypes.PublicFields"/>; see
+    /// <see cref="GetAll{T}"/> for why.
+    /// </typeparam>
     /// <param name="value">The value to search for.</param>
     /// <param name="result">When this method returns, contains the matching member if found; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if a matching member was found; otherwise, <see langword="false"/>.</returns>
-    public static bool TryFromValue<T>(TValue? value, out T? result) where T : Enumeration<TValue>
+    public static bool TryFromValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(TValue? value, out T? result) where T : Enumeration<TValue>
     {
         if (value is null)
         {
@@ -95,10 +106,13 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
     /// <summary>
     /// Finds an enumeration member by its name (case-insensitive).
     /// </summary>
-    /// <typeparam name="T">The concrete enumeration type.</typeparam>
+    /// <typeparam name="T">
+    /// The concrete enumeration type. Annotated <see cref="DynamicallyAccessedMemberTypes.PublicFields"/>; see
+    /// <see cref="GetAll{T}"/> for why.
+    /// </typeparam>
     /// <param name="name">The name to search for.</param>
     /// <returns>The matching member, or <see langword="null"/> if not found.</returns>
-    public static T? FromName<T>(string name) where T : Enumeration<TValue>
+    public static T? FromName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string name) where T : Enumeration<TValue>
     {
         ThrowHelper.ThrowIfNullOrWhiteSpace(name);
         return GetAll<T>().FirstOrDefault(e => string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase));
@@ -107,11 +121,14 @@ public abstract class Enumeration<TValue> : IEquatable<Enumeration<TValue>>, ICo
     /// <summary>
     /// Attempts to find an enumeration member by its name (case-insensitive).
     /// </summary>
-    /// <typeparam name="T">The concrete enumeration type.</typeparam>
+    /// <typeparam name="T">
+    /// The concrete enumeration type. Annotated <see cref="DynamicallyAccessedMemberTypes.PublicFields"/>; see
+    /// <see cref="GetAll{T}"/> for why.
+    /// </typeparam>
     /// <param name="name">The name to search for.</param>
     /// <param name="result">When this method returns, contains the matching member if found; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if a matching member was found; otherwise, <see langword="false"/>.</returns>
-    public static bool TryFromName<T>(string? name, out T? result) where T : Enumeration<TValue>
+    public static bool TryFromName<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string? name, out T? result) where T : Enumeration<TValue>
     {
         if (string.IsNullOrWhiteSpace(name))
         {

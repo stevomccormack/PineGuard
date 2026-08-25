@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using Xunit.Abstractions;
 
@@ -171,5 +173,17 @@ public sealed class NumberAttributesTests(ITestOutputHelper output) : BaseDataAn
         var attribute = (ValidationAttribute)Activator.CreateInstance(attributeType)!;
         var ctx = new ValidationContext(new object());
         Assert.Throws<InvalidOperationException>(() => attribute.GetValidationResult(DateTime.Now, ctx));
+    }
+
+    [Theory]
+    [MemberData(nameof(NumberAttributesTestData.BoundMismatch.Cases), MemberType = typeof(NumberAttributesTestData.BoundMismatch))]
+    public void NumberAttribute_WithNonExactBound_ThrowsExpected(IThrowsCase tc)
+    {
+        // Arrange
+        var action = ((ValueCase<Action>)tc).Value;
+
+        // Act + Assert
+        var ex = Assert.Throws(tc.ExpectedException.Type, action);
+        ThrowsCaseAssert.Expected(ex, tc);
     }
 }

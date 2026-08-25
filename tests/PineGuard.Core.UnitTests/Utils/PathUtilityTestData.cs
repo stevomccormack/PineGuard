@@ -22,7 +22,9 @@ public static class FilePathUtilityTestData
             new("backslash invalid => true", "file\\name.txt", true),
             new("forward slash invalid => true", "file/name.txt", true),
             new("unicode filename => false", "über-file.txt", false),
-            new("spaces in name => false", "file name.txt", false)
+            new("spaces in name => false", "file name.txt", false),
+            new("embedded control char (BEL) invalid => true", "report\u0007.txt", true),
+            new("embedded tab invalid => true", "a\tb.txt", true)
         ];
 
         public sealed record ValidCase(string Name, string? Value, bool Expected)
@@ -51,7 +53,8 @@ public static class FilePathUtilityTestData
         [
             new("whitespace", "  ", false),
             new("reserved with surrounding whitespace", "  con  ", true),
-            new("leading dot produces empty base", ".con", false)
+            new("leading dot produces empty base", ".con", false),
+            new("trailing space before extension is reserved", "CON .txt", true)
         ];
 
         public sealed record ValidCase(string Name, string Value, bool Expected)

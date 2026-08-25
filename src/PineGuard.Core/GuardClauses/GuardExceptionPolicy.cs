@@ -64,7 +64,13 @@ public static class GuardExceptionPolicy
                 return;
             }
 
-            currentScope.Options.ExceptionReplacer = value;
+            CurrentScope.Value = ScopeFrame.WithOverride(
+                currentScope,
+                new GuardExceptionPolicyOptions
+                {
+                    ExceptionReplacer = value,
+                    ReplaceDefaultExceptions = currentScope.Options.ReplaceDefaultExceptions
+                });
         }
     }
 
@@ -89,7 +95,13 @@ public static class GuardExceptionPolicy
                 return;
             }
 
-            currentScope.Options.ReplaceDefaultExceptions = value;
+            CurrentScope.Value = ScopeFrame.WithOverride(
+                currentScope,
+                new GuardExceptionPolicyOptions
+                {
+                    ExceptionReplacer = currentScope.Options.ExceptionReplacer,
+                    ReplaceDefaultExceptions = value
+                });
         }
     }
 
@@ -123,7 +135,31 @@ public static class GuardExceptionPolicy
     }
 
     internal static bool ShouldReplace(Exception exception) =>
-        ReplaceDefaultExceptions || exception is not ArgumentException;
+        ShouldReplace(ReplaceDefaultExceptions, exception);
+
+    /// <summary>
+    /// Evaluates the replacement gate against an already-resolved <see cref="ReplaceDefaultExceptions"/>
+    /// value, so callers that need to combine it with an <see cref="ExceptionReplacer"/> resolved from the
+    /// same snapshot (see <see cref="GetEffectivePolicy"/>) never trigger a second, independently-resolved
+    /// ambient lookup.
+    /// </summary>
+    internal static bool ShouldReplace(bool replaceDefaultExceptions, Exception exception) =>
+        replaceDefaultExceptions || exception is not ArgumentException;
+
+    /// <summary>
+    /// Resolves <see cref="ExceptionReplacer"/> and <see cref="ReplaceDefaultExceptions"/> from a single
+    /// ambient-scope resolution, so the pair is always read from the same frame. Reading the two properties
+    /// independently can observe a torn combination if a scope is disposed by another execution context
+    /// between the reads; this method walks <see cref="ActiveScope"/> exactly once and returns both values
+    /// from that one result.
+    /// </summary>
+    internal static (Func<Exception, Exception>? ExceptionReplacer, bool ReplaceDefaultExceptions) GetEffectivePolicy()
+    {
+        var currentScope = ActiveScope();
+        return currentScope is not null
+            ? (currentScope.Options.ExceptionReplacer, currentScope.Options.ReplaceDefaultExceptions)
+            : (ExceptionReplacer, ReplaceDefaultExceptions);
+    }
 
     /// <summary>
     /// Resolves the innermost scope frame that is still active, skipping any frames already disposed
@@ -138,21 +174,49 @@ public static class GuardExceptionPolicy
         return frame;
     }
 
-    private sealed class ScopeFrame(GuardExceptionPolicyOptions options, ScopeFrame? previous)
+    private sealed class ScopeFrame
     {
-        private int _disposed;
+        // A single-element array, rather than a plain field, so that copy-on-write frames created by
+        // WithOverride can share the exact same disposal cell as the frame they were derived from: marking
+        // the original scope's lease disposed must also invalidate every frame later derived from it via a
+        // property setter, even though those frames are distinct object instances.
+        private readonly int[] _disposedCell;
 
-        public GuardExceptionPolicyOptions Options { get; } = options;
-        public ScopeFrame? Previous { get; } = previous;
+        public ScopeFrame(GuardExceptionPolicyOptions options, ScopeFrame? previous)
+            : this(options, previous, new int[1])
+        {
+        }
+
+        private ScopeFrame(GuardExceptionPolicyOptions options, ScopeFrame? previous, int[] disposedCell)
+        {
+            Options = options;
+            Previous = previous;
+            _disposedCell = disposedCell;
+        }
+
+        public GuardExceptionPolicyOptions Options { get; }
+        public ScopeFrame? Previous { get; }
 
         /// <summary>
         /// Gets a value indicating whether the lease for this frame has been disposed. Disposed frames stay
         /// linked in the chain but are skipped when resolving the ambient policy, so out-of-order disposal
         /// never restores a dead frame's options.
         /// </summary>
-        public bool IsDisposed => Volatile.Read(ref _disposed) != 0;
+        public bool IsDisposed => Volatile.Read(ref _disposedCell[0]) != 0;
 
-        public void MarkDisposed() => Volatile.Write(ref _disposed, 1);
+        public void MarkDisposed() => Volatile.Write(ref _disposedCell[0], 1);
+
+        /// <summary>
+        /// Creates a copy-on-write frame carrying <paramref name="options"/> in place of
+        /// <paramref name="source"/>'s options. The new frame shares <paramref name="source"/>'s disposal
+        /// cell and <see cref="Previous"/> link, so disposing the scope's original lease invalidates it too.
+        /// Assigning the result to <see cref="CurrentScope"/> only changes the ambient policy for the
+        /// current execution context and its descendants (normal <see cref="AsyncLocal{T}"/> semantics) —
+        /// unlike mutating <paramref name="source"/>.Options in place, it can never be observed by the
+        /// parent context or by sibling contexts that already captured a reference to <paramref name="source"/>.
+        /// </summary>
+        public static ScopeFrame WithOverride(ScopeFrame source, GuardExceptionPolicyOptions options) =>
+            new(options, source.Previous, source._disposedCell);
     }
 
     private sealed class ScopeLease(ScopeFrame scope) : IDisposable

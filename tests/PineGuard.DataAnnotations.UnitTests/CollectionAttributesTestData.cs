@@ -1,3 +1,4 @@
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -15,8 +16,12 @@ public static class CollectionAttributesTestData
 
     private static TheoryData<ValidCase> CommonEdgeCases() =>
     [
-        new("null", null, true),
-        new("not collection (int)", 123, true)
+        new("null", null, true)
+    ];
+
+    public static TheoryData<ThrowsCase> TypeMismatchCases =>
+    [
+        new("not collection (int)", 123, new ExpectedException(typeof(InvalidOperationException), null, "can only be applied to properties implementing"))
     ];
 
     public static class EmptyCollection

@@ -26,6 +26,14 @@ public static class OwaspRulesTestData
             new("plain",    "hello",   new RuleExpected(false))
         ];
 
+        public static TheoryData<RuleCase<string>> PercentEncodedAngleBracketRegexCases =>
+        [
+            new("%3C",         "%3C",         new RuleExpected(true)),
+            new("%3E",         "%3E",         new RuleExpected(true)),
+            new("lowercase",   "%3cscript%3e",new RuleExpected(true)),
+            new("plain",       "hello",       new RuleExpected(false))
+        ];
+
         public static TheoryData<RuleCase<string>> ScriptProtocolRegexCases =>
         [
             new("javascript",       "javascript:alert(1)",                                         new RuleExpected(true)),

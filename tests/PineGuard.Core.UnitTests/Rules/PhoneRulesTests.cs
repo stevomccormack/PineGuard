@@ -7,6 +7,21 @@ namespace PineGuard.Core.UnitTests.Rules;
 public sealed class PhoneRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(output)
 {
     [Theory]
+    [MemberData(nameof(PhoneRulesTestData.DefaultAllowedNonDigitCharacters.Cases), MemberType = typeof(PhoneRulesTestData.DefaultAllowedNonDigitCharacters))]
+    public void DefaultAllowedNonDigitCharacters_MutatingReturnedArray_DoesNotAffectSubsequentAccess(PhoneRulesTestData.DefaultAllowedNonDigitCharacters.Case tc)
+    {
+        // Arrange
+        var first = PhoneRules.DefaultAllowedNonDigitCharacters;
+
+        // Act
+        first[tc.Value] = '#';
+        var second = PhoneRules.DefaultAllowedNonDigitCharacters;
+
+        // Assert
+        Assert.Equal(tc.Expected, second[tc.Value]);
+    }
+
+    [Theory]
     [MemberData(nameof(PhoneRulesTestData.IsPhoneNumber.Cases), MemberType = typeof(PhoneRulesTestData.IsPhoneNumber))]
     public void IsPhoneNumber_BehavesAsExpected(RuleCase<string?> tc)
     {

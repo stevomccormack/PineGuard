@@ -62,7 +62,8 @@ public static class OwaspRules
         return !(!OwaspRegex.Xss.NoAngleBracketsRegex().IsMatch(trimmed)
             || OwaspRegex.Xss.ScriptProtocolRegex().IsMatch(trimmed)
             || OwaspRegex.Xss.HtmlEventHandlerAttributeRegex().IsMatch(trimmed)
-            || OwaspRegex.Xss.HtmlEntityEncodedAngleBracketRegex().IsMatch(trimmed));
+            || OwaspRegex.Xss.HtmlEntityEncodedAngleBracketRegex().IsMatch(trimmed)
+            || OwaspRegex.Xss.PercentEncodedAngleBracketRegex().IsMatch(trimmed));
     }
 
     /// <summary>

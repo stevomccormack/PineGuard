@@ -6,12 +6,16 @@ namespace PineGuard.Utils;
 /// <seealso href="https://pineguard.ai/docs/utils/filepath">FilePath Utility documentation</seealso>
 public static class FilePathUtility
 {
-    // Union of platform-specific and Windows-specific invalid file name characters so that
-    // validation is consistent across Windows (NLS) and Linux/macOS (where Path.GetInvalidFileNameChars
-    // returns only '/' and '\0', omitting Windows chars such as '\', ':', '*', '?', etc.).
+    // Union of platform-specific and Windows-specific invalid file name characters, plus the full
+    // ASCII control range, so that validation is genuinely consistent across Windows (NLS) and
+    // Linux/macOS. Path.GetInvalidFileNameChars() returns only '/' and '\0' on Linux/macOS, omitting
+    // both the printable Windows-invalid chars ('\', ':', '*', '?', etc.) and control characters
+    // 0x01-0x1F that Windows also rejects; both are added explicitly here so the resulting set does
+    // not depend on the OS the code happens to run on.
     private static readonly char[] InvalidFileNameChars =
         Path.GetInvalidFileNameChars()
             .Union(['"', '<', '>', '|', ':', '*', '?', '\\'])
+            .Union(Enumerable.Range(0x00, 0x20).Select(codePoint => (char)codePoint))
             .ToArray();
 
     /// <summary>
@@ -39,9 +43,11 @@ public static class FilePathUtility
 
         var trimmed = value.Trim();
 
-        // Windows reserved device names are reserved even with extensions (e.g., "CON.txt")
+        // Windows reserved device names are reserved even with extensions (e.g., "CON.txt"), and
+        // Win32 name normalization strips trailing spaces/dots from the base name before matching
+        // a reserved device, so "CON .txt" also resolves to the CON device.
         var dot = trimmed.IndexOf('.');
-        var baseName = dot < 0 ? trimmed : trimmed[..dot];
+        var baseName = (dot < 0 ? trimmed : trimmed[..dot]).TrimEnd(' ', '.');
 
         return baseName.Equals("CON", StringComparison.OrdinalIgnoreCase)
             || baseName.Equals("PRN", StringComparison.OrdinalIgnoreCase)

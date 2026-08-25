@@ -68,6 +68,24 @@ public static partial class StringRulesFixtures
             public static RuleScenario<(string? value, TimeOnly other, Inclusion inclusion, TimePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
         }
 
+        public static class IsBeforeDefaultInclusion
+        {
+            public static readonly (string? value, TimeOnly other) StrictlyBefore = ("10:00", T1200);
+            public static readonly (string? value, TimeOnly other) SameInstant = ("12:00", T1200);
+
+            public static RuleScenario<(string? value, TimeOnly other)>[] ValidScenarios =>
+            [
+                new(nameof(StrictlyBefore), StrictlyBefore, true)
+            ];
+
+            public static RuleScenario<(string? value, TimeOnly other)>[] InvalidScenarios =>
+            [
+                new(nameof(SameInstant), SameInstant, false)
+            ];
+
+            public static RuleScenario<(string? value, TimeOnly other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+        }
+
         public static class IsAfter
         {
             public static readonly (string? value, TimeOnly other, Inclusion inclusion, TimePrecision? precision) AfterExclusive = ("13:00", T1200, Inclusion.Exclusive, null);
@@ -94,6 +112,24 @@ public static partial class StringRulesFixtures
             ];
 
             public static RuleScenario<(string? value, TimeOnly other, Inclusion inclusion, TimePrecision? precision)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+        }
+
+        public static class IsAfterDefaultInclusion
+        {
+            public static readonly (string? value, TimeOnly other) StrictlyAfter = ("13:00", T1200);
+            public static readonly (string? value, TimeOnly other) SameInstant = ("12:00", T1200);
+
+            public static RuleScenario<(string? value, TimeOnly other)>[] ValidScenarios =>
+            [
+                new(nameof(StrictlyAfter), StrictlyAfter, true)
+            ];
+
+            public static RuleScenario<(string? value, TimeOnly other)>[] InvalidScenarios =>
+            [
+                new(nameof(SameInstant), SameInstant, false)
+            ];
+
+            public static RuleScenario<(string? value, TimeOnly other)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
         }
 
         public static class IsSame

@@ -52,11 +52,33 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
     }
 
     [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsBeforeDefaultInclusion.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsBeforeDefaultInclusion))]
+    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(DateTimeOffset? value, DateTimeOffset? other)> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsBefore(tc.Value.value, tc.Value.other);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(DateTimeOffsetRulesTestData.IsAfter.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsAfter))]
     public void IsAfter_BehavesAsExpected(RuleCase<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)> tc)
     {
         // Act
         var result = DateTimeOffsetRules.IsAfter(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsAfterDefaultInclusion.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsAfterDefaultInclusion))]
+    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(DateTimeOffset? value, DateTimeOffset? other)> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsAfter(tc.Value.value, tc.Value.other);
 
         // Assert
         AssertResult(tc, result);

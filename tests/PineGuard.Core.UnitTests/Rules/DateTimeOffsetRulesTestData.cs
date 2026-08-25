@@ -50,9 +50,19 @@ public static class DateTimeOffsetRulesTestData
         public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsBefore.AllScenarios.ToRuleCases();
     }
 
+    public static class IsBeforeDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset? other)>> Cases => F.IsBeforeDefaultInclusion.AllScenarios.ToRuleCases();
+    }
+
     public static class IsAfter
     {
         public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsAfter.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsAfterDefaultInclusion
+    {
+        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset? other)>> Cases => F.IsAfterDefaultInclusion.AllScenarios.ToRuleCases();
     }
 
     public static class IsSame

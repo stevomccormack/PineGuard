@@ -20,8 +20,10 @@ public static class FluentObjectExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustObjectClauses.EqualTo"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustObjectClauses.EqualTo"/>, which compares using
+    /// <see cref="EqualityComparer{T}.Default"/> semantics. A <see langword="null"/> value satisfies this check
+    /// only when <paramref name="other"/> is also <see langword="null"/>; there is no unconditional null
+    /// pass-through, so this is not a substitute for a separate <c>.NotNull()</c> rule.
     /// </remarks>
     /// <example>
     /// <code>
@@ -45,8 +47,10 @@ public static class FluentObjectExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustObjectClauses.NotEqualTo"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustObjectClauses.NotEqualTo"/>, which compares using
+    /// <see cref="EqualityComparer{T}.Default"/> semantics. A <see langword="null"/> value satisfies this check
+    /// unless <paramref name="other"/> is also <see langword="null"/>; there is no unconditional null
+    /// pass-through, so this is not a substitute for a separate <c>.NotNull()</c> rule.
     /// </remarks>
     /// <example>
     /// <code>
@@ -70,7 +74,9 @@ public static class FluentObjectExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustObjectClauses.OfType"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails, since <see langword="null"/> has no runtime type to compare against
+    /// <typeparamref name="T"/>; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/>
+    /// should be reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code><![CDATA[
@@ -114,7 +120,9 @@ public static class FluentObjectExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustObjectClauses.AssignableToType"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails, since <see langword="null"/> is not an instance of <typeparamref name="T"/>; use a
+    /// separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be reported as a distinct
+    /// failure.
     /// </remarks>
     /// <example>
     /// <code><![CDATA[
@@ -158,8 +166,10 @@ public static class FluentObjectExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustObjectClauses.SameReferenceAs"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustObjectClauses.SameReferenceAs"/>, which compares using
+    /// <c>ReferenceEquals</c> semantics. A <see langword="null"/> value satisfies this check only when
+    /// <paramref name="b"/> is also <see langword="null"/>; there is no unconditional null pass-through, so
+    /// this is not a substitute for a separate <c>.NotNull()</c> rule.
     /// </remarks>
     /// <example>
     /// <code>
@@ -184,8 +194,10 @@ public static class FluentObjectExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustObjectClauses.NotSameReferenceAs"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustObjectClauses.NotSameReferenceAs"/>, which compares using
+    /// <c>ReferenceEquals</c> semantics. A <see langword="null"/> value satisfies this check unless
+    /// <paramref name="b"/> is also <see langword="null"/>; there is no unconditional null pass-through, so
+    /// this is not a substitute for a separate <c>.NotNull()</c> rule.
     /// </remarks>
     /// <example>
     /// <code>

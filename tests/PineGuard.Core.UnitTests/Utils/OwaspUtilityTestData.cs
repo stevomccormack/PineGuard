@@ -27,7 +27,12 @@ public static class OwaspUtilityTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("../etc/passwd => true", "../etc/passwd", true),
-            new("relative/path => false", "relative/path", false)
+            new("relative/path => false", "relative/path", false),
+            new("%2e./etc/passwd (mixed encoding, leading dot encoded) => true", "%2e./etc/passwd", true),
+            new(".%2e/etc/passwd (mixed encoding, trailing dot encoded) => true", ".%2e/etc/passwd", true),
+            new("..%252f..%252fsecret (double-encoded slash) => true", "..%252f..%252fsecret", true),
+            new("uploads/%2e%2e (trailing encoded dot-dot) => true", "uploads/%2e%2e", true),
+            new(@"%2e.\etc\passwd (mixed encoding, backslash separator) => true", @"%2e.\etc\passwd", true)
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>
@@ -70,6 +75,8 @@ public static class OwaspUtilityTestData
         [
             new(@"\r\nHeader: value (leading) => true", "\r\nHeader: value", true),
             new(@"Header: value\r\n (trailing) => true", "Header: value\r\n", true),
+            new(@"\r\n (bare, entirely whitespace) => true", "\r\n", true),
+            new(@" \r\n  (whitespace-padded CRLF) => true", " \r\n ", true),
             new("null => false", null, false),
             new("whitespace => false", " ", false)
         ];

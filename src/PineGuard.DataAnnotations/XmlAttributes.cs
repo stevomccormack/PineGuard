@@ -52,7 +52,13 @@ public sealed class XmlStringAttribute() : ValidationAttributeBase(typeof(string
 /// is <see cref="IEnumerable{T}"/> of <see cref="string"/>.
 /// </para>
 /// <para>
-/// If the value is not an <see cref="IReadOnlyDictionary{TKey, TValue}"/>, validation passes silently.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// <para>
+/// If the value is non-<see langword="null"/> but is not an
+/// <see cref="IReadOnlyDictionary{TKey, TValue}"/> of <see cref="string"/> to
+/// <see cref="IEnumerable{T}"/> of <see cref="string"/>, the attribute is misapplied and an
+/// <see cref="InvalidOperationException"/> is thrown rather than silently reporting the value as valid.
 /// </para>
 /// </remarks>
 /// <example>
@@ -70,9 +76,18 @@ public sealed class XmlStringAttribute() : ValidationAttributeBase(typeof(string
 public sealed class XmlContentTypeAttribute() : ValidationAttributeBase(typeof(object))
 {
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="value"/>'s runtime type is not <see cref="IReadOnlyDictionary{TKey, TValue}"/>
+    /// of <see cref="string"/> to <see cref="IEnumerable{T}"/> of <see cref="string"/>.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        if (value is not IReadOnlyDictionary<string, IEnumerable<string>> headers) return ValidationResult.Success;
+        if (value is not IReadOnlyDictionary<string, IEnumerable<string>> headers)
+            throw new InvalidOperationException(
+                $"[{nameof(XmlContentTypeAttribute)}] can only be applied to properties implementing " +
+                $"IReadOnlyDictionary<string, IEnumerable<string>>. Property '{validationContext.DisplayName}' " +
+                $"is of type {value!.GetType().Name}.");
+
         var result = Must.Be.XmlContentType(headers, paramName: null);
         return FromMustResult(result, validationContext);
     }
