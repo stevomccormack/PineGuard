@@ -19,7 +19,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.AbsoluteUri"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Endpoint).AbsoluteUri();</code></example>
     /// <seealso cref="MustUriClauses.AbsoluteUri"/>
@@ -36,7 +37,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.RelativeUri"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Path).RelativeUri();</code></example>
     /// <seealso cref="MustUriClauses.RelativeUri"/>
@@ -53,7 +55,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.Url"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Website).WebUrl();</code></example>
     /// <seealso cref="MustUriClauses.Url"/>
@@ -82,7 +85,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.HttpsUrl"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.SecureEndpoint).HttpsUrl();</code></example>
     /// <seealso cref="MustUriClauses.HttpsUrl"/>
@@ -99,7 +103,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.HttpUrl"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.LegacyEndpoint).HttpUrl();</code></example>
     /// <seealso cref="MustUriClauses.HttpUrl"/>
@@ -116,7 +121,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.FileUri"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.LocalResource).FileUri();</code></example>
     /// <seealso cref="MustUriClauses.FileUri"/>
@@ -133,7 +139,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.FilePath"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.OutputPath).FilePath();</code></example>
     /// <seealso cref="MustUriClauses.FilePath"/>
@@ -150,7 +157,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.NotFilePath"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Identifier).NotFilePath();</code></example>
     /// <seealso cref="MustUriClauses.NotFilePath"/>
@@ -168,7 +176,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.HasScheme"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Endpoint).HasScheme("https");</code></example>
     /// <seealso cref="MustUriClauses.HasScheme"/>
@@ -188,7 +197,8 @@ public static class FluentUriExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustUriClauses.NotHasScheme"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Endpoint).NotHasScheme("http");</code></example>
     /// <seealso cref="MustUriClauses.NotHasScheme"/>

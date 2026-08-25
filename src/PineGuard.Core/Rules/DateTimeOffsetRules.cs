@@ -43,10 +43,10 @@ public static class DateTimeOffsetRules
     /// </summary>
     /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference date/time offset. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date/time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is before <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBefore(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion = Inclusion.Inclusive, DateTimePrecision? precision = null)
+    public static bool IsBefore(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion = Inclusion.Exclusive, DateTimePrecision? precision = null)
     {
         if (value is null || other is null) return false;
 
@@ -71,10 +71,10 @@ public static class DateTimeOffsetRules
     /// </summary>
     /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference date/time offset. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+    /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date/time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is after <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsAfter(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion = Inclusion.Inclusive, DateTimePrecision? precision = null)
+    public static bool IsAfter(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion = Inclusion.Exclusive, DateTimePrecision? precision = null)
     {
         if (value is null || other is null) return false;
 
@@ -123,7 +123,7 @@ public static class DateTimeOffsetRules
     }
 
     /// <summary>
-    /// Determines whether the start date/time offset is chronologically before or equal to the end date/time offset.
+    /// Determines whether the start date/time offset precedes the end date/time offset (equality permitted when <paramref name="inclusion"/> is <see cref="Inclusion.Inclusive"/>).
     /// </summary>
     /// <param name="start">The start date/time offset. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end">The end date/time offset. If <see langword="null"/>, returns <see langword="false"/>.</param>

@@ -291,8 +291,11 @@ public static class HttpSecurityHeaderRulesFixtures
         public static readonly IReadOnlyDictionary<string, IEnumerable<string>> MeetsDefaults =
             BuildHeaders("Content-Security-Policy", "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
 
-        public static readonly IReadOnlyDictionary<string, IEnumerable<string>> MultipleSegmentsMatch =
+        public static readonly IReadOnlyDictionary<string, IEnumerable<string>> DuplicateDirectiveFirstOccurrenceEmpty =
             BuildHeaders("Content-Security-Policy", ["default-src; default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"]);
+
+        public static readonly IReadOnlyDictionary<string, IEnumerable<string>> ObjectSrcNoneCombinedWithOtherSource =
+            BuildHeaders("Content-Security-Policy", "default-src 'self'; object-src 'none' https://evil.example; base-uri 'self'; frame-ancestors 'none'");
 
         public static readonly IReadOnlyDictionary<string, IEnumerable<string>> IgnoresNullAndWhitespaceCandidates =
             BuildHeaders("Content-Security-Policy", ["", "   ", "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"]);
@@ -323,7 +326,6 @@ public static class HttpSecurityHeaderRulesFixtures
         public static RuleScenario<IReadOnlyDictionary<string, IEnumerable<string>>?>[] ValidScenarios =>
         [
             new(nameof(MeetsDefaults), MeetsDefaults, true),
-            new(nameof(MultipleSegmentsMatch), MultipleSegmentsMatch, true),
             new(nameof(IgnoresNullAndWhitespaceCandidates), IgnoresNullAndWhitespaceCandidates, true)
         ];
 
@@ -337,6 +339,8 @@ public static class HttpSecurityHeaderRulesFixtures
             new(nameof(EmptyHeaders), EmptyHeaders, false),
             new(nameof(SegmentsCannotBeParsed), SegmentsCannotBeParsed, false),
             new(nameof(MissingObjectSrc), MissingObjectSrc, false),
+            new(nameof(DuplicateDirectiveFirstOccurrenceEmpty), DuplicateDirectiveFirstOccurrenceEmpty, false),
+            new(nameof(ObjectSrcNoneCombinedWithOtherSource), ObjectSrcNoneCombinedWithOtherSource, false),
             new(nameof(Null), Null, false)
         ];
 

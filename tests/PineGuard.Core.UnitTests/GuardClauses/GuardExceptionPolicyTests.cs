@@ -291,4 +291,89 @@ public sealed class GuardExceptionPolicyTests : BaseUnitTest
             GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
         }
     }
+
+    [Theory]
+    [MemberData(nameof(GuardExceptionPolicyTestData.GetEffectivePolicy.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.GetEffectivePolicy))]
+    public void GetEffectivePolicy_ResolvesReplacerAndFlagFromTheSameFrame(GuardExceptionPolicyTestData.GetEffectivePolicy.Case testCase)
+    {
+        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
+        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
+        Func<Exception, Exception> globalReplacer = ex => new InvalidOperationException("global", ex);
+        Func<Exception, Exception> scopedReplacer = ex => new NotSupportedException("scoped", ex);
+
+        try
+        {
+            GuardExceptionPolicy.ExceptionReplacer = globalReplacer;
+            GuardExceptionPolicy.ReplaceDefaultExceptions = false;
+
+            if (testCase.ScopeActive)
+            {
+                using (GuardExceptionPolicy.BeginScope(options =>
+                       {
+                           options.ExceptionReplacer = scopedReplacer;
+                           options.ReplaceDefaultExceptions = testCase.ScopedReplaceDefaultExceptions;
+                       }))
+                {
+                    var (replacer, replaceDefaultExceptions) = GuardExceptionPolicy.GetEffectivePolicy();
+
+                    Assert.Same(scopedReplacer, replacer);
+                    Assert.Equal(testCase.ScopedReplaceDefaultExceptions, replaceDefaultExceptions);
+                }
+            }
+            else
+            {
+                var (replacer, replaceDefaultExceptions) = GuardExceptionPolicy.GetEffectivePolicy();
+
+                Assert.Same(globalReplacer, replacer);
+                Assert.False(replaceDefaultExceptions);
+            }
+        }
+        finally
+        {
+            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
+            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardExceptionPolicyTestData.ChildContextPropertyMutation.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.ChildContextPropertyMutation))]
+    public async Task SetPropertyInsideScope_FromChildTask_DoesNotLeakToParentContext(GuardExceptionPolicyTestData.ChildContextPropertyMutation.Case testCase)
+    {
+        _ = testCase;
+        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
+        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
+
+        try
+        {
+            GuardExceptionPolicy.ExceptionReplacer = null;
+            GuardExceptionPolicy.ReplaceDefaultExceptions = false;
+
+            using (GuardExceptionPolicy.BeginScope(options => options.ReplaceDefaultExceptions = true))
+            {
+                Assert.True(GuardExceptionPolicy.ReplaceDefaultExceptions);
+
+                await Task.Run(() =>
+                {
+                    // The child inherits the parent's scope via AsyncLocal flow...
+                    Assert.True(GuardExceptionPolicy.ReplaceDefaultExceptions);
+
+                    // ...and setting the property here must only ever affect this child's own context.
+                    GuardExceptionPolicy.ReplaceDefaultExceptions = false;
+                    Assert.False(GuardExceptionPolicy.ReplaceDefaultExceptions);
+                });
+
+                // The parent context's scope must be untouched by the child task's mutation: before the
+                // fix, both contexts shared the same mutable Options instance, so the child's write was
+                // instantly visible here too.
+                Assert.True(GuardExceptionPolicy.ReplaceDefaultExceptions);
+            }
+
+            Assert.False(GuardExceptionPolicy.ReplaceDefaultExceptions);
+        }
+        finally
+        {
+            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
+            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
+        }
+    }
 }

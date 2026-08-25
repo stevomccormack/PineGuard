@@ -29,11 +29,33 @@ public sealed class StringRulesTimeOnlyTests(ITestOutputHelper output) : BaseRul
     }
 
     [Theory]
+    [MemberData(nameof(StringRulesTimeOnlyTestData.IsBeforeDefaultInclusion.Cases), MemberType = typeof(StringRulesTimeOnlyTestData.IsBeforeDefaultInclusion))]
+    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(string? value, TimeOnly other)> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.TimeOnly.IsBefore(tc.Value.value, tc.Value.other);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(StringRulesTimeOnlyTestData.IsAfter.Cases), MemberType = typeof(StringRulesTimeOnlyTestData.IsAfter))]
     public void IsAfter_BehavesAsExpected(RuleCase<(string? value, TimeOnly other, Inclusion inclusion, TimePrecision? precision)> tc)
     {
         // Act
         var result = PineGuard.Rules.StringRules.TimeOnly.IsAfter(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTimeOnlyTestData.IsAfterDefaultInclusion.Cases), MemberType = typeof(StringRulesTimeOnlyTestData.IsAfterDefaultInclusion))]
+    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(string? value, TimeOnly other)> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.TimeOnly.IsAfter(tc.Value.value, tc.Value.other);
 
         // Assert
         AssertResult(tc, result);

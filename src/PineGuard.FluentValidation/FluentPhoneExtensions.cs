@@ -23,7 +23,8 @@ public static class FluentPhoneExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustPhoneClauses.PhoneNumber"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Phone).PhoneNumber();</code></example>
     /// <seealso cref="MustPhoneClauses.PhoneNumber"/>
@@ -47,7 +48,8 @@ public static class FluentPhoneExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustPhoneClauses.PhoneNumberString"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Mobile).PhoneNumberString();</code></example>
     /// <seealso cref="MustPhoneClauses.PhoneNumberString"/>

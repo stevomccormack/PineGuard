@@ -11,6 +11,10 @@ public sealed class CollectionAttributesTests
         Assert.Equal(testCase.Expected, result == ValidationResult.Success);
     }
 
+    private static void VerifyThrows<TAttribute>(TAttribute attribute, ThrowsCase testCase)
+        where TAttribute : ValidationAttribute
+        => Assert.Throws<InvalidOperationException>(() => attribute.GetValidationResult(testCase.Value, new ValidationContext(new object())));
+
     [Theory]
     [MemberData(nameof(CollectionAttributesTestData.EmptyCollection.ValidCases), MemberType = typeof(CollectionAttributesTestData.EmptyCollection))]
     [MemberData(nameof(CollectionAttributesTestData.EmptyCollection.EdgeCases), MemberType = typeof(CollectionAttributesTestData.EmptyCollection))]
@@ -66,4 +70,14 @@ public sealed class CollectionAttributesTests
     [MemberData(nameof(CollectionAttributesTestData.HasDuplicateItemsCollection.InvalidCases), MemberType = typeof(CollectionAttributesTestData.HasDuplicateItemsCollection))]
     public void HasDuplicateItemsCollection_ShouldReturnExpected(CollectionAttributesTestData.ValidCase testCase)
         => Verify(new HasDuplicateItemsCollectionAttribute(), testCase);
+
+    [Theory]
+    [MemberData(nameof(CollectionAttributesTestData.TypeMismatchCases), MemberType = typeof(CollectionAttributesTestData))]
+    public void EmptyCollection_ShouldThrow_WhenNotACollection(ThrowsCase testCase)
+        => VerifyThrows(new EmptyCollectionAttribute(), testCase);
+
+    [Theory]
+    [MemberData(nameof(CollectionAttributesTestData.TypeMismatchCases), MemberType = typeof(CollectionAttributesTestData))]
+    public void NotEmptyCollection_ShouldThrow_WhenNotACollection(ThrowsCase testCase)
+        => VerifyThrows(new NotEmptyCollectionAttribute(), testCase);
 }

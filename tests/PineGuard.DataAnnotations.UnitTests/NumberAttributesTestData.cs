@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using F = PineGuard.Testing.Fixtures.NumberRulesFixtures;
 
@@ -180,5 +182,19 @@ public static class NumberAttributesTestData
     public static class NotApproximatelyNoTolerance
     {
         public static TheoryData<ValidCase> InvalidCases => [new("null tolerance exact", 10.0, false), new("null tolerance far", 100.0, false)];
+    }
+
+    // A fractional or out-of-range double bound cannot be exactly represented in the property's
+    // integral runtime type; ConvertBound must fail loudly rather than silently rounding or letting
+    // an undocumented OverflowException escape.
+    public static class BoundMismatch
+    {
+        private sealed record ActionThrowsCase(string Name, Action Value, ExpectedException ExpectedException) : ThrowsCase<Action>(Name, Value, ExpectedException);
+
+        public static TheoryData<IThrowsCase> Cases =>
+        [
+            new ActionThrowsCase("fractional bound rounds silently on int", () => new LessThanOrEqualNumberAttribute(10.99).GetValidationResult(11, new ValidationContext(new object())), new ExpectedException(typeof(InvalidOperationException), null, "cannot be represented exactly")),
+            new ActionThrowsCase("out-of-range bound overflows byte", () => new InRangeNumberAttribute(0, 1000).GetValidationResult((byte)5, new ValidationContext(new object())), new ExpectedException(typeof(InvalidOperationException), null, "does not fit in"))
+        ];
     }
 }

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>PineGuard</RootNamespace>
-    <Description>Zero-dependency validation primitives: rules and utilities for strings, numbers, dates, collections, URIs, emails, network identifiers, and OWASP-safe input.</Description>
+    <Description>Validation primitives with no third-party dependencies: rules and utilities for strings, numbers, dates, collections, URIs, emails, network identifiers, and OWASP-safe input.</Description>
     <PackageTags>$(PackageTags);parsing;regex;format-validation</PackageTags>
   </PropertyGroup>
 
@@ -13,6 +13,10 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="PineGuard.Core.UnitTests" />
+    <!-- PineGuard.MustClauses and PineGuard.GuardClauses apply [CallerArgumentExpression] on their own
+         netstandard2.1 builds and need friend access to this project's internal polyfill to compile. -->
+    <InternalsVisibleTo Include="PineGuard.MustClauses" />
+    <InternalsVisibleTo Include="PineGuard.GuardClauses" />
   </ItemGroup>
 
   <ItemGroup>

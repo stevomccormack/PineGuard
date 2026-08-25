@@ -30,6 +30,17 @@ public sealed class OwaspRulesTests(ITestOutputHelper output) : BaseRuleUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(OwaspRulesTestData.OwaspRegexXss.PercentEncodedAngleBracketRegexCases), MemberType = typeof(OwaspRulesTestData.OwaspRegexXss))]
+    public void PercentEncodedAngleBracketRegex_BehavesAsExpected(RuleCase<string> tc)
+    {
+        // Act
+        var result = OwaspRegex.Xss.PercentEncodedAngleBracketRegex().IsMatch(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(OwaspRulesTestData.OwaspRegexXss.ScriptProtocolRegexCases), MemberType = typeof(OwaspRulesTestData.OwaspRegexXss))]
     public void ScriptProtocolRegex_BehavesAsExpected(RuleCase<string> tc)
     {

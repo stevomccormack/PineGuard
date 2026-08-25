@@ -1,3 +1,4 @@
+using System.Numerics;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Utils;
 
@@ -25,6 +26,19 @@ public sealed class BitWiseUtilityTests : BaseUnitTest
     {
         // Act
         var ok = BitWiseUtility.TryParseNonNegativeMask<ushort>(testCase.Value, out var parsed);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Equal(testCase.ExpectedOutValue, parsed);
+    }
+
+    [Theory]
+    [MemberData(nameof(BitWiseUtilityTestData.TryParseNonNegativeMaskBigInteger.ValidCases), MemberType = typeof(BitWiseUtilityTestData.TryParseNonNegativeMaskBigInteger))]
+    [MemberData(nameof(BitWiseUtilityTestData.TryParseNonNegativeMaskBigInteger.EdgeCases), MemberType = typeof(BitWiseUtilityTestData.TryParseNonNegativeMaskBigInteger))]
+    public void TryParseNonNegativeMask_BigInteger_ReturnsExpected(BitWiseUtilityTestData.TryParseNonNegativeMaskBigInteger.ValidCase testCase)
+    {
+        // Act
+        var ok = BitWiseUtility.TryParseNonNegativeMask<BigInteger>(testCase.Value, out var parsed);
 
         // Assert
         Assert.Equal(testCase.Expected, ok);

@@ -67,16 +67,13 @@ public sealed class SqlDateTimeAttributesTests(ITestOutputHelper output) : BaseD
 
     [Theory]
     [MemberData(nameof(SqlDateTimeAttributesTestData.InSqlDateTimeRangeWrongType.Cases), MemberType = typeof(SqlDateTimeAttributesTestData.InSqlDateTimeRangeWrongType))]
-    public void InSqlDateTimeRange_WrongType_BehavesAsExpected(DataAnnotationCase tc)
+    public void InSqlDateTimeRange_WrongType_ThrowsExpected(IThrowsCase tc)
     {
         // Arrange
-        var attr = new InSqlDateTimeRangeAttribute();
-        var ctx = new ValidationContext(new object());
+        var action = ((ValueCase<Action>)tc).Value;
 
-        // Act
-        var result = attr.GetValidationResult(tc.Value, ctx);
-
-        // Assert
-        AssertResult(tc, result);
+        // Act + Assert
+        var ex = Assert.Throws(tc.ExpectedException.Type, action);
+        ThrowsCaseAssert.Expected(ex, tc);
     }
 }

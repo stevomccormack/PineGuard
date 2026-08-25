@@ -1,3 +1,4 @@
+using System.Numerics;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Utils;
@@ -57,5 +58,25 @@ public static class BitWiseUtilityTestData
 
         public sealed record ValidCase(string Name, string? Value, bool Expected, ushort ExpectedOutValue)
             : TryCase<string?, ushort>(Name, Value, Expected, ExpectedOutValue);
+    }
+
+    public static class TryParseNonNegativeMaskBigInteger
+    {
+        // BigInteger has no fixed bit width, so Unsafe.SizeOf<BigInteger>() (managed struct layout: a sign
+        // int plus an array reference) must never be used as a significant-bit cap for the binary literal
+        // path. These cases exceed that struct-layout-derived cap (128 bits on x64 / 64 bits on x86) yet are
+        // valid masks that the equivalent hex literal already accepted before and after the fix.
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("binary literal with 129 significant bits parses like the equivalent hex literal", "0b1" + new string('0', 129), true, BigInteger.Pow(2, 129)),
+            new("binary literal with 200 significant bits parses like the equivalent hex literal", "0b1" + new string('0', 200), true, BigInteger.Pow(2, 200)),
+            new("hex literal with 129 significant bits parses (parity reference for the binary case above)", "0x" + BigInteger.Pow(2, 129).ToString("x"), true, BigInteger.Pow(2, 129))];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("binary invalid digit still rejected regardless of length", "0b1" + new string('0', 129) + "2", false, BigInteger.Zero)];
+
+        public sealed record ValidCase(string Name, string? Value, bool Expected, BigInteger ExpectedOutValue)
+            : TryCase<string?, BigInteger>(Name, Value, Expected, ExpectedOutValue);
     }
 }

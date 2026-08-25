@@ -89,8 +89,8 @@ public static class GuardFailure
         if (exceptionReplacer is not null)
             throw exceptionReplacer(defaultException);
 
-        var configuredReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        if (configuredReplacer is null || !GuardExceptionPolicy.ShouldReplace(defaultException))
+        var (configuredReplacer, replaceDefaultExceptions) = GuardExceptionPolicy.GetEffectivePolicy();
+        if (configuredReplacer is null || !GuardExceptionPolicy.ShouldReplace(replaceDefaultExceptions, defaultException))
             throw defaultException;
 
         throw configuredReplacer(defaultException);

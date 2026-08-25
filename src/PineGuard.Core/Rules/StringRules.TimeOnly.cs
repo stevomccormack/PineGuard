@@ -48,11 +48,11 @@ public static partial class StringRules
         /// </summary>
         /// <param name="value">The time string to validate. If <see langword="null"/> or not a valid time, returns <see langword="false"/>.</param>
         /// <param name="other">The reference time to compare against.</param>
-        /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+        /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
         /// <param name="precision">Optional precision for time truncation before comparison.</param>
         /// <param name="styles">The <see cref="DateTimeStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed time is before <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool IsBefore(string? value, System.TimeOnly other, Inclusion inclusion = Inclusion.Inclusive, TimePrecision? precision = null, DateTimeStyles styles = DefaultStyles) =>
+        public static bool IsBefore(string? value, System.TimeOnly other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null, DateTimeStyles styles = DefaultStyles) =>
             StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsBefore(parsed, other, inclusion, precision);
 
         /// <summary>
@@ -60,11 +60,11 @@ public static partial class StringRules
         /// </summary>
         /// <param name="value">The time string to validate. If <see langword="null"/> or not a valid time, returns <see langword="false"/>.</param>
         /// <param name="other">The reference time to compare against.</param>
-        /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
+        /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
         /// <param name="precision">Optional precision for time truncation before comparison.</param>
         /// <param name="styles">The <see cref="DateTimeStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed time is after <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool IsAfter(string? value, System.TimeOnly other, Inclusion inclusion = Inclusion.Inclusive, TimePrecision? precision = null, DateTimeStyles styles = DefaultStyles) =>
+        public static bool IsAfter(string? value, System.TimeOnly other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null, DateTimeStyles styles = DefaultStyles) =>
             StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsAfter(parsed, other, inclusion, precision);
 
         /// <summary>

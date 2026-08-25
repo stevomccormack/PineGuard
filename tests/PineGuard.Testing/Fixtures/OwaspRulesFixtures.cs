@@ -38,6 +38,8 @@ public static class OwaspRulesFixtures
         public static readonly string? ScriptProtocol = "javascript:alert(1)";
         public static readonly string? EventHandler = "x onload=alert(1)";
         public static readonly string? EntityEncoded = "&lt;script&gt;alert(1)&lt;/script&gt;";
+        public static readonly string? PercentEncoded = "%3Cscript%3Ealert(1)%3C/script%3E";
+        public static readonly string? PercentEncodedLowerCase = "%3cscript%3e";
         public static readonly string? Null = null;
         public static readonly string? Space = " ";
 
@@ -48,12 +50,14 @@ public static class OwaspRulesFixtures
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
-            new(nameof(ScriptTag),      ScriptTag,      false),
-            new(nameof(ScriptProtocol), ScriptProtocol, false),
-            new(nameof(EventHandler),   EventHandler,   false),
-            new(nameof(EntityEncoded),  EntityEncoded,  false),
-            new(nameof(Null),           Null,           false),
-            new(nameof(Space),          Space,          false)
+            new(nameof(ScriptTag),              ScriptTag,              false),
+            new(nameof(ScriptProtocol),         ScriptProtocol,         false),
+            new(nameof(EventHandler),           EventHandler,           false),
+            new(nameof(EntityEncoded),          EntityEncoded,          false),
+            new(nameof(PercentEncoded),         PercentEncoded,         false),
+            new(nameof(PercentEncodedLowerCase),PercentEncodedLowerCase,false),
+            new(nameof(Null),                   Null,                   false),
+            new(nameof(Space),                  Space,                  false)
         ];
 
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
@@ -96,6 +100,13 @@ public static class OwaspRulesFixtures
         public static readonly string? Unc = @"\\server\share\file.txt";
         public static readonly string? EncodedSlashDotDot = "..%2f..%2fetc%2fpasswd";
         public static readonly string? TrailingDotDotSegment = "uploads/..";
+        public static readonly string? MixedEncodingLeadingDot = "%2e./etc/passwd";
+        public static readonly string? MixedEncodingTrailingDot = ".%2e/etc/passwd";
+        public static readonly string? MixedEncodingUpperCase = "%2E./etc/passwd";
+        public static readonly string? DoubleEncodedSlashDotDot = "..%252f..%252fsecret";
+        public static readonly string? TrailingEncodedDotDotSegment = "uploads/%2e%2e";
+        public static readonly string? EncodedSlashTrailingDotDot = "uploads%2f..";
+        public static readonly string? BackslashMixedEncoding = @"%2e.\etc\passwd";
         public static readonly string? Null = null;
         public static readonly string? Space = " ";
 
@@ -106,14 +117,21 @@ public static class OwaspRulesFixtures
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
-            new(nameof(DotDot),                DotDot,                false),
-            new(nameof(AbsoluteUnix),          AbsoluteUnix,          false),
-            new(nameof(AbsoluteWindows),       AbsoluteWindows,       false),
-            new(nameof(Unc),                   Unc,                   false),
-            new(nameof(EncodedSlashDotDot),    EncodedSlashDotDot,    false),
-            new(nameof(TrailingDotDotSegment), TrailingDotDotSegment, false),
-            new(nameof(Null),                  Null,                  false),
-            new(nameof(Space),                 Space,                 false)
+            new(nameof(DotDot),                      DotDot,                      false),
+            new(nameof(AbsoluteUnix),                AbsoluteUnix,                false),
+            new(nameof(AbsoluteWindows),             AbsoluteWindows,             false),
+            new(nameof(Unc),                         Unc,                         false),
+            new(nameof(EncodedSlashDotDot),          EncodedSlashDotDot,          false),
+            new(nameof(TrailingDotDotSegment),       TrailingDotDotSegment,       false),
+            new(nameof(MixedEncodingLeadingDot),     MixedEncodingLeadingDot,     false),
+            new(nameof(MixedEncodingTrailingDot),    MixedEncodingTrailingDot,    false),
+            new(nameof(MixedEncodingUpperCase),      MixedEncodingUpperCase,      false),
+            new(nameof(DoubleEncodedSlashDotDot),    DoubleEncodedSlashDotDot,    false),
+            new(nameof(TrailingEncodedDotDotSegment),TrailingEncodedDotDotSegment,false),
+            new(nameof(EncodedSlashTrailingDotDot),  EncodedSlashTrailingDotDot,  false),
+            new(nameof(BackslashMixedEncoding),      BackslashMixedEncoding,      false),
+            new(nameof(Null),                        Null,                        false),
+            new(nameof(Space),                       Space,                       false)
         ];
 
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];

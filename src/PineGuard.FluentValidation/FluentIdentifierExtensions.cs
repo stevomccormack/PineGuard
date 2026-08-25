@@ -19,7 +19,8 @@ public static class FluentIdentifierExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustIdentifierClauses.Slug"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>

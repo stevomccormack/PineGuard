@@ -19,7 +19,8 @@ public static class FluentOwaspExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustOwaspClauses.OwaspSafe"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -40,7 +41,8 @@ public static class FluentOwaspExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustOwaspClauses.XssSafe"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -61,7 +63,8 @@ public static class FluentOwaspExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustOwaspClauses.SqlInjectionSafe"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -82,7 +85,8 @@ public static class FluentOwaspExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustOwaspClauses.PathTraversalSafe"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -103,7 +107,8 @@ public static class FluentOwaspExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustOwaspClauses.CommandInjectionSafe"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -124,7 +129,8 @@ public static class FluentOwaspExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustOwaspClauses.CrLfSafe"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -145,7 +151,8 @@ public static class FluentOwaspExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustOwaspClauses.LdapFilterSafe"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -166,7 +173,8 @@ public static class FluentOwaspExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustOwaspClauses.OpenRedirectSafe"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
@@ -187,7 +195,8 @@ public static class FluentOwaspExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustOwaspClauses.SsrfSchemeSafe"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>

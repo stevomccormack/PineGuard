@@ -161,11 +161,13 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? start, DateTime? end, Inclusion inclusion) BothNull = (null, null, Inclusion.Exclusive);
         public static readonly (DateTime? start, DateTime? end, Inclusion inclusion) StartNullEndSet = (null, new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive);
         public static readonly (DateTime? start, DateTime? end, Inclusion inclusion) StartSetEndNull = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), null, Inclusion.Exclusive);
+        public static readonly (DateTime? start, DateTime? end, Inclusion inclusion) MixedKindOrdered = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Local), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive);
 
         public static RuleScenario<(DateTime? start, DateTime? end, Inclusion inclusion)>[] ValidScenarios =>
         [
             new(nameof(ChronologicalExclusive), ChronologicalExclusive, true),
-            new(nameof(SameInstantInclusive), SameInstantInclusive, true)
+            new(nameof(SameInstantInclusive), SameInstantInclusive, true),
+            new(nameof(MixedKindOrdered), MixedKindOrdered, true)
         ];
 
         public static RuleScenario<(DateTime? start, DateTime? end, Inclusion inclusion)>[] InvalidScenarios =>
@@ -190,10 +192,12 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion) Start2Null = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), null, new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive);
         public static readonly (DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion) End2Null = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), null, Inclusion.Exclusive);
         public static readonly (DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion) FirstRangeInverted = (new DateTime(2024, 01, 10, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 05, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 31, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive);
+        public static readonly (DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion) MixedKindOverlap = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Local), new DateTime(2024, 01, 03, 0, 0, 0, DateTimeKind.Local), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 04, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive);
 
         public static RuleScenario<(DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion)>[] ValidScenarios =>
         [
-            new(nameof(TouchingInclusive), TouchingInclusive, true)
+            new(nameof(TouchingInclusive), TouchingInclusive, true),
+            new(nameof(MixedKindOverlap), MixedKindOverlap, true)
         ];
 
         public static RuleScenario<(DateTime? start1, DateTime? end1, DateTime? start2, DateTime? end2, Inclusion inclusion)>[] InvalidScenarios =>

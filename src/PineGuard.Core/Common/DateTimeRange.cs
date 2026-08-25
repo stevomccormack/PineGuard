@@ -7,11 +7,11 @@ namespace PineGuard.Common;
 /// </summary>
 /// <remarks>
 /// <see cref="Contains(DateTime)"/>, <see cref="Overlaps(DateTimeRange)"/>, <see cref="Overlaps(DateTimeRange, Inclusion)"/>,
-/// and equality (<see cref="Equals(DateTimeRange)"/> and <see cref="GetHashCode"/>) normalize both operands to UTC via
-/// <see cref="DateTimeUtility.ToUtc(DateTime?)"/> before comparing, so <see cref="DateTimeKind.Utc"/> and
-/// <see cref="DateTimeKind.Local"/> values are compared by absolute instant rather than by raw ticks.
-/// <see cref="DateTimeKind.Unspecified"/> values are treated as UTC, matching the convention used throughout
-/// <c>PineGuard.Core</c>.
+/// equality (<see cref="Equals(DateTimeRange)"/> and <see cref="GetHashCode"/>), and the ordering invariant enforced by the
+/// constructor and <see cref="TryCreate"/> all normalize both operands to UTC via <see cref="DateTimeUtility.ToUtc(DateTime?)"/>
+/// before comparing, so <see cref="DateTimeKind.Utc"/> and <see cref="DateTimeKind.Local"/> values are compared by absolute
+/// instant rather than by raw ticks. <see cref="DateTimeKind.Unspecified"/> values are treated as UTC, matching the
+/// convention used throughout <c>PineGuard.Core</c>.
 /// </remarks>
 public readonly struct DateTimeRange : IEquatable<DateTimeRange>
 {
@@ -33,15 +33,18 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     /// <exception cref="ArgumentException">Thrown when <paramref name="start"/> is greater than <paramref name="end"/> or when the <see cref="DateTimeKind"/> values are incompatible.</exception>
     public DateTimeRange(DateTime start, DateTime end)
     {
-        if (start > end)
-            throw new ArgumentException("Start must be less than or equal to End.", nameof(start));
-
         if (start.Kind != end.Kind &&
             start.Kind != DateTimeKind.Unspecified &&
             end.Kind != DateTimeKind.Unspecified)
             throw new ArgumentException(
                 $"DateTime values must have compatible Kind. Start.Kind={start.Kind}, End.Kind={end.Kind}.",
                 nameof(start));
+
+        // Validate ordering on the same normalized (UTC) basis that Contains/Overlaps/Equals use, so a range
+        // whose raw endpoints look ordered can never be constructed with an inverted normalized instant range
+        // (e.g. an Unspecified start paired with a Local end that converts to an earlier UTC instant).
+        if (DateTimeUtility.ToUtc(start)!.Value > DateTimeUtility.ToUtc(end)!.Value)
+            throw new ArgumentException("Start must be less than or equal to End.", nameof(start));
 
         Start = start;
         End = end;
@@ -64,10 +67,11 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
         var s = start.Value;
         var e = end.Value;
 
-        if (s > e)
+        if (s.Kind != e.Kind && s.Kind != DateTimeKind.Unspecified && e.Kind != DateTimeKind.Unspecified)
             return false;
 
-        if (s.Kind != e.Kind && s.Kind != DateTimeKind.Unspecified && e.Kind != DateTimeKind.Unspecified)
+        // Mirror the constructor: order is validated on the normalized (UTC) endpoints, not raw ticks.
+        if (DateTimeUtility.ToUtc(s)!.Value > DateTimeUtility.ToUtc(e)!.Value)
             return false;
 
         range = new DateTimeRange(s, e);

@@ -88,8 +88,12 @@ public static class BitWiseUtility
             start++;
 
         // Beyond T's bit width, the value is guaranteed to overflow T.CreateChecked; fail fast instead of
-        // performing an O(n^2) BigInteger shift-and-add over an unbounded number of significant bits.
-        if (bits.Length - start > Unsafe.SizeOf<T>() * 8)
+        // performing an O(n^2) BigInteger shift-and-add over an unbounded number of significant bits. This
+        // only holds for fixed-width types: Unsafe.SizeOf<T>() reports managed struct layout, not numeric
+        // range, and for BigInteger those diverge (16/8 bytes for a sign + array reference, not "unbounded").
+        // Skip the cap for BigInteger so it parses the same 0b... masks it already accepts as 0x... — the
+        // hex path has no such cap — falling back to the unbounded (but still hex-path-equivalent) walk below.
+        if (typeof(T) != typeof(BigInteger) && bits.Length - start > Unsafe.SizeOf<T>() * 8)
             return false;
 
         var big = BigInteger.Zero;

@@ -8,10 +8,17 @@ namespace PineGuard.Rules;
 /// <seealso href="https://pineguard.ai/docs/rules/phone">Phone Rules documentation</seealso>
 public static partial class PhoneRules
 {
+    private static readonly char[] DefaultAllowedNonDigitCharactersSource = ['+', '(', ')', '-', '.', '/'];
+
     /// <summary>
     /// The default set of allowed non-digit characters in phone numbers: <c>+</c>, <c>(</c>, <c>)</c>, <c>-</c>, <c>.</c>, <c>/</c>.
     /// </summary>
-    public static readonly char[] DefaultAllowedNonDigitCharacters = ['+', '(', ')', '-', '.', '/'];
+    /// <remarks>
+    /// Returns a fresh copy on every access. <see cref="PhoneUtility.TryParsePhone"/> and every caller that
+    /// receives this default hold their own array instance, so mutating the returned array cannot change the
+    /// default used by other callers or by later calls.
+    /// </remarks>
+    public static char[] DefaultAllowedNonDigitCharacters => [.. DefaultAllowedNonDigitCharactersSource];
 
     /// <summary>
     /// The default minimum number of digits in a phone number (7).

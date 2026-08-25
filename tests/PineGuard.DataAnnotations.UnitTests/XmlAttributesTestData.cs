@@ -1,3 +1,4 @@
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using F = PineGuard.Testing.Fixtures.XmlRulesFixtures;
 
@@ -55,14 +56,19 @@ public static class XmlAttributesTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("null", null, true),
-            new("not dictionary", 123, true)
+            new("null", null, true)
         ];
 
         public static TheoryData<ValidCase> InvalidCases =>
         [
             new(nameof(F.IsXmlContentType.NotXml),       F.IsXmlContentType.NotXml,       false),
             new(nameof(F.IsXmlContentType.MissingHeader),F.IsXmlContentType.MissingHeader, false)
+        ];
+
+        public static TheoryData<ThrowsCase> TypeMismatchCases =>
+        [
+            new("not dictionary (int)", 123, new ExpectedException(typeof(InvalidOperationException), null, "can only be applied to properties implementing")),
+            new("string-array values", new Dictionary<string, string[]> { ["Content-Type"] = ["application/json"] }, new ExpectedException(typeof(InvalidOperationException), null, "can only be applied to properties implementing"))
         ];
     }
 }

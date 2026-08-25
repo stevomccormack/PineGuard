@@ -21,7 +21,8 @@ public static class FluentCsvExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustCsvClauses.CsvLine"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.CsvRow).CsvLine();</code></example>
     /// <seealso cref="MustCsvClauses.CsvLine"/>
@@ -41,7 +42,8 @@ public static class FluentCsvExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustCsvClauses.CsvHeaderLine"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Header).CsvHeaderLine(new[] { "Id", "Name", "Email" });</code></example>
     /// <seealso cref="MustCsvClauses.CsvHeaderLine"/>
@@ -64,7 +66,8 @@ public static class FluentCsvExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustCsvClauses.CsvRowLine(IMustClause, string, IReadOnlyList{CsvColumnSchema}, char, string)"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.DataRow).CsvRowLine(schema);</code></example>
     /// <seealso cref="MustCsvClauses.CsvRowLine(IMustClause, string, IReadOnlyList{CsvColumnSchema}, char, string)"/>
@@ -88,7 +91,8 @@ public static class FluentCsvExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustCsvClauses.CsvRowLine(IMustClause, string, IReadOnlyList{string}, IReadOnlyDictionary{string, CsvColumnType}, char, StringComparison, string)"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
+    /// reported as a distinct failure.
     /// </remarks>
     /// <example><code>RuleFor(x => x.DataRow).CsvRowLine(header, types);</code></example>
     /// <seealso cref="MustCsvClauses.CsvRowLine(IMustClause, string, IReadOnlyList{string}, IReadOnlyDictionary{string, CsvColumnType}, char, StringComparison, string)"/>

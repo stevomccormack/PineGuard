@@ -23,9 +23,57 @@ namespace PineGuard.DataAnnotations;
 /// </remarks>
 public abstract class NumberAttributeBase() : ValidationAttributeBase(typeof(object), allowNull: true)
 {
+    private static readonly HashSet<TypeCode> IntegralTypeCodes =
+    [
+        TypeCode.SByte, TypeCode.Byte, TypeCode.Int16, TypeCode.UInt16,
+        TypeCode.Int32, TypeCode.UInt32, TypeCode.Int64, TypeCode.UInt64
+    ];
+
     /// <inheritdoc/>
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext) =>
         value is null ? ValidationResult.Success : ValidateValue(value, validationContext);
+
+    /// <summary>
+    /// Converts a numeric bound declared as <see cref="double"/> on the attribute to the runtime type of
+    /// the value being validated.
+    /// </summary>
+    /// <param name="bound">The bound value declared on the attribute (e.g. <c>Min</c>, <c>Max</c>, <c>Factor</c>).</param>
+    /// <param name="type">The runtime type of the validated value.</param>
+    /// <param name="boundName">The name of the bound, used in exception messages.</param>
+    /// <returns>The bound converted to <paramref name="type"/>.</returns>
+    /// <remarks>
+    /// For integral target types (e.g. <see cref="int"/>, <see cref="long"/>, <see cref="byte"/>), the
+    /// conversion is verified to be exact. <see cref="Convert.ChangeType(object, Type, IFormatProvider)"/>
+    /// alone would otherwise silently round a fractional bound (e.g. <c>10.99</c> becomes <c>11</c> for
+    /// <see cref="int"/>) or throw an undocumented <see cref="OverflowException"/> for an out-of-range
+    /// bound; both cases now fail loudly with a clear message instead.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="bound"/> does not fit in <paramref name="type"/>, or (for an integral
+    /// <paramref name="type"/>) cannot be represented exactly without rounding.
+    /// </exception>
+    private protected static object ConvertBound(double bound, Type type, string boundName)
+    {
+        object converted;
+        try
+        {
+            converted = Convert.ChangeType(bound, type, CultureInfo.InvariantCulture);
+        }
+        catch (OverflowException ex)
+        {
+            throw new InvalidOperationException(
+                $"The {boundName} value {bound.ToString(CultureInfo.InvariantCulture)} does not fit in {type.Name}; " +
+                "specify a bound within the annotated property's numeric range.", ex);
+        }
+
+        if (IntegralTypeCodes.Contains(Type.GetTypeCode(type)) &&
+            !Convert.ToDouble(converted, CultureInfo.InvariantCulture).Equals(bound))
+            throw new InvalidOperationException(
+                $"The {boundName} value {bound.ToString(CultureInfo.InvariantCulture)} cannot be represented exactly as " +
+                $"{type.Name}; specify a whole-number bound that fits the annotated property's numeric type.");
+
+        return converted;
+    }
 
     /// <summary>
     /// Invokes the named <see cref="MustNumberClauses"/> method for the runtime type of
@@ -515,10 +563,14 @@ public sealed class GreaterThanOrEqualNumberAttribute(double min) : NumberAttrib
     public double Min { get; } = min;
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// A configured bound does not fit in the property's runtime numeric type, or (for an integral
+    /// type) cannot be represented exactly without rounding.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMin = Convert.ChangeType(Min, type, CultureInfo.InvariantCulture);
+        var typedMin = ConvertBound(Min, type, nameof(Min));
         return InvokeAndMap(nameof(MustNumberClauses.GreaterThanOrEqual), value, validationContext, typedMin);
     }
 }
@@ -552,10 +604,14 @@ public sealed class LessThanOrEqualNumberAttribute(double max) : NumberAttribute
     public double Max { get; } = max;
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// A configured bound does not fit in the property's runtime numeric type, or (for an integral
+    /// type) cannot be represented exactly without rounding.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMax = Convert.ChangeType(Max, type, CultureInfo.InvariantCulture);
+        var typedMax = ConvertBound(Max, type, nameof(Max));
         return InvokeAndMap(nameof(MustNumberClauses.LessThanOrEqual), value, validationContext, typedMax);
     }
 }
@@ -598,11 +654,15 @@ public sealed class InRangeNumberAttribute(double min, double max, Inclusion inc
     public Inclusion Inclusion { get; } = inclusion;
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// A configured bound does not fit in the property's runtime numeric type, or (for an integral
+    /// type) cannot be represented exactly without rounding.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMin = Convert.ChangeType(Min, type, CultureInfo.InvariantCulture);
-        var typedMax = Convert.ChangeType(Max, type, CultureInfo.InvariantCulture);
+        var typedMin = ConvertBound(Min, type, nameof(Min));
+        var typedMax = ConvertBound(Max, type, nameof(Max));
         return InvokeAndMap(nameof(MustNumberClauses.InRange), value, validationContext, typedMin, typedMax, Inclusion);
     }
 }
@@ -644,11 +704,15 @@ public sealed class OutOfRangeNumberAttribute(double min, double max, Inclusion 
     public Inclusion Inclusion { get; } = inclusion;
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// A configured bound does not fit in the property's runtime numeric type, or (for an integral
+    /// type) cannot be represented exactly without rounding.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMin = Convert.ChangeType(Min, type, CultureInfo.InvariantCulture);
-        var typedMax = Convert.ChangeType(Max, type, CultureInfo.InvariantCulture);
+        var typedMin = ConvertBound(Min, type, nameof(Min));
+        var typedMax = ConvertBound(Max, type, nameof(Max));
         return InvokeAndMap(nameof(MustNumberClauses.OutOfRange), value, validationContext, typedMin, typedMax, Inclusion);
     }
 }
@@ -682,10 +746,14 @@ public sealed class MultipleOfNumberAttribute(double factor) : NumberAttributeBa
     public double Factor { get; } = factor;
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// A configured bound does not fit in the property's runtime numeric type, or (for an integral
+    /// type) cannot be represented exactly without rounding.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedFactor = Convert.ChangeType(Factor, type, CultureInfo.InvariantCulture);
+        var typedFactor = ConvertBound(Factor, type, nameof(Factor));
         return InvokeAndMap(nameof(MustNumberClauses.MultipleOf), value, validationContext, typedFactor);
     }
 }
@@ -719,10 +787,14 @@ public sealed class NotMultipleOfNumberAttribute(double factor) : NumberAttribut
     public double Factor { get; } = factor;
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// A configured bound does not fit in the property's runtime numeric type, or (for an integral
+    /// type) cannot be represented exactly without rounding.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedFactor = Convert.ChangeType(Factor, type, CultureInfo.InvariantCulture);
+        var typedFactor = ConvertBound(Factor, type, nameof(Factor));
         return InvokeAndMap(nameof(MustNumberClauses.NotMultipleOf), value, validationContext, typedFactor);
     }
 }
@@ -761,11 +833,15 @@ public sealed class ApproximatelyNumberAttribute(double target) : NumberAttribut
     public double? Tolerance { get; set; }
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// A configured bound does not fit in the property's runtime numeric type, or (for an integral
+    /// type) cannot be represented exactly without rounding.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedTarget = Convert.ChangeType(Target, type, CultureInfo.InvariantCulture);
-        var typedTolerance = Tolerance is null ? null : Convert.ChangeType(Tolerance.Value, type, CultureInfo.InvariantCulture);
+        var typedTarget = ConvertBound(Target, type, nameof(Target));
+        var typedTolerance = Tolerance is null ? null : ConvertBound(Tolerance.Value, type, nameof(Tolerance));
         return InvokeAndMap(nameof(MustNumberClauses.Approximately), value, validationContext, typedTarget, typedTolerance);
     }
 }
@@ -804,11 +880,15 @@ public sealed class NotApproximatelyNumberAttribute(double target) : NumberAttri
     public double? Tolerance { get; set; }
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// A configured bound does not fit in the property's runtime numeric type, or (for an integral
+    /// type) cannot be represented exactly without rounding.
+    /// </exception>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedTarget = Convert.ChangeType(Target, type, CultureInfo.InvariantCulture);
-        var typedTolerance = Tolerance is null ? null : Convert.ChangeType(Tolerance.Value, type, CultureInfo.InvariantCulture);
+        var typedTarget = ConvertBound(Target, type, nameof(Target));
+        var typedTolerance = Tolerance is null ? null : ConvertBound(Tolerance.Value, type, nameof(Tolerance));
         return InvokeAndMap(nameof(MustNumberClauses.NotApproximately), value, validationContext, typedTarget, typedTolerance);
     }
 }

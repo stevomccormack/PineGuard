@@ -33,7 +33,7 @@ public static class FluentGuidExtensions
             message);
 
     /// <summary>
-    /// Validates that the property value is not <see langword="null"/> and not <see cref="Guid.Empty"/>.
+    /// Validates that the property value, when present, is not <see cref="Guid.Empty"/>.
     /// </summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>

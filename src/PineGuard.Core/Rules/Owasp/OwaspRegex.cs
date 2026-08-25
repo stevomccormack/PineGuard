@@ -36,6 +36,11 @@ public static partial class OwaspRegex
         public const string HtmlEntityEncodedAngleBracketPattern = "(?:&#0*60;|&#x0*3c;|&lt;|&#0*62;|&#x0*3e;|&gt;)";
 
         /// <summary>
+        /// A pattern that matches URL-percent-encoded angle brackets (<c>%3C</c>, <c>%3E</c>).
+        /// </summary>
+        public const string PercentEncodedAngleBracketPattern = "(?:%3c|%3e)";
+
+        /// <summary>
         /// A pattern that matches <c>javascript:</c> or <c>data:</c> protocol prefixes.
         /// </summary>
         public const string ScriptProtocolPattern = @"\b(?:javascript|data)\s*:";
@@ -79,6 +84,18 @@ public static partial class OwaspRegex
 #else
         public static Regex HtmlEntityEncodedAngleBracketRegex() => CompiledHtmlEntityEncodedAngleBracketRegex;
         private static readonly Regex CompiledHtmlEntityEncodedAngleBracketRegex = new(HtmlEntityEncodedAngleBracketPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
+#endif
+
+        /// <summary>
+        /// Gets a compiled regex that matches URL-percent-encoded angle brackets.
+        /// </summary>
+        /// <returns>A <see cref="Regex"/> compiled from <see cref="PercentEncodedAngleBracketPattern"/>.</returns>
+#if NET8_0_OR_GREATER
+        [GeneratedRegex(PercentEncodedAngleBracketPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, matchTimeoutMilliseconds: 250)]
+        public static partial Regex PercentEncodedAngleBracketRegex();
+#else
+        public static Regex PercentEncodedAngleBracketRegex() => CompiledPercentEncodedAngleBracketRegex;
+        private static readonly Regex CompiledPercentEncodedAngleBracketRegex = new(PercentEncodedAngleBracketPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
 #endif
 
         /// <summary>
@@ -220,9 +237,14 @@ public static partial class OwaspRegex
     public static partial class PathTraversal
     {
         /// <summary>
-        /// A pattern that matches dot-dot path traversal segments (e.g., <c>../</c>, <c>..\</c>, URL-encoded variants).
+        /// A pattern that matches a dot-dot path traversal segment bounded by a path separator (or the start/end
+        /// of the string). Each dot of the pair, and each bounding separator, is matched independently as either
+        /// its literal form or a single- or double-percent-encoded form (e.g. <c>../</c>, <c>..\</c>, <c>%2e./</c>,
+        /// <c>.%2e/</c>, <c>%2e%2e/</c>, <c>..%2f</c>, <c>..%252f</c>, a bare trailing <c>..</c>, or a trailing
+        /// <c>%2e%2e</c>) so that mixed-encoding and double-encoding evasions of the traversal token are still
+        /// recognized before any URL-decoding happens downstream.
         /// </summary>
-        public const string DotDotSegmentPattern = @"(\.\.(?:/|\\|%2f|%5c)|%2e%2e(?:/|\\|%2f|%5c)|(?:^|[/\\])\.\.$)";
+        public const string DotDotSegmentPattern = @"(?:^|/|\\|%2f|%5c|%252f|%255c)(?:\.|%2e|%252e){2}(?:/|\\|%2f|%5c|%252f|%255c|$)";
 
         /// <summary>
         /// A pattern that matches absolute Unix paths starting with <c>/</c>.

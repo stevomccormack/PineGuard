@@ -110,4 +110,27 @@ public static class GuardExceptionPolicyTestData
         public sealed record Case(string Name)
             : BaseCase(Name);
     }
+
+    public static class GetEffectivePolicy
+    {
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("no active scope resolves the global replacer and flag", ScopeActive: false, ScopedReplaceDefaultExceptions: false),
+            new("an active scope resolves the scope's replacer and flag, not the global ones", ScopeActive: true, ScopedReplaceDefaultExceptions: true)
+        ];
+
+        public sealed record Case(string Name, bool ScopeActive, bool ScopedReplaceDefaultExceptions)
+            : BaseCase(Name);
+    }
+
+    public static class ChildContextPropertyMutation
+    {
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("a child execution context setting ReplaceDefaultExceptions inside a scope does not leak to the parent context")
+        ];
+
+        public sealed record Case(string Name)
+            : BaseCase(Name);
+    }
 }
