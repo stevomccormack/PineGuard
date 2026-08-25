@@ -1,4 +1,4 @@
-﻿---
+---
 spec:
   id: pineguard.ai.core.project-spec
   title: "PineGuard.Core Project Spec (Rules & Utils)"
@@ -71,17 +71,9 @@ Canonical definition: see `docs/ai/specs/spec.md` (“Validated value vs configu
 
 ### 1.1 Relationship to MustClauses and GuardClauses
 
-Single source of truth (strict). PineGuard layers in one direction — each layer calls only the one before it:
-
-- **Core** (`Rules`/`Utils`) owns validation logic and parsing.
-- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
-- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
-- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
-- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
-
-Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none reimplements Core logic.
-
-Do not duplicate parsing/validation logic across layers.
+Single source of truth (strict). The one-directional layer pipeline is canonical in
+`../project.md` §1.1 — Core owns all validation logic and parsing; every higher layer calls
+down, never sideways, and never reimplements it.
 
 ---
 

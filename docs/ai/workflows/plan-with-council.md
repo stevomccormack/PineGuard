@@ -1,3 +1,9 @@
+<!-- metadata_header
+type: workflow
+id: workflow-plan-with-council
+version: 1.0
+-->
+
 # Workflow: Plan with Council
 
 > [!NOTE]

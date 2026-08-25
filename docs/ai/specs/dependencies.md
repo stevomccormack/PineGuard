@@ -1,4 +1,4 @@
-﻿---
+---
 spec:
   id: pineguard.ai.dependencies
   title: "PineGuard AI Spec Dependencies"

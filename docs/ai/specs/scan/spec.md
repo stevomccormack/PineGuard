@@ -1,8 +1,15 @@
-<!-- metadata_header
-type: spec
-id: spec-scan
-version: 1.0
--->
+---
+spec:
+  id: pineguard.ai.scan.sonar
+  title: "Scan Specification (SonarQube)"
+  version: 2
+  parent:
+    - ../spec.md
+  dependencies:
+    - ../dependencies.md
+applies_to:
+  - "tools/sonar-scanner/**"
+---
 
 # Scan Specification (SonarQube)
 

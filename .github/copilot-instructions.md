@@ -33,9 +33,12 @@ If the user asks to run coverage, check tests, or fix bugs, refer to the canonic
 | "Add XML docs" | `../docs/ai/agents/document-all.md` | Software Engineer |
 | "Commit changes" | `../docs/ai/agents/commit-all.md` | DevOps Engineer |
 | "Implement new validation" | `../docs/ai/agents/scaffold-vertical-slice.md` | Senior Engineer |
-| "Pressure-test a decision" | `../docs/ai/agents/ask-council.md` | Architect |
+| "Pressure-test a decision" | `../docs/ai/agents/ask-council.md` | Architect / Council |
 
 *All scoped commands are available for: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing — except the Document family, which has no Testing scope.*
+
+*Single-layer scaffolds ("add a Must clause", "add a Guard clause", …) are skill-routed, not
+agent-routed — see `../docs/ai/commands/scaffold.md` for the roster.*
 
 The Role column always matches the `roles:` header of the target agent; `../docs/ai/business-units/engineering.md` maps each persona name to its canonical role file.
 

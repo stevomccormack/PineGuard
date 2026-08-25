@@ -1,12 +1,19 @@
-# Workflow: Format Code
+<!-- metadata_header
+type: workflow
+id: workflow-format
+version: 1.1
+-->
+
+# Workflow: Format
 
 > [!NOTE]
-> Standard workflow for enforcing .editorconfig formatting rules via dotnet format.
+> Enforces `.editorconfig` formatting rules via `dotnet format` for the requested scope.
 
 ## Context
 
 - **Role**: [Software Engineer](../roles/builder.md)
-- **Skill**: [Format Code](../skills/format-code/SKILL.md)
+- **Skill**: [Format Code](../skills/format-code/SKILL.md) — the canonical procedure
+- **Reference**: `tools/code-formatter/Run-Format.ps1`
 
 ## Parameters
 
@@ -24,29 +31,9 @@ See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface invento
 
 // turbo-all
 
-1. **Execute Formatter**
-   Run the code formatter for the specified scope.
-
-   **Command Template**:
-
-   ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope [SCOPE]
-   ```
-
-   **Scope map** (resolves to source projects):
-   - Core: `src/PineGuard.Core/PineGuard.Core.csproj`
-   - MustClauses: `src/PineGuard.MustClauses/PineGuard.MustClauses.csproj`
-   - GuardClauses: `src/PineGuard.GuardClauses/PineGuard.GuardClauses.csproj`
-   - FluentValidation: `src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj`
-   - DataAnnotations: `src/PineGuard.DataAnnotations/PineGuard.DataAnnotations.csproj`
-   - Testing: `tests/PineGuard.Testing/PineGuard.Testing.csproj`
-   - All: `PineGuard.slnx` (entire solution including tests)
-
-   **Verify mode** (CI/dry-run):
-
-   ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope [SCOPE] -VerifyNoChanges
-   ```
+1. **Execute the canonical procedure** in [`../skills/format-code/SKILL.md`](../skills/format-code/SKILL.md)
+   with **Scope = [SCOPE]** — it carries the `Run-Format.ps1` invocation, the scope → project map,
+   and the `-VerifyNoChanges` dry-run mode.
 
 2. **Check Results**
-   Ensure dotnet format exited with code 0 (no violations).
+   Ensure `dotnet format` exited with code 0 (no violations).

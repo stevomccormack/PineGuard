@@ -106,3 +106,14 @@ public static partial Regex SignedIntegerRegex();
         public NotHasFlagValidator() => RuleFor(x => x.Value).NotHasFlag(FluentEnumExtensionsTestData.TestEnum.First);
 #pragma warning restore CS0612 // Type or member is obsolete
 ```
+
+## XML Documentation (Normative)
+
+- **Rule**: Every public member in the five `src/` packages carries gold-standard XML
+  documentation. `Directory.Build.props` enables `<GenerateDocumentationFile>` repo-wide, so a
+  missing doc comment is a CS1591 warning — and warnings are errors.
+- **Exception**: `tests/PineGuard.Testing/` sets `<NoWarn>CS1591</NoWarn>` by design (thousands
+  of self-describing fixture constants) — see `testing/project.md` §3.
+- **Templates**: the per-layer doc shapes, cross-reference and example conventions live in
+  `docs/ai/skills/document/SKILL.md` §5 (the procedure); this spec owns the *requirement*.
+- **Generator compatibility**: use only the tag set a DocFX-compatible generator can render.

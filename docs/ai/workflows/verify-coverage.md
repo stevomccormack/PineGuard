@@ -1,14 +1,34 @@
----
-description: Verify code coverage sequentially in dependency order (Core -> Must -> Guards -> Fluent -> Data -> Testing) to isolate issues faster.
----
+<!-- metadata_header
+type: workflow
+id: workflow-verify-coverage
+version: 1.1
+-->
 
-# Verify Coverage Sequential
+# Workflow: Verify Coverage
 
 > [!NOTE]
-> This workflow adds nothing to the coverage tooling itself — [Run Coverage](coverage.md) owns the
-> command surface. What it contributes is the **dependency order** and a **stop-on-first-gap gate**:
-> a gap in Core will surface again in every layer above it, so the sweep halts at the first scope
-> below 100% instead of collecting downstream noise.
+> Verifies code coverage sequentially in dependency order (Core → Must → Guard → Fluent →
+> Annotation → Testing) to isolate issues faster. This workflow adds nothing to the coverage
+> tooling itself — [Coverage](coverage.md) owns the command surface. What it contributes is the
+> **dependency order** and a **stop-on-first-gap gate**: a gap in Core will surface again in every
+> layer above it, so the sweep halts at the first scope below 100% instead of collecting
+> downstream noise.
+
+## Context
+
+- **Role**: [Test Analyst](../roles/planner.md)
+- **Reference**: [Coverage workflow](coverage.md), [Dependencies spec](../specs/dependencies.md)
+
+## Parameters
+
+None — the sweep always runs the full dependency order below.
+
+## Auto-Approval
+
+Same policy as [Coverage](coverage.md) — the scoped coverage commands it chains are auto-approved
+on every surface. See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface inventory.
+
+## Steps
 
 Each step runs the scoped coverage command and stops the sweep if the scope is < 100%.
 

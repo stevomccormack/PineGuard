@@ -1,4 +1,10 @@
-# Workflow: Run Roslyn Compiler Diagnostics
+<!-- metadata_header
+type: workflow
+id: workflow-scan-roslyn
+version: 1.0
+-->
+
+# Workflow: Scan Roslyn
 
 > [!NOTE]
 > Runs Roslyn compiler diagnostics via the repo wrapper under `tools/code-diagnostics/`.

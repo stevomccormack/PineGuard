@@ -35,8 +35,8 @@ Important:
 
 ## Quick start (FluentValidation only)
 
-Use the auto-approved workflow:
-`view_file .agent/workflows/coverage-fluent.md`
+Use the auto-approved workflow: `docs/ai/agents/coverage-fluent.md`
+(→ `docs/ai/workflows/coverage.md` with **Scope = FluentValidation**).
 
 ## Enforce 100% (FluentValidation only)
 

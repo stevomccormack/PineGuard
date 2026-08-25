@@ -35,8 +35,8 @@ Important:
 
 ## Quick start (MustClauses only)
 
-Use the auto-approved workflow:
-`view_file .agent/workflows/coverage-must.md`
+Use the auto-approved workflow: `docs/ai/agents/coverage-must.md`
+(→ `docs/ai/workflows/coverage.md` with **Scope = MustClauses**).
 
 ## Enforce 100% (MustClauses only)
 

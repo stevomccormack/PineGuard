@@ -19,12 +19,13 @@
 
 ## Coverage Tool Usage
 
-- Runner: `tools/code-coverage/Run-CodeCoverage.ps1`.
+The flags, valid scopes, and output paths are operational docs owned by
+`tools/code-coverage/README.md` — read that, don't rely on remembered commands. Gotchas this
+agent has actually hit:
+
 - `-Format cobertura` MUST be supplied explicitly — omitting it fails the `Gen-CoverageReport.ps1` ValidateSet.
 - There is no `-Engine` parameter. Any stored command carrying one is stale — delete the flag, do not translate it.
 - Drop `-Isolated` on multi-targeted projects (Core, MustClauses, GuardClauses); the non-isolated run is equally authoritative.
-- Valid `-Scope` values: `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`, `All`.
-- Reports land in `artifacts/code-coverage/xplat/`.
 
 ## Known Constraints
 

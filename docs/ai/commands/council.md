@@ -9,7 +9,7 @@ version: 1.0
 > [!NOTE]
 > **Interface Definition**: explicit triggers and contracts for the LLM Council decision-support procedure.
 
-## 1. Triggers (Slash Commands)
+## Intent Mapping
 
 | Command                | Scope                | Auto-Approve | Description |
 | :--------------------- | :------------------- | :----------- | :---------- |
@@ -26,20 +26,20 @@ Strong (when combined with a real trade-off): `should I X or Y`, `which option`,
 
 Do **not** trigger on factual lookups, creation tasks, or low-stakes "should I" phrasing (see [`../specs/council.md`](../specs/council.md) §"When the Council MUST NOT Run").
 
-## 2. Execution Logic
+## Execution
 
 **Agent entrypoint**: [`../agents/ask-council.md`](../agents/ask-council.md)
 **Canonical procedure**: [`../skills/ask-council/SKILL.md`](../skills/ask-council/SKILL.md)
 **Plan workflow**: [`../workflows/plan-with-council.md`](../workflows/plan-with-council.md)
 
-## 3. Auto-Approval Rules
+## Auto-Approval
 
 - **Claude**: not auto-approved. Slash command `/ask-council` is explicit; the command adapter at `.claude/commands/ask-council.md` delegates to the brain agent.
 - **Copilot**: `.github/prompts/ask-council.prompt.md` requires explicit invocation.
 - **Antigravity**: `.agent/workflows/ask-council.md` **omits** `// turbo-all` — the user must confirm.
 - **Pi**: `.pi/skills/ask-council/SKILL.md` requires explicit invocation.
 
-## 4. When Is This the Right Command?
+## When Is This the Right Command?
 
 Prefer `/ask-council` when:
 - The decision has genuine uncertainty and non-trivial cost-of-being-wrong.

@@ -51,11 +51,7 @@ version: 1.0
 
 ## Related
 
-- [Related agent / workflow / spec / script]
-
-<!-- footer
-last_verified: YYYY-MM-DD
--->
+- [Related agent / workflow / spec / script — omit on delegating stubs]
 ```
 
 ## Required Elements
@@ -71,8 +67,8 @@ last_verified: YYYY-MM-DD
 | `## Purpose` | When the title is not self-evident | Omit on trivial delegating stubs |
 | `## Inputs` | When parameterised | Table form |
 | `## Steps` | Always | Literal commands, or a delegation to a workflow with explicit parameters |
-| `## Related` | Always | At minimum the workflow or script the agent drives |
-| `last_verified` footer | Always | Date the steps were last checked against the repo |
+| `## Related` | When the agent has links beyond its Steps | Delegating stubs omit it — the workflow reference in Steps is enough. Standalone playbooks (clean, release) carry it |
+| `last_verified` footer | Never on agents | Verification dates live on the narrative docs and specs; a 16-line stub is verified by the workflow it delegates to |
 
 ## Roles Are Canonical
 
@@ -93,7 +89,8 @@ Most per-scope agents are three lines of delegation. That is the intended shape:
 2. Execute it with parameter **Scope = Core**.
 ```
 
-A stub still carries the metadata header, the role blockquote, `## Related` and the footer.
+A stub still carries the metadata header and the role blockquote; it omits `## Related` and the
+footer.
 
 ## References
 

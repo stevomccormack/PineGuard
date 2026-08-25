@@ -1,8 +1,8 @@
-﻿---
+---
 spec:
   id: pineguard.ai.specs.testing.fixture
   title: "Unified Fixture Architecture v2"
-  version: 2
+  version: 3
   parent:
     - unit-test.md
 applies_to:
@@ -278,16 +278,36 @@ Pattern: `Fixture.Scenarios` → `.ToXxxCases()` → `TheoryData<XxxCase>` → `
 
 ## 9. Edge Case Constants
 
-Fixtures should reference boundary constants from Core classes for edge case scenarios. These classes provide the canonical boundary values:
+When a Rule, Standards, or Utils class defines `const` or `static readonly` boundary values,
+fixture edge cases MUST reference them — never hardcode a boundary value that exists as a
+constant:
 
-| Source Class | Constants | Use For |
-|---|---|---|
-| `StringRules` | `MinLength`, `MaxLength` patterns | String length boundary tests |
-| `NumberRules` | Numeric range boundaries | Number range edge cases |
-| `PanAlgorithm` | `PanMinLength`, `PanMaxLength` | PAN length boundaries |
-| `EmailUtility` | `MaxEmailLength` | Email length edge cases |
-| `Inclusion` (enum) | `Inclusive`, `Exclusive` | Range inclusion boundary tests |
-| `TimeOnlyRange` | `TimeOnly.MinValue`, `TimeOnly.MaxValue` | Time boundary edge cases |
+```csharp
+// Rule constants
+public static readonly double AtMin = GeoLocationRules.MinLatitude;
+public static readonly double BelowMin = GeoLocationRules.MinLatitude - 0.0001;
+
+// Utils constants
+public static readonly int AtMaxEmail = EmailUtility.MaxEmailLength;
+```
+
+**Known constant locations** (not exhaustive — always read the Rule source to find references):
+
+| Source Class | Constants |
+|---|---|
+| `GeoLocationRules` | `MinLatitude`, `MaxLatitude`, `MinLongitude`, `MaxLongitude` |
+| `PhoneRules` | `DefaultMinDigits`, `DefaultMaxDigits`, `DefaultAllowedNonDigitCharacters` |
+| `CharRules` | `AsciiMinValue`, `AsciiMaxValue`, `PrintableAsciiMinValue`, `PrintableAsciiMaxValue` |
+| `SqlDateTimeRules` | `MinValue`, `MaxValue` |
+| `BufferRules` | `Base64CharsPerQuantum`, `Base64BytesPerQuantum` |
+| `HttpSecurityHeaderRules` | `DefaultStrictTransportSecurityMinMaxAgeSeconds`, 7 default value constants |
+| `CsvRules` | `DefaultCsvSeparator` |
+| `StringRules` | `SignedIntegerPattern`, `DefaultAllowedDigitSeparators` |
+| `OwaspRegex` | ~23 pattern constants across nested classes |
+| `PanAlgorithm` | `PanMinLength`, `PanMaxLength` |
+| `EmailUtility` | `MaxEmailLength`, `MaxLocalPartLength`, `MaxDomainLength` |
+| `Inclusion` (enum) | `Inclusive`, `Exclusive` |
+| `TimeOnlyRange` | `TimeOnly.MinValue`, `TimeOnly.MaxValue` |
 
 When creating `ValidEdgeScenarios` or `InvalidEdgeScenarios` (§2), reference these constants rather than hardcoding magic numbers:
 
@@ -311,10 +331,133 @@ When the source Rules class is split across partial files, the fixture class mir
 | `src/PineGuard.Core/Rules/StringRules.Bool.cs` | `tests/PineGuard.Testing/Fixtures/StringRulesFixtures.Bool.cs` |
 | `src/PineGuard.Core/Rules/StringRules.Casing.cs` | `tests/PineGuard.Testing/Fixtures/StringRulesFixtures.Casing.cs` |
 
-Each file declares `public static partial class XxxRulesFixtures`. Monolithic per-method fixture files are not used.
+Each file declares `public static partial class XxxRulesFixtures`. Monolithic per-method fixture files are not used — a monolithic fixture file standing alone beside a partial Rules class is drift; fold it into the matching partial.
 
 Because every partial contributes to the same class, inner class names must be unique across the whole set — prefix them with the partial's sub-scope where a bare method name would collide (`BoolIsTrue`, `BoolIsFalse` in `StringRulesFixtures.Bool.cs`). TestData files still alias the whole class as `F`:
 
 ```csharp
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 ```
+
+## 11. Test Code Conventions
+
+These conventions apply to ALL fixture, TestData and test code.
+
+### 11.1 Structural comments only
+
+No ad-hoc or explanatory comments. Structural comments that provide navigation value ARE allowed and encouraged:
+
+- `// Arrange`, `// Act`, `// Assert` — test phase markers
+- `// Guard.Against.NotInteger` — method-under-test identification
+- `// CsvRules.IsCsvLine` — section headers in TestData files
+
+Do NOT add: `// valid input`, `// this checks the length`, `// returns true when valid`, or any other inline explanation.
+
+### 11.2 Single-line formatting (max 400 characters)
+
+- Fixture field declarations: one field per line
+- `RuleScenario` entries: `new(nameof(Field), Field, true),` — single line
+- TestData switch cases: `nameof(F.X.Y) => new MustExpected(false, "msg"),` — single line
+- `[MemberData]` attributes: full attribute on one line
+- `TheoryData` entries: `new("name", value, expected),` — single line
+
+### 11.3 Naming precision
+
+| Term | Meaning | Suffix |
+|---|---|---|
+| Scenario | `RuleScenario<T>` array | `Scenarios` (e.g., `ValidScenarios`) |
+| Case | `TheoryData<XxxCase>` property | `Cases` (e.g., `ValidCases`, `Cases`) |
+| Expected | Layer-specific expected record | `Expected` (e.g., `MustExpected`) |
+
+### 11.4 camelCase tuple elements
+
+Tuple element names MUST be camelCase and MUST be the exact parameter names from the method under test:
+
+```csharp
+// Method: IsExactLength(string? value, int length)
+// Fixture: (string? value, int length) Matching = ("abc", 3);
+// RuleScenario<(string? value, int length)>
+```
+
+### 11.5 Fixture alias — zero magic strings
+
+```csharp
+using F = PineGuard.Testing.Fixtures.[RulesClass]Fixtures;
+```
+
+All test case Names use `nameof(F.OpGroup.Field)` — zero magic strings.
+
+### 11.6 Ad-hoc cases
+
+Layer-specific cases not derivable from RuleScenarios (e.g., custom message overrides, type-mismatch tests) use an `AdHocCases` property with inline values:
+
+```csharp
+public static TheoryData<DataAnnotationCase> AdHocCases =>
+[
+    new("int-value", 42, new DataAnnotationExpected(true)),
+];
+```
+
+## 12. Guard TestData Patterns
+
+### 12.1 CallerArgumentExpression — extract to a local first
+
+Guard methods use `[CallerArgumentExpression(nameof(value))]`. Passing `tc.Value` directly captures the expression `"tc.Value"` as the paramName, which breaks paramName assertions. Always extract to a local variable first:
+
+```csharp
+// Non-tuple (string, string?, int, etc.):
+public void NotCamelCase_BehavesAsExpected(GuardCase<string> tc)
+{
+    var value = tc.Value;
+    var result = AssertResult(tc, () => Guard.Against.NotCamelCase(value));
+    if (tc.Expected.IsValid) Assert.Equal(value, result);
+}
+
+// Tuple ((string? value, StringCasing style), etc.):
+public void NotCaseStyle_BehavesAsExpected(GuardCase<(string? value, StringCasing style)> tc)
+{
+    var value = tc.Value.value;
+    var style = tc.Value.style;
+    var result = AssertResult(tc, () => Guard.Against.NotCaseStyle(value, style));
+    if (tc.Expected.IsValid) Assert.Equal(value, result);
+}
+```
+
+### 12.2 Inverted guard classes — explicit factory required
+
+Some guard methods are "inverted" (`Guard.Against.CamelCase` throws when value IS camelCase). Their TestData must use an explicit factory to produce the correct `GuardExpected`:
+
+```csharp
+// WRONG — ToGuardCases() on InvalidScenarios (IsValid=false) → GuardExpected(false) with null ExceptionType → crash:
+public static TheoryData<GuardCase<string>> ValidCases => F.IsCamelCase.InvalidScenarios.ToGuardCases();
+
+// CORRECT — explicit factory:
+public static TheoryData<GuardCase<string>> ValidCases => F.IsCamelCase.InvalidScenarios.ToGuardCases(_ => new GuardExpected(true));
+public static TheoryData<GuardCase<string>> InvalidCases => F.IsCamelCase.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+```
+
+For nullable variants with `NullValue` (UpperInvariant, LowerInvariant):
+
+```csharp
+public static TheoryData<GuardCase<string?>> ValidCases => F.IsUpperInvariant.InvalidScenarios.Except(nameof(F.IsUpperInvariant.NullValue)).ToGuardCases(_ => new GuardExpected(true));
+public static TheoryData<GuardCase<string?>> InvalidCases => F.IsUpperInvariant.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+public static TheoryData<GuardCase<string?>> NullCases => F.IsUpperInvariant.InvalidScenarios.Only(nameof(F.IsUpperInvariant.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value"));
+```
+
+### 12.3 Tuple NullValue fields — IsNull does not see inside tuples
+
+`RuleScenario<T>.IsNull` checks if the entire `T` is null — not fields within it. For tuple inputs like `(string? value, StringCasing style)`, `IsNull` is always false even when `value` is null. Use an explicit factory switch in these cases:
+
+```csharp
+// NotCaseStyle.InvalidCases — tuple input, NullValue field must be ANE not AE:
+public static TheoryData<GuardCase<(string? value, StringCasing style)>> InvalidCases =>
+    F.IsCaseStyle.InvalidScenarios
+        .Except(nameof(F.IsCaseStyle.UnknownStyle))
+        .ToGuardCases(s => s.Name switch
+        {
+            nameof(F.IsCaseStyle.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+            _ => new GuardExpected(false, typeof(ArgumentException), "value")
+        });
+```
+
+Non-inverted guard `InvalidCases` with simple `string?` inputs can still use `.ToGuardCases("value")` auto-logic (`IsNull` works correctly for non-tuple types).

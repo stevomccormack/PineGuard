@@ -1,4 +1,10 @@
-# Workflow: Run SonarQube Analysis
+<!-- metadata_header
+type: workflow
+id: workflow-scan-sonar
+version: 1.0
+-->
+
+# Workflow: Scan Sonar
 
 > [!NOTE]
 > Runs SonarQube analysis locally via the repo wrapper under `tools/sonar-scanner/`.

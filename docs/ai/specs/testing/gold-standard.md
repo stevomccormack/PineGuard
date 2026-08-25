@@ -92,10 +92,10 @@ TestData files using the `RuleScenario<T>` → `.ToXxxCases()` fixture pattern (
 
 **Note**: DataAnnotations is now the only layer with materially low adoption. Migrating its remaining TestData files to the pattern defined in `fixture.md` is the outstanding gap.
 
-## Coverage Status
+## Re-verifying Coverage
 
-Coverage has not been re-verified since the last audit, so every project is still graded SILVER on
-criterion 5. Verify per `docs/ai/specs/testing/coverage.md`:
+GOLD is only as fresh as its last verification (see the dated section above). After any
+substantive test or source change, re-verify per `docs/ai/specs/testing/coverage.md`:
 
 - run the scope's coverage agent — `/coverage-core`, `/coverage-must`, `/coverage-guard`, `/coverage-fluent`, `/coverage-annotation`, `/coverage-testing`, `/coverage-all`; or
 - run the script directly:
@@ -104,14 +104,14 @@ criterion 5. Verify per `docs/ai/specs/testing/coverage.md`:
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope <Scope> -SkipHtml -Enforce100
 ```
 
-When a scope comes back green, promote that project's status from SILVER → GOLD.
+If a scope comes back below 100%, demote that project to SILVER here, close the gap
+(`/fix-coverage-<scope>`), then restore GOLD with a new dated verification section.
 
 ## Next Steps
 
-1. **Run coverage analysis** per `coverage.md` to identify remaining gaps
-2. **Promote to GOLD** as each project achieves 100% line+branch coverage
-3. **Increase fixture adoption** in the DataAnnotations project
-4. **Maintain this index** — recompute the tables (per the counting method above) when new test classes are added
+1. **Increase fixture adoption** in the DataAnnotations project (36% — the outstanding gap)
+2. **Maintain this index** — recompute the tables (per the counting method above) and re-date the
+   coverage verification whenever new test classes are added
 
 ## History
 

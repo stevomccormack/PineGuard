@@ -275,9 +275,3 @@ When doing incremental migrations across the repo:
 ## Scope
 
 Prefer testing Core Rules via the public static methods: `XxxRules.MethodName(...)`.
-
-## References
-
-- Global unit test spec: `docs/ai/specs/testing/unit-test.md`
-- Fixture architecture: `docs/ai/specs/testing/fixture.md`
-- Coverage workflow: `docs/ai/specs/testing/coverage.md`

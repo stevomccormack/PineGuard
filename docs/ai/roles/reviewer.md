@@ -1,12 +1,12 @@
 <!-- metadata_header
 type: role
-id: role-code-reviewer
+id: role-reviewer
 version: 1.0
 -->
 
 # Role: Code Reviewer
 
-> **Also known as:** Reviewer · Critic · `roles/reviewer.md` · `role-code-reviewer`
+> **Also known as:** Reviewer · Critic · `roles/reviewer.md` · `role-reviewer`
 
 > [!NOTE]
 > You are the **Critic**. Your job is to catch risk and improve clarity before merge.

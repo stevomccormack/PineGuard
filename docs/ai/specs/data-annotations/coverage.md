@@ -36,8 +36,8 @@ Important:
 
 ## Quick start (DataAnnotations only)
 
-Use the auto-approved workflow:
-`view_file .agent/workflows/coverage-annotation.md`
+Use the auto-approved workflow: `docs/ai/agents/coverage-annotation.md`
+(→ `docs/ai/workflows/coverage.md` with **Scope = DataAnnotations**).
 
 ## Enforce 100% (DataAnnotations only)
 

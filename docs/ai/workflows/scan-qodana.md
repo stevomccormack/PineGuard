@@ -1,4 +1,10 @@
-# Workflow: Run Qodana
+<!-- metadata_header
+type: workflow
+id: workflow-scan-qodana
+version: 1.0
+-->
+
+# Workflow: Scan Qodana
 
 > [!NOTE]
 > Runs JetBrains Qodana locally via the repo wrapper under `tools/code-inspection/qodana/`.

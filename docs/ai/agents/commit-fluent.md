@@ -4,7 +4,7 @@ id: agent-commit-fluent
 version: 1.0
 -->
 
-# Agent: Run Scoped Git Commits (FluentValidation) (tools/git)
+# Agent: Commit FluentValidation
 
 > [!IMPORTANT]
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
@@ -20,5 +20,3 @@ version: 1.0
    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -FluentValidation -DryRun
    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -FluentValidation -AutoMessage
    ```
-
-4. `.vscode/tasks.json` carries equivalent tasks for human runs; an agent must invoke the PowerShell commands above directly.

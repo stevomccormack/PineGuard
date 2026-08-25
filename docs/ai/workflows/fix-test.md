@@ -1,4 +1,10 @@
-# Workflow: Debug and Fix Unit Tests
+<!-- metadata_header
+type: workflow
+id: workflow-fix-test
+version: 1.1
+-->
+
+# Workflow: Fix Test
 
 > [!NOTE]
 > Workflow for resolving unit test failures.
@@ -12,6 +18,12 @@
 ## Parameters
 
 - **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All)
+
+## Auto-Approval
+
+Not auto-approved on any surface — this workflow writes code. The scoped test runs it chains are
+auto-approved, but the repair loop requires explicit user intent.
+See [`../commands/fix.md`](../commands/fix.md).
 
 ## Steps
 

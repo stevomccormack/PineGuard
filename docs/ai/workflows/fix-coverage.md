@@ -1,4 +1,10 @@
-# Workflow: Debug and Fix Coverage
+<!-- metadata_header
+type: workflow
+id: workflow-fix-coverage
+version: 1.1
+-->
+
+# Workflow: Fix Coverage
 
 > [!NOTE]
 > Interactive workflow for closing coverage gaps.
@@ -12,6 +18,12 @@
 ## Parameters
 
 - **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All)
+
+## Auto-Approval
+
+Not auto-approved on any surface — this workflow writes test code. The scoped coverage runs it
+chains are auto-approved, but the remediation loop requires explicit user intent.
+See [`../commands/fix.md`](../commands/fix.md).
 
 ## Steps
 

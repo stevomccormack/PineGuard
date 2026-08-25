@@ -126,11 +126,17 @@ line. The playbook is authoritative: if the two ever disagree, the playbook wins
 - `/commit-solution`: Act as **Shipper**. Execute `docs/ai/agents/commit-solution.md`.
 - `/commit-tool`: Act as **Shipper**. Execute `docs/ai/agents/commit-tool.md`.
 
-### Audit & Scaffold
+### Audit
 
 - `/audit-gap`: Act as **Planner / Verifier**. Execute `docs/ai/agents/audit-gap.md`.
 - `/audit-cli`: Act as **Shipper**. Execute `docs/ai/agents/audit-cli.md`.
+
+### Scaffold
+
 - `/scaffold-vertical-slice`: Act as **Owner**. Execute `docs/ai/agents/scaffold-vertical-slice.md`.
+- Single-layer scaffolds are **Skills, not commands** — see `docs/ai/commands/scaffold.md` for the
+  skill roster (`scaffold-rule`, `scaffold-must`, `scaffold-guard`, `scaffold-fluent`,
+  `scaffold-annotation`, `scaffold-unit-test`, `new-validation`).
 
 ### Council
 

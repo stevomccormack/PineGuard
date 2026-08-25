@@ -534,4 +534,5 @@ The following patterns are **explicitly forbidden** and must never appear in DA 
 ## References
 
 - Global unit test spec: `docs/ai/specs/testing/unit-test.md`
+- Fixture architecture: `docs/ai/specs/testing/fixture.md`
 - Coverage workflow: `docs/ai/specs/testing/coverage.md`

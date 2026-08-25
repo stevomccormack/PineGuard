@@ -41,24 +41,17 @@ with dated, per-file review logs; durable criteria belong here.
 
 ## Fixture Architecture v2 Review Checklist
 
-Spec: `../specs/testing/fixture.md` · Conventions: `../rules/fixture-conventions.md`
+The type hierarchy, record signatures, and conventions live in `../specs/testing/fixture.md`
+(§1, §3, §11) — review against that file, do not review from this list. Drift the reviewer has
+actually caught, in observed frequency order:
 
-- Expected types per layer: `RuleExpected` (Core), `MustExpected` (Must), `GuardExpected` (Guard),
-  `FluentExpected` (Fluent), `DataAnnotationExpected` (DataAnnotations).
-- All implement `IExpectedResult { bool IsValid }`. `MustExpected`/`FluentExpected`/`DataAnnotationExpected`
-  extend `ReturnExpected`; `GuardExpected` extends `ThrowExpected`.
-- `MustExpected(bool IsValid, string? Message = null, string? ParamName = null)` and
-  `FluentExpected(bool IsValid, string? Message = null, string? PropertyName = null)` — assert `IsValid`
-  first, message details only when the case defines them. The case property is `Expected`, never
-  `ExpectedReturn`/`ExpectedSuccess`.
-- `RuleCase<T>` replaces the obsolete `IsCase<T>`/`HasCase<T>`; layer cases are `MustCase<T>`,
-  `GuardCase<T>`, `FluentCase<T>`, `DataAnnotationCase`.
-- Fixtures are `RuleScenario` arrays with named fields; edge-case values reference Rule/Utils constants
-  and are never hardcoded.
-- Every test is `[Theory]` + `TheoryData`/`[MemberData]`; `[Fact]` fails CI Rule50.
-- Tests files are flat (`MethodName_BehavesAsExpected`); TestData files keep their Operation Groups.
-- Single-line entries, zero explanatory comments, camelCase tuple elements matching the exact method
-  parameter names, fixture partials mirroring the source Rules partials.
+- Case property named `ExpectedReturn`/`ExpectedSuccess` instead of `Expected`.
+- New tests using the soft-deprecated `IsCase<T>`/`HasCase<T>` instead of `RuleCase<T>`.
+- Edge-case boundary values hardcoded when a Rule/Utils constant exists (`fixture.md` §9).
+- `[Fact]` sneaking in — fails CI Rule50; every test is `[Theory]` + `TheoryData`/`[MemberData]`.
+- Nested Operation Group classes reappearing in Tests files (only TestData keeps them).
+- Explanatory comments, multi-line scenario entries, or PascalCase tuple elements
+  (`fixture.md` §11).
 
 ## Review Priorities
 
