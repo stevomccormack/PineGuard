@@ -14,7 +14,7 @@
     <!-- 5.x Workspaces.MSBuild pulls a net-framework-only Contracts package (NU1701) — stay on the 4.x family -->
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.14.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.301" />
     <PackageVersion Include="MinVer" Version="7.0.0" />
     <PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
