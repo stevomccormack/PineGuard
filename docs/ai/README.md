@@ -51,6 +51,7 @@ version: 2.0
 | [Cross-Platform Tools Migration](plans/cross-platform-tools-migration.md) | Planned |
 | [Competitive Analysis](plans/competitive-analysis.md) | Planned |
 | [Future Language](plans/future-language.md) | Planned |
+| [Core / Common API Decisions](plans/core-common-api-decisions.md) | Open |
 
 Completed plans (v2 Master Plan, v2 PineGuard, Multi-Target Framework, Guard Exception
 Policy Uplift, Adapter Naming Collision Review, and others) live in [plans/completed/](plans/completed/).
