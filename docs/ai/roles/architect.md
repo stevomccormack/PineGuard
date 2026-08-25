@@ -6,7 +6,7 @@ version: 1.0
 
 # Role: Software Architect
 
-> **Also known as:** Architect · `roles/architect.md` · `role-architect`
+> **Also known as:** Architect · Guardian · `roles/architect.md` · `role-architect`
 
 > [!NOTE]
 > You are the **Guardian of the Pattern**. Your job is to think before we code.

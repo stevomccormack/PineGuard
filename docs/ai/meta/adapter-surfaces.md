@@ -18,8 +18,9 @@ The Brain lives in `docs/ai/`. Everything listed below is an **adapter**: a thin
 that routes a tool's native entry points into the Brain. Adapters carry no logic of their own
 (`docs/ai/specs/protocol.md` Rule #1).
 
-There are **twelve** adapter surfaces and three root boot files. Tiering matters: what counts as
-parity debt differs per tier, and treating a rules-only surface as though it were missing 87
+There are **eleven** adapter surfaces (four full, two skill/hook-only, five rules-only — plus two
+legacy single-file variants) and three root boot files. Tiering matters: what counts as parity
+debt differs per tier, and treating a rules-only surface as though it were missing dozens of
 command files generates directories no tool reads.
 
 ## 1. Root boot files
@@ -57,12 +58,11 @@ command parity; they are checked for skill-name and hook-path resolution.
 
 | Surface | Tool | Shape |
 |---------|------|-------|
-| `.agents/skills/` | Generic `AGENTS.md`-convention tools | 17 `SKILL.md` files mirroring `docs/ai/skills/` |
+| `.agents/skills/` | Generic `AGENTS.md`-convention tools | One `SKILL.md` directory per Brain skill, mirroring `docs/ai/skills/` (the roster lives in [`docs/ai/skills/INDEX.md`](../skills/INDEX.md) — do not maintain a count here) |
 | `.codex/` | OpenAI Codex | `agents/*.toml`, `hooks/*.sh`, `hooks.json`, `config.toml` |
 
-Skill files on these surfaces MUST use the **current** Brain skill names. `.agents/skills/` was
-added carrying pre-rename names (`generate-xml-docs` for what is now `document`); see the rename
-map in `docs/ai/skills/INDEX.md` and keep the two in step.
+Skill files on these surfaces MUST use the **current** Brain skill names — a directory carrying a
+retired verb (taxonomy §N.3) is drift, not a variant.
 
 ## 3. Rules-only adapters
 
@@ -97,7 +97,7 @@ Anything not listed here is parity debt and the audit-cli adapter-parity rule wi
 | Exception | Surfaces | Rationale |
 |-----------|----------|-----------|
 | **Release family** — `github-release-publish`, `github-ruleset-enable`, `github-ruleset-disable`, `nuget-unlist` | Claude Code only | These publish releases, mutate branch protection, and unlist packages from nuget.org — the Tier 0/1 irreversible operations of `docs/ai/specs/safety.md`. They MUST NOT be exposed on surfaces that apply blanket auto-approval. |
-| **Copilot subset** — `.github/prompts/` carries one representative per command family (coverage, test, fix-coverage, format, scan, audit, council) rather than every agent | `.github/` | Copilot prompt files are the least-used entry point; mirroring all 87 agents would multiply the maintenance surface for no gain. The subset is deliberate and its selection rule is stated here. |
+| **Copilot subset** — `.github/prompts/` carries one representative per command family (coverage, test, fix-coverage, format, scan, audit, council) rather than every agent | `.github/` | Copilot prompt files are the least-used entry point; mirroring all 84 agents would multiply the maintenance surface for no gain. The subset is deliberate and its selection rule is stated here. |
 
 Both exceptions are **decisions, not gaps**. A future parity pass must read this table before
 generating missing files.

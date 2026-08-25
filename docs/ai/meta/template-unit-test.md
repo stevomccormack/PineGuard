@@ -39,6 +39,7 @@ spec:
   dependencies:
     - ../dependencies.md
 applies_to:
+  - "src/<Project>/**"
   - "tests/<Project>.UnitTests/**"
 ---
 ```
@@ -54,7 +55,7 @@ Every path must resolve to a file that exists — check it before committing.
     - `TheoryData` + `[Theory]` + `[MemberData]` parameterization.
     - Nested Operation Group pattern (§4–5).
     - Element ordering: datasets first, records last (§4.4).
-    - Method naming: `Valid_BehavesAsExpected`, `ValidAndEdge_BehavesAsExpected`, `ValidEdgeAndInvalid_BehavesAsExpected`, `Invalid_ThrowsAsExpected` (§5.1).
+    - Method naming: `<MemberUnderTest>_BehavesAsExpected` — e.g. `IsCsvLine_BehavesAsExpected` (§5.1).
     - Full canonical examples in §8.
     - Fixtures conventions (§9).
 

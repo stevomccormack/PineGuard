@@ -35,8 +35,8 @@ Important:
 
 ## Quick start (Core only)
 
-Use the auto-approved workflow:
-`view_file .agent/workflows/coverage-core.md`
+Use the auto-approved workflow: `docs/ai/agents/coverage-core.md`
+(→ `docs/ai/workflows/coverage.md` with **Scope = Core**).
 
 ## Enforce 100% (Core only)
 

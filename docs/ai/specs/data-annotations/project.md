@@ -1,4 +1,4 @@
-﻿---
+---
 spec:
   id: pineguard.ai.data-annotations.project-spec
   title: "PineGuard.DataAnnotations Project Spec"
@@ -19,15 +19,9 @@ applies_to:
 
 Define **project-specific** rules for the `PineGuard.DataAnnotations` integration.
 
-This integration must keep PineGuard’s layering intact. PineGuard layers in one direction — each layer calls only the one before it:
-
-- **Core** (`Rules`/`Utils`) owns validation logic and parsing.
-- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
-- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
-- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
-- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
-
-Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none reimplements Core logic.
+This integration must keep PineGuard’s layering intact. The one-directional pipeline is
+canonical in `../project.md` §1.1. This adapter calls MustClauses only — never Core directly,
+never a sibling adapter, and never reimplemented logic.
 
 ## Scope
 
@@ -120,7 +114,7 @@ DataAnnotations follows the standard "skip on null" behavior:
 
 This is intentionally different from Must/Guard behavior:
 
-- MustClauses follow Rule07 (see `docs/ai/specs/tools/audit-cli/spec.md` and `tools/audit-cli/rules/Test-Rule07-Nullability.ps1`) — the hybrid nullability strategy: inputs may be declared nullable (especially reference types), but **null is invalid by default** unless the method name explicitly encodes null as acceptable (e.g., `NullOrXxx`).
+- MustClauses follow the Rule07 hybrid nullability strategy — **null is invalid by default** unless the method name encodes it (e.g., `NullOrXxx`). Canonical statement: `../must-clauses/project.md` §Nullability.
 - The adapter layer is responsible for DataAnnotations UX: null handling is controlled by `[Required]` / `allowNull`, not by failing on null inside PineGuard validation attributes.
 
 Implementation rule:

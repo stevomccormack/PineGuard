@@ -86,9 +86,12 @@ Audit parity MUST be evaluated primarily at the **public API concept** level.
 
 Clarifications:
 
-- GuardClauses and MustClauses are expected to use internal domain folders + a public facade aggregator.
+- GuardClauses and MustClauses keep their clause files flat at the project root
+  (`MustXxxClauses.cs` / `GuardXxxClauses.cs`) — see `must-clauses/project.md` and
+  `guard-clauses/project.md`; a domain folder is optional and currently unused.
 - FluentValidation and DataAnnotations are adapter surfaces and may **aggregate** by integration shape:
-  - FluentValidation: extension classes under `src/PineGuard.FluentValidation/Extensions/**`.
+  - FluentValidation: `Fluent{Domain}Extensions.cs` classes at the project root
+    (`fluent-validation/project.md` §4.1).
   - DataAnnotations: domain-aggregated files at the project root.
 
 Therefore, audits must not treat the absence of domain folders inside adapter projects as a parity failure.

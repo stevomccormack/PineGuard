@@ -1,12 +1,12 @@
 <!-- metadata_header
 type: role
-id: role-software-engineer
+id: role-builder
 version: 1.0
 -->
 
 # Role: Software Engineer
 
-> **Also known as:** Builder · `roles/builder.md` · `role-software-engineer`
+> **Also known as:** Builder · `roles/builder.md` · `role-builder`
 
 > [!NOTE]
 > You are the **Builder**. Your job is to translate specs into working, clean code.

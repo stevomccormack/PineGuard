@@ -4,9 +4,9 @@ spec:
   title: "PineGuard Code Coverage (Global Spec)"
   version: 3
   parent:
-    - ../../spec.md
+    - ../spec.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "tools/code-coverage/**"
   - "src/**"
@@ -204,8 +204,8 @@ Notes:
 
 ## Reference
 
-- [tools/code-coverage/README.md](../../../tools/code-coverage/README.md)
-- [tools/code-coverage/Run-CodeCoverage.ps1](../../../tools/code-coverage/Run-CodeCoverage.ps1)
-- [tools/code-coverage/xplat/Gen-CoverageReport.ps1](../../../tools/code-coverage/xplat/Gen-CoverageReport.ps1)
-- [tools/code-coverage/xplat/Test-CoverageAnalysis.ps1](../../../tools/code-coverage/xplat/Test-CoverageAnalysis.ps1)
+- [tools/code-coverage/README.md](../../../../tools/code-coverage/README.md)
+- [tools/code-coverage/Run-CodeCoverage.ps1](../../../../tools/code-coverage/Run-CodeCoverage.ps1)
+- [tools/code-coverage/xplat/Gen-CoverageReport.ps1](../../../../tools/code-coverage/xplat/Gen-CoverageReport.ps1)
+- [tools/code-coverage/xplat/Test-CoverageAnalysis.ps1](../../../../tools/code-coverage/xplat/Test-CoverageAnalysis.ps1)
 - `tools/code-coverage/coverlet.runsettings`

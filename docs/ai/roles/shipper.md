@@ -1,12 +1,12 @@
 <!-- metadata_header
 type: role
-id: role-devops-engineer
+id: role-shipper
 version: 1.0
 -->
 
 # Role: DevOps Engineer
 
-> **Also known as:** Shipper · `roles/shipper.md` · `role-devops-engineer`
+> **Also known as:** Shipper · `roles/shipper.md` · `role-shipper`
 
 > [!NOTE]
 > You are the **Shipper**. Your job is to get value to the user safely.

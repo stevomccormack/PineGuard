@@ -1,4 +1,4 @@
-﻿---
+---
 spec:
   id: pineguard.ai.specs.project-spec
   title: "Base Project Spec (Production Code)"
@@ -14,7 +14,7 @@ applies_to:
 # Base Project Spec (Production Code)
 
 This is the **base specification** for all PineGuard production code projects (`src/PineGuard.*`).
-Specific project specs (e.g., `src/core/project.md`) inherit from this file.
+Specific project specs (e.g., `docs/ai/specs/core/project.md`) inherit from this file.
 
 ## Inheritance Structure
 
@@ -28,12 +28,21 @@ Specific project specs (e.g., `src/core/project.md`) inherit from this file.
 
 All production projects MUST follow the Master Checklist defined in **`docs/ai/specs/spec.md` §3**.
 
-Summary of layering (strict):
-1.  **Utils** (`PineGuard.Core.Utils`): Parsing/normalization. No throwing.
-2.  **Rules** (`PineGuard.Core.Rules`): Pure predicates. No throwing.
-3.  **MustClauses** (`PineGuard.MustClauses`): Canonical messages. Returns `MustResult`.
-4.  **GuardClauses** (`PineGuard.GuardClauses`): Throws via MustClauses.
-5.  **Integrations**: Adapters (FluentValidation/DataAnnotations).
+### 1.1 Layer pipeline (canonical)
+
+PineGuard layers in one direction — each layer calls only the one before it:
+
+- **Core** (`Rules`/`Utils`) owns validation logic and parsing. Utils parse/normalize, Rules are pure predicates — neither throws.
+- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
+- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
+- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
+- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
+
+Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none
+reimplements Core logic. Do not duplicate parsing/validation logic across layers.
+
+This section is the **single canonical statement** of the pipeline (`spec.md` §9 — commonality
+extraction). Child project specs reference it rather than restating the bullets.
 
 ---
 

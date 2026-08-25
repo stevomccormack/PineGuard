@@ -42,7 +42,9 @@ Refresh checklist (non-negotiable to avoid summarising and losing context regula
 - `docs/ai/plans/` — the active roadmap for the work in flight
 - `.claude/agent-memory/` — patterns and corrections learned in earlier sessions
 
-3. Load the local spec for the area you’re editing:
+3. Load the local spec for the area you’re editing (`<area>` is one of `core`, `must-clauses`,
+   `guard-clauses`, `fluent-validation`, `data-annotations`, `testing` — the scope-id →
+   directory map is `spec.md` §11.2):
 
 - `docs/ai/specs/<area>/project.md`
 - `docs/ai/specs/<area>/unit-test.md` (if adding/changing tests)
@@ -102,7 +104,7 @@ Use these annotations ONLY when you are confident the commands are safe or when 
 
 To re-run a specific, ad-hoc command (like `dotnet test` with a filter) without rebuilding the invocation each time, use the workflow that already exists rather than authoring a new playbook:
 
-- Workflow: [`docs/ai/workflows/custom.md`](../workflows/custom.md)
+- Workflow: [`docs/ai/workflows/test-last.md`](../workflows/test-last.md)
 - Script: `tools/code-inspection/auto/Run-Last.ps1`
 
 Parameterise the run through the script's `-Project` / `-Filter` parameters. Do not inline ad-hoc command scripts into an adapter workflow — that is logic in an adapter, which `docs/ai/specs/protocol.md` Rule #1 forbids.

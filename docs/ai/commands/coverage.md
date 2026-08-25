@@ -1,9 +1,15 @@
+<!-- metadata_header
+type: command
+id: cmd-coverage
+version: 1.0
+-->
+
 # Command: Coverage
 
 > [!NOTE]
 > **Interface Definition**: This file defines the explicit triggers and contracts for Code Coverage operations.
 
-## 1. Triggers (Slash Commands)
+## Intent Mapping
 
 Map these to your Agent's slash command palette:
 
@@ -23,12 +29,12 @@ Every `Scope` value above is a first-class member of the `-Scope` ValidateSet in
 These commands **measure** coverage. The `/fix-coverage-*` family that closes the gaps they report is
 contracted in [`fix.md`](fix.md) — it writes code and is never auto-approved.
 
-## 2. Execution Logic
+## Execution
 
 **Agent entrypoint**: `docs/ai/agents/coverage-[scope].md` (or `docs/ai/agents/coverage-all.md`)
 **Notes**: the agent may call shared orchestration in `docs/ai/workflows/coverage.md`.
 
-## 3. Auto-Approval Rules
+## Auto-Approval
 
 - **Claude Code**: implicitly allowed via project context.
 - **Antigravity**: `// turbo-all` active in the adapter stub `.agent/workflows/coverage-[scope].md`.

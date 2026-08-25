@@ -1,9 +1,15 @@
-# Command: Tests
+<!-- metadata_header
+type: command
+id: cmd-test
+version: 1.0
+-->
+
+# Command: Test
 
 > [!NOTE]
 > **Interface Definition**: This file defines the explicit triggers and contracts for Unit Test execution.
 
-## 1. Triggers (Slash Commands)
+## Intent Mapping
 
 Map these to your Agent's slash command palette:
 
@@ -23,12 +29,12 @@ project; its own tests live in `tests/PineGuard.Testing.UnitTests/` and are run 
 These commands **run** the tests. The `/fix-test-*` family that diagnoses and repairs the failures
 they report is contracted in [`fix.md`](fix.md) — it writes code and is never auto-approved.
 
-## 2. Execution Logic
+## Execution
 
 **Agent entrypoint**: `docs/ai/agents/test-[scope].md` (or `docs/ai/agents/test-all.md`)
 **Notes**: the agent may call shared orchestration in `docs/ai/workflows/test.md`.
 
-## 3. Auto-Approval Rules
+## Auto-Approval
 
 - **Claude Code**: implicitly allowed via project context.
 - **Antigravity**: `// turbo-all` active in the adapter stub `.agent/workflows/test-[scope].md`.

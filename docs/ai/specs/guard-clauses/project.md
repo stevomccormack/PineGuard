@@ -1,4 +1,4 @@
-﻿---
+---
 spec:
   id: pineguard.ai.guard-clauses.project-spec
   title: "PineGuard.GuardClauses Project Spec"
@@ -66,15 +66,9 @@ Semantics:
 
 ### 1.1 Relationship to MustClauses (analogous by design)
 
-PineGuard layers in one direction — each layer calls only the one before it:
-
-- **Core** (`Rules`/`Utils`) owns validation logic and parsing.
-- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
-- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
-- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
-- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
-
-Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none reimplements Core logic.
+The one-directional layer pipeline is canonical in `../project.md` §1.1. Guard's place in it:
+call MustClauses and throw using `MustResult.Message` — never Core directly, never a sibling
+adapter, and never reimplemented logic.
 
 Must and Guard are two fluent validation surfaces that intentionally share implementation:
 
@@ -157,7 +151,7 @@ Folder conventions (strict):
 
 ## Analyzer / ReSharper requirements (required)
 
-See `docs/ai/specs/spec.md` (section “Analyzer / ReSharper requirements (global)”).
+See `docs/ai/specs/spec.md` §10 “Coding Standards & Analyzer Rules (Global)”.
 
 ---
 
@@ -510,7 +504,10 @@ Rules:
 
 ### 6.0 Nullability
 
-GuardClauses follow Rule07 (see `docs/ai/specs/tools/audit-cli/spec.md` and `tools/audit-cli/rules/Test-Rule07-Nullability.ps1`) — the hybrid nullability strategy: use nullable reference inputs for ergonomic call sites and correct exception typing, but treat null as invalid unless the method name explicitly encodes null as acceptable.
+GuardClauses follow the Rule07 hybrid nullability strategy (canonical statement:
+`../must-clauses/project.md` §Nullability; enforced by `tools/audit-cli/rules/Test-Rule07-Nullability.ps1`):
+use nullable reference inputs for ergonomic call sites and correct exception typing, but treat null
+as invalid unless the method name explicitly encodes null as acceptable.
 
 Rules:
 

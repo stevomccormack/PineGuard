@@ -14,4 +14,3 @@ version: 1.0
 
 1. Read the master workflow at `docs/ai/workflows/scan-qodana.md`.
 2. Execute it with parameter **Scope = Testing**.
-

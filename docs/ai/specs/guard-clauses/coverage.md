@@ -35,8 +35,8 @@ Important:
 
 ## Quick start (GuardClauses only)
 
-Use the auto-approved workflow:
-`view_file .agent/workflows/coverage-guard.md`
+Use the auto-approved workflow: `docs/ai/agents/coverage-guard.md`
+(→ `docs/ai/workflows/coverage.md` with **Scope = GuardClauses**).
 
 ## Enforce 100% (GuardClauses only)
 

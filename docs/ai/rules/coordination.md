@@ -1,6 +1,6 @@
-> Inherits from: `docs/ai/rules/global.md`
-
 # Coordination Rules
+
+> Inherits from: `docs/ai/rules/global.md` (read first)
 
 These rules prevent collisions when multiple agent sessions run simultaneously
 (Claude Desktop, VS, JetBrains, Terminal, Antigravity, Copilot, Pi, Cline, or parallel subagents).

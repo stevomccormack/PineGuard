@@ -16,8 +16,8 @@ version: 1.1
 - **Reusable procedures**: `docs/ai/skills/**` and `docs/ai/workflows/**`
 - **Canonical entrypoints**: `docs/ai/agents/**`
 - **Interface contracts**: `docs/ai/commands/**`
-- **Adapters** (thin pointers): every surface is inventoried in `docs/ai/meta/adapter-surfaces.md` —
-  ten adapter surfaces plus three root boot files. Never maintain a second list here.
+- **Adapters** (thin pointers): every surface is inventoried in `docs/ai/meta/adapter-surfaces.md`,
+  which owns the count and the tiering. Never maintain a second list here.
 
 ## GitHub-First Operating Model
 
@@ -110,10 +110,12 @@ Use automated gates that fit enterprise expectations:
 - Test shape: `tools/audit-cli/Run-All.ps1 -RuleId Rule50` gates every PR — `[Theory]` + `TheoryData`
   only, and every `*Tests.cs` file must have a paired `*TestData.cs` file. See
   `docs/ai/specs/tools/audit-cli/spec.md` and `docs/ai/specs/testing/unit-test.md` §1.
-- Coverage: Cobertura output from either supported engine — the cross-platform collector (`xplat`)
-  or JetBrains dotCover 2025.3.3. Both work on `net8.0` and `net10.0`; CI enforces the
+- Coverage: Cobertura output via the cross-platform collector (`xplat`) — the engine every repo
+  run uses; JetBrains dotCover 2025.3.3 also works on `net8.0`/`net10.0` from the IDE, but the
+  repo ships no dotCover wrapper under `tools/code-coverage/`. CI enforces the
   `MIN_CODE_COVERAGE` threshold (default 100%).
-- Inspection: JetBrains Qodana (static analysis) integrated into CI
+- Inspection: JetBrains Qodana (static analysis) — available in CI behind the
+  `QODANA_ENABLED` repository variable (opt-in, not always-on)
 - Auditing: repo audit CLI/tasks as defined in `tools/` and referenced by workflow docs
 
 ## Adding a New Capability (Best Practice)

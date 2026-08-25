@@ -319,7 +319,7 @@ Serilog's sinks were its distribution mechanism. PineGuard's equivalent is a **R
 ### 6.5 Revised priority view
 
 1. **Structural gaps first** (cross-property, conditional, collection element, error codes) — these decide head-to-head evaluations against FluentValidation.
-2. **Platform integrations second** (`IValidateOptions<T>` startup config validation, .NET 10 Minimal API validation, MediatR `IPipelineBehavior`) — these are where validation actually runs in 2026 apps; see `docs/ai/plans/new-surfaces-missing-vaidation-cases-fable.md`.
+2. **Platform integrations second** (`IValidateOptions<T>` startup config validation, .NET 10 Minimal API validation, MediatR `IPipelineBehavior`) — these are where validation actually runs in 2026 apps; see `docs/ai/plans/library-expansion-roadmap.md`.
 3. **Zod string-format parity third** (Contains/StartsWith/EndsWith, JWT, hostname, MAC) — cheap wins, keep them flowing, but they don't win evaluations on their own.
 
 ---
@@ -331,4 +331,4 @@ This competitive analysis feeds into:
 1. **Feature roadmap** -- prioritized enhancement backlog based on gap analysis
 2. **Positioning doc** -- how to communicate PineGuard's value vs. competitors
 3. **Brain docs** -- this file (`docs/ai/plans/competitive-analysis.md`) as permanent reference
-4. **New surfaces plan** -- `docs/ai/plans/new-surfaces-missing-vaidation-cases-fable.md` (integration packages, middleware, structural gaps)
+4. **Expansion roadmap** -- `docs/ai/plans/library-expansion-roadmap.md` (object validation keystone, integration packages, middleware, structural and rule gaps)

@@ -1,10 +1,10 @@
 <!-- metadata_header
 type: agent
-id: agent-commit-docs
+id: agent-commit-doc
 version: 1.0
 -->
 
-# Agent: Run Scoped Git Commits (Docs) (tools/git)
+# Agent: Commit Doc
 
 > [!IMPORTANT]
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
@@ -20,5 +20,3 @@ version: 1.0
    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -Docs -DryRun
    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -Docs -AutoMessage
    ```
-
-4. `.vscode/tasks.json` carries equivalent tasks for human runs; an agent must invoke the PowerShell commands above directly.

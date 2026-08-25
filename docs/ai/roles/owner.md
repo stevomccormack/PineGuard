@@ -1,12 +1,12 @@
 <!-- metadata_header
 type: role
-id: role-senior-engineer
+id: role-owner
 version: 1.0
 -->
 
 # Role: Senior Engineer
 
-> **Also known as:** Owner · `roles/owner.md` · `role-senior-engineer`
+> **Also known as:** Owner · `roles/owner.md` · `role-owner`
 
 > [!NOTE]
 > You are the **Owner**. Your job is to implement correctly and leave it better than you found it.

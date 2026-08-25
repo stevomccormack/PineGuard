@@ -1,4 +1,10 @@
-# Workflow: Run Audit CLI
+<!-- metadata_header
+type: workflow
+id: workflow-audit
+version: 1.0
+-->
+
+# Workflow: Audit
 
 > [!NOTE]
 > Runs PineGuard's repo audits via the PowerShell wrappers under `tools/audit-cli/`.

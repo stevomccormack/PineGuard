@@ -105,8 +105,8 @@ Make PineGuard’s AI documentation:
 - **Where**: `docs/ai/plans/*.md` while live; `docs/ai/plans/completed/*.md` once shipped.
 - **Used by**: Humans and agents scoping multi-step work.
 - **Rule**: Every plan carries a `metadata_header` with `type: plan`, a stable `id:`, and a
-  `status:` of `active`, `planned`, `living`, `non-binding` or `completed`. A plan filed under
-  `plans/completed/` is always `completed`.
+  `status:` of `active`, `planned`, `living`, `non-binding`, `open` (decisions awaiting an
+  owner's call) or `completed`. A plan filed under `plans/completed/` is always `completed`.
 - **Rule**: Everything under `plans/completed/` is a **historical record** — read it for
   provenance, never as a task list. When an archived plan has become misleading, add an archival
   banner saying what actually shipped; do not rewrite it and do not repair its links.
@@ -238,8 +238,16 @@ When a filename targets a tool, use the tool's canonical short name:
 3. **Target nouns**: Always singular — `artifact`, `log`, `gap`, `rule`, `test`, `standard`, `tool`, `workflow`.
 4. **Qualifiers**: Always singular — `blocker`, not `blockers`.
 5. **Only exception**: `all` (refers to a collection by design).
+6. **Plans are exempt**: a plan's `{topic}` names a subject, not an action, and may be naturally
+   plural (`…-decisions.md`, `…-cases.md`). The no-plural rule binds action files and identity
+   nouns, not plan topics.
 
 **Never pluralise in filenames**: ~~tests~~, ~~clauses~~, ~~annotations~~, ~~issues~~, ~~diagnostics~~, ~~docs~~, ~~commits~~, ~~libraries~~, ~~conventions~~.
+
+Two grandfathered exceptions exist in `rules/`: `fixture-conventions.md` (plural, topic-named)
+and `coordination.md` (topic-named). Both are bound by path-scoped adapters on every surface, so
+renaming them costs more than the inconsistency; do not add further topic-named rule files —
+fold new rules into the owning scope file instead.
 
 ### §N.6 Per-Directory Conventions
 
@@ -260,9 +268,10 @@ Examples are repo-relative so they resolve from anywhere.
 | `business-units/` | `{noun}.md` | No | `docs/ai/business-units/engineering.md` |
 
 Metadata convention for `meta/`: narrative meta documents (`taxonomy.md`, `tooling.md`,
-`adapter-surfaces.md`, `template-spec.md`) carry a `metadata_header` and a `last_verified` footer;
-the `template-*.md` spec templates carry YAML `spec:` front matter with `version` and
-`last_verified`. Use whichever form the document it governs uses.
+`template-agent.md`, `template-spec.md`) carry a `metadata_header` and a `last_verified` footer;
+`adapter-surfaces.md` carries YAML front matter with `last_verified`; the `template-*.md` spec
+templates carry YAML `spec:` front matter with `version` and `last_verified`. Use whichever form
+the document it governs uses.
 
 ### §N.7 Scan Tool Qualifier Convention
 

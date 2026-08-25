@@ -1,6 +1,14 @@
-# Plan: New Surfaces & Missing Validation Cases (Fable)
+<!-- metadata_header
+type: plan
+id: new-surfaces-missing-validation-cases
+version: 1.0
+status: planned
+last_updated: 2026-08-25
+-->
 
-> **Status**: Proposed | **Author**: Fable intelligence pass | **Created**: 2026-08-20
+# Plan: New Surfaces & Missing Validation Cases
+
+> **Status**: Planned | **Author**: Fable intelligence pass | **Created**: 2026-08-20
 >
 > Companion documents: `competitive-analysis.md` (Section 6), `future-language.md` (Section 7).
 >

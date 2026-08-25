@@ -1,4 +1,10 @@
-# Workflow: Rebuild All Libraries
+<!-- metadata_header
+type: workflow
+id: workflow-build-all
+version: 1.0
+-->
+
+# Workflow: Build All
 
 > [!NOTE]
 > Full, non-incremental rebuild of every PineGuard library and test project. Use it after a

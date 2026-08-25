@@ -33,11 +33,11 @@ Spawn **all five** sub-agents in a **single message** (so they run concurrently)
 
 | Sub-agent name | Project | Agent playbook |
 |:---|:---|:---|
-| `xml-docs-core` | PineGuard.Core | `docs/ai/agents/document-core.md` |
-| `xml-docs-must` | PineGuard.MustClauses | `docs/ai/agents/document-must.md` |
-| `xml-docs-guard` | PineGuard.GuardClauses | `docs/ai/agents/document-guard.md` |
-| `xml-docs-fluent` | PineGuard.FluentValidation | `docs/ai/agents/document-fluent.md` |
-| `xml-docs-da` | PineGuard.DataAnnotations | `docs/ai/agents/document-annotation.md` |
+| `document-core` | PineGuard.Core | `docs/ai/agents/document-core.md` |
+| `document-must` | PineGuard.MustClauses | `docs/ai/agents/document-must.md` |
+| `document-guard` | PineGuard.GuardClauses | `docs/ai/agents/document-guard.md` |
+| `document-fluent` | PineGuard.FluentValidation | `docs/ai/agents/document-fluent.md` |
+| `document-annotation` | PineGuard.DataAnnotations | `docs/ai/agents/document-annotation.md` |
 
 **Sub-agent prompt template** (use `subagent_type: general-purpose`):
 

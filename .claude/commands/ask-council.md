@@ -1,1 +1,1 @@
-Act as **Architect**. Read and execute `docs/ai/agents/ask-council.md`.
+Act as **Architect / Council**. Read and execute `docs/ai/agents/ask-council.md`.

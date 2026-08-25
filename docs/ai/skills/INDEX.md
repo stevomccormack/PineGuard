@@ -72,6 +72,8 @@ Thin `context: fork` wrappers that delegate to Brain skills or standalone toolin
 | [scan-sonar](../../../.claude/skills/scan-sonar/SKILL.md) | `scan-sonar` | SonarQube analysis |
 | [fix-sonar](../../../.claude/skills/fix-sonar/SKILL.md) | `fix-sonar` | SonarQube issue fixes |
 | [document](../../../.claude/skills/document/SKILL.md) | `document` | XML documentation generation |
+| [scaffold-workflow](../../../.claude/skills/scaffold-workflow/SKILL.md) | `scaffold-workflow` | New agent playbook + adapter cascade |
+| [scaffold-quality-tool](../../../.claude/skills/scaffold-quality-tool/SKILL.md) | `scaffold-quality-tool` | New quality/inspection tool scaffold |
 | [changelog](../../../.claude/skills/changelog/SKILL.md) | *(standalone)* | Generate changelog from git history |
 | [dependency-audit](../../../.claude/skills/dependency-audit/SKILL.md) | *(standalone)* | Check NuGet vulnerabilities and outdated packages |
 | [ask-council](../../../.claude/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |

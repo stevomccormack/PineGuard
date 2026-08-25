@@ -1,10 +1,16 @@
+<!-- metadata_header
+type: command
+id: cmd-fix
+version: 1.0
+-->
+
 # Command: Fix
 
 > [!NOTE]
 > **Interface Definition**: These commands change code. None of them is auto-approved — each runs an
 > analyse/repair/re-verify loop that requires AI judgement.
 
-## 1. Triggers (Slash Commands)
+## Intent Mapping
 
 Map these to your Agent's slash command palette:
 
@@ -45,7 +51,13 @@ Map these to your Agent's slash command palette:
 
 Findings are always fixed at the root cause — suppressing a diagnostic is not a fix.
 
-## 2. Execution Logic
+> [!NOTE]
+> The Sonar family is deliberately **severity-scoped** rather than project-scoped: SonarQube
+> analyses the whole solution (see [`scan.md`](scan.md)), and its issue API filters by severity,
+> so remediation batches follow the same axis. The Roslyn and coverage families are
+> project-scoped because their tooling is.
+
+## Execution
 
 | Family | Agent entrypoint | Shared orchestration |
 |--------|------------------|----------------------|
@@ -57,7 +69,7 @@ Findings are always fixed at the root cause — suppressing a diagnostic is not 
 Run the matching read-only command first — [`coverage.md`](coverage.md), [`test.md`](test.md) or
 [`scan.md`](scan.md) — so the fix loop starts from a current report.
 
-## 3. Auto-Approval Rules
+## Auto-Approval
 
 - These workflows are **interactive**. The sub-commands they invoke (`dotnet test`, the coverage and
   scan scripts) may be auto-approved, but the repair loop itself requires explicit user intent.

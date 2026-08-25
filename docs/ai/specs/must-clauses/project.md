@@ -1,4 +1,4 @@
-﻿---
+---
 spec:
   id: pineguard.ai.must-clauses.project-spec
   title: "PineGuard.MustClauses Project Spec"
@@ -34,15 +34,9 @@ See `docs/ai/specs/spec.md` §3 ("Feature Implementation Checklist (Master)").
 
 ## Layer pipeline
 
-PineGuard layers in one direction — each layer calls only the one before it:
-
-- **Core** (`Rules`/`Utils`) owns validation logic and parsing.
-- **MustClauses** call Core and own the canonical, user-facing messages (`MustResult<T>`).
-- **GuardClauses** call MustClauses and throw using `MustResult.Message`.
-- **FluentValidation** adapts MustClauses into `IRuleBuilder` extensions.
-- **DataAnnotations** adapts MustClauses into `ValidationAttribute`s.
-
-Guard, Fluent and DataAnnotations are sibling adapters over Must — none calls another, and none reimplements Core logic.
+The one-directional layer pipeline is canonical in `../project.md` §1.1. Must's place in it:
+call Core, own the canonical user-facing messages (`MustResult<T>`); Guard, Fluent and
+DataAnnotations sit above as sibling adapters over Must.
 
 ---
 

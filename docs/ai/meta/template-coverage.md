@@ -39,6 +39,7 @@ spec:
   dependencies:
     - ../dependencies.md
 applies_to:
+  - "src/<Project>/**"
   - "tests/<Project>.UnitTests/**"
 ---
 ```

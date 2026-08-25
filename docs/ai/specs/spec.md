@@ -1,11 +1,18 @@
-﻿# PineGuard AI Root Spec (Cascading)
+---
+spec:
+  id: pineguard.ai.spec
+  title: "PineGuard AI Root Spec (Cascading)"
+  version: 1
+  dependencies:
+    - dependencies.md
+applies_to:
+  - "docs/ai/specs/**"
+---
 
-This is the **root specification** for every AI generation spec under `docs/ai/**`.
+# PineGuard AI Root Spec (Cascading)
 
-It is global to both:
-
-- `docs/ai/specs/**` (production code generation specs), and
-- `docs/ai/specs/testing/**` (testing + coverage specs).
+This is the **root specification** for every AI generation spec under `docs/ai/**` — the
+production code generation specs and the testing + coverage specs alike.
 
 Read this first. Child specs assume these defaults and only describe what’s _different_ for their domain.
 
@@ -84,10 +91,15 @@ Notes:
 
 - `parent` is a list to support multiple inheritance if ever needed.
 - Child specs should add `applies_to` so it’s obvious what code the spec governs.
-- For `docs/ai/specs/**` specs, `spec.template` is required and should point at one of:
+- `spec.template` is required for the **per-project spec families** (`<domain>/project.md`,
+  `<domain>/unit-test.md`, `<domain>/coverage.md`) and should point at the matching template:
   - `docs/ai/meta/template-project.md`
   - `docs/ai/meta/template-unit-test.md`
   - `docs/ai/meta/template-coverage.md`
+
+  Root and process specs (this file, `protocol.md`, `orchestration.md`, `dependencies.md`,
+  `safety.md`, `coding-standard.md`, `council.md`, and the `language/`, `scan/`, `tools/`
+  specs) have no template and omit the field.
 - All header paths are relative to the spec's own location, so the depth varies: `../meta/…` and `parent: spec.md` for a spec directly under `docs/ai/specs/`, `../../meta/…` and `parent: ../spec.md` one directory deeper, and so on.
 
 Recommended extended header:
@@ -199,7 +211,7 @@ Logging / Temporary Files (required):
 
 Context Maintenance (required):
 
-- **Rehydrate context continuously:** When summarising progress or starting a new deep-dive, explicitly re-read `docs/ai/specs/spec.md` and `docs/ai/specs/orchestration.md` to prevent "concept drift" over long conversations.
+- **Rehydrate context continuously:** When summarising progress or starting a new deep-dive, run the "Context refresh" checklist in `docs/ai/specs/orchestration.md` — that file owns the procedure; this bullet only mandates that you do it.
 - Do not rely solely on your own generated summaries; refer back to source-of-truth specs.
 
 Verification defaults (choose the tightest checks that prove your change):
@@ -229,7 +241,11 @@ All generated C# code must follow these conventions:
 - **Naming**:
   - **Parameters**: Validated input parameter must be named `value` (not `input`).
   - **Tests**: Use strict **AAA** (Arrange, Act, Assert) pattern.
-  - **Test Data**: Organize into Valid/Edge/Invalid cases.
+  - **Test Data**: Follow the per-layer dataset model in `docs/ai/specs/testing/unit-test.md` §4.1
+    (the dataset split differs by layer — do not assume a Valid/Edge/Invalid split).
+
+Analyzer-level rules (ReSharper/SonarQube optimisations, nullability, suppression policy) live in
+[`coding-standard.md`](./coding-standard.md) — see §10.
 
 ---
 
@@ -456,12 +472,38 @@ All code must be clean, engineering-focused, and **warning-free**.
 
 ### 11.1 Directory Structure
 
+Root files: `spec.md` (this file), `protocol.md`, `orchestration.md`, `dependencies.md`,
+`safety.md`, `coding-standard.md`, `council.md`, `project.md` (base project spec).
+
+Per-project spec directories (each carries `project.md`, `unit-test.md`, `coverage.md`):
+
 - `docs/ai/specs/core/`
 - `docs/ai/specs/must-clauses/`
 - `docs/ai/specs/guard-clauses/`
 - `docs/ai/specs/data-annotations/`
 - `docs/ai/specs/fluent-validation/`
-- `docs/ai/specs/testing/` (test/cov guidance, helpers, and shared patterns)
+- `docs/ai/specs/testing/` (plus `fixture.md` and the `gold-standard.md` status index)
+
+Other directories:
+
+- `docs/ai/specs/language/` — vocabulary and naming-collision specs
+- `docs/ai/specs/scan/` — SonarQube scan spec
+- `docs/ai/specs/tools/` — tool specs (`audit-cli/`, `code-diagnostics/`, `code-inspection/`)
+
+### 11.2 Scope identifier → spec directory map
+
+Filenames elsewhere in the Brain use the short scope identifiers from
+`docs/ai/meta/taxonomy.md` §N.4; the spec directories predate that convention and keep their
+long names. Translate with this table (the only two that coincide are `core` and `testing`):
+
+| Scope id | Spec directory |
+|----------|----------------|
+| `core` | `docs/ai/specs/core/` |
+| `must` | `docs/ai/specs/must-clauses/` |
+| `guard` | `docs/ai/specs/guard-clauses/` |
+| `fluent` | `docs/ai/specs/fluent-validation/` |
+| `annotation` | `docs/ai/specs/data-annotations/` |
+| `testing` | `docs/ai/specs/testing/` |
 
 ---
 

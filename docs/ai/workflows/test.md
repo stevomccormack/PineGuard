@@ -1,4 +1,10 @@
-# Workflow: Run Unit Tests
+<!-- metadata_header
+type: workflow
+id: workflow-test
+version: 1.0
+-->
+
+# Workflow: Test
 
 > [!NOTE]
 > Standard workflow for executing unit tests without coverage analysis.

@@ -1,12 +1,12 @@
-﻿---
+---
 spec:
   id: pineguard.ai.specs.testing.unit-tests
   title: "PineGuard Unit Tests (Global Spec)"
   version: 11
   parent:
-    - ../../spec.md
+    - ../spec.md
   dependencies:
-    - ../../dependencies.md
+    - ../dependencies.md
 applies_to:
   - "tests/**"
   - "src/**" # when adding test-focused hooks/visibility helpers
@@ -60,7 +60,10 @@ Related specs in this folder:
 
 - **`UseCulture(...)`**: Use only if explicitly testing culture-specific behavior.
 - **Additional helpers**: `UseEnvironmentVariable(key, value)`, `CreateDeterministicRandom(seed)`, `CreateCancelledToken()`.
-- **Layer-specific addenda**: Each layer has its own spec addendum that overrides patterns here. See `docs/ai/specs/{layer}/unit-test.md`.
+- **Layer-specific addenda**: Each layer has its own spec addendum that overrides patterns here —
+  `core/unit-test.md`, `must-clauses/unit-test.md`, `guard-clauses/unit-test.md`,
+  `fluent-validation/unit-test.md`, `data-annotations/unit-test.md` (scope-id → directory map:
+  `spec.md` §11.2).
 
 ### 2.2 PineGuard.Testing — Shared Test Infrastructure Library
 
@@ -138,15 +141,20 @@ Shared input constants live in `PineGuard.Testing/Fixtures/` (see §9). TestData
 
 Define `public static class XxxTestData` containing nested **Operation Groups** for each method/feature under test.
 
-Each Operation Group defines up to three datasets:
+**The dataset model is layer-specific** — each layer addendum is normative for its own layer:
 
-- `ValidCases` (`TheoryData<ValidCase>`) — Success scenarios.
-- `EdgeCases` (`TheoryData<ValidCase>`) — Boundary/Null/Interesting scenarios.
-- `InvalidCases` (`TheoryData<IThrowsCase>`) — Exception-throwing scenarios.
+| Layer | Datasets per Operation Group | Addendum |
+|-------|------------------------------|----------|
+| Core | single `Cases` rollup | `core/unit-test.md` |
+| MustClauses | `ValidCases` + `InvalidCases` (no `EdgeCases`) | `must-clauses/unit-test.md` |
+| GuardClauses | `ValidCases` + `InvalidCases` | `guard-clauses/unit-test.md` |
+| FluentValidation | single `Cases` rollup | `fluent-validation/unit-test.md` |
+| DataAnnotations | single `Cases` rollup | `data-annotations/unit-test.md` |
 
-When the Operation Group is fed by a fixture's scenario arrays (§9, `fixture.md` §2), a single rollup dataset named `Cases` — built from `AllScenarios` via `.ToXxxCases()` — replaces the three-dataset split:
-
-- `Cases` (`TheoryData<RuleCase<T>>`, `TheoryData<MustCase<T>>`, …) — the whole scenario set for that member.
+The `Cases` rollup is built from a fixture's scenario arrays (§9, `fixture.md` §2) via
+`AllScenarios` + `.ToXxxCases()`: `Cases` (`TheoryData<RuleCase<T>>`, `TheoryData<MustCase<T>>`, …)
+carries the whole scenario set for that member. Where a split is used, the dataset names are
+`ValidCases`, `EdgeCases`, `InvalidCases` — never any other names.
 
 Notes:
 

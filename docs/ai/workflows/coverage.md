@@ -1,4 +1,10 @@
-# Workflow: Run Coverage
+<!-- metadata_header
+type: workflow
+id: workflow-coverage
+version: 1.0
+-->
+
+# Workflow: Coverage
 
 > [!NOTE]
 > Master workflow for executing code coverage analysis on any PineGuard component.

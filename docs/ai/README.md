@@ -32,7 +32,7 @@ version: 2.0
 | `docs/ai/roles/` | Personas and responsibilities | 11 roles (see Roles Inventory below) |
 | `docs/ai/memory/` | Durable learned patterns | Portable, checked-in agent memory shared across tools |
 | `docs/ai/business-units/` | Organisational context | Engineering business unit |
-| `docs/ai/meta/` | Meta-documentation | Taxonomy, tooling alignment, [adapter surfaces](meta/adapter-surfaces.md), and the document templates (`template-spec.md`, `template-project.md`, `template-unit-test.md`, `template-coverage.md`) |
+| `docs/ai/meta/` | Meta-documentation | Taxonomy, tooling alignment, [adapter surfaces](meta/adapter-surfaces.md), and the document templates (`template-spec.md`, `template-agent.md`, `template-project.md`, `template-unit-test.md`, `template-coverage.md`) |
 | `docs/ai/plans/` | Implementation plans | Phased execution plans for major initiatives |
 
 
@@ -46,12 +46,15 @@ version: 2.0
 
 ### Active Plans
 
+Statuses mirror each plan's `metadata_header` (`docs/ai/meta/taxonomy.md` §Plans) — update both together.
+
 | Plan | Status |
 |------|--------|
+| [Library Expansion Roadmap](plans/library-expansion-roadmap.md) | Planned |
 | [Cross-Platform Tools Migration](plans/cross-platform-tools-migration.md) | Planned |
-| [Competitive Analysis](plans/competitive-analysis.md) | Planned |
-| [Future Language](plans/future-language.md) | Planned |
-| [Core / Common API Decisions](plans/core-common-api-decisions.md) | Open |
+| [Core / Common API Decisions](plans/core-common-api-decisions.md) | Open — decisions awaiting an owner's call |
+| [Competitive Analysis](plans/competitive-analysis.md) | Living reference — not a work item |
+| [Future Language](plans/future-language.md) | Non-binding idea backlog |
 
 Completed plans (v2 Master Plan, v2 PineGuard, Multi-Target Framework, Guard Exception
 Policy Uplift, Adapter Naming Collision Review, and others) live in [plans/completed/](plans/completed/).
@@ -64,7 +67,7 @@ Policy Uplift, Adapter Naming Collision Review, and others) live in [plans/compl
   [test](commands/test.md), [coverage](commands/coverage.md), [fix](commands/fix.md),
   [scan](commands/scan.md), [format](commands/format.md), [document](commands/document.md),
   [commit](commands/commit.md), [clean](commands/clean.md), [audit](commands/audit.md),
-  [release](commands/release.md), [council](commands/council.md).
+  [scaffold](commands/scaffold.md), [release](commands/release.md), [council](commands/council.md).
 - Follow its canonical agent entrypoint in `docs/ai/agents/`.
 - Agents should reuse `docs/ai/workflows/` and `docs/ai/skills/`.
 
@@ -110,7 +113,7 @@ docs/ai/rules/global.md          (always applies — invariants, file hygiene)
 
 ## Skills Inventory
 
-The 16 Brain skills. [`skills/INDEX.md`](skills/INDEX.md) carries the same list with per-skill IDs
+The 17 Brain skills. [`skills/INDEX.md`](skills/INDEX.md) carries the same list with per-skill IDs
 and the adapter wrappers that delegate to each one.
 
 | Skill | Directory | Purpose |
@@ -121,6 +124,7 @@ and the adapter wrappers that delegate to each one.
 | Implement FluentValidation | `skills/scaffold-fluent/` | IRuleBuilder extensions |
 | Implement DataAnnotations | `skills/scaffold-annotation/` | ValidationAttribute adapters |
 | Implement Unit Tests | `skills/scaffold-unit-test/` | xUnit tests per spec |
+| New Validation | `skills/new-validation/` | Drive a predicate-based validation through every layer |
 | Generate XML Docs | `skills/document/` | Layer-aware XML documentation for all public members |
 | Improve Code Coverage | `skills/improve-coverage/` | Coverage gap analysis and filling |
 | Format Code | `skills/format-code/` | dotnet format enforcement |
@@ -131,6 +135,31 @@ and the adapter wrappers that delegate to each one.
 | Scaffold Quality Tool | `skills/scaffold-quality-tool/` | Meta-skill: add a new quality/inspection tool |
 | Create Workflow | `skills/scaffold-workflow/` | Agent playbook generation |
 | Ask Council | `skills/ask-council/` | Pressure-test a decision via 5 advisors + peer review + chairman synthesis |
+
+## Workflows Inventory
+
+Reusable orchestration in `docs/ai/workflows/` — the middle of the command → agent → workflow
+chain. Most are **family orchestration** (one workflow parameterized by Scope/Severity, driven by
+a family of thin agents); three are **standalone** conveniences reachable from roles and specs.
+
+| Workflow | Kind | Driven by |
+|----------|------|-----------|
+| `workflows/test.md` | Family | `test-*` agents |
+| `workflows/coverage.md` | Family | `coverage-*` agents |
+| `workflows/fix-test.md` | Family | `fix-test-*` agents |
+| `workflows/fix-coverage.md` | Family | `fix-coverage-*` agents |
+| `workflows/format.md` | Family | `format-*` agents (procedure: `skills/format-code/`) |
+| `workflows/commit.md` | Family | `commit-*` agents |
+| `workflows/scan-roslyn.md` | Family | `scan-roslyn-*` agents |
+| `workflows/scan-qodana.md` | Family | `scan-qodana-*` agents |
+| `workflows/scan-sonar.md` | Family | `scan-sonar` agent |
+| `workflows/fix-roslyn.md` | Family | `fix-roslyn-all` agent (procedure: `skills/fix-roslyn/`) |
+| `workflows/fix-sonar.md` | Family | `fix-sonar-*` agents (procedure: `skills/fix-sonar/`) |
+| `workflows/audit.md` | Family | `audit-cli` agent |
+| `workflows/plan-with-council.md` | Standalone | `/plan-with-council` (command contract: `commands/council.md`) |
+| `workflows/build-all.md` | Standalone | Conversational — full non-incremental rebuild (`roles/shipper.md`) |
+| `workflows/verify-coverage.md` | Standalone | Conversational — dependency-ordered coverage sweep (`roles/planner.md`) |
+| `workflows/test-last.md` | Standalone | Conversational — re-run the last test command (`specs/orchestration.md`) |
 
 ## Roles Inventory
 
@@ -172,8 +201,11 @@ its tier, and where command parity is expected. Do not keep a second copy here �
 - **Root boot files** — `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`.
 - **Full adapters** (per-command file format; parity expected) — `.claude/`, `.agent/` (Antigravity),
   `.pi/`, `.github/`.
+- **Skill/hook-only adapters** (no command format; skill-name and hook-path resolution checked) —
+  `.agents/skills/`, `.codex/`.
 - **Rules-only adapters** (no command format; parity not expected) — `.clinerules/`, `.cursor/rules/`,
-  `.windsurf/rules/`, `.amazonq/rules/`, `.junie/guidelines.md`.
+  `.windsurf/rules/`, `.amazonq/rules/`, `.junie/guidelines.md` (plus the legacy single-file
+  `.cursorrules` / `.windsurfrules` stubs).
 
 The two sections below detail the native features of the two richest surfaces; every other surface is
 described in the inventory.
