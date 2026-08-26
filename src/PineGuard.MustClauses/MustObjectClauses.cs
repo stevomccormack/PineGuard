@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -47,7 +48,7 @@ public static class MustObjectClauses
         const string messageTemplate = "{paramName} must be equal to the expected value.";
 
         var ok = ObjectRules.IsEqualTo(value, other);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<T>.FromBool(ok, MustCodes.Value.Equality.NotEqual, messageTemplate, paramName, value, result: value!);
     }
 
     /// <summary>
@@ -87,7 +88,7 @@ public static class MustObjectClauses
         const string messageTemplate = "{paramName} must not be equal to the expected value.";
 
         var ok = !ObjectRules.IsEqualTo(value, other);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<T>.FromBool(ok, MustCodes.Value.Equality.Equal, messageTemplate, paramName, value, result: value!);
     }
 
     /// <summary>
@@ -125,7 +126,7 @@ public static class MustObjectClauses
         const string messageTemplate = "{paramName} must be of the expected type.";
 
         var ok = ObjectRules.IsOfType<T>(value);
-        return MustResult<object>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<object>.FromBool(ok, MustCodes.Value.Identity.WrongType, messageTemplate, paramName, value, result: value!);
     }
 
     /// <summary>
@@ -163,7 +164,7 @@ public static class MustObjectClauses
         const string messageTemplate = "{paramName} must not be of the expected type.";
 
         var ok = !ObjectRules.IsOfType<T>(value);
-        return MustResult<object>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<object>.FromBool(ok, MustCodes.Value.Identity.SameType, messageTemplate, paramName, value, result: value!);
     }
 
     /// <summary>
@@ -202,7 +203,7 @@ public static class MustObjectClauses
         const string messageTemplate = "{paramName} must be assignable to the expected type.";
 
         var ok = ObjectRules.IsAssignableToType<T>(value);
-        return MustResult<object>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<object>.FromBool(ok, MustCodes.Value.Identity.NotAssignable, messageTemplate, paramName, value, result: value!);
     }
 
     /// <summary>
@@ -240,7 +241,7 @@ public static class MustObjectClauses
         const string messageTemplate = "{paramName} must not be assignable to the expected type.";
 
         var ok = !ObjectRules.IsAssignableToType<T>(value);
-        return MustResult<object>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<object>.FromBool(ok, MustCodes.Value.Identity.Assignable, messageTemplate, paramName, value, result: value!);
     }
 
     /// <summary>
@@ -281,7 +282,7 @@ public static class MustObjectClauses
         const string messageTemplate = "{paramName} must reference the same instance.";
 
         var ok = ObjectRules.IsSameReferenceAs(a, b);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, a, result: a!);
+        return MustResult<T>.FromBool(ok, MustCodes.Value.Identity.NotSameReference, messageTemplate, paramName, a, result: a!);
     }
 
     /// <summary>
@@ -322,6 +323,6 @@ public static class MustObjectClauses
         const string messageTemplate = "{paramName} must not reference the same instance.";
 
         var ok = !ObjectRules.IsSameReferenceAs(a, b);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, a, result: a!);
+        return MustResult<T>.FromBool(ok, MustCodes.Value.Identity.SameReference, messageTemplate, paramName, a, result: a!);
     }
 }

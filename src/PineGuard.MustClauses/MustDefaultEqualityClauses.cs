@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -45,7 +46,7 @@ public static class MustDefaultEqualityClauses
         const string messageTemplate = "{paramName} must be the default value.";
 
         var ok = DefaultEqualityRules.IsDefault(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<T>.FromBool(ok, MustCodes.Value.State.NotDefault, messageTemplate, paramName, value, result: value!);
     }
 
     /// <summary>
@@ -83,7 +84,7 @@ public static class MustDefaultEqualityClauses
         const string messageTemplate = "{paramName} must not be the default value.";
 
         var ok = !DefaultEqualityRules.IsDefault(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<T>.FromBool(ok, MustCodes.Value.State.Default, messageTemplate, paramName, value, result: value!);
     }
 
     /// <summary>
@@ -121,7 +122,7 @@ public static class MustDefaultEqualityClauses
         const string messageTemplate = "{paramName} must be null or the default value.";
 
         var ok = DefaultEqualityRules.IsNullOrDefault(value);
-        return MustResult<T?>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<T?>.FromBool(ok, MustCodes.Value.State.NotNullOrDefault, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -159,6 +160,6 @@ public static class MustDefaultEqualityClauses
         const string messageTemplate = "{paramName} must not be null or the default value.";
 
         var ok = !DefaultEqualityRules.IsNullOrDefault(value);
-        return MustResult<T?>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<T?>.FromBool(ok, MustCodes.Value.State.NullOrDefault, messageTemplate, paramName, value, result: value);
     }
 }
