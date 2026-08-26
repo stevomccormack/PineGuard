@@ -80,6 +80,20 @@ public sealed class CaseRecordTests : BaseUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(CaseRecordTestData.MustValidationCaseOps.ValidCases), MemberType = typeof(CaseRecordTestData.MustValidationCaseOps))]
+    public void MustValidationCase_SetsProperties(CaseRecordTestData.MustValidationCaseOps.Case testCase)
+    {
+        var (value, isValid, failureCount) = testCase.Value;
+
+        var validationCase = new MustValidationCase<string?>("test", value, new MustValidationExpected(isValid, FailureCount: failureCount));
+
+        Assert.Equal(value, validationCase.Value);
+        Assert.Equal(isValid, validationCase.Expected.IsValid);
+        Assert.Equal(failureCount, validationCase.Expected.FailureCount);
+        Assert.IsType<IReturnsCase<MustValidationExpected>>(validationCase, exactMatch: false);
+    }
+
+    [Theory]
     [InlineData("my-case")]
     [InlineData("")]
     public void RuleCase_ToStringReturnsName(string name)

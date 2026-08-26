@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -45,7 +46,7 @@ public static class MustNullClauses
         const string messageTemplate = "{paramName} must be null.";
 
         var ok = NullRules.IsNull(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, result: default);
+        return MustResult<T>.FromBool(ok, MustCodes.Value.State.NotNull, messageTemplate, paramName, value, result: default);
     }
 
     /// <summary>
@@ -83,6 +84,6 @@ public static class MustNullClauses
         const string messageTemplate = "{paramName} must not be null.";
 
         var ok = NullRules.IsNotNull(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Value.State.Null, messageTemplate, paramName, value, value);
     }
 }

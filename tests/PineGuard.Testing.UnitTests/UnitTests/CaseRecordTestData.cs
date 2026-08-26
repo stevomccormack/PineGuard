@@ -69,4 +69,16 @@ public static class CaseRecordTestData
         ];
 
     }
+
+    public static class MustValidationCaseOps
+    {
+        public sealed record Case(string Name, (string? value, bool isValid, int? failureCount) Value)
+            : BaseCase(Name);
+
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("valid case", ("hello", true, null)),
+            new("invalid with failure count", ("bad", false, 2))
+        ];
+    }
 }
