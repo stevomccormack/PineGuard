@@ -3,10 +3,12 @@ type: plan
 id: library-expansion-roadmap
 version: 2.0
 status: planned
-last_updated: 2026-08-25
+last_updated: 2026-08-26
 -->
 
 # Plan: Library Expansion Roadmap
+
+> **Reconciled (2026-08-26)**: this roadmap is consumed through [Plan 00](new-surfaces-missing-validation-cases-00-program.md) §2, which keeps the parent plan's six-phase numbering and adopts this document's keystone. Names below have been aligned to Plan 00 §5 (`MustValidationResult`, `ValidateMustRules()`, `AddMustValidation(...)`, the `<domain>.<aspect>.<condition>` code grammar); where any remaining detail disagrees with Plan 00, Plan 00 wins.
 
 > **Status**: Planned | **Authors**: Fable intelligence pass (2026-08-20), merged with Fable growth review (2026-08-25)
 >
@@ -35,7 +37,7 @@ Guiding principle: **Core stays pure** (deterministic, sync, zero-allocation pre
 
 ---
 
-## Part 1 — The Keystone: `IMustValidator<T>` + `MustResultSet`
+## Part 1 — The Keystone: `IMustValidator<T>` + `MustValidationResult`
 
 The single highest-leverage addition. Every integration in Part 2 and the DataAnnotations bridge in Part 5 become thin adapters over this contract; without it, each adapter package would invent its own incompatible object-level shape.
 
@@ -44,11 +46,11 @@ The single highest-leverage addition. Every integration in Part 2 and the DataAn
 ```csharp
 public interface IMustValidator<in T>
 {
-    MustResultSet Validate(T instance);
+    MustValidationResult Validate(T instance);
 }
 ```
 
-- `MustResultSet`: aggregate of named results (member path → failures), with the uniform `IsValid` boolean roll-up matching the repo-wide `Expected.IsValid` convention.
+- `MustValidationResult`: aggregate of named results (member path → failures), with the uniform `IsValid` boolean roll-up matching the repo-wide `Expected.IsValid` convention.
 - Member paths must support nesting and collection indexing (`Items[2].Name`) so the collection-element work in Part 4 lands on a ready error-path model.
 - Error entries carry the stable machine-readable code (Part 3 item 5) alongside the human message from day one — retrofitting codes into an aggregate type later is breaking.
 
@@ -83,7 +85,7 @@ Ordered by strategic value.
 
 An `IValidateOptions<TOptions>` implementation that runs Must clauses against bound configuration, wired for `ValidateOnStart()`. Config validation at startup is one of the most common validation needs in modern .NET and is underserved by every competitor.
 
-- `services.AddOptions<SmtpOptions>().BindConfiguration("Smtp").ValidateWithPineGuard().ValidateOnStart();`
+- `services.AddOptions<SmtpOptions>().BindConfiguration("Smtp").ValidateMustRules().ValidateOnStart();`
 - Resolves `IMustValidator<TOptions>` (Part 1); failure aggregates all violations into one `OptionsValidationException` message (never fail one-at-a-time — restart loops are expensive).
 - Zero dependencies beyond `Microsoft.Extensions.Options`.
 
@@ -92,10 +94,10 @@ An `IValidateOptions<TOptions>` implementation that runs Must clauses against bo
 One package, several cooperating pieces:
 
 - **Minimal API (.NET 10)**: integrate with `Microsoft.Extensions.Validation` (`AddValidation()`, `[ValidatableType]`, source-generated). This is Microsoft's new built-in story — riding it solves trimming/AOT and positions PineGuard as the rule library for the platform validator. Also ship a plain `IEndpointFilter` for pre-.NET-10 minimal APIs.
-- **MVC auto-validation**: an async-safe `IAsyncActionFilter` (FluentValidation dropped official auto-validation because sync model binding can't run async validators — do it correctly and capture that abandoned demand). Both filter types return RFC 9457 `ValidationProblemDetails`, consistently shaped, via a public `MustResultSet → ValidationProblemDetails` mapper so manual-validation users get the same 400 bodies.
+- **MVC auto-validation**: an async-safe `IAsyncActionFilter` (FluentValidation dropped official auto-validation because sync model binding can't run async validators — do it correctly and capture that abandoned demand). Both filter types return RFC 9457 `ValidationProblemDetails`, consistently shaped, via a public `MustValidationResult → ValidationProblemDetails` mapper so manual-validation users get the same 400 bodies.
 - **Guard exception handling**: an `IExceptionHandler` (net8+) mapping the `ArgumentException` family to `ProblemDetails`. **Critical policy**: a guard firing at the API boundary is a 400; the same guard three layers deep is a programmer error and must stay 500 — blanket 400-mapping masks bugs. Introduce a marker (distinct exception type or exception `Data` tag) so the handler can distinguish boundary validation from invariant violations.
 - **Replacement exceptions for Guards**: `exceptionFactory` overloads and/or `Guard.Against.Null<TException>(...)` so domain code can throw `DomainValidationException` instead of `ArgumentNullException`. Framework exceptions remain the default (BCL conventions and analyzers expect them); replacement is opt-in per call or via configured policy.
-- **DI registration**: `services.AddPineGuard(params Assembly[])` — assembly scanning for validators, singleton lifetime for stateless ones.
+- **DI registration**: `services.AddMustValidation(params Assembly[])` — assembly scanning for validators, singleton lifetime for stateless ones.
 - **`HttpClient` integration — response-first**: by the time a `DelegatingHandler` runs, the outbound model is already serialized into `HttpContent`, so request validation there means buffering and re-deserializing our own body. Revised design:
   - **Primary value = response contract validation** (opt-in, forces buffering): a `DelegatingHandler` asserting status class, content type (the existing `IsJsonContentType(headers)` signature already anticipates exactly this), and optionally payload shape; throws a rich contract-violation exception. Aimed at third-party API integration.
   - **Request-side validation belongs before serialization**: in the typed client via `IMustValidator<T>` — ship `AddHttpClient<T>().ValidateRequests(...)` resolving validators pre-send, and document the pattern; do not deserialize outbound content in a handler.
@@ -132,7 +134,7 @@ Failure modes observed in how validation is actually wired in production apps. E
 2. **Minimal APIs skip MVC filters**: any MVC-only auto-validation silently validates nothing on minimal endpoints. Ship both filter types from day one (see 2.2).
 3. **Headers, query strings, and route values**: validation frameworks obsess over the body; provide first-class support for validating bound non-body parameters.
 4. **Aggregate vs. short-circuit**: default to aggregating all errors per request; expose fail-fast as configuration. Cancellation tokens must flow through async validators.
-5. **Error codes vs. messages**: stable machine-readable codes (e.g. `pineguard.string.email`) separate from human messages, carried in `ProblemDetails` extensions. Frontends and API consumers key on codes; messages get localized.
+5. **Error codes vs. messages**: stable machine-readable codes (e.g. `email.address.invalid`) separate from human messages, carried in `ProblemDetails` extensions. Frontends and API consumers key on codes; messages get localized.
 6. **Localization**: message resolution through `IStringLocalizer` seam (English default). Validot shipped 5 languages; PineGuard needs the seam even if translations come later.
 7. **Trimming/AOT**: reflection-heavy DataAnnotations paths must be documented per package; the .NET 10 source-generated route is the AOT story.
 8. **Response validation is nearly never done**: opt-in response contract checking (DelegatingHandler inbound per 2.2 + endpoint filter outbound) is a differentiator for teams integrating third-party APIs.
@@ -145,11 +147,11 @@ These are what FluentValidation actually wins on when a team evaluates head-to-h
 
 | Gap | Shape | Notes |
 |---|---|---|
-| Cross-property validation | `Must` support for comparing two model properties (`EndDate > StartDate`) with a correct two-property error path | Range rules validate a range *object*; this is different. #1 day-one question from evaluators. DataAnnotations layer needs a `[PgCompare*]`-style story too. |
+| Cross-property validation | `Must` support for comparing two model properties (`EndDate > StartDate`) with a correct two-property error path | Range rules validate a range *object*; this is different. #1 day-one question from evaluators. DataAnnotations layer needs a `<Comparison>PropertyAttribute`-style story too. |
 | Conditional composition | `When(...)` / `Unless(...)` on Must chains | CheckValidators' AndIf/OrIf validates the demand. |
-| Collection element validation | Apply a clause per element with indexed error paths (`Items[2].Name`) | FluentValidation's `RuleForEach` equivalent; error-path model owned by `MustResultSet` (Part 1.1). |
+| Collection element validation | Apply a clause per element with indexed error paths (`Items[2].Name`) | FluentValidation's `RuleForEach` equivalent; error-path model owned by `MustValidationResult` (Part 1.1). |
 | Async predicate seam | `MustAsync` at the Must layer only | Core stays sync. Needed for DB-uniqueness-style checks; required before the ASP.NET filters can claim full FV parity. |
-| Error codes | Stable code per rule, owned by Core alongside the message | Prerequisite for Part 3 item 5 and for `MustResultSet` (Part 1.1). |
+| Error codes | Stable code per rule, owned by Core alongside the message | Prerequisite for Part 3 item 5 and for `MustValidationResult` (Part 1.1). |
 | Clock injection | `TimeProvider`-aware in-past/in-future/min-age rules | Nobody does testable temporal validation well — differentiator. |
 
 ---
@@ -170,14 +172,14 @@ public IEnumerable<ValidationResult> Validate(ValidationContext context)
 }
 ```
 
-Plus the aggregate form: `MustResultSet.ToValidationResults()`.
+Plus the aggregate form: `MustValidationResult.ToValidationResults()`.
 
 ### 5.2 Recursive object-graph validator
 
 `Validator.TryValidateObject` famously does **not** recurse into child objects or collections; teams have hand-rolled this for 15 years. Ship a correct, fully tested graph walker:
 
 - Walks properties, nested objects, and collection elements; honors `[ValidateComplexType]`-style opt-in/opt-out; cycle-safe via reference tracking.
-- Runs DataAnnotations attributes, `IValidatableObject`, and any registered `IMustValidator<T>` per node; returns a single `MustResultSet` with full member paths.
+- Runs DataAnnotations attributes, `IValidatableObject`, and any registered `IMustValidator<T>` per node; returns a single `MustValidationResult` with full member paths.
 - This is a genuine BCL pain-point fix and a differentiator independent of the fluent API.
 
 ### 5.3 `ValidationContext` service resolution
@@ -229,7 +231,7 @@ Existing coverage is broad (see competitive-analysis §2 — base64, hex, IP/CID
 
 `tests/PineGuard.Testing/` (12 classes, 100% coverage) currently serves internal suites only. Once consumers write `IMustValidator<T>` implementations, the case-record / `TheoryData` infrastructure becomes a selling point — the `FluentValidation.TestHelper` equivalent: "we give you the test harness too."
 
-- Add validator-level assertion helpers (`ShouldHaveErrorFor(x => x.Currency)`-style) over `MustResultSet`.
+- Add validator-level assertion helpers (`ShouldHaveErrorFor(x => x.Currency)`-style) over `MustValidationResult`.
 - Requires packaging hygiene: XML docs, README, versioning aligned with the main packages, and the same CI gates.
 
 ---
@@ -238,7 +240,7 @@ Existing coverage is broad (see competitive-analysis §2 — base64, hex, IP/CID
 
 | Phase | Deliverable | Why this order |
 |---|---|---|
-| 1 | Keystone contract: `IMustValidator<T>` + `MustResultSet` + `MustValidator<T>` base, incl. error codes (Parts 1, 4) | Everything else consumes it; retrofitting codes into the aggregate later is breaking |
+| 1 | Keystone contract: `IMustValidator<T>` + `MustValidationResult` + `MustValidator<T>` base, incl. error codes (Parts 1, 4) | Everything else consumes it; retrofitting codes into the aggregate later is breaking |
 | 2 | Structural gaps: cross-property, conditional, collection-element (Part 4) | Decide competitive evaluations; compose on the Phase 1 base |
 | 3 | `PineGuard.Extensions.Options` (2.1) | Smallest new package; stress-tests the contract before it ossifies; immediate real-world value |
 | 4 | `PineGuard.AspNetCore` (2.2) + `MustAsync` seam | The flagship integration; consumes Phases 1–2 outputs |
@@ -252,7 +254,7 @@ Existing coverage is broad (see competitive-analysis §2 — base64, hex, IP/CID
 
 | Risk | Mitigation |
 |---|---|
-| `MustResultSet` shape ossifies before adapters stress it | Build `Extensions.Options` (smallest adapter) immediately after; treat the contract as unstable until two adapters consume it |
+| `MustValidationResult` shape ossifies before adapters stress it | Build `Extensions.Options` (smallest adapter) immediately after; treat the contract as unstable until two adapters consume it |
 | New packages dilute the 100%-coverage / audit-rule discipline | Every new package adopts the same CI gates (`ci.yml` paths-filter entries, coverage, Rule50) before first commit |
 | ASP.NET integration couples releases to framework versions | Multi-target (net8.0;net10.0) as the existing packages do; .NET 10 source-gen pieces behind TFM conditionals |
 | `MustAsync` leaks async into Core | Hard rule: async exists only in the Must layer and above; Core signatures stay sync — enforce via audit-cli rule |
