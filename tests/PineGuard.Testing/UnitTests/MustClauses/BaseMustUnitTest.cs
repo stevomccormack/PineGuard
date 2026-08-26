@@ -19,5 +19,7 @@ public abstract class BaseMustUnitTest(ITestOutputHelper output) : BaseUnitTest(
         AssertReturn(testCase.Expected, result.Success, result.Message);
         if (testCase.Expected.ParamName is not null)
             Assert.Equal(testCase.Expected.ParamName, result.ParamName);
+        if (testCase.Expected.Code is not null)
+            Assert.Equal(testCase.Expected.Code, result.Code);
     }
 }
