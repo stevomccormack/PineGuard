@@ -1,18 +1,43 @@
 <!-- metadata_header
 type: plan
 id: new-surfaces-missing-validation-cases
-version: 1.0
+version: 1.2
 status: planned
-last_updated: 2026-08-25
+last_updated: 2026-08-26
+children:
+  - new-surfaces-missing-validation-cases-00-program.md
+  - new-surfaces-missing-validation-cases-01-structural-validation.md
+  - new-surfaces-missing-validation-cases-02-options.md
+  - new-surfaces-missing-validation-cases-03-aspnetcore.md
+  - new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md
+  - new-surfaces-missing-validation-cases-05-rule-batches.md
+  - new-surfaces-missing-validation-cases-06-analyzers.md
 -->
 
 # Plan: New Surfaces & Missing Validation Cases
+
+<!-- plan-nav -->
+> **Parent** · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
+<!-- /plan-nav -->
+
 
 > **Status**: Planned | **Author**: Fable intelligence pass | **Created**: 2026-08-20
 >
 > Companion documents: `competitive-analysis.md` (Section 6), `future-language.md` (Section 7).
 >
+> **Execution plans** (2026-08-25): each phase in Part 5 has its own implementation plan — start with
+> [Plan 00 — Program charter](new-surfaces-missing-validation-cases-00-program.md), which also
+> reconciles this document with `library-expansion-roadmap.md`. Phase plans:
+> [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) ·
+> [02 Options](new-surfaces-missing-validation-cases-02-options.md) ·
+> [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) ·
+> [04 MediatR & result bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) ·
+> [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) ·
+> [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md).
+>
 > Scope note: ISO/standards-registry validations (country codes, currencies, IBAN registries, etc.) are explicitly **out of scope** — they belong to the separate standards repo project.
+>
+> **Terminology note (2026-08-26)**: the code snippets in Parts 1–4 predate the naming canon; where a name here differs from Plan 00 §5 (registration verbs, package ids, error-code grammar, attribute names such as `[PgCompare*]` → `<Comparison>PropertyAttribute`), **Plan 00 is authoritative**.
 
 ## Context
 
@@ -30,7 +55,7 @@ Ordered by strategic value.
 
 An `IValidateOptions<TOptions>` implementation that runs Must clauses against bound configuration, wired for `ValidateOnStart()`. Config validation at startup is one of the most common validation needs in modern .NET and is underserved by every competitor.
 
-- `services.AddOptions<SmtpOptions>().BindConfiguration("Smtp").ValidateWithPineGuard().ValidateOnStart();`
+- `services.AddOptions<SmtpOptions>().BindConfiguration("Smtp").ValidateMustRules().ValidateOnStart();` (member name settled in Plan 00 §5.3; this document originally said `ValidateWithPineGuard()`)
 - Failure aggregates all violations into one `OptionsValidationException` message (never fail one-at-a-time — restart loops are expensive).
 - Zero dependencies beyond `Microsoft.Extensions.Options`.
 
@@ -42,7 +67,7 @@ One package, several cooperating pieces:
 - **MVC auto-validation**: an async-safe `IAsyncActionFilter` (FluentValidation dropped official auto-validation because sync model binding can't run async validators — do it correctly and capture that abandoned demand). Both filter types return RFC 9457 `ValidationProblemDetails`, consistently shaped.
 - **Guard exception handling**: an `IExceptionHandler` (net8+) mapping the `ArgumentException` family to `ProblemDetails`. **Critical policy**: a guard firing at the API boundary is a 400; the same guard three layers deep is a programmer error and must stay 500 — blanket 400-mapping masks bugs. Introduce a marker (distinct exception type or exception `Data` tag) so the handler can distinguish boundary validation from invariant violations.
 - **Replacement exceptions for Guards**: `exceptionFactory` overloads and/or `Guard.Against.Null<TException>(...)` so domain code can throw `DomainValidationException` instead of `ArgumentNullException`. Framework exceptions remain the default (BCL conventions and analyzers expect them); replacement is opt-in per call or via configured policy.
-- **DI registration**: `services.AddPineGuard(params Assembly[])` — assembly scanning for validators, singleton lifetime for stateless ones.
+- **DI registration**: assembly scanning for validators, singleton lifetime for stateless ones — settled as `AddMustValidatorsFromAssembly(...)` / `AddMustValidation(...)` in Plans 03–04 (this document originally said `services.AddPineGuard(params Assembly[])`).
 - **DelegatingHandler** for `HttpClient`: validate outgoing request payloads (cheap, on by default when registered); response validation opt-in (forces buffering + double deserialization) but valuable for third-party API contract enforcement.
 
 ### 1.3 `PineGuard.MediatR` — pipeline behavior
@@ -73,7 +98,7 @@ Failure modes observed in how validation is actually wired in production apps. E
 2. **Minimal APIs skip MVC filters**: any MVC-only auto-validation silently validates nothing on minimal endpoints. Ship both filter types from day one (see 1.2).
 3. **Headers, query strings, and route values**: validation frameworks obsess over the body; provide first-class support for validating bound non-body parameters.
 4. **Aggregate vs. short-circuit**: default to aggregating all errors per request; expose fail-fast as configuration. Cancellation tokens must flow through async validators.
-5. **Error codes vs. messages**: stable machine-readable codes (e.g. `pineguard.string.email`) separate from human messages, carried in `ProblemDetails` extensions. Frontends and API consumers key on codes; messages get localized.
+5. **Error codes vs. messages**: stable machine-readable codes (settled grammar `<domain>.<aspect>.<condition>`, e.g. `email.address.invalid` — Plan 00 §5.4) separate from human messages, carried in `ProblemDetails` extensions. Frontends and API consumers key on codes; messages get localized.
 6. **Localization**: message resolution through `IStringLocalizer` seam (English default). Validot shipped 5 languages; PineGuard needs the seam even if translations come later.
 7. **Trimming/AOT**: reflection-heavy DataAnnotations paths must be documented per package; the .NET 10 source-generated route is the AOT story.
 8. **Response validation is nearly never done**: opt-in response contract checking (DelegatingHandler inbound + endpoint filter outbound) is a differentiator for teams integrating third-party APIs.
@@ -146,3 +171,7 @@ Existing coverage is broad (see competitive-analysis §2 — base64, hex, IP/CID
 - XSD/JSON Schema conformance (future `PineGuard.Xml` / `PineGuard.Json` if demand appears)
 - Transforms/coercion
 - Error message translations beyond the localization seam (seam ships; translations are demand-driven)
+
+<!-- plan-nav -->
+> **Parent** · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
+<!-- /plan-nav -->
