@@ -89,8 +89,7 @@ public sealed record GuardFailure(string Code, string Message, string? ParamName
     private static void Stamp(Exception exception, IMustResult result)
     {
         exception.Data[CodeDataKey] = result.Code;
-        if (result.ParamName is not null)
-            exception.Data[PropertyPathDataKey] = result.ParamName;
+        exception.Data[PropertyPathDataKey] = result.ParamName ?? string.Empty;
     }
 
     private static Exception CreateDefaultException(string message, string? paramName, object? value) =>

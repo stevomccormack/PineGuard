@@ -22,23 +22,29 @@ public static class FluentExtension
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="check">A function that accepts the property value and returns a <see cref="MustResult{T}"/>.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the message from the <see cref="MustResult{T}"/>.</param>
+    /// <param name="code">
+    /// The <c>MustCodes</c> catalogue constant identifying the clause being adapted. When non-<see langword="null"/>,
+    /// emitted as the rule's <c>ErrorCode</c> via <c>WithErrorCode</c>.
+    /// Fixed at rule-build time — FluentValidation's <c>ErrorCode</c> cannot vary per invocation.
+    /// </param>
     /// <returns>An <see cref="IRuleBuilderOptions{T, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// This overload validates the property value in isolation. The model instance is not available to the check function.
     /// </remarks>
     /// <example>
     /// <code>
-    /// ruleBuilder.MustBe(val => Must.Be.NotNull(val, paramName: null), message);
+    /// ruleBuilder.MustBe(val => Must.Be.NotNull(val, paramName: null), message, MustCodes.Value.State.Null);
     /// </code>
     /// </example>
     public static IRuleBuilderOptions<T, TProp> MustBe<T, TProp, TResult>(this IRuleBuilder<T, TProp> ruleBuilder,
         Func<TProp, MustResult<TResult>> check,
-        string? message)
+        string? message,
+        string? code = null)
     {
         ThrowHelper.ThrowIfNull(ruleBuilder);
         ThrowHelper.ThrowIfNull(check);
 
-        return ruleBuilder
+        var rule = ruleBuilder
             .Must((_, value, context) =>
             {
                 var result = check(value);
@@ -51,6 +57,8 @@ public static class FluentExtension
                 return false;
             })
             .WithMessage("{ErrorMessage}");
+
+        return code is null ? rule : rule.WithErrorCode(code);
     }
 
     /// <summary>
@@ -63,6 +71,11 @@ public static class FluentExtension
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="check">A function that accepts the model and property value and returns a <see cref="MustResult{T}"/>.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the message from the <see cref="MustResult{T}"/>.</param>
+    /// <param name="code">
+    /// The <c>MustCodes</c> catalogue constant identifying the clause being adapted. When non-<see langword="null"/>,
+    /// emitted as the rule's <c>ErrorCode</c> via <c>WithErrorCode</c>.
+    /// Fixed at rule-build time — FluentValidation's <c>ErrorCode</c> cannot vary per invocation.
+    /// </param>
     /// <returns>An <see cref="IRuleBuilderOptions{T, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// This overload provides access to the model instance, enabling cross-property validation scenarios
@@ -70,17 +83,18 @@ public static class FluentExtension
     /// </remarks>
     /// <example>
     /// <code>
-    /// ruleBuilder.MustBe((model, val) => Must.Be.Chronological(val, model.EndDate, paramName: null), message);
+    /// ruleBuilder.MustBe((model, val) => Must.Be.Chronological(val, model.EndDate, paramName: null), message, MustCodes.Date.Order.NotAfter);
     /// </code>
     /// </example>
     public static IRuleBuilderOptions<T, TProp> MustBe<T, TProp, TResult>(this IRuleBuilder<T, TProp> ruleBuilder,
         Func<T, TProp, MustResult<TResult>> check,
-        string? message)
+        string? message,
+        string? code = null)
     {
         ThrowHelper.ThrowIfNull(ruleBuilder);
         ThrowHelper.ThrowIfNull(check);
 
-        return ruleBuilder
+        var rule = ruleBuilder
             .Must((model, value, context) =>
             {
                 var result = check(model, value);
@@ -93,6 +107,8 @@ public static class FluentExtension
                 return false;
             })
             .WithMessage("{ErrorMessage}");
+
+        return code is null ? rule : rule.WithErrorCode(code);
     }
 
     /// <summary>
@@ -103,17 +119,22 @@ public static class FluentExtension
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="check">A function that accepts the nullable property value and returns a <see cref="MustResult{T}"/>.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the message from the <see cref="MustResult{T}"/>.</param>
+    /// <param name="code">
+    /// The <c>MustCodes</c> catalogue constant identifying the clause being adapted. When non-<see langword="null"/>,
+    /// emitted as the rule's <c>ErrorCode</c> via <c>WithErrorCode</c>.
+    /// </param>
     /// <returns>An <see cref="IRuleBuilderOptions{T, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// This overload forwards to <see cref="MustBe{T, TProp, TResult}(IRuleBuilder{T, TProp}, Func{TProp, MustResult{TResult}}, string?)"/>
+    /// This overload forwards to <see cref="MustBe{T, TProp, TResult}(IRuleBuilder{T, TProp}, Func{TProp, MustResult{TResult}}, string?, string?)"/>
     /// and exists to simplify the generic inference for nullable struct properties.
     /// </remarks>
     public static IRuleBuilderOptions<T, TProp?> MustBe<T, TProp>(
         this IRuleBuilder<T, TProp?> ruleBuilder,
         Func<TProp?, MustResult<TProp?>> check,
-        string? message)
+        string? message,
+        string? code = null)
         where TProp : struct
-        => ruleBuilder.MustBe<T, TProp?, TProp?>(check, message);
+        => ruleBuilder.MustBe<T, TProp?, TProp?>(check, message, code);
 
     private static string FormatMessage(string template, string paramName) =>
         template.Replace(ParamNameToken, paramName, StringComparison.Ordinal);

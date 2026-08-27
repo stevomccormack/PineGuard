@@ -125,4 +125,9 @@ public static class FluentExtensionTestData
             string? ExpectedErrorMessage)
             : ReturnCase<int?, bool>(Name, Value, Expected);
     }
+
+    public static class ErrorCode
+    {
+        public static TheoryData<bool> Cases => [true];
+    }
 }
