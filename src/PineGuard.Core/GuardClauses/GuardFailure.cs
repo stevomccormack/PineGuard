@@ -1,103 +1,114 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using PineGuard.Common;
+using PineGuard.MustClauses;
 
 namespace PineGuard.GuardClauses;
 
 /// <summary>
-/// Provides the exception-throwing infrastructure used by all <c>Guard.Against.*</c> methods.
+/// Describes one <c>Guard.Against.*</c> failure: the stable code and message of the rule that failed,
+/// the parameter it failed against, and the default exception <see cref="Throw"/> would raise.
 /// </summary>
-/// <remarks>
-/// <para>
-/// Guards call <see cref="Throw"/> after a failed <see cref="MustClauses.MustResult{T}"/> to raise
-/// an appropriate exception. <see cref="ThrowAndReplace"/> is a public extension point for callers
-/// that need a per-call exception replacer; it is not called by any built-in guard clause.
-/// </para>
-/// <para>
-/// When the value is <see langword="null"/>, an <see cref="ArgumentNullException"/> is raised;
-/// otherwise, an <see cref="ArgumentException"/> is raised.
-/// Both are subject to overrides configured via <see cref="GuardExceptionPolicy"/>.
-/// </para>
-/// </remarks>
+/// <param name="Code">The stable, machine-readable identity of the rule that failed.</param>
+/// <param name="Message">The rendered, human-readable failure message.</param>
+/// <param name="ParamName">The name of the parameter that failed validation, or <see langword="null"/> if unknown.</param>
+/// <param name="Value">
+/// The attempted value. Never serialized by any adapter — a value that may hold a secret must not reach a
+/// response body, a log line, or a localisation table through this property. See <see cref="MustFailure.Value"/>.
+/// </param>
+/// <param name="Exception">
+/// The default exception <see cref="Throw"/> raises absent an active <see cref="GuardExceptionPolicy"/> map:
+/// an <see cref="ArgumentNullException"/> when <see cref="Value"/> is <see langword="null"/>, otherwise an
+/// <see cref="ArgumentException"/>. A <see cref="GuardExceptionPolicy"/> map receives this record and returns
+/// the exception to throw in its place.
+/// </param>
 /// <seealso cref="GuardExceptionPolicy"/>
+/// <seealso cref="ExceptionExtension"/>
 /// <seealso href="https://pineguard.ai/docs/guard">Guard Clauses documentation</seealso>
-public static class GuardFailure
+public sealed record GuardFailure(string Code, string Message, string? ParamName, object? Value, Exception Exception)
 {
     /// <summary>
-    /// Throws an exception for the given failure message, applying any active
-    /// <see cref="GuardExceptionPolicy"/> replacer.
+    /// The <see cref="Exception.Data"/> key <see cref="Throw"/> stamps with <see cref="IMustResult.Code"/>.
     /// </summary>
-    /// <param name="message">The human-readable failure message.</param>
-    /// <param name="paramName">The name of the parameter that failed validation.</param>
-    /// <param name="value">The original value that failed validation. Determines the default exception type.</param>
-    /// <param name="exceptionCreator">
-    /// An optional factory that returns a custom exception. If <see langword="null"/>,
-    /// the default <see cref="ArgumentException"/> or <see cref="ArgumentNullException"/> is created.
-    /// </param>
-    /// <exception cref="Exception">
-    /// Always thrown. The exact type depends on <paramref name="exceptionCreator"/>, the configured
-    /// <see cref="GuardExceptionPolicy"/>, and whether <paramref name="value"/> is <see langword="null"/>.
-    /// </exception>
-    [DoesNotReturn]
-    public static void Throw(
-        string message,
-        string? paramName,
-        object? value,
-        Func<Exception>? exceptionCreator = null)
-        => ThrowCore(message, paramName, value, exceptionCreator, exceptionReplacer: null);
+    public const string CodeDataKey = "pineguard.code";
 
     /// <summary>
-    /// Throws an exception for the given failure message, applying a caller-supplied replacer
-    /// instead of any active <see cref="GuardExceptionPolicy"/> replacer.
+    /// The <see cref="Exception.Data"/> key <see cref="Throw"/> stamps with <see cref="IMustResult.ParamName"/>.
     /// </summary>
-    /// <param name="message">The human-readable failure message.</param>
-    /// <param name="paramName">The name of the parameter that failed validation.</param>
-    /// <param name="value">The original value that failed validation.</param>
+    public const string PropertyPathDataKey = "pineguard.property-path";
+
+    /// <summary>
+    /// Raises an exception for a failed <see cref="IMustResult"/>.
+    /// </summary>
+    /// <param name="result">The failed result to raise an exception for.</param>
+    /// <param name="message">An optional message overriding <paramref name="result"/>'s own.</param>
     /// <param name="exceptionCreator">
-    /// An optional factory that returns a custom exception. If it returns non-<see langword="null"/>,
-    /// that exception is thrown directly and neither <paramref name="exceptionReplacer"/> nor the
-    /// global <see cref="GuardExceptionPolicy"/> replacer is applied.
+    /// An optional factory for a custom exception. When it returns non-<see langword="null"/>, that exception
+    /// is thrown as-is — an explicit per-call choice always wins over the active <see cref="GuardExceptionPolicy"/> map.
     /// </param>
-    /// <param name="exceptionReplacer">
-    /// An optional factory that maps the default exception to a replacement. When supplied, it takes
-    /// precedence over the global/scoped <see cref="GuardExceptionPolicy.ExceptionReplacer"/> — the
-    /// policy replacer and its <see cref="GuardExceptionPolicy.ReplaceDefaultExceptions"/> gate are
-    /// not consulted.
-    /// </param>
-    /// <exception cref="Exception">Always thrown.</exception>
+    /// <remarks>
+    /// Every thrown exception has <see cref="CodeDataKey"/> stamped with <paramref name="result"/>'s
+    /// <see cref="IMustResult.Code"/>, and (when known) <see cref="PropertyPathDataKey"/> stamped with its
+    /// <see cref="IMustResult.ParamName"/>. Read them back via <see cref="ExceptionExtension"/>.
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="result"/> is <see langword="null"/>, or when the active
+    /// <see cref="GuardExceptionPolicy"/> map returns <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="Exception">
+    /// Always thrown when <paramref name="result"/> represents a failure. The exact type depends on
+    /// <paramref name="exceptionCreator"/>, the active <see cref="GuardExceptionPolicy"/> map, and whether
+    /// <paramref name="result"/>'s value is <see langword="null"/>.
+    /// </exception>
     [DoesNotReturn]
-    public static void ThrowAndReplace(
-        string message,
-        string? paramName,
-        object? value,
-        Func<Exception>? exceptionCreator = null,
-        Func<Exception, Exception>? exceptionReplacer = null)
-        => ThrowCore(message, paramName, value, exceptionCreator, exceptionReplacer);
-
-    [DoesNotReturn]
-    private static void ThrowCore(
-        string message,
-        string? paramName,
-        object? value,
-        Func<Exception>? exceptionCreator,
-        Func<Exception, Exception>? exceptionReplacer)
+    public static void Throw(IMustResult result, string? message = null, Func<Exception>? exceptionCreator = null)
     {
-        var exception = exceptionCreator?.Invoke();
-        if (exception is not null)
-            throw exception;
+        ThrowHelper.ThrowIfNull(result);
 
-        var defaultException = CreateDefaultException(message, paramName, value);
+        var explicitException = exceptionCreator?.Invoke();
+        if (explicitException is not null)
+        {
+            Stamp(explicitException, result);
+            throw explicitException;
+        }
 
-        if (exceptionReplacer is not null)
-            throw exceptionReplacer(defaultException);
+        var defaultException = CreateDefaultException(message ?? result.Message, result.ParamName, result.Value);
+        Stamp(defaultException, result);
 
-        var (configuredReplacer, replaceDefaultExceptions) = GuardExceptionPolicy.GetEffectivePolicy();
-        if (configuredReplacer is null || !GuardExceptionPolicy.ShouldReplace(replaceDefaultExceptions, defaultException))
+        var map = GuardExceptionPolicy.GetEffectiveMap();
+        if (map is null)
             throw defaultException;
 
-        throw configuredReplacer(defaultException);
+        var failure = new GuardFailure(result.Code, message ?? result.Message, result.ParamName, result.Value, defaultException);
+        var mappedException = map(failure);
+        ThrowHelper.ThrowIfNull(mappedException);
+        Stamp(mappedException, result);
+        throw mappedException;
+    }
+
+    private static void Stamp(Exception exception, IMustResult result)
+    {
+        exception.Data[CodeDataKey] = result.Code;
+        if (result.ParamName is not null)
+            exception.Data[PropertyPathDataKey] = result.ParamName;
     }
 
     private static Exception CreateDefaultException(string message, string? paramName, object? value) =>
         value is null
             ? new ArgumentNullException(paramName, message)
             : new ArgumentException(message, paramName);
+
+    /// <summary>
+    /// Overrides the compiler-generated record printer to omit <see cref="Value"/> — see the same
+    /// caution on <see cref="MustFailure.Value"/>: it must never reach a log line via <see cref="ToString"/>
+    /// or string interpolation (e.g. <c>$"{failure}"</c>).
+    /// </summary>
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(Code)).Append(" = ").Append(Code);
+        builder.Append(", ").Append(nameof(Message)).Append(" = ").Append(Message);
+        builder.Append(", ").Append(nameof(ParamName)).Append(" = ").Append(ParamName);
+        builder.Append(", ").Append(nameof(Exception)).Append(" = ").Append(Exception);
+        return true;
+    }
 }

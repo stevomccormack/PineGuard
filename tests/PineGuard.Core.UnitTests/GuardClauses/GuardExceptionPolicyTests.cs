@@ -1,4 +1,5 @@
 using PineGuard.GuardClauses;
+using PineGuard.MustClauses;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.GuardClauses;
@@ -6,374 +7,223 @@ namespace PineGuard.Core.UnitTests.GuardClauses;
 [Collection(GuardPolicyCollection.Name)]
 public sealed class GuardExceptionPolicyTests : BaseUnitTest
 {
-    [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.ExceptionReplacer.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.ExceptionReplacer))]
-    public void ExceptionReplacer_CanBeSetAndRetrieved(GuardExceptionPolicyTestData.ExceptionReplacer.Case testCase)
-    {
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
+    private static IMustResult FailedResult => MustResult<string>.Fail("sample.always-fails", "{paramName} is bad.", "value", "x");
 
+    [Theory]
+    [MemberData(nameof(GuardExceptionPolicyTestData.HasMap.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.HasMap))]
+    public void HasMap_ReflectsWhetherAMapIsInstalled(GuardExceptionPolicyTestData.HasMap.Case testCase)
+    {
         try
         {
-            GuardExceptionPolicy.ExceptionReplacer = testCase.Value;
+            if (testCase.InstallMap)
+                GuardExceptionPolicy.Map(failure => new InvalidOperationException(failure.Message));
 
-            if (testCase.Value is null)
-                Assert.Null(GuardExceptionPolicy.ExceptionReplacer);
-            else
-                Assert.Same(testCase.Value, GuardExceptionPolicy.ExceptionReplacer);
+            Assert.Equal(testCase.Expected, GuardExceptionPolicy.HasMap);
         }
         finally
         {
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
+            GuardExceptionPolicy.Clear();
         }
     }
 
     [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.ReplaceDefaultExceptions.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.ReplaceDefaultExceptions))]
-    public void ReplaceDefaultExceptions_CanBeSetAndRetrieved(GuardExceptionPolicyTestData.ReplaceDefaultExceptions.Case testCase)
+    [MemberData(nameof(GuardExceptionPolicyTestData.Clear.Cases), MemberType = typeof(GuardExceptionPolicyTestData.Clear))]
+    public void Clear_RemovesTheGlobalMap(bool _)
     {
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
+        GuardExceptionPolicy.Map(failure => new InvalidOperationException(failure.Message));
 
-        try
-        {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.Value;
+        GuardExceptionPolicy.Clear();
 
-            Assert.Equal(testCase.Value, GuardExceptionPolicy.ReplaceDefaultExceptions);
-        }
-        finally
-        {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
-        }
+        Assert.False(GuardExceptionPolicy.HasMap);
     }
 
     [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.ShouldReplace.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.ShouldReplace))]
-    public void ShouldReplace_ReturnsExpected(GuardExceptionPolicyTestData.ShouldReplace.Case testCase)
+    [MemberData(nameof(GuardExceptionPolicyTestData.BeginScope.Cases), MemberType = typeof(GuardExceptionPolicyTestData.BeginScope))]
+    public void BeginScope_OverridesGlobalMap_AndRestoresOnDispose(bool _)
     {
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-
         try
         {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.ReplaceDefaultExceptions;
+            GuardExceptionPolicy.Map(failure => new InvalidOperationException("global: " + failure.Message));
 
-            Assert.Equal(testCase.Expected, GuardExceptionPolicy.ShouldReplace(testCase.Value));
-        }
-        finally
-        {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
-        }
-    }
-
-    [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.BeginScope.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.BeginScope))]
-    public void BeginScope_OverridesAndRestoresEffectivePolicy(GuardExceptionPolicyTestData.BeginScope.Case testCase)
-    {
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-        Func<Exception, Exception> globalReplacer = ex => new InvalidOperationException("global", ex);
-        Func<Exception, Exception> scopedReplacer = ex => new NotSupportedException("scoped", ex);
-
-        try
-        {
-            GuardExceptionPolicy.ExceptionReplacer = globalReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.GlobalReplaceDefaultExceptions;
-
-            using (GuardExceptionPolicy.BeginScope(options =>
-                   {
-                       options.ExceptionReplacer = scopedReplacer;
-                       options.ReplaceDefaultExceptions = testCase.ScopedReplaceDefaultExceptions;
-                   }))
+            using (GuardExceptionPolicy.BeginScope(failure => new NotSupportedException("scoped: " + failure.Message)))
             {
-                Assert.Same(scopedReplacer, GuardExceptionPolicy.ExceptionReplacer);
-                Assert.Equal(testCase.ScopedReplaceDefaultExceptions, GuardExceptionPolicy.ReplaceDefaultExceptions);
+                var scoped = Assert.Throws<NotSupportedException>(() => GuardFailure.Throw(FailedResult));
+                Assert.StartsWith("scoped: ", scoped.Message, StringComparison.Ordinal);
             }
 
-            Assert.Same(globalReplacer, GuardExceptionPolicy.ExceptionReplacer);
-            Assert.Equal(testCase.GlobalReplaceDefaultExceptions, GuardExceptionPolicy.ReplaceDefaultExceptions);
+            var global = Assert.Throws<InvalidOperationException>(() => GuardFailure.Throw(FailedResult));
+            Assert.StartsWith("global: ", global.Message, StringComparison.Ordinal);
         }
         finally
         {
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
+            GuardExceptionPolicy.Clear();
         }
     }
 
     [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.NestedScope.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.NestedScope))]
-    public void BeginScope_NestedScopes_RestoreOuterPolicyAfterInnerDispose(GuardExceptionPolicyTestData.NestedScope.Case testCase)
+    [MemberData(nameof(GuardExceptionPolicyTestData.NestedScope.Cases), MemberType = typeof(GuardExceptionPolicyTestData.NestedScope))]
+    public void BeginScope_NestedScopes_RestoreOuterAfterInnerDispose(bool _)
     {
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-        Func<Exception, Exception> globalReplacer = ex => new InvalidOperationException("global", ex);
-        Func<Exception, Exception> outerReplacer = ex => new NotSupportedException("outer", ex);
-        Func<Exception, Exception> innerReplacer = ex => new ApplicationException("inner", ex);
-
         try
         {
-            GuardExceptionPolicy.ExceptionReplacer = globalReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.GlobalReplaceDefaultExceptions;
+            GuardExceptionPolicy.Map(failure => new InvalidOperationException("global: " + failure.Message));
 
-            using (GuardExceptionPolicy.BeginScope(options =>
-                   {
-                       options.ExceptionReplacer = outerReplacer;
-                       options.ReplaceDefaultExceptions = testCase.OuterReplaceDefaultExceptions;
-                   }))
+            using (GuardExceptionPolicy.BeginScope(failure => new NotSupportedException("outer: " + failure.Message)))
             {
-                Assert.Same(outerReplacer, GuardExceptionPolicy.ExceptionReplacer);
-                Assert.Equal(testCase.OuterReplaceDefaultExceptions, GuardExceptionPolicy.ReplaceDefaultExceptions);
-
-                using (GuardExceptionPolicy.BeginScope(options =>
-                       {
-                           options.ExceptionReplacer = innerReplacer;
-                           options.ReplaceDefaultExceptions = testCase.InnerReplaceDefaultExceptions;
-                       }))
+                using (GuardExceptionPolicy.BeginScope(failure => new ApplicationException("inner: " + failure.Message)))
                 {
-                    Assert.Same(innerReplacer, GuardExceptionPolicy.ExceptionReplacer);
-                    Assert.Equal(testCase.InnerReplaceDefaultExceptions, GuardExceptionPolicy.ReplaceDefaultExceptions);
+                    var inner = Assert.Throws<ApplicationException>(() => GuardFailure.Throw(FailedResult));
+                    Assert.StartsWith("inner: ", inner.Message, StringComparison.Ordinal);
                 }
 
-                Assert.Same(outerReplacer, GuardExceptionPolicy.ExceptionReplacer);
-                Assert.Equal(testCase.OuterReplaceDefaultExceptions, GuardExceptionPolicy.ReplaceDefaultExceptions);
+                var outer = Assert.Throws<NotSupportedException>(() => GuardFailure.Throw(FailedResult));
+                Assert.StartsWith("outer: ", outer.Message, StringComparison.Ordinal);
             }
 
-            Assert.Same(globalReplacer, GuardExceptionPolicy.ExceptionReplacer);
-            Assert.Equal(testCase.GlobalReplaceDefaultExceptions, GuardExceptionPolicy.ReplaceDefaultExceptions);
+            var global = Assert.Throws<InvalidOperationException>(() => GuardFailure.Throw(FailedResult));
+            Assert.StartsWith("global: ", global.Message, StringComparison.Ordinal);
         }
         finally
         {
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
+            GuardExceptionPolicy.Clear();
         }
     }
 
     [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.SetPropertyInsideScope.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.SetPropertyInsideScope))]
-    public void SetPropertyInsideScope_UpdatesScopeNotGlobal(GuardExceptionPolicyTestData.SetPropertyInsideScope.Case testCase)
+    [MemberData(nameof(GuardExceptionPolicyTestData.MapInsideActiveScope.Cases), MemberType = typeof(GuardExceptionPolicyTestData.MapInsideActiveScope))]
+    public void Map_CalledInsideActiveScope_UpdatesScopeNotGlobal(bool _)
     {
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-        Func<Exception, Exception> globalReplacer = ex => new InvalidOperationException("global", ex);
-        Func<Exception, Exception> scopeOverrideReplacer = ex => new NotSupportedException("override", ex);
-
         try
         {
-            GuardExceptionPolicy.ExceptionReplacer = globalReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = false;
+            GuardExceptionPolicy.Map(failure => new InvalidOperationException("global: " + failure.Message));
 
-            using (GuardExceptionPolicy.BeginScope(_ => { }))
+            using (GuardExceptionPolicy.BeginScope(failure => new NotSupportedException("initial: " + failure.Message)))
             {
-                if (testCase.SetExceptionReplacer)
-                {
-                    GuardExceptionPolicy.ExceptionReplacer = scopeOverrideReplacer;
-                    Assert.Same(scopeOverrideReplacer, GuardExceptionPolicy.ExceptionReplacer);
-                }
+                GuardExceptionPolicy.Map(failure => new ApplicationException("replaced: " + failure.Message));
 
-                if (testCase.SetReplaceDefaultExceptions)
-                {
-                    GuardExceptionPolicy.ReplaceDefaultExceptions = true;
-                    Assert.True(GuardExceptionPolicy.ReplaceDefaultExceptions);
-                }
+                var replaced = Assert.Throws<ApplicationException>(() => GuardFailure.Throw(FailedResult));
+                Assert.StartsWith("replaced: ", replaced.Message, StringComparison.Ordinal);
             }
 
-            Assert.Same(globalReplacer, GuardExceptionPolicy.ExceptionReplacer);
-            Assert.False(GuardExceptionPolicy.ReplaceDefaultExceptions);
+            var global = Assert.Throws<InvalidOperationException>(() => GuardFailure.Throw(FailedResult));
+            Assert.StartsWith("global: ", global.Message, StringComparison.Ordinal);
         }
         finally
         {
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
+            GuardExceptionPolicy.Clear();
         }
     }
 
     [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.DoubleDispose.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.DoubleDispose))]
-    public void BeginScope_DoubleDispose_IsIdempotent(GuardExceptionPolicyTestData.DoubleDispose.Case testCase)
+    [MemberData(nameof(GuardExceptionPolicyTestData.ClearInsideActiveScope.Cases), MemberType = typeof(GuardExceptionPolicyTestData.ClearInsideActiveScope))]
+    public void Clear_CalledInsideActiveScope_ClearsScopeNotGlobal(bool _)
     {
-        _ = testCase;
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-
         try
         {
-            GuardExceptionPolicy.ExceptionReplacer = null;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = false;
+            GuardExceptionPolicy.Map(failure => new InvalidOperationException("global: " + failure.Message));
 
-            var scope = GuardExceptionPolicy.BeginScope(options =>
+            using (GuardExceptionPolicy.BeginScope(failure => new NotSupportedException("scoped: " + failure.Message)))
             {
-                options.ReplaceDefaultExceptions = true;
-            });
+                GuardExceptionPolicy.Clear();
 
-            Assert.True(GuardExceptionPolicy.ReplaceDefaultExceptions);
+                Assert.False(GuardExceptionPolicy.HasMap);
+                Assert.Throws<ArgumentException>(() => GuardFailure.Throw(FailedResult));
+            }
+
+            Assert.True(GuardExceptionPolicy.HasMap);
+            Assert.Throws<InvalidOperationException>(() => GuardFailure.Throw(FailedResult));
+        }
+        finally
+        {
+            GuardExceptionPolicy.Clear();
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardExceptionPolicyTestData.DoubleDispose.Cases), MemberType = typeof(GuardExceptionPolicyTestData.DoubleDispose))]
+    public void BeginScope_DoubleDispose_IsIdempotent(bool _)
+    {
+        try
+        {
+            var scope = GuardExceptionPolicy.BeginScope(failure => new NotSupportedException(failure.Message));
+            Assert.True(GuardExceptionPolicy.HasMap);
 
             scope.Dispose();
-            Assert.False(GuardExceptionPolicy.ReplaceDefaultExceptions);
+            Assert.False(GuardExceptionPolicy.HasMap);
 
             scope.Dispose();
-            Assert.False(GuardExceptionPolicy.ReplaceDefaultExceptions);
+            Assert.False(GuardExceptionPolicy.HasMap);
         }
         finally
         {
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
+            GuardExceptionPolicy.Clear();
         }
     }
 
     [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.StaleDispose.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.StaleDispose))]
-    public void BeginScope_StaleDispose_DoesNotAffectCurrentScope(GuardExceptionPolicyTestData.StaleDispose.Case testCase)
+    [MemberData(nameof(GuardExceptionPolicyTestData.StaleDispose.Cases), MemberType = typeof(GuardExceptionPolicyTestData.StaleDispose))]
+    public void BeginScope_StaleOuterDispose_DoesNotAffectActiveInnerScope(bool _)
     {
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-        Func<Exception, Exception> globalReplacer = ex => new InvalidOperationException("global", ex);
-        Func<Exception, Exception> outerReplacer = ex => new NotSupportedException("outer", ex);
-        Func<Exception, Exception> innerReplacer = ex => new ApplicationException("inner", ex);
-
         try
         {
-            GuardExceptionPolicy.ExceptionReplacer = globalReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.GlobalReplaceDefaultExceptions;
+            var outerScope = GuardExceptionPolicy.BeginScope(failure => new NotSupportedException("outer: " + failure.Message));
 
-            var outerScope = GuardExceptionPolicy.BeginScope(options =>
+            using (GuardExceptionPolicy.BeginScope(failure => new ApplicationException("inner: " + failure.Message)))
             {
-                options.ExceptionReplacer = outerReplacer;
-                options.ReplaceDefaultExceptions = testCase.OuterReplaceDefaultExceptions;
-            });
-
-            using (GuardExceptionPolicy.BeginScope(options =>
-                   {
-                       options.ExceptionReplacer = innerReplacer;
-                       options.ReplaceDefaultExceptions = testCase.InnerReplaceDefaultExceptions;
-                   }))
-            {
-                // Dispose the OUTER lease first, while the inner scope is still alive.
+                // Dispose the OUTER lease first, while the inner scope is still active.
                 outerScope.Dispose();
 
-                // The inner scope's policy must still apply — the disposed outer frame's options
-                // (a different replacer and a different flag value) must not resurface.
-                Assert.Same(innerReplacer, GuardExceptionPolicy.ExceptionReplacer);
-                Assert.Equal(testCase.InnerReplaceDefaultExceptions, GuardExceptionPolicy.ReplaceDefaultExceptions);
+                // The inner scope's map must still apply — the disposed outer frame must not resurface.
+                var inner = Assert.Throws<ApplicationException>(() => GuardFailure.Throw(FailedResult));
+                Assert.StartsWith("inner: ", inner.Message, StringComparison.Ordinal);
             }
 
-            // The inner scope has now also disposed. Out-of-order disposal must not leave the
-            // already-disposed outer frame's options resurfacing: both frames are marked disposed
-            // and skipped when resolving the ambient policy, so the effective policy unwinds all
-            // the way back to the global value.
-            Assert.Same(globalReplacer, GuardExceptionPolicy.ExceptionReplacer);
-            Assert.Equal(testCase.GlobalReplaceDefaultExceptions, GuardExceptionPolicy.ReplaceDefaultExceptions);
+            // Both frames are now disposed; the effective map unwinds all the way back to none.
+            Assert.False(GuardExceptionPolicy.HasMap);
         }
         finally
         {
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
+            GuardExceptionPolicy.Clear();
         }
     }
 
     [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.ScopeClearsInheritedReplacer.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.ScopeClearsInheritedReplacer))]
-    public void BeginScope_ExplicitNullReplacer_DisablesInheritedGlobalReplacer(GuardExceptionPolicyTestData.ScopeClearsInheritedReplacer.Case testCase)
+    [MemberData(nameof(GuardExceptionPolicyTestData.ChildContextIsolation.Cases), MemberType = typeof(GuardExceptionPolicyTestData.ChildContextIsolation))]
+    public async Task BeginScope_FromChildTask_DoesNotLeakToParentContext(bool _)
     {
-        _ = testCase;
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        Func<Exception, Exception> globalReplacer = ex => new InvalidOperationException("global", ex);
-
         try
         {
-            GuardExceptionPolicy.ExceptionReplacer = globalReplacer;
-
-            using (GuardExceptionPolicy.BeginScope(options => options.ExceptionReplacer = null))
+            using (GuardExceptionPolicy.BeginScope(failure => new NotSupportedException("outer: " + failure.Message)))
             {
-                Assert.Null(GuardExceptionPolicy.ExceptionReplacer);
-            }
-
-            Assert.Same(globalReplacer, GuardExceptionPolicy.ExceptionReplacer);
-        }
-        finally
-        {
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-        }
-    }
-
-    [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.GetEffectivePolicy.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.GetEffectivePolicy))]
-    public void GetEffectivePolicy_ResolvesReplacerAndFlagFromTheSameFrame(GuardExceptionPolicyTestData.GetEffectivePolicy.Case testCase)
-    {
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-        Func<Exception, Exception> globalReplacer = ex => new InvalidOperationException("global", ex);
-        Func<Exception, Exception> scopedReplacer = ex => new NotSupportedException("scoped", ex);
-
-        try
-        {
-            GuardExceptionPolicy.ExceptionReplacer = globalReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = false;
-
-            if (testCase.ScopeActive)
-            {
-                using (GuardExceptionPolicy.BeginScope(options =>
-                       {
-                           options.ExceptionReplacer = scopedReplacer;
-                           options.ReplaceDefaultExceptions = testCase.ScopedReplaceDefaultExceptions;
-                       }))
-                {
-                    var (replacer, replaceDefaultExceptions) = GuardExceptionPolicy.GetEffectivePolicy();
-
-                    Assert.Same(scopedReplacer, replacer);
-                    Assert.Equal(testCase.ScopedReplaceDefaultExceptions, replaceDefaultExceptions);
-                }
-            }
-            else
-            {
-                var (replacer, replaceDefaultExceptions) = GuardExceptionPolicy.GetEffectivePolicy();
-
-                Assert.Same(globalReplacer, replacer);
-                Assert.False(replaceDefaultExceptions);
-            }
-        }
-        finally
-        {
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
-        }
-    }
-
-    [Theory]
-    [MemberData(nameof(GuardExceptionPolicyTestData.ChildContextPropertyMutation.ValidCases), MemberType = typeof(GuardExceptionPolicyTestData.ChildContextPropertyMutation))]
-    public async Task SetPropertyInsideScope_FromChildTask_DoesNotLeakToParentContext(GuardExceptionPolicyTestData.ChildContextPropertyMutation.Case testCase)
-    {
-        _ = testCase;
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-
-        try
-        {
-            GuardExceptionPolicy.ExceptionReplacer = null;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = false;
-
-            using (GuardExceptionPolicy.BeginScope(options => options.ReplaceDefaultExceptions = true))
-            {
-                Assert.True(GuardExceptionPolicy.ReplaceDefaultExceptions);
-
                 await Task.Run(() =>
                 {
                     // The child inherits the parent's scope via AsyncLocal flow...
-                    Assert.True(GuardExceptionPolicy.ReplaceDefaultExceptions);
+                    Assert.True(GuardExceptionPolicy.HasMap);
 
-                    // ...and setting the property here must only ever affect this child's own context.
-                    GuardExceptionPolicy.ReplaceDefaultExceptions = false;
-                    Assert.False(GuardExceptionPolicy.ReplaceDefaultExceptions);
+                    // ...and a scope begun here must only ever affect this child's own context.
+                    using var childScope = GuardExceptionPolicy.BeginScope(failure => new ApplicationException("child: " + failure.Message));
+                    var child = Assert.Throws<ApplicationException>(() => GuardFailure.Throw(FailedResult));
+                    Assert.StartsWith("child: ", child.Message, StringComparison.Ordinal);
                 });
 
-                // The parent context's scope must be untouched by the child task's mutation: before the
-                // fix, both contexts shared the same mutable Options instance, so the child's write was
-                // instantly visible here too.
-                Assert.True(GuardExceptionPolicy.ReplaceDefaultExceptions);
+                // The parent context's scope must be untouched by the child task's own nested scope.
+                var outer = Assert.Throws<NotSupportedException>(() => GuardFailure.Throw(FailedResult));
+                Assert.StartsWith("outer: ", outer.Message, StringComparison.Ordinal);
             }
 
-            Assert.False(GuardExceptionPolicy.ReplaceDefaultExceptions);
+            Assert.False(GuardExceptionPolicy.HasMap);
         }
         finally
         {
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
+            GuardExceptionPolicy.Clear();
         }
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardExceptionPolicyTestData.NullArgumentGuards.Cases), MemberType = typeof(GuardExceptionPolicyTestData.NullArgumentGuards))]
+    public void Map_AndBeginScope_NullMap_Throw(bool _)
+    {
+        Assert.Throws<ArgumentNullException>(() => GuardExceptionPolicy.Map(null!));
+        Assert.Throws<ArgumentNullException>(() => GuardExceptionPolicy.BeginScope(null!));
     }
 }

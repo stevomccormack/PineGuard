@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.GuardClauses;
 
 namespace PineGuard.MustClauses;
 
@@ -211,12 +212,18 @@ public sealed class MustResult<T> : IMustResult
     /// <summary>
     /// Throws an <see cref="ArgumentException"/> if the result represents a failure.
     /// </summary>
+    /// <remarks>
+    /// Stamps <see cref="Code"/> and <see cref="ParamName"/> onto the thrown exception's
+    /// <see cref="Exception.Data"/> — read them back via <see cref="PineGuard.GuardClauses.ExceptionExtension"/>.
+    /// </remarks>
     /// <exception cref="ArgumentException">
     /// Thrown when <see cref="Failed"/> is <see langword="true"/>.
     /// </exception>
     public void ThrowIfFailed()
     {
-        if (Failed) throw new ArgumentException(Message, ParamName);
+        if (!Failed) return;
+
+        throw Stamp(new ArgumentException(Message, ParamName));
     }
 
     /// <summary>
@@ -226,6 +233,10 @@ public sealed class MustResult<T> : IMustResult
     /// <param name="exceptionFactory">
     /// A factory that creates the exception from the failure <see cref="Message"/> and <see cref="ParamName"/>.
     /// </param>
+    /// <remarks>
+    /// Stamps <see cref="Code"/> and <see cref="ParamName"/> onto the thrown exception's
+    /// <see cref="Exception.Data"/> — read them back via <see cref="PineGuard.GuardClauses.ExceptionExtension"/>.
+    /// </remarks>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="exceptionFactory"/> is <see langword="null"/>.</exception>
     /// <exception cref="Exception">Thrown as <typeparamref name="TException"/> when <see cref="Failed"/> is <see langword="true"/>.</exception>
     public void ThrowIfFailed<TException>(Func<string, string?, TException> exceptionFactory)
@@ -233,7 +244,9 @@ public sealed class MustResult<T> : IMustResult
     {
         ThrowHelper.ThrowIfNull(exceptionFactory);
 
-        if (Failed) throw exceptionFactory(Message, ParamName);
+        if (!Failed) return;
+
+        throw Stamp(exceptionFactory(Message, ParamName));
     }
 
     /// <summary>
@@ -244,6 +257,10 @@ public sealed class MustResult<T> : IMustResult
     /// A factory that creates the exception from the failed result, so it can read <see cref="Code"/> in
     /// addition to <see cref="Message"/> and <see cref="ParamName"/> — e.g. to build a coded domain exception.
     /// </param>
+    /// <remarks>
+    /// Stamps <see cref="Code"/> and <see cref="ParamName"/> onto the thrown exception's
+    /// <see cref="Exception.Data"/> — read them back via <see cref="PineGuard.GuardClauses.ExceptionExtension"/>.
+    /// </remarks>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="exceptionFactory"/> is <see langword="null"/>.</exception>
     /// <exception cref="Exception">Thrown as <typeparamref name="TException"/> when <see cref="Failed"/> is <see langword="true"/>.</exception>
     public void ThrowIfFailed<TException>(Func<IMustResult, TException> exceptionFactory)
@@ -251,18 +268,36 @@ public sealed class MustResult<T> : IMustResult
     {
         ThrowHelper.ThrowIfNull(exceptionFactory);
 
-        if (Failed) throw exceptionFactory(this);
+        if (!Failed) return;
+
+        throw Stamp(exceptionFactory(this));
     }
 
     /// <summary>
     /// Throws an <see cref="ArgumentNullException"/> if the result represents a failure.
     /// </summary>
+    /// <remarks>
+    /// Stamps <see cref="Code"/> and <see cref="ParamName"/> onto the thrown exception's
+    /// <see cref="Exception.Data"/> — read them back via <see cref="PineGuard.GuardClauses.ExceptionExtension"/>.
+    /// </remarks>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <see cref="Failed"/> is <see langword="true"/>.
     /// </exception>
     public void ThrowNullIfFailed()
     {
-        if (Failed) throw new ArgumentNullException(ParamName, Message);
+        if (!Failed) return;
+
+        throw Stamp(new ArgumentNullException(ParamName, Message));
+    }
+
+    private TException Stamp<TException>(TException exception)
+        where TException : Exception
+    {
+        exception.Data[GuardFailure.CodeDataKey] = Code;
+        if (ParamName is not null)
+            exception.Data[GuardFailure.PropertyPathDataKey] = ParamName;
+
+        return exception;
     }
 
     /// <summary>

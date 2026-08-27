@@ -37,7 +37,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.CaseStyle(value, style, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -67,7 +67,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.CamelCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -97,7 +97,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.PascalCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -127,7 +127,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.SnakeCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -157,7 +157,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.UpperSnakeCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -187,7 +187,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.KebabCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -217,7 +217,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.TrainCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -247,7 +247,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.DotCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -277,7 +277,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.SpaceCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -307,7 +307,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.UpperInvariant(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -337,7 +337,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.LowerInvariant(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -369,7 +369,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotCaseStyle(value, style, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -399,7 +399,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotCamelCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -429,7 +429,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotPascalCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -459,7 +459,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotSnakeCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -489,7 +489,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotUpperSnakeCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -519,7 +519,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotKebabCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -549,7 +549,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotTrainCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -579,7 +579,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotDotCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -609,7 +609,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotSpaceCase(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -639,7 +639,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotUpperInvariant(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -669,7 +669,7 @@ public static class GuardStringCasingClauses
     {
         var result = Must.Be.NotLowerInvariant(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

@@ -1,3 +1,4 @@
+using PineGuard.GuardClauses;
 using PineGuard.Testing.Common;
 using Xunit;
 using Xunit.Abstractions;
@@ -21,6 +22,13 @@ public abstract class BaseGuardUnitTest(ITestOutputHelper output) : BaseUnitTest
             Assert.Equal(expected.ParamName, ae.ParamName);
         if (expected.MessageContains is not null)
             Assert.Contains(expected.MessageContains, ex.Message);
+        if (expected is GuardExpected { Code: { } code } guardExpected)
+        {
+            Assert.Equal(code, ex.Data[GuardFailure.CodeDataKey]);
+            if (guardExpected.ParamName is not null)
+                Assert.Equal(guardExpected.ParamName, ex.Data[GuardFailure.PropertyPathDataKey]);
+        }
+
         return default!;
     }
 

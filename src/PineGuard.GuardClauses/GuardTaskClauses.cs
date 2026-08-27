@@ -49,7 +49,7 @@ public static class GuardTaskClauses
     {
         var result = Must.Be.NotCompleted(value, paramName); // Guard.Against.Completed => Must.Be.NotCompleted (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -94,7 +94,7 @@ public static class GuardTaskClauses
     {
         var result = Must.Be.Completed(value, paramName); // Guard.Against.NotCompleted => Must.Be.Completed (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -139,7 +139,7 @@ public static class GuardTaskClauses
     {
         var result = Must.Be.NotCanceled(value, paramName); // Guard.Against.Canceled => Must.Be.NotCanceled (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -184,7 +184,7 @@ public static class GuardTaskClauses
     {
         var result = Must.Be.Canceled(value, paramName); // Guard.Against.NotCanceled => Must.Be.Canceled (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -229,7 +229,7 @@ public static class GuardTaskClauses
     {
         var result = Must.Be.NotFaulted(value, paramName); // Guard.Against.Faulted => Must.Be.NotFaulted (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -274,7 +274,7 @@ public static class GuardTaskClauses
     {
         var result = Must.Be.Faulted(value, paramName); // Guard.Against.NotFaulted => Must.Be.Faulted (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

@@ -50,7 +50,7 @@ public static class GuardEmailClauses
     {
         var result = Must.Be.Email(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -96,7 +96,7 @@ public static class GuardEmailClauses
     {
         var result = Must.Be.StrictEmail(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -141,7 +141,7 @@ public static class GuardEmailClauses
     {
         var result = Must.Be.HasEmailAlias(value, paramName); // Guard.Against.NotHasEmailAlias => Must.Be.HasEmailAlias (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -186,7 +186,7 @@ public static class GuardEmailClauses
     {
         var result = Must.Be.NotHasEmailAlias(value, paramName); // Guard.Against.HasEmailAlias => Must.Be.NotHasEmailAlias (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

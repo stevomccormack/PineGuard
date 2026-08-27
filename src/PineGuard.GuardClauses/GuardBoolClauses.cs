@@ -50,7 +50,7 @@ public static class GuardBoolClauses
     {
         var result = Must.Be.True(value, paramName); // Guard.Against.False => Must.Be.True (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -96,7 +96,7 @@ public static class GuardBoolClauses
     {
         var result = Must.Be.False(value, paramName); // Guard.Against.True => Must.Be.False (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

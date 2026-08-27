@@ -50,7 +50,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NullOrEmpty(value, paramName); // Guard.Against.NotNullOrEmpty => Must.Be.NullOrEmpty (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -95,7 +95,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotNullOrEmpty(value, paramName); // Guard.Against.NullOrEmpty => Must.Be.NotNullOrEmpty (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -140,7 +140,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NullOrWhiteSpace(value, paramName); // Guard.Against.NotNullOrWhiteSpace => Must.Be.NullOrWhiteSpace (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -185,7 +185,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotNullOrWhiteSpace(value, paramName); // Guard.Against.NullOrWhiteSpace => Must.Be.NotNullOrWhiteSpace (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -232,7 +232,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.ExactLength(value, length, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -281,7 +281,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.LengthBetween(value, min, max, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -328,7 +328,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.LongerThan(value, length, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -375,7 +375,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.LongerThanOrEqual(value, length, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -422,7 +422,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.ShorterThan(value, length, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -469,7 +469,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.ShorterThanOrEqual(value, length, paramName); // Guard.Against.LongerThan => Must.Be.ShorterThanOrEqual (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -516,7 +516,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.Match(value, pattern, paramName); // Guard.Against.NotMatch => Must.Be.Match (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -563,7 +563,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotMatch(value, pattern, paramName); // Guard.Against.Match => Must.Be.NotMatch (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -601,7 +601,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.Alphabetic(value, inclusions, paramName); // Guard.Against.NotAlphabetic => Must.Be.Alphabetic (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -639,7 +639,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.Numeric(value, inclusions, paramName); // Guard.Against.NotNumeric => Must.Be.Numeric (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -677,7 +677,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.Alphanumeric(value, inclusions, paramName); // Guard.Against.NotAlphanumeric => Must.Be.Alphanumeric (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -713,7 +713,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.DigitsOnly(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -751,7 +751,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.DigitsOnly(value, allowedNonDigitChars, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -789,7 +789,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotAlphabetic(value, inclusions, paramName); // Guard.Against.Alphabetic => Must.Be.NotAlphabetic (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -827,7 +827,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotNumeric(value, inclusions, paramName); // Guard.Against.Numeric => Must.Be.NotNumeric (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -865,7 +865,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotAlphanumeric(value, inclusions, paramName); // Guard.Against.Alphanumeric => Must.Be.NotAlphanumeric (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -901,7 +901,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotDigitsOnly(value, paramName); // Guard.Against.DigitsOnly => Must.Be.NotDigitsOnly (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -939,7 +939,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotDigitsOnly(value, allowedNonDigitChars, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -977,7 +977,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotUppercase(value, lettersOnly, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1015,7 +1015,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotLowercase(value, lettersOnly, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1051,7 +1051,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.Ascii(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1087,7 +1087,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotAscii(value, paramName); // Guard.Against.NotAscii => Must.Be.Ascii (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1125,7 +1125,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.PrintableAscii(value, allowCommonWhitespace, paramName); // Guard.Against.NotPrintableAscii => Must.Be.PrintableAscii (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1163,7 +1163,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotPrintableAscii(value, allowCommonWhitespace, paramName); // Guard.Against.PrintableAscii => Must.Be.NotPrintableAscii (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1199,7 +1199,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotWhitespace(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1235,7 +1235,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.ContainsWhitespace(value, paramName); // Guard.Against.NotContainsWhitespace => Must.Be.ContainsWhitespace (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1271,7 +1271,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotContainsWhitespace(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1307,7 +1307,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.ContainsControlChars(value, paramName); // Guard.Against.NotContainsControlChars => Must.Be.ContainsControlChars (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1372,7 +1372,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotContainsControlChars(value, paramName); // Guard.Against.ContainsControlChars => Must.Be.NotContainsControlChars (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1410,7 +1410,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.ContainsAllowedOnly(value, allowedChars, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1448,7 +1448,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotContainsAllowedOnly(value, allowedChars, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1486,7 +1486,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.NotContainsDisallowed(value, disallowedChars, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1524,7 +1524,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.ContainsAny(value, characters, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1562,7 +1562,7 @@ public static class GuardStringClauses
     {
         var result = Must.Be.ContainsAny(value, disallowedChars, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

@@ -1,3 +1,4 @@
+using PineGuard.GuardClauses;
 using PineGuard.MustClauses;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
@@ -282,6 +283,30 @@ public sealed class MustResultTests : BaseUnitTest
 
         // Assert
         Assert.Equal("exceptionFactory", ex.ParamName);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustResultTestData.ThrowIfFailed.DataStampingCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
+    public void ThrowIfFailed_StampsCodeAndPropertyPathOntoExceptionData(MustResultTestData.ThrowIfFailed.DataStampingCase testCase)
+    {
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => testCase.MustResult.ThrowIfFailed());
+
+        // Assert
+        Assert.True(ex.HasMustCode(testCase.ExpectedCode));
+        Assert.Equal(testCase.ExpectedPropertyPath, ex.GetMustPropertyPath());
+    }
+
+    [Theory]
+    [MemberData(nameof(MustResultTestData.ThrowIfFailed.DataStampingCases), MemberType = typeof(MustResultTestData.ThrowIfFailed))]
+    public void ThrowNullIfFailed_StampsCodeAndPropertyPathOntoExceptionData(MustResultTestData.ThrowIfFailed.DataStampingCase testCase)
+    {
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(() => testCase.MustResult.ThrowNullIfFailed());
+
+        // Assert
+        Assert.True(ex.HasMustCode(testCase.ExpectedCode));
+        Assert.Equal(testCase.ExpectedPropertyPath, ex.GetMustPropertyPath());
     }
 
     [Theory]

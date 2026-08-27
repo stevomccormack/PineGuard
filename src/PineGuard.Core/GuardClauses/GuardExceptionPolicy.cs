@@ -3,162 +3,95 @@ using PineGuard.Common;
 namespace PineGuard.GuardClauses;
 
 /// <summary>
-/// Configures the global and ambient exception-replacement policy for all <c>Guard.Against.*</c> guards.
+/// Configures how <c>Guard.Against.*</c> failures are mapped onto the exception your application throws.
 /// </summary>
 /// <remarks>
 /// <para>
-/// By default, guards throw <see cref="ArgumentException"/> or <see cref="ArgumentNullException"/>.
-/// Use <see cref="ExceptionReplacer"/> together with <see cref="ReplaceDefaultExceptions"/> set to
-/// <see langword="true"/> to redirect these default guard failures to a different exception type
-/// (e.g., a custom domain exception). When <see cref="ReplaceDefaultExceptions"/> is <see langword="false"/>
-/// (the default), <see cref="ExceptionReplacer"/> has no effect on the built-in
-/// <see cref="ArgumentException"/> / <see cref="ArgumentNullException"/> failures.
-/// </para>
-/// <para>
-/// Use <see cref="BeginScope"/> to override the policy within a bounded ambient scope (e.g., per-request
-/// in an ASP.NET Core application), restoring the previous policy automatically on disposal.
+/// By default, guards throw the standard <see cref="ArgumentException"/> / <see cref="ArgumentNullException"/>
+/// family. Call <see cref="Map"/> once, at the composition root, to route every guard failure through your
+/// own <see cref="Func{GuardFailure,Exception}"/> — switching on <see cref="GuardFailure.Code"/> lets one
+/// expression map by code, by code family, or by exception type. <see cref="BeginScope"/> overrides the map
+/// for a bounded ambient scope (e.g. a test, or a per-request scope), restoring the previous map on disposal.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
-/// using (GuardExceptionPolicy.BeginScope(o =>
+/// using PineGuard.Codes;
+/// using PineGuard.GuardClauses;
+///
+/// GuardExceptionPolicy.Map(failure => failure.Code switch
 /// {
-///     o.ExceptionReplacer = ex => new DomainException(ex.Message);
-///     o.ReplaceDefaultExceptions = true;
-/// }))
-/// {
-///     Guard.Against.Null(value);  // throws DomainException instead of ArgumentNullException
-/// }
+///     MustCodes.Value.State.Null => new MissingRequiredValueException(failure.ParamName, failure.Exception),
+///     var c when c.StartsWith(MustCodes.Owasp.Prefix + '.', StringComparison.Ordinal) => new SecurityViolationException(c, failure.Exception),
+///     var c => new DomainValidationException(c, failure.Message, failure.Exception),
+/// });
 /// </code>
 /// </example>
-/// <seealso cref="GuardExceptionPolicyOptions"/>
 /// <seealso cref="GuardFailure"/>
 /// <seealso href="https://pineguard.ai/docs/guard">Guard Clauses documentation</seealso>
 public static class GuardExceptionPolicy
 {
+    private static Func<GuardFailure, Exception>? _globalMap;
     private static readonly AsyncLocal<ScopeFrame?> CurrentScope = new();
 
     /// <summary>
-    /// Gets or sets the global exception-replacement factory.
+    /// Installs an app-wide map from a <see cref="GuardFailure"/> to the exception guards should throw.
     /// </summary>
-    /// <remarks>
-    /// When set, and <see cref="ReplaceDefaultExceptions"/> is <see langword="true"/>, the factory maps
-    /// the default <see cref="ArgumentException"/> / <see cref="ArgumentNullException"/> to a custom exception.
-    /// If an ambient scope is active, the scope-local value is used instead — including a scope that
-    /// explicitly sets it back to <see langword="null"/> to disable an inherited replacer for that scope.
-    /// If <see langword="null"/> and no scope is active, no replacement occurs.
-    /// </remarks>
-    public static Func<Exception, Exception>? ExceptionReplacer
+    /// <param name="map">The mapping function. Called once per guard failure while no scope overrides it.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="map"/> is <see langword="null"/>.</exception>
+    public static void Map(Func<GuardFailure, Exception> map)
     {
-        get
-        {
-            var currentScope = ActiveScope();
-            return currentScope is not null ? currentScope.Options.ExceptionReplacer : Volatile.Read(ref field);
-        }
-        set
-        {
-            var currentScope = ActiveScope();
-            if (currentScope is null)
-            {
-                Volatile.Write(ref field, value);
-                return;
-            }
-
-            CurrentScope.Value = ScopeFrame.WithOverride(
-                currentScope,
-                new GuardExceptionPolicyOptions
-                {
-                    ExceptionReplacer = value,
-                    ReplaceDefaultExceptions = currentScope.Options.ReplaceDefaultExceptions
-                });
-        }
+        ThrowHelper.ThrowIfNull(map);
+        SetMap(map);
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the exception replacer applies to
-    /// the built-in <see cref="ArgumentException"/> family as well as other types.
+    /// Begins an ambient scope that overrides the current map. Restores the previous map when the
+    /// returned <see cref="IDisposable"/> is disposed.
     /// </summary>
-    /// <remarks>
-    /// When <see langword="false"/> (the default), the replacer is not applied to
-    /// <see cref="ArgumentException"/> or <see cref="ArgumentNullException"/>.
-    /// Set to <see langword="true"/> to replace all exception types uniformly.
-    /// </remarks>
-    public static bool ReplaceDefaultExceptions
+    /// <param name="map">The mapping function for the scope.</param>
+    /// <returns>An <see cref="IDisposable"/> that restores the previous map on disposal.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="map"/> is <see langword="null"/>.</exception>
+    public static IDisposable BeginScope(Func<GuardFailure, Exception> map)
     {
-        get => ActiveScope()?.Options.ReplaceDefaultExceptions ?? Volatile.Read(ref field);
-        set
-        {
-            var currentScope = ActiveScope();
-            if (currentScope is null)
-            {
-                Volatile.Write(ref field, value);
-                return;
-            }
+        ThrowHelper.ThrowIfNull(map);
 
-            CurrentScope.Value = ScopeFrame.WithOverride(
-                currentScope,
-                new GuardExceptionPolicyOptions
-                {
-                    ExceptionReplacer = currentScope.Options.ExceptionReplacer,
-                    ReplaceDefaultExceptions = value
-                });
-        }
-    }
-
-    /// <summary>
-    /// Begins an ambient policy scope that overrides the current exception-replacement settings.
-    /// Restores the previous settings when the returned <see cref="IDisposable"/> is disposed.
-    /// </summary>
-    /// <param name="configure">
-    /// A delegate that configures the <see cref="GuardExceptionPolicyOptions"/> for the scope.
-    /// </param>
-    /// <returns>An <see cref="IDisposable"/> that restores the previous policy on disposal.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="configure"/> is <see langword="null"/>.
-    /// </exception>
-    public static IDisposable BeginScope(Action<GuardExceptionPolicyOptions> configure)
-    {
-        ThrowHelper.ThrowIfNull(configure);
-
-        var scope = new ScopeFrame(
-            new GuardExceptionPolicyOptions
-            {
-                ExceptionReplacer = ExceptionReplacer,
-                ReplaceDefaultExceptions = ReplaceDefaultExceptions
-            },
-            ActiveScope());
-
-        configure(scope.Options);
+        var scope = new ScopeFrame(map, ActiveScope());
         CurrentScope.Value = scope;
 
         return new ScopeLease(scope);
     }
 
-    internal static bool ShouldReplace(Exception exception) =>
-        ShouldReplace(ReplaceDefaultExceptions, exception);
+    /// <summary>
+    /// Removes the current map. Guards fall back to the standard <see cref="ArgumentException"/> family.
+    /// </summary>
+    public static void Clear() => SetMap(null);
 
     /// <summary>
-    /// Evaluates the replacement gate against an already-resolved <see cref="ReplaceDefaultExceptions"/>
-    /// value, so callers that need to combine it with an <see cref="ExceptionReplacer"/> resolved from the
-    /// same snapshot (see <see cref="GetEffectivePolicy"/>) never trigger a second, independently-resolved
-    /// ambient lookup.
+    /// Gets a value indicating whether a map is currently installed (globally, or by an active scope).
     /// </summary>
-    internal static bool ShouldReplace(bool replaceDefaultExceptions, Exception exception) =>
-        replaceDefaultExceptions || exception is not ArgumentException;
+    public static bool HasMap => GetEffectiveMap() is not null;
 
-    /// <summary>
-    /// Resolves <see cref="ExceptionReplacer"/> and <see cref="ReplaceDefaultExceptions"/> from a single
-    /// ambient-scope resolution, so the pair is always read from the same frame. Reading the two properties
-    /// independently can observe a torn combination if a scope is disposed by another execution context
-    /// between the reads; this method walks <see cref="ActiveScope"/> exactly once and returns both values
-    /// from that one result.
-    /// </summary>
-    internal static (Func<Exception, Exception>? ExceptionReplacer, bool ReplaceDefaultExceptions) GetEffectivePolicy()
+    private static void SetMap(Func<GuardFailure, Exception>? map)
     {
         var currentScope = ActiveScope();
-        return currentScope is not null
-            ? (currentScope.Options.ExceptionReplacer, currentScope.Options.ReplaceDefaultExceptions)
-            : (ExceptionReplacer, ReplaceDefaultExceptions);
+        if (currentScope is null)
+        {
+            Volatile.Write(ref _globalMap, map);
+            return;
+        }
+
+        CurrentScope.Value = ScopeFrame.WithOverride(currentScope, map);
+    }
+
+    /// <summary>
+    /// Resolves the map currently in effect: the innermost active scope's map, or the global map when
+    /// no scope is active.
+    /// </summary>
+    internal static Func<GuardFailure, Exception>? GetEffectiveMap()
+    {
+        var currentScope = ActiveScope();
+        return currentScope is not null ? currentScope.Map : Volatile.Read(ref _globalMap);
     }
 
     /// <summary>
@@ -178,45 +111,41 @@ public static class GuardExceptionPolicy
     {
         // A single-element array, rather than a plain field, so that copy-on-write frames created by
         // WithOverride can share the exact same disposal cell as the frame they were derived from: marking
-        // the original scope's lease disposed must also invalidate every frame later derived from it via a
-        // property setter, even though those frames are distinct object instances.
+        // the original scope's lease disposed must also invalidate every frame later derived from it via
+        // SetMap, even though those frames are distinct object instances.
         private readonly int[] _disposedCell;
 
-        public ScopeFrame(GuardExceptionPolicyOptions options, ScopeFrame? previous)
-            : this(options, previous, new int[1])
+        public ScopeFrame(Func<GuardFailure, Exception>? map, ScopeFrame? previous)
+            : this(map, previous, new int[1])
         {
         }
 
-        private ScopeFrame(GuardExceptionPolicyOptions options, ScopeFrame? previous, int[] disposedCell)
+        private ScopeFrame(Func<GuardFailure, Exception>? map, ScopeFrame? previous, int[] disposedCell)
         {
-            Options = options;
+            Map = map;
             Previous = previous;
             _disposedCell = disposedCell;
         }
 
-        public GuardExceptionPolicyOptions Options { get; }
+        public Func<GuardFailure, Exception>? Map { get; }
         public ScopeFrame? Previous { get; }
 
         /// <summary>
         /// Gets a value indicating whether the lease for this frame has been disposed. Disposed frames stay
-        /// linked in the chain but are skipped when resolving the ambient policy, so out-of-order disposal
-        /// never restores a dead frame's options.
+        /// linked in the chain but are skipped when resolving the ambient map, so out-of-order disposal
+        /// never restores a dead frame's map.
         /// </summary>
         public bool IsDisposed => Volatile.Read(ref _disposedCell[0]) != 0;
 
         public void MarkDisposed() => Volatile.Write(ref _disposedCell[0], 1);
 
         /// <summary>
-        /// Creates a copy-on-write frame carrying <paramref name="options"/> in place of
-        /// <paramref name="source"/>'s options. The new frame shares <paramref name="source"/>'s disposal
-        /// cell and <see cref="Previous"/> link, so disposing the scope's original lease invalidates it too.
-        /// Assigning the result to <see cref="CurrentScope"/> only changes the ambient policy for the
-        /// current execution context and its descendants (normal <see cref="AsyncLocal{T}"/> semantics) —
-        /// unlike mutating <paramref name="source"/>.Options in place, it can never be observed by the
-        /// parent context or by sibling contexts that already captured a reference to <paramref name="source"/>.
+        /// Creates a copy-on-write frame carrying <paramref name="map"/> in place of <paramref name="source"/>'s
+        /// map. The new frame shares <paramref name="source"/>'s disposal cell and <see cref="Previous"/> link,
+        /// so disposing the scope's original lease invalidates it too.
         /// </summary>
-        public static ScopeFrame WithOverride(ScopeFrame source, GuardExceptionPolicyOptions options) =>
-            new(options, source.Previous, source._disposedCell);
+        public static ScopeFrame WithOverride(ScopeFrame source, Func<GuardFailure, Exception>? map) =>
+            new(map, source.Previous, source._disposedCell);
     }
 
     private sealed class ScopeLease(ScopeFrame scope) : IDisposable

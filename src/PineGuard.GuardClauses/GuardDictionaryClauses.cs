@@ -53,12 +53,13 @@ public static class GuardDictionaryClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            GuardFailure.Throw(message ?? Must.Be.NotNull(value, paramName).Message, paramName, value, exceptionCreator);
+        var nullCheck = Must.Be.NotNull(value, paramName);
+        if (nullCheck.Failed)
+            GuardFailure.Throw(nullCheck, message, exceptionCreator);
 
         var result = Must.Be.Empty(value, paramName); // Guard.Against.NotEmpty => Must.Be.Empty (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -105,7 +106,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.NotEmpty(value, paramName); // Guard.Against.Empty => Must.Be.NotEmpty (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -153,7 +154,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.HasKey(value, key, paramName); // Guard.Against.NotHasKey => Must.Be.HasKey (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -201,7 +202,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.NotHasKey(value, key, paramName); // Guard.Against.HasKey => Must.Be.NotHasKey (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -249,7 +250,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.HasValue(value, dictionaryValue, paramName); // Guard.Against.NotHasValue => Must.Be.HasValue (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -297,7 +298,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.NotHasValue(value, dictionaryValue, paramName); // Guard.Against.HasValue => Must.Be.NotHasValue (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -347,7 +348,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.HasKeyValue(value, key, dictionaryValue, paramName); // Guard.Against.NotHasKeyValue => Must.Be.HasKeyValue (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -397,7 +398,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.NotHasKeyValue(value, key, dictionaryValue, paramName); // Guard.Against.HasKeyValue => Must.Be.NotHasKeyValue (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -445,7 +446,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.HasAnyKey(value, predicate, paramName); // Guard.Against.NotHasAnyKey => Must.Be.HasAnyKey (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -493,7 +494,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.NotHasAnyKey(value, predicate, paramName); // Guard.Against.HasAnyKey => Must.Be.NotHasAnyKey (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -541,7 +542,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.HasAnyValue(value, predicate, paramName); // Guard.Against.NotHasAnyValue => Must.Be.HasAnyValue (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -589,7 +590,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.NotHasAnyValue(value, predicate, paramName); // Guard.Against.HasAnyValue => Must.Be.NotHasAnyValue (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -637,7 +638,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.HasAnyItem(value, predicate, paramName); // Guard.Against.NotHasAnyItem => Must.Be.HasAnyItem (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -685,7 +686,7 @@ public static class GuardDictionaryClauses
     {
         var result = Must.Be.NotHasAnyItem(value, predicate, paramName); // Guard.Against.HasAnyItem => Must.Be.NotHasAnyItem (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
