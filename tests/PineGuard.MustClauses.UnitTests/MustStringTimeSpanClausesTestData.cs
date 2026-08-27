@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
@@ -14,7 +15,8 @@ public static class MustStringTimeSpanClausesTestData
             F.TimeSpanIsDurationBetween.AllInvalid.ToMustCases(s => s.Name switch
             {
                 nameof(F.TimeSpanIsDurationBetween.NullValue) => new MustExpected(false, "value must not be null.", "value"),
-                _ => new MustExpected(false, "value must be a duration within the expected range.")
+                nameof(F.TimeSpanIsDurationBetween.NotADuration) => new MustExpected(false, "value must be a duration within the expected range.", Code: MustCodes.Time.Format.Invalid),
+                _ => new MustExpected(false, "value must be a duration within the expected range.", Code: MustCodes.Time.Duration.OutOfRange)
             });
     }
 
@@ -22,7 +24,7 @@ public static class MustStringTimeSpanClausesTestData
     {
         public static TheoryData<MustCase<(string? value, TimeSpan min, TimeSpan max, Inclusion inclusion)>> Cases =>
         [
-            new("in-range", ("00:30:00", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive), new MustExpected(false, "value must be a duration not within the expected range.")),
+            new("in-range", ("00:30:00", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive), new MustExpected(false, "value must be a duration not within the expected range.", Code: MustCodes.Time.Duration.InRange)),
             new("out-of-range", ("02:00:00", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive), new MustExpected(true)),
             new("not-a-duration", ("not-a-duration", TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive), new MustExpected(false, "value must be a duration not within the expected range.")),
             new("null-value", (null, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive), new MustExpected(false, "value must not be null.", "value")),
@@ -38,6 +40,7 @@ public static class MustStringTimeSpanClausesTestData
             F.TimeSpanIsGreaterThan.AllInvalid.ToMustCases(s => s.Name switch
             {
                 nameof(F.TimeSpanIsGreaterThan.NullValue) => new MustExpected(false, "value must not be null.", "value"),
+                nameof(F.TimeSpanIsGreaterThan.EqualExclusive) => new MustExpected(false, "value must be a duration greater than the threshold.", Code: MustCodes.Time.Duration.NotGreater),
                 _ => new MustExpected(false, "value must be a duration greater than the threshold.")
             });
     }
@@ -50,6 +53,7 @@ public static class MustStringTimeSpanClausesTestData
             F.TimeSpanIsLessThan.AllInvalid.ToMustCases(s => s.Name switch
             {
                 nameof(F.TimeSpanIsLessThan.NullValue) => new MustExpected(false, "value must not be null.", "value"),
+                nameof(F.TimeSpanIsLessThan.EqualExclusive) => new MustExpected(false, "value must be a duration less than the threshold.", Code: MustCodes.Time.Duration.NotLess),
                 _ => new MustExpected(false, "value must be a duration less than the threshold.")
             });
     }

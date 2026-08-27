@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -45,7 +46,7 @@ public static class MustGeoLocationClauses
         const string messageTemplate = "{paramName} must be a valid latitude.";
 
         var ok = GeoLocationRules.IsLatitude(value);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<double>.FromBool(ok, MustCodes.Geo.Latitude.Invalid, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -82,7 +83,7 @@ public static class MustGeoLocationClauses
         const string messageTemplate = "{paramName} must be a valid longitude.";
 
         var ok = GeoLocationRules.IsLongitude(value);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<double>.FromBool(ok, MustCodes.Geo.Longitude.Invalid, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -123,6 +124,7 @@ public static class MustGeoLocationClauses
         var ok = GeoLocationRules.IsGeoLocation(latitude, longitude);
         return MustResult<(double Latitude, double Longitude)>.FromBool(
             ok,
+            MustCodes.Geo.Coordinate.Invalid,
             messageTemplate,
             paramName,
             value: (latitude, longitude),

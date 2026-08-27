@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -46,12 +47,12 @@ public static class MustBufferClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Encoding.Hex.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid hex string.";
 
         var ok = BufferRules.IsHex(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Encoding.Hex.Invalid, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -87,12 +88,12 @@ public static class MustBufferClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Encoding.Base64.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid base64 string.";
 
         var ok = BufferRules.IsBase64(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Encoding.Base64.Invalid, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -128,12 +129,12 @@ public static class MustBufferClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Encoding.Base64.WellFormed, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid base64 string.";
 
         var ok = !BufferRules.IsBase64(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Encoding.Base64.WellFormed, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -169,11 +170,11 @@ public static class MustBufferClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Encoding.Hex.WellFormed, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid hex string.";
 
         var ok = !BufferRules.IsHex(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Encoding.Hex.WellFormed, messageTemplate, paramName, value, result: value);
     }
 }

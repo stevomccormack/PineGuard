@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.MustClauses.UnitTests;
@@ -10,6 +11,7 @@ public class MustStringClausesTests : BaseUnitTest
     {
         var result = Must.Be.NullOrEmpty(testCase.Value);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Content.NotNullOrEmpty, result);
     }
 
     [Theory]
@@ -18,6 +20,7 @@ public class MustStringClausesTests : BaseUnitTest
     {
         var result = Must.Be.NotNullOrEmpty(testCase.Value);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Content.NullOrEmpty, result);
     }
 
     [Theory]
@@ -26,6 +29,7 @@ public class MustStringClausesTests : BaseUnitTest
     {
         var result = Must.Be.NullOrWhiteSpace(testCase.Value);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Content.NotBlank, result);
     }
 
     [Theory]
@@ -34,6 +38,7 @@ public class MustStringClausesTests : BaseUnitTest
     {
         var result = Must.Be.NotNullOrWhiteSpace(testCase.Value);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Content.Blank, result);
     }
 
     [Theory]
@@ -42,6 +47,7 @@ public class MustStringClausesTests : BaseUnitTest
     {
         var result = Must.Be.Empty(testCase.Value);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Content.NotEmpty, result);
     }
 
     [Theory]
@@ -50,6 +56,7 @@ public class MustStringClausesTests : BaseUnitTest
     {
         var result = Must.Be.NotEmpty(testCase.Value);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Content.Empty, result);
     }
 
     [Theory]
@@ -60,6 +67,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.ExactLength(input, testCase.Value.Length);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Length.Mismatch, result);
     }
 
     [Theory]
@@ -81,6 +89,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.LengthBetween(input, testCase.Value.Min, testCase.Value.Max);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Length.OutOfRange, result);
     }
 
     [Theory]
@@ -102,6 +111,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.Match(input, testCase.Value.Pattern);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Pattern.NoMatch, result);
     }
 
     [Theory]
@@ -128,6 +138,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotMatch(input, testCase.Value.Pattern);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Pattern.Match, result);
     }
 
     [Theory]
@@ -149,6 +160,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.Alphabetic(input, testCase.Value.Inclusions);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotAlpha, result);
     }
 
     [Theory]
@@ -159,6 +171,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotAlphabetic(input, testCase.Value.Inclusions);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.Alpha, result);
     }
 
     [Theory]
@@ -191,6 +204,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.Numeric(input, testCase.Value.Inclusions);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotNumeric, result);
     }
 
     [Theory]
@@ -201,6 +215,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotNumeric(input, testCase.Value.Inclusions);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.Numeric, result);
     }
 
     [Theory]
@@ -233,6 +248,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.Alphanumeric(input, testCase.Value.Inclusions);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotAlphanumeric, result);
     }
 
     [Theory]
@@ -243,6 +259,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotAlphanumeric(input, testCase.Value.Inclusions);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.Alphanumeric, result);
     }
 
     [Theory]
@@ -277,11 +294,13 @@ public class MustStringClausesTests : BaseUnitTest
         {
             var result = Must.Be.DigitsOnly(input);
             Assert.Equal(testCase.Expected, result.Success);
+            AssertCode(MustCodes.Text.Charset.NotDigits, result);
         }
         else
         {
             var result = Must.Be.DigitsOnly(input, testCase.Value.AllowedChars);
             Assert.Equal(testCase.Expected, result.Success);
+            AssertCode(MustCodes.Text.Charset.NotDigits, result);
         }
     }
 
@@ -308,11 +327,13 @@ public class MustStringClausesTests : BaseUnitTest
         {
             var result = Must.Be.NotDigitsOnly(input);
             Assert.NotEqual(testCase.Expected, result.Success);
+            AssertCode(MustCodes.Text.Charset.Digits, result);
         }
         else
         {
             var result = Must.Be.NotDigitsOnly(input, testCase.Value.AllowedChars);
             Assert.NotEqual(testCase.Expected, result.Success);
+            AssertCode(MustCodes.Text.Charset.Digits, result);
         }
     }
 
@@ -337,6 +358,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.Uppercase(input, testCase.Value.LettersOnly);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Casing.NotUpper, result);
     }
 
     [Theory]
@@ -358,6 +380,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotUppercase(input, testCase.Value.LettersOnly);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Casing.Upper, result);
     }
 
     [Theory]
@@ -379,6 +402,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.Lowercase(input, testCase.Value.LettersOnly);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Casing.NotLower, result);
     }
 
     [Theory]
@@ -400,6 +424,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotLowercase(input, testCase.Value.LettersOnly);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Casing.Lower, result);
     }
 
     [Theory]
@@ -421,6 +446,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.Ascii(input);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotAscii, result);
     }
 
     [Theory]
@@ -442,6 +468,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotAscii(input);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.Ascii, result);
     }
 
     [Theory]
@@ -463,6 +490,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.PrintableAscii(input);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotPrintable, result);
     }
 
     [Theory]
@@ -484,6 +512,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotPrintableAscii(input);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.Printable, result);
     }
 
     [Theory]
@@ -505,6 +534,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotWhitespace(input);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Content.Whitespace, result);
     }
 
     [Theory]
@@ -526,6 +556,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.ContainsWhitespace(input);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotContainsWhitespace, result);
     }
 
     [Theory]
@@ -547,6 +578,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotContainsWhitespace(input);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.ContainsWhitespace, result);
     }
 
     [Theory]
@@ -568,6 +600,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.ContainsControlChars(input);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotContainsControl, result);
     }
 
     [Theory]
@@ -589,6 +622,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotContainsControlChars(input);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.ContainsControl, result);
     }
 
     [Theory]
@@ -610,6 +644,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.ContainsAllowedOnly(input, testCase.Value.Allowed);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotSubset, result);
     }
 
     [Theory]
@@ -631,6 +666,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotContainsAllowedOnly(input, testCase.Value.Allowed);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.Subset, result);
     }
 
     [Theory]
@@ -652,6 +688,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.ContainsDisallowed(input, testCase.Value.Allowed);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotContainsDisallowed, result);
     }
 
     [Theory]
@@ -674,6 +711,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.NotContainsDisallowed(input, testCase.Value.Allowed);
         Assert.NotEqual(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.ContainsDisallowed, result);
     }
 
     [Theory]
@@ -696,6 +734,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.LongerThan(input, testCase.Value.Length);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Length.TooShort, result);
     }
 
     [Theory]
@@ -717,6 +756,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.LongerThanOrEqual(input, testCase.Value.Length);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Length.TooShort, result);
     }
 
     [Theory]
@@ -738,6 +778,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.ShorterThan(input, testCase.Value.Length);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Length.TooLong, result);
     }
 
     [Theory]
@@ -759,6 +800,7 @@ public class MustStringClausesTests : BaseUnitTest
 
         var result = Must.Be.ShorterThanOrEqual(input, testCase.Value.Length);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Length.TooLong, result);
     }
 
     [Theory]
@@ -781,6 +823,7 @@ public class MustStringClausesTests : BaseUnitTest
         var input = testCase.Value.Value;
         var result = Must.Be.ContainsAny(input, testCase.Value.Chars);
         Assert.Equal(testCase.Expected, result.Success);
+        AssertCode(MustCodes.Text.Charset.NotContainsAny, result);
     }
 
     [Theory]
@@ -791,5 +834,11 @@ public class MustStringClausesTests : BaseUnitTest
         var result = Must.Be.ContainsAny(input, testCase.Value.Chars);
         Assert.Equal(testCase.Expected, result.Success);
         Assert.Equal(testCase.ParamName, result.ParamName);
+    }
+
+    private static void AssertCode(string expectedCode, MustResult<string> result)
+    {
+        if (result.Failed)
+            Assert.Equal(expectedCode, result.Code);
     }
 }

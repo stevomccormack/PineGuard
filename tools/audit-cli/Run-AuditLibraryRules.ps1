@@ -3,7 +3,7 @@
     Run Audit Library Rules
 
 .DESCRIPTION
-    Runs PineGuard audit rules for the library surfaces (Rule01..Rule10).
+    Runs PineGuard audit rules for the library surfaces (Rule01..Rule10, Rule13).
 
     If -Rule or -RuleName is provided, the explicit filter overrides the default subset.
 
@@ -62,7 +62,7 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'helpers\Load-AuditOrchestrator.ps1')
 
 if ((-not $RuleId -or $RuleId.Count -eq 0) -and (-not $RuleName -or $RuleName.Count -eq 0)) {
-    $RuleId = @('Rule01','Rule02','Rule03','Rule04','Rule05','Rule06','Rule07','Rule08','Rule09','Rule10')
+    $RuleId = @('Rule01','Rule02','Rule03','Rule04','Rule05','Rule06','Rule07','Rule08','Rule09','Rule10','Rule13')
 }
 
 Invoke-PineGuardAuditRules -AuditCliRoot $PSScriptRoot @PSBoundParameters

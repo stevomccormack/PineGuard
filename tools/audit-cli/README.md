@@ -12,12 +12,12 @@ For the normative specification (rule patterns, vocabulary, parity scope), see:
 tools/audit-cli/
 ├── PineGuard.AuditCli.slnx         # Solution file for the .NET auditor
 ├── Run-All.ps1                      # Master orchestrator (preferred entrypoint)
-├── Run-AuditLibraryRules.ps1        # Library rules subset (Rule01-Rule10)
+├── Run-AuditLibraryRules.ps1        # Library rules subset (Rule01-Rule10, Rule13)
 ├── Run-AuditTestingRules.ps1        # Testing rules subset (Rule50-Rule54)
 ├── Run-AuditRules.ps1               # Legacy compatibility shim
 ├── rules/
 │   ├── Load-Catalog.ps1             # Single source of truth for rule metadata
-│   ├── Test-Rule01-Naming.ps1       # through Test-Rule10 (library rules)
+│   ├── Test-Rule01-Naming.ps1       # through Test-Rule10, Test-Rule13 (library rules)
 │   └── Test-Rule50-*.ps1            # through Test-Rule54 (testing rules)
 ├── helpers/
 │   ├── Load-AuditHelpers.ps1        # Shared helpers
@@ -63,6 +63,7 @@ The rule catalog is defined in `rules/Load-Catalog.ps1` (single source of truth)
 | Rule08 | Ordering | Method ordering parity across layers |
 | Rule09 | CatalogIntegrity | Rule catalog self-consistency |
 | Rule10 | PsNormalization | PowerShell parse-safety compliance |
+| Rule13 | MustCodes | Must error-code catalogue integrity (one code per clause, every code used, no hardcoded literals, domain isolation, dependency-free leaf) |
 
 ### Testing Rules
 

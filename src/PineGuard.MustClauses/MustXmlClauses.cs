@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -43,12 +44,12 @@ public static class MustXmlClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<string>.Fail(MustCodes.Xml.Document.Invalid, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be XML.";
 
         var ok = XmlRules.IsXml(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Xml.Document.Invalid, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -85,7 +86,7 @@ public static class MustXmlClauses
         const string messageTemplate = "{paramName} must contain an XML Content-Type.";
 
         var ok = XmlRules.IsXmlContentType(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, MustCodes.Xml.ContentType.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -121,11 +122,11 @@ public static class MustXmlClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<string>.Fail(MustCodes.Xml.Document.Invalid, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be an XML document.";
 
         var ok = XmlRules.IsXml(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Xml.Document.Invalid, messageTemplate, paramName, value, value);
     }
 }

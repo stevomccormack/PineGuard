@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -43,12 +44,12 @@ public static class MustFilePathClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<string>.Fail(MustCodes.File.Name.Unsafe, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be a safe file name.";
 
         var ok = FilePathRules.IsSafeFileName(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.File.Name.Unsafe, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -89,11 +90,11 @@ public static class MustFilePathClauses
         [CallerArgumentExpression(nameof(path))] string? paramName = null)
     {
         if (path is null)
-            return MustResult<string>.Fail("{paramName} must not be null.", paramName, path);
+            return MustResult<string>.Fail(MustCodes.File.Extension.Mismatch, "{paramName} must not be null.", paramName, path);
 
         const string messageTemplate = "{paramName} must have an allowed file extension.";
 
         var ok = FilePathRules.HasFileExtension(path, allowed);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, path, path);
+        return MustResult<string>.FromBool(ok, MustCodes.File.Extension.Mismatch, messageTemplate, paramName, path, path);
     }
 }

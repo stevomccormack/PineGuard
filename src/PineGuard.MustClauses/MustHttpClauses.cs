@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -34,12 +35,12 @@ public static class MustHttpClauses
         [CallerArgumentExpression(nameof(name))] string? paramName = null)
     {
         if (name is null)
-            return MustResult<string>.Fail(NullMessage, paramName, name);
+            return MustResult<string>.Fail(MustCodes.Http.HeaderName.Malformed, NullMessage, paramName, name);
 
         const string messageTemplate = "{paramName} must be a valid HTTP header name.";
 
         var ok = HttpRules.IsHeaderName(name);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, name, name);
+        return MustResult<string>.FromBool(ok, MustCodes.Http.HeaderName.Malformed, messageTemplate, paramName, name, name);
     }
 
     /// <summary>
@@ -63,12 +64,12 @@ public static class MustHttpClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Http.HeaderValue.Malformed, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid HTTP header value.";
 
         var ok = HttpRules.IsHeaderValue(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Http.HeaderValue.Malformed, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -94,7 +95,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must be a valid HTTP status code.";
 
         var ok = HttpRules.IsHttpStatusCode(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.OutOfRange, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -120,7 +121,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must be an informational HTTP status code.";
 
         var ok = HttpRules.IsHttpStatusInformational(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.NotInformational, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -146,7 +147,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must be a successful HTTP status code.";
 
         var ok = HttpRules.IsHttpStatusSuccess(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.NotSuccess, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -172,7 +173,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must be a redirect HTTP status code.";
 
         var ok = HttpRules.IsHttpStatusRedirect(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.NotRedirect, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -198,7 +199,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must be a client error HTTP status code.";
 
         var ok = HttpRules.IsHttpStatusClientError(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.NotClientError, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -224,7 +225,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must be a server error HTTP status code.";
 
         var ok = HttpRules.IsHttpStatusServerError(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.NotServerError, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -242,7 +243,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must contain the specified header.";
 
         var ok = HttpRules.HasHeader(headers, name);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.Header.Missing, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -260,7 +262,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must contain a value for the specified header.";
 
         var ok = HttpRules.HasHeaderValue(headers, name);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.HeaderValue.Missing, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -280,7 +283,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must contain the specified header value.";
 
         var ok = HttpRules.HasHeaderValue(headers, name, expectedValue, comparison);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.HeaderValue.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -298,7 +302,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must contain a single value for the specified header.";
 
         var ok = HttpRules.HasSingleHeaderValue(headers, name);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.HeaderValue.NotSingle, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -316,7 +321,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must contain an allowed Content-Type.";
 
         var ok = HttpRules.HasContentType(headers, allowed);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentType.NotAllowed, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -340,12 +346,12 @@ public static class MustHttpClauses
         [CallerArgumentExpression(nameof(name))] string? paramName = null)
     {
         if (name is null)
-            return MustResult<string>.Fail(NullMessage, paramName, name);
+            return MustResult<string>.Fail(MustCodes.Http.HeaderName.WellFormed, NullMessage, paramName, name);
 
         const string messageTemplate = "{paramName} must not be a valid HTTP header name.";
 
         var ok = !HttpRules.IsHeaderName(name);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, name, name);
+        return MustResult<string>.FromBool(ok, MustCodes.Http.HeaderName.WellFormed, messageTemplate, paramName, name, name);
     }
 
     /// <summary>
@@ -369,12 +375,12 @@ public static class MustHttpClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Http.HeaderValue.WellFormed, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid HTTP header value.";
 
         var ok = !HttpRules.IsHeaderValue(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Http.HeaderValue.WellFormed, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -400,7 +406,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not be a valid HTTP status code.";
 
         var ok = !HttpRules.IsHttpStatusCode(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.InRange, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -426,7 +432,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not be an informational HTTP status code.";
 
         var ok = !HttpRules.IsHttpStatusInformational(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.Informational, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -452,7 +458,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not be a successful HTTP status code.";
 
         var ok = !HttpRules.IsHttpStatusSuccess(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.Success, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -478,7 +484,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not be a redirect HTTP status code.";
 
         var ok = !HttpRules.IsHttpStatusRedirect(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.Redirect, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -504,7 +510,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not be a client error HTTP status code.";
 
         var ok = !HttpRules.IsHttpStatusClientError(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.ClientError, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -530,7 +536,7 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not be a server error HTTP status code.";
 
         var ok = !HttpRules.IsHttpStatusServerError(status);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, status, result: status);
+        return MustResult<int>.FromBool(ok, MustCodes.Http.Status.ServerError, messageTemplate, paramName, status, result: status);
     }
 
     /// <summary>
@@ -548,7 +554,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not contain the specified header.";
 
         var ok = !HttpRules.HasHeader(headers, name);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.Header.Present, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -566,7 +573,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not contain a value for the specified header.";
 
         var ok = !HttpRules.HasHeaderValue(headers, name);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.HeaderValue.Present, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -586,7 +594,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not contain the specified header value.";
 
         var ok = !HttpRules.HasHeaderValue(headers, name, expectedValue, comparison);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.HeaderValue.Match, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -604,7 +613,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not contain a single value for the specified header.";
 
         var ok = !HttpRules.HasSingleHeaderValue(headers, name);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.HeaderValue.Single, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -622,7 +632,8 @@ public static class MustHttpClauses
         const string messageTemplate = "{paramName} must not contain an allowed Content-Type.";
 
         var ok = !HttpRules.HasContentType(headers, allowed);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentType.Allowed, messageTemplate, paramName, headers, headers);
     }
 }
 

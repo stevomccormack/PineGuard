@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -46,12 +47,12 @@ public static class MustOwaspClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Owasp.Payload.Unsafe, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be OWASP safe.";
 
         var ok = OwaspRules.IsOwaspSafe(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Owasp.Payload.Unsafe, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -87,12 +88,12 @@ public static class MustOwaspClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Owasp.Xss.Unsafe, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be XSS safe.";
 
         var ok = OwaspRules.IsXssSafe(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Owasp.Xss.Unsafe, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -128,12 +129,12 @@ public static class MustOwaspClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Owasp.SqlInjection.Unsafe, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be SQL-injection safe.";
 
         var ok = OwaspRules.IsSqlInjectionSafe(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Owasp.SqlInjection.Unsafe, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -169,12 +170,12 @@ public static class MustOwaspClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Owasp.PathTraversal.Unsafe, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be path-traversal safe.";
 
         var ok = OwaspRules.IsPathTraversalSafe(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Owasp.PathTraversal.Unsafe, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -210,12 +211,12 @@ public static class MustOwaspClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Owasp.CommandInjection.Unsafe, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be command-injection safe.";
 
         var ok = OwaspRules.IsCommandInjectionSafe(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Owasp.CommandInjection.Unsafe, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -251,12 +252,12 @@ public static class MustOwaspClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Owasp.Crlf.Unsafe, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be CRLF safe.";
 
         var ok = OwaspRules.IsCrLfSafe(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Owasp.Crlf.Unsafe, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -292,12 +293,12 @@ public static class MustOwaspClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Owasp.LdapFilter.Unsafe, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be LDAP-filter safe.";
 
         var ok = OwaspRules.IsLdapFilterSafe(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Owasp.LdapFilter.Unsafe, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -333,12 +334,12 @@ public static class MustOwaspClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Owasp.OpenRedirect.Unsafe, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be open-redirect safe.";
 
         var ok = OwaspRules.IsOpenRedirectSafe(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Owasp.OpenRedirect.Unsafe, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -374,13 +375,13 @@ public static class MustOwaspClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Owasp.SsrfScheme.Unsafe, NullMessage, paramName, value);
 
         // ReSharper disable once StringLiteralTypo
         const string messageTemplate = "{paramName} must be SSRF-scheme safe.";
 
         var ok = OwaspRules.IsSsrfSchemeSafe(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Owasp.SsrfScheme.Unsafe, messageTemplate, paramName, value, value);
     }
 
     //--------------------------------------------------------------------------------------------

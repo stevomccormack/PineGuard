@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -47,7 +48,7 @@ public static class MustSqlDateTimeClauses
         const string messageTemplate = "{paramName} must be within the SQL date range.";
 
         var ok = SqlDateTimeRules.IsInSqlDateRange(value);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Sql.OutOfRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -85,7 +86,7 @@ public static class MustSqlDateTimeClauses
         const string messageTemplate = "{paramName} must be within the SQL date/time range.";
 
         var ok = SqlDateTimeRules.IsInSqlDateTimeRange(value);
-        return MustResult<DateTimeOffset>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Sql.OutOfRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -123,7 +124,7 @@ public static class MustSqlDateTimeClauses
         const string messageTemplate = "{paramName} must be within the SQL date/time range.";
 
         var ok = SqlDateTimeRules.IsInSqlDateTimeRange(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Sql.OutOfRange, messageTemplate, paramName, value, value);
     }
 }
 #endif

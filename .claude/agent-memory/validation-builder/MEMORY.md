@@ -96,4 +96,4 @@ When implementing new validations, tests should follow the v2 architecture:
 - Zero comments, single-line entries, flat test classes, edge case constants from Rule classes
 
 ## Topic Files
-- (none yet — will grow organically)
+- [MustCodes catalogue](must-codes-catalogue.md) — wiring error codes into clauses: arg positions, null-early-return rule, reflection tests that reject bad entries

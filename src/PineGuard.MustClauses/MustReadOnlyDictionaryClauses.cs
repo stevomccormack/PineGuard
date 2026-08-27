@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -27,7 +28,7 @@ public static class MustReadOnlyDictionaryClauses
         const string messageTemplate = "{paramName} must be empty.";
 
         var ok = ReadOnlyDictionaryRules.IsEmpty(dictionary);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>?>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>?>.FromBool(ok, MustCodes.Dictionary.Items.NotEmpty, messageTemplate, paramName, dictionary, dictionary);
     }
 
     /// <summary>
@@ -44,7 +45,7 @@ public static class MustReadOnlyDictionaryClauses
         const string messageTemplate = "{paramName} must not be empty and have items.";
 
         var ok = ReadOnlyDictionaryRules.IsNotEmpty(dictionary);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Items.Empty, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -62,7 +63,7 @@ public static class MustReadOnlyDictionaryClauses
         const string messageTemplate = "{paramName} must contain the specified key.";
 
         var ok = ReadOnlyDictionaryRules.HasKey(dictionary, key);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Keys.Missing, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -80,7 +81,7 @@ public static class MustReadOnlyDictionaryClauses
         const string messageTemplate = "{paramName} must not contain the specified key.";
 
         var ok = !ReadOnlyDictionaryRules.HasKey(dictionary, key);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Keys.Present, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -98,7 +99,7 @@ public static class MustReadOnlyDictionaryClauses
         const string messageTemplate = "{paramName} must contain the specified value.";
 
         var ok = ReadOnlyDictionaryRules.HasValue(dictionary, value);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Values.Missing, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -116,7 +117,7 @@ public static class MustReadOnlyDictionaryClauses
         const string messageTemplate = "{paramName} must not contain the specified value.";
 
         var ok = !ReadOnlyDictionaryRules.HasValue(dictionary, value);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Values.Present, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -135,7 +136,7 @@ public static class MustReadOnlyDictionaryClauses
         const string messageTemplate = "{paramName} must contain the specified key/value pair.";
 
         var ok = ReadOnlyDictionaryRules.HasKeyValue(dictionary, key, value);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Items.Missing, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -154,7 +155,7 @@ public static class MustReadOnlyDictionaryClauses
         const string messageTemplate = "{paramName} must not contain the specified key/value pair.";
 
         var ok = !ReadOnlyDictionaryRules.HasKeyValue(dictionary, key, value);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Items.Present, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -170,12 +171,12 @@ public static class MustReadOnlyDictionaryClauses
         [CallerArgumentExpression(nameof(dictionary))] string? paramName = null)
     {
         if (predicate is null)
-            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(MustCodes.Dictionary.Keys.NoMatch, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must contain a key that matches the predicate.";
 
         var ok = ReadOnlyDictionaryRules.HasAnyKey(dictionary, predicate);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Keys.NoMatch, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -191,12 +192,12 @@ public static class MustReadOnlyDictionaryClauses
         [CallerArgumentExpression(nameof(dictionary))] string? paramName = null)
     {
         if (predicate is null)
-            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(MustCodes.Dictionary.Keys.Match, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must not contain a key that matches the predicate.";
 
         var ok = !ReadOnlyDictionaryRules.HasAnyKey(dictionary, predicate);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Keys.Match, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -212,12 +213,12 @@ public static class MustReadOnlyDictionaryClauses
         [CallerArgumentExpression(nameof(dictionary))] string? paramName = null)
     {
         if (predicate is null)
-            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(MustCodes.Dictionary.Values.NoMatch, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must contain a value that matches the predicate.";
 
         var ok = ReadOnlyDictionaryRules.HasAnyValue(dictionary, predicate);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Values.NoMatch, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -233,12 +234,12 @@ public static class MustReadOnlyDictionaryClauses
         [CallerArgumentExpression(nameof(dictionary))] string? paramName = null)
     {
         if (predicate is null)
-            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(MustCodes.Dictionary.Values.Match, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must not contain a value that matches the predicate.";
 
         var ok = !ReadOnlyDictionaryRules.HasAnyValue(dictionary, predicate);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Values.Match, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -254,12 +255,12 @@ public static class MustReadOnlyDictionaryClauses
         [CallerArgumentExpression(nameof(dictionary))] string? paramName = null)
     {
         if (predicate is null)
-            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(MustCodes.Dictionary.Items.NoMatch, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must contain an item that matches the predicate.";
 
         var ok = ReadOnlyDictionaryRules.HasAnyItem(dictionary, predicate);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Items.NoMatch, messageTemplate, paramName, dictionary, dictionary!);
     }
 
     /// <summary>
@@ -275,11 +276,11 @@ public static class MustReadOnlyDictionaryClauses
         [CallerArgumentExpression(nameof(dictionary))] string? paramName = null)
     {
         if (predicate is null)
-            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IReadOnlyDictionary<TKey, TValue>>.Fail(MustCodes.Dictionary.Items.Match, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must not contain an item that matches the predicate.";
 
         var ok = !ReadOnlyDictionaryRules.HasAnyItem(dictionary, predicate);
-        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, messageTemplate, paramName, dictionary, dictionary!);
+        return MustResult<IReadOnlyDictionary<TKey, TValue>>.FromBool(ok, MustCodes.Dictionary.Items.Match, messageTemplate, paramName, dictionary, dictionary!);
     }
 }
