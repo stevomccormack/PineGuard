@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -43,7 +44,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must be a letter.";
         var ok = CharRules.IsLetter(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.NotLetter, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -79,7 +80,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must not be a letter.";
         var ok = !CharRules.IsLetter(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.Letter, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -115,7 +116,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must be a digit.";
         var ok = CharRules.IsDigit(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.NotDigit, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -151,7 +152,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must not be a digit.";
         var ok = !CharRules.IsDigit(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.Digit, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -187,7 +188,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must be a letter or digit.";
         var ok = CharRules.IsLetterOrDigit(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.NotLetterOrDigit, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -223,7 +224,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must not be a letter or digit.";
         var ok = !CharRules.IsLetterOrDigit(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.LetterOrDigit, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -259,7 +260,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must be an ASCII character.";
         var ok = CharRules.IsAscii(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.NotAscii, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -295,7 +296,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must not be an ASCII character.";
         var ok = !CharRules.IsAscii(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.Ascii, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -331,7 +332,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must be a printable ASCII character.";
         var ok = CharRules.IsPrintableAscii(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.NotPrintableAscii, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -367,7 +368,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must not be a printable ASCII character.";
         var ok = !CharRules.IsPrintableAscii(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.PrintableAscii, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -403,7 +404,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must not be whitespace.";
         var ok = !CharRules.IsWhitespace(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Category.Whitespace, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -439,7 +440,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must be a control character.";
         var ok = CharRules.IsControl(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Category.NotControl, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -475,7 +476,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must not be a control character.";
         var ok = !CharRules.IsControl(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Category.Control, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -511,7 +512,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must be an uppercase letter.";
         var ok = CharRules.IsUppercase(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Casing.NotUpper, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -547,7 +548,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must be a lowercase letter.";
         var ok = CharRules.IsLowercase(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Casing.NotLower, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -583,7 +584,7 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must be a hexadecimal digit.";
         var ok = CharRules.IsHexDigit(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.NotHexDigit, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -619,6 +620,6 @@ public static class MustCharClauses
     {
         const string messageTemplate = "{paramName} must not be a hexadecimal digit.";
         var ok = !CharRules.IsHexDigit(value);
-        return MustResult<char>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<char>.FromBool(ok, MustCodes.Character.Charset.HexDigit, messageTemplate, paramName, value, value);
     }
 }

@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 using PineGuard.Utils;
 
@@ -45,16 +46,16 @@ public static class MustStringBoolClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<bool>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<bool>.Fail(MustCodes.Boolean.Value.False, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be true.";
 
         if (!StringUtility.Bool.TryParse(value, out var parsed))
-            return MustResult<bool>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<bool>.FromBool(false, MustCodes.Boolean.Value.False, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = BoolRules.IsTrue(parsedValue);
-        return MustResult<bool>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<bool>.FromBool(ok, MustCodes.Boolean.Value.False, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -90,15 +91,15 @@ public static class MustStringBoolClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<bool>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<bool>.Fail(MustCodes.Boolean.Value.True, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be false.";
 
         if (!StringUtility.Bool.TryParse(value, out var parsed))
-            return MustResult<bool>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<bool>.FromBool(false, MustCodes.Boolean.Value.True, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = BoolRules.IsFalse(parsedValue);
-        return MustResult<bool>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<bool>.FromBool(ok, MustCodes.Boolean.Value.True, messageTemplate, paramName, value, parsedValue);
     }
 }

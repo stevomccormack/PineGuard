@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -38,7 +39,7 @@ public static class MustDateOnlyRangeClauses
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = DateOnlyRangeRules.IsChronological(range, inclusion);
-        return MustResult<DateOnlyRange>.FromBool(ok, messageTemplate, paramName, range, range);
+        return MustResult<DateOnlyRange>.FromBool(ok, MustCodes.Range.Order.NotChronological, messageTemplate, paramName, range, range);
     }
 
     /// <summary>
@@ -68,7 +69,7 @@ public static class MustDateOnlyRangeClauses
         const string messageTemplate = "{paramName} must be overlapping.";
 
         var ok = DateOnlyRangeRules.IsOverlapping(range1, range2, inclusion);
-        return MustResult<DateOnlyRange>.FromBool(ok, messageTemplate, paramName, range1, range1);
+        return MustResult<DateOnlyRange>.FromBool(ok, MustCodes.Range.Overlap.Missing, messageTemplate, paramName, range1, range1);
     }
 
     /// <summary>
@@ -98,7 +99,7 @@ public static class MustDateOnlyRangeClauses
         const string messageTemplate = "{paramName} must not be overlapping.";
 
         var ok = !DateOnlyRangeRules.IsOverlapping(range1, range2, inclusion);
-        return MustResult<DateOnlyRange>.FromBool(ok, messageTemplate, paramName, range1, range1);
+        return MustResult<DateOnlyRange>.FromBool(ok, MustCodes.Range.Overlap.Present, messageTemplate, paramName, range1, range1);
     }
 
     /// <summary>
@@ -128,7 +129,7 @@ public static class MustDateOnlyRangeClauses
         const string messageTemplate = "{paramName} must contain the specified date.";
 
         var ok = DateOnlyRangeRules.Contains(range, value, inclusion);
-        return MustResult<DateOnlyRange>.FromBool(ok, messageTemplate, paramName, range, range);
+        return MustResult<DateOnlyRange>.FromBool(ok, MustCodes.Range.Bounds.NotContains, messageTemplate, paramName, range, range);
     }
 
     /// <summary>
@@ -158,7 +159,7 @@ public static class MustDateOnlyRangeClauses
         const string messageTemplate = "{paramName} must not contain the specified date.";
 
         var ok = !DateOnlyRangeRules.Contains(range, value, inclusion);
-        return MustResult<DateOnlyRange>.FromBool(ok, messageTemplate, paramName, range, range);
+        return MustResult<DateOnlyRange>.FromBool(ok, MustCodes.Range.Bounds.Contains, messageTemplate, paramName, range, range);
     }
 }
 #endif

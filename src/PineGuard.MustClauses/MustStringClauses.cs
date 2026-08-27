@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -41,7 +42,7 @@ public static class MustStringClauses
     {
         const string messageTemplate = "{paramName} must be null or empty.";
         var ok = string.IsNullOrEmpty(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value ?? string.Empty);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.NotNullOrEmpty, messageTemplate, paramName, value, value ?? string.Empty);
     }
 
     /// <summary>
@@ -69,7 +70,7 @@ public static class MustStringClauses
     {
         const string messageTemplate = "{paramName} must not be null or empty.";
         var ok = !string.IsNullOrEmpty(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value ?? string.Empty);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.NullOrEmpty, messageTemplate, paramName, value, value ?? string.Empty);
     }
 
     /// <summary>
@@ -97,7 +98,7 @@ public static class MustStringClauses
     {
         const string messageTemplate = "{paramName} must be null or whitespace.";
         var ok = string.IsNullOrWhiteSpace(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value ?? string.Empty);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.NotBlank, messageTemplate, paramName, value, value ?? string.Empty);
     }
 
     /// <summary>
@@ -125,7 +126,7 @@ public static class MustStringClauses
     {
         const string messageTemplate = "{paramName} must not be null or whitespace.";
         var ok = !string.IsNullOrWhiteSpace(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value ?? string.Empty);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.Blank, messageTemplate, paramName, value, value ?? string.Empty);
     }
 
     /// <summary>
@@ -155,7 +156,7 @@ public static class MustStringClauses
         // Usually Empty means not null and length 0.
         // If value is null, it's NOT empty string.
         var ok = value == string.Empty;
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value ?? string.Empty);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.NotEmpty, messageTemplate, paramName, value, value ?? string.Empty);
     }
 
     /// <summary>
@@ -182,7 +183,7 @@ public static class MustStringClauses
     {
         const string messageTemplate = "{paramName} must not be empty.";
         var ok = value != string.Empty;
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value ?? string.Empty);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.Empty, messageTemplate, paramName, value, value ?? string.Empty);
     }
 
     /// <summary>
@@ -212,15 +213,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Length.Mismatch, NullMessage, paramName, value);
 
         if (length < 0)
-            return MustResult<string>.Fail(NonNegativeLengthMessage, nameof(length), length);
+            return MustResult<string>.Fail(MustCodes.Text.Length.Mismatch, NonNegativeLengthMessage, nameof(length), length);
 
         const string messageTemplate = "{paramName} must be the expected length.";
 
         var ok = StringRules.IsExactLength(value, length);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Length.Mismatch, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -252,21 +253,21 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Length.OutOfRange, NullMessage, paramName, value);
 
         if (min < 0)
-            return MustResult<string>.Fail("{paramName} requires a non-negative min.", nameof(min), min);
+            return MustResult<string>.Fail(MustCodes.Text.Length.OutOfRange, "{paramName} requires a non-negative min.", nameof(min), min);
 
         if (max < 0)
-            return MustResult<string>.Fail("{paramName} requires a non-negative max.", nameof(max), max);
+            return MustResult<string>.Fail(MustCodes.Text.Length.OutOfRange, "{paramName} requires a non-negative max.", nameof(max), max);
 
         if (min > max)
-            return MustResult<string>.Fail("{paramName} requires a valid length range.", nameof(min), min);
+            return MustResult<string>.Fail(MustCodes.Text.Length.OutOfRange, "{paramName} requires a valid length range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must have a length within the expected range.";
 
         var ok = StringRules.IsLengthBetween(value, min, max);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Length.OutOfRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -296,15 +297,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NullMessage, paramName, value);
 
         if (length < 0)
-            return MustResult<string>.Fail(NonNegativeLengthMessage, nameof(length), length);
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NonNegativeLengthMessage, nameof(length), length);
 
         const string messageTemplate = "{paramName} must be longer than the specified length.";
 
         var ok = StringRules.IsLongerThan(value, length, Inclusion.Exclusive);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Length.TooShort, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -334,15 +335,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NullMessage, paramName, value);
 
         if (length < 0)
-            return MustResult<string>.Fail(NonNegativeLengthMessage, nameof(length), length);
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NonNegativeLengthMessage, nameof(length), length);
 
         const string messageTemplate = "{paramName} must be longer than or equal to the specified length.";
 
         var ok = StringRules.IsLongerThan(value, length, Inclusion.Inclusive);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Length.TooShort, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -372,15 +373,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NullMessage, paramName, value);
 
         if (length < 0)
-            return MustResult<string>.Fail(NonNegativeLengthMessage, nameof(length), length);
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NonNegativeLengthMessage, nameof(length), length);
 
         const string messageTemplate = "{paramName} must be shorter than the specified length.";
 
         var ok = StringRules.IsShorterThan(value, length, Inclusion.Exclusive);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Length.TooLong, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -410,15 +411,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NullMessage, paramName, value);
 
         if (length < 0)
-            return MustResult<string>.Fail(NonNegativeLengthMessage, nameof(length), length);
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NonNegativeLengthMessage, nameof(length), length);
 
         const string messageTemplate = "{paramName} must be shorter than or equal to the specified length.";
 
         var ok = StringRules.IsShorterThan(value, length, Inclusion.Inclusive);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Length.TooLong, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -448,15 +449,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Pattern.NoMatch, NullMessage, paramName, value);
 
         if (pattern is null)
-            return MustResult<string>.Fail(NullMessage, nameof(pattern), pattern);
+            return MustResult<string>.Fail(MustCodes.Text.Pattern.NoMatch, NullMessage, nameof(pattern), pattern);
 
         const string messageTemplate = "{paramName} must match the specified pattern.";
 
         var ok = StringRules.IsMatch(value, pattern);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Pattern.NoMatch, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -486,15 +487,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Pattern.Match, NullMessage, paramName, value);
 
         if (pattern is null)
-            return MustResult<string>.Fail(NullMessage, nameof(pattern), pattern);
+            return MustResult<string>.Fail(MustCodes.Text.Pattern.Match, NullMessage, nameof(pattern), pattern);
 
         const string messageTemplate = "{paramName} must not match the specified pattern.";
 
         var ok = !StringRules.IsMatch(value, pattern);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Pattern.Match, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -524,12 +525,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotAlpha, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be alphabetic.";
 
         var ok = StringRules.IsAlphabetic(value, inclusions);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotAlpha, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -559,12 +560,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.Alpha, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be alphabetic.";
 
         var ok = !StringRules.IsAlphabetic(value, inclusions);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.Alpha, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -594,12 +595,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotNumeric, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be numeric.";
 
         var ok = StringRules.IsNumeric(value, inclusions);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotNumeric, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -629,12 +630,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.Numeric, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be numeric.";
 
         var ok = !StringRules.IsNumeric(value, inclusions);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.Numeric, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -664,12 +665,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotAlphanumeric, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be alphanumeric.";
 
         var ok = StringRules.IsAlphanumeric(value, inclusions);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotAlphanumeric, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -699,12 +700,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.Alphanumeric, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be alphanumeric.";
 
         var ok = !StringRules.IsAlphanumeric(value, inclusions);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.Alphanumeric, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -732,12 +733,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotDigits, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must contain digits only.";
 
         var ok = StringRules.IsDigitsOnly(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotDigits, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -767,12 +768,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotDigits, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must contain digits only (except for allowed characters).";
 
         var ok = StringRules.IsDigitsOnly(value, allowedNonDigitChars);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotDigits, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -800,12 +801,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.Digits, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not contain digits only.";
 
         var ok = !StringRules.IsDigitsOnly(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.Digits, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -835,12 +836,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.Digits, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not contain digits only (considering allowed characters).";
 
         var ok = !StringRules.IsDigitsOnly(value, allowedNonDigitChars);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.Digits, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -870,12 +871,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotUpper, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be uppercase.";
 
         var ok = StringRules.IsUppercase(value, lettersOnly);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotUpper, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -905,12 +906,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Upper, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be uppercase.";
 
         var ok = !StringRules.IsUppercase(value, lettersOnly);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Upper, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -940,12 +941,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotLower, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be lowercase.";
 
         var ok = StringRules.IsLowercase(value, lettersOnly);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotLower, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -975,12 +976,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Lower, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be lowercase.";
 
         var ok = !StringRules.IsLowercase(value, lettersOnly);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Lower, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1008,12 +1009,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotAscii, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be ASCII.";
 
         var ok = StringRules.IsAscii(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotAscii, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1041,12 +1042,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.Ascii, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be ASCII.";
 
         var ok = !StringRules.IsAscii(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.Ascii, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1076,12 +1077,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotPrintable, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be printable ASCII.";
 
         var ok = StringRules.IsPrintableAscii(value, allowCommonWhitespace);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotPrintable, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1111,12 +1112,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.Printable, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be printable ASCII.";
 
         var ok = !StringRules.IsPrintableAscii(value, allowCommonWhitespace);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.Printable, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1144,12 +1145,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Content.Whitespace, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be whitespace.";
 
         var ok = !StringRules.IsWhitespace(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.Whitespace, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1177,12 +1178,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotContainsWhitespace, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must contain whitespace.";
 
         var ok = StringRules.ContainsWhitespace(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotContainsWhitespace, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1210,12 +1211,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.ContainsWhitespace, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not contain whitespace.";
 
         var ok = !StringRules.ContainsWhitespace(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.ContainsWhitespace, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1243,12 +1244,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotContainsControl, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must contain control characters.";
 
         var ok = StringRules.ContainsControlChars(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotContainsControl, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1276,12 +1277,12 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.ContainsControl, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not contain control characters.";
 
         var ok = StringRules.NotContainsControlChars(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.ContainsControl, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1311,15 +1312,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotSubset, NullMessage, paramName, value);
 
         if (allowedChars is null)
-            return MustResult<string>.Fail(NullMessage, nameof(allowedChars), allowedChars);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotSubset, NullMessage, nameof(allowedChars), allowedChars);
 
         const string messageTemplate = "{paramName} must contain only allowed characters.";
 
         var ok = StringRules.ContainsAllowedOnly(value, allowedChars);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotSubset, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1349,15 +1350,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotContainsDisallowed, NullMessage, paramName, value);
 
         if (disallowedChars is null)
-            return MustResult<string>.Fail(NullMessage, nameof(disallowedChars), disallowedChars);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotContainsDisallowed, NullMessage, nameof(disallowedChars), disallowedChars);
 
         const string messageTemplate = "{paramName} must contain a disallowed character.";
 
         var ok = StringRules.ContainsDisallowed(value, disallowedChars);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotContainsDisallowed, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1387,15 +1388,15 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.ContainsDisallowed, NullMessage, paramName, value);
 
         if (disallowedChars is null)
-            return MustResult<string>.Fail(NullMessage, nameof(disallowedChars), disallowedChars);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.ContainsDisallowed, NullMessage, nameof(disallowedChars), disallowedChars);
 
         const string messageTemplate = "{paramName} must not contain any disallowed characters.";
 
         var ok = !StringRules.ContainsDisallowed(value, disallowedChars);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.ContainsDisallowed, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1425,16 +1426,16 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.Subset, NullMessage, paramName, value);
 
         if (allowedChars is null)
-            return MustResult<string>.Fail(NullMessage, nameof(allowedChars), allowedChars);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.Subset, NullMessage, nameof(allowedChars), allowedChars);
 
         const string messageTemplate = "{paramName} must not contain only allowed characters.";
 
         // Not "ContainsAllowedOnly" means it must contain at least one disallowed char.
         var ok = !StringRules.ContainsAllowedOnly(value, allowedChars);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.Subset, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1464,14 +1465,14 @@ public static class MustStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotContainsAny, NullMessage, paramName, value);
 
         if (characters is null)
-            return MustResult<string>.Fail(NullMessage, nameof(characters), characters);
+            return MustResult<string>.Fail(MustCodes.Text.Charset.NotContainsAny, NullMessage, nameof(characters), characters);
 
         const string messageTemplate = "{paramName} must contain at least one of the expected characters.";
 
         var ok = StringRules.ContainsDisallowed(value, characters);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotContainsAny, messageTemplate, paramName, value, value);
     }
 }

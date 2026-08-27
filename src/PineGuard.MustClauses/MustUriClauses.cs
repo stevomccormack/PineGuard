@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 using PineGuard.Utils;
 
@@ -47,12 +48,12 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<Uri>.Fail(NullMessage, paramName, value);
+            return MustResult<Uri>.Fail(MustCodes.Uri.Form.NotAbsolute, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid absolute URI.";
 
         var ok = UriUtility.TryParseAbsolute(value, out var uri) && uri is not null;
-        return MustResult<Uri>.FromBool(ok, messageTemplate, paramName, value, result: uri!);
+        return MustResult<Uri>.FromBool(ok, MustCodes.Uri.Form.NotAbsolute, messageTemplate, paramName, value, result: uri!);
     }
 
     /// <summary>
@@ -89,12 +90,12 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<Uri>.Fail(NullMessage, paramName, value);
+            return MustResult<Uri>.Fail(MustCodes.Uri.Form.NotRelative, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid relative URI.";
 
         var ok = UriUtility.TryParseRelative(value, out var uri) && uri is not null;
-        return MustResult<Uri>.FromBool(ok, messageTemplate, paramName, value, result: uri!);
+        return MustResult<Uri>.FromBool(ok, MustCodes.Uri.Form.NotRelative, messageTemplate, paramName, value, result: uri!);
     }
 
     /// <summary>
@@ -131,12 +132,12 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<Uri>.Fail(NullMessage, paramName, value);
+            return MustResult<Uri>.Fail(MustCodes.Uri.Form.NotUrl, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid URL.";
 
         var ok = UriUtility.TryParseUrl(value, out var uri) && uri is not null;
-        return MustResult<Uri>.FromBool(ok, messageTemplate, paramName, value, result: uri!);
+        return MustResult<Uri>.FromBool(ok, MustCodes.Uri.Form.NotUrl, messageTemplate, paramName, value, result: uri!);
     }
 
     /// <summary>
@@ -173,7 +174,7 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<Uri>.Fail(NullMessage, paramName, value);
+            return MustResult<Uri>.Fail(MustCodes.Uri.Scheme.NotHttps, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid HTTPS URL.";
 
@@ -183,7 +184,7 @@ public static class MustUriClauses
 
         var uri = url.Result!;
         var ok = uri.Scheme == Uri.UriSchemeHttps;
-        return MustResult<Uri>.FromBool(ok, messageTemplate, paramName, value, result: uri);
+        return MustResult<Uri>.FromBool(ok, MustCodes.Uri.Scheme.NotHttps, messageTemplate, paramName, value, result: uri);
     }
 
     /// <summary>
@@ -220,7 +221,7 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<Uri>.Fail(NullMessage, paramName, value);
+            return MustResult<Uri>.Fail(MustCodes.Uri.Scheme.NotHttp, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid HTTP URL.";
 
@@ -230,7 +231,7 @@ public static class MustUriClauses
 
         var uri = url.Result!;
         var ok = uri.Scheme == Uri.UriSchemeHttp;
-        return MustResult<Uri>.FromBool(ok, messageTemplate, paramName, value, result: uri);
+        return MustResult<Uri>.FromBool(ok, MustCodes.Uri.Scheme.NotHttp, messageTemplate, paramName, value, result: uri);
     }
 
     /// <summary>
@@ -267,7 +268,7 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<Uri>.Fail(NullMessage, paramName, value);
+            return MustResult<Uri>.Fail(MustCodes.Uri.Scheme.NotFile, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid file URI.";
 
@@ -277,7 +278,7 @@ public static class MustUriClauses
 
         var uri = absoluteUri.Result!;
         var ok = uri.IsFile;
-        return MustResult<Uri>.FromBool(ok, messageTemplate, paramName, value, result: uri);
+        return MustResult<Uri>.FromBool(ok, MustCodes.Uri.Scheme.NotFile, messageTemplate, paramName, value, result: uri);
     }
 
     /// <summary>
@@ -313,12 +314,12 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Uri.FilePath.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid file path.";
 
         var ok = UriRules.IsFilePath(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Uri.FilePath.Invalid, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -356,15 +357,15 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Uri.Scheme.Mismatch, NullMessage, paramName, value);
 
         if (scheme is null)
-            return MustResult<string>.Fail(NullMessage, nameof(scheme), scheme);
+            return MustResult<string>.Fail(MustCodes.Uri.Scheme.Mismatch, NullMessage, nameof(scheme), scheme);
 
         const string messageTemplate = "{paramName} must have the expected scheme.";
 
         var ok = UriRules.HasScheme(value, scheme);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Uri.Scheme.Mismatch, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -400,12 +401,12 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Uri.FilePath.WellFormed, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid file path.";
 
         var ok = !UriRules.IsFilePath(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Uri.FilePath.WellFormed, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -443,14 +444,14 @@ public static class MustUriClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Uri.Scheme.Match, NullMessage, paramName, value);
 
         if (scheme is null)
-            return MustResult<string>.Fail(NullMessage, nameof(scheme), scheme);
+            return MustResult<string>.Fail(MustCodes.Uri.Scheme.Match, NullMessage, nameof(scheme), scheme);
 
         const string messageTemplate = "{paramName} must not have the expected scheme.";
 
         var ok = !UriRules.HasScheme(value, scheme);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Uri.Scheme.Match, messageTemplate, paramName, value, result: value);
     }
 }

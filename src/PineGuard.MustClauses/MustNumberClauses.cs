@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -38,7 +39,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be positive.";
 
         var ok = NumberRules.IsPositive<T>(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Sign.NotPositive, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -65,7 +66,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be negative.";
 
         var ok = NumberRules.IsNegative<T>(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Sign.NotNegative, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -92,7 +93,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be zero.";
 
         var ok = NumberRules.IsZero<T>(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Sign.NotZero, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -119,7 +120,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must not be zero.";
 
         var ok = NumberRules.IsNotZero<T>(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Sign.Zero, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -146,7 +147,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be zero or positive.";
 
         var ok = NumberRules.IsZeroOrPositive<T>(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Sign.Negative, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -173,7 +174,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be zero or negative.";
 
         var ok = NumberRules.IsZeroOrNegative<T>(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Sign.Positive, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -202,7 +203,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be greater than the minimum.";
 
         var ok = NumberRules.IsGreaterThan(value, min);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Range.NotGreater, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -231,7 +232,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be greater than or equal to the minimum.";
 
         var ok = NumberRules.IsGreaterThanOrEqual(value, min);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Range.BelowMinimum, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -260,7 +261,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be less than the maximum.";
 
         var ok = NumberRules.IsLessThan(value, max);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Range.NotLess, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -289,7 +290,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be less than or equal to the maximum.";
 
         var ok = NumberRules.IsLessThanOrEqual(value, max);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Range.Exceeded, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -320,12 +321,12 @@ public static class MustNumberClauses
         where T : struct, IComparable<T>
     {
         if (min.CompareTo(max) > 0)
-            return MustResult<T>.Fail("{paramName} requires a valid range.", nameof(min), min);
+            return MustResult<T>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must be within the expected range.";
 
         var ok = NumberRules.IsInRange(value, min, max, inclusion);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Range.OutOfRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -356,12 +357,12 @@ public static class MustNumberClauses
         where T : struct, IComparable<T>
     {
         if (min.CompareTo(max) > 0)
-            return MustResult<T>.Fail("{paramName} requires a valid range.", nameof(min), min);
+            return MustResult<T>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must be out of the expected range.";
 
         var ok = !NumberRules.IsInRange(value, min, max, inclusion);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Range.InRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -390,12 +391,12 @@ public static class MustNumberClauses
         where T : struct, INumber<T>
     {
         if (tolerance is null)
-            return MustResult<T>.Fail("{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
+            return MustResult<T>.Fail(MustCodes.Number.Tolerance.Null, "{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
 
         const string messageTemplate = "{paramName} must be approximately the target value.";
 
         var ok = NumberRules.IsApproximately(value, target, tolerance);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Proximity.NotApproximate, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -424,12 +425,12 @@ public static class MustNumberClauses
         where T : struct, INumber<T>
     {
         if (tolerance is null)
-            return MustResult<T>.Fail("{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
+            return MustResult<T>.Fail(MustCodes.Number.Tolerance.Null, "{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
 
         const string messageTemplate = "{paramName} must not be approximately the target value.";
 
         var ok = !NumberRules.IsApproximately(value, target, tolerance);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Proximity.Approximate, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -458,7 +459,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be a multiple of the specified factor.";
 
         var ok = NumberRules.IsMultipleOf(value, factor);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Divisibility.NotMultiple, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -487,7 +488,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must not be a multiple of the specified factor.";
 
         var ok = !NumberRules.IsMultipleOf(value, factor);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Divisibility.Multiple, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -513,7 +514,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be even.";
 
         var ok = NumberRules.IsEven(value);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<int>.FromBool(ok, MustCodes.Number.Parity.Odd, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -539,7 +540,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be even.";
 
         var ok = NumberRules.IsEven(value);
-        return MustResult<long>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<long>.FromBool(ok, MustCodes.Number.Parity.Odd, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -565,7 +566,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be odd.";
 
         var ok = NumberRules.IsOdd(value);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<int>.FromBool(ok, MustCodes.Number.Parity.Even, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -591,7 +592,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be odd.";
 
         var ok = NumberRules.IsOdd(value);
-        return MustResult<long>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<long>.FromBool(ok, MustCodes.Number.Parity.Even, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -617,7 +618,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be finite.";
 
         var ok = NumberRules.IsFinite(value);
-        return MustResult<float>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<float>.FromBool(ok, MustCodes.Number.Form.NotFinite, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -643,7 +644,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be finite.";
 
         var ok = NumberRules.IsFinite(value);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<double>.FromBool(ok, MustCodes.Number.Form.NotFinite, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -669,7 +670,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must not be finite.";
 
         var ok = !NumberRules.IsFinite(value);
-        return MustResult<float>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<float>.FromBool(ok, MustCodes.Number.Form.Finite, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -695,7 +696,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must not be finite.";
 
         var ok = !NumberRules.IsFinite(value);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<double>.FromBool(ok, MustCodes.Number.Form.Finite, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -721,7 +722,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must not be NaN.";
 
         var ok = !NumberRules.IsNaN(value);
-        return MustResult<float>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<float>.FromBool(ok, MustCodes.Number.Form.Nan, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -747,7 +748,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must not be NaN.";
 
         var ok = !NumberRules.IsNaN(value);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<double>.FromBool(ok, MustCodes.Number.Form.Nan, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -773,7 +774,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be NaN.";
 
         var ok = NumberRules.IsNaN(value);
-        return MustResult<float>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<float>.FromBool(ok, MustCodes.Number.Form.NotNan, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -799,7 +800,7 @@ public static class MustNumberClauses
         const string messageTemplate = "{paramName} must be NaN.";
 
         var ok = NumberRules.IsNaN(value);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<double>.FromBool(ok, MustCodes.Number.Form.NotNan, messageTemplate, paramName, value, value);
     }
 }
 #endif

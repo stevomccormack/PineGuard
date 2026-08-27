@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.MustClauses;
@@ -14,8 +15,8 @@ public static class MustStringNumberTypesClausesTestData
 
         public static TheoryData<MustCase<string?>> InvalidCases => F.IsDecimal.InvalidScenarios.ToMustCases(s => s.Name switch
         {
-            nameof(F.IsDecimal.NullValue) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must be a decimal number.")
+            nameof(F.IsDecimal.NullValue) => new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Number.Format.NotDecimal),
+            _ => new MustExpected(false, "value must be a decimal number.", Code: MustCodes.Number.Format.NotDecimal)
         });
     }
 
@@ -36,8 +37,8 @@ public static class MustStringNumberTypesClausesTestData
 
         public static TheoryData<MustCase<string?>> InvalidCases => F.IsExactDecimal.InvalidScenarios.ToMustCases(s => s.Name switch
         {
-            nameof(F.IsExactDecimal.NullValue) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must be an exact decimal number.")
+            nameof(F.IsExactDecimal.NullValue) => new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Number.Scale.Mismatch),
+            _ => new MustExpected(false, "value must be an exact decimal number.", Code: MustCodes.Number.Scale.Mismatch)
         });
     }
 
@@ -58,8 +59,8 @@ public static class MustStringNumberTypesClausesTestData
 
         public static TheoryData<MustCase<string?>> InvalidCases => F.IsInt32.InvalidScenarios.ToMustCases(s => s.Name switch
         {
-            nameof(F.IsInt32.NullValue) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must be a 32-bit integer.")
+            nameof(F.IsInt32.NullValue) => new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Number.Format.NotInt32),
+            _ => new MustExpected(false, "value must be a 32-bit integer.", Code: MustCodes.Number.Format.NotInt32)
         });
     }
 
@@ -69,8 +70,8 @@ public static class MustStringNumberTypesClausesTestData
 
         public static TheoryData<MustCase<string?>> InvalidCases => F.IsInt64.InvalidScenarios.ToMustCases(s => s.Name switch
         {
-            nameof(F.IsInt64.NullValue) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must be a 64-bit integer.")
+            nameof(F.IsInt64.NullValue) => new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Number.Format.NotInt64),
+            _ => new MustExpected(false, "value must be a 64-bit integer.", Code: MustCodes.Number.Format.NotInt64)
         });
     }
 
@@ -80,7 +81,7 @@ public static class MustStringNumberTypesClausesTestData
             F.IsInt32InRange.AllValid.ToMustCases();
 
         public static TheoryData<MustCase<(string text, int min, int max, Inclusion inclusion)>> InvalidCases =>
-            F.IsInt32InRange.AllInvalid.ToMustCases(_ => new MustExpected(false, "value must be a 32-bit integer within the expected range."));
+            F.IsInt32InRange.AllInvalid.ToMustCases(_ => new MustExpected(false, "value must be a 32-bit integer within the expected range.", Code: MustCodes.Number.Range.OutOfRange));
 
         public static TheoryData<NullCase> NullCases =>
         [
@@ -138,7 +139,7 @@ public static class MustStringNumberTypesClausesTestData
             F.IsInt64InRange.AllValid.ToMustCases();
 
         public static TheoryData<MustCase<(string text, long min, long max, Inclusion inclusion)>> InvalidCases =>
-            F.IsInt64InRange.AllInvalid.ToMustCases(_ => new MustExpected(false, "value must be a 64-bit integer within the expected range."));
+            F.IsInt64InRange.AllInvalid.ToMustCases(_ => new MustExpected(false, "value must be a 64-bit integer within the expected range.", Code: MustCodes.Number.Range.OutOfRange));
 
         public static TheoryData<NullCase> NullCases =>
         [

@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -25,12 +26,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.ContentSecurityPolicy.Missing, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Content-Security-Policy header.";
 
         var ok = HttpSecurityHeaderRules.HasContentSecurityPolicyHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentSecurityPolicy.Missing, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -45,12 +48,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.ContentSecurityPolicy.Weak, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Content-Security-Policy header with secure default values.";
 
         var ok = HttpSecurityHeaderRules.HasContentSecurityPolicyWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentSecurityPolicy.Weak, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -69,7 +74,8 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.ContentSecurityPolicy.Weak, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Content-Security-Policy header that meets requirements.";
 
@@ -80,7 +86,8 @@ public static class MustHttpSecurityHeaderClauses
             requiredBaseUriValue,
             requiredFrameAncestorsValue);
 
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentSecurityPolicy.Weak, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -95,12 +102,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.StrictTransportSecurity.Missing, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Strict-Transport-Security header.";
 
         var ok = HttpSecurityHeaderRules.HasStrictTransportSecurityHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.StrictTransportSecurity.Missing, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -115,12 +124,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.StrictTransportSecurity.Weak, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Strict-Transport-Security header with secure default values.";
 
         var ok = HttpSecurityHeaderRules.HasStrictTransportSecurityWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.StrictTransportSecurity.Weak, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -138,15 +149,18 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.StrictTransportSecurity.Weak, NullMessage, paramName, headers);
 
         if (minMaxAgeSeconds <= 0)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail("{paramName} must be positive.", nameof(minMaxAgeSeconds), minMaxAgeSeconds);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.StrictTransportSecurity.Weak, "{paramName} must be positive.", nameof(minMaxAgeSeconds), minMaxAgeSeconds);
 
         const string messageTemplate = "{paramName} must contain a Strict-Transport-Security header that meets requirements.";
 
         var ok = HttpSecurityHeaderRules.HasStrictTransportSecurity(headers, minMaxAgeSeconds, requireIncludeSubDomains, requirePreload);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.StrictTransportSecurity.Weak, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -161,12 +175,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.ContentTypeOptions.Missing, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain an X-Content-Type-Options header.";
 
         var ok = HttpSecurityHeaderRules.HasXContentTypeOptionsHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentTypeOptions.Missing, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -181,12 +197,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.ContentTypeOptions.Mismatch, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain an X-Content-Type-Options header with secure default values.";
 
         var ok = HttpSecurityHeaderRules.HasXContentTypeOptionsWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentTypeOptions.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -202,12 +220,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.ContentTypeOptions.Mismatch, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain an X-Content-Type-Options header with the expected value.";
 
         var ok = HttpSecurityHeaderRules.HasXContentTypeOptions(headers, expectedValue);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentTypeOptions.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -222,12 +242,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.FrameOptions.Missing, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain an X-Frame-Options header.";
 
         var ok = HttpSecurityHeaderRules.HasXFrameOptionsHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.FrameOptions.Missing, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -242,12 +264,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.FrameOptions.Mismatch, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain an X-Frame-Options header with secure default values.";
 
         var ok = HttpSecurityHeaderRules.HasXFrameOptionsWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.FrameOptions.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -263,12 +287,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.FrameOptions.Mismatch, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain an X-Frame-Options header with the expected value.";
 
         var ok = HttpSecurityHeaderRules.HasXFrameOptions(headers, expectedValue);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.FrameOptions.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -283,12 +309,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.ReferrerPolicy.Missing, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Referrer-Policy header.";
 
         var ok = HttpSecurityHeaderRules.HasReferrerPolicyHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ReferrerPolicy.Missing, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -303,12 +331,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.ReferrerPolicy.Mismatch, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Referrer-Policy header with secure default values.";
 
         var ok = HttpSecurityHeaderRules.HasReferrerPolicyWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ReferrerPolicy.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -324,12 +354,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.ReferrerPolicy.Mismatch, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Referrer-Policy header with the expected value.";
 
         var ok = HttpSecurityHeaderRules.HasReferrerPolicy(headers, expectedValue);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ReferrerPolicy.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -344,12 +376,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.PermissionsPolicy.Missing, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Permissions-Policy header.";
 
         var ok = HttpSecurityHeaderRules.HasPermissionsPolicyHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.PermissionsPolicy.Missing, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -364,12 +398,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.PermissionsPolicy.NotContains, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Permissions-Policy header with secure default values.";
 
         var ok = HttpSecurityHeaderRules.HasPermissionsPolicyWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.PermissionsPolicy.NotContains, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -385,12 +421,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.PermissionsPolicy.Mismatch, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Permissions-Policy header with the expected value.";
 
         var ok = HttpSecurityHeaderRules.HasPermissionsPolicy(headers, expectedValue);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.PermissionsPolicy.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -406,12 +444,14 @@ public static class MustHttpSecurityHeaderClauses
         [CallerArgumentExpression(nameof(headers))] string? paramName = null)
     {
         if (headers is null)
-            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(NullMessage, paramName, headers);
+            return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Fail(
+                MustCodes.Http.PermissionsPolicy.NotContains, NullMessage, paramName, headers);
 
         const string messageTemplate = "{paramName} must contain a Permissions-Policy header containing required fragments.";
 
         var ok = HttpSecurityHeaderRules.HasPermissionsPolicyContaining(headers, requiredFragments);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.PermissionsPolicy.NotContains, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -427,7 +467,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain a Content-Security-Policy header.";
         var ok = !HttpSecurityHeaderRules.HasContentSecurityPolicyHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentSecurityPolicy.Present, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -443,7 +484,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain a Content-Security-Policy header with defaults.";
         var ok = !HttpSecurityHeaderRules.HasContentSecurityPolicyWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentSecurityPolicy.Strong, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -459,7 +501,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain a Strict-Transport-Security header.";
         var ok = !HttpSecurityHeaderRules.HasStrictTransportSecurityHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.StrictTransportSecurity.Present, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -475,7 +518,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain a Strict-Transport-Security header with defaults.";
         var ok = !HttpSecurityHeaderRules.HasStrictTransportSecurityWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.StrictTransportSecurity.Strong, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -491,7 +535,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain an X-Content-Type-Options header.";
         var ok = !HttpSecurityHeaderRules.HasXContentTypeOptionsHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentTypeOptions.Present, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -507,7 +552,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain an X-Content-Type-Options header with defaults.";
         var ok = !HttpSecurityHeaderRules.HasXContentTypeOptionsWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ContentTypeOptions.Match, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -523,7 +569,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain an X-Frame-Options header.";
         var ok = !HttpSecurityHeaderRules.HasXFrameOptionsHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.FrameOptions.Present, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -539,7 +586,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain an X-Frame-Options header with defaults.";
         var ok = !HttpSecurityHeaderRules.HasXFrameOptionsWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.FrameOptions.Match, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -555,7 +603,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain a Referrer-Policy header.";
         var ok = !HttpSecurityHeaderRules.HasReferrerPolicyHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ReferrerPolicy.Present, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -571,7 +620,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain a Referrer-Policy header with defaults.";
         var ok = !HttpSecurityHeaderRules.HasReferrerPolicyWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.ReferrerPolicy.Match, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -587,7 +637,8 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain a Permissions-Policy header.";
         var ok = !HttpSecurityHeaderRules.HasPermissionsPolicyHeader(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.PermissionsPolicy.Present, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -603,6 +654,7 @@ public static class MustHttpSecurityHeaderClauses
     {
         const string messageTemplate = "{paramName} must not contain a Permissions-Policy header with defaults.";
         var ok = !HttpSecurityHeaderRules.HasPermissionsPolicyWithDefaults(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(
+            ok, MustCodes.Http.PermissionsPolicy.Contains, messageTemplate, paramName, headers, headers);
     }
 }

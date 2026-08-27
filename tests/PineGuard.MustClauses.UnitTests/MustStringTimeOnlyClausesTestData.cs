@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
@@ -15,9 +16,9 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? value, TimeOnly min, TimeOnly max)>> Cases =>
         [
             new("in-range", ("11:00", T1000, T1200), new MustExpected(true)),
-            new("out-of-range", ("13:00", T1000, T1200), new MustExpected(false, "value must be a time within the expected range.")),
+            new("out-of-range", ("13:00", T1000, T1200), new MustExpected(false, "value must be a time within the expected range.", Code: MustCodes.Time.Range.OutOfRange)),
             new("null-value", (null, T1000, T1200), new MustExpected(false, "value must not be null.", "value")),
-            new("unparseable", ("invalid", T1000, T1200), new MustExpected(false, "value must be a time within the expected range.")),
+            new("unparseable", ("invalid", T1000, T1200), new MustExpected(false, "value must be a time within the expected range.", Code: MustCodes.Time.Format.Invalid)),
             new("min-gt-max", ("11:00", T1200, T1000), new MustExpected(false, "min must be less than or equal to max.", "min"))
         ];
     }
@@ -27,7 +28,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? value, TimeOnly min, TimeOnly max)>> Cases =>
         [
             new("out-of-range", ("13:00", T1000, T1200), new MustExpected(true)),
-            new("in-range", ("11:00", T1000, T1200), new MustExpected(false, "value must be a time not within the expected range.")),
+            new("in-range", ("11:00", T1000, T1200), new MustExpected(false, "value must be a time not within the expected range.", Code: MustCodes.Time.Range.InRange)),
             new("null-value", (null, T1000, T1200), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1000, T1200), new MustExpected(false, "value must be a time not within the expected range.")),
             new("min-gt-max", ("11:00", T1200, T1000), new MustExpected(false, "min must be less than or equal to max.", "min"))
@@ -39,7 +40,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? value, string? reference, TimeSpan window)>> Cases =>
         [
             new("within", ("12:15", "12:00", Win), new MustExpected(true)),
-            new("outside", ("13:00", "12:00", Win), new MustExpected(false, "value must be a time within the expected time window.")),
+            new("outside", ("13:00", "12:00", Win), new MustExpected(false, "value must be a time within the expected time window.", Code: MustCodes.Time.Proximity.NotWithin)),
             new("null-value", (null, "12:00", Win), new MustExpected(false, "value must not be null.", "value")),
             new("null-reference", ("12:00", null, Win), new MustExpected(false, "reference must not be null.", "reference")),
             new("negative-window", ("12:00", "12:00", TimeSpan.FromMinutes(-1)), new MustExpected(false, "window requires a non-negative time window.", "window")),
@@ -53,7 +54,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? value, string? reference, TimeSpan window)>> Cases =>
         [
             new("outside", ("13:00", "12:00", Win), new MustExpected(true)),
-            new("within", ("12:15", "12:00", Win), new MustExpected(false, "value must be a time not within the expected time window.")),
+            new("within", ("12:15", "12:00", Win), new MustExpected(false, "value must be a time not within the expected time window.", Code: MustCodes.Time.Proximity.Within)),
             new("null-value", (null, "12:00", Win), new MustExpected(false, "value must not be null.", "value")),
             new("null-reference", ("12:00", null, Win), new MustExpected(false, "reference must not be null.", "reference")),
             new("negative-window", ("12:00", "12:00", TimeSpan.FromMinutes(-1)), new MustExpected(false, "window requires a non-negative time window.", "window")),
@@ -67,7 +68,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? value, TimeOnly other, TimePrecision? precision)>> Cases =>
         [
             new("before", ("11:00", T1200, null), new MustExpected(true)),
-            new("after", ("13:00", T1200, null), new MustExpected(false, "value must be a time before the specified time.")),
+            new("after", ("13:00", T1200, null), new MustExpected(false, "value must be a time before the specified time.", Code: MustCodes.Time.Order.NotBefore)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must be a time before the specified time.")),
             new("invalid-precision", ("11:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -80,7 +81,7 @@ public static class MustStringTimeOnlyClausesTestData
         [
             new("before", ("11:00", T1200, null), new MustExpected(true)),
             new("on", ("12:00", T1200, null), new MustExpected(true)),
-            new("after", ("13:00", T1200, null), new MustExpected(false, "value must be a time on or before the specified time.")),
+            new("after", ("13:00", T1200, null), new MustExpected(false, "value must be a time on or before the specified time.", Code: MustCodes.Time.Order.After)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must be a time on or before the specified time.")),
             new("invalid-precision", ("11:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -93,7 +94,7 @@ public static class MustStringTimeOnlyClausesTestData
         [
             new("after", ("13:00", T1200, null), new MustExpected(true)),
             new("on", ("12:00", T1200, null), new MustExpected(true)),
-            new("before", ("11:00", T1200, null), new MustExpected(false, "value must not be a time before the specified time.")),
+            new("before", ("11:00", T1200, null), new MustExpected(false, "value must not be a time before the specified time.", Code: MustCodes.Time.Order.Before)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must not be a time before the specified time.")),
             new("invalid-precision", ("11:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -106,7 +107,7 @@ public static class MustStringTimeOnlyClausesTestData
         [
             new("after", ("13:00", T1200, null), new MustExpected(true)),
             new("on", ("12:00", T1200, null), new MustExpected(false, "value must not be a time on or before the specified time.")),
-            new("before", ("11:00", T1200, null), new MustExpected(false, "value must not be a time on or before the specified time.")),
+            new("before", ("11:00", T1200, null), new MustExpected(false, "value must not be a time on or before the specified time.", Code: MustCodes.Time.Order.NotAfter)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must not be a time on or before the specified time.")),
             new("invalid-precision", ("11:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -118,7 +119,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? value, TimeOnly other, TimePrecision? precision)>> Cases =>
         [
             new("after", ("13:00", T1200, null), new MustExpected(true)),
-            new("before", ("11:00", T1200, null), new MustExpected(false, "value must be a time after the specified time.")),
+            new("before", ("11:00", T1200, null), new MustExpected(false, "value must be a time after the specified time.", Code: MustCodes.Time.Order.NotAfter)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must be a time after the specified time.")),
             new("invalid-precision", ("13:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -131,7 +132,7 @@ public static class MustStringTimeOnlyClausesTestData
         [
             new("after", ("13:00", T1200, null), new MustExpected(true)),
             new("on", ("12:00", T1200, null), new MustExpected(true)),
-            new("before", ("11:00", T1200, null), new MustExpected(false, "value must be a time on or after the specified time.")),
+            new("before", ("11:00", T1200, null), new MustExpected(false, "value must be a time on or after the specified time.", Code: MustCodes.Time.Order.Before)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must be a time on or after the specified time.")),
             new("invalid-precision", ("13:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -144,7 +145,7 @@ public static class MustStringTimeOnlyClausesTestData
         [
             new("before", ("11:00", T1200, null), new MustExpected(true)),
             new("on", ("12:00", T1200, null), new MustExpected(true)),
-            new("after", ("13:00", T1200, null), new MustExpected(false, "value must not be a time after the specified time.")),
+            new("after", ("13:00", T1200, null), new MustExpected(false, "value must not be a time after the specified time.", Code: MustCodes.Time.Order.After)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must not be a time after the specified time.")),
             new("invalid-precision", ("13:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -157,7 +158,7 @@ public static class MustStringTimeOnlyClausesTestData
         [
             new("before", ("11:00", T1200, null), new MustExpected(true)),
             new("on", ("12:00", T1200, null), new MustExpected(false, "value must not be a time on or after the specified time.")),
-            new("after", ("13:00", T1200, null), new MustExpected(false, "value must not be a time on or after the specified time.")),
+            new("after", ("13:00", T1200, null), new MustExpected(false, "value must not be a time on or after the specified time.", Code: MustCodes.Time.Order.NotBefore)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must not be a time on or after the specified time.")),
             new("invalid-precision", ("11:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -169,7 +170,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? value, TimeOnly other, TimePrecision? precision)>> Cases =>
         [
             new("same", ("12:00", T1200, null), new MustExpected(true)),
-            new("different", ("11:00", T1200, null), new MustExpected(false, "value must be a time the same as the specified time.")),
+            new("different", ("11:00", T1200, null), new MustExpected(false, "value must be a time the same as the specified time.", Code: MustCodes.Time.Equality.NotEqual)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must be a time the same as the specified time.")),
             new("invalid-precision", ("12:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -181,7 +182,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? value, TimeOnly other, TimePrecision? precision)>> Cases =>
         [
             new("different", ("11:00", T1200, null), new MustExpected(true)),
-            new("same", ("12:00", T1200, null), new MustExpected(false, "value must be a time not the same as the specified time.")),
+            new("same", ("12:00", T1200, null), new MustExpected(false, "value must be a time not the same as the specified time.", Code: MustCodes.Time.Equality.Equal)),
             new("null-value", (null, T1200, null), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1200, null), new MustExpected(false, "value must be a time not the same as the specified time.")),
             new("invalid-precision", ("12:00", T1200, (TimePrecision)999), new MustExpected(false, "precision has an invalid time precision.", "precision"))
@@ -193,7 +194,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? start, string? end)>> Cases =>
         [
             new("chrono", ("12:00", "13:00"), new MustExpected(true)),
-            new("not-chrono", ("13:00", "12:00"), new MustExpected(false, "start must be chronological.")),
+            new("not-chrono", ("13:00", "12:00"), new MustExpected(false, "start must be chronological.", Code: MustCodes.Time.Order.NotChronological)),
             new("null-start", (null, "13:00"), new MustExpected(false, "start must not be null.", "start")),
             new("null-end", ("12:00", null), new MustExpected(false, "end must not be null.", "end")),
             new("unparseable-start", ("invalid", "13:00"), new MustExpected(false, "start must be chronological.")),
@@ -206,7 +207,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? start, string? end)>> Cases =>
         [
             new("not-chrono", ("13:00", "12:00"), new MustExpected(true)),
-            new("chrono", ("12:00", "13:00"), new MustExpected(false, "start must not be chronological.")),
+            new("chrono", ("12:00", "13:00"), new MustExpected(false, "start must not be chronological.", Code: MustCodes.Time.Order.Chronological)),
             new("null-start", (null, "13:00"), new MustExpected(false, "start must not be null.", "start")),
             new("null-end", ("12:00", null), new MustExpected(false, "end must not be null.", "end")),
             new("unparseable-start", ("invalid", "13:00"), new MustExpected(false, "start must not be chronological.")),
@@ -219,7 +220,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? start1, string? end1, string? start2, string? end2)>> Cases =>
         [
             new("overlapping", ("10:00", "12:00", "11:00", "13:00"), new MustExpected(true)),
-            new("disjoint", ("10:00", "11:00", "12:00", "13:00"), new MustExpected(false, "start1 must be overlapping.", "start1")),
+            new("disjoint", ("10:00", "11:00", "12:00", "13:00"), new MustExpected(false, "start1 must be overlapping.", "start1", Code: MustCodes.Time.Overlap.Missing)),
             new("null-start1", (null, "12:00", "11:00", "13:00"), new MustExpected(false, "start1 must not be null.", "start1")),
             new("null-end1", ("10:00", null, "11:00", "13:00"), new MustExpected(false, "end1 must not be null.", "end1")),
             new("null-start2", ("10:00", "12:00", null, "13:00"), new MustExpected(false, "start2 must not be null.", "start2")),
@@ -236,7 +237,7 @@ public static class MustStringTimeOnlyClausesTestData
         public static TheoryData<MustCase<(string? start1, string? end1, string? start2, string? end2)>> Cases =>
         [
             new("disjoint", ("10:00", "11:00", "12:00", "13:00"), new MustExpected(true)),
-            new("overlapping", ("10:00", "12:00", "11:00", "13:00"), new MustExpected(false, "start1 must not be overlapping.", "start1")),
+            new("overlapping", ("10:00", "12:00", "11:00", "13:00"), new MustExpected(false, "start1 must not be overlapping.", "start1", Code: MustCodes.Time.Overlap.Present)),
             new("null-start1", (null, "12:00", "11:00", "13:00"), new MustExpected(false, "start1 must not be null.", "start1")),
             new("null-end1", ("10:00", null, "11:00", "13:00"), new MustExpected(false, "end1 must not be null.", "end1")),
             new("null-start2", ("10:00", "12:00", null, "13:00"), new MustExpected(false, "start2 must not be null.", "start2")),

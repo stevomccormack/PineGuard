@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -42,12 +43,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (min > max)
-            return MustResult<TimeOnly>.Fail("{paramName} requires a valid range.", nameof(min), min);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, "{paramName} requires a valid range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must be within the expected range.";
 
         var ok = TimeOnlyRules.IsBetween(value, min, max, inclusion);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Range.OutOfRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -77,12 +78,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (min > max)
-            return MustResult<TimeOnly>.Fail("{paramName} requires a valid range.", nameof(min), min);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, "{paramName} requires a valid range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must not be within the expected range.";
 
         var ok = !TimeOnlyRules.IsBetween(value, min, max, inclusion);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Range.InRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -110,12 +111,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be before the specified time.";
 
         var ok = TimeOnlyRules.IsBefore(value, other, Inclusion.Exclusive, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotBefore, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -143,12 +144,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be on or before the specified time.";
 
         var ok = TimeOnlyRules.IsBefore(value, other, Inclusion.Inclusive, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.After, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -176,12 +177,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be after the specified time.";
 
         var ok = TimeOnlyRules.IsAfter(value, other, Inclusion.Exclusive, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotAfter, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -209,12 +210,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be on or after the specified time.";
 
         var ok = TimeOnlyRules.IsAfter(value, other, Inclusion.Inclusive, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.Before, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -242,12 +243,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.NotEqual, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be the same time.";
 
         var ok = TimeOnlyRules.IsSame(value, other, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Equality.NotEqual, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -275,12 +276,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.Equal, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must not be the same time.";
 
         var ok = !TimeOnlyRules.IsSame(value, other, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Equality.Equal, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -308,12 +309,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (window < TimeSpan.Zero)
-            return MustResult<TimeOnly>.Fail("{paramName} requires a non-negative window.", nameof(window), window);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Proximity.NotWithin, "{paramName} requires a non-negative window.", nameof(window), window);
 
         const string messageTemplate = "{paramName} must be within the expected time window.";
 
         var ok = TimeOnlyRules.IsWithin(value, reference, window);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Proximity.NotWithin, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -341,12 +342,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (window < TimeSpan.Zero)
-            return MustResult<TimeOnly>.Fail("{paramName} requires a non-negative window.", nameof(window), window);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Proximity.Within, "{paramName} requires a non-negative window.", nameof(window), window);
 
         const string messageTemplate = "{paramName} must not be within the expected time window.";
 
         var ok = !TimeOnlyRules.IsWithin(value, reference, window);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Proximity.Within, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -376,7 +377,7 @@ public static class MustTimeOnlyClauses
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = TimeOnlyRules.IsChronological(start, end, inclusion);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, start, start);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotChronological, messageTemplate, paramName, start, start);
     }
 
     /// <summary>
@@ -413,7 +414,7 @@ public static class MustTimeOnlyClauses
         var range2Ok = TimeOnlyRange.TryCreate(start2, end2, out var _);
 
         var ok = range1Ok && range2Ok && TimeOnlyRangeRules.IsOverlapping(new TimeOnlyRange(start1, end1), new TimeOnlyRange(start2, end2), inclusion);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, start1, start1);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Overlap.Missing, messageTemplate, paramName, start1, start1);
     }
 
     /// <summary>
@@ -450,7 +451,7 @@ public static class MustTimeOnlyClauses
         var range2Ok = TimeOnlyRange.TryCreate(start2, end2, out var _);
 
         var ok = !(range1Ok && range2Ok && TimeOnlyRangeRules.IsOverlapping(new TimeOnlyRange(start1, end1), new TimeOnlyRange(start2, end2), inclusion));
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, start1, start1);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Overlap.Present, messageTemplate, paramName, start1, start1);
     }
 
     /// <summary>
@@ -478,12 +479,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must not be before the specified time.";
 
         var ok = !TimeOnlyRules.IsBefore(value, other, Inclusion.Exclusive, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.Before, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -511,12 +512,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must not be on or before the specified time.";
 
         var ok = !TimeOnlyRules.IsBefore(value, other, Inclusion.Inclusive, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotAfter, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -544,12 +545,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must not be after the specified time.";
 
         var ok = !TimeOnlyRules.IsAfter(value, other, Inclusion.Exclusive, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.After, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -577,12 +578,12 @@ public static class MustTimeOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(InvalidPrecisionMessage, nameof(precision), precision);
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, InvalidPrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must not be on or after the specified time.";
 
         var ok = !TimeOnlyRules.IsAfter(value, other, Inclusion.Inclusive, precision);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotBefore, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -612,7 +613,7 @@ public static class MustTimeOnlyClauses
         const string messageTemplate = "{paramName} must not be chronological.";
 
         var ok = !TimeOnlyRules.IsChronological(start, end, inclusion);
-        return MustResult<TimeOnly>.FromBool(ok, messageTemplate, paramName, start, start);
+        return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.Chronological, messageTemplate, paramName, start, start);
     }
 }
 #endif

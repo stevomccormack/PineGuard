@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -35,7 +36,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must be a defined enum value.";
 
         var ok = EnumRules.IsDefined<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Value.NotDefined, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -62,7 +63,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must be a defined enum backing value.";
 
         var ok = EnumRules.IsDefinedValue<TEnum>(value);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<int>.FromBool(ok, MustCodes.Enum.BackingValue.NotDefined, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -91,7 +92,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must be a defined enum name.";
 
         var ok = EnumRules.IsDefinedName<TEnum>(name, ignoreCase);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, name, result: name!);
+        return MustResult<string>.FromBool(ok, MustCodes.Enum.Name.NotDefined, messageTemplate, paramName, name, result: name!);
     }
 
     /// <summary>
@@ -118,7 +119,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must be a valid flags enum combination.";
 
         var ok = EnumRules.IsFlagsEnumCombination<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Flags.NotDefined, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -146,7 +147,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must have the expected attribute.";
 
         var ok = EnumRules.HasAttribute<TEnum, TAttribute>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Attribute.Missing, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -447,7 +448,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not be a defined enum value.";
 
         var ok = !EnumRules.IsDefined<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Value.Defined, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -474,7 +475,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not be a defined enum backing value.";
 
         var ok = !EnumRules.IsDefinedValue<TEnum>(value);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<int>.FromBool(ok, MustCodes.Enum.BackingValue.Defined, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -503,7 +504,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not be a defined enum name.";
 
         var ok = !EnumRules.IsDefinedName<TEnum>(name, ignoreCase);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, name, result: name!);
+        return MustResult<string>.FromBool(ok, MustCodes.Enum.Name.Defined, messageTemplate, paramName, name, result: name!);
     }
 
     /// <summary>
@@ -530,7 +531,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not be a valid flags enum combination.";
 
         var ok = !EnumRules.IsFlagsEnumCombination<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Flags.Defined, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -558,6 +559,6 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not have the expected attribute.";
 
         var ok = !EnumRules.HasAttribute<TEnum, TAttribute>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Attribute.Present, messageTemplate, paramName, value, result: value);
     }
 }

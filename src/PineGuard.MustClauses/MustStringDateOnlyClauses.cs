@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 using PineGuard.Utils;
@@ -42,16 +43,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotPast, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date in the past.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsInPast(parsedValue);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -77,16 +78,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.Future, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date in the past or present.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsInPast(parsedValue, Inclusion.Inclusive);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -112,16 +113,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotFuture, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date in the future.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsInFuture(parsedValue);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -147,16 +148,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.Past, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date in the future or present.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsInFuture(parsedValue, Inclusion.Inclusive);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -188,19 +189,20 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.OutOfRange, NullMessage, paramName, value);
 
         if (min > max)
-            return MustResult<DateOnly>.Fail("{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.OutOfRange,
+                "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
 
         const string messageTemplate = "{paramName} must be a date within the expected range.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsBetween(parsedValue, min, max, inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Range.OutOfRange, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -232,19 +234,20 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.InRange, NullMessage, paramName, value);
 
         if (min > max)
-            return MustResult<DateOnly>.Fail("{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.InRange,
+                "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
 
         const string messageTemplate = "{paramName} must be a date not within the expected range.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = !DateOnlyRules.IsBetween(parsedValue, min, max, inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Range.InRange, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -274,19 +277,20 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.NotWithin, NullMessage, paramName, value);
 
         if (days < 0)
-            return MustResult<DateOnly>.Fail("{paramName} requires a non-negative number of days.", nameof(days), days);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.NotWithin,
+                "{paramName} requires a non-negative number of days.", nameof(days), days);
 
         const string messageTemplate = "{paramName} must be a date within the expected number of days.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsWithin(parsedValue, reference, days);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.NotWithin, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -316,19 +320,20 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.Within, NullMessage, paramName, value);
 
         if (days < 0)
-            return MustResult<DateOnly>.Fail("{paramName} requires a non-negative number of days.", nameof(days), days);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.Within,
+                "{paramName} requires a non-negative number of days.", nameof(days), days);
 
         const string messageTemplate = "{paramName} must be a date not within the expected number of days.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = !DateOnlyRules.IsWithin(parsedValue, reference, days);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.Within, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -358,19 +363,21 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.NotWithinCalendarMonths, NullMessage, paramName, value);
 
         if (months < 0)
-            return MustResult<DateOnly>.Fail("{paramName} requires a non-negative number of months.", nameof(months), months);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.NotWithinCalendarMonths,
+                "{paramName} requires a non-negative number of months.", nameof(months), months);
 
         const string messageTemplate = "{paramName} must be a date within the expected number of calendar months.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsWithinCalendarMonths(parsedValue, reference, months);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.NotWithinCalendarMonths,
+            messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -400,19 +407,21 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.WithinCalendarMonths, NullMessage, paramName, value);
 
         if (months < 0)
-            return MustResult<DateOnly>.Fail("{paramName} requires a non-negative number of months.", nameof(months), months);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.WithinCalendarMonths,
+                "{paramName} requires a non-negative number of months.", nameof(months), months);
 
         const string messageTemplate = "{paramName} must be a date not within the expected number of calendar months.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = !DateOnlyRules.IsWithinCalendarMonths(parsedValue, reference, months);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.WithinCalendarMonths,
+            messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -442,16 +451,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotBefore, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date before the specified date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsBefore(parsedValue, other, Inclusion.Exclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotBefore, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -481,16 +490,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Before, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a date before the specified date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = !DateOnlyRules.IsBefore(parsedValue, other, Inclusion.Exclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.Before, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -520,16 +529,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.After, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date on or before the specified date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsBefore(parsedValue, other, Inclusion.Inclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.After, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -559,16 +568,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotAfter, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a date on or before the specified date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = !DateOnlyRules.IsBefore(parsedValue, other, Inclusion.Inclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotAfter, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -598,16 +607,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotAfter, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date after the specified date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsAfter(parsedValue, other, Inclusion.Exclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotAfter, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -637,16 +646,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.After, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a date after the specified date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = !DateOnlyRules.IsAfter(parsedValue, other, Inclusion.Exclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.After, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -676,16 +685,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Before, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date on or after the specified date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsAfter(parsedValue, other, Inclusion.Inclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.Before, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -715,16 +724,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotBefore, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a date on or after the specified date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = !DateOnlyRules.IsAfter(parsedValue, other, Inclusion.Inclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotBefore, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -754,16 +763,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.NotEqual, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be the same date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = DateOnlyRules.IsSame(parsedValue, other, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Equality.NotEqual, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -793,16 +802,16 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.Equal, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be the same date.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = !DateOnlyRules.IsSame(parsedValue, other, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Equality.Equal, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -832,22 +841,23 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(start))] string? paramName = null)
     {
         if (start is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, start);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotChronological, NullMessage, paramName, start);
 
         if (end is null)
-            return MustResult<DateOnly>.Fail(NullMessage, nameof(end), end);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotChronological, NullMessage, nameof(end), end);
 
         const string messageTemplate = "{paramName} must be chronological.";
 
         if (!StringUtility.DateOnly.TryParse(start, out var parsedStart, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, start);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, start);
 
         if (!StringUtility.DateOnly.TryParse(end, out var parsedEnd, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, nameof(end), end);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end), end);
 
         var parsedStartValue = parsedStart.GetValueOrDefault();
         var ok = DateOnlyRules.IsChronological(parsedStartValue, parsedEnd.GetValueOrDefault(), inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, start, parsedStartValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotChronological,
+            messageTemplate, paramName, start, parsedStartValue);
     }
 
     /// <summary>
@@ -877,22 +887,22 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(start))] string? paramName = null)
     {
         if (start is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, start);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Chronological, NullMessage, paramName, start);
 
         if (end is null)
-            return MustResult<DateOnly>.Fail(NullMessage, nameof(end), end);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Chronological, NullMessage, nameof(end), end);
 
         const string messageTemplate = "{paramName} must not be chronological.";
 
         if (!StringUtility.DateOnly.TryParse(start, out var parsedStart, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, start);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, start);
 
         if (!StringUtility.DateOnly.TryParse(end, out var parsedEnd, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, nameof(end), end);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end), end);
 
         var parsedStartValue = parsedStart.GetValueOrDefault();
         var ok = !DateOnlyRules.IsChronological(parsedStartValue, parsedEnd.GetValueOrDefault(), inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, start, parsedStartValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.Chronological, messageTemplate, paramName, start, parsedStartValue);
     }
 
     /// <summary>
@@ -926,30 +936,30 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
         if (start1 is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, start1);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Missing, NullMessage, paramName, start1);
 
         if (end1 is null)
-            return MustResult<DateOnly>.Fail(NullMessage, nameof(end1), end1);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Missing, NullMessage, nameof(end1), end1);
 
         if (start2 is null)
-            return MustResult<DateOnly>.Fail(NullMessage, nameof(start2), start2);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Missing, NullMessage, nameof(start2), start2);
 
         if (end2 is null)
-            return MustResult<DateOnly>.Fail(NullMessage, nameof(end2), end2);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Missing, NullMessage, nameof(end2), end2);
 
         const string messageTemplate = "{paramName} must be overlapping.";
 
         if (!StringUtility.DateOnly.TryParse(start1, out var s1, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, start1);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, start1);
 
         if (!StringUtility.DateOnly.TryParse(end1, out var e1, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, nameof(end1), end1);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end1), end1);
 
         if (!StringUtility.DateOnly.TryParse(start2, out var s2, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, nameof(start2), start2);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(start2), start2);
 
         if (!StringUtility.DateOnly.TryParse(end2, out var e2, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, nameof(end2), end2);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end2), end2);
 
         var parsedStartValue = s1.GetValueOrDefault();
         var ok = DateOnlyRules.IsOverlapping(
@@ -958,7 +968,7 @@ public static class MustStringDateOnlyClauses
             s2.GetValueOrDefault(),
             e2.GetValueOrDefault(),
             inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, start1, parsedStartValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Overlap.Missing, messageTemplate, paramName, start1, parsedStartValue);
     }
 
     /// <summary>
@@ -992,30 +1002,30 @@ public static class MustStringDateOnlyClauses
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
         if (start1 is null)
-            return MustResult<DateOnly>.Fail(NullMessage, paramName, start1);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Present, NullMessage, paramName, start1);
 
         if (end1 is null)
-            return MustResult<DateOnly>.Fail(NullMessage, nameof(end1), end1);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Present, NullMessage, nameof(end1), end1);
 
         if (start2 is null)
-            return MustResult<DateOnly>.Fail(NullMessage, nameof(start2), start2);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Present, NullMessage, nameof(start2), start2);
 
         if (end2 is null)
-            return MustResult<DateOnly>.Fail(NullMessage, nameof(end2), end2);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Present, NullMessage, nameof(end2), end2);
 
         const string messageTemplate = "{paramName} must not be overlapping.";
 
         if (!StringUtility.DateOnly.TryParse(start1, out var s1, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, paramName, start1);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, start1);
 
         if (!StringUtility.DateOnly.TryParse(end1, out var e1, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, nameof(end1), end1);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end1), end1);
 
         if (!StringUtility.DateOnly.TryParse(start2, out var s2, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, nameof(start2), start2);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(start2), start2);
 
         if (!StringUtility.DateOnly.TryParse(end2, out var e2, styles))
-            return MustResult<DateOnly>.FromBool(false, messageTemplate, nameof(end2), end2);
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end2), end2);
 
         var parsedStartValue = s1.GetValueOrDefault();
         var ok = !DateOnlyRules.IsOverlapping(
@@ -1024,7 +1034,7 @@ public static class MustStringDateOnlyClauses
             s2.GetValueOrDefault(),
             e2.GetValueOrDefault(),
             inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, start1, parsedStartValue);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Overlap.Present, messageTemplate, paramName, start1, parsedStartValue);
     }
 }
 #endif

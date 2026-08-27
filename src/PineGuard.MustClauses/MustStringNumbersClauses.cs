@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 using PineGuard.Utils;
@@ -45,17 +46,17 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.NotPositive, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be positive.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.NotPositive, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsPositive<decimal>(parsed);
-        return MustResult<decimal>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.NotPositive, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -81,17 +82,17 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.NotNegative, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be negative.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.NotNegative, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsNegative<decimal>(parsed);
-        return MustResult<decimal>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.NotNegative, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -117,17 +118,17 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.NotZero, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be zero.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.NotZero, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsZero<decimal>(parsed);
-        return MustResult<decimal>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.NotZero, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -153,17 +154,17 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.Negative, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be zero or positive.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.Negative, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsZeroOrPositive<decimal>(parsed);
-        return MustResult<decimal>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.Negative, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -189,17 +190,17 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.Positive, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be zero or negative.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.Positive, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsZeroOrNegative<decimal>(parsed);
-        return MustResult<decimal>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.Positive, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -227,17 +228,17 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.NotGreater, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be greater than '{Min}'.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.NotGreater, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
         var ok = NumberRules.IsGreaterThan(parsed, min);
-        return MustResult<decimal>.FromBool(ok, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.NotGreater, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -265,17 +266,17 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.BelowMinimum, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be greater than or equal to '{Min}'.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.BelowMinimum, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
         var ok = NumberRules.IsGreaterThanOrEqual(parsed, min);
-        return MustResult<decimal>.FromBool(ok, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.BelowMinimum, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -303,17 +304,17 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.NotLess, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be less than '{Max}'.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.NotLess, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
         var ok = NumberRules.IsLessThan(parsed, max);
-        return MustResult<decimal>.FromBool(ok, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.NotLess, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -341,17 +342,17 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.Exceeded, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be less than or equal to '{Max}'.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.Exceeded, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
         var ok = NumberRules.IsLessThanOrEqual(parsed, max);
-        return MustResult<decimal>.FromBool(ok, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.Exceeded, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -383,20 +384,20 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.OutOfRange, "{paramName} must not be null.", paramName, value);
 
         if (min > max)
-            return MustResult<decimal>.Fail("{paramName} requires a valid range.", nameof(min), min);
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must be within the expected range.";
 
 
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.OutOfRange, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsInRange(parsed, min, max, inclusion);
-        return MustResult<decimal>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.OutOfRange, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -428,18 +429,18 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.InRange, "{paramName} must not be null.", paramName, value);
 
         if (min > max)
-            return MustResult<decimal>.Fail("{paramName} requires a valid range.", nameof(min), min);
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must not be between '{Min}' and '{Max}'.";
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)).Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.InRange, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)).Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
         var ok = !NumberRules.IsInRange(parsed, min, max, inclusion);
-        return MustResult<decimal>.FromBool(ok, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)).Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.InRange, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)).Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -469,18 +470,18 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.NotApproximate, "{paramName} must not be null.", paramName, value);
 
         if (tolerance is null)
-            return MustResult<decimal>.Fail("{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
+            return MustResult<decimal>.Fail(MustCodes.Number.Tolerance.Null, "{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
 
         const string messageTemplate = "{paramName} must be approximately '{Target}'.";
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Proximity.NotApproximate, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
         var ok = NumberRules.IsApproximately(parsed, target, tolerance);
-        return MustResult<decimal>.FromBool(ok, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Proximity.NotApproximate, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -508,18 +509,18 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Divisibility.NotMultiple, "{paramName} must not be null.", paramName, value);
 
         if (factor == 0)
-            return MustResult<decimal>.Fail("{paramName} requires a non-zero factor.", nameof(factor), factor);
+            return MustResult<decimal>.Fail(MustCodes.Number.Factor.Zero, "{paramName} requires a non-zero factor.", nameof(factor), factor);
 
         const string messageTemplate = "{paramName} must be a multiple of '{Factor}'.";
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Divisibility.NotMultiple, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
         var ok = NumberRules.IsMultipleOf(parsed, factor);
-        return MustResult<decimal>.FromBool(ok, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Divisibility.NotMultiple, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -548,15 +549,15 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<int>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<int>.Fail(MustCodes.Number.Parity.Odd, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be even.";
 
         if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<int>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<int>.FromBool(false, MustCodes.Number.Parity.Odd, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsEven(parsed);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<int>.FromBool(ok, MustCodes.Number.Parity.Odd, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -585,15 +586,15 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<int>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<int>.Fail(MustCodes.Number.Parity.Even, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be odd.";
 
         if (!StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<int>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<int>.FromBool(false, MustCodes.Number.Parity.Even, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsOdd(parsed);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<int>.FromBool(ok, MustCodes.Number.Parity.Even, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -619,15 +620,15 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<double>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<double>.Fail(MustCodes.Number.Form.NotFinite, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be finite.";
 
         if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<double>.FromBool(false, MustCodes.Number.Form.NotFinite, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsFinite(parsed);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<double>.FromBool(ok, MustCodes.Number.Form.NotFinite, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -653,15 +654,15 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.Zero, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must not be zero.";
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.Zero, messageTemplate, paramName, value, result: default);
 
         var ok = NumberRules.IsNotZero<decimal>(parsed);
-        return MustResult<decimal>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.Zero, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -691,18 +692,18 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.Approximate, "{paramName} must not be null.", paramName, value);
 
         if (tolerance is null)
-            return MustResult<decimal>.Fail("{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
+            return MustResult<decimal>.Fail(MustCodes.Number.Tolerance.Null, "{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
 
         const string messageTemplate = "{paramName} must not be approximately '{Target}'.";
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Proximity.Approximate, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
         var ok = !NumberRules.IsApproximately(parsed, target, tolerance);
-        return MustResult<decimal>.FromBool(ok, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Proximity.Approximate, messageTemplate.Replace(TargetToken, target.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -730,18 +731,18 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<decimal>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<decimal>.Fail(MustCodes.Number.Divisibility.Multiple, "{paramName} must not be null.", paramName, value);
 
         if (factor == 0)
-            return MustResult<decimal>.Fail("{paramName} requires a non-zero factor.", nameof(factor), factor);
+            return MustResult<decimal>.Fail(MustCodes.Number.Factor.Zero, "{paramName} requires a non-zero factor.", nameof(factor), factor);
 
         const string messageTemplate = "{paramName} must not be a multiple of '{Factor}'.";
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Divisibility.Multiple, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
         var ok = !NumberRules.IsMultipleOf(parsed, factor);
-        return MustResult<decimal>.FromBool(ok, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Divisibility.Multiple, messageTemplate.Replace(FactorToken, factor.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -767,15 +768,15 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<double>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<double>.Fail(MustCodes.Number.Form.Finite, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must not be finite.";
 
         if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<double>.FromBool(false, MustCodes.Number.Form.Finite, messageTemplate, paramName, value, result: default);
 
         var ok = !NumberRules.IsFinite(parsed);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<double>.FromBool(ok, MustCodes.Number.Form.Finite, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -801,15 +802,15 @@ public static class MustStringNumbersClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<double>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<double>.Fail(MustCodes.Number.Form.Nan, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must not be NaN.";
 
         if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<double>.FromBool(false, MustCodes.Number.Form.Nan, messageTemplate, paramName, value, result: default);
 
         var ok = !NumberRules.IsNaN(parsed);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<double>.FromBool(ok, MustCodes.Number.Form.Nan, messageTemplate, paramName, value, parsed);
     }
 }
 #endif

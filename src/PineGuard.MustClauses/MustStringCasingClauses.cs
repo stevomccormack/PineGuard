@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -41,12 +42,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Mismatch, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be in the specified casing style.";
 
         var ok = StringRules.IsCaseStyle(value, style);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Mismatch, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -74,12 +75,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotCamel, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be camelCase.";
 
         var ok = StringRules.IsCamelCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotCamel, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -107,12 +108,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotPascal, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be PascalCase.";
 
         var ok = StringRules.IsPascalCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotPascal, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -140,12 +141,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotSnake, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be snake_case.";
 
         var ok = StringRules.IsSnakeCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotSnake, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -173,12 +174,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotUpperSnake, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be UPPER_SNAKE_CASE.";
 
         var ok = StringRules.IsUpperSnakeCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotUpperSnake, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -206,12 +207,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotKebab, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be kebab-case.";
 
         var ok = StringRules.IsKebabCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotKebab, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -239,12 +240,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotTrain, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be Train-Case.";
 
         var ok = StringRules.IsTrainCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotTrain, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -272,12 +273,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotDot, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be dot.case.";
 
         var ok = StringRules.IsDotCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotDot, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -305,12 +306,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotSpace, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be space case.";
 
         var ok = StringRules.IsSpaceCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotSpace, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -338,12 +339,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotUpperInvariant, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be upper invariant.";
 
         var ok = StringRules.IsUpperInvariant(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotUpperInvariant, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -371,12 +372,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.NotLowerInvariant, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be lower invariant.";
 
         var ok = StringRules.IsLowerInvariant(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.NotLowerInvariant, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -406,12 +407,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Match, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be in the specified casing style.";
 
         var ok = !StringRules.IsCaseStyle(value, style);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Match, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -439,12 +440,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Camel, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be camelCase.";
 
         var ok = !StringRules.IsCamelCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Camel, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -472,12 +473,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Pascal, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be PascalCase.";
 
         var ok = !StringRules.IsPascalCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Pascal, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -505,12 +506,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Snake, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be snake_case.";
 
         var ok = !StringRules.IsSnakeCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Snake, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -538,12 +539,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.UpperSnake, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be UPPER_SNAKE_CASE.";
 
         var ok = !StringRules.IsUpperSnakeCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.UpperSnake, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -571,12 +572,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Kebab, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be kebab-case.";
 
         var ok = !StringRules.IsKebabCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Kebab, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -604,12 +605,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Train, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be Train-Case.";
 
         var ok = !StringRules.IsTrainCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Train, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -637,12 +638,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Dot, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be dot.case.";
 
         var ok = !StringRules.IsDotCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Dot, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -670,12 +671,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.Space, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be space case.";
 
         var ok = !StringRules.IsSpaceCase(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.Space, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -703,12 +704,12 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.UpperInvariant, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be upper invariant.";
 
         var ok = !StringRules.IsUpperInvariant(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.UpperInvariant, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -736,11 +737,11 @@ public static class MustStringCasingClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Text.Casing.LowerInvariant, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be lower invariant.";
 
         var ok = !StringRules.IsLowerInvariant(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Casing.LowerInvariant, messageTemplate, paramName, value, value);
     }
 }
