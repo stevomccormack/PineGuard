@@ -19,5 +19,7 @@ public abstract class BaseFluentUnitTest(ITestOutputHelper output) : BaseUnitTes
         AssertReturn(testCase.Expected, result.IsValid, result.IsValid ? null : result.Errors[0].ErrorMessage);
         if (testCase.Expected.PropertyName is not null)
             Assert.Equal(testCase.Expected.PropertyName, result.Errors[0].PropertyName);
+        if (testCase.Expected.Code is not null)
+            Assert.Equal(testCase.Expected.Code, result.Errors[0].ErrorCode);
     }
 }

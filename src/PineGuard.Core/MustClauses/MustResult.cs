@@ -294,8 +294,7 @@ public sealed class MustResult<T> : IMustResult
         where TException : Exception
     {
         exception.Data[GuardFailure.CodeDataKey] = Code;
-        if (ParamName is not null)
-            exception.Data[GuardFailure.PropertyPathDataKey] = ParamName;
+        exception.Data[GuardFailure.PropertyPathDataKey] = ParamName ?? string.Empty;
 
         return exception;
     }
