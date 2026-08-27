@@ -34,7 +34,7 @@ public static class GuardStringGuidClauses
     {
         var result = Must.Be.Guid(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -64,7 +64,7 @@ public static class GuardStringGuidClauses
     {
         var result = Must.Be.NotEmptyGuid(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

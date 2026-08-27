@@ -132,32 +132,44 @@ public static class GuardStringNumbersClausesTestData
         });
     }
 
+    // Guard.Against.OutOfRange calls Must.Be.OutOfRange, which checks "min > max" as its own precondition
+    // before inspecting the value at all — an inverted range therefore attributes to "min", not "value"
+    // (see MustStringNumbersClauses.OutOfRange).
     public static class OutOfRange
     {
         public static TheoryData<GuardCase<(string? text, decimal min, decimal max, Inclusion inclusion)>> ValidCases => F.NumbersIsInRange.AllValid.ToGuardCases();
         public static TheoryData<GuardCase<(string? text, decimal min, decimal max, Inclusion inclusion)>> InvalidCases => F.NumbersIsInRange.AllInvalid.ToGuardCases(s => s.Name switch
         {
             nameof(F.NumbersIsInRange.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+            nameof(F.NumbersIsInRange.InvalidRange) => new GuardExpected(false, typeof(ArgumentException), "min"),
             _ => new GuardExpected(false, typeof(ArgumentException), "value")
         });
     }
 
+    // Guard.Against.NotApproximately calls Must.Be.Approximately, which checks "tolerance" for null as its
+    // own precondition before inspecting the value at all — a null tolerance therefore attributes to
+    // "tolerance" (and is a null-reference failure, not a range failure), not "value" (see MustStringNumbersClauses.Approximately).
     public static class NotApproximately
     {
         public static TheoryData<GuardCase<(string? text, decimal target, decimal? tolerance)>> ValidCases => F.NumbersIsApproximately.AllValid.ToGuardCases();
         public static TheoryData<GuardCase<(string? text, decimal target, decimal? tolerance)>> InvalidCases => F.NumbersIsApproximately.AllInvalid.ToGuardCases(s => s.Name switch
         {
             nameof(F.NumbersIsApproximately.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+            nameof(F.NumbersIsApproximately.NullTolerance) => new GuardExpected(false, typeof(ArgumentNullException), "tolerance"),
             _ => new GuardExpected(false, typeof(ArgumentException), "value")
         });
     }
 
+    // Guard.Against.NotMultipleOf calls Must.Be.MultipleOf, which checks "factor == 0" as its own
+    // precondition before inspecting the value at all — a zero factor therefore attributes to "factor",
+    // not "value" (see MustStringNumbersClauses.MultipleOf).
     public static class NotMultipleOf
     {
         public static TheoryData<GuardCase<(string? text, decimal factor)>> ValidCases => F.NumbersIsMultipleOf.AllValid.ToGuardCases();
         public static TheoryData<GuardCase<(string? text, decimal factor)>> InvalidCases => F.NumbersIsMultipleOf.AllInvalid.ToGuardCases(s => s.Name switch
         {
             nameof(F.NumbersIsMultipleOf.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+            nameof(F.NumbersIsMultipleOf.ZeroFactor) => new GuardExpected(false, typeof(ArgumentException), "factor"),
             _ => new GuardExpected(false, typeof(ArgumentException), "value")
         });
     }
@@ -177,6 +189,8 @@ public static class GuardStringNumbersClausesTestData
         ];
     }
 
+    // Guard.Against.Approximately calls Must.Be.NotApproximately, which also checks "tolerance" for null as
+    // its own precondition — a null tolerance attributes to "tolerance" here too (see MustStringNumbersClauses.NotApproximately).
     public static class Approximately
     {
         public static TheoryData<GuardCase<(string? text, decimal target, decimal? tolerance)>> ValidCases =>
@@ -188,7 +202,7 @@ public static class GuardStringNumbersClausesTestData
         [
             new(nameof(F.NumbersIsApproximately.WithinTolerance), F.NumbersIsApproximately.WithinTolerance, new GuardExpected(false, typeof(ArgumentException), "value")),
             new(nameof(F.NumbersIsApproximately.Letters), F.NumbersIsApproximately.Letters, new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.NumbersIsApproximately.NullTolerance), F.NumbersIsApproximately.NullTolerance, new GuardExpected(false, typeof(ArgumentException), "value"))
+            new(nameof(F.NumbersIsApproximately.NullTolerance), F.NumbersIsApproximately.NullTolerance, new GuardExpected(false, typeof(ArgumentNullException), "tolerance"))
         ];
     }
 

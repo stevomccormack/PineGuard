@@ -45,6 +45,9 @@ public static class GuardHttpSecurityHeaderClausesTestData
         public static TheoryData<GuardCase<IReadOnlyDictionary<string, IEnumerable<string>>?>> InvalidCases => F.HasStrictTransportSecurityWithDefaults.InvalidScenarios.ToGuardCases("headers");
     }
 
+    // Guard.Against.NotStrictTransportSecurity calls Must.Be.StrictTransportSecurity, which checks its own
+    // "minMaxAgeSeconds must be positive" precondition before inspecting headers at all — a non-positive
+    // minMaxAgeSeconds therefore attributes to "minMaxAgeSeconds", not "headers" (see MustHttpSecurityHeaderClauses.StrictTransportSecurity).
     public static class NotStrictTransportSecurity
     {
         public static TheoryData<GuardCase<(IReadOnlyDictionary<string, IEnumerable<string>>? headers, int minMaxAgeSeconds, bool requireIncludeSubDomains, bool requirePreload)>> ValidCases =>
@@ -59,8 +62,8 @@ public static class GuardHttpSecurityHeaderClausesTestData
             new(nameof(F.HasStrictTransportSecurity.MaxAgeLessThanMin), F.HasStrictTransportSecurity.MaxAgeLessThanMin, new GuardExpected(false, typeof(ArgumentException), "headers")),
             new(nameof(F.HasStrictTransportSecurity.MaxAgeNonNumeric), F.HasStrictTransportSecurity.MaxAgeNonNumeric, new GuardExpected(false, typeof(ArgumentException), "headers")),
             new(nameof(F.HasStrictTransportSecurity.MaxAgeNegativeValue), F.HasStrictTransportSecurity.MaxAgeNegativeValue, new GuardExpected(false, typeof(ArgumentException), "headers")),
-            new(nameof(F.HasStrictTransportSecurity.MinMaxAgeZero), F.HasStrictTransportSecurity.MinMaxAgeZero, new GuardExpected(false, typeof(ArgumentException), "headers")),
-            new(nameof(F.HasStrictTransportSecurity.MinMaxAgeNegative), F.HasStrictTransportSecurity.MinMaxAgeNegative, new GuardExpected(false, typeof(ArgumentException), "headers")),
+            new(nameof(F.HasStrictTransportSecurity.MinMaxAgeZero), F.HasStrictTransportSecurity.MinMaxAgeZero, new GuardExpected(false, typeof(ArgumentException), "minMaxAgeSeconds")),
+            new(nameof(F.HasStrictTransportSecurity.MinMaxAgeNegative), F.HasStrictTransportSecurity.MinMaxAgeNegative, new GuardExpected(false, typeof(ArgumentException), "minMaxAgeSeconds")),
             new("EmptyHeaders", (F.EmptyHeaders, 1, false, false), new GuardExpected(false, typeof(ArgumentException), "headers")),
             new("Null", (null, 1, false, false), new GuardExpected(false, typeof(ArgumentNullException), "headers"))
         ];

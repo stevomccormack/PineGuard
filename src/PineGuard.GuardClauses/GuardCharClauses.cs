@@ -49,7 +49,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.Letter(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -94,7 +94,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.Digit(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -139,7 +139,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.NotDigit(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -184,7 +184,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.LetterOrDigit(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -229,7 +229,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.NotLetterOrDigit(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -274,7 +274,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.Ascii(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -319,7 +319,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.NotAscii(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -364,7 +364,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.PrintableAscii(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -409,7 +409,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.NotPrintableAscii(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -454,7 +454,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.NotWhitespace(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -499,7 +499,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.Control(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -544,7 +544,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.Uppercase(value, paramName); // Guard.Against.Lowercase => Must.Be.Uppercase (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -589,7 +589,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.Lowercase(value, paramName); // Guard.Against.Uppercase => Must.Be.Lowercase (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -634,7 +634,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.HexDigit(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -679,7 +679,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.NotLetter(value, paramName); // Guard.Against.Letter => Must.Be.NotLetter (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -724,7 +724,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.NotHexDigit(value, paramName); // Guard.Against.HexDigit => Must.Be.NotHexDigit (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -769,7 +769,7 @@ public static class GuardCharClauses
     {
         var result = Must.Be.NotControl(value, paramName); // Guard.Against.Control => Must.Be.NotControl (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

@@ -51,7 +51,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotEmpty(value, paramName); // Guard.Against.Empty => Must.Be.NotEmpty (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -97,7 +97,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.Empty(value, paramName); // Guard.Against.NotEmpty => Must.Be.Empty (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -145,7 +145,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.HasExactCount(value, count, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -193,7 +193,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.HasMinCount(value, min, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -241,7 +241,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.HasMaxCount(value, max, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -293,7 +293,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.HasCountBetween(value, min, max, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -341,7 +341,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.HasAny(value, predicate, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -389,7 +389,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotHasAny(value, predicate, paramName); // Guard.Against.HasAny => Must.Be.NotHasAny (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -437,7 +437,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.HasAll(value, predicate, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -485,7 +485,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotHasAll(value, predicate, paramName); // Guard.Against.HasAll => Must.Be.NotHasAll (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -533,7 +533,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.HasDistinctItems(value, comparer, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -581,7 +581,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.HasDuplicateItems(value, comparer, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -628,7 +628,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotContainsNullItems(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -676,7 +676,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.Contains(value, item, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -724,7 +724,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotContains(value, item, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -772,7 +772,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.SubsetOf(value, other, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -820,7 +820,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotSubsetOf(value, other, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -868,7 +868,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.HasIndex(value, index, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -916,7 +916,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotHasIndex(value, index, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -964,7 +964,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotHasExactCount(value, count, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1012,7 +1012,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotHasMinCount(value, min, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1060,7 +1060,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotHasMaxCount(value, max, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -1112,7 +1112,7 @@ public static class GuardCollectionClauses
     {
         var result = Must.Be.NotHasCountBetween(value, min, max, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

@@ -50,7 +50,7 @@ public static class GuardDefaultEqualityClauses
     {
         var result = Must.Be.NotDefault(value, paramName); // Guard.Against.Default => Must.Be.NotDefault (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -96,7 +96,7 @@ public static class GuardDefaultEqualityClauses
     {
         var result = Must.Be.Default(value, paramName); // Guard.Against.NotDefault => Must.Be.Default (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -142,7 +142,7 @@ public static class GuardDefaultEqualityClauses
     {
         var result = Must.Be.NotNullOrDefault(value, paramName); // Guard.Against.NullOrDefault => Must.Be.NotNullOrDefault (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -188,7 +188,7 @@ public static class GuardDefaultEqualityClauses
     {
         var result = Must.Be.NullOrDefault(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

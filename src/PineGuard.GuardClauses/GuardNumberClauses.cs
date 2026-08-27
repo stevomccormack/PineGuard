@@ -54,7 +54,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Positive(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -101,7 +101,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Negative(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -148,7 +148,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Zero(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -195,7 +195,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.NotZero(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -242,7 +242,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.ZeroOrPositive(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -289,7 +289,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.ZeroOrNegative(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -329,7 +329,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.GreaterThan(value, min, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -369,7 +369,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.GreaterThanOrEqual(value, min, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -409,7 +409,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.LessThan(value, max, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -449,7 +449,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.LessThanOrEqual(value, min, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -493,7 +493,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.InRange(value, min, max, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -537,7 +537,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.OutOfRange(value, min, max, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -579,7 +579,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Approximately(value, target, tolerance, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -621,7 +621,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.NotApproximately(value, target, tolerance, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -661,7 +661,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.MultipleOf(value, factor, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -701,7 +701,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.NotMultipleOf(value, factor, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -737,7 +737,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Even(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -773,7 +773,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Even(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -809,7 +809,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Odd(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -845,7 +845,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Odd(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -881,7 +881,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.NotFinite(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -917,7 +917,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.NotFinite(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -953,7 +953,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Finite(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -989,7 +989,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.Finite(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -1025,7 +1025,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.NotNaN(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -1061,7 +1061,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.NotNaN(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -1097,7 +1097,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.NaN(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -1133,7 +1133,7 @@ public static class GuardNumberClauses
     {
         var result = Must.Be.NaN(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

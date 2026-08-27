@@ -52,7 +52,7 @@ public static class GuardObjectClauses
     {
         var result = Must.Be.EqualTo(value, other, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -100,7 +100,7 @@ public static class GuardObjectClauses
     {
         var result = Must.Be.NotEqualTo(value, other, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -146,7 +146,7 @@ public static class GuardObjectClauses
     {
         var result = Must.Be.OfType<T>(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -192,7 +192,7 @@ public static class GuardObjectClauses
     {
         var result = Must.Be.NotOfType<T>(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -238,7 +238,7 @@ public static class GuardObjectClauses
     {
         var result = Must.Be.AssignableToType<T>(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -284,7 +284,7 @@ public static class GuardObjectClauses
     {
         var result = Must.Be.NotAssignableToType<T>(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -333,7 +333,7 @@ public static class GuardObjectClauses
     {
         var result = Must.Be.SameReferenceAs(a, b, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, a, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -382,7 +382,7 @@ public static class GuardObjectClauses
     {
         var result = Must.Be.NotSameReferenceAs(a, b, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, a, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

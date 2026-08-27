@@ -40,7 +40,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.PastDateTimeOffset(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -72,7 +72,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.PastOrPresentDateTimeOffset(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -104,7 +104,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.FutureDateTimeOffset(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -136,7 +136,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.FutureOrPresentDateTimeOffset(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -174,7 +174,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.BetweenDateTimeOffset(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -212,7 +212,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.NotBetweenDateTimeOffset(value, min, max, inclusion, styles, paramName); // Guard.Against.BetweenDateTimeOffset => Must.Be.NotBetweenDateTimeOffset (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -248,7 +248,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.WithinDateTimeOffset(value, reference, window, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -284,7 +284,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.NotWithinDateTimeOffset(value, reference, window, styles, paramName); // Guard.Against.WithinDateTimeOffset => Must.Be.NotWithinDateTimeOffset (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -320,7 +320,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.WithinCalendarMonthsDateTimeOffset(value, reference, months, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -356,7 +356,7 @@ public static class GuardStringDateTimeOffsetClauses
     {
         var result = Must.Be.NotWithinCalendarMonthsDateTimeOffset(value, reference, months, styles, paramName); // Guard.Against.WithinCalendarMonthsDateTimeOffset => Must.Be.NotWithinCalendarMonthsDateTimeOffset (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

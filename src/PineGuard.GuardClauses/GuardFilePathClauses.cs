@@ -49,7 +49,7 @@ public static class GuardFilePathClauses
     {
         var result = Must.Be.SafeFileName(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -99,7 +99,7 @@ public static class GuardFilePathClauses
     {
         var result = Must.Be.HasFileExtension(path, allowed, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, path, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

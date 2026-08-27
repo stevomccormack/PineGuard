@@ -47,7 +47,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.BetweenTimeOnly(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -85,7 +85,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.NotBetweenTimeOnly(value, min, max, inclusion, styles, paramName); // Guard.Against.BetweenTimeOnly => Must.Be.NotBetweenTimeOnly (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -121,7 +121,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.WithinTimeOnly(value, reference, window, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -157,7 +157,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.NotWithinTimeOnly(value, reference, window, styles, paramName); // Guard.Against.WithinTimeOnly => Must.Be.NotWithinTimeOnly (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -193,7 +193,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.BeforeTimeOnly(value, other, precision, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -229,7 +229,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.OnOrBeforeTimeOnly(value, other, precision, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -265,7 +265,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.AfterTimeOnly(value, other, precision, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -301,7 +301,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.OnOrAfterTimeOnly(value, other, precision, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -337,7 +337,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.SameTimeOnly(value, other, precision, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -373,7 +373,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.NotSameTimeOnly(value, other, precision, styles, paramName); // Guard.Against.SameTimeOnly => Must.Be.NotSameTimeOnly (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -409,7 +409,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.NotBeforeTimeOnly(value, other, precision, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -445,7 +445,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.NotOnOrBeforeTimeOnly(value, other, precision, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -481,7 +481,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.NotAfterTimeOnly(value, other, precision, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -517,7 +517,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.NotOnOrAfterTimeOnly(value, other, precision, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -553,7 +553,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.ChronologicalTimeOnly(start, end, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -589,7 +589,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.NotChronologicalTimeOnly(start, end, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -629,7 +629,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.NotOverlappingTimeOnly(start1, end1, start2, end2, inclusion, styles, paramName); // Guard.Against.OverlappingTimeOnly => Must.Be.NotOverlappingTimeOnly (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start1, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -669,7 +669,7 @@ public static class GuardStringTimeOnlyClauses
     {
         var result = Must.Be.OverlappingTimeOnly(start1, end1, start2, end2, inclusion, styles, paramName); // Guard.Against.NotOverlappingTimeOnly => Must.Be.OverlappingTimeOnly (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start1, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

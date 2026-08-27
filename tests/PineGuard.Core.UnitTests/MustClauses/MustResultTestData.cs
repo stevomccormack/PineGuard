@@ -122,6 +122,15 @@ public static class MustResultTestData
             new("fails with code", MustResult<int>.Fail("test.code", "{paramName} must be valid.", "value", 123), new ExpectedException(typeof(InvalidOperationException), null, "test.code:value must be valid."))
         ];
 
+        public static TheoryData<DataStampingCase> DataStampingCases =>
+        [
+            new("stamps code and property path when param name is known", MustResult<int>.Fail("test.code", "{paramName} must be valid.", "value", 123), "test.code", "value"),
+            new("stamps code only when param name is unknown", MustResult<int>.Fail("test.other-code", "No param name.", null, 123), "test.other-code", string.Empty)
+        ];
+
+        public sealed record DataStampingCase(string Name, MustResult<int> MustResult, string ExpectedCode, string ExpectedPropertyPath)
+            : ValueCase<MustResult<int>>(Name, MustResult);
+
         public static TheoryData<ImplicitBoolCase> ImplicitBoolCases =>
         [
             new("null reference converts to false", null, false),

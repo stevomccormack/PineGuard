@@ -41,7 +41,7 @@ public static class GuardTimeSpanClauses
     {
         var result = Must.Be.DurationBetween(value, min, max, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -77,7 +77,7 @@ public static class GuardTimeSpanClauses
     {
         var result = Must.Be.NotDurationBetween(value, min, max, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -111,7 +111,7 @@ public static class GuardTimeSpanClauses
     {
         var result = Must.Be.GreaterThan(value, threshold, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -145,7 +145,7 @@ public static class GuardTimeSpanClauses
     {
         var result = Must.Be.LessThan(value, threshold, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
