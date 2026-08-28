@@ -54,7 +54,9 @@ protected static void AssertCustomMessage<TValue, TReturn>(GuardCase<TValue> tes
 ```
 
 - If `tc.Expected.IsValid` is `true`: invokes the action and returns the result.
-- If `tc.Expected.IsValid` is `false`: asserts the action throws the expected exception type, ParamName, and MessageContains.
+- If `tc.Expected.IsValid` is `false`: asserts the action throws the expected exception type, ParamName, and
+  MessageContains; when `Expected.Code` is set, also asserts `ex.Data[GuardFailure.CodeDataKey]` equals it,
+  and — when `Expected.ParamName` is also set — that `ex.Data[GuardFailure.PropertyPathDataKey]` equals it.
 
 ### Custom Message Assertion (Required)
 
@@ -87,13 +89,17 @@ public sealed record GuardCase<TValue>(string Name, TValue Value, GuardExpected 
 ### Expected Type: `GuardExpected`
 
 ```csharp
-public sealed record GuardExpected(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null)
+public sealed record GuardExpected(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null, string? Code = null)
     : ThrowExpected(IsValid, ExceptionType, ParamName, MessageContains);
 ```
 
 - `new GuardExpected(true)` — valid pass-through case, no exception thrown
 - `new GuardExpected(false, typeof(ArgumentException), "value")` — throws `ArgumentException` with ParamName "value"
 - `new GuardExpected(false, typeof(ArgumentNullException), "value")` — throws `ArgumentNullException` with ParamName "value"
+- `new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Email.Address.Invalid)` — also
+  asserts the thrown exception's `Data[GuardFailure.CodeDataKey]`/`Data[GuardFailure.PropertyPathDataKey]`; a
+  spot check on one representative group per guard file (~50 total, Rule13 is the exhaustive check), not
+  every case
 
 ### Required Imports
 
