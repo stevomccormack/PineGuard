@@ -133,30 +133,33 @@ public sealed class EndpointService
 **Best for:** teams who want a single validation library but need exceptions that match their application language.
 
 ```csharp
+using PineGuard.Codes;
 using PineGuard.GuardClauses;
 using PineGuard.MustClauses;
 
 // Default behavior: built-in ArgumentException / ArgumentNullException
 Guard.Against.NotNull(orderId);
 
-// Global replacement
-GuardExceptionPolicy.ExceptionReplacer = ex => new DomainValidationException(ex.Message, ex);
-GuardExceptionPolicy.ReplaceDefaultExceptions = true;
+// App-wide mapping, by code, by code family, or by exception type, in one switch expression.
+// Call once, at the composition root.
+GuardExceptionPolicy.Map(failure => failure.Code switch
+{
+    MustCodes.Value.State.Null => new DomainValidationException(failure.Message, failure.Exception),
+    var c when c.StartsWith(MustCodes.Owasp.Prefix + '.', StringComparison.Ordinal)
+        => new SecurityViolationException(c, failure.Exception),
+    var c => new DomainValidationException(c, failure.Message, failure.Exception),
+});
 
 Guard.Against.NotNull(orderId);
 
-// Scoped replacement
-using (GuardExceptionPolicy.BeginScope(options =>
-{
-    options.ExceptionReplacer = ex => new CheckoutException(ex.Message, ex);
-    options.ReplaceDefaultExceptions = true;
-}))
+// Scoped mapping — overrides the global map for the scope only, restores it on disposal
+using (GuardExceptionPolicy.BeginScope(failure => new CheckoutException(failure.Message, failure.Exception)))
 {
     Guard.Against.NotNull(orderId);
     Guard.Against.OwaspUnsafe(input);
 }
 
-// Per-call override wins for this invocation only
+// Per-call override wins for this invocation only, bypassing the map entirely
 Guard.Against.NotNull(
     orderId,
     exceptionCreator: () => new CheckoutException("Order id is required."));
@@ -164,6 +167,12 @@ Guard.Against.NotNull(
 // If you're already working with MustResult<T>, throw from there instead
 Must.Be.OwaspSafe(input).ThrowIfFailed((message, paramName) =>
     new CheckoutException($"{paramName}: {message}"));
+
+// Reading the code back off an exception you didn't map yourself (logging, a catch block)
+if (ex.TryGetMustCode(out var code) && code.StartsWith(MustCodes.Owasp.Prefix + '.', StringComparison.Ordinal))
+{
+    // ...
+}
 ```
 
 ### FluentValidation Integration &mdash; expressive pipeline validation

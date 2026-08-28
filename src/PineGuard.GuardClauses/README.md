@@ -40,18 +40,23 @@ public EndpointConfiguration Create(string callback, string userEmail, string us
 ### Your domain, your exception story
 
 ```csharp
-// Replace globally
-GuardExceptionPolicy.ExceptionReplacer = ex => new DomainValidationException(ex.Message, ex);
-GuardExceptionPolicy.ReplaceDefaultExceptions = true;
+using PineGuard.Codes;
+
+// Map globally — one switch over the failed clause's code, by code, by code family, or by exception type
+GuardExceptionPolicy.Map(failure => failure.Code switch
+{
+    var c when c.StartsWith(MustCodes.Owasp.Prefix + '.', StringComparison.Ordinal)
+        => new SecurityViolationException(c, failure.Exception),
+    var c => new DomainValidationException(c, failure.Message, failure.Exception),
+});
 
 // Or just for a block
-using (GuardExceptionPolicy.BeginScope(o =>
-    o.ExceptionReplacer = ex => new CheckoutException(ex.Message, ex)))
+using (GuardExceptionPolicy.BeginScope(failure => new CheckoutException(failure.Message, failure.Exception)))
 {
     Guard.Against.NotNull(orderId);
 }
 
-// Or just for one call
+// Or just for one call — bypasses the map entirely
 Guard.Against.NotNull(orderId,
     exceptionCreator: () => new CheckoutException("Order id is required."));
 ```

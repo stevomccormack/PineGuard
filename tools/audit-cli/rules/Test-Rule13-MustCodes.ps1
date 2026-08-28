@@ -8,8 +8,10 @@
     (a) every public Must.Be.* clause passes exactly one MustCodes constant on every Fail(/FromBool(
     call; (b) every catalogue constant (other than Prefix) is referenced by at least one clause,
     DataAnnotations attribute, or Core/AspNetCore call site; (c) no code string literal duplicates a
-    catalogue domain outside src/PineGuard.Core/Codes/; (f) every clause file only references
-    constants from its mapped domain; (g) no "using PineGuard" line appears under
+    catalogue domain outside src/PineGuard.Core/Codes/; (e) every Guard.Against.* clause passes its
+    IMustResult (never a string) as GuardFailure.Throw's first argument, so the code and property
+    path on the thrown exception are always the Must layer's own; (f) every clause file only
+    references constants from its mapped domain; (g) no "using PineGuard" line appears under
     src/PineGuard.Core/Codes/ (the catalogue must stay a dependency-free leaf).
 
 .PARAMETER RepoRoot
@@ -220,6 +222,26 @@ foreach ($file in $clauseFiles) {
     }
 }
 
+# ---- (e) every Guard.Against.* clause passes its IMustResult (never a string) to GuardFailure.Throw ----
+
+$guardClausesDir = Resolve-PineGuardPath -RepoRoot $repoRootResolved -Path 'src/PineGuard.GuardClauses'
+if (-not (Test-Path $guardClausesDir)) { throw "GuardClauses directory not found: $guardClausesDir" }
+
+$guardClauseFiles = @(Get-ChildItem -Path $guardClausesDir -Filter 'Guard*Clauses.cs' -File)
+$guardThrowPattern = [regex]::new('GuardFailure\.Throw\s*\(\s*(.)')
+
+foreach ($file in $guardClauseFiles) {
+    $content = Get-Content -LiteralPath $file.FullName -Raw
+
+    foreach ($m in $guardThrowPattern.Matches($content)) {
+        $firstChar = $m.Groups[1].Value
+        if ($firstChar -eq '"' -or $firstChar -eq [char]39) {
+            $lineNumber = ($content.Substring(0, $m.Index) -split "`n").Count
+            Add-Finding "(e) $($file.Name):$($lineNumber): GuardFailure.Throw(...) is called with a string literal as its first argument — pass the IMustResult itself, e.g. GuardFailure.Throw(result, message, exceptionCreator)."
+        }
+    }
+}
+
 # Usage scan across the extra roots (Core/DataAnnotations/AspNetCore) for check (b)
 foreach ($filePath in $allUsageFiles) {
     if ($filePath -match '\\Codes\\') { continue }
@@ -257,6 +279,7 @@ $summaryLines = @(
     "Date: $(Get-Date)",
     "RepoRoot: $repoRootResolved",
     "Clause files scanned: $($clauseFiles.Count)",
+    "Guard clause files scanned: $($guardClauseFiles.Count)",
     "Codes files scanned: $($codesFiles.Count)",
     "Declared constants (excl. Prefix): $($declaredConstants.Count)",
     "Findings: $($findings.Count)",

@@ -411,7 +411,7 @@ Examples:
 // Forbid non-ASCII => enforce ASCII
 var result = Must.Be.Ascii(value, paramName); // Guard.Against.NotAscii => Must.Be.Ascii (complement)
 if (result.Failed)
-  GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+  GuardFailure.Throw(result, message, exceptionCreator);
 return result.Result;
 ```
 
@@ -460,7 +460,7 @@ Example:
 ```csharp
 var result = Must.Be.Positive(value, paramName); // Guard.Against.ZeroOrNegative => Must.Be.Positive (complement)
 if (result.Failed)
-  GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+  GuardFailure.Throw(result, message, exceptionCreator);
 ```
 
 Important: do NOT implement GuardClauses by “throwing on `result.Success`”.
@@ -533,23 +533,37 @@ GuardClauses may optionally accept:
 - `string? message = null` (caller override of the canonical message template), and
 - `Func<Exception>? exceptionCreator = null` (caller override of the exception instance), and
 
-GuardClauses should not expose an `exceptionReplacer` parameter in public APIs unless explicitly requested.
-Central replacement is provided by `GuardExceptionPolicy`.
+GuardClauses should not expose a map/policy parameter in public APIs unless explicitly requested.
+Central mapping is provided by `GuardExceptionPolicy`.
 
 When provided:
 
-- If `exceptionCreator` returns a non-null exception, that exception must be thrown.
-- Otherwise, GuardClauses throw the appropriate BCL exception by default.
+- If `exceptionCreator` returns a non-null exception, that exception must be thrown as-is — an explicit
+  per-call choice always wins over the active `GuardExceptionPolicy` map.
+- Otherwise, GuardClauses build the default `ArgumentException`/`ArgumentNullException`, then consult the
+  active `GuardExceptionPolicy` map (if any) and throw what it returns instead.
 
-Replacement behavior:
+Mapping behavior:
 
-GuardClauses also supports a global replacement policy via `GuardExceptionPolicy.ExceptionReplacer`.
-`GuardFailure.Throw(...)` uses the effective Guard exception policy.
-`GuardExceptionPolicy.ReplaceDefaultExceptions` controls whether the effective policy may replace the built-in default exceptions.
-`GuardExceptionPolicy.BeginScope(...)` provides a scoped override on top of the global policy.
-`GuardFailure.ThrowAndReplace(...)` remains the explicit per-call replacement path and takes precedence over scoped/global policy replacement.
+`GuardFailure.Throw(IMustResult result, string? message = null, Func<Exception>? exceptionCreator = null)`
+is the sole entry point every guard calls. It stamps `GuardFailure.CodeDataKey` and
+`GuardFailure.PropertyPathDataKey` onto the thrown exception's `Data` (read them back via
+`ExceptionExtension.TryGetMustCode`/`HasMustCode`/`GetMustPropertyPath`), then consults
+`GuardExceptionPolicy`:
 
-See §11.5 for a copy/paste example combining a custom exception type and message.
+- `GuardExceptionPolicy.Map(Func<GuardFailure, Exception> map)` installs an app-wide map — call it once,
+  at the composition root.
+- `GuardExceptionPolicy.BeginScope(Func<GuardFailure, Exception> map)` returns an `IDisposable` that
+  overrides the map for the scope only (`AsyncLocal`-backed), restoring the previous map on disposal —
+  the tool for tests.
+- `GuardExceptionPolicy.Clear()` removes the map; with no map installed, guards throw the standard
+  `ArgumentException`/`ArgumentNullException` family.
+- `GuardExceptionPolicy.HasMap` reports whether a map is currently in effect.
+
+There is no per-call replacer parameter and no `GuardExceptionPolicyOptions` bag — the map receives one
+`GuardFailure` (`Code`, `Message`, `ParamName`, `Value`, `Exception`) and returns the exception to throw,
+so a consumer switches on `failure.Code` directly. See §11.3/§11.4 for copy/paste examples and §11.6 for
+`Guard.Against.Invalid`.
 
 ---
 
@@ -559,9 +573,12 @@ See §11.5 for a copy/paste example combining a custom exception type and messag
 
 Current implementation rule (source-of-truth):
 
-- The default thrown exception comes from `GuardFailure`:
-  - `ArgumentNullException` when `value is null`
+- The default thrown exception comes from `GuardFailure.Throw`:
+  - `ArgumentNullException` when the failed result's value is `null`
   - otherwise `ArgumentException`
+- Every thrown exception (default, `exceptionCreator`'s, or a `GuardExceptionPolicy` map's) is stamped
+  with `GuardFailure.CodeDataKey` (the failed clause's `MustCodes` constant) and
+  `GuardFailure.PropertyPathDataKey` (the failed result's `ParamName`, or `""`) on `Exception.Data`.
 
 Outlier / requires attention:
 
@@ -587,7 +604,9 @@ GuardClauses are a thin facade over MustClauses.
 When implementing a GuardClause:
 
 1. Call the corresponding MustClause in `src/PineGuard.MustClauses/**`.
-2. If the MustClause failed, throw via `GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator)`.
+2. If the MustClause failed, throw via `GuardFailure.Throw(result, message, exceptionCreator)` — always
+   pass the `IMustResult` itself (never a message string) so the thrown exception carries the clause's
+   own `Code` and `ParamName`, not the guard's outer parameter name.
 3. If the MustClause succeeded:
 
 - for validate-only: return normally.
@@ -666,13 +685,13 @@ When asked to add GuardClauses, produce:
 public static void NotSomething(
   this IGuardClause _,
   string? value,
-  [CallerArgumentExpression(nameof(value))] string? paramName = null,
   string? message = null,
-  Func<Exception>? exceptionCreator = null)
+  Func<Exception>? exceptionCreator = null,
+  [CallerArgumentExpression(nameof(value))] string? paramName = null)
 {
   var result = Must.Be.Something(value, paramName); // (optional) note complement mapping when applicable
   if (result.Failed)
-    GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+    GuardFailure.Throw(result, message, exceptionCreator);
 }
 ```
 
@@ -682,36 +701,52 @@ public static void NotSomething(
 public static TParsed Something(
   this IGuardClause _,
   string? value,
-  [CallerArgumentExpression(nameof(value))] string? paramName = null,
   string? message = null,
-  Func<Exception>? exceptionCreator = null)
+  Func<Exception>? exceptionCreator = null,
+  [CallerArgumentExpression(nameof(value))] string? paramName = null)
 {
   var result = Must.Be.Something(value, paramName); // (optional) note complement mapping when applicable
   if (result.Failed)
-    GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+    GuardFailure.Throw(result, message, exceptionCreator);
 
   return result.Result!;
 }
 ```
 
-### 11.3 Central exception replacement (BusinessException)
+### 11.3 App-wide exception mapping
+
+Call once, at the composition root — switches on `failure.Code` directly, by code, by code family, or by
+exception type, in one expression:
 
 ```csharp
-GuardExceptionPolicy.ExceptionReplacer = ex => new BusinessException(ex.Message, ex);
-GuardExceptionPolicy.ReplaceDefaultExceptions = true;
-```
+using PineGuard.Codes;
+using PineGuard.GuardClauses;
 
-### 11.4 Scoped exception replacement
-
-```csharp
-using var _ = GuardExceptionPolicy.BeginScope(options =>
+GuardExceptionPolicy.Map(failure => failure.Code switch
 {
-  options.ExceptionReplacer = ex => new BusinessException(ex.Message, ex);
-  options.ReplaceDefaultExceptions = true;
+    MustCodes.Value.State.Null => new MissingRequiredValueException(failure.ParamName, failure.Exception),
+    var c when c.StartsWith(MustCodes.Owasp.Prefix + '.', StringComparison.Ordinal)
+        => new SecurityViolationException(c, failure.Exception),
+    var c => new DomainValidationException(c, failure.Message, failure.Exception),
 });
 ```
 
-### 11.5 Example: custom exception type + message
+### 11.4 Scoped exception mapping (tests, per-request boundaries)
+
+```csharp
+using (GuardExceptionPolicy.BeginScope(failure => new BusinessException(failure.Message, failure.Exception)))
+{
+    // guards inside this scope throw BusinessException instead of the standard ArgumentException family;
+    // disposing restores whatever map (if any) was active before the scope began.
+}
+
+GuardExceptionPolicy.Clear();       // no map -> standard argument exceptions
+if (GuardExceptionPolicy.HasMap) { /* a map is currently installed */ }
+```
+
+### 11.5 Example: custom exception type + message (bypasses the map)
+
+An `exceptionCreator` always wins over the active `GuardExceptionPolicy` map — it is an explicit per-call choice:
 
 ```csharp
 public static void NotValidEmail(
@@ -722,12 +757,27 @@ public static void NotValidEmail(
   var result = Must.Be.Email(value, paramName);
   if (result.Failed)
     GuardFailure.Throw(
+      result,
       "Email format is invalid.",
-      paramName,
-      value,
       () => new BusinessException("Email format is invalid."));
 }
 ```
+
+### 11.6 `Guard.Against.Invalid` — the object validator in Guard style
+
+```csharp
+public Order(string email, IReadOnlyList<OrderLine> lines)
+{
+    Guard.Against.Invalid(this, OrderValidator.Instance);
+    // ...
+}
+```
+
+Runs `IMustValidator<T>.Validate(value)` and, on failure, throws the standard `ArgumentException` family
+(never `MustValidationException`) built from the *first* failure — `Code`, `Message`, its `PropertyPath`
+as the exception's `ParamName`, and `Value` — so a `GuardExceptionPolicy` map routes it by code exactly
+like every other guard. Reach for `validator.Validate(value).ThrowIfFailed()` instead when the whole
+`MustValidationResult` (every failure, not just the first) is wanted at a boundary.
 
 ---
 
