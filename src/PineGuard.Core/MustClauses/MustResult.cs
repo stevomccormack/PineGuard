@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.GuardClauses;
 
@@ -96,18 +97,6 @@ public sealed class MustResult<T> : IMustResult
         new(true, string.Empty, string.Empty, string.Empty, paramName, value, result);
 
     /// <summary>
-    /// Creates a failed <see cref="MustResult{T}"/> with a formatted failure message.
-    /// </summary>
-    /// <param name="messageTemplate">
-    /// The message template. Use <c>{paramName}</c> as a placeholder for the parameter name.
-    /// </param>
-    /// <param name="paramName">The name of the parameter that failed validation.</param>
-    /// <param name="value">The original untyped value that failed validation.</param>
-    /// <returns>A <see cref="MustResult{T}"/> with <see cref="Failed"/> set to <see langword="true"/>.</returns>
-    public static MustResult<T> Fail(string messageTemplate, string? paramName, object? value) =>
-        new(false, string.Empty, MustMessage.Format(messageTemplate, paramName), messageTemplate, paramName, value, default);
-
-    /// <summary>
     /// Creates a failed <see cref="MustResult{T}"/> carrying a stable machine-readable <paramref name="code"/>.
     /// </summary>
     /// <param name="code">The <c>MustCodes</c> catalogue constant identifying the failed rule. Must not be empty.</param>
@@ -165,35 +154,6 @@ public sealed class MustResult<T> : IMustResult
     }
 
     /// <summary>
-    /// Creates a <see cref="MustResult{T}"/> from a nullable boolean flag.
-    /// </summary>
-    /// <param name="ok">
-    /// If <see langword="true"/>, returns a successful result; if <see langword="false"/> or
-    /// <see langword="null"/>, returns a failed result.
-    /// </param>
-    /// <param name="messageTemplate">The failure message template. Use <c>{paramName}</c> as a placeholder.</param>
-    /// <param name="paramName">The name of the parameter being validated.</param>
-    /// <param name="value">The original value being validated.</param>
-    /// <param name="result">The typed result to carry on success.</param>
-    /// <returns>A success or failure <see cref="MustResult{T}"/> based on <paramref name="ok"/>.</returns>
-    public static MustResult<T> FromBool(bool? ok, string messageTemplate, string? paramName, object? value, T? result) =>
-        ok ?? false ? Ok(result!, value, paramName) : Fail(messageTemplate, paramName, value);
-
-    /// <summary>
-    /// Creates a <see cref="MustResult{T}"/> from a nullable boolean flag with no typed result.
-    /// </summary>
-    /// <param name="ok">
-    /// If <see langword="true"/>, returns a successful result; if <see langword="false"/> or
-    /// <see langword="null"/>, returns a failed result.
-    /// </param>
-    /// <param name="messageTemplate">The failure message template. Use <c>{paramName}</c> as a placeholder.</param>
-    /// <param name="paramName">The name of the parameter being validated.</param>
-    /// <param name="value">The original value being validated.</param>
-    /// <returns>A success or failure <see cref="MustResult{T}"/> based on <paramref name="ok"/>.</returns>
-    public static MustResult<T> FromBool(bool? ok, string messageTemplate, string? paramName, object? value) =>
-        FromBool(ok, messageTemplate, paramName, value, result: default);
-
-    /// <summary>
     /// Creates a <see cref="MustResult{T}"/> carrying a stable machine-readable <paramref name="code"/> from a nullable boolean flag.
     /// </summary>
     /// <param name="ok">
@@ -208,6 +168,22 @@ public sealed class MustResult<T> : IMustResult
     /// <returns>A success or failure <see cref="MustResult{T}"/> based on <paramref name="ok"/>.</returns>
     public static MustResult<T> FromBool(bool? ok, string code, string messageTemplate, string? paramName, object? value, T? result) =>
         ok ?? false ? Ok(result!, value, paramName) : Fail(code, messageTemplate, paramName, value);
+
+    /// <summary>
+    /// Creates a <see cref="MustResult{T}"/> carrying a stable machine-readable <paramref name="code"/> from a
+    /// nullable boolean flag, with no typed result.
+    /// </summary>
+    /// <param name="ok">
+    /// If <see langword="true"/>, returns a successful result; if <see langword="false"/> or
+    /// <see langword="null"/>, returns a failed result.
+    /// </param>
+    /// <param name="code">The <c>MustCodes</c> catalogue constant identifying the rule on failure. Must not be empty.</param>
+    /// <param name="messageTemplate">The failure message template. Use <c>{paramName}</c> as a placeholder.</param>
+    /// <param name="paramName">The name of the parameter being validated.</param>
+    /// <param name="value">The original value being validated.</param>
+    /// <returns>A success or failure <see cref="MustResult{T}"/> based on <paramref name="ok"/>.</returns>
+    public static MustResult<T> FromBool(bool? ok, string code, string messageTemplate, string? paramName, object? value) =>
+        FromBool(ok, code, messageTemplate, paramName, value, result: default);
 
     /// <summary>
     /// Throws an <see cref="ArgumentException"/> if the result represents a failure.
@@ -356,7 +332,7 @@ public static class MustResultExtension
     public static MustResult<T> Combine<T>(this IEnumerable<MustResult<T>>? results)
     {
         if (results is null)
-            return MustResult<T>.Fail("{paramName} must not be null.", nameof(results), results);
+            return MustResult<T>.Fail(MustCodes.Value.State.Null, "{paramName} must not be null.", nameof(results), results);
 
         var all = results.ToList();
         if (all.Count == 0) return MustResult<T>.Ok(result: default!, value: null);

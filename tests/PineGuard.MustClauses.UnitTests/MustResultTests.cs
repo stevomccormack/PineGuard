@@ -20,7 +20,7 @@ public class MustResultTests : BaseUnitTest
     [MemberData(nameof(MustResultTestData.Fail.ValidCases), MemberType = typeof(MustResultTestData.Fail))]
     public void Fail_Checks(MustResultTestData.Fail.ValidCase testCase)
     {
-        var result = MustResult<int>.Fail(testCase.Value.Msg, testCase.Value.ParamName, testCase.Value.Value);
+        var result = MustResult<int>.Fail("test.code", testCase.Value.Msg, testCase.Value.ParamName, testCase.Value.Value);
         Assert.Equal(testCase.Expected, result.Success);
         Assert.Equal(testCase.Value.ParamName, result.ParamName);
         // Message check logic: "Error {paramName}" -> "Error param" (if param not null)
@@ -38,7 +38,7 @@ public class MustResultTests : BaseUnitTest
     [MemberData(nameof(MustResultTestData.FromBool.ValidCases), MemberType = typeof(MustResultTestData.FromBool))]
     public void FromBool_Checks(MustResultTestData.FromBool.ValidCase testCase)
     {
-        var result = MustResult<int>.FromBool(testCase.Value.Success, testCase.Value.Msg, testCase.Value.ParamName, testCase.Value.Value, testCase.Value.Result);
+        var result = MustResult<int>.FromBool(testCase.Value.Success, "test.code", testCase.Value.Msg, testCase.Value.ParamName, testCase.Value.Value, testCase.Value.Result);
         Assert.Equal(testCase.Expected, result.Success);
         Assert.Equal(testCase.Value.Result, result.Result);
         if (!testCase.Value.Success)

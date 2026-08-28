@@ -26,6 +26,16 @@ public static class GuardFailureTestData
         public static TheoryData<bool> Cases => [true];
     }
 
+    public static class MessageOverrideWithMapActive
+    {
+        public static TheoryData<bool> Cases => [true];
+    }
+
+    public static class NullParamName
+    {
+        public static TheoryData<bool> Cases => [true];
+    }
+
     public static class ExceptionCreatorPrecedence
     {
         public static TheoryData<bool> Cases => [true];

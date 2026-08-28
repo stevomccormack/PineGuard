@@ -34,7 +34,7 @@ public static class FluentGeoLocationExtensions
                 return MustResult<double?>.Ok(null);
 
             var res = Must.Be.Latitude(val.Value, paramName: null);
-            return MustResult<double?>.FromBool(res.Success, res.Message, res.ParamName, val, res.Result);
+            return MustResult<double?>.FromBool(res.Success, res.Code, res.Message, res.ParamName, val, res.Result);
         }, message, MustCodes.Geo.Latitude.Invalid);
 
     /// <summary>
@@ -73,7 +73,7 @@ public static class FluentGeoLocationExtensions
         {
             if (!val.HasValue) return MustResult<double?>.Ok(null);
             var res = Must.Be.Longitude(val.Value, paramName: null);
-            return MustResult<double?>.FromBool(res.Success, res.Message, res.ParamName, val, res.Result);
+            return MustResult<double?>.FromBool(res.Success, res.Code, res.Message, res.ParamName, val, res.Result);
         }, message, MustCodes.Geo.Longitude.Invalid);
 
     /// <summary>
@@ -116,7 +116,7 @@ public static class FluentGeoLocationExtensions
                 return MustResult<double?>.Ok(null);
 
             var res = Must.Be.GeoLocation(val.Value, longitude.Value, paramName: null);
-            return MustResult<double?>.FromBool(res.Success, res.Message, res.ParamName, val, val.Value);
+            return MustResult<double?>.FromBool(res.Success, res.Code, res.Message, res.ParamName, val, val.Value);
         }, message, MustCodes.Geo.Coordinate.Invalid);
 
     /// <summary>
