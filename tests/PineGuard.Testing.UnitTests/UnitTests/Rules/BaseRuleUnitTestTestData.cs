@@ -27,4 +27,10 @@ public static class BaseRuleUnitTestTestData
             new("invalid case passes", (new RuleCase<string?>("test", null, new RuleExpected(false)), false))
         ];
     }
+
+    public static class Constructor
+    {
+        public sealed record Case(string Name) : BaseCase(Name);
+        public static TheoryData<Case> ValidCases => [new("constructs without error")];
+    }
 }
