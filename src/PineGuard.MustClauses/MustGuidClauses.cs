@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -45,6 +46,6 @@ public static class MustGuidClauses
         const string messageTemplate = "{paramName} must not be an empty GUID.";
 
         var ok = !GuidRules.IsEmpty(value);
-        return MustResult<Guid>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<Guid>.FromBool(ok, MustCodes.Guid.Emptiness.Empty, messageTemplate, paramName, value, value);
     }
 }
