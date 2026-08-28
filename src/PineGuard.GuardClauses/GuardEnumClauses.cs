@@ -51,7 +51,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.Defined(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -98,7 +98,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.DefinedValue<TEnum>(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -147,7 +147,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.DefinedName<TEnum>(name, ignoreCase, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, name, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -194,7 +194,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.FlagsEnumCombination(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -242,7 +242,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.HasAttribute<TEnum, TAttribute>(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -290,7 +290,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotHasAttribute<TEnum, TAttribute>(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -338,7 +338,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.HasFlag(value, flag, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -386,7 +386,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotHasFlag(value, flag, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -432,7 +432,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.HasDescription(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -478,7 +478,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotHasDescription(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -524,7 +524,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.HasDisplay(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -570,7 +570,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotHasDisplay(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -616,7 +616,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.HasEnumMember(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -662,7 +662,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotHasEnumMember(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -708,7 +708,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotObsolete(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -754,7 +754,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.Obsolete(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return value;
     }
@@ -800,7 +800,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotDefined(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -846,7 +846,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotDefinedValue<TEnum>(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -894,7 +894,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotDefinedName<TEnum>(name, ignoreCase, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, name, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -940,7 +940,7 @@ public static class GuardEnumClauses
     {
         var result = Must.Be.NotFlagsEnumCombination(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

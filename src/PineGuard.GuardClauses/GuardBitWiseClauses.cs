@@ -57,7 +57,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.NotBitwiseEqualTo(value, other, mask, paramName); // Guard.Against.BitwiseEqualTo => Must.Be.NotBitwiseEqualTo (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -108,7 +108,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.BitwiseEqualTo(value, other, mask, paramName); // Guard.Against.NotBitwiseEqualTo => Must.Be.BitwiseEqualTo (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -157,7 +157,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.HasAllBits(value, mask, paramName); // Guard.Against.NotHasAllBits => Must.Be.HasAllBits (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -206,7 +206,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.HasAnyBits(value, mask, paramName); // Guard.Against.NotHasAnyBits => Must.Be.HasAnyBits (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -255,7 +255,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.HasNoBits(value, mask, paramName); // Guard.Against.NotHasNoBits => Must.Be.HasNoBits (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -304,7 +304,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.HasOnlyBits(value, allowedMask, paramName); // Guard.Against.NotHasOnlyBits => Must.Be.HasOnlyBits (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -351,7 +351,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.PowerOfTwo(value, paramName); // Guard.Against.NotPowerOfTwo => Must.Be.PowerOfTwo (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -398,7 +398,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.NotPowerOfTwo(value, paramName); // Guard.Against.PowerOfTwo => Must.Be.NotPowerOfTwo (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -447,7 +447,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.NotHasAllBits(value, mask, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -496,7 +496,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.NotHasAnyBits(value, mask, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -545,7 +545,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.NotHasNoBits(value, mask, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -594,7 +594,7 @@ public static class GuardBitWiseClauses
     {
         var result = Must.Be.NotHasOnlyBits(value, allowedMask, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

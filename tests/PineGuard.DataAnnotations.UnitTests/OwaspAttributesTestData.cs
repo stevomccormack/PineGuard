@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.DataAnnotations;
@@ -24,7 +25,7 @@ public static class OwaspAttributesTestData
         {
             nameof(F.IsOwaspSafe.Null) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false)
+            _ => new DataAnnotationExpected(false, Code: MustCodes.Owasp.Payload.Unsafe)
         });
     }
 

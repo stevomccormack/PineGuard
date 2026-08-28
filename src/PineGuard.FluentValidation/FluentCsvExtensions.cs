@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -28,7 +29,7 @@ public static class FluentCsvExtensions
     /// <seealso cref="MustCsvClauses.CsvLine"/>
     public static IRuleBuilderOptions<TModel, string?> CsvLine<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.CsvLine(val, paramName: null),
-            message);
+            message, MustCodes.Csv.Line.Invalid);
 
     /// <summary>
     /// Validates that the string value is a well-formed CSV header line matching the expected columns.
@@ -53,7 +54,7 @@ public static class FluentCsvExtensions
         StringComparison comparison = StringComparison.OrdinalIgnoreCase,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.CsvHeaderLine(val, expectedHeader, separator, comparison, paramName: null),
-            message);
+            message, MustCodes.Csv.Header.Invalid);
 
     /// <summary>
     /// Validates that the string value is a well-formed CSV data row matching the specified column schema.
@@ -76,7 +77,7 @@ public static class FluentCsvExtensions
         char separator = CsvRules.DefaultCsvSeparator,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.CsvRowLine(val, schema, separator, paramName: null),
-            message);
+            message, MustCodes.Csv.Row.Invalid);
 
     /// <summary>
     /// Validates that the string value is a well-formed CSV data row matching the specified header and column types.
@@ -103,5 +104,5 @@ public static class FluentCsvExtensions
         StringComparison headerNameComparison = StringComparison.OrdinalIgnoreCase,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.CsvRowLine(val, header, types, separator, headerNameComparison, paramName: null),
-            message);
+            message, MustCodes.Csv.Row.Invalid);
 }

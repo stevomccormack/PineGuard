@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.JsonRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class FluentJsonExtensionsTestData
         {
             nameof(F.IsJson.Null) => new FluentExpected(false, "Value must not be null."),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be JSON.")
+            _ => new FluentExpected(false, "Value must be JSON.", Code: MustCodes.Json.Document.Invalid)
         });
     }
 

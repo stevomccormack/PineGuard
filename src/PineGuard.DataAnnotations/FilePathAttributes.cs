@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustFilePathClauses.SafeFileName"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/filepath">FilePath Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class SafeFileNameAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class SafeFileNameAttribute() : ValidationAttributeBase(typeof(string), MustCodes.File.Name.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -70,7 +71,7 @@ public sealed class SafeFileNameAttribute() : ValidationAttributeBase(typeof(str
 /// <seealso href="https://pineguard.ai/docs/annotations/filepath">FilePath Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class HasFileExtensionAttribute(params string[] allowedExtensions)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.File.Extension.Mismatch)
 {
     /// <summary>Gets the list of allowed file extensions (each with a leading dot, e.g., <c>".pdf"</c>).</summary>
     public string[] AllowedExtensions { get; } = allowedExtensions;

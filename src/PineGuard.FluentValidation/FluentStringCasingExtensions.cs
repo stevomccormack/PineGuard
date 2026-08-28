@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -33,7 +34,7 @@ public static class FluentStringCasingExtensions
         StringCasing style,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.CaseStyle(val, style, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Mismatch);
 
     /// <summary>
     /// Validates that the property value does not match the specified <see cref="StringCasing"/> style.
@@ -57,7 +58,7 @@ public static class FluentStringCasingExtensions
         StringCasing style,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotCaseStyle(val, style, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Match);
 
     /// <summary>
     /// Validates that the property value is in camelCase format.
@@ -78,7 +79,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.CamelCase"/>
     public static IRuleBuilderOptions<TModel, string?> CamelCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.CamelCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotCamel);
 
     /// <summary>
     /// Validates that the property value is not in camelCase format.
@@ -99,7 +100,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotCamelCase"/>
     public static IRuleBuilderOptions<TModel, string?> NotCamelCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotCamelCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Camel);
 
     /// <summary>
     /// Validates that the property value is in PascalCase format.
@@ -120,7 +121,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.PascalCase"/>
     public static IRuleBuilderOptions<TModel, string?> PascalCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.PascalCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotPascal);
 
     /// <summary>
     /// Validates that the property value is not in PascalCase format.
@@ -141,7 +142,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotPascalCase"/>
     public static IRuleBuilderOptions<TModel, string?> NotPascalCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotPascalCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Pascal);
 
     /// <summary>
     /// Validates that the property value is in snake_case format.
@@ -162,7 +163,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.SnakeCase"/>
     public static IRuleBuilderOptions<TModel, string?> SnakeCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.SnakeCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotSnake);
 
     /// <summary>
     /// Validates that the property value is not in snake_case format.
@@ -183,7 +184,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotSnakeCase"/>
     public static IRuleBuilderOptions<TModel, string?> NotSnakeCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotSnakeCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Snake);
 
     /// <summary>
     /// Validates that the property value is in UPPER_SNAKE_CASE format.
@@ -204,7 +205,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.UpperSnakeCase"/>
     public static IRuleBuilderOptions<TModel, string?> UpperSnakeCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.UpperSnakeCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotUpperSnake);
 
     /// <summary>
     /// Validates that the property value is not in UPPER_SNAKE_CASE format.
@@ -225,7 +226,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotUpperSnakeCase"/>
     public static IRuleBuilderOptions<TModel, string?> NotUpperSnakeCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotUpperSnakeCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.UpperSnake);
 
     /// <summary>
     /// Validates that the property value is in kebab-case format.
@@ -246,7 +247,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.KebabCase"/>
     public static IRuleBuilderOptions<TModel, string?> KebabCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.KebabCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotKebab);
 
     /// <summary>
     /// Validates that the property value is not in kebab-case format.
@@ -267,7 +268,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotKebabCase"/>
     public static IRuleBuilderOptions<TModel, string?> NotKebabCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotKebabCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Kebab);
 
     /// <summary>
     /// Validates that the property value is in Train-Case format.
@@ -288,7 +289,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.TrainCase"/>
     public static IRuleBuilderOptions<TModel, string?> TrainCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.TrainCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotTrain);
 
     /// <summary>
     /// Validates that the property value is not in Train-Case format.
@@ -309,7 +310,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotTrainCase"/>
     public static IRuleBuilderOptions<TModel, string?> NotTrainCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotTrainCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Train);
 
     /// <summary>
     /// Validates that the property value is in <c>dot.case</c> format.
@@ -330,7 +331,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.DotCase"/>
     public static IRuleBuilderOptions<TModel, string?> DotCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.DotCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotDot);
 
     /// <summary>
     /// Validates that the property value is not in <c>dot.case</c> format.
@@ -351,7 +352,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotDotCase"/>
     public static IRuleBuilderOptions<TModel, string?> NotDotCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotDotCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Dot);
 
     /// <summary>
     /// Validates that the property value is in space case format.
@@ -372,7 +373,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.SpaceCase"/>
     public static IRuleBuilderOptions<TModel, string?> SpaceCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.SpaceCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotSpace);
 
     /// <summary>
     /// Validates that the property value is not in space case format.
@@ -393,7 +394,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotSpaceCase"/>
     public static IRuleBuilderOptions<TModel, string?> NotSpaceCase<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotSpaceCase(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Space);
 
     /// <summary>
     /// Validates that the property value is entirely uppercase (culture-invariant).
@@ -414,7 +415,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.UpperInvariant"/>
     public static IRuleBuilderOptions<TModel, string?> UpperInvariant<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.UpperInvariant(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotUpperInvariant);
 
     /// <summary>
     /// Validates that the property value is not entirely uppercase (culture-invariant).
@@ -435,7 +436,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotUpperInvariant"/>
     public static IRuleBuilderOptions<TModel, string?> NotUpperInvariant<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotUpperInvariant(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.UpperInvariant);
 
     /// <summary>
     /// Validates that the property value is entirely lowercase (culture-invariant).
@@ -456,7 +457,7 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.LowerInvariant"/>
     public static IRuleBuilderOptions<TModel, string?> LowerInvariant<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.LowerInvariant(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotLowerInvariant);
 
     /// <summary>
     /// Validates that the property value is not entirely lowercase (culture-invariant).
@@ -477,5 +478,5 @@ public static class FluentStringCasingExtensions
     /// <seealso cref="MustStringCasingClauses.NotLowerInvariant"/>
     public static IRuleBuilderOptions<TModel, string?> NotLowerInvariant<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotLowerInvariant(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.LowerInvariant);
 }

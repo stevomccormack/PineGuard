@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -20,7 +21,11 @@ public sealed class ReadOnlyDictionaryAttributesTests
     [MemberData(nameof(ReadOnlyDictionaryAttributesTestData.EmptyReadOnlyDictionary.EdgeCases), MemberType = typeof(ReadOnlyDictionaryAttributesTestData.EmptyReadOnlyDictionary))]
     [MemberData(nameof(ReadOnlyDictionaryAttributesTestData.EmptyReadOnlyDictionary.InvalidCases), MemberType = typeof(ReadOnlyDictionaryAttributesTestData.EmptyReadOnlyDictionary))]
     public void EmptyReadOnlyDictionary_ShouldReturnExpected(ReadOnlyDictionaryAttributesTestData.ValidCase testCase)
-        => Verify(new EmptyReadOnlyDictionaryAttribute(), testCase);
+    {
+        var attribute = new EmptyReadOnlyDictionaryAttribute();
+        Assert.Equal(MustCodes.Dictionary.Items.NotEmpty, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(ReadOnlyDictionaryAttributesTestData.NotEmptyReadOnlyDictionary.ValidCases), MemberType = typeof(ReadOnlyDictionaryAttributesTestData.NotEmptyReadOnlyDictionary))]

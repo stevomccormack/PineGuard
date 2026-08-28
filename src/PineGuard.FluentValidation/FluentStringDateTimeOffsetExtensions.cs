@@ -1,5 +1,6 @@
 using System.Globalization;
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -27,7 +28,7 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.PastDateTimeOffset(val, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> in the past or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -40,7 +41,7 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.PastOrPresentDateTimeOffset(val, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> in the future.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -53,7 +54,7 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.FutureDateTimeOffset(val, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> in the future or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -66,7 +67,7 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.FutureOrPresentDateTimeOffset(val, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> between the specified bounds.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -85,7 +86,7 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.BetweenDateTimeOffset(val, min, max, inclusion, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Range.OutOfRange);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> not between the specified bounds.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -104,7 +105,7 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotBetweenDateTimeOffset(val, min, max, inclusion, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Range.InRange);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> within the specified time window of a reference.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -121,7 +122,7 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.WithinDateTimeOffset(val, reference, window, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Proximity.NotWithin);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> not within the specified time window of a reference.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -138,7 +139,7 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotWithinDateTimeOffset(val, reference, window, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Proximity.Within);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> within the specified calendar months of a reference.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -155,7 +156,7 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.WithinCalendarMonthsDateTimeOffset(val, reference, months, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Proximity.NotWithinCalendarMonths);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> not within the specified calendar months of a reference.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -172,5 +173,5 @@ public static class FluentStringDateTimeOffsetExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotWithinCalendarMonthsDateTimeOffset(val, reference, months, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Proximity.WithinCalendarMonths);
 }

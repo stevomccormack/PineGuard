@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -36,7 +37,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class BetweenTimeOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(TimeOnly))
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Range.OutOfRange)
 {
     /// <summary>Gets the lower boundary of the valid time range.</summary>
     public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
@@ -85,7 +86,7 @@ public sealed class BetweenTimeOnlyAttribute(string min, string max, Inclusion i
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotBetweenTimeOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(TimeOnly))
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Range.InRange)
 {
     /// <summary>Gets the lower boundary of the excluded time range.</summary>
     public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
@@ -132,7 +133,7 @@ public sealed class NotBetweenTimeOnlyAttribute(string min, string max, Inclusio
 /// <seealso cref="MustTimeOnlyClauses.Before"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BeforeTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly))
+public sealed class BeforeTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.NotBefore)
 {
     /// <summary>Gets the time boundary that the value must precede.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -173,7 +174,7 @@ public sealed class BeforeTimeOnlyAttribute(string other) : ValidationAttributeB
 /// <seealso cref="MustTimeOnlyClauses.After"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class AfterTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly))
+public sealed class AfterTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.NotAfter)
 {
     /// <summary>Gets the time boundary that the value must follow.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -214,7 +215,7 @@ public sealed class AfterTimeOnlyAttribute(string other) : ValidationAttributeBa
 /// <seealso cref="MustTimeOnlyClauses.NotBefore"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBeforeTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly))
+public sealed class NotBeforeTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.Before)
 {
     /// <summary>Gets the time boundary that the value must not precede.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -256,7 +257,7 @@ public sealed class NotBeforeTimeOnlyAttribute(string other) : ValidationAttribu
 /// <seealso cref="MustTimeOnlyClauses.OnOrBefore"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OnOrBeforeTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly))
+public sealed class OnOrBeforeTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.After)
 {
     /// <summary>Gets the time boundary that the value must be on or before.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -298,7 +299,7 @@ public sealed class OnOrBeforeTimeOnlyAttribute(string other) : ValidationAttrib
 /// <seealso cref="MustTimeOnlyClauses.NotOnOrBefore"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOnOrBeforeTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly))
+public sealed class NotOnOrBeforeTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.NotAfter)
 {
     /// <summary>Gets the time boundary that the value must not be on or before.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -339,7 +340,7 @@ public sealed class NotOnOrBeforeTimeOnlyAttribute(string other) : ValidationAtt
 /// <seealso cref="MustTimeOnlyClauses.NotAfter"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotAfterTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly))
+public sealed class NotAfterTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.After)
 {
     /// <summary>Gets the time boundary that the value must not exceed.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -381,7 +382,7 @@ public sealed class NotAfterTimeOnlyAttribute(string other) : ValidationAttribut
 /// <seealso cref="MustTimeOnlyClauses.OnOrAfter"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OnOrAfterTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly))
+public sealed class OnOrAfterTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.Before)
 {
     /// <summary>Gets the time boundary that the value must be on or after.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -423,7 +424,7 @@ public sealed class OnOrAfterTimeOnlyAttribute(string other) : ValidationAttribu
 /// <seealso cref="MustTimeOnlyClauses.NotOnOrAfter"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOnOrAfterTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly))
+public sealed class NotOnOrAfterTimeOnlyAttribute(string other) : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.NotBefore)
 {
     /// <summary>Gets the time boundary that the value must not be on or after.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -466,7 +467,7 @@ public sealed class NotOnOrAfterTimeOnlyAttribute(string other) : ValidationAttr
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalTimeOnlyAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeOnly))
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.NotChronological)
 {
     /// <summary>Gets the end time that the annotated start time must precede.</summary>
     public TimeOnly End { get; } = TimeOnly.Parse(end, CultureInfo.InvariantCulture);
@@ -512,7 +513,7 @@ public sealed class ChronologicalTimeOnlyAttribute(string end, Inclusion inclusi
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotChronologicalTimeOnlyAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeOnly))
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.Chronological)
 {
     /// <summary>Gets the end time that the annotated start time must not precede.</summary>
     public TimeOnly End { get; } = TimeOnly.Parse(end, CultureInfo.InvariantCulture);
@@ -559,7 +560,7 @@ public sealed class NotChronologicalTimeOnlyAttribute(string end, Inclusion incl
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class OverlappingTimeOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeOnly))
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Overlap.Missing)
 {
     /// <summary>Gets the end of the first time interval.</summary>
     public TimeOnly End1 { get; } = TimeOnly.Parse(end1, CultureInfo.InvariantCulture);
@@ -612,7 +613,7 @@ public sealed class OverlappingTimeOnlyAttribute(string end1, string start2, str
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotOverlappingTimeOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeOnly))
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Overlap.Present)
 {
     /// <summary>Gets the end of the first time interval.</summary>
     public TimeOnly End1 { get; } = TimeOnly.Parse(end1, CultureInfo.InvariantCulture);

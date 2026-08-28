@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.MustClauses;
 using PineGuard.Testing.UnitTests.Rules;
@@ -19,7 +20,7 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<IEnumerable<string>>> InvalidCases => F.IsEmpty.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             "Null" => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must be empty.")
+            _ => new MustExpected(false, "value must be empty.", Code: MustCodes.Collection.Items.NotEmpty)
         });
     }
 
@@ -30,7 +31,7 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<IEnumerable<string>>> InvalidCases => F.IsNotEmpty.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             "Null" => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must not be empty.")
+            _ => new MustExpected(false, "value must not be empty.", Code: MustCodes.Collection.Items.Empty)
         });
     }
 
@@ -42,7 +43,7 @@ public static class MustCollectionClausesTestData
         {
             nameof(F.HasExactCount.NullThree) => new MustExpected(false, "value must not be null.", "value"),
             nameof(F.HasExactCount.SingleNeg) => new MustExpected(false, "count requires a non-negative count.", "count"),
-            _ => new MustExpected(false, "value must have the expected count.")
+            _ => new MustExpected(false, "value must have the expected count.", Code: MustCodes.Collection.Count.Mismatch)
         });
     }
 
@@ -57,7 +58,7 @@ public static class MustCollectionClausesTestData
                 var data = F.HasMinCount.InvalidScenarios.ToMustCases(s => s.Name switch
                 {
                     nameof(F.HasMinCount.NullOne) => new MustExpected(false, "value must not be null.", "value"),
-                    _ => new MustExpected(false, "value must have at least the minimum count.")
+                    _ => new MustExpected(false, "value must have at least the minimum count.", Code: MustCodes.Collection.Count.TooFew)
                 });
                 data.Add(new MustCase<(IEnumerable<string>? value, int min)>("NegativeMin", (["a"], -1), new MustExpected(false, "min requires a non-negative minimum count.", "min")));
                 return data;
@@ -81,7 +82,7 @@ public static class MustCollectionClausesTestData
                 var data = F.HasMaxCount.InvalidScenarios.ToMustCases(s => s.Name switch
                 {
                     nameof(F.HasMaxCount.NullThree) => new MustExpected(false, "value must not be null.", "value"),
-                    _ => new MustExpected(false, "value must have at most the maximum count.")
+                    _ => new MustExpected(false, "value must have at most the maximum count.", Code: MustCodes.Collection.Count.TooMany)
                 });
                 data.Add(new MustCase<(IEnumerable<string>? value, int max)>("NegativeMax", (["a"], -1), new MustExpected(false, "max requires a non-negative maximum count.", "max")));
                 return data;
@@ -105,7 +106,7 @@ public static class MustCollectionClausesTestData
                 var data = F.HasCountBetween.InvalidScenarios.ToMustCases(s => s.Name switch
                 {
                     nameof(F.HasCountBetween.NullTwoFourInclusive) => new MustExpected(false, "value must not be null.", "value"),
-                    _ => new MustExpected(false, "value must have a count within the expected range.")
+                    _ => new MustExpected(false, "value must have a count within the expected range.", Code: MustCodes.Collection.Count.OutOfRange)
                 });
                 data.Add(new MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>("NegativeMin", (["a"], -1, 3, Inclusion.Inclusive), new MustExpected(false, "min requires a non-negative minimum count.", "min")));
                 data.Add(new MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>("NegativeMax", (["a"], 0, -1, Inclusion.Inclusive), new MustExpected(false, "max requires a non-negative maximum count.", "max")));
@@ -128,7 +129,7 @@ public static class MustCollectionClausesTestData
         [
             new("Null", (null, IsA), new MustExpected(false, "value must not be null.", "value")),
             new("Empty", ([], IsA), new MustExpected(false, "value must contain an item that matches the predicate.")),
-            new("No match", (["b", "c"], IsA), new MustExpected(false, "value must contain an item that matches the predicate.")),
+            new("No match", (["b", "c"], IsA), new MustExpected(false, "value must contain an item that matches the predicate.", Code: MustCodes.Collection.Items.NoMatch)),
             new("Null predicate", (["a"], null), new MustExpected(false, "predicate must not be null.", "predicate"))
         ];
     }
@@ -139,13 +140,14 @@ public static class MustCollectionClausesTestData
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, Func<string, bool>? predicate)>> ValidCases =>
         [
-            new("No match", (["b", "c"], IsA), new MustExpected(true))
+            new("No match", (["b", "c"], IsA), new MustExpected(true)),
+            new("Empty", ([], IsA), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, Func<string, bool>? predicate)>> InvalidCases =>
         [
             new("Null", (null, IsA), new MustExpected(false, "value must not be null.", "value")),
-            new("Has match", (["a", "b"], IsA), new MustExpected(false, "value must not contain an item that matches the predicate.")),
+            new("Has match", (["a", "b"], IsA), new MustExpected(false, "value must not contain an item that matches the predicate.", Code: MustCodes.Collection.Items.Match)),
             new("Null predicate", (["a"], null), new MustExpected(false, "predicate must not be null.", "predicate"))
         ];
     }
@@ -163,7 +165,7 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<(IEnumerable<string>? value, Func<string, bool>? predicate)>> InvalidCases =>
         [
             new("Null", (null, IsA), new MustExpected(false, "value must not be null.", "value")),
-            new("Partial", (["a", "b"], IsA), new MustExpected(false, "value must have all items match the predicate.")),
+            new("Partial", (["a", "b"], IsA), new MustExpected(false, "value must have all items match the predicate.", Code: MustCodes.Collection.Items.NotAllMatch)),
             new("Null predicate", (["a"], null), new MustExpected(false, "predicate must not be null.", "predicate"))
         ];
     }
@@ -180,7 +182,8 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<(IEnumerable<string>? value, Func<string, bool>? predicate)>> InvalidCases =>
         [
             new("Null", (null, IsA), new MustExpected(false, "value must not be null.", "value")),
-            new("All match", (["a", "a"], IsA), new MustExpected(false, "value must not have all items match the predicate.")),
+            new("All match", (["a", "a"], IsA), new MustExpected(false, "value must not have all items match the predicate.", Code: MustCodes.Collection.Items.AllMatch)),
+            new("Empty", ([], IsA), new MustExpected(false, "value must not have all items match the predicate.", Code: MustCodes.Collection.Items.AllMatch)),
             new("Null predicate", (["a"], null), new MustExpected(false, "predicate must not be null.", "predicate"))
         ];
     }
@@ -197,7 +200,7 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<IEnumerable<string>>> InvalidCases => F.HasDistinctItems.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             "Null" => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must have distinct items.")
+            _ => new MustExpected(false, "value must have distinct items.", Code: MustCodes.Collection.Items.Duplicate)
         });
     }
 
@@ -213,7 +216,7 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<IEnumerable<string>>> InvalidCases => F.HasDuplicateItems.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             "Null" => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must have duplicate items.")
+            _ => new MustExpected(false, "value must have duplicate items.", Code: MustCodes.Collection.Items.Distinct)
         });
     }
 
@@ -230,7 +233,7 @@ public static class MustCollectionClausesTestData
         {
             get
             {
-                var data = F.ContainsNullItems.ValidScenarios.ToMustCases(_ => new MustExpected(false, "value must not contain any null items."));
+                var data = F.ContainsNullItems.ValidScenarios.ToMustCases(_ => new MustExpected(false, "value must not contain any null items.", Code: MustCodes.Collection.Items.ContainsNull));
                 data.Add(new MustCase<IEnumerable<string?>>("NullCollection", null!, new MustExpected(false, "value must not be null.", "value")));
                 return data;
             }
@@ -244,7 +247,7 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<(IEnumerable<string>? value, string item)>> InvalidCases => F.Contains.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             nameof(F.Contains.NullA) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must contain the specified item.")
+            _ => new MustExpected(false, "value must contain the specified item.", Code: MustCodes.Collection.Items.Missing)
         });
     }
 
@@ -252,13 +255,14 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, string item)>> ValidCases =>
         [
-            new("Not contains", (["b", "c"], "a"), new MustExpected(true))
+            new("Not contains", (["b", "c"], "a"), new MustExpected(true)),
+            new("Empty", ([], "a"), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, string item)>> InvalidCases =>
         [
             new(nameof(F.Contains.NullA), (null, "a"), new MustExpected(false, "value must not be null.", "value")),
-            new("Contains a", (["a", "b"], "a"), new MustExpected(false, "value must not contain the specified item."))
+            new("Contains a", (["a", "b"], "a"), new MustExpected(false, "value must not contain the specified item.", Code: MustCodes.Collection.Items.Present))
         ];
     }
 
@@ -275,7 +279,7 @@ public static class MustCollectionClausesTestData
         {
             nameof(F.IsSubsetOf.NullMultiple) => new MustExpected(false, "value must not be null.", "value"),
             nameof(F.IsSubsetOf.MultipleNull) => new MustExpected(false, "other must not be null.", "other"),
-            _ => new MustExpected(false, "value must be a subset of the other collection.")
+            _ => new MustExpected(false, "value must be a subset of the other collection.", Code: MustCodes.Collection.Items.NotSubset)
         });
     }
 
@@ -295,7 +299,7 @@ public static class MustCollectionClausesTestData
         [
             new(nameof(F.IsSubsetOf.NullMultiple), (null, ["a"]), new MustExpected(false, "value must not be null.", "value")),
             new(nameof(F.IsSubsetOf.MultipleNull), (["a"], null), new MustExpected(false, "other must not be null.", "other")),
-            new("Is subset", (["a"], ["a", "b"]), new MustExpected(false, "value must not be a subset of the other collection."))
+            new("Is subset", (["a"], ["a", "b"]), new MustExpected(false, "value must not be a subset of the other collection.", Code: MustCodes.Collection.Items.Subset))
         ];
     }
 
@@ -307,7 +311,7 @@ public static class MustCollectionClausesTestData
         {
             nameof(F.HasIndex.NullZero) => new MustExpected(false, "value must not be null.", "value"),
             nameof(F.HasIndex.MultipleNeg) => new MustExpected(false, "index requires a non-negative index.", "index"),
-            _ => new MustExpected(false, "value must have an item at the specified index.")
+            _ => new MustExpected(false, "value must have an item at the specified index.", Code: MustCodes.Collection.Index.OutOfRange)
         });
     }
 
@@ -315,14 +319,15 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int index)>> ValidCases =>
         [
-            new("No index", (["a", "b"], 5), new MustExpected(true))
+            new("No index", (["a", "b"], 5), new MustExpected(true)),
+            new("Empty", ([], 0), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int index)>> InvalidCases =>
         [
             new(nameof(F.HasIndex.NullZero), (null, 0), new MustExpected(false, "value must not be null.", "value")),
             new(nameof(F.HasIndex.MultipleNeg), (["a"], -1), new MustExpected(false, "index requires a non-negative index.", "index")),
-            new("Has index", (["a", "b"], 0), new MustExpected(false, "value must not have an item at the specified index."))
+            new("Has index", (["a", "b"], 0), new MustExpected(false, "value must not have an item at the specified index.", Code: MustCodes.Collection.Index.InRange))
         ];
     }
 
@@ -330,14 +335,15 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int count)>> ValidCases =>
         [
-            new("Wrong count", (["a", "b"], 3), new MustExpected(true))
+            new("Wrong count", (["a", "b"], 3), new MustExpected(true)),
+            new("Empty", ([], 3), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int count)>> InvalidCases =>
         [
             new(nameof(F.HasExactCount.NullThree), (null, 3), new MustExpected(false, "value must not be null.", "value")),
             new(nameof(F.HasExactCount.SingleNeg), (["a"], -1), new MustExpected(false, "count requires a non-negative count.", "count")),
-            new("Exact count", (["a", "b", "c"], 3), new MustExpected(false, "value must not have the expected count."))
+            new("Exact count", (["a", "b", "c"], 3), new MustExpected(false, "value must not have the expected count.", Code: MustCodes.Collection.Count.Match))
         ];
     }
 
@@ -345,13 +351,14 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min)>> ValidCases =>
         [
-            new("Below min", (["a"], 3), new MustExpected(true))
+            new("Below min", (["a"], 3), new MustExpected(true)),
+            new("Empty", ([], 1), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min)>> InvalidCases =>
         [
             new(nameof(F.HasMinCount.NullOne), (null, 1), new MustExpected(false, "value must not be null.", "value")),
-            new("At min", (["a", "b"], 2), new MustExpected(false, "value must not have at least the minimum count.")),
+            new("At min", (["a", "b"], 2), new MustExpected(false, "value must not have at least the minimum count.", Code: MustCodes.Collection.Count.TooMany)),
             new("NegativeMin", (["a"], -1), new MustExpected(false, "min requires a non-negative minimum count.", "min"))
         ];
     }
@@ -371,7 +378,7 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<(IEnumerable<string>? value, int max)>> InvalidCases =>
         [
             new(nameof(F.HasMaxCount.NullThree), (null, 3), new MustExpected(false, "value must not be null.", "value")),
-            new("At max", (["a", "b"], 3), new MustExpected(false, "value must not have at most the maximum count.")),
+            new("At max", (["a", "b"], 3), new MustExpected(false, "value must not have at most the maximum count.", Code: MustCodes.Collection.Count.TooFew)),
             new("NegativeMax", (["a"], -1), new MustExpected(false, "max requires a non-negative maximum count.", "max"))
         ];
     }
@@ -391,7 +398,7 @@ public static class MustCollectionClausesTestData
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> InvalidCases =>
         [
             new(nameof(F.HasCountBetween.NullTwoFourInclusive), (null, 2, 4, Inclusion.Inclusive), new MustExpected(false, "value must not be null.", "value")),
-            new("In range", (["a", "b", "c"], 2, 4, Inclusion.Inclusive), new MustExpected(false, "value must not have a count within the expected range.")),
+            new("In range", (["a", "b", "c"], 2, 4, Inclusion.Inclusive), new MustExpected(false, "value must not have a count within the expected range.", Code: MustCodes.Collection.Count.InRange)),
             new("NegativeMin", (["a"], -1, 3, Inclusion.Inclusive), new MustExpected(false, "min requires a non-negative minimum count.", "min")),
             new("NegativeMax", (["a"], 0, -1, Inclusion.Inclusive), new MustExpected(false, "max requires a non-negative maximum count.", "max")),
             new("MinGtMax", (["a"], 4, 2, Inclusion.Inclusive), new MustExpected(false, "min requires a valid count range.", "min"))

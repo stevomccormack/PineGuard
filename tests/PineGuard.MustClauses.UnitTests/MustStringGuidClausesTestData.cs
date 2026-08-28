@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -12,7 +13,7 @@ public static class MustStringGuidClausesTestData
         public static TheoryData<MustCase<string?>> InvalidCases => F.GuidIsGuid.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             nameof(F.GuidIsGuid.NullValue) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must be a valid GUID.")
+            _ => new MustExpected(false, "value must be a valid GUID.", Code: MustCodes.Guid.Format.Invalid)
         });
     }
 
@@ -23,7 +24,7 @@ public static class MustStringGuidClausesTestData
         public static TheoryData<MustCase<string?>> InvalidCases => F.GuidIsNotEmpty.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             nameof(F.GuidIsNotEmpty.NullValue) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must not be an empty GUID.")
+            _ => new MustExpected(false, "value must not be an empty GUID.", Code: MustCodes.Guid.Emptiness.Empty)
         });
     }
 }

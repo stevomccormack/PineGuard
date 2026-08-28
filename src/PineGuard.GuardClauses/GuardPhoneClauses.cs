@@ -41,7 +41,7 @@ public static class GuardPhoneClauses
     {
         var result = Must.Be.PhoneNumber(value, minDigits, maxDigits, allowedNonDigitCharacters, paramName); // Guard.Against.NotPhoneNumber => Must.Be.PhoneNumber
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -77,7 +77,7 @@ public static class GuardPhoneClauses
     {
         var result = Must.Be.PhoneNumberString(value, minDigits, maxDigits, allowedNonDigitCharacters, paramName); // Guard.Against.NotPhoneNumberString => Must.Be.PhoneNumberString
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

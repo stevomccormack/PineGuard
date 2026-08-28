@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using PineGuard.Common;
 #endif
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -48,7 +49,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustDateTimeOffsetClauses.Past"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastAttribute() : ValidationAttributeBase(typeof(object), allowNull: true)
+public sealed class PastAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Date.Relative.NotPast, allowNull: true)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -108,7 +109,7 @@ public sealed class PastAttribute() : ValidationAttributeBase(typeof(object), al
 /// <seealso cref="MustDateTimeOffsetClauses.PastOrPresent"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastOrPresentAttribute() : ValidationAttributeBase(typeof(object), allowNull: true)
+public sealed class PastOrPresentAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Date.Relative.Future, allowNull: true)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -169,7 +170,7 @@ public sealed class PastOrPresentAttribute() : ValidationAttributeBase(typeof(ob
 /// <seealso cref="MustDateTimeOffsetClauses.Future"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureAttribute() : ValidationAttributeBase(typeof(object), allowNull: true)
+public sealed class FutureAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Date.Relative.NotFuture, allowNull: true)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -230,7 +231,7 @@ public sealed class FutureAttribute() : ValidationAttributeBase(typeof(object), 
 /// <seealso cref="MustDateTimeOffsetClauses.FutureOrPresent"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureOrPresentAttribute() : ValidationAttributeBase(typeof(object), allowNull: true)
+public sealed class FutureOrPresentAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Date.Relative.Past, allowNull: true)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -291,7 +292,7 @@ public sealed class FutureOrPresentAttribute() : ValidationAttributeBase(typeof(
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class DateOnlyBetweenAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateOnly))
+    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Range.OutOfRange)
 {
     /// <summary>Gets the lower boundary of the valid date range.</summary>
     public DateOnly Min { get; } = DateOnly.Parse(min, CultureInfo.InvariantCulture);
@@ -340,7 +341,7 @@ public sealed class DateOnlyBetweenAttribute(string min, string max, Inclusion i
 /// <seealso cref="MustDateTimeClauses.Utc"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class UtcAttribute() : ValidationAttributeBase(typeof(DateTime))
+public sealed class UtcAttribute() : ValidationAttributeBase(typeof(DateTime), MustCodes.Date.Kind.NotUtc)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -379,7 +380,7 @@ public sealed class UtcAttribute() : ValidationAttributeBase(typeof(DateTime))
 /// <seealso cref="MustDateTimeClauses.Local"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LocalAttribute() : ValidationAttributeBase(typeof(DateTime))
+public sealed class LocalAttribute() : ValidationAttributeBase(typeof(DateTime), MustCodes.Date.Kind.NotLocal)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -418,7 +419,7 @@ public sealed class LocalAttribute() : ValidationAttributeBase(typeof(DateTime))
 /// <seealso cref="MustDateTimeClauses.Unspecified"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class UnspecifiedAttribute() : ValidationAttributeBase(typeof(DateTime))
+public sealed class UnspecifiedAttribute() : ValidationAttributeBase(typeof(DateTime), MustCodes.Date.Kind.NotUnspecified)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

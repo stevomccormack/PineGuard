@@ -92,6 +92,18 @@ public static class RuleScenarioExtensionsTestData
 
     }
 
+    public static class ToMustValidationCasesOps
+    {
+        public sealed record Case(string Name, (RuleScenario<string?>[] input, bool expectedIsValid) Value)
+            : BaseCase(Name);
+
+        public static TheoryData<Case> Cases =>
+        [
+            new("valid scenario maps IsValid true", ([new("test", "x", true)], true)),
+            new("invalid scenario maps IsValid false", ([new("test", "x", false)], false))
+        ];
+    }
+
     public static class ToGuardCasesParamNameOps
     {
         public sealed record Case(string Name, (RuleScenario<string?>[] input, string paramName) Value)

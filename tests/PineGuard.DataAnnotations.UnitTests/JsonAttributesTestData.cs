@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.JsonRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class JsonAttributesTestData
         {
             nameof(F.IsJson.Null) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be JSON.")
+            _ => new DataAnnotationExpected(false, "Value must be JSON.", Code: MustCodes.Json.Document.Invalid)
         });
     }
 

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -13,7 +14,10 @@ namespace PineGuard.DataAnnotations;
 /// runtime and invoke the corresponding <see cref="MustReadOnlyDictionaryClauses"/> method via reflection.
 /// </para>
 /// </remarks>
-public abstract class ReadOnlyDictionaryAttributeBase() : GenericDictionaryAttributeBase(typeof(IReadOnlyDictionary<,>), typeof(MustReadOnlyDictionaryClauses));
+/// <param name="code">
+/// The <c>MustCodes</c> catalogue constant identifying the clause the derived attribute adapts.
+/// </param>
+public abstract class ReadOnlyDictionaryAttributeBase(string code) : GenericDictionaryAttributeBase(typeof(IReadOnlyDictionary<,>), typeof(MustReadOnlyDictionaryClauses), code);
 
 /// <summary>
 /// Validates that the annotated <see cref="IReadOnlyDictionary{TKey,TValue}"/> property or field is empty
@@ -38,7 +42,7 @@ public abstract class ReadOnlyDictionaryAttributeBase() : GenericDictionaryAttri
 /// <seealso cref="MustReadOnlyDictionaryClauses.Empty{TKey,TValue}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dictionary">Dictionary Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EmptyReadOnlyDictionaryAttribute : ReadOnlyDictionaryAttributeBase
+public sealed class EmptyReadOnlyDictionaryAttribute() : ReadOnlyDictionaryAttributeBase(MustCodes.Dictionary.Items.NotEmpty)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) => InvokeDictionaryMust(nameof(MustReadOnlyDictionaryClauses.Empty), value, validationContext);
@@ -67,7 +71,7 @@ public sealed class EmptyReadOnlyDictionaryAttribute : ReadOnlyDictionaryAttribu
 /// <seealso cref="MustReadOnlyDictionaryClauses.NotEmpty{TKey,TValue}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dictionary">Dictionary Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotEmptyReadOnlyDictionaryAttribute : ReadOnlyDictionaryAttributeBase
+public sealed class NotEmptyReadOnlyDictionaryAttribute() : ReadOnlyDictionaryAttributeBase(MustCodes.Dictionary.Items.Empty)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) => InvokeDictionaryMust(nameof(MustReadOnlyDictionaryClauses.NotEmpty), value, validationContext);

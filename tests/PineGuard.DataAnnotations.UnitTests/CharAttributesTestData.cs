@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.CharRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class CharAttributesTestData
         {
             nameof(F.IsAscii.Null) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false)
+            _ => new DataAnnotationExpected(false, Code: MustCodes.Character.Charset.NotAscii)
         });
     }
 

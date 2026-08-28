@@ -19,6 +19,6 @@ public sealed class StringGuidAttributeTests(ITestOutputHelper output)
         var result = attr.GetValidationResult(tc.Value, ctx);
 
         // Assert
-        AssertResult(tc, result);
+        AssertResult(tc, result, attr.Code);
     }
 }

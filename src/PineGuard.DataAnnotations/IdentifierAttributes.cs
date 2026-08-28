@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -29,7 +30,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustIdentifierClauses.Slug"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/identifier">Identifier Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class SlugAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class SlugAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Identifier.Slug.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

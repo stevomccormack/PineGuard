@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ public static class FluentEmailExtensions
     /// <seealso cref="MustEmailClauses.Email"/>
     public static IRuleBuilderOptions<TModel, string?> Email<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Email(val, paramName: null),
-            message);
+            message, MustCodes.Email.Address.Invalid);
 
     /// <summary>
     /// Validates that the property value is a valid email address using strict RFC-5321 rules.
@@ -52,7 +53,7 @@ public static class FluentEmailExtensions
     /// <seealso cref="MustEmailClauses.StrictEmail"/>
     public static IRuleBuilderOptions<TModel, string?> StrictEmail<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.StrictEmail(val, paramName: null),
-            message);
+            message, MustCodes.Email.Address.NotStrict);
 
     /// <summary>
     /// Validates that the property value is an email address containing a plus-sign alias (e.g., <c>user+alias@domain.com</c>).
@@ -74,7 +75,7 @@ public static class FluentEmailExtensions
     /// <seealso cref="MustEmailClauses.HasEmailAlias"/>
     public static IRuleBuilderOptions<TModel, string?> HasEmailAlias<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasEmailAlias(val, paramName: null),
-            message);
+            message, MustCodes.Email.Alias.Missing);
 
     /// <summary>
     /// Validates that the property value is an email address that does not contain a plus-sign alias.
@@ -96,5 +97,5 @@ public static class FluentEmailExtensions
     /// <seealso cref="MustEmailClauses.NotHasEmailAlias"/>
     public static IRuleBuilderOptions<TModel, string?> NotHasEmailAlias<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasEmailAlias(val, paramName: null),
-            message);
+            message, MustCodes.Email.Alias.Present);
 }

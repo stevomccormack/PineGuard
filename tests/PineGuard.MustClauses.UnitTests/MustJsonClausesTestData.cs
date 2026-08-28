@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.JsonRulesFixtures;
 
@@ -12,7 +13,7 @@ public static class MustJsonClausesTestData
         public static TheoryData<MustCase<string?>> InvalidCases => F.IsJson.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             nameof(F.IsJson.Null) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must be JSON.")
+            _ => new MustExpected(false, "value must be JSON.", Code: MustCodes.Json.Document.Invalid)
         });
     }
 
@@ -23,7 +24,7 @@ public static class MustJsonClausesTestData
         public static TheoryData<MustCase<string?>> InvalidCases => F.IsJsonObject.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             nameof(F.IsJsonObject.Null) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must be a JSON object.")
+            _ => new MustExpected(false, "value must be a JSON object.", Code: MustCodes.Json.Root.NotObject)
         });
     }
 
@@ -34,7 +35,7 @@ public static class MustJsonClausesTestData
         public static TheoryData<MustCase<string?>> InvalidCases => F.IsJsonArray.InvalidScenarios.ToMustCases(s => s.Name switch
         {
             nameof(F.IsJsonArray.Null) => new MustExpected(false, "value must not be null.", "value"),
-            _ => new MustExpected(false, "value must be a JSON array.")
+            _ => new MustExpected(false, "value must be a JSON array.", Code: MustCodes.Json.Root.NotArray)
         });
     }
 
@@ -42,6 +43,6 @@ public static class MustJsonClausesTestData
     {
         public static TheoryData<MustCase<IReadOnlyDictionary<string, IEnumerable<string>>?>> ValidCases => F.IsJsonContentType.ValidScenarios.ToMustCases();
 
-        public static TheoryData<MustCase<IReadOnlyDictionary<string, IEnumerable<string>>?>> InvalidCases => F.IsJsonContentType.InvalidScenarios.ToMustCases(_ => new MustExpected(false, "value must contain a JSON Content-Type."));
+        public static TheoryData<MustCase<IReadOnlyDictionary<string, IEnumerable<string>>?>> InvalidCases => F.IsJsonContentType.InvalidScenarios.ToMustCases(_ => new MustExpected(false, "value must contain a JSON Content-Type.", Code: MustCodes.Json.ContentType.Mismatch));
     }
 }

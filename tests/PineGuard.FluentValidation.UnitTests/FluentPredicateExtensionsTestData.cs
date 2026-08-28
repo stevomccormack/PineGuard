@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 
 namespace PineGuard.FluentValidation.UnitTests;
@@ -10,7 +11,7 @@ public static class FluentPredicateExtensionsTestData
         public static TheoryData<FluentCase<int>> Cases =>
         [
             new("satisfies", 1, new FluentExpected(true)),
-            new("not-satisfies", -1, new FluentExpected(false, "Value must satisfy the predicate."))
+            new("not-satisfies", -1, new FluentExpected(false, "Value must satisfy the predicate.", Code: MustCodes.Predicate.Result.False))
         ];
     }
 

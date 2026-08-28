@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -37,13 +38,13 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NotEmpty, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be empty.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.IsEmpty(enumerable);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.NotEmpty, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -67,13 +68,13 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Empty, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be empty.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.IsNotEmpty(enumerable);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Empty, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -99,16 +100,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.Mismatch, NullMessage, paramName, value);
 
         if (count < 0)
-            return MustResult<IEnumerable<T>>.Fail("{paramName} requires a non-negative count.", nameof(count), count);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.Mismatch, "{paramName} requires a non-negative count.", nameof(count), count);
 
         const string messageTemplate = "{paramName} must have the expected count.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.HasExactCount(enumerable, count);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.Mismatch, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -134,16 +135,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.TooFew, NullMessage, paramName, value);
 
         if (min < 0)
-            return MustResult<IEnumerable<T>>.Fail(NonNegativeMinMessage, nameof(min), min);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.TooFew, NonNegativeMinMessage, nameof(min), min);
 
         const string messageTemplate = "{paramName} must have at least the minimum count.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.HasMinCount(enumerable, min);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.TooFew, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -169,16 +170,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.TooMany, NullMessage, paramName, value);
 
         if (max < 0)
-            return MustResult<IEnumerable<T>>.Fail(NonNegativeMaxMessage, nameof(max), max);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.TooMany, NonNegativeMaxMessage, nameof(max), max);
 
         const string messageTemplate = "{paramName} must have at most the maximum count.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.HasMaxCount(enumerable, max);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.TooMany, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -208,22 +209,22 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.OutOfRange, NullMessage, paramName, value);
 
         if (min < 0)
-            return MustResult<IEnumerable<T>>.Fail(NonNegativeMinMessage, nameof(min), min);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.OutOfRange, NonNegativeMinMessage, nameof(min), min);
 
         if (max < 0)
-            return MustResult<IEnumerable<T>>.Fail(NonNegativeMaxMessage, nameof(max), max);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.OutOfRange, NonNegativeMaxMessage, nameof(max), max);
 
         if (min > max)
-            return MustResult<IEnumerable<T>>.Fail("{paramName} requires a valid count range.", nameof(min), min);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.OutOfRange, "{paramName} requires a valid count range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must have a count within the expected range.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.HasCountBetween(enumerable, min, max, inclusion);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.OutOfRange, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -249,16 +250,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NoMatch, NullMessage, paramName, value);
 
         if (predicate is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NoMatch, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must contain an item that matches the predicate.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.HasAny(enumerable, predicate);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.NoMatch, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -284,16 +285,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Match, NullMessage, paramName, value);
 
         if (predicate is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Match, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must not contain an item that matches the predicate.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = !CollectionRules.HasAny(enumerable, predicate);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Match, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -319,16 +320,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NotAllMatch, NullMessage, paramName, value);
 
         if (predicate is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NotAllMatch, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must have all items match the predicate.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.HasAll(enumerable, predicate);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.NotAllMatch, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -354,16 +355,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.AllMatch, NullMessage, paramName, value);
 
         if (predicate is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, nameof(predicate), predicate);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.AllMatch, NullMessage, nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must not have all items match the predicate.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = !CollectionRules.HasAll(enumerable, predicate);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.AllMatch, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -389,13 +390,13 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Duplicate, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must have distinct items.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.HasDistinctItems(enumerable, comparer);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Duplicate, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -421,13 +422,13 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Distinct, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must have duplicate items.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.HasDuplicateItems(enumerable, comparer);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Distinct, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -452,13 +453,13 @@ public static class MustCollectionClauses
         where T : class
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.ContainsNull, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not contain any null items.";
 
         var enumerable = value as T?[] ?? [.. value];
         var ok = !CollectionRules.ContainsNullItems(enumerable);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable!);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.ContainsNull, messageTemplate, paramName, enumerable, enumerable!);
     }
 
     /// <summary>
@@ -484,13 +485,13 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Missing, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must contain the specified item.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.Contains(enumerable, item);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Missing, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -516,13 +517,13 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Present, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not contain the specified item.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = !CollectionRules.Contains(enumerable, item);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Present, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -548,17 +549,17 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NotSubset, NullMessage, paramName, value);
 
         if (other is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, nameof(other), other);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NotSubset, NullMessage, nameof(other), other);
 
         const string messageTemplate = "{paramName} must be a subset of the other collection.";
 
         var enumerable = value as T[] ?? [.. value];
         var otherEnumerable = other as T[] ?? [.. other];
         var ok = CollectionRules.IsSubsetOf(enumerable, otherEnumerable);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.NotSubset, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -584,17 +585,17 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Subset, NullMessage, paramName, value);
 
         if (other is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, nameof(other), other);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Subset, NullMessage, nameof(other), other);
 
         const string messageTemplate = "{paramName} must not be a subset of the other collection.";
 
         var enumerable = value as T[] ?? [.. value];
         var otherEnumerable = other as T[] ?? [.. other];
         var ok = !CollectionRules.IsSubsetOf(enumerable, otherEnumerable);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Subset, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -620,16 +621,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Index.OutOfRange, NullMessage, paramName, value);
 
         if (index < 0)
-            return MustResult<IEnumerable<T>>.Fail("{paramName} requires a non-negative index.", nameof(index), index);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Index.OutOfRange, "{paramName} requires a non-negative index.", nameof(index), index);
 
         const string messageTemplate = "{paramName} must have an item at the specified index.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = CollectionRules.HasIndex(enumerable, index);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Index.OutOfRange, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -655,16 +656,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Index.InRange, NullMessage, paramName, value);
 
         if (index < 0)
-            return MustResult<IEnumerable<T>>.Fail("{paramName} requires a non-negative index.", nameof(index), index);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Index.InRange, "{paramName} requires a non-negative index.", nameof(index), index);
 
         const string messageTemplate = "{paramName} must not have an item at the specified index.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = !CollectionRules.HasIndex(enumerable, index);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Index.InRange, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -690,16 +691,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.Match, NullMessage, paramName, value);
 
         if (count < 0)
-            return MustResult<IEnumerable<T>>.Fail("{paramName} requires a non-negative count.", nameof(count), count);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.Match, "{paramName} requires a non-negative count.", nameof(count), count);
 
         const string messageTemplate = "{paramName} must not have the expected count.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = !CollectionRules.HasExactCount(enumerable, count);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.Match, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -725,16 +726,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.TooMany, NullMessage, paramName, value);
 
         if (min < 0)
-            return MustResult<IEnumerable<T>>.Fail(NonNegativeMinMessage, nameof(min), min);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.TooMany, NonNegativeMinMessage, nameof(min), min);
 
         const string messageTemplate = "{paramName} must not have at least the minimum count.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = !CollectionRules.HasMinCount(enumerable, min);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.TooMany, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -760,16 +761,16 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.TooFew, NullMessage, paramName, value);
 
         if (max < 0)
-            return MustResult<IEnumerable<T>>.Fail(NonNegativeMaxMessage, nameof(max), max);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.TooFew, NonNegativeMaxMessage, nameof(max), max);
 
         const string messageTemplate = "{paramName} must not have at most the maximum count.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = !CollectionRules.HasMaxCount(enumerable, max);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.TooFew, messageTemplate, paramName, enumerable, enumerable);
     }
 
     /// <summary>
@@ -799,21 +800,21 @@ public static class MustCollectionClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(NullMessage, paramName, value);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.InRange, NullMessage, paramName, value);
 
         if (min < 0)
-            return MustResult<IEnumerable<T>>.Fail(NonNegativeMinMessage, nameof(min), min);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.InRange, NonNegativeMinMessage, nameof(min), min);
 
         if (max < 0)
-            return MustResult<IEnumerable<T>>.Fail(NonNegativeMaxMessage, nameof(max), max);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.InRange, NonNegativeMaxMessage, nameof(max), max);
 
         if (min > max)
-            return MustResult<IEnumerable<T>>.Fail("{paramName} requires a valid count range.", nameof(min), min);
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.InRange, "{paramName} requires a valid count range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must not have a count within the expected range.";
 
         var enumerable = value as T[] ?? [.. value];
         var ok = !CollectionRules.HasCountBetween(enumerable, min, max, inclusion);
-        return MustResult<IEnumerable<T>>.FromBool(ok, messageTemplate, paramName, enumerable, enumerable);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.InRange, messageTemplate, paramName, enumerable, enumerable);
     }
 }

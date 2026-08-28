@@ -50,7 +50,7 @@ public static class GuardOwaspClauses
     {
         var result = Must.Be.OwaspSafe(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -95,7 +95,7 @@ public static class GuardOwaspClauses
     {
         var result = Must.Be.XssSafe(value, paramName); // Guard.Against.Xss => Must.Be.XssSafe (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -140,7 +140,7 @@ public static class GuardOwaspClauses
     {
         var result = Must.Be.SqlInjectionSafe(value, paramName); // Guard.Against.SqlInjection => Must.Be.SqlInjectionSafe (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -185,7 +185,7 @@ public static class GuardOwaspClauses
     {
         var result = Must.Be.PathTraversalSafe(value, paramName); // Guard.Against.PathTraversal => Must.Be.PathTraversalSafe (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -230,7 +230,7 @@ public static class GuardOwaspClauses
     {
         var result = Must.Be.CommandInjectionSafe(value, paramName); // Guard.Against.CommandInjection => Must.Be.CommandInjectionSafe (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -275,7 +275,7 @@ public static class GuardOwaspClauses
     {
         var result = Must.Be.CrLfSafe(value, paramName); // Guard.Against.CrLf => Must.Be.CrLfSafe (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -320,7 +320,7 @@ public static class GuardOwaspClauses
     {
         var result = Must.Be.LdapFilterSafe(value, paramName); // Guard.Against.LdapFilter => Must.Be.LdapFilterSafe (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -365,7 +365,7 @@ public static class GuardOwaspClauses
     {
         var result = Must.Be.OpenRedirectSafe(value, paramName); // Guard.Against.OpenRedirect => Must.Be.OpenRedirectSafe (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -410,7 +410,7 @@ public static class GuardOwaspClauses
     {
         var result = Must.Be.SsrfSchemeSafe(value, paramName); // Guard.Against.SsrfScheme => Must.Be.SsrfSchemeSafe (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -13,7 +14,10 @@ namespace PineGuard.DataAnnotations;
 /// runtime and invoke the corresponding <see cref="MustDictionaryClauses"/> method via reflection.
 /// </para>
 /// </remarks>
-public abstract class DictionaryAttributeBase() : GenericDictionaryAttributeBase(typeof(IDictionary<,>), typeof(MustDictionaryClauses));
+/// <param name="code">
+/// The <c>MustCodes</c> catalogue constant identifying the clause the derived attribute adapts.
+/// </param>
+public abstract class DictionaryAttributeBase(string code) : GenericDictionaryAttributeBase(typeof(IDictionary<,>), typeof(MustDictionaryClauses), code);
 
 /// <summary>
 /// Validates that the annotated <see cref="IDictionary{TKey,TValue}"/> property or field is empty
@@ -38,7 +42,7 @@ public abstract class DictionaryAttributeBase() : GenericDictionaryAttributeBase
 /// <seealso cref="MustDictionaryClauses.Empty{TKey,TValue}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dictionary">Dictionary Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EmptyDictionaryAttribute : DictionaryAttributeBase
+public sealed class EmptyDictionaryAttribute() : DictionaryAttributeBase(MustCodes.Dictionary.Items.NotEmpty)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) => InvokeDictionaryMust(nameof(MustDictionaryClauses.Empty), value, validationContext);
@@ -67,7 +71,7 @@ public sealed class EmptyDictionaryAttribute : DictionaryAttributeBase
 /// <seealso cref="MustDictionaryClauses.NotEmpty{TKey,TValue}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dictionary">Dictionary Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotEmptyDictionaryAttribute : DictionaryAttributeBase
+public sealed class NotEmptyDictionaryAttribute() : DictionaryAttributeBase(MustCodes.Dictionary.Items.Empty)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) => InvokeDictionaryMust(nameof(MustDictionaryClauses.NotEmpty), value, validationContext);

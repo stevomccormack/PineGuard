@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -27,7 +28,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustDateTimeOffsetClauses.Past"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffset">DateTimeOffset Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastDateTimeOffsetAttribute() : ValidationAttributeBase(typeof(DateTimeOffset))
+public sealed class PastDateTimeOffsetAttribute() : ValidationAttributeBase(typeof(DateTimeOffset), MustCodes.Date.Relative.NotPast)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -62,7 +63,7 @@ public sealed class PastDateTimeOffsetAttribute() : ValidationAttributeBase(type
 /// <seealso cref="MustDateTimeOffsetClauses.PastOrPresent"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffset">DateTimeOffset Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastOrPresentDateTimeOffsetAttribute() : ValidationAttributeBase(typeof(DateTimeOffset))
+public sealed class PastOrPresentDateTimeOffsetAttribute() : ValidationAttributeBase(typeof(DateTimeOffset), MustCodes.Date.Relative.Future)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -97,7 +98,7 @@ public sealed class PastOrPresentDateTimeOffsetAttribute() : ValidationAttribute
 /// <seealso cref="MustDateTimeOffsetClauses.Future"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffset">DateTimeOffset Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureDateTimeOffsetAttribute() : ValidationAttributeBase(typeof(DateTimeOffset))
+public sealed class FutureDateTimeOffsetAttribute() : ValidationAttributeBase(typeof(DateTimeOffset), MustCodes.Date.Relative.NotFuture)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -132,7 +133,7 @@ public sealed class FutureDateTimeOffsetAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustDateTimeOffsetClauses.FutureOrPresent"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffset">DateTimeOffset Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureOrPresentDateTimeOffsetAttribute() : ValidationAttributeBase(typeof(DateTimeOffset))
+public sealed class FutureOrPresentDateTimeOffsetAttribute() : ValidationAttributeBase(typeof(DateTimeOffset), MustCodes.Date.Relative.Past)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

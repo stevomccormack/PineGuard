@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using PineGuard.Codes;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
@@ -7,7 +8,7 @@ namespace PineGuard.DataAnnotations.UnitTests;
 
 public sealed class BaseAttributesTests : BaseUnitTest
 {
-    private sealed class TestImplementationObjectAttribute : ObjectAttributeBase
+    private sealed class TestImplementationObjectAttribute() : ObjectAttributeBase(MustCodes.Value.State.NotDefault)
     {
         protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
             => InvokeGenericMust("Default", value, validationContext);
@@ -19,7 +20,7 @@ public sealed class BaseAttributesTests : BaseUnitTest
             => BuildInvokeArgs(method, value, args);
     }
 
-    private sealed class TestImplementationNumberAttribute : NumberAttributeBase
+    private sealed class TestImplementationNumberAttribute() : NumberAttributeBase(MustCodes.Number.Sign.NotPositive)
     {
         protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
             => ValidationResult.Success;

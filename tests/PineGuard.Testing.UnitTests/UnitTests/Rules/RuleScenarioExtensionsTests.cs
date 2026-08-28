@@ -126,6 +126,21 @@ public sealed class RuleScenarioExtensionsTests : BaseUnitTest
         Assert.Equal("param", mustCase.Expected.ParamName);
     }
 
+    // ToMustValidationCases
+
+    [Theory]
+    [MemberData(nameof(RuleScenarioExtensionsTestData.ToMustValidationCasesOps.Cases), MemberType = typeof(RuleScenarioExtensionsTestData.ToMustValidationCasesOps))]
+    public void ToMustValidationCases_MapsIsValidCorrectly(RuleScenarioExtensionsTestData.ToMustValidationCasesOps.Case testCase)
+    {
+        var (input, expectedIsValid) = testCase.Value;
+
+        var validationCase = FirstCase(input.ToMustValidationCases());
+
+        Assert.Equal(expectedIsValid, validationCase.Expected.IsValid);
+        Assert.Equal("test", validationCase.Name);
+        Assert.Equal("x", validationCase.Value);
+    }
+
     // Project
 
     [Fact]

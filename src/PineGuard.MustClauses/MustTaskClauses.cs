@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -44,7 +45,7 @@ public static class MustTaskClauses
         const string messageTemplate = "{paramName} must be completed.";
 
         var ok = TaskRules.IsCompleted(task);
-        return MustResult<Task>.FromBool(ok, messageTemplate, paramName, task, result: task!);
+        return MustResult<Task>.FromBool(ok, MustCodes.Task.Status.NotCompleted, messageTemplate, paramName, task, result: task!);
     }
 
     /// <summary>
@@ -81,7 +82,7 @@ public static class MustTaskClauses
         const string messageTemplate = "{paramName} must not be completed.";
 
         var ok = !TaskRules.IsCompleted(task);
-        return MustResult<Task>.FromBool(ok, messageTemplate, paramName, task, result: task!);
+        return MustResult<Task>.FromBool(ok, MustCodes.Task.Status.Completed, messageTemplate, paramName, task, result: task!);
     }
 
     /// <summary>
@@ -118,7 +119,7 @@ public static class MustTaskClauses
         const string messageTemplate = "{paramName} must be canceled.";
 
         var ok = TaskRules.IsCanceled(task);
-        return MustResult<Task>.FromBool(ok, messageTemplate, paramName, task, result: task!);
+        return MustResult<Task>.FromBool(ok, MustCodes.Task.Status.NotCanceled, messageTemplate, paramName, task, result: task!);
     }
 
     /// <summary>
@@ -155,7 +156,7 @@ public static class MustTaskClauses
         const string messageTemplate = "{paramName} must not be canceled.";
 
         var ok = !TaskRules.IsCanceled(task);
-        return MustResult<Task>.FromBool(ok, messageTemplate, paramName, task, result: task!);
+        return MustResult<Task>.FromBool(ok, MustCodes.Task.Status.Canceled, messageTemplate, paramName, task, result: task!);
     }
 
     /// <summary>
@@ -192,7 +193,7 @@ public static class MustTaskClauses
         const string messageTemplate = "{paramName} must be faulted.";
 
         var ok = TaskRules.IsFaulted(task);
-        return MustResult<Task>.FromBool(ok, messageTemplate, paramName, task, result: task!);
+        return MustResult<Task>.FromBool(ok, MustCodes.Task.Status.NotFaulted, messageTemplate, paramName, task, result: task!);
     }
 
     /// <summary>
@@ -229,6 +230,6 @@ public static class MustTaskClauses
         const string messageTemplate = "{paramName} must not be faulted.";
 
         var ok = !TaskRules.IsFaulted(task);
-        return MustResult<Task>.FromBool(ok, messageTemplate, paramName, task, result: task!);
+        return MustResult<Task>.FromBool(ok, MustCodes.Task.Status.Faulted, messageTemplate, paramName, task, result: task!);
     }
 }

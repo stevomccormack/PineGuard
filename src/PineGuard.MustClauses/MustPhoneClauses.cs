@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 using PineGuard.Utils;
 
@@ -54,7 +55,7 @@ public static class MustPhoneClauses
         const string messageTemplate = "{paramName} must be a valid phone number.";
 
         var ok = PhoneUtility.TryParsePhone(value, out var digits, minDigits, maxDigits, allowedNonDigitCharacters);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: digits);
+        return MustResult<string>.FromBool(ok, MustCodes.Phone.Number.Invalid, messageTemplate, paramName, value, result: digits);
     }
 
     /// <summary>
@@ -100,6 +101,6 @@ public static class MustPhoneClauses
         const string messageTemplate = "{paramName} must be a valid phone number.";
 
         var ok = PhoneRules.IsPhoneNumber(value, minDigits, maxDigits, allowedNonDigitCharacters);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<string>.FromBool(ok, MustCodes.Phone.Number.Invalid, messageTemplate, paramName, value, result: value!);
     }
 }

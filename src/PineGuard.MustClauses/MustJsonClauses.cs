@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -43,12 +44,12 @@ public static class MustJsonClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<string>.Fail(MustCodes.Json.Document.Invalid, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be JSON.";
 
         var ok = JsonRules.IsJson(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Json.Document.Invalid, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -85,7 +86,7 @@ public static class MustJsonClauses
         const string messageTemplate = "{paramName} must contain a JSON Content-Type.";
 
         var ok = JsonRules.IsJsonContentType(headers);
-        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, messageTemplate, paramName, headers, headers);
+        return MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.FromBool(ok, MustCodes.Json.ContentType.Mismatch, messageTemplate, paramName, headers, headers);
     }
 
     /// <summary>
@@ -121,12 +122,12 @@ public static class MustJsonClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<string>.Fail(MustCodes.Json.Root.NotObject, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be a JSON object.";
 
         var ok = JsonRules.IsJsonObject(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Json.Root.NotObject, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -162,11 +163,11 @@ public static class MustJsonClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<string>.Fail(MustCodes.Json.Root.NotArray, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be a JSON array.";
 
         var ok = JsonRules.IsJsonArray(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Json.Root.NotArray, messageTemplate, paramName, value, value);
     }
 }

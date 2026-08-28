@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.BitWiseRulesFixtures;
 
@@ -99,7 +100,7 @@ public static class FluentBitWiseExtensionsTestData
         {
             nameof(F.IsPowerOfTwo.ValueNull) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Flags must be a power of two.")
+            _ => new FluentExpected(false, "Flags must be a power of two.", Code: MustCodes.Bitwise.Value.NotPowerOfTwo)
         });
     }
 

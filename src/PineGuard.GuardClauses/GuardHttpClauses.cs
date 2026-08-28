@@ -34,7 +34,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HeaderName(name, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, name, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -64,7 +64,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HeaderValue(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -94,7 +94,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HttpStatusCode(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -124,7 +124,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HttpStatusInformational(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -154,7 +154,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HttpStatusSuccess(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -184,7 +184,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HttpStatusRedirect(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -214,7 +214,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HttpStatusClientError(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -244,7 +244,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HttpStatusServerError(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -276,7 +276,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HasHeader(headers, name, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -308,7 +308,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HasHeaderValue(headers, name, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -344,7 +344,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HasHeaderValueEqualTo(headers, name, expectedValue, comparison, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -406,7 +406,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HasSingleHeaderValue(headers, name, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -438,7 +438,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.HasContentType(headers, allowed, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -468,7 +468,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHeaderName(name, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, name, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -498,7 +498,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHeaderValue(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -528,7 +528,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHttpStatusCode(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -558,7 +558,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHttpStatusInformational(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -588,7 +588,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHttpStatusSuccess(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -618,7 +618,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHttpStatusRedirect(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -648,7 +648,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHttpStatusClientError(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -678,7 +678,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHttpStatusServerError(status, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, status, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -710,7 +710,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHasHeader(headers, name, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -742,7 +742,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHasHeaderValue(headers, name, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -778,7 +778,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHasHeaderValueEqualTo(headers, name, expectedValue, comparison, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -810,7 +810,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHasSingleHeaderValue(headers, name, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -842,7 +842,7 @@ public static class GuardHttpClauses
     {
         var result = Must.Be.NotHasContentType(headers, allowed, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

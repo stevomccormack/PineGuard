@@ -35,7 +35,7 @@ public static class GuardSqlDateTimeClauses
     {
         var result = Must.Be.InSqlDateRange(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -65,7 +65,7 @@ public static class GuardSqlDateTimeClauses
     {
         var result = Must.Be.InSqlDateTimeRange(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -95,7 +95,7 @@ public static class GuardSqlDateTimeClauses
     {
         var result = Must.Be.InSqlDateTimeRange(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

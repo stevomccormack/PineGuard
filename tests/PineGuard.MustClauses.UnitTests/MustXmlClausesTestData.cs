@@ -1,4 +1,5 @@
-using PineGuard.Testing.UnitTests;
+using PineGuard.Codes;
+using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.XmlRulesFixtures;
 
 namespace PineGuard.MustClauses.UnitTests;
@@ -7,38 +8,30 @@ public static class MustXmlClausesTestData
 {
     public static class Xml
     {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-            new(nameof(F.IsXml.Valid),   F.IsXml.Valid,   true),
-            new(nameof(F.IsXml.Invalid), F.IsXml.Invalid, false),
-            new(nameof(F.IsXml.Null),    F.IsXml.Null,    false)
-        ];
+        public static TheoryData<MustCase<string?>> ValidCases => F.IsXml.ValidScenarios.ToMustCases();
 
-        public sealed record ValidCase(string Name, string? Input, bool Expected) : IsCase<string?>(Name, Input, Expected);
+        public static TheoryData<MustCase<string?>> InvalidCases => F.IsXml.InvalidScenarios.ToMustCases(s => s.Name switch
+        {
+            nameof(F.IsXml.Null) => new MustExpected(false, "value must not be null.", "value"),
+            _ => new MustExpected(false, "value must be XML.", Code: MustCodes.Xml.Document.Invalid)
+        });
     }
 
     public static class XmlContentType
     {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-            new(nameof(F.IsXmlContentType.ApplicationXml), F.IsXmlContentType.ApplicationXml, true),
-            new(nameof(F.IsXmlContentType.NotXml),         F.IsXmlContentType.NotXml,         false),
-            new(nameof(F.IsXmlContentType.NullHeaders),    F.IsXmlContentType.NullHeaders,    false)
-        ];
+        public static TheoryData<MustCase<IReadOnlyDictionary<string, IEnumerable<string>>?>> ValidCases => F.IsXmlContentType.ValidScenarios.ToMustCases();
 
-        public sealed record ValidCase(string Name, IReadOnlyDictionary<string, IEnumerable<string>>? Input, bool Expected)
-            : IsCase<IReadOnlyDictionary<string, IEnumerable<string>>?>(Name, Input, Expected);
+        public static TheoryData<MustCase<IReadOnlyDictionary<string, IEnumerable<string>>?>> InvalidCases => F.IsXmlContentType.InvalidScenarios.ToMustCases(_ => new MustExpected(false, "value must contain an XML Content-Type.", Code: MustCodes.Xml.ContentType.Mismatch));
     }
 
     public static class XmlDocument
     {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-            new(nameof(F.IsXml.Valid),   F.IsXml.Valid,   true),
-            new(nameof(F.IsXml.Invalid), F.IsXml.Invalid, false),
-            new(nameof(F.IsXml.Null),    F.IsXml.Null,    false)
-        ];
+        public static TheoryData<MustCase<string?>> ValidCases => F.IsXml.ValidScenarios.ToMustCases();
 
-        public sealed record ValidCase(string Name, string? Input, bool Expected) : IsCase<string?>(Name, Input, Expected);
+        public static TheoryData<MustCase<string?>> InvalidCases => F.IsXml.InvalidScenarios.ToMustCases(s => s.Name switch
+        {
+            nameof(F.IsXml.Null) => new MustExpected(false, "value must not be null.", "value"),
+            _ => new MustExpected(false, "value must be an XML document.", Code: MustCodes.Xml.Document.Invalid)
+        });
     }
 }

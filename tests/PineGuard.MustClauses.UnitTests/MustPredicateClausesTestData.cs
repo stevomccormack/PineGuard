@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.PredicateRulesFixtures;
 
@@ -14,9 +15,9 @@ public static class MustPredicateClausesTestData
 
         public static TheoryData<MustCase<(string? value, Func<string, bool>? predicate)>> InvalidCases =>
         [
-            new(nameof(F.Satisfies.NotMatching), (F.Satisfies.NotMatching.value, F.Satisfies.NotMatching.predicate), new MustExpected(false, "value must satisfy the predicate.")),
+            new(nameof(F.Satisfies.NotMatching), (F.Satisfies.NotMatching.value, F.Satisfies.NotMatching.predicate), new MustExpected(false, "value must satisfy the predicate.", Code: MustCodes.Predicate.Result.False)),
             new(nameof(F.Satisfies.NullValue),   (F.Satisfies.NullValue.value,   F.Satisfies.NullValue.predicate),   new MustExpected(false, "value must satisfy the predicate.")),
-            new("null-predicate", ("hello", null), new MustExpected(false, "predicate must not be null.", "predicate"))
+            new("null-predicate", ("hello", null), new MustExpected(false, "predicate must not be null.", "predicate", MustCodes.Predicate.Callback.Null))
         ];
     }
 
@@ -30,8 +31,8 @@ public static class MustPredicateClausesTestData
 
         public static TheoryData<MustCase<(string? value, Func<string, bool>? predicate)>> InvalidCases =>
         [
-            new(nameof(F.NotSatisfies.Matching), (F.NotSatisfies.Matching.value, F.NotSatisfies.Matching.predicate), new MustExpected(false, "value must not satisfy the predicate.")),
-            new("null-predicate", ("hi", null), new MustExpected(false, "predicate must not be null.", "predicate"))
+            new(nameof(F.NotSatisfies.Matching), (F.NotSatisfies.Matching.value, F.NotSatisfies.Matching.predicate), new MustExpected(false, "value must not satisfy the predicate.", Code: MustCodes.Predicate.Result.True)),
+            new("null-predicate", ("hi", null), new MustExpected(false, "predicate must not be null.", "predicate", MustCodes.Predicate.Callback.Null))
         ];
     }
 }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustEnumClauses.Defined{TEnum}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/enum">Enum Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class DefinedAttribute() : ValidationAttributeBase(typeof(object))
+public sealed class DefinedAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Enum.Value.NotDefined)
 {
     /// <inheritdoc/>
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
@@ -79,7 +80,7 @@ public sealed class DefinedAttribute() : ValidationAttributeBase(typeof(object))
 /// <seealso cref="MustEnumClauses.FlagsEnumCombination{TEnum}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/enum">Enum Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FlagsEnumCombinationAttribute() : ValidationAttributeBase(typeof(object))
+public sealed class FlagsEnumCombinationAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Enum.Flags.NotDefined)
 {
     /// <inheritdoc/>
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
@@ -128,7 +129,7 @@ public sealed class FlagsEnumCombinationAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustEnumClauses.HasFlag{TEnum}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/enum">Enum Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasFlagAttribute(string flagName) : ValidationAttributeBase(typeof(Enum))
+public sealed class HasFlagAttribute(string flagName) : ValidationAttributeBase(typeof(Enum), MustCodes.Enum.Flags.NotSet)
 {
     /// <summary>Gets the case-insensitive name of the flag that must be set.</summary>
     public string FlagName { get; } = flagName;
@@ -177,7 +178,7 @@ public sealed class HasFlagAttribute(string flagName) : ValidationAttributeBase(
 /// <seealso cref="MustEnumClauses.NotHasFlag{TEnum}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/enum">Enum Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotHasFlagAttribute(string flagName) : ValidationAttributeBase(typeof(Enum))
+public sealed class NotHasFlagAttribute(string flagName) : ValidationAttributeBase(typeof(Enum), MustCodes.Enum.Flags.Set)
 {
     /// <summary>Gets the case-insensitive name of the flag that must not be set.</summary>
     public string FlagName { get; } = flagName;

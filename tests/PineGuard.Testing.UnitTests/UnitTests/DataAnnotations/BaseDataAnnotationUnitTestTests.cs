@@ -15,6 +15,9 @@ public sealed class BaseDataAnnotationUnitTestTests
 
         public static void InvokeAssertResult(DataAnnotationCase testCase, ValidationResult? result) =>
             AssertResult(testCase, result);
+
+        public static void InvokeAssertResult(DataAnnotationCase testCase, ValidationResult? result, string? actualCode) =>
+            AssertResult(testCase, result, actualCode);
     }
 
     public static class AssertReturnOps
@@ -36,6 +39,17 @@ public sealed class BaseDataAnnotationUnitTestTests
         {
             var (daCase, result) = testCase.Value;
             Testable.InvokeAssertResult(daCase, result);
+        }
+    }
+
+    public static class AssertResultWithCodeOps
+    {
+        [Theory]
+        [MemberData(nameof(BaseDataAnnotationUnitTestTestData.AssertResultWithCodeOps.ValidCases), MemberType = typeof(BaseDataAnnotationUnitTestTestData.AssertResultWithCodeOps))]
+        public static void ValidAndEdge_BehavesAsExpected(BaseDataAnnotationUnitTestTestData.AssertResultWithCodeOps.Case testCase)
+        {
+            var (daCase, result, actualCode) = testCase.Value;
+            Testable.InvokeAssertResult(daCase, result, actualCode);
         }
     }
 

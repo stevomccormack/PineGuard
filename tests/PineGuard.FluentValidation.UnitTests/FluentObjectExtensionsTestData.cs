@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.ObjectRulesFixtures;
 
@@ -10,7 +11,7 @@ public static class FluentObjectExtensionsTestData
         public static TheoryData<FluentCase<(string? value, string? other)>> Cases => F.IsEqualTo.AllScenarios.ToFluentCases(s => s.Name switch
         {
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be equal to the expected value.")
+            _ => new FluentExpected(false, "Value must be equal to the expected value.", Code: MustCodes.Value.Equality.NotEqual)
         });
     }
 

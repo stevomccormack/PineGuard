@@ -35,7 +35,16 @@ public static class BaseFluentUnitTestTestData
                  new ValidationResult([new ValidationFailure("Prop", "error")]))),
             new("invalid result without property name",
                 (new FluentCase<string>("c3", "x", new FluentExpected(false, "error")),
-                 new ValidationResult([new ValidationFailure("Prop", "error")])))
+                 new ValidationResult([new ValidationFailure("Prop", "error")]))),
+            new("invalid result with code",
+                (new FluentCase<string>("c4", "x", new FluentExpected(false, "error", "Prop", "test.code")),
+                 new ValidationResult([new ValidationFailure("Prop", "error") { ErrorCode = "test.code" }])))
         ];
+    }
+
+    public static class Constructor
+    {
+        public sealed record Case(string Name) : BaseCase(Name);
+        public static TheoryData<Case> ValidCases => [new("constructs without error")];
     }
 }

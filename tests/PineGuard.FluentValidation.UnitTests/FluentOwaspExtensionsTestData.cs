@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.OwaspRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class FluentOwaspExtensionsTestData
         {
             nameof(F.IsOwaspSafe.Null) => new FluentExpected(false, "Value must not be null."),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be OWASP safe.")
+            _ => new FluentExpected(false, "Value must be OWASP safe.", Code: MustCodes.Owasp.Payload.Unsafe)
         });
     }
 

@@ -34,4 +34,38 @@ public static class BaseGuardUnitTestTestData
             new("invalid delegates to AssertThrow", (false, (Type?)typeof(ArgumentException), (string?)"p"))
         ];
     }
+
+    public static class AssertThrowCodeOps
+    {
+        public sealed record Case(string Name, (string code, string? paramName) Value) : BaseCase(Name);
+
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("code with paramName", ("test.code", (string?)"p")),
+            new("code without paramName", ("test.code", null))
+        ];
+    }
+
+    public static class AssertThrowNonGuardOps
+    {
+        public sealed record Case(string Name) : BaseCase(Name);
+        public static TheoryData<Case> ValidCases => [new("non-GuardExpected skips the code branch entirely")];
+    }
+
+    public static class AssertCustomMessageOps
+    {
+        public sealed record Case(string Name, bool Value) : BaseCase(Name);
+
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("valid no-ops", true),
+            new("invalid asserts custom message", false)
+        ];
+    }
+
+    public static class Constructor
+    {
+        public sealed record Case(string Name) : BaseCase(Name);
+        public static TheoryData<Case> ValidCases => [new("constructs without error")];
+    }
 }

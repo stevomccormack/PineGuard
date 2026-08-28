@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.EmailRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class FluentEmailExtensionsTestData
         {
             nameof(F.IsEmail.Null) => new FluentExpected(false, "Value must not be null."),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a valid email address.")
+            _ => new FluentExpected(false, "Value must be a valid email address.", Code: MustCodes.Email.Address.Invalid)
         });
     }
 

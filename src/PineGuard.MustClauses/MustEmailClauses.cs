@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -45,12 +46,12 @@ public static class MustEmailClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Email.Address.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid email address.";
 
         var ok = EmailRules.IsEmail(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Email.Address.Invalid, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -86,12 +87,12 @@ public static class MustEmailClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Email.Address.NotStrict, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid strict email address.";
 
         var ok = EmailRules.IsStrictEmail(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Email.Address.NotStrict, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -127,12 +128,12 @@ public static class MustEmailClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Email.Alias.Missing, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must contain an email alias.";
 
         var ok = EmailRules.HasAlias(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Email.Alias.Missing, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -168,11 +169,11 @@ public static class MustEmailClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Email.Alias.Present, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not contain an email alias.";
 
         var ok = !EmailRules.HasAlias(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Email.Alias.Present, messageTemplate, paramName, value, result: value);
     }
 }

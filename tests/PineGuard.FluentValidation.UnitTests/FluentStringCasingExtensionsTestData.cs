@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
@@ -29,7 +30,7 @@ public static class FluentStringCasingExtensionsTestData
 
     public static class CamelCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsCamelCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be camelCase."));
+        public static TheoryData<FluentCase<string>> Cases => F.IsCamelCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be camelCase.", Code: MustCodes.Text.Casing.NotCamel));
     }
 
     public static class NotCamelCase

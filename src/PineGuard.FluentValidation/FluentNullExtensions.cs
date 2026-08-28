@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -35,7 +36,7 @@ public static class FluentNullExtensions
     /// <seealso cref="MustNullClauses.Null"/>
     public static IRuleBuilderOptions<TModel, T?> NotRequired<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Null(val, paramName: null),
-            message);
+            message, MustCodes.Value.State.NotNull);
 
     /// <summary>
     /// Validates that the property value is not <see langword="null"/>.
@@ -57,5 +58,5 @@ public static class FluentNullExtensions
     /// <seealso cref="MustNullClauses.NotNull"/>
     public static IRuleBuilderOptions<TModel, T?> Required<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotNull(val, paramName: null),
-            message);
+            message, MustCodes.Value.State.Null);
 }

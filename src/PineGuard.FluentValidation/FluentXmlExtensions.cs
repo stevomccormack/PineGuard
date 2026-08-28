@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -32,7 +33,7 @@ public static class FluentXmlExtensions
         this IRuleBuilder<TModel, string?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Xml(val, paramName: null),
-            message);
+            message, MustCodes.Xml.Document.Invalid);
 
     /// <summary>
     /// Validates that the HTTP headers dictionary contains an XML-compatible Content-Type header.
@@ -56,7 +57,7 @@ public static class FluentXmlExtensions
         this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.XmlContentType(val, paramName: null),
-            message);
+            message, MustCodes.Xml.ContentType.Mismatch);
 
     /// <summary>
     /// Validates that the property value is a valid, parseable XML document.
@@ -80,5 +81,5 @@ public static class FluentXmlExtensions
         this IRuleBuilder<TModel, string?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.XmlDocument(val, paramName: null),
-            message);
+            message, MustCodes.Xml.Document.Invalid);
 }

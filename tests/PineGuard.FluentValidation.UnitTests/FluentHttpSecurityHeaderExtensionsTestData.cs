@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.HttpSecurityHeaderRulesFixtures;
 
@@ -12,7 +13,7 @@ public static class FluentHttpSecurityHeaderExtensionsTestData
             {
                 nameof(F.HasContentSecurityPolicyHeader.Null) => new FluentExpected(true),
                 _ when s.IsValid => new FluentExpected(true),
-                _ => new FluentExpected(false, "Value must contain a Content-Security-Policy header.")
+                _ => new FluentExpected(false, "Value must contain a Content-Security-Policy header.", Code: MustCodes.Http.ContentSecurityPolicy.Missing)
             });
     }
 

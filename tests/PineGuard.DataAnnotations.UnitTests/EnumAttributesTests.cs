@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
@@ -107,8 +108,10 @@ public sealed class EnumAttributesTests
     public void Defined_WithMemberName_ShouldReportMemberNames(EnumAttributesTestData.ValidCase testCase)
     {
         var ctx = new ValidationContext(new object()) { MemberName = "SomeMember" };
-        var result = new DefinedAttribute().GetValidationResult(testCase.Value, ctx);
+        var attribute = new DefinedAttribute();
+        var result = attribute.GetValidationResult(testCase.Value, ctx);
         Assert.NotEqual(ValidationResult.Success, result);
         Assert.Contains("SomeMember", result!.MemberNames);
+        Assert.Equal(MustCodes.Enum.Value.NotDefined, attribute.Code);
     }
 }

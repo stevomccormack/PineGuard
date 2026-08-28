@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -16,7 +17,11 @@ public sealed class DateOnlyAttributesTests
     [MemberData(nameof(DateOnlyAttributesTestData.PastDateOnly.EdgeCases), MemberType = typeof(DateOnlyAttributesTestData.PastDateOnly))]
     [MemberData(nameof(DateOnlyAttributesTestData.PastDateOnly.InvalidCases), MemberType = typeof(DateOnlyAttributesTestData.PastDateOnly))]
     public void PastDateOnly_ShouldReturnExpected(DateOnlyAttributesTestData.ValidCase testCase)
-        => Verify(new PastDateOnlyAttribute(), testCase);
+    {
+        var attribute = new PastDateOnlyAttribute();
+        Assert.Equal(MustCodes.Date.Relative.NotPast, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(DateOnlyAttributesTestData.PastOrPresentDateOnly.ValidCases), MemberType = typeof(DateOnlyAttributesTestData.PastOrPresentDateOnly))]

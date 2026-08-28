@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -44,11 +45,11 @@ public static class MustIdentifierClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<string>.Fail(MustCodes.Identifier.Slug.Invalid, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid slug.";
 
         var ok = IdentifierRules.IsSlug(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<string>.FromBool(ok, MustCodes.Identifier.Slug.Invalid, messageTemplate, paramName, value, value);
     }
 }

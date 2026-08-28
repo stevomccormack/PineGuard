@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -34,7 +35,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustNetworkClauses.IpAddress"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/network">Network Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class IpAddressAttribute() : ValidationAttributeBase(typeof(object), allowNull: true)
+public sealed class IpAddressAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Network.Address.Invalid, allowNull: true)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -73,7 +74,7 @@ public sealed class IpAddressAttribute() : ValidationAttributeBase(typeof(object
 /// <seealso cref="MustNetworkClauses.Ipv4"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/network">Network Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Ipv4Attribute() : ValidationAttributeBase(typeof(string))
+public sealed class Ipv4Attribute() : ValidationAttributeBase(typeof(string), MustCodes.Network.Address.NotIpv4)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -111,7 +112,7 @@ public sealed class Ipv4Attribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustNetworkClauses.Ipv6"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/network">Network Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Ipv6Attribute() : ValidationAttributeBase(typeof(string))
+public sealed class Ipv6Attribute() : ValidationAttributeBase(typeof(string), MustCodes.Network.Address.NotIpv6)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -149,7 +150,7 @@ public sealed class Ipv6Attribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustNetworkClauses.InCidrRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/network">Network Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class InCidrRangeAttribute(string cidr) : ValidationAttributeBase(typeof(string))
+public sealed class InCidrRangeAttribute(string cidr) : ValidationAttributeBase(typeof(string), MustCodes.Network.Cidr.OutOfRange)
 {
     /// <summary>Gets the CIDR notation string (e.g., <c>"192.168.0.0/24"</c>) used to validate the IP range.</summary>
     public string Cidr { get; } = cidr;
@@ -187,7 +188,7 @@ public sealed class InCidrRangeAttribute(string cidr) : ValidationAttributeBase(
 /// <seealso cref="MustNetworkClauses.Hostname"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/network">Network Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HostnameAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class HostnameAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Network.Hostname.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -220,7 +221,7 @@ public sealed class HostnameAttribute() : ValidationAttributeBase(typeof(string)
 /// <seealso cref="MustNetworkClauses.PortNumber"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/network">Network Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PortNumberAttribute() : ValidationAttributeBase(typeof(int))
+public sealed class PortNumberAttribute() : ValidationAttributeBase(typeof(int), MustCodes.Network.Port.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

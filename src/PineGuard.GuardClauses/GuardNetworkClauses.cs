@@ -35,7 +35,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.IpAddress(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -65,7 +65,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.Ipv4(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -95,7 +95,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.Ipv6(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -125,7 +125,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.IpAddressString(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -155,7 +155,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.Ipv4String(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -185,7 +185,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.Ipv6String(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -217,7 +217,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.InCidrRange(value, cidr, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -247,7 +247,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.Hostname(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -277,7 +277,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.PortNumber(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -307,7 +307,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.NotIpAddress(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -337,7 +337,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.NotIpv4(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -367,7 +367,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.NotIpv6(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -397,7 +397,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.NotIpAddressString(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -427,7 +427,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.NotIpv4String(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -457,7 +457,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.NotIpv6String(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -489,7 +489,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.NotInCidrRange(value, cidr, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -519,7 +519,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.NotHostname(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -549,7 +549,7 @@ public static class GuardNetworkClauses
     {
         var result = Must.Be.NotPortNumber(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

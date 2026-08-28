@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using PineGuard.Testing.UnitTests.Rules;
@@ -13,7 +14,7 @@ public static class FluentTimeSpanExtensionsTestData
         public static TheoryData<FluentCase<(TimeSpan value, TimeSpan min, TimeSpan max, Inclusion inclusion)>> Cases =>
             F.IsDurationBetween.AllScenarios.Where(s => s.Inputs.value.HasValue)
             .Select(s => new RuleScenario<(TimeSpan, TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.min, s.Inputs.max, s.Inputs.inclusion), s.IsValid)).ToArray()
-            .ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be within the expected duration range."));
+            .ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be within the expected duration range.", Code: MustCodes.Time.Duration.OutOfRange));
     }
 
     // NotDurationBetween — valid when value is NOT within [min, max]

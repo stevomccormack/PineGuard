@@ -38,7 +38,7 @@ public static class GuardTimeOnlyRangeClauses
     {
         var result = Must.Be.Chronological(range, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, range, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -72,7 +72,7 @@ public static class GuardTimeOnlyRangeClauses
     {
         var result = Must.Be.NotOverlapping(range1, range2, inclusion, paramName); // Guard.Against.Overlapping => Must.Be.NotOverlapping (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, range1, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -106,7 +106,7 @@ public static class GuardTimeOnlyRangeClauses
     {
         var result = Must.Be.Overlapping(range1, range2, inclusion, paramName); // Guard.Against.NotOverlapping => Must.Be.Overlapping (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, range1, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -140,7 +140,7 @@ public static class GuardTimeOnlyRangeClauses
     {
         var result = Must.Be.Contains(range, value, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, range, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -174,7 +174,7 @@ public static class GuardTimeOnlyRangeClauses
     {
         var result = Must.Be.NotContains(range, value, inclusion, paramName); // Guard.Against.Contains => Must.Be.NotContains (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, range, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

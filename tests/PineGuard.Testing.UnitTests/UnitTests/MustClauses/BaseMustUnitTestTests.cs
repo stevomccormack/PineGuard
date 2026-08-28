@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using PineGuard.MustClauses;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.MustClauses;
@@ -35,6 +36,18 @@ public sealed class BaseMustUnitTestTests
         {
             var (mustCase, result) = testCase.Value;
             Testable.InvokeAssertResult(mustCase, result);
+        }
+    }
+
+    public static class Constructor
+    {
+        [Theory]
+        [MemberData(nameof(BaseMustUnitTestTestData.Constructor.ValidCases), MemberType = typeof(BaseMustUnitTestTestData.Constructor))]
+        [SuppressMessage("Assertion", "S2699:Tests should include assertions", Justification = "Implicit assertion: constructor completes without exception")]
+        public static void BehavesAsExpected(BaseMustUnitTestTestData.Constructor.Case testCase)
+        {
+            _ = testCase;
+            _ = new Testable();
         }
     }
 }

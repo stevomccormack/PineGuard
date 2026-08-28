@@ -21,14 +21,21 @@ public static class GuardCollectionClausesTestData
     }
 
     // Guard.Against.NotHasExactCount — calls Must.Be.HasExactCount — throws when does NOT have exact count
+    // Must.Be.HasExactCount checks its own preconditions: a null value attributes to "value", but a
+    // negative count is its own precondition and attributes to "count" (see MustCollectionClauses.HasExactCount).
     public static class NotHasExactCount
     {
         public static TheoryData<GuardCase<(IEnumerable<string>? value, int count)>> ValidCases => F.HasExactCount.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
-        public static TheoryData<GuardCase<(IEnumerable<string>? value, int count)>> InvalidCases => F.HasExactCount.InvalidScenarios.ToGuardCases(s => s.Inputs.value == null ? new GuardExpected(false, typeof(ArgumentNullException), "value") : new GuardExpected(false, typeof(ArgumentException), "value"));
+        public static TheoryData<GuardCase<(IEnumerable<string>? value, int count)>> InvalidCases => F.HasExactCount.InvalidScenarios.ToGuardCases(s => s.Inputs.value == null
+            ? new GuardExpected(false, typeof(ArgumentNullException), "value")
+            : s.Inputs.count < 0
+                ? new GuardExpected(false, typeof(ArgumentException), "count")
+                : new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
     // Guard.Against.HasExactCount — calls Must.Be.NotHasExactCount — throws when HAS exact count
-    // Null value and negative count cause pre-condition throws; only non-null, non-negative-count cases pass
+    // Null value and negative count cause pre-condition throws; only non-null, non-negative-count cases pass.
+    // The negative-count precondition attributes to "count", not "value" (see MustCollectionClauses.NotHasExactCount).
     public static class HasExactCount
     {
         public static TheoryData<GuardCase<(IEnumerable<string>? value, int count)>> ValidCases =>
@@ -40,7 +47,7 @@ public static class GuardCollectionClausesTestData
         [
             .. F.HasExactCount.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
             new(nameof(F.HasExactCount.NullThree), F.HasExactCount.NullThree, new GuardExpected(false, typeof(ArgumentNullException), "value")),
-            new(nameof(F.HasExactCount.SingleNeg), F.HasExactCount.SingleNeg, new GuardExpected(false, typeof(ArgumentException), "value"))
+            new(nameof(F.HasExactCount.SingleNeg), F.HasExactCount.SingleNeg, new GuardExpected(false, typeof(ArgumentException), "count"))
         ];
     }
 
@@ -164,14 +171,21 @@ public static class GuardCollectionClausesTestData
     }
 
     // Guard.Against.NotSubsetOf — calls Must.Be.SubsetOf — throws when NOT a subset
+    // Must.Be.SubsetOf checks "other" for null as its own precondition, distinct from a null "value"
+    // (see MustCollectionClauses.SubsetOf).
     public static class NotSubsetOf
     {
         public static TheoryData<GuardCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> ValidCases => F.IsSubsetOf.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
-        public static TheoryData<GuardCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> InvalidCases => F.IsSubsetOf.InvalidScenarios.ToGuardCases(s => s.Inputs.value == null ? new GuardExpected(false, typeof(ArgumentNullException), "value") : new GuardExpected(false, typeof(ArgumentException), "value"));
+        public static TheoryData<GuardCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> InvalidCases => F.IsSubsetOf.InvalidScenarios.ToGuardCases(s => s.Inputs.value == null
+            ? new GuardExpected(false, typeof(ArgumentNullException), "value")
+            : s.Inputs.other == null
+                ? new GuardExpected(false, typeof(ArgumentNullException), "other")
+                : new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
     // Guard.Against.SubsetOf — calls Must.Be.NotSubsetOf — throws when IS a subset
-    // Null value/other cause pre-condition throws; only cases that truly fail NotSubsetOf pass
+    // Null value/other cause pre-condition throws; only cases that truly fail NotSubsetOf pass.
+    // A null "other" attributes to "other", not "value" (see MustCollectionClauses.NotSubsetOf).
     public static class SubsetOf
     {
         public static TheoryData<GuardCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> ValidCases =>
@@ -182,19 +196,26 @@ public static class GuardCollectionClausesTestData
         [
             .. F.IsSubsetOf.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
             new(nameof(F.IsSubsetOf.NullMultiple), F.IsSubsetOf.NullMultiple, new GuardExpected(false, typeof(ArgumentNullException), "value")),
-            new(nameof(F.IsSubsetOf.MultipleNull), F.IsSubsetOf.MultipleNull, new GuardExpected(false, typeof(ArgumentException), "value"))
+            new(nameof(F.IsSubsetOf.MultipleNull), F.IsSubsetOf.MultipleNull, new GuardExpected(false, typeof(ArgumentNullException), "other"))
         ];
     }
 
     // Guard.Against.NotHasIndex — calls Must.Be.HasIndex — throws when does NOT have index
+    // Must.Be.HasIndex checks its own preconditions: a null value attributes to "value", but a
+    // negative index is its own precondition and attributes to "index" (see MustCollectionClauses.HasIndex).
     public static class NotHasIndex
     {
         public static TheoryData<GuardCase<(IEnumerable<string>? value, int index)>> ValidCases => F.HasIndex.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
-        public static TheoryData<GuardCase<(IEnumerable<string>? value, int index)>> InvalidCases => F.HasIndex.InvalidScenarios.ToGuardCases(s => s.Inputs.value == null ? new GuardExpected(false, typeof(ArgumentNullException), "value") : new GuardExpected(false, typeof(ArgumentException), "value"));
+        public static TheoryData<GuardCase<(IEnumerable<string>? value, int index)>> InvalidCases => F.HasIndex.InvalidScenarios.ToGuardCases(s => s.Inputs.value == null
+            ? new GuardExpected(false, typeof(ArgumentNullException), "value")
+            : s.Inputs.index < 0
+                ? new GuardExpected(false, typeof(ArgumentException), "index")
+                : new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
     // Guard.Against.HasIndex — calls Must.Be.NotHasIndex — throws when HAS index
-    // Null value and negative index cause pre-condition throws; only valid non-throwing pass cases remain
+    // Null value and negative index cause pre-condition throws; only valid non-throwing pass cases remain.
+    // The negative-index precondition attributes to "index", not "value" (see MustCollectionClauses.NotHasIndex).
     public static class HasIndex
     {
         public static TheoryData<GuardCase<(IEnumerable<string>? value, int index)>> ValidCases =>
@@ -206,7 +227,7 @@ public static class GuardCollectionClausesTestData
         [
             .. F.HasIndex.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
             new(nameof(F.HasIndex.NullZero),   F.HasIndex.NullZero,   new GuardExpected(false, typeof(ArgumentNullException), "value")),
-            new(nameof(F.HasIndex.MultipleNeg), F.HasIndex.MultipleNeg, new GuardExpected(false, typeof(ArgumentException), "value"))
+            new(nameof(F.HasIndex.MultipleNeg), F.HasIndex.MultipleNeg, new GuardExpected(false, typeof(ArgumentException), "index"))
         ];
     }
 

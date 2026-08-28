@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -46,12 +47,12 @@ public static class MustPredicateClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (predicate is null)
-            return MustResult<T>.Fail("{paramName} must not be null.", nameof(predicate), predicate);
+            return MustResult<T>.Fail(MustCodes.Predicate.Callback.Null, "{paramName} must not be null.", nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must satisfy the predicate.";
 
         var ok = PredicateRules.Satisfies(value, predicate);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<T>.FromBool(ok, MustCodes.Predicate.Result.False, messageTemplate, paramName, value, result: value!);
     }
 
     /// <summary>
@@ -90,11 +91,11 @@ public static class MustPredicateClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (predicate is null)
-            return MustResult<T>.Fail("{paramName} must not be null.", nameof(predicate), predicate);
+            return MustResult<T>.Fail(MustCodes.Predicate.Callback.Null, "{paramName} must not be null.", nameof(predicate), predicate);
 
         const string messageTemplate = "{paramName} must not satisfy the predicate.";
 
         var ok = !PredicateRules.Satisfies(value, predicate);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, result: value!);
+        return MustResult<T>.FromBool(ok, MustCodes.Predicate.Result.True, messageTemplate, paramName, value, result: value!);
     }
 }

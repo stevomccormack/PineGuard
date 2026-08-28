@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ public static class FluentGuidExtensions
         this IRuleBuilder<TModel, Guid> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotEmpty(val, paramName: null),
-            message);
+            message, MustCodes.Guid.Emptiness.Empty);
 
     /// <summary>
     /// Validates that the property value, when present, is not <see cref="Guid.Empty"/>.
@@ -53,5 +54,5 @@ public static class FluentGuidExtensions
         this IRuleBuilder<TModel, Guid?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotEmpty(val.Value, paramName: null) : MustResult<Guid>.Ok(Guid.Empty),
-            message);
+            message, MustCodes.Guid.Emptiness.Empty);
 }

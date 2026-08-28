@@ -1,5 +1,6 @@
 using FluentValidation;
 using FluentValidation.Results;
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.ReadOnlyDictionaryRulesFixtures;
 
@@ -32,7 +33,7 @@ public static class FluentReadOnlyDictionaryExtensionsTestData
         public static TheoryData<FluentCase<(IReadOnlyDictionary<string, int>? dictionary, string key)>> Cases => F.HasKey.AllScenarios.ToFluentCases(s => s.Name switch
         {
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Dict must contain the specified key.")
+            _ => new FluentExpected(false, "Dict must contain the specified key.", Code: MustCodes.Dictionary.Keys.Missing)
         });
     }
 

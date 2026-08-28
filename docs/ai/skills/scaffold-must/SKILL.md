@@ -14,6 +14,7 @@ Implement a new **MustClause** fluent validation method. A MustClause validates 
 > [!IMPORTANT]
 > 1.  **Never Throw**: MustClauses must return `MustResult.Fail(...)` for invalid input, never throw exceptions.
 > 2.  **Canonical Messages**: You OWN the user-facing message. It must include `{paramName}`.
+> 2b. **Error code**: Every `Fail(...)`/`FromBool(...)` call passes exactly one `MustCodes` constant — there is no code-less overload to fall back to. Pick (or add) the `<domain>.<aspect>.<condition>` constant in `src/PineGuard.Core/Codes/MustCodes.<Domain>.cs` first; Rule13 fails the build if it's missing or duplicated. See `docs/ai/specs/must-clauses/project.md` ("Error codes").
 > 3.  **Layering**: Call `PineGuard.Rules` or `PineGuard.Utils` for logic. Do not write raw parsing logic or regexes in Must.
 > 4.  **Config vs Value**: If a *configuration* parameter (like a regex pattern) is null, attribute the failure to `nameof(configParam)`, not `value`.
 > 5.  **Strict Coding**: File-scoped namespaces, sorted usings, arrow functions where possible, `value` parameter naming.
@@ -51,7 +52,7 @@ Implement a new **MustClause** fluent validation method. A MustClause validates 
             const string messageTemplate = "{paramName} must satisfy condition.";
 
             var ok = MyDomainUtility.TryParse(value, out var parsed);
-            return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, result: parsed);
+            return MustResult<T>.FromBool(ok, MustCodes.Domain.Aspect.Condition, messageTemplate, paramName, value, result: parsed);
         }
     }
     ```
@@ -73,7 +74,7 @@ Implement a new **MustClause** fluent validation method. A MustClause validates 
             const string messageTemplate = "{paramName} must satisfy condition.";
 
             var ok = MyDomainRules.IsCondition(value);
-            return MustResult<bool>.FromBool(ok, messageTemplate, paramName, value, result: ok);
+            return MustResult<bool>.FromBool(ok, MustCodes.Domain.Aspect.Condition, messageTemplate, paramName, value, result: ok);
         }
     }
     ```
@@ -87,6 +88,8 @@ Implement a new **MustClause** fluent validation method. A MustClause validates 
 - [ ] implementation compiles.
 - [ ] No `[GeneratedRegex]` or raw logic in Must class.
 - [ ] Returns `MustResult.Fail` for null input (unless `NullOr...`).
+- [ ] Every `Fail`/`FromBool` call passes exactly one `MustCodes` constant.
+- [ ] `pwsh tools/audit-cli/Run-All.ps1 -RuleId Rule13` is clean.
 
 ## 6. Success Criteria
 
@@ -97,6 +100,7 @@ Implement a new **MustClause** fluent validation method. A MustClause validates 
 | 3 | Message includes paramName | Every failure message interpolates `{paramName}` |
 | 4 | Delegates to Core | No regex, parsing, or raw validation logic in MustClause bodies |
 | 5 | Facade flattens API (complex domain) | Public facade exposes flat API, not nested namespaces |
+| 6 | Carries an error code | `Fail`/`FromBool` passes exactly one `MustCodes` constant; `Run-All.ps1 -RuleId Rule13` clean |
 
 ## 7. Examples
 

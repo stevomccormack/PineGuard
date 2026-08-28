@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -36,7 +37,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringNumbersClauses.Positive"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PositiveStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class PositiveStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.NotPositive)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -81,7 +82,7 @@ public sealed class PositiveStringAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustStringNumbersClauses.Negative"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NegativeStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NegativeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.NotNegative)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -126,7 +127,7 @@ public sealed class NegativeStringAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustStringNumbersClauses.Zero"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ZeroStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class ZeroStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.NotZero)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -171,7 +172,7 @@ public sealed class ZeroStringAttribute() : ValidationAttributeBase(typeof(strin
 /// <seealso cref="MustStringNumbersClauses.NotZero"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotZeroStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotZeroStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.Zero)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -214,7 +215,7 @@ public sealed class NotZeroStringAttribute() : ValidationAttributeBase(typeof(st
 /// <seealso cref="MustStringNumbersClauses.Even"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EvenStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class EvenStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Parity.Odd)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Integer;
@@ -255,7 +256,7 @@ public sealed class EvenStringAttribute() : ValidationAttributeBase(typeof(strin
 /// <seealso cref="MustStringNumbersClauses.Odd"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OddStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class OddStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Parity.Even)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Integer;
@@ -298,7 +299,7 @@ public sealed class OddStringAttribute() : ValidationAttributeBase(typeof(string
 /// <seealso cref="MustStringNumbersClauses.ZeroOrPositive"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ZeroOrPositiveStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class ZeroOrPositiveStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.Negative)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -343,7 +344,7 @@ public sealed class ZeroOrPositiveStringAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustStringNumbersClauses.ZeroOrNegative"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ZeroOrNegativeStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class ZeroOrNegativeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.Positive)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -388,7 +389,7 @@ public sealed class ZeroOrNegativeStringAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustStringNumbersClauses.GreaterThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class GreaterThanOrEqualStringAttribute(decimal min) : ValidationAttributeBase(typeof(string))
+public sealed class GreaterThanOrEqualStringAttribute(decimal min) : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.BelowMinimum)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -436,7 +437,7 @@ public sealed class GreaterThanOrEqualStringAttribute(decimal min) : ValidationA
 /// <seealso cref="MustStringNumbersClauses.LessThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LessThanOrEqualStringAttribute(decimal max) : ValidationAttributeBase(typeof(string))
+public sealed class LessThanOrEqualStringAttribute(decimal max) : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.Exceeded)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -485,7 +486,7 @@ public sealed class LessThanOrEqualStringAttribute(decimal max) : ValidationAttr
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class InRangeStringAttribute(decimal min, decimal max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.OutOfRange)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -540,7 +541,7 @@ public sealed class InRangeStringAttribute(decimal min, decimal max, Inclusion i
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class OutOfRangeStringAttribute(decimal min, decimal max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.InRange)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -594,7 +595,7 @@ public sealed class OutOfRangeStringAttribute(decimal min, decimal max, Inclusio
 /// <seealso cref="MustStringNumbersClauses.MultipleOf"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class MultipleOfStringAttribute(decimal factor) : ValidationAttributeBase(typeof(string))
+public sealed class MultipleOfStringAttribute(decimal factor) : ValidationAttributeBase(typeof(string), MustCodes.Number.Divisibility.NotMultiple)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -642,7 +643,7 @@ public sealed class MultipleOfStringAttribute(decimal factor) : ValidationAttrib
 /// <seealso cref="MustStringNumbersClauses.NotMultipleOf"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotMultipleOfStringAttribute(decimal factor) : ValidationAttributeBase(typeof(string))
+public sealed class NotMultipleOfStringAttribute(decimal factor) : ValidationAttributeBase(typeof(string), MustCodes.Number.Divisibility.Multiple)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -692,7 +693,7 @@ public sealed class NotMultipleOfStringAttribute(decimal factor) : ValidationAtt
 /// <seealso cref="MustStringNumbersClauses.Approximately"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ApproximatelyStringAttribute(decimal target) : ValidationAttributeBase(typeof(string))
+public sealed class ApproximatelyStringAttribute(decimal target) : ValidationAttributeBase(typeof(string), MustCodes.Number.Proximity.NotApproximate)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -745,7 +746,7 @@ public sealed class ApproximatelyStringAttribute(decimal target) : ValidationAtt
 /// <seealso cref="MustStringNumbersClauses.NotApproximately"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotApproximatelyStringAttribute(decimal target) : ValidationAttributeBase(typeof(string))
+public sealed class NotApproximatelyStringAttribute(decimal target) : ValidationAttributeBase(typeof(string), MustCodes.Number.Proximity.Approximate)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -796,7 +797,7 @@ public sealed class NotApproximatelyStringAttribute(decimal target) : Validation
 /// <seealso cref="MustStringNumbersClauses.Finite"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FiniteStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class FiniteStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Form.NotFinite)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Float | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
@@ -839,7 +840,7 @@ public sealed class FiniteStringAttribute() : ValidationAttributeBase(typeof(str
 /// <seealso cref="MustStringNumbersClauses.NotFinite"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotFiniteStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotFiniteStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Form.Finite)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Float | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
@@ -882,7 +883,7 @@ public sealed class NotFiniteStringAttribute() : ValidationAttributeBase(typeof(
 /// <seealso cref="MustStringNumbersClauses.NotNaN"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotNaNStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotNaNStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Form.Nan)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Float | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;

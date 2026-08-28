@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -31,7 +32,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustGuidClauses.NotEmpty"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/guid">GUID Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotEmptyGuidAttribute() : ValidationAttributeBase(typeof(Guid))
+public sealed class NotEmptyGuidAttribute() : ValidationAttributeBase(typeof(Guid), MustCodes.Guid.Emptiness.Empty)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

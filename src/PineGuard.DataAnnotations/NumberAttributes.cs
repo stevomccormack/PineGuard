@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -21,7 +22,7 @@ namespace PineGuard.DataAnnotations;
 /// If the value is <see langword="null"/>, validation passes silently.
 /// </para>
 /// </remarks>
-public abstract class NumberAttributeBase() : ValidationAttributeBase(typeof(object), allowNull: true)
+public abstract class NumberAttributeBase(string code) : ValidationAttributeBase(typeof(object), code, allowNull: true)
 {
     private static readonly HashSet<TypeCode> IntegralTypeCodes =
     [
@@ -167,7 +168,7 @@ public abstract class NumberAttributeBase() : ValidationAttributeBase(typeof(obj
 /// <seealso cref="MustNumberClauses.Positive"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PositiveNumberAttribute : NumberAttributeBase
+public sealed class PositiveNumberAttribute() : NumberAttributeBase(MustCodes.Number.Sign.NotPositive)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -196,7 +197,7 @@ public sealed class PositiveNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.Negative"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NegativeNumberAttribute : NumberAttributeBase
+public sealed class NegativeNumberAttribute() : NumberAttributeBase(MustCodes.Number.Sign.NotNegative)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -225,7 +226,7 @@ public sealed class NegativeNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.Zero"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ZeroNumberAttribute : NumberAttributeBase
+public sealed class ZeroNumberAttribute() : NumberAttributeBase(MustCodes.Number.Sign.NotZero)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -254,7 +255,7 @@ public sealed class ZeroNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.NotZero"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotZeroNumberAttribute : NumberAttributeBase
+public sealed class NotZeroNumberAttribute() : NumberAttributeBase(MustCodes.Number.Sign.Zero)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -284,7 +285,7 @@ public sealed class NotZeroNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.ZeroOrPositive"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ZeroOrPositiveNumberAttribute : NumberAttributeBase
+public sealed class ZeroOrPositiveNumberAttribute() : NumberAttributeBase(MustCodes.Number.Sign.Negative)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -314,7 +315,7 @@ public sealed class ZeroOrPositiveNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.ZeroOrNegative"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ZeroOrNegativeNumberAttribute : NumberAttributeBase
+public sealed class ZeroOrNegativeNumberAttribute() : NumberAttributeBase(MustCodes.Number.Sign.Positive)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -345,7 +346,7 @@ public sealed class ZeroOrNegativeNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.Even(IMustClause, int, string)"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EvenNumberAttribute : NumberAttributeBase
+public sealed class EvenNumberAttribute() : NumberAttributeBase(MustCodes.Number.Parity.Odd)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -392,7 +393,7 @@ public sealed class EvenNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.Odd(IMustClause, int, string)"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OddNumberAttribute : NumberAttributeBase
+public sealed class OddNumberAttribute() : NumberAttributeBase(MustCodes.Number.Parity.Even)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -438,7 +439,7 @@ public sealed class OddNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.Finite(IMustClause, double, string)"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FiniteNumberAttribute : NumberAttributeBase
+public sealed class FiniteNumberAttribute() : NumberAttributeBase(MustCodes.Number.Form.NotFinite)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -468,7 +469,7 @@ public sealed class FiniteNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.NotFinite(IMustClause, double, string)"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotFiniteNumberAttribute : NumberAttributeBase
+public sealed class NotFiniteNumberAttribute() : NumberAttributeBase(MustCodes.Number.Form.Finite)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -497,7 +498,7 @@ public sealed class NotFiniteNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.NotNaN(IMustClause, double, string)"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotNaNNumberAttribute : NumberAttributeBase
+public sealed class NotNaNNumberAttribute() : NumberAttributeBase(MustCodes.Number.Form.Nan)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -526,7 +527,7 @@ public sealed class NotNaNNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.NaN(IMustClause, double, string)"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NaNNumberAttribute : NumberAttributeBase
+public sealed class NaNNumberAttribute() : NumberAttributeBase(MustCodes.Number.Form.NotNan)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -557,7 +558,7 @@ public sealed class NaNNumberAttribute : NumberAttributeBase
 /// <seealso cref="MustNumberClauses.GreaterThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class GreaterThanOrEqualNumberAttribute(double min) : NumberAttributeBase
+public sealed class GreaterThanOrEqualNumberAttribute(double min) : NumberAttributeBase(MustCodes.Number.Range.BelowMinimum)
 {
     /// <summary>Gets the minimum value (inclusive) that the property must meet.</summary>
     public double Min { get; } = min;
@@ -598,7 +599,7 @@ public sealed class GreaterThanOrEqualNumberAttribute(double min) : NumberAttrib
 /// <seealso cref="MustNumberClauses.LessThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LessThanOrEqualNumberAttribute(double max) : NumberAttributeBase
+public sealed class LessThanOrEqualNumberAttribute(double max) : NumberAttributeBase(MustCodes.Number.Range.Exceeded)
 {
     /// <summary>Gets the maximum value (inclusive) that the property must not exceed.</summary>
     public double Max { get; } = max;
@@ -642,7 +643,7 @@ public sealed class LessThanOrEqualNumberAttribute(double max) : NumberAttribute
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class InRangeNumberAttribute(double min, double max, Inclusion inclusion = Inclusion.Inclusive)
-    : NumberAttributeBase
+    : NumberAttributeBase(MustCodes.Number.Range.OutOfRange)
 {
     /// <summary>Gets the lower boundary of the valid range.</summary>
     public double Min { get; } = min;
@@ -692,7 +693,7 @@ public sealed class InRangeNumberAttribute(double min, double max, Inclusion inc
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class OutOfRangeNumberAttribute(double min, double max, Inclusion inclusion = Inclusion.Inclusive)
-    : NumberAttributeBase
+    : NumberAttributeBase(MustCodes.Number.Range.InRange)
 {
     /// <summary>Gets the lower boundary of the excluded range.</summary>
     public double Min { get; } = min;
@@ -740,7 +741,7 @@ public sealed class OutOfRangeNumberAttribute(double min, double max, Inclusion 
 /// <seealso cref="MustNumberClauses.MultipleOf"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class MultipleOfNumberAttribute(double factor) : NumberAttributeBase
+public sealed class MultipleOfNumberAttribute(double factor) : NumberAttributeBase(MustCodes.Number.Divisibility.NotMultiple)
 {
     /// <summary>Gets the factor that the value must be a multiple of.</summary>
     public double Factor { get; } = factor;
@@ -781,7 +782,7 @@ public sealed class MultipleOfNumberAttribute(double factor) : NumberAttributeBa
 /// <seealso cref="MustNumberClauses.NotMultipleOf"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotMultipleOfNumberAttribute(double factor) : NumberAttributeBase
+public sealed class NotMultipleOfNumberAttribute(double factor) : NumberAttributeBase(MustCodes.Number.Divisibility.Multiple)
 {
     /// <summary>Gets the factor that the value must not be a multiple of.</summary>
     public double Factor { get; } = factor;
@@ -824,7 +825,7 @@ public sealed class NotMultipleOfNumberAttribute(double factor) : NumberAttribut
 /// <seealso cref="MustNumberClauses.Approximately"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ApproximatelyNumberAttribute(double target) : NumberAttributeBase
+public sealed class ApproximatelyNumberAttribute(double target) : NumberAttributeBase(MustCodes.Number.Proximity.NotApproximate)
 {
     /// <summary>Gets the target value to approximate.</summary>
     public double Target { get; } = target;
@@ -871,7 +872,7 @@ public sealed class ApproximatelyNumberAttribute(double target) : NumberAttribut
 /// <seealso cref="MustNumberClauses.NotApproximately"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotApproximatelyNumberAttribute(double target) : NumberAttributeBase
+public sealed class NotApproximatelyNumberAttribute(double target) : NumberAttributeBase(MustCodes.Number.Proximity.Approximate)
 {
     /// <summary>Gets the target value to compare against.</summary>
     public double Target { get; } = target;

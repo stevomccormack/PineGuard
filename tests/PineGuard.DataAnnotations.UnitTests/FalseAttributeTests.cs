@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.MustClauses;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
@@ -33,6 +34,7 @@ public sealed class FalseAttributeTests : BaseUnitTest
 
         Assert.NotEqual(ValidationResult.Success, result);
         Assert.Equal(expectedMessage, result!.ErrorMessage);
+        Assert.Equal(MustCodes.Boolean.Value.True, attribute.Code);
     }
 
     [Theory]

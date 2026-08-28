@@ -1,56 +1,58 @@
 using PineGuard.Common;
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
+using Xunit.Abstractions;
 
 namespace PineGuard.MustClauses.UnitTests;
 
-public class MustDateTimeRangeClausesTests : BaseUnitTest
+public sealed class MustDateTimeRangeClausesTests(ITestOutputHelper output) : BaseMustUnitTest(output)
 {
     [Theory]
     [MemberData(nameof(MustDateTimeRangeClausesTestData.Chronological.ValidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.Chronological))]
-    public void Chronological_Checks(MustDateTimeRangeClausesTestData.Chronological.ValidCase testCase)
+    [MemberData(nameof(MustDateTimeRangeClausesTestData.Chronological.InvalidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.Chronological))]
+    public void Chronological_BehavesAsExpected(MustCase<(DateTimeRange range, Inclusion inclusion)> tc)
     {
-        var range = new DateTimeRange(testCase.Value.Start, testCase.Value.End);
-        var result = Must.Be.Chronological(range, testCase.Value.Inclusion);
-        Assert.Equal(testCase.Expected, result.Success);
+        var range = tc.Value.range;
+        var result = Must.Be.Chronological(range, tc.Value.inclusion);
+        AssertResult(tc, result);
     }
 
     [Theory]
     [MemberData(nameof(MustDateTimeRangeClausesTestData.Overlapping.ValidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.Overlapping))]
-    public void Overlapping_Checks(MustDateTimeRangeClausesTestData.Overlapping.ValidCase testCase)
+    [MemberData(nameof(MustDateTimeRangeClausesTestData.Overlapping.InvalidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.Overlapping))]
+    public void Overlapping_BehavesAsExpected(MustCase<(DateTimeRange range1, DateTimeRange range2, Inclusion inclusion)> tc)
     {
-        var range1 = new DateTimeRange(testCase.Value.S1, testCase.Value.E1);
-        var range2 = new DateTimeRange(testCase.Value.S2, testCase.Value.E2);
-
-        var result = Must.Be.Overlapping(range1, range2, testCase.Value.Inclusion);
-        Assert.Equal(testCase.Expected, result.Success);
+        var range1 = tc.Value.range1;
+        var result = Must.Be.Overlapping(range1, tc.Value.range2, tc.Value.inclusion);
+        AssertResult(tc, result);
     }
 
     [Theory]
     [MemberData(nameof(MustDateTimeRangeClausesTestData.NotOverlapping.ValidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.NotOverlapping))]
-    public void NotOverlapping_Checks(MustDateTimeRangeClausesTestData.NotOverlapping.ValidCase testCase)
+    [MemberData(nameof(MustDateTimeRangeClausesTestData.NotOverlapping.InvalidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.NotOverlapping))]
+    public void NotOverlapping_BehavesAsExpected(MustCase<(DateTimeRange range1, DateTimeRange range2, Inclusion inclusion)> tc)
     {
-        var range1 = new DateTimeRange(testCase.Value.S1, testCase.Value.E1);
-        var range2 = new DateTimeRange(testCase.Value.S2, testCase.Value.E2);
-
-        var result = Must.Be.NotOverlapping(range1, range2, testCase.Value.Inclusion);
-        Assert.Equal(testCase.Expected, result.Success);
+        var range1 = tc.Value.range1;
+        var result = Must.Be.NotOverlapping(range1, tc.Value.range2, tc.Value.inclusion);
+        AssertResult(tc, result);
     }
 
     [Theory]
     [MemberData(nameof(MustDateTimeRangeClausesTestData.Contains.ValidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.Contains))]
-    public void Contains_Checks(MustDateTimeRangeClausesTestData.Contains.ValidCase testCase)
+    [MemberData(nameof(MustDateTimeRangeClausesTestData.Contains.InvalidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.Contains))]
+    public void Contains_BehavesAsExpected(MustCase<(DateTimeRange range, DateTime value, Inclusion inclusion)> tc)
     {
-        var range = new DateTimeRange(testCase.Value.Start, testCase.Value.End);
-        var result = Must.Be.Contains(range, testCase.Value.Target, testCase.Value.Inclusion);
-        Assert.Equal(testCase.Expected, result.Success);
+        var range = tc.Value.range;
+        var result = Must.Be.Contains(range, tc.Value.value, tc.Value.inclusion);
+        AssertResult(tc, result);
     }
 
     [Theory]
     [MemberData(nameof(MustDateTimeRangeClausesTestData.NotContains.ValidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.NotContains))]
-    public void NotContains_Checks(MustDateTimeRangeClausesTestData.NotContains.ValidCase testCase)
+    [MemberData(nameof(MustDateTimeRangeClausesTestData.NotContains.InvalidCases), MemberType = typeof(MustDateTimeRangeClausesTestData.NotContains))]
+    public void NotContains_BehavesAsExpected(MustCase<(DateTimeRange range, DateTime value, Inclusion inclusion)> tc)
     {
-        var range = new DateTimeRange(testCase.Value.Start, testCase.Value.End);
-        var result = Must.Be.NotContains(range, testCase.Value.Target, testCase.Value.Inclusion);
-        Assert.Equal(testCase.Expected, result.Success);
+        var range = tc.Value.range;
+        var result = Must.Be.NotContains(range, tc.Value.value, tc.Value.inclusion);
+        AssertResult(tc, result);
     }
 }

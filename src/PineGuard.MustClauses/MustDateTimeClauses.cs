@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -35,7 +36,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be in the past.";
 
         var ok = DateTimeRules.IsInPast(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -61,7 +62,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be in the past or present.";
 
         var ok = DateTimeRules.IsInPast(value, Inclusion.Inclusive);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -87,7 +88,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be in the future.";
 
         var ok = DateTimeRules.IsInFuture(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -113,7 +114,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be in the future or present.";
 
         var ok = DateTimeRules.IsInFuture(value, Inclusion.Inclusive);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -145,7 +146,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be within the expected range.";
 
         var ok = DateTimeRules.IsBetween(value, min, max, inclusion);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Range.OutOfRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -177,7 +178,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be within the expected range.";
 
         var ok = !DateTimeRules.IsBetween(value, min, max, inclusion);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Range.InRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -207,7 +208,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be before the specified date/time.";
 
         var ok = DateTimeRules.IsBefore(value, other, Inclusion.Exclusive, precision);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Order.NotBefore, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -237,7 +238,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be on or before the specified date/time.";
 
         var ok = DateTimeRules.IsBefore(value, other, Inclusion.Inclusive, precision);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Order.After, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -267,7 +268,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be after the specified date/time.";
 
         var ok = DateTimeRules.IsAfter(value, other, Inclusion.Exclusive, precision);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Order.NotAfter, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -297,7 +298,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be on or after the specified date/time.";
 
         var ok = DateTimeRules.IsAfter(value, other, Inclusion.Inclusive, precision);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Order.Before, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -327,7 +328,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be the same date/time.";
 
         var ok = DateTimeRules.IsSame(value, other, precision);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Equality.NotEqual, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -357,7 +358,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be the same date/time.";
 
         var ok = !DateTimeRules.IsSame(value, other, precision);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Equality.Equal, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -387,7 +388,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = DateTimeRules.IsChronological(start, end, inclusion);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, start, start);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Order.NotChronological, messageTemplate, paramName, start, start);
     }
 
     /// <summary>
@@ -424,7 +425,7 @@ public static class MustDateTimeClauses
         var range2Ok = DateTimeRange.TryCreate(start2, end2, out var _);
 
         var ok = range1Ok && range2Ok && DateTimeRules.IsOverlapping(start1, end1, start2, end2, inclusion);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, start1, start1);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Overlap.Missing, messageTemplate, paramName, start1, start1);
     }
 
     /// <summary>
@@ -461,7 +462,7 @@ public static class MustDateTimeClauses
         var range2Ok = DateTimeRange.TryCreate(start2, end2, out var _);
 
         var ok = !(range1Ok && range2Ok && DateTimeRules.IsOverlapping(start1, end1, start2, end2, inclusion));
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, start1, start1);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Overlap.Present, messageTemplate, paramName, start1, start1);
     }
 
     /// <summary>
@@ -489,7 +490,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be within the expected number of days from now.";
 
         var ok = DateTimeRules.IsWithinDaysFromNow(value, days);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Proximity.NotWithin, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -517,7 +518,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be within the expected number of days from now.";
 
         var ok = !DateTimeRules.IsWithinDaysFromNow(value, days);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Proximity.Within, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -547,7 +548,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be within the expected time window.";
 
         var ok = DateTimeRules.IsWithin(value, reference, window);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Proximity.NotWithin, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -577,7 +578,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be within the expected time window.";
 
         var ok = !DateTimeRules.IsWithin(value, reference, window);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Proximity.Within, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -607,7 +608,8 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be within the expected number of calendar months.";
 
         var ok = DateTimeRules.IsWithinCalendarMonths(value, reference, months);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Proximity.NotWithinCalendarMonths,
+            messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -637,7 +639,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be within the expected number of calendar months.";
 
         var ok = !DateTimeRules.IsWithinCalendarMonths(value, reference, months);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Proximity.WithinCalendarMonths, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -663,7 +665,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be a weekday.";
 
         var ok = DateTimeRules.IsWeekday(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Calendar.NotWeekday, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -689,7 +691,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be a weekend day.";
 
         var ok = DateTimeRules.IsWeekend(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Calendar.NotWeekend, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -715,7 +717,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be the first day of the month.";
 
         var ok = DateTimeRules.IsFirstDayOfMonth(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Calendar.NotFirstDayOfMonth, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -741,7 +743,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be the first day of the month.";
 
         var ok = !DateTimeRules.IsFirstDayOfMonth(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Calendar.FirstDayOfMonth, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -767,7 +769,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be the last day of the month.";
 
         var ok = DateTimeRules.IsLastDayOfMonth(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Calendar.NotLastDayOfMonth, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -793,7 +795,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be the last day of the month.";
 
         var ok = !DateTimeRules.IsLastDayOfMonth(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Calendar.LastDayOfMonth, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -821,7 +823,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be the same day.";
 
         var ok = DateTimeRules.IsSameDay(value, other);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Equality.NotSameDay, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -849,7 +851,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be the same day.";
 
         var ok = !DateTimeRules.IsSameDay(value, other);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Equality.SameDay, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -875,7 +877,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be UTC.";
 
         var ok = DateTimeRules.IsUtc(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.NotUtc, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -901,7 +903,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be UTC.";
 
         var ok = !DateTimeRules.IsUtc(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.Utc, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -927,7 +929,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must be local.";
 
         var ok = DateTimeRules.IsLocal(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.NotLocal, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -953,7 +955,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not be local.";
 
         var ok = !DateTimeRules.IsLocal(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.Local, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -979,7 +981,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must have an unspecified kind.";
 
         var ok = DateTimeRules.IsUnspecified(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.NotUnspecified, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1005,7 +1007,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not have an unspecified kind.";
 
         var ok = !DateTimeRules.IsUnspecified(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.Unspecified, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1031,7 +1033,7 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must have an explicit kind.";
 
         var ok = DateTimeRules.HasExplicitKind(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.Unspecified, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -1057,6 +1059,6 @@ public static class MustDateTimeClauses
         const string messageTemplate = "{paramName} must not have an explicit kind.";
 
         var ok = !DateTimeRules.HasExplicitKind(value);
-        return MustResult<DateTime>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.NotUnspecified, messageTemplate, paramName, value, value);
     }
 }

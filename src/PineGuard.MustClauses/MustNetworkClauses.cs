@@ -1,5 +1,6 @@
 using System.Net;
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 using PineGuard.Utils;
 
@@ -36,12 +37,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IPAddress>.Fail(NullMessage, paramName, value);
+            return MustResult<IPAddress>.Fail(MustCodes.Network.Address.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid IP address.";
 
         var ok = NetworkUtility.TryParseIpAddress(value, out var ipAddress) && ipAddress is not null;
-        return MustResult<IPAddress>.FromBool(ok, messageTemplate, paramName, value, result: ipAddress!);
+        return MustResult<IPAddress>.FromBool(ok, MustCodes.Network.Address.Invalid, messageTemplate, paramName, value, result: ipAddress!);
     }
 
     /// <summary>
@@ -65,12 +66,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IPAddress>.Fail(NullMessage, paramName, value);
+            return MustResult<IPAddress>.Fail(MustCodes.Network.Address.NotIpv4, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid IPv4 address.";
 
         var ok = NetworkUtility.TryParseIpv4(value, out var ipAddress) && ipAddress is not null;
-        return MustResult<IPAddress>.FromBool(ok, messageTemplate, paramName, value, result: ipAddress!);
+        return MustResult<IPAddress>.FromBool(ok, MustCodes.Network.Address.NotIpv4, messageTemplate, paramName, value, result: ipAddress!);
     }
 
     /// <summary>
@@ -94,12 +95,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IPAddress>.Fail(NullMessage, paramName, value);
+            return MustResult<IPAddress>.Fail(MustCodes.Network.Address.NotIpv6, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid IPv6 address.";
 
         var ok = NetworkUtility.TryParseIpv6(value, out var ipAddress) && ipAddress is not null;
-        return MustResult<IPAddress>.FromBool(ok, messageTemplate, paramName, value, result: ipAddress!);
+        return MustResult<IPAddress>.FromBool(ok, MustCodes.Network.Address.NotIpv6, messageTemplate, paramName, value, result: ipAddress!);
     }
 
     /// <summary>
@@ -123,12 +124,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Address.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid IP address.";
 
         var ok = NetworkRules.IsIpAddress(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.Invalid, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -152,12 +153,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Address.NotIpv4, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid IPv4 address.";
 
         var ok = NetworkRules.IsIpv4(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.NotIpv4, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -181,12 +182,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Address.NotIpv6, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid IPv6 address.";
 
         var ok = NetworkRules.IsIpv6(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.NotIpv6, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -212,21 +213,21 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<IPAddress>.Fail(NullMessage, paramName, value);
+            return MustResult<IPAddress>.Fail(MustCodes.Network.Cidr.OutOfRange, NullMessage, paramName, value);
 
         if (string.IsNullOrWhiteSpace(cidr))
-            return MustResult<IPAddress>.Fail("{paramName} must not be null or whitespace.", nameof(cidr), cidr);
+            return MustResult<IPAddress>.Fail(MustCodes.Network.Cidr.OutOfRange, "{paramName} must not be null or whitespace.", nameof(cidr), cidr);
 
         const string messageTemplate = "{paramName} must be within the specified CIDR range.";
 
         if (!NetworkUtility.TryParseIpAddress(value, out var address) || address is null)
-            return MustResult<IPAddress>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<IPAddress>.FromBool(false, MustCodes.Network.Cidr.OutOfRange, messageTemplate, paramName, value, result: default);
 
         if (!NetworkUtility.TryParseCidr(cidr, out var network, out var prefixLength) || network is null)
-            return MustResult<IPAddress>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<IPAddress>.FromBool(false, MustCodes.Network.Cidr.OutOfRange, messageTemplate, paramName, value, result: default);
 
         var ok = NetworkUtility.IsInCidr(address, network, prefixLength);
-        return MustResult<IPAddress>.FromBool(ok, messageTemplate, paramName, value, result: address);
+        return MustResult<IPAddress>.FromBool(ok, MustCodes.Network.Cidr.OutOfRange, messageTemplate, paramName, value, result: address);
     }
 
     /// <summary>
@@ -250,12 +251,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Hostname.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid hostname.";
 
         var ok = NetworkUtility.TryGetAsciiHostname(value, out var ascii) && NetworkRules.IsValidHostname(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: ascii!);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Hostname.Invalid, messageTemplate, paramName, value, result: ascii!);
     }
 
     /// <summary>
@@ -281,7 +282,7 @@ public static class MustNetworkClauses
         const string messageTemplate = "{paramName} must be a valid port number.";
 
         var ok = NetworkRules.IsPortNumber(value);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<int>.FromBool(ok, MustCodes.Network.Port.Invalid, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -305,12 +306,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Address.WellFormed, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid IP address.";
 
         var ok = !NetworkUtility.TryParseIpAddress(value, out var unused);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.WellFormed, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -334,12 +335,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Address.Ipv4, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid IPv4 address.";
 
         var ok = !NetworkUtility.TryParseIpv4(value, out var unused);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.Ipv4, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -363,12 +364,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Address.Ipv6, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid IPv6 address.";
 
         var ok = !NetworkUtility.TryParseIpv6(value, out var unused);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.Ipv6, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -392,12 +393,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Address.WellFormed, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid IP address.";
 
         var ok = !NetworkRules.IsIpAddress(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.WellFormed, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -421,12 +422,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Address.Ipv4, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid IPv4 address.";
 
         var ok = !NetworkRules.IsIpv4(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.Ipv4, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -450,12 +451,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Address.Ipv6, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid IPv6 address.";
 
         var ok = !NetworkRules.IsIpv6(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.Ipv6, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -481,15 +482,15 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Cidr.InRange, NullMessage, paramName, value);
 
         if (string.IsNullOrWhiteSpace(cidr))
-            return MustResult<string>.Fail("{paramName} must not be null or whitespace.", nameof(cidr), cidr);
+            return MustResult<string>.Fail(MustCodes.Network.Cidr.InRange, "{paramName} must not be null or whitespace.", nameof(cidr), cidr);
 
         const string messageTemplate = "{paramName} must not be within the specified CIDR range.";
 
         var ok = !NetworkRules.IsInCidr(value, cidr);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Cidr.InRange, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -513,12 +514,12 @@ public static class MustNetworkClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<string>.Fail(NullMessage, paramName, value);
+            return MustResult<string>.Fail(MustCodes.Network.Hostname.WellFormed, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a valid hostname.";
 
         var ok = !NetworkRules.IsValidHostname(value);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Hostname.WellFormed, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -544,6 +545,6 @@ public static class MustNetworkClauses
         const string messageTemplate = "{paramName} must not be a valid port number.";
 
         var ok = !NetworkRules.IsPortNumber(value);
-        return MustResult<int>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<int>.FromBool(ok, MustCodes.Network.Port.WellFormed, messageTemplate, paramName, value, value);
     }
 }

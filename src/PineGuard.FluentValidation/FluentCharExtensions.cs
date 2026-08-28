@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -22,7 +23,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.Letter"/>
     public static IRuleBuilderOptions<TModel, char> Letter<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Letter(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.NotLetter);
 
     /// <summary>
     /// Validates that the character is not a Unicode letter.
@@ -36,7 +37,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.NotLetter"/>
     public static IRuleBuilderOptions<TModel, char> NotLetter<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotLetter(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.Letter);
 
     /// <summary>
     /// Validates that the character is a decimal digit (0-9).
@@ -50,7 +51,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.Digit"/>
     public static IRuleBuilderOptions<TModel, char> Digit<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Digit(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.NotDigit);
 
     /// <summary>
     /// Validates that the character is not a decimal digit.
@@ -64,7 +65,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.NotDigit"/>
     public static IRuleBuilderOptions<TModel, char> NotDigit<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotDigit(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.Digit);
 
     /// <summary>
     /// Validates that the character is a letter or digit.
@@ -78,7 +79,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.LetterOrDigit"/>
     public static IRuleBuilderOptions<TModel, char> LetterOrDigit<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.LetterOrDigit(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.NotLetterOrDigit);
 
     /// <summary>
     /// Validates that the character is not a letter or digit.
@@ -92,7 +93,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.NotLetterOrDigit"/>
     public static IRuleBuilderOptions<TModel, char> NotLetterOrDigit<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotLetterOrDigit(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.LetterOrDigit);
 
     /// <summary>
     /// Validates that the character is within the ASCII range (0x00-0x7F).
@@ -106,7 +107,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.Ascii"/>
     public static IRuleBuilderOptions<TModel, char> Ascii<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Ascii(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.NotAscii);
 
     /// <summary>
     /// Validates that the character is outside the ASCII range.
@@ -120,7 +121,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.NotAscii"/>
     public static IRuleBuilderOptions<TModel, char> NotAscii<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotAscii(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.Ascii);
 
     /// <summary>
     /// Validates that the character is a printable ASCII character (0x20-0x7E).
@@ -134,7 +135,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.PrintableAscii"/>
     public static IRuleBuilderOptions<TModel, char> PrintableAscii<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.PrintableAscii(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.NotPrintableAscii);
 
     /// <summary>
     /// Validates that the character is not a printable ASCII character.
@@ -148,7 +149,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.NotPrintableAscii"/>
     public static IRuleBuilderOptions<TModel, char> NotPrintableAscii<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotPrintableAscii(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.PrintableAscii);
 
     /// <summary>
     /// Validates that the character is not whitespace.
@@ -162,7 +163,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.NotWhitespace"/>
     public static IRuleBuilderOptions<TModel, char> NotWhitespace<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotWhitespace(val, paramName: null),
-            message);
+            message, MustCodes.Character.Category.Whitespace);
 
     /// <summary>
     /// Validates that the character is a Unicode control character.
@@ -176,7 +177,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.Control"/>
     public static IRuleBuilderOptions<TModel, char> Control<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Control(val, paramName: null),
-            message);
+            message, MustCodes.Character.Category.NotControl);
 
     /// <summary>
     /// Validates that the character is not a Unicode control character.
@@ -190,7 +191,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.NotControl"/>
     public static IRuleBuilderOptions<TModel, char> NotControl<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotControl(val, paramName: null),
-            message);
+            message, MustCodes.Character.Category.Control);
 
     /// <summary>
     /// Validates that the character is an uppercase letter.
@@ -204,7 +205,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.Uppercase"/>
     public static IRuleBuilderOptions<TModel, char> Uppercase<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Uppercase(val, paramName: null),
-            message);
+            message, MustCodes.Character.Casing.NotUpper);
 
     /// <summary>
     /// Validates that the character is a lowercase letter.
@@ -218,7 +219,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.Lowercase"/>
     public static IRuleBuilderOptions<TModel, char> Lowercase<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Lowercase(val, paramName: null),
-            message);
+            message, MustCodes.Character.Casing.NotLower);
 
     /// <summary>
     /// Validates that the character is a hexadecimal digit (0-9, A-F, a-f).
@@ -232,7 +233,7 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.HexDigit"/>
     public static IRuleBuilderOptions<TModel, char> HexDigit<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HexDigit(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.NotHexDigit);
 
     /// <summary>
     /// Validates that the character is not a hexadecimal digit.
@@ -246,5 +247,5 @@ public static class FluentCharExtensions
     /// <seealso cref="MustCharClauses.NotHexDigit"/>
     public static IRuleBuilderOptions<TModel, char> NotHexDigit<TModel>(this IRuleBuilder<TModel, char> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHexDigit(val, paramName: null),
-            message);
+            message, MustCodes.Character.Charset.HexDigit);
 }

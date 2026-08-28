@@ -372,4 +372,82 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
         var result = new NotWithinCalendarMonthsNonNullableValidator(tc.Value.reference, tc.Value.months).Validate(new NonNullableModel { Value = tc.Value.value });
         AssertResult(tc, result);
     }
+
+    // ── Cross-property expression overloads ──────────────────────────
+
+    private sealed record ComparisonModel { public DateOnly Value { get; init; } public DateOnly Other { get; init; } }
+    private sealed record NullableComparisonModel { public DateOnly? Value { get; init; } public DateOnly Other { get; init; } }
+
+    private sealed class BeforeExpressionValidator : AbstractValidator<ComparisonModel> { public BeforeExpressionValidator() => RuleFor(x => x.Value).Before(m => m.Other); }
+    private sealed class BeforeNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public BeforeNullableExpressionValidator() => RuleFor(x => x.Value).Before(m => m.Other); }
+    private sealed class OnOrBeforeExpressionValidator : AbstractValidator<ComparisonModel> { public OnOrBeforeExpressionValidator() => RuleFor(x => x.Value).OnOrBefore(m => m.Other); }
+    private sealed class OnOrBeforeNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public OnOrBeforeNullableExpressionValidator() => RuleFor(x => x.Value).OnOrBefore(m => m.Other); }
+    private sealed class AfterExpressionValidator : AbstractValidator<ComparisonModel> { public AfterExpressionValidator() => RuleFor(x => x.Value).After(m => m.Other); }
+    private sealed class AfterNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public AfterNullableExpressionValidator() => RuleFor(x => x.Value).After(m => m.Other); }
+    private sealed class OnOrAfterExpressionValidator : AbstractValidator<ComparisonModel> { public OnOrAfterExpressionValidator() => RuleFor(x => x.Value).OnOrAfter(m => m.Other); }
+    private sealed class OnOrAfterNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public OnOrAfterNullableExpressionValidator() => RuleFor(x => x.Value).OnOrAfter(m => m.Other); }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.BeforeExpression.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.BeforeExpression))]
+    public void BeforeExpression_BehavesAsExpected(FluentCase<(DateOnly value, DateOnly other)> tc)
+    {
+        var result = new BeforeExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.BeforeNullableExpression.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.BeforeNullableExpression))]
+    public void BeforeNullableExpression_BehavesAsExpected(FluentCase<(DateOnly? value, DateOnly other)> tc)
+    {
+        var result = new BeforeNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.OnOrBeforeExpression.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.OnOrBeforeExpression))]
+    public void OnOrBeforeExpression_BehavesAsExpected(FluentCase<(DateOnly value, DateOnly other)> tc)
+    {
+        var result = new OnOrBeforeExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.OnOrBeforeNullableExpression.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.OnOrBeforeNullableExpression))]
+    public void OnOrBeforeNullableExpression_BehavesAsExpected(FluentCase<(DateOnly? value, DateOnly other)> tc)
+    {
+        var result = new OnOrBeforeNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.AfterExpression.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.AfterExpression))]
+    public void AfterExpression_BehavesAsExpected(FluentCase<(DateOnly value, DateOnly other)> tc)
+    {
+        var result = new AfterExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.AfterNullableExpression.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.AfterNullableExpression))]
+    public void AfterNullableExpression_BehavesAsExpected(FluentCase<(DateOnly? value, DateOnly other)> tc)
+    {
+        var result = new AfterNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.OnOrAfterExpression.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.OnOrAfterExpression))]
+    public void OnOrAfterExpression_BehavesAsExpected(FluentCase<(DateOnly value, DateOnly other)> tc)
+    {
+        var result = new OnOrAfterExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.OnOrAfterNullableExpression.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.OnOrAfterNullableExpression))]
+    public void OnOrAfterNullableExpression_BehavesAsExpected(FluentCase<(DateOnly? value, DateOnly other)> tc)
+    {
+        var result = new OnOrAfterNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
 }

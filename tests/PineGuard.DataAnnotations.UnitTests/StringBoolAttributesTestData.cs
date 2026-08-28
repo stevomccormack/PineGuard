@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -12,7 +13,7 @@ public static class StringBoolAttributesTestData
         {
             nameof(F.BoolIsTrue.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be true.")
+            _ => new DataAnnotationExpected(false, "Value must be true.", Code: MustCodes.Boolean.Value.False)
         });
     }
 
@@ -23,7 +24,7 @@ public static class StringBoolAttributesTestData
         {
             nameof(F.BoolIsFalse.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be false.")
+            _ => new DataAnnotationExpected(false, "Value must be false.", Code: MustCodes.Boolean.Value.True)
         });
     }
 }

@@ -43,7 +43,7 @@ public static class MustResultTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("all ok", [MustResult<int>.Ok(1), MustResult<int>.Ok(2)], true),
-            new("any fail", [MustResult<int>.Ok(1), MustResult<int>.Fail("F", "p", "v")], false),
+            new("any fail", [MustResult<int>.Ok(1), MustResult<int>.Fail("test.code", "F", "p", "v")], false),
             new("empty", [], true),
             new("null", null, false)
         ];
@@ -60,7 +60,7 @@ public static class MustResultTestData
         ];
         public static TheoryData<InvalidCase> InvalidCases =>
         [
-            new("any fail", [MustResult<int>.Ok(1), MustResult<int>.Fail("F", "p", "v")], new ExpectedException(typeof(ArgumentException)))
+            new("any fail", [MustResult<int>.Ok(1), MustResult<int>.Fail("test.code", "F", "p", "v")], new ExpectedException(typeof(ArgumentException)))
         ];
         public sealed record ValidCase(string Name, IEnumerable<MustResult<int>> Value, bool Expected) : IsCase<IEnumerable<MustResult<int>>>(Name, Value, Expected);
         public sealed record InvalidCase(string Name, IEnumerable<MustResult<int>> Value, ExpectedException ExpectedException) : ThrowsCase<IEnumerable<MustResult<int>>>(Name, Value, ExpectedException);
@@ -80,7 +80,7 @@ public static class MustResultTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("ok is true", MustResult<int>.Ok(1), true),
-            new("fail is false", MustResult<int>.Fail("E", "p", "v"), false)
+            new("fail is false", MustResult<int>.Fail("test.code", "E", "p", "v"), false)
         ];
         public sealed record ValidCase(string Name, MustResult<int> Value, bool Expected) : IsCase<MustResult<int>>(Name, Value, Expected);
     }
@@ -94,8 +94,8 @@ public static class MustResultTestData
 
         public static TheoryData<InvalidCase> InvalidCases =>
         [
-             new("fail", MustResult<int>.Fail("Error", "param", "val"), new ExpectedException(typeof(ArgumentException), "param")),
-             new("fail custom", MustResult<int>.Fail("Error", "param", "val"), new ExpectedException(typeof(InvalidOperationException))) { Name = "fail custom" }
+             new("fail", MustResult<int>.Fail("test.code", "Error", "param", "val"), new ExpectedException(typeof(ArgumentException), "param")),
+             new("fail custom", MustResult<int>.Fail("test.code", "Error", "param", "val"), new ExpectedException(typeof(InvalidOperationException))) { Name = "fail custom" }
         ];
 
         public sealed record ValidCase(string Name, MustResult<int> Value, bool Expected) : IsCase<MustResult<int>>(Name, Value, Expected);
@@ -116,7 +116,7 @@ public static class MustResultTestData
         public static TheoryData<ValidCase> ValidCases => [new("ok", MustResult<int>.Ok(1), true)];
         public static TheoryData<InvalidCase> InvalidCases =>
         [
-            new("fail", MustResult<int>.Fail("E", "p", "v"), new ExpectedException(typeof(ArgumentNullException), "p"))
+            new("fail", MustResult<int>.Fail("test.code", "E", "p", "v"), new ExpectedException(typeof(ArgumentNullException), "p"))
         ];
         public sealed record ValidCase(string Name, MustResult<int> Value, bool Expected) : IsCase<MustResult<int>>(Name, Value, Expected);
         public sealed record InvalidCase(string Name, MustResult<int> Value, ExpectedException ExpectedException) : ThrowsCase<MustResult<int>>(Name, Value, ExpectedException);
@@ -130,7 +130,7 @@ public static class MustResultTestData
         ];
         public static TheoryData<InvalidCase> InvalidCases =>
       [
-          new("fail", MustResult<int>.Fail("E", "p", "v"), new ExpectedException(typeof(ArgumentException)))
+          new("fail", MustResult<int>.Fail("test.code", "E", "p", "v"), new ExpectedException(typeof(ArgumentException)))
       ];
         public sealed record ValidCase(string Name, MustResult<int> Value, bool Expected) : IsCase<MustResult<int>>(Name, Value, Expected);
         public sealed record InvalidCase(string Name, MustResult<int> Value, ExpectedException ExpectedException) : ThrowsCase<MustResult<int>>(Name, Value, ExpectedException);

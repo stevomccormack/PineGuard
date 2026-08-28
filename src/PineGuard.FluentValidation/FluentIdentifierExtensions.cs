@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -32,5 +33,5 @@ public static class FluentIdentifierExtensions
         this IRuleBuilder<TModel, string?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Slug(val, paramName: null),
-            message);
+            message, MustCodes.Identifier.Slug.Invalid);
 }

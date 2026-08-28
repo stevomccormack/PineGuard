@@ -49,7 +49,7 @@ public static class GuardBufferClauses
     {
         var result = Must.Be.Hex(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -94,7 +94,7 @@ public static class GuardBufferClauses
     {
         var result = Must.Be.NotHex(value, paramName); // Guard.Against.Hex => Must.Be.NotHex (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -139,7 +139,7 @@ public static class GuardBufferClauses
     {
         var result = Must.Be.Base64(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -184,7 +184,7 @@ public static class GuardBufferClauses
     {
         var result = Must.Be.NotBase64(value, paramName); // Guard.Against.Base64 => Must.Be.NotBase64 (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

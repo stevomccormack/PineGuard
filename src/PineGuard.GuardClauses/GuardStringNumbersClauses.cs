@@ -41,7 +41,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.Positive(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -73,7 +73,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.Negative(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -105,7 +105,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.Zero(value, styles, paramName); // Guard.Against.NotZero => Must.Be.Zero (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -137,7 +137,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.NotZero(value, styles, paramName); // Guard.Against.Zero => Must.Be.NotZero (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -169,7 +169,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.ZeroOrPositive(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -201,7 +201,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.ZeroOrNegative(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -235,7 +235,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.GreaterThan(value, max, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -269,7 +269,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.GreaterThanOrEqual(value, max, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -303,7 +303,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.LessThan(value, min, styles, paramName); // Guard.Against.LessThan => Must.Be.GreaterThanOrEqual (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -337,7 +337,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.LessThanOrEqual(value, min, styles, paramName); // Guard.Against.GreaterThanOrEqual => Must.Be.LessThan (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -375,7 +375,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.InRange(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -413,7 +413,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.OutOfRange(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -449,7 +449,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.Approximately(value, target, tolerance, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -485,7 +485,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.NotApproximately(value, target, tolerance, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -519,7 +519,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.MultipleOf(value, factor, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -553,7 +553,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.NotMultipleOf(value, factor, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -585,7 +585,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.Even(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -617,7 +617,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.Odd(value, styles, paramName); // Guard.Against.Even => Must.Be.Odd (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -649,7 +649,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.Finite(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -681,7 +681,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.NotFinite(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -713,7 +713,7 @@ public static class GuardStringNumbersClauses
     {
         var result = Must.Be.NotNaN(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

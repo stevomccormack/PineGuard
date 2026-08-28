@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -30,7 +31,7 @@ public static class FluentTimeSpanExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.DurationBetween(val, min, max, inclusion, paramName: null),
-            message);
+            message, MustCodes.Time.Duration.OutOfRange);
 
     /// <summary>
     /// Validates that the <see cref="TimeSpan"/> duration does not fall between the specified bounds.
@@ -51,7 +52,7 @@ public static class FluentTimeSpanExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotDurationBetween(val, min, max, inclusion, paramName: null),
-            message);
+            message, MustCodes.Time.Duration.InRange);
 
     /// <summary>
     /// Validates that the <see cref="TimeSpan"/> duration is greater than the specified threshold.
@@ -70,7 +71,7 @@ public static class FluentTimeSpanExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.GreaterThan(val, threshold, inclusion, paramName: null),
-            message);
+            message, MustCodes.Time.Duration.NotGreater);
 
     /// <summary>
     /// Validates that the <see cref="TimeSpan"/> duration is less than the specified threshold.
@@ -89,5 +90,5 @@ public static class FluentTimeSpanExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.LessThan(val, threshold, inclusion, paramName: null),
-            message);
+            message, MustCodes.Time.Duration.NotLess);
 }

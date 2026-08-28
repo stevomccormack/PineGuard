@@ -198,6 +198,26 @@
             "problemMatcher": []
         },
         {
+            "label": "Audit: Must Codes (Rule13)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/audit-cli/Run-All.ps1",
+                "-Configuration",
+                "Release",
+                "-RepoRoot",
+                ".",
+                "-Rule",
+                "Rule13",
+                "-NoSummary"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Audit: PS Normalization (Rule10)",
             "type": "shell",
             "command": "pwsh",

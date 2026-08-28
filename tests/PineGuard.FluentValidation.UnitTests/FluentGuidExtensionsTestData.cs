@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.GuidRulesFixtures;
 
@@ -9,7 +10,7 @@ public static class FluentGuidExtensionsTestData
     {
         public static TheoryData<FluentCase<Guid>> Cases => F.NotEmpty.AllScenarios.ToFluentCases(s => s.IsValid
             ? new FluentExpected(true)
-            : new FluentExpected(false, "Value must not be an empty GUID."));
+            : new FluentExpected(false, "Value must not be an empty GUID.", Code: MustCodes.Guid.Emptiness.Empty));
     }
 
     public static class NotEmptyNullable

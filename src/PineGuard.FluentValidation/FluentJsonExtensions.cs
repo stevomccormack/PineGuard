@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -32,7 +33,7 @@ public static class FluentJsonExtensions
         this IRuleBuilder<TModel, string?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Json(val, paramName: null),
-            message);
+            message, MustCodes.Json.Document.Invalid);
 
     /// <summary>
     /// Validates that the HTTP headers dictionary contains a JSON-compatible Content-Type header.
@@ -56,7 +57,7 @@ public static class FluentJsonExtensions
         this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.JsonContentType(val, paramName: null),
-            message);
+            message, MustCodes.Json.ContentType.Mismatch);
 
     /// <summary>
     /// Validates that the property value is a well-formed JSON object (not an array or primitive).
@@ -78,7 +79,7 @@ public static class FluentJsonExtensions
     /// <seealso cref="MustJsonClauses.JsonObject"/>
     public static IRuleBuilderOptions<TModel, string?> JsonObject<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.JsonObject(val, paramName: null),
-            message);
+            message, MustCodes.Json.Root.NotObject);
 
     /// <summary>
     /// Validates that the property value is a well-formed JSON array.
@@ -100,5 +101,5 @@ public static class FluentJsonExtensions
     /// <seealso cref="MustJsonClauses.JsonArray"/>
     public static IRuleBuilderOptions<TModel, string?> JsonArray<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.JsonArray(val, paramName: null),
-            message);
+            message, MustCodes.Json.Root.NotArray);
 }

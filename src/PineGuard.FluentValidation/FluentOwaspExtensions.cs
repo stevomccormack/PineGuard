@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ public static class FluentOwaspExtensions
     /// <seealso cref="MustOwaspClauses.OwaspSafe"/>
     public static IRuleBuilderOptions<TModel, string?> OwaspSafe<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.OwaspSafe(val, paramName: null),
-            message);
+            message, MustCodes.Owasp.Payload.Unsafe);
 
     /// <summary>
     /// Validates that the property value does not contain cross-site scripting (XSS) patterns.
@@ -52,7 +53,7 @@ public static class FluentOwaspExtensions
     /// <seealso cref="MustOwaspClauses.XssSafe"/>
     public static IRuleBuilderOptions<TModel, string?> XssSafe<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.XssSafe(val, paramName: null),
-            message);
+            message, MustCodes.Owasp.Xss.Unsafe);
 
     /// <summary>
     /// Validates that the property value does not contain SQL injection patterns.
@@ -74,7 +75,7 @@ public static class FluentOwaspExtensions
     /// <seealso cref="MustOwaspClauses.SqlInjectionSafe"/>
     public static IRuleBuilderOptions<TModel, string?> SqlInjectionSafe<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.SqlInjectionSafe(val, paramName: null),
-            message);
+            message, MustCodes.Owasp.SqlInjection.Unsafe);
 
     /// <summary>
     /// Validates that the property value does not contain path traversal sequences.
@@ -96,7 +97,7 @@ public static class FluentOwaspExtensions
     /// <seealso cref="MustOwaspClauses.PathTraversalSafe"/>
     public static IRuleBuilderOptions<TModel, string?> PathTraversalSafe<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.PathTraversalSafe(val, paramName: null),
-            message);
+            message, MustCodes.Owasp.PathTraversal.Unsafe);
 
     /// <summary>
     /// Validates that the property value does not contain OS command injection patterns.
@@ -118,7 +119,7 @@ public static class FluentOwaspExtensions
     /// <seealso cref="MustOwaspClauses.CommandInjectionSafe"/>
     public static IRuleBuilderOptions<TModel, string?> CommandInjectionSafe<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.CommandInjectionSafe(val, paramName: null),
-            message);
+            message, MustCodes.Owasp.CommandInjection.Unsafe);
 
     /// <summary>
     /// Validates that the property value does not contain CRLF injection sequences (<c>\r\n</c>).
@@ -140,7 +141,7 @@ public static class FluentOwaspExtensions
     /// <seealso cref="MustOwaspClauses.CrLfSafe"/>
     public static IRuleBuilderOptions<TModel, string?> CrLfSafe<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.CrLfSafe(val, paramName: null),
-            message);
+            message, MustCodes.Owasp.Crlf.Unsafe);
 
     /// <summary>
     /// Validates that the property value does not contain LDAP filter injection characters.
@@ -162,7 +163,7 @@ public static class FluentOwaspExtensions
     /// <seealso cref="MustOwaspClauses.LdapFilterSafe"/>
     public static IRuleBuilderOptions<TModel, string?> LdapFilterSafe<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.LdapFilterSafe(val, paramName: null),
-            message);
+            message, MustCodes.Owasp.LdapFilter.Unsafe);
 
     /// <summary>
     /// Validates that the property value does not contain open redirect patterns.
@@ -184,7 +185,7 @@ public static class FluentOwaspExtensions
     /// <seealso cref="MustOwaspClauses.OpenRedirectSafe"/>
     public static IRuleBuilderOptions<TModel, string?> OpenRedirectSafe<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.OpenRedirectSafe(val, paramName: null),
-            message);
+            message, MustCodes.Owasp.OpenRedirect.Unsafe);
 
     /// <summary>
     /// Validates that the property value uses a scheme that is safe against Server-Side Request Forgery (SSRF) attacks.
@@ -206,5 +207,5 @@ public static class FluentOwaspExtensions
     /// <seealso cref="MustOwaspClauses.SsrfSchemeSafe"/>
     public static IRuleBuilderOptions<TModel, string?> SsrfSchemeSafe<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.SsrfSchemeSafe(val, paramName: null),
-            message);
+            message, MustCodes.Owasp.SsrfScheme.Unsafe);
 }

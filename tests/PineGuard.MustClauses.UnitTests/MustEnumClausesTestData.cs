@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.EnumRulesFixtures;
 
@@ -137,7 +138,7 @@ public static class MustEnumClausesTestData
         ];
         public static TheoryData<MustCase<(F.FlagsEnum value, F.FlagsEnum flag)>> InvalidCases =>
         [
-            new(nameof(F.HasFlag.MissingFlag), (F.FlagsEnum.A, F.FlagsEnum.B), new MustExpected(false, "value must have the expected flag."))
+            new(nameof(F.HasFlag.MissingFlag), (F.FlagsEnum.A, F.FlagsEnum.B), new MustExpected(false, "value must have the expected flag.", Code: MustCodes.Enum.Flags.NotSet))
         ];
     }
 
@@ -161,7 +162,7 @@ public static class MustEnumClausesTestData
         ];
         public static TheoryData<MustCase<F.AttributedEnum>> InvalidCases =>
         [
-            new(nameof(F.HasDescription.NoneValue), F.AttributedEnum.None, new MustExpected(false, "value must have a description."))
+            new(nameof(F.HasDescription.NoneValue), F.AttributedEnum.None, new MustExpected(false, "value must have a description.", Code: MustCodes.Enum.Description.Missing))
         ];
     }
 
@@ -185,7 +186,7 @@ public static class MustEnumClausesTestData
         ];
         public static TheoryData<MustCase<F.AttributedEnum>> InvalidCases =>
         [
-            new(nameof(F.HasDisplay.NoneValue), F.AttributedEnum.None, new MustExpected(false, "value must have a display attribute."))
+            new(nameof(F.HasDisplay.NoneValue), F.AttributedEnum.None, new MustExpected(false, "value must have a display attribute.", Code: MustCodes.Enum.Display.Missing))
         ];
     }
 
@@ -209,7 +210,7 @@ public static class MustEnumClausesTestData
         ];
         public static TheoryData<MustCase<F.AttributedEnum>> InvalidCases =>
         [
-            new(nameof(F.HasEnumMember.NoneValue), F.AttributedEnum.None, new MustExpected(false, "value must have an enum member attribute."))
+            new(nameof(F.HasEnumMember.NoneValue), F.AttributedEnum.None, new MustExpected(false, "value must have an enum member attribute.", Code: MustCodes.Enum.MemberAttribute.Missing))
         ];
     }
 
@@ -235,7 +236,7 @@ public static class MustEnumClausesTestData
         ];
         public static TheoryData<MustCase<F.AttributedEnum>> InvalidCases =>
         [
-            new(nameof(F.IsObsolete.NoneValue), F.AttributedEnum.None, new MustExpected(false, "value must be obsolete."))
+            new(nameof(F.IsObsolete.NoneValue), F.AttributedEnum.None, new MustExpected(false, "value must be obsolete.", Code: MustCodes.Enum.Obsolescence.Missing))
         ];
     }
 

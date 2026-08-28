@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -25,7 +26,7 @@ public static class FluentStringGuidExtensions
     /// <seealso cref="MustStringGuidClauses.Guid"/>
     public static IRuleBuilderOptions<TModel, string?> Guid<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Guid(val, paramName: null) : MustResult<Guid>.Ok(System.Guid.Empty),
-            message);
+            message, MustCodes.Guid.Format.Invalid);
 
     /// <summary>
     /// Validates that the string value is a valid non-empty GUID representation.
@@ -42,5 +43,5 @@ public static class FluentStringGuidExtensions
     /// <seealso cref="MustStringGuidClauses.NotEmptyGuid"/>
     public static IRuleBuilderOptions<TModel, string?> NotEmptyGuid<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotEmptyGuid(val, paramName: null) : MustResult<Guid>.Ok(System.Guid.Empty),
-            message);
+            message, MustCodes.Guid.Emptiness.Empty);
 }
