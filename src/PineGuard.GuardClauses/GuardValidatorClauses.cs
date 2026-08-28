@@ -61,11 +61,12 @@ public static class GuardValidatorClauses
 
         var result = validator.Validate(value);
         if (result.Failed)
-        {
-            var failure = result.Failures[0];
-            var propertyPath = string.IsNullOrEmpty(failure.PropertyPath) ? paramName : failure.PropertyPath;
-            GuardFailure.Throw(MustResult<T>.FailPreformatted(failure.Code, failure.Message, failure.Message, propertyPath, failure.Value));
-        }
+            GuardFailure.Throw(MustResult<T>.FailPreformatted(
+                result.Failures[0].Code,
+                result.Failures[0].Message,
+                result.Failures[0].Message,
+                string.IsNullOrEmpty(result.Failures[0].PropertyPath) ? paramName : result.Failures[0].PropertyPath,
+                result.Failures[0].Value));
 
         return value;
     }
