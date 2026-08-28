@@ -8,6 +8,7 @@
 - `Must` owns user-facing messages. Guard, FluentValidation, and DataAnnotations reuse them.
 - Guard methods call Must methods and throw through `GuardFailure.Throw(...)`; they do not duplicate validation logic.
 - Core stays pure: no IO, no user-facing messages, and no architectural shortcuts around Must.
+- Every clause passes its `MustCodes` constant on every `Fail(...)`/`FromBool(...)` call — there is no code-less overload. Guard, FluentValidation (`MustBe`'s trailing `code` argument) and DataAnnotations (`ValidationAttributeBase`'s `code` constructor parameter) all carry the same constant the clause itself uses. Rule13 enforces this; see `docs/ai/specs/must-clauses/project.md` ("Error codes").
 
 ## Signature Heuristics
 

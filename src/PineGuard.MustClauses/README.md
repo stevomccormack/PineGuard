@@ -38,9 +38,13 @@ var url = Must.Be.HttpsUrl(callback).OrThrow();
 Must.Be.Email(userEmail).ThrowIfFailed((message, paramName) =>
     new BusinessException($"{paramName}: {message}"));
 
-// Compose
+// Compose — later steps run only if earlier ones pass
 var result = Must.Be.NotNull(orderId)
-    .AndThen(id => Must.Be.GuidV4(id));
+    .AndThen(id => Must.Be.Guid(id));
+
+// Every failure carries a stable, machine-readable code alongside its message
+if (email.Failed)
+    Console.WriteLine($"{email.Message} [{email.Code}]"); // "userEmail must be a valid email address. [email.address.invalid]"
 ```
 
 ## Other layers, same rule library

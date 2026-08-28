@@ -79,6 +79,7 @@ Rules:
 - Prefer calling `ruleBuilder.MustBe(...)` over calling FluentValidation’s `.Must(...)` directly.
 - The adapter must take a `MustResult`-returning delegate (no exceptions for normal invalid values) and translate it into a FluentValidation rule.
 - When the Must result is a failure, compute the final message by taking either the caller-provided `message` (if not null) or `result.Message`, then replace `{paramName}` with FluentValidation’s display/property name.
+- Every extension method passes the invoked clause's `MustCodes` constant as `MustBe`'s trailing `code` parameter, which `MustBe` sets as the rule's FluentValidation `ErrorCode` directly — **not** read off the delegate's own `MustResult.Code`, because the delegate may internally re-wrap a nullable/typed bridge result (see `FluentGeoLocationExtensions.cs`) whose own `Code` is never inspected for this purpose. `code` is static per extension method (the same constant on every call), matching the one-clause-one-code rule in `../must-clauses/project.md` ("Error codes"). A consumer's own `.WithErrorCode(...)`/`.WithMessage(...)` called after the extension still wins, per FluentValidation's normal rule-configuration order.
 
 ## 4) Extension methods (folder/shape/naming)
 
@@ -117,7 +118,7 @@ Example shape:
 public static IRuleBuilderOptions<T, string?> DigitsOnly<T>(
     this IRuleBuilder<T, string?> ruleBuilder,
     string? message = null) =>
-    ruleBuilder.MustBe<T, string?, string>(v => Must.Be.DigitsOnly(v, paramName: null), message);
+    ruleBuilder.MustBe<T, string?, string>(v => Must.Be.DigitsOnly(v, paramName: null), message, MustCodes.Text.Charset.NotDigits);
 ```
 
 Guidance:
@@ -131,7 +132,7 @@ For example, if the property type matches the Must clause result type, this is p
 public static IRuleBuilderOptions<T, DateTimeOffset?> PastOrPresent<T>(
     this IRuleBuilder<T, DateTimeOffset?> ruleBuilder,
     string? message = null) =>
-    ruleBuilder.MustBe(value => Must.Be.PastOrPresent(value, paramName: null), message);
+    ruleBuilder.MustBe(value => Must.Be.PastOrPresent(value, paramName: null), message, MustCodes.Date.Relative.Future);
 ```
 
 ## 5) Adapter conventions
@@ -167,5 +168,5 @@ public static IRuleBuilderOptions<T, DateOnly?> Past<T>(
     ruleBuilder.MustBe(val => val.HasValue
         ? Must.Be.Past(val.Value, paramName: null)
         : MustResult<DateOnly>.Ok(default),
-        message);
+        message, MustCodes.Date.Relative.NotPast);
 ```

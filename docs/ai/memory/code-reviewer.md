@@ -21,6 +21,13 @@ with dated, per-file review logs; durable criteria belong here.
 - DataAnnotations not inheriting `ValidationAttributeBase`.
 - Nullable value type (`int?`) where Rules expect the non-nullable form.
 - Test files that break the expected PineGuard test structure or fixture usage.
+- A `Fail(...)`/`FromBool(...)` call missing its `MustCodes` constant, passing more than one, or passing a
+  hardcoded string literal instead — Rule13 check (a)/(c) should already catch this, but treat a finding as
+  a real defect, not a false positive.
+- An adapter's declared code (Guard's stamped `Exception.Data`, a DataAnnotations attribute's `Code`
+  constructor argument, a FluentValidation extension's `MustBe` trailing argument) not matching the code the
+  underlying Must clause itself uses — Rule13 checks (d)/(e) cover DataAnnotations and Guard; FluentValidation
+  has no automated check for this yet, so review it by hand against the invoked clause's source.
 
 ## Parsed-Result Drift Signals
 
