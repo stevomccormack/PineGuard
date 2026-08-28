@@ -39,6 +39,24 @@ public static class BaseDataAnnotationUnitTestTestData
         ];
     }
 
+    public static class AssertResultWithCodeOps
+    {
+        public sealed record Case(string Name, (DataAnnotationCase testCase, ValidationResult? result, string? actualCode) Value)
+            : BaseCase(Name);
+
+        public static TheoryData<Case> ValidCases =>
+        [
+            new("invalid result with code",
+                (new DataAnnotationCase("c4", "x", new DataAnnotationExpected(false, "error", "Field", "test.code")),
+                 new ValidationResult("error", ["Field"]),
+                 "test.code")),
+            new("valid result, expectation carries no code",
+                (new DataAnnotationCase("c5", "x", new DataAnnotationExpected(true)),
+                 ValidationResult.Success,
+                 null))
+        ];
+    }
+
     public static class Constructor
     {
         public sealed record Case(string Name) : BaseCase(Name);

@@ -38,7 +38,16 @@ public static class BaseMustUnitTestTestData
                  MustResult<bool>.Fail("test.code", "error", "p", "x"))),
             new("invalid result without paramName",
                 (new MustCase<string>("c4", "x", new MustExpected(false, "error")),
-                 MustResult<bool>.Fail("test.code", "error", null, "x")))
+                 MustResult<bool>.Fail("test.code", "error", null, "x"))),
+            new("invalid result with code",
+                (new MustCase<string>("c5", "x", new MustExpected(false, "error", "p", "test.code")),
+                 MustResult<bool>.Fail("test.code", "error", "p", "x")))
         ];
+    }
+
+    public static class Constructor
+    {
+        public sealed record Case(string Name) : BaseCase(Name);
+        public static TheoryData<Case> ValidCases => [new("constructs without error")];
     }
 }

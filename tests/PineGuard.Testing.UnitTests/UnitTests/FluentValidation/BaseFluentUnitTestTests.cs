@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using FluentValidation.Results;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
@@ -35,6 +36,18 @@ public sealed class BaseFluentUnitTestTests
         {
             var (fluentCase, result) = testCase.Value;
             Testable.InvokeAssertResult(fluentCase, result);
+        }
+    }
+
+    public static class Constructor
+    {
+        [Theory]
+        [MemberData(nameof(BaseFluentUnitTestTestData.Constructor.ValidCases), MemberType = typeof(BaseFluentUnitTestTestData.Constructor))]
+        [SuppressMessage("Assertion", "S2699:Tests should include assertions", Justification = "Implicit assertion: constructor completes without exception")]
+        public static void BehavesAsExpected(BaseFluentUnitTestTestData.Constructor.Case testCase)
+        {
+            _ = testCase;
+            _ = new Testable();
         }
     }
 }

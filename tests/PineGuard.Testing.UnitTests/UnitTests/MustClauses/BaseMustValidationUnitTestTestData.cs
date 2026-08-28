@@ -27,4 +27,10 @@ public static class BaseMustValidationUnitTestTestData
                  MustValidationResult.Ok()))
         ];
     }
+
+    public static class Constructor
+    {
+        public sealed record Case(string Name) : BaseCase(Name);
+        public static TheoryData<Case> ValidCases => [new("constructs without error")];
+    }
 }
