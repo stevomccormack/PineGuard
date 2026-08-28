@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
@@ -46,7 +47,11 @@ public sealed class ObjectAttributesTests
     [MemberData(nameof(ObjectAttributesTestData.EqualTo.EdgeCases), MemberType = typeof(ObjectAttributesTestData.EqualTo))]
     [MemberData(nameof(ObjectAttributesTestData.EqualTo.InvalidCases), MemberType = typeof(ObjectAttributesTestData.EqualTo))]
     public void EqualTo_ShouldReturnExpected(ObjectAttributesTestData.ValidCase testCase)
-        => Verify(new EqualToAttribute("abc"), testCase);
+    {
+        var attribute = new EqualToAttribute("abc");
+        Assert.Equal(MustCodes.Value.Equality.NotEqual, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(ObjectAttributesTestData.NotEqualTo.ValidCases), MemberType = typeof(ObjectAttributesTestData.NotEqualTo))]

@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class FluentStringDateOnlyExtensionsTestData
         {
             nameof(F.DateOnlyIsInPast.NullValue) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a date in the past.")
+            _ => new FluentExpected(false, "Value must be a date in the past.", Code: MustCodes.Date.Relative.NotPast)
         });
     }
 

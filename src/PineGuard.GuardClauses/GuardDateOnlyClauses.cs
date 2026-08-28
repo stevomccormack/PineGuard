@@ -36,7 +36,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.Past(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -66,7 +66,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.PastOrPresent(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -96,7 +96,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.Future(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -126,7 +126,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.FutureOrPresent(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -162,7 +162,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.Between(value, min, max, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -198,7 +198,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.NotBetween(value, min, max, inclusion, paramName); // Guard.Against.Between => Must.Be.NotBetween (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -230,7 +230,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.Before(value, other, paramName: paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -262,7 +262,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.OnOrBefore(value, other, paramName: paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -294,7 +294,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.After(value, other, paramName: paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -326,7 +326,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.OnOrAfter(value, other, paramName: paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -358,7 +358,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.Same(value, other, paramName: paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -390,7 +390,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.NotSame(value, other, paramName: paramName); // Guard.Against.Same => Must.Be.NotSame (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -424,7 +424,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.Chronological(start, end, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -458,7 +458,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.NotChronological(start, end, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -496,7 +496,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.NotOverlapping(start1, end1, start2, end2, inclusion, paramName); // Guard.Against.Overlapping => Must.Be.NotOverlapping (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start1, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -534,7 +534,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.Overlapping(start1, end1, start2, end2, inclusion, paramName); // Guard.Against.Overlapping => Must.Be.NotOverlapping (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start1, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -568,7 +568,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.WithinDays(value, reference, days, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -602,7 +602,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.NotWithinDays(value, reference, days, paramName); // Guard.Against.WithinDays => Must.Be.NotWithinDays (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -636,7 +636,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.WithinCalendarMonths(value, reference, months, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -670,7 +670,7 @@ public static class GuardDateOnlyClauses
     {
         var result = Must.Be.NotWithinCalendarMonths(value, reference, months, paramName); // Guard.Against.WithinCalendarMonths => Must.Be.NotWithinCalendarMonths (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

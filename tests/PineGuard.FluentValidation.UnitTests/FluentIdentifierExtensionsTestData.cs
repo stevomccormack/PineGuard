@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.IdentifierRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class FluentIdentifierExtensionsTestData
         {
             nameof(F.IsSlug.Null) => new FluentExpected(false, "Value must not be null."),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a valid slug.")
+            _ => new FluentExpected(false, "Value must be a valid slug.", Code: MustCodes.Identifier.Slug.Invalid)
         });
     }
 }

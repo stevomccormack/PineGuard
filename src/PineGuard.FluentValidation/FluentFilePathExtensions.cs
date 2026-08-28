@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ public static class FluentFilePathExtensions
     /// <seealso cref="MustFilePathClauses.SafeFileName"/>
     public static IRuleBuilderOptions<TModel, string?> SafeFileName<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.SafeFileName(val, paramName: null),
-            message);
+            message, MustCodes.File.Name.Unsafe);
 
     /// <summary>
     /// Validates that the property value has a file extension included in the allowed list.
@@ -55,5 +56,5 @@ public static class FluentFilePathExtensions
         string[]? allowed,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasFileExtension(val, allowed, paramName: null),
-            message);
+            message, MustCodes.File.Extension.Mismatch);
 }

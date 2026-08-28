@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.CsvRulesFixtures;
 
@@ -12,7 +13,7 @@ public static class CsvAttributesTestData
         {
             nameof(F.IsCsvLine.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be a valid CSV line.")
+            _ => new DataAnnotationExpected(false, "Value must be a valid CSV line.", Code: MustCodes.Csv.Line.Invalid)
         });
     }
 
@@ -24,7 +25,7 @@ public static class CsvAttributesTestData
             new("exact", "Id,Name", new DataAnnotationExpected(true)),
             new("case insensitive", "id,name", new DataAnnotationExpected(true)),
             new("null", null, new DataAnnotationExpected(true)),
-            new("missing header", "Id", new DataAnnotationExpected(false)),
+            new("missing header", "Id", new DataAnnotationExpected(false, Code: MustCodes.Csv.Header.Invalid)),
             new("wrong order", "Name,Id", new DataAnnotationExpected(false))
         ];
     }

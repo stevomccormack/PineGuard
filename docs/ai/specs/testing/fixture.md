@@ -17,13 +17,14 @@ Authoritative reference for the fixture / scenario architecture implemented in `
 
 ```
 IExpectedResult { bool IsValid }
-├── ReturnExpected(IsValid, Message?)                                        [abstract]
-│   ├── MustExpected(IsValid, Message?, ParamName?)                          [sealed]
-│   ├── FluentExpected(IsValid, Message?, PropertyName?)                     [sealed]
-│   └── DataAnnotationExpected(IsValid, Message?, MemberName?)               [sealed]
-├── ThrowExpected(IsValid, ExceptionType?, ParamName?, MessageContains?)     [abstract]
-│   └── GuardExpected(IsValid, ExceptionType?, ParamName?, MessageContains?) [sealed]
-└── RuleExpected(IsValid)                                                    [sealed]
+├── ReturnExpected(IsValid, Message?)                                                [abstract]
+│   ├── MustExpected(IsValid, Message?, ParamName?, Code?)                          [sealed]
+│   ├── MustValidationExpected(IsValid, Message?, FailureCount?, PropertyPath?, Code?) [sealed]
+│   ├── FluentExpected(IsValid, Message?, PropertyName?, Code?)                     [sealed]
+│   └── DataAnnotationExpected(IsValid, Message?, MemberName?, Code?)               [sealed]
+├── ThrowExpected(IsValid, ExceptionType?, ParamName?, MessageContains?)             [abstract]
+│   └── GuardExpected(IsValid, ExceptionType?, ParamName?, MessageContains?, Code?) [sealed]
+└── RuleExpected(IsValid)                                                            [sealed]
 ```
 
 ```csharp
@@ -31,21 +32,32 @@ public interface IExpectedResult { bool IsValid { get; } }
 public abstract record ReturnExpected(bool IsValid, string? Message = null) : IExpectedResult;
 public abstract record ThrowExpected(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null) : IExpectedResult;
 public sealed record RuleExpected(bool IsValid) : IExpectedResult;
-public sealed record MustExpected(bool IsValid, string? Message = null, string? ParamName = null) : ReturnExpected(IsValid, Message);
-public sealed record FluentExpected(bool IsValid, string? Message = null, string? PropertyName = null) : ReturnExpected(IsValid, Message);
-public sealed record DataAnnotationExpected(bool IsValid, string? Message = null, string? MemberName = null) : ReturnExpected(IsValid, Message);
-public sealed record GuardExpected(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null) : ThrowExpected(IsValid, ExceptionType, ParamName, MessageContains);
+public sealed record MustExpected(bool IsValid, string? Message = null, string? ParamName = null, string? Code = null) : ReturnExpected(IsValid, Message);
+public sealed record MustValidationExpected(bool IsValid, string? Message = null, int? FailureCount = null, string? PropertyPath = null, string? Code = null) : ReturnExpected(IsValid, Message);
+public sealed record FluentExpected(bool IsValid, string? Message = null, string? PropertyName = null, string? Code = null) : ReturnExpected(IsValid, Message);
+public sealed record DataAnnotationExpected(bool IsValid, string? Message = null, string? MemberName = null, string? Code = null) : ReturnExpected(IsValid, Message);
+public sealed record GuardExpected(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null, string? Code = null) : ThrowExpected(IsValid, ExceptionType, ParamName, MessageContains);
 ```
 
 | Layer | Expected | Base | Extra Fields |
 |---|---|---|---|
 | Rules (Core) | `RuleExpected` | `IExpectedResult` | — |
-| Must | `MustExpected` | `ReturnExpected` | `.ParamName` |
-| Guard | `GuardExpected` | `ThrowExpected` | `.ExceptionType`, `.ParamName`, `.MessageContains` |
-| Fluent | `FluentExpected` | `ReturnExpected` | `.PropertyName` |
-| DA | `DataAnnotationExpected` | `ReturnExpected` | `.MemberName` |
+| Must | `MustExpected` | `ReturnExpected` | `.ParamName`, `.Code` |
+| Must (object validator) | `MustValidationExpected` | `ReturnExpected` | `.FailureCount`, `.PropertyPath`, `.Code` |
+| Guard | `GuardExpected` | `ThrowExpected` | `.ExceptionType`, `.ParamName`, `.MessageContains`, `.Code` |
+| Fluent | `FluentExpected` | `ReturnExpected` | `.PropertyName`, `.Code` |
+| DA | `DataAnnotationExpected` | `ReturnExpected` | `.MemberName`, `.Code` |
 
-Files — one type per file, no `Expected/` folder. The abstract and shared types live under `Common/` (`IExpectedResult.cs`, `ReturnExpected.cs`, `ThrowExpected.cs`); each layer's `Expected`, `Case` and scenario-extension types live under `UnitTests/<Layer>/` (`UnitTests/Rules/RuleExpected.cs`, `UnitTests/MustClauses/MustExpected.cs`, `UnitTests/GuardClauses/GuardExpected.cs`, `UnitTests/FluentValidation/FluentExpected.cs`, `UnitTests/DataAnnotations/DataAnnotationExpected.cs`).
+`Code` is a trailing optional parameter on every layer's `Expected` type — set it only on the representative
+spot-check cases that assert wiring (see `docs/ai/specs/must-clauses/project.md` "Error codes"); leave it
+`null` everywhere else and the base test class simply skips the assertion. `DataAnnotationExpected`'s `Code`
+is asserted via a 3-argument `AssertResult(tc, result, actualCode)` overload where the caller passes
+`attribute.Code` explicitly — `PineGuard.Testing` references only `PineGuard.Core` and must not gain a
+`PineGuard.DataAnnotations` reference, so it cannot read the attribute's `Code` property itself.
+`GuardExpected`'s `Code` is asserted against `ex.Data[GuardFailure.CodeDataKey]` (`GuardFailure` lives in
+Core, so `BaseGuardUnitTest` can reference the constant directly).
+
+Files — one type per file, no `Expected/` folder. The abstract and shared types live under `Common/` (`IExpectedResult.cs`, `ReturnExpected.cs`, `ThrowExpected.cs`); each layer's `Expected`, `Case` and scenario-extension types live under `UnitTests/<Layer>/` (`UnitTests/Rules/RuleExpected.cs`, `UnitTests/MustClauses/MustExpected.cs`, `UnitTests/MustClauses/MustValidationExpected.cs`, `UnitTests/GuardClauses/GuardExpected.cs`, `UnitTests/FluentValidation/FluentExpected.cs`, `UnitTests/DataAnnotations/DataAnnotationExpected.cs`).
 
 ## 2. RuleScenario
 

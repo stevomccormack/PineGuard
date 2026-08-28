@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -35,7 +36,7 @@ public static class FluentDictionaryExtensions
         this IRuleBuilderInitial<TModel, IDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe<TModel, IDictionary<TKey, TValue>?, IDictionary<TKey, TValue>?>(val => Must.Be.Empty(val, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.NotEmpty);
 
     /// <summary>
     /// Validates that the property value is an empty dictionary (overload for <see cref="IRuleBuilderOptions{TModel,TProperty}"/>).
@@ -62,7 +63,7 @@ public static class FluentDictionaryExtensions
         this IRuleBuilderOptions<TModel, IDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe<TModel, IDictionary<TKey, TValue>?, IDictionary<TKey, TValue>?>(val => Must.Be.Empty(val, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.NotEmpty);
 
     /// <summary>
     /// Validates that the property value is an empty dictionary (overload for <see cref="IRuleBuilder{TModel,TProperty}"/>).
@@ -89,7 +90,7 @@ public static class FluentDictionaryExtensions
         this IRuleBuilder<TModel, IDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Empty(val, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.NotEmpty);
 
     /// <summary>
     /// Validates that the property value is a non-empty dictionary (overload for <see cref="IRuleBuilderInitial{TModel,TProperty}"/>).
@@ -115,7 +116,7 @@ public static class FluentDictionaryExtensions
         this IRuleBuilderInitial<TModel, IDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe<TModel, IDictionary<TKey, TValue>?, IDictionary<TKey, TValue>?>(val => Must.Be.NotEmpty(val, paramName: null)!,
-            message);
+            message, MustCodes.Dictionary.Items.Empty);
 
     /// <summary>
     /// Validates that the property value is a non-empty dictionary (overload for <see cref="IRuleBuilderOptions{TModel,TProperty}"/>).
@@ -141,7 +142,7 @@ public static class FluentDictionaryExtensions
         this IRuleBuilderOptions<TModel, IDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe<TModel, IDictionary<TKey, TValue>?, IDictionary<TKey, TValue>?>(val => Must.Be.NotEmpty(val, paramName: null)!,
-            message);
+            message, MustCodes.Dictionary.Items.Empty);
 
     /// <summary>
     /// Validates that the property value is a non-empty dictionary (overload for <see cref="IRuleBuilder{TModel,TProperty}"/>).
@@ -166,7 +167,7 @@ public static class FluentDictionaryExtensions
     public static IRuleBuilderOptions<TModel, IDictionary<TKey, TValue>?> NotEmpty<TModel, TKey, TValue>(
         this IRuleBuilder<TModel, IDictionary<TKey, TValue>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotEmpty(val, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.Empty);
 
     /// <summary>
     /// Validates that the property value contains the specified key.
@@ -194,7 +195,7 @@ public static class FluentDictionaryExtensions
         TKey key,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasKey(val, key, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Keys.Missing);
 
     /// <summary>
     /// Validates that the property value does not contain the specified key.
@@ -220,7 +221,7 @@ public static class FluentDictionaryExtensions
         TKey key,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasKey(val, key, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Keys.Present);
 
     /// <summary>
     /// Validates that the property value contains the specified value.
@@ -247,7 +248,7 @@ public static class FluentDictionaryExtensions
         TValue value,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasValue(val, value, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Values.Missing);
 
     /// <summary>
     /// Validates that the property value does not contain the specified value.
@@ -273,7 +274,7 @@ public static class FluentDictionaryExtensions
         TValue value,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasValue(val, value, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Values.Present);
 
     /// <summary>
     /// Validates that the property value contains the specified key-value pair.
@@ -302,7 +303,7 @@ public static class FluentDictionaryExtensions
         TValue value,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasKeyValue(val, key, value, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.Missing);
 
     /// <summary>
     /// Validates that the property value does not contain the specified key-value pair.

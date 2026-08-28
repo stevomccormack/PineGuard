@@ -34,7 +34,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.ContentSecurityPolicyHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -64,7 +64,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.ContentSecurityPolicyWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -109,7 +109,7 @@ public static class GuardHttpSecurityHeaderClauses
             paramName);
 
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -139,7 +139,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.StrictTransportSecurityHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -169,7 +169,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.StrictTransportSecurityWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -205,7 +205,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.StrictTransportSecurity(headers, minMaxAgeSeconds, requireIncludeSubDomains, requirePreload, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -235,7 +235,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.XContentTypeOptionsHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -265,7 +265,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.XContentTypeOptionsWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -297,7 +297,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.XContentTypeOptions(headers, expectedValue, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -327,7 +327,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.XFrameOptionsHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -357,7 +357,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.XFrameOptionsWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -389,7 +389,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.XFrameOptions(headers, expectedValue, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -419,7 +419,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.ReferrerPolicyHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -449,7 +449,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.ReferrerPolicyWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -481,7 +481,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.ReferrerPolicy(headers, expectedValue, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -511,7 +511,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.PermissionsPolicyHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -541,7 +541,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.PermissionsPolicyWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -573,7 +573,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.PermissionsPolicy(headers, expectedValue, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -605,7 +605,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.PermissionsPolicyContaining(headers, requiredFragments);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -635,7 +635,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotContentSecurityPolicyHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -665,7 +665,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotContentSecurityPolicyWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -695,7 +695,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotStrictTransportSecurityHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -725,7 +725,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotStrictTransportSecurityWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -755,7 +755,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotXContentTypeOptionsHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -785,7 +785,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotXContentTypeOptionsWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -815,7 +815,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotXFrameOptionsHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -845,7 +845,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotXFrameOptionsWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -875,7 +875,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotReferrerPolicyHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -905,7 +905,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotReferrerPolicyWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -935,7 +935,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotPermissionsPolicyHeader(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -965,7 +965,7 @@ public static class GuardHttpSecurityHeaderClauses
     {
         var result = Must.Be.NotPermissionsPolicyWithDefaults(headers, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

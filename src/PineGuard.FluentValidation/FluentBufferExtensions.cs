@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -29,7 +30,7 @@ public static class FluentBufferExtensions
     /// <seealso cref="MustBufferClauses.Hex"/>
     public static IRuleBuilderOptions<TModel, string?> Hex<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Hex(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Encoding.Hex.Invalid);
 
     /// <summary>
     /// Validates that the property value is not a valid hexadecimal string.
@@ -50,7 +51,7 @@ public static class FluentBufferExtensions
     /// <seealso cref="MustBufferClauses.NotHex"/>
     public static IRuleBuilderOptions<TModel, string?> NotHex<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotHex(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Encoding.Hex.WellFormed);
 
     /// <summary>
     /// Validates that the property value is a valid Base64-encoded string.
@@ -71,7 +72,7 @@ public static class FluentBufferExtensions
     /// <seealso cref="MustBufferClauses.Base64"/>
     public static IRuleBuilderOptions<TModel, string?> Base64<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Base64(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Encoding.Base64.Invalid);
 
     /// <summary>
     /// Validates that the property value is not a valid Base64-encoded string.
@@ -92,5 +93,5 @@ public static class FluentBufferExtensions
     /// <seealso cref="MustBufferClauses.NotBase64"/>
     public static IRuleBuilderOptions<TModel, string?> NotBase64<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotBase64(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Encoding.Base64.WellFormed);
 }

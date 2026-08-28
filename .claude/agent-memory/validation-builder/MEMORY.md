@@ -23,14 +23,14 @@
 
 ### FluentValidation Signatures
 - Extension on `IRuleBuilder<TModel, T>`, returns `IRuleBuilderOptions<TModel, T>`
-- Single-expression body using `ruleBuilder.MustBe(val => Must.Be.X(val, paramName: null), message)`
+- Single-expression body using `ruleBuilder.MustBe(val => Must.Be.X(val, paramName: null), message, MustCodes.X.Y.Z)` — the trailing `code` arg is now standard; see [MustCodes catalogue](must-codes-catalogue.md)
 - Nullable string handling: `val is not null ? Must.Be.X(val, paramName: null) : MustResult<string>.Ok(null!)`
 - Optional `string? message = null` parameter for custom error override
 - Type mismatches: use explicit generic args `ruleBuilder.MustBe<T, string?, string>(...)`
 
 ### DataAnnotations Signatures
-- `sealed class`, inherits `ValidationAttributeBase(typeof(T))`
-- Primary constructor for parameterized attributes: `sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(typeof(string))`
+- `sealed class`, inherits `ValidationAttributeBase(typeof(T), MustCodes.X.Y.Z)` — the `code` argument is now required and sits **before** `allowNull:`; see [MustCodes catalogue](must-codes-catalogue.md)
+- Primary constructor for parameterized attributes: `sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.X.Y.Z)`; a parameterless attribute still needs the empty primary ctor `FooAttribute() : Base(code)` to pass the code up
 - Expose constructor params as `public` properties
 - Override `ValidateValue(object? value, ValidationContext validationContext)`
 - Type check: `if (value is not string strValue) return ValidationResult.Success;` (skip on wrong type)
@@ -96,4 +96,4 @@ When implementing new validations, tests should follow the v2 architecture:
 - Zero comments, single-line entries, flat test classes, edge case constants from Rule classes
 
 ## Topic Files
-- (none yet — will grow organically)
+- [MustCodes catalogue](must-codes-catalogue.md) — wiring codes into Must + Fluent + DataAnnotations: arg positions, one-clause-one-code and its bitwise exception, fixed-at-build ErrorCode

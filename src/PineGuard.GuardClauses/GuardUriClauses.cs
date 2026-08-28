@@ -34,7 +34,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.AbsoluteUri(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -64,7 +64,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.RelativeUri(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -94,7 +94,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.Url(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -124,7 +124,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.HttpsUrl(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -154,7 +154,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.HttpUrl(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -184,7 +184,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.FileUri(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -214,7 +214,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.FilePath(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -246,7 +246,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.HasScheme(value, scheme, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -276,7 +276,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.NotFilePath(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -308,7 +308,7 @@ public static class GuardUriClauses
     {
         var result = Must.Be.NotHasScheme(value, scheme, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

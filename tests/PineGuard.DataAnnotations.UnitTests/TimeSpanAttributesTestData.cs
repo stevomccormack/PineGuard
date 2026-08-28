@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -12,7 +13,7 @@ public static class TimeSpanAttributesTestData
             new("mid",       TimeSpan.Parse("00:00:05"), new DataAnnotationExpected(true)),
             new("max",       TimeSpan.Parse("00:00:10"), new DataAnnotationExpected(true)),
             new("null",      null,                        new DataAnnotationExpected(true)),
-            new("too small", TimeSpan.Parse("00:00:00"), new DataAnnotationExpected(false)),
+            new("too small", TimeSpan.Parse("00:00:00"), new DataAnnotationExpected(false, Code: MustCodes.Time.Duration.OutOfRange)),
             new("too large", TimeSpan.Parse("00:00:11"), new DataAnnotationExpected(false))
         ];
     }
@@ -24,7 +25,7 @@ public static class TimeSpanAttributesTestData
             new("too small", TimeSpan.Parse("00:00:00"), new DataAnnotationExpected(true)),
             new("too large", TimeSpan.Parse("00:00:11"), new DataAnnotationExpected(true)),
             new("null",      null,                        new DataAnnotationExpected(true)),
-            new("min",       TimeSpan.Parse("00:00:01"), new DataAnnotationExpected(false)),
+            new("min",       TimeSpan.Parse("00:00:01"), new DataAnnotationExpected(false, Code: MustCodes.Time.Duration.InRange)),
             new("mid",       TimeSpan.Parse("00:00:05"), new DataAnnotationExpected(false)),
             new("max",       TimeSpan.Parse("00:00:10"), new DataAnnotationExpected(false))
         ];
@@ -36,7 +37,7 @@ public static class TimeSpanAttributesTestData
         [
             new("greater", TimeSpan.Parse("00:00:06"), new DataAnnotationExpected(true)),
             new("null",    null,                        new DataAnnotationExpected(true)),
-            new("equal",   TimeSpan.Parse("00:00:05"), new DataAnnotationExpected(false)),
+            new("equal",   TimeSpan.Parse("00:00:05"), new DataAnnotationExpected(false, Code: MustCodes.Time.Duration.NotGreater)),
             new("less",    TimeSpan.Parse("00:00:04"), new DataAnnotationExpected(false))
         ];
     }

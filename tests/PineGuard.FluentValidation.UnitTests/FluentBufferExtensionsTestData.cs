@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.BufferRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class FluentBufferExtensionsTestData
         {
             nameof(F.IsHex.Null) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a valid hex string.")
+            _ => new FluentExpected(false, "Value must be a valid hex string.", Code: MustCodes.Encoding.Hex.Invalid)
         });
     }
 

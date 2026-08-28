@@ -1,85 +1,49 @@
+using PineGuard.Codes;
 using PineGuard.Common;
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
+using F = PineGuard.Testing.Fixtures.DateTimeRangeRulesFixtures;
 
 namespace PineGuard.MustClauses.UnitTests;
 
 public static class MustDateTimeRangeClausesTestData
 {
-    private static readonly DateTime D1 = new(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-    private static readonly DateTime D2 = new(2023, 1, 2, 0, 0, 0, DateTimeKind.Utc);
-    private static readonly DateTime D3 = new(2023, 1, 3, 0, 0, 0, DateTimeKind.Utc);
-    private static readonly DateTime D4 = new(2023, 1, 4, 0, 0, 0, DateTimeKind.Utc);
-
     public static class Chronological
     {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-            new("strict", (D1, D3, Inclusion.Exclusive), true),
-            new("equal fail strict", (D1, D1, Inclusion.Exclusive), false),
-            new("inclusive", (D1, D3, Inclusion.Inclusive), true),
-            new("equal pass inclusive", (D1, D1, Inclusion.Inclusive), true)
-        ];
+        public static TheoryData<MustCase<(DateTimeRange range, Inclusion inclusion)>> ValidCases => F.IsChronological.NonNullValidScenarios.ToMustCases();
 
-        public sealed record ValidCase(string Name, (DateTime Start, DateTime End, Inclusion Inclusion) Value, bool Expected)
-            : IsCase<(DateTime Start, DateTime End, Inclusion Inclusion)>(Name, Value, Expected);
+        public static TheoryData<MustCase<(DateTimeRange range, Inclusion inclusion)>> InvalidCases => F.IsChronological.NonNullInvalidScenarios.ToMustCases(_ =>
+            new MustExpected(false, "range must be chronological.", Code: MustCodes.Range.Order.NotChronological));
     }
 
     public static class Overlapping
     {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-            new("overlap", (D1, D3, D2, D4, Inclusion.Exclusive), true),
-            new("contained", (D1, D4, D2, D3, Inclusion.Exclusive), true),
-            new("no overlap", (D1, D2, D3, D4, Inclusion.Exclusive), false),
-            new("touching exclusive", (D1, D2, D2, D3, Inclusion.Exclusive), false),
-            new("touching inclusive", (D1, D2, D2, D3, Inclusion.Inclusive), true)
-        ];
+        public static TheoryData<MustCase<(DateTimeRange range1, DateTimeRange range2, Inclusion inclusion)>> ValidCases => F.IsOverlapping.NonNullValidScenarios.ToMustCases();
 
-        public sealed record ValidCase(string Name, (DateTime S1, DateTime E1, DateTime S2, DateTime E2, Inclusion Inclusion) Value, bool Expected)
-            : IsCase<(DateTime S1, DateTime E1, DateTime S2, DateTime E2, Inclusion Inclusion)>(Name, Value, Expected);
+        public static TheoryData<MustCase<(DateTimeRange range1, DateTimeRange range2, Inclusion inclusion)>> InvalidCases => F.IsOverlapping.NonNullInvalidScenarios.ToMustCases(_ =>
+            new MustExpected(false, "range1 must be overlapping.", Code: MustCodes.Range.Overlap.Missing));
     }
 
     public static class NotOverlapping
     {
-        public static TheoryData<ValidCase> ValidCases =>
-       [
-           new("no overlap", (D1, D2, D3, D4, Inclusion.Exclusive), true),
-            new("overlap", (D1, D3, D2, D4, Inclusion.Exclusive), false),
-            new("touching exclusive", (D1, D2, D2, D3, Inclusion.Exclusive), true),
-            new("touching inclusive", (D1, D2, D2, D3, Inclusion.Inclusive), false)
-       ];
+        public static TheoryData<MustCase<(DateTimeRange range1, DateTimeRange range2, Inclusion inclusion)>> ValidCases => F.IsOverlapping.NonNullInvalidScenarios.ToMustCases(_ => new MustExpected(true));
 
-        public sealed record ValidCase(string Name, (DateTime S1, DateTime E1, DateTime S2, DateTime E2, Inclusion Inclusion) Value, bool Expected)
-            : IsCase<(DateTime S1, DateTime E1, DateTime S2, DateTime E2, Inclusion Inclusion)>(Name, Value, Expected);
+        public static TheoryData<MustCase<(DateTimeRange range1, DateTimeRange range2, Inclusion inclusion)>> InvalidCases => F.IsOverlapping.NonNullValidScenarios.ToMustCases(_ =>
+            new MustExpected(false, "range1 must not be overlapping.", Code: MustCodes.Range.Overlap.Present));
     }
 
     public static class Contains
     {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-             new("middle", (D1, D3, D2, Inclusion.Inclusive), true),
-             new("outside", (D1, D3, D4, Inclusion.Inclusive), false),
-             new("start inclusive", (D1, D3, D1, Inclusion.Inclusive), true),
-             new("end inclusive", (D1, D3, D3, Inclusion.Inclusive), true),
-             new("start exclusive", (D1, D3, D1, Inclusion.Exclusive), false),
-             new("end exclusive", (D1, D3, D3, Inclusion.Exclusive), false)
-        ];
+        public static TheoryData<MustCase<(DateTimeRange range, DateTime value, Inclusion inclusion)>> ValidCases => F.Contains.NonNullValidScenarios.ToMustCases();
 
-        public sealed record ValidCase(string Name, (DateTime Start, DateTime End, DateTime Target, Inclusion Inclusion) Value, bool Expected)
-           : IsCase<(DateTime Start, DateTime End, DateTime Target, Inclusion Inclusion)>(Name, Value, Expected);
+        public static TheoryData<MustCase<(DateTimeRange range, DateTime value, Inclusion inclusion)>> InvalidCases => F.Contains.NonNullInvalidScenarios.ToMustCases(_ =>
+            new MustExpected(false, "range must contain the specified date/time.", Code: MustCodes.Range.Bounds.NotContains));
     }
 
     public static class NotContains
     {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-             new("outside", (D1, D3, D4, Inclusion.Inclusive), true),
-             new("middle", (D1, D3, D2, Inclusion.Inclusive), false),
-             new("start inclusive", (D1, D3, D1, Inclusion.Inclusive), false),
-             new("start exclusive", (D1, D3, D1, Inclusion.Exclusive), true)
-        ];
+        public static TheoryData<MustCase<(DateTimeRange range, DateTime value, Inclusion inclusion)>> ValidCases => F.Contains.NonNullInvalidScenarios.ToMustCases(_ => new MustExpected(true));
 
-        public sealed record ValidCase(string Name, (DateTime Start, DateTime End, DateTime Target, Inclusion Inclusion) Value, bool Expected)
-           : IsCase<(DateTime Start, DateTime End, DateTime Target, Inclusion Inclusion)>(Name, Value, Expected);
+        public static TheoryData<MustCase<(DateTimeRange range, DateTime value, Inclusion inclusion)>> InvalidCases => F.Contains.NonNullValidScenarios.ToMustCases(_ =>
+            new MustExpected(false, "range must not contain the specified date/time.", Code: MustCodes.Range.Bounds.Contains));
     }
 }

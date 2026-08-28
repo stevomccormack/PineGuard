@@ -4,133 +4,59 @@ namespace PineGuard.Core.UnitTests.GuardClauses;
 
 public static class GuardExceptionPolicyTestData
 {
-    public static class ExceptionReplacer
+    public static class HasMap
     {
         public static TheoryData<Case> ValidCases =>
         [
-            new("non-null replacer can be set and retrieved", ex => new InvalidOperationException("wrapped", ex)),
-            new("null replacer can be set and retrieved", null)
+            new("no map installed: HasMap is false", InstallMap: false, Expected: false),
+            new("a map installed: HasMap is true", InstallMap: true, Expected: true)
         ];
 
-        public sealed record Case(string Name, Func<Exception, Exception>? Value)
-            : ValueCase<Func<Exception, Exception>?>(Name, Value);
+        public sealed record Case(string Name, bool InstallMap, bool Expected) : BaseCase(Name);
     }
 
-    public static class ReplaceDefaultExceptions
+    public static class Clear
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("false can be set and retrieved", false),
-            new("true can be set and retrieved", true)
-        ];
-
-        public sealed record Case(string Name, bool Value)
-            : ValueCase<bool>(Name, Value);
-    }
-
-    public static class ShouldReplace
-    {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("ReplaceDefaultExceptions=false: ArgumentException => false", ReplaceDefaultExceptions: false, Value: new ArgumentException("bad"), Expected: false),
-            new("ReplaceDefaultExceptions=false: InvalidOperationException => true", ReplaceDefaultExceptions: false, Value: new InvalidOperationException("bad"), Expected: true),
-            new("ReplaceDefaultExceptions=true: ArgumentException => true", ReplaceDefaultExceptions: true, Value: new ArgumentException("bad"), Expected: true),
-            new("ReplaceDefaultExceptions=true: InvalidOperationException => true", ReplaceDefaultExceptions: true, Value: new InvalidOperationException("bad"), Expected: true)
-        ];
-
-        public sealed record Case(string Name, bool ReplaceDefaultExceptions, Exception Value, bool Expected)
-            : ReturnCase<Exception, bool>(Name, Value, Expected);
+        public static TheoryData<bool> Cases => [true];
     }
 
     public static class BeginScope
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("scope can enable default replacement over a disabled global policy", GlobalReplaceDefaultExceptions: false, ScopedReplaceDefaultExceptions: true),
-            new("scope can disable default replacement over an enabled global policy", GlobalReplaceDefaultExceptions: true, ScopedReplaceDefaultExceptions: false)
-        ];
-
-        public sealed record Case(string Name, bool GlobalReplaceDefaultExceptions, bool ScopedReplaceDefaultExceptions)
-            : BaseCase(Name);
+        public static TheoryData<bool> Cases => [true];
     }
 
     public static class NestedScope
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("inner scope overrides outer policy and outer policy is restored after inner dispose", GlobalReplaceDefaultExceptions: false, OuterReplaceDefaultExceptions: true, InnerReplaceDefaultExceptions: false)
-        ];
-
-        public sealed record Case(string Name, bool GlobalReplaceDefaultExceptions, bool OuterReplaceDefaultExceptions, bool InnerReplaceDefaultExceptions)
-            : BaseCase(Name);
+        public static TheoryData<bool> Cases => [true];
     }
 
-    public static class SetPropertyInsideScope
+    public static class MapInsideActiveScope
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("setting ExceptionReplacer inside scope updates scope not global", SetExceptionReplacer: true, SetReplaceDefaultExceptions: false),
-            new("setting ReplaceDefaultExceptions inside scope updates scope not global", SetExceptionReplacer: false, SetReplaceDefaultExceptions: true),
-            new("setting both properties inside scope updates scope not global", SetExceptionReplacer: true, SetReplaceDefaultExceptions: true)
-        ];
+        public static TheoryData<bool> Cases => [true];
+    }
 
-        public sealed record Case(string Name, bool SetExceptionReplacer, bool SetReplaceDefaultExceptions)
-            : BaseCase(Name);
+    public static class ClearInsideActiveScope
+    {
+        public static TheoryData<bool> Cases => [true];
     }
 
     public static class DoubleDispose
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("disposing a scope twice is idempotent")
-        ];
-
-        public sealed record Case(string Name)
-            : BaseCase(Name);
+        public static TheoryData<bool> Cases => [true];
     }
 
     public static class StaleDispose
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("disposing the outer lease out of order leaves the still-active inner scope's policy in effect, then unwinds to the global policy once the inner lease disposes too", GlobalReplaceDefaultExceptions: false, OuterReplaceDefaultExceptions: true, InnerReplaceDefaultExceptions: false)
-        ];
-
-        public sealed record Case(string Name, bool GlobalReplaceDefaultExceptions, bool OuterReplaceDefaultExceptions, bool InnerReplaceDefaultExceptions)
-            : BaseCase(Name);
+        public static TheoryData<bool> Cases => [true];
     }
 
-    public static class ScopeClearsInheritedReplacer
+    public static class ChildContextIsolation
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("scope explicitly clearing the replacer disables the inherited global replacer")
-        ];
-
-        public sealed record Case(string Name)
-            : BaseCase(Name);
+        public static TheoryData<bool> Cases => [true];
     }
 
-    public static class GetEffectivePolicy
+    public static class NullArgumentGuards
     {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("no active scope resolves the global replacer and flag", ScopeActive: false, ScopedReplaceDefaultExceptions: false),
-            new("an active scope resolves the scope's replacer and flag, not the global ones", ScopeActive: true, ScopedReplaceDefaultExceptions: true)
-        ];
-
-        public sealed record Case(string Name, bool ScopeActive, bool ScopedReplaceDefaultExceptions)
-            : BaseCase(Name);
-    }
-
-    public static class ChildContextPropertyMutation
-    {
-        public static TheoryData<Case> ValidCases =>
-        [
-            new("a child execution context setting ReplaceDefaultExceptions inside a scope does not leak to the parent context")
-        ];
-
-        public sealed record Case(string Name)
-            : BaseCase(Name);
+        public static TheoryData<bool> Cases => [true];
     }
 }

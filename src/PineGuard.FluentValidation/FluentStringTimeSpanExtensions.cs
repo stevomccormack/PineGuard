@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -33,7 +34,7 @@ public static class FluentStringTimeSpanExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.DurationBetween(val, min, max, inclusion, paramName: null) : MustResult<TimeSpan>.Ok(TimeSpan.Zero),
-            message);
+            message, MustCodes.Time.Duration.OutOfRange);
 
     /// <summary>
     /// Validates that the string value represents a <see cref="TimeSpan"/> duration not between the specified bounds.
@@ -57,7 +58,7 @@ public static class FluentStringTimeSpanExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotDurationBetween(val, min, max, inclusion, paramName: null) : MustResult<TimeSpan>.Ok(TimeSpan.Zero),
-            message);
+            message, MustCodes.Time.Duration.InRange);
 
     /// <summary>
     /// Validates that the string value represents a <see cref="TimeSpan"/> greater than the specified threshold.
@@ -79,7 +80,7 @@ public static class FluentStringTimeSpanExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.GreaterThan(val, threshold, inclusion, paramName: null) : MustResult<TimeSpan>.Ok(TimeSpan.Zero),
-            message);
+            message, MustCodes.Time.Duration.NotGreater);
 
     /// <summary>
     /// Validates that the string value represents a <see cref="TimeSpan"/> less than the specified threshold.
@@ -101,5 +102,5 @@ public static class FluentStringTimeSpanExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.LessThan(val, threshold, inclusion, paramName: null) : MustResult<TimeSpan>.Ok(TimeSpan.Zero),
-            message);
+            message, MustCodes.Time.Duration.NotLess);
 }

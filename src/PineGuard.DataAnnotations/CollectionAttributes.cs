@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -26,7 +27,7 @@ namespace PineGuard.DataAnnotations;
 /// is thrown rather than silently reporting the value as valid.
 /// </para>
 /// </remarks>
-public abstract class CollectionAttributeBase() : ValidationAttributeBase(typeof(object), allowNull: true)
+public abstract class CollectionAttributeBase(string code) : ValidationAttributeBase(typeof(object), code, allowNull: true)
 {
     private static readonly ConcurrentDictionary<Type, Type?> InterfaceCache = new();
     private static readonly ConcurrentDictionary<(string MethodName, Type ItemType), MethodInfo> MethodCache = new();
@@ -89,7 +90,7 @@ public abstract class CollectionAttributeBase() : ValidationAttributeBase(typeof
 /// <seealso cref="MustCollectionClauses.Empty{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/collection">Collection Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EmptyCollectionAttribute : CollectionAttributeBase
+public sealed class EmptyCollectionAttribute() : CollectionAttributeBase(MustCodes.Collection.Items.NotEmpty)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) => InvokeCollectionMust(nameof(MustCollectionClauses.Empty), value, validationContext);
@@ -118,7 +119,7 @@ public sealed class EmptyCollectionAttribute : CollectionAttributeBase
 /// <seealso cref="MustCollectionClauses.NotEmpty{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/collection">Collection Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotEmptyCollectionAttribute : CollectionAttributeBase
+public sealed class NotEmptyCollectionAttribute() : CollectionAttributeBase(MustCodes.Collection.Items.Empty)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) => InvokeCollectionMust(nameof(MustCollectionClauses.NotEmpty), value, validationContext);
@@ -146,7 +147,7 @@ public sealed class NotEmptyCollectionAttribute : CollectionAttributeBase
 /// <seealso cref="MustCollectionClauses.HasExactCount{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/collection">Collection Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasExactCountCollectionAttribute(int count) : CollectionAttributeBase
+public sealed class HasExactCountCollectionAttribute(int count) : CollectionAttributeBase(MustCodes.Collection.Count.Mismatch)
 {
     /// <summary>Gets the exact number of elements the collection must contain.</summary>
     public int Count { get; } = count;
@@ -178,7 +179,7 @@ public sealed class HasExactCountCollectionAttribute(int count) : CollectionAttr
 /// <seealso cref="MustCollectionClauses.HasMinCount{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/collection">Collection Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasMinCountCollectionAttribute(int min) : CollectionAttributeBase
+public sealed class HasMinCountCollectionAttribute(int min) : CollectionAttributeBase(MustCodes.Collection.Count.TooFew)
 {
     /// <summary>Gets the minimum number of elements the collection must contain.</summary>
     public int Min { get; } = min;
@@ -210,7 +211,7 @@ public sealed class HasMinCountCollectionAttribute(int min) : CollectionAttribut
 /// <seealso cref="MustCollectionClauses.HasMaxCount{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/collection">Collection Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasMaxCountCollectionAttribute(int max) : CollectionAttributeBase
+public sealed class HasMaxCountCollectionAttribute(int max) : CollectionAttributeBase(MustCodes.Collection.Count.TooMany)
 {
     /// <summary>Gets the maximum number of elements the collection may contain.</summary>
     public int Max { get; } = max;
@@ -245,7 +246,7 @@ public sealed class HasCountBetweenCollectionAttribute(
     int min,
     int max,
     PineGuard.Common.Inclusion inclusion = PineGuard.Common.Inclusion.Inclusive)
-    : CollectionAttributeBase
+    : CollectionAttributeBase(MustCodes.Collection.Count.OutOfRange)
 {
     /// <summary>Gets the minimum element count boundary.</summary>
     public int Min { get; } = min;
@@ -287,7 +288,7 @@ public sealed class HasCountBetweenCollectionAttribute(
 /// <seealso cref="MustCollectionClauses.HasDistinctItems{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/collection">Collection Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasDistinctItemsCollectionAttribute : CollectionAttributeBase
+public sealed class HasDistinctItemsCollectionAttribute() : CollectionAttributeBase(MustCodes.Collection.Items.Duplicate)
 {
     // Comparer is optional in MustClauses (defaults to EqualityComparer<T>.Default).
     // Attributes can't pass IEqualityComparer. So we use default.
@@ -321,7 +322,7 @@ public sealed class HasDistinctItemsCollectionAttribute : CollectionAttributeBas
 /// <seealso cref="MustCollectionClauses.HasDuplicateItems{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/collection">Collection Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasDuplicateItemsCollectionAttribute : CollectionAttributeBase
+public sealed class HasDuplicateItemsCollectionAttribute() : CollectionAttributeBase(MustCodes.Collection.Items.Distinct)
 {
     // Comparer is optional (defaults to null in MustClauses signature in Attributes? No, method sig: (..., comparer = null)).
     // We pass null for comparer.

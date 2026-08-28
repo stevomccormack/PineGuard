@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.DateTimeOffsetRulesFixtures;
 
@@ -77,7 +78,7 @@ public static class FluentDateTimeOffsetExtensionsTestData
         [
             new("Before", (RefDateMinus1, RefDate), new FluentExpected(true)),
             new("Null", (null, RefDate), new FluentExpected(true)),
-            new("After", (RefDatePlus1, RefDate), new FluentExpected(false, "Value must be before the specified date/time."))
+            new("After", (RefDatePlus1, RefDate), new FluentExpected(false, "Value must be before the specified date/time.", Code: MustCodes.Date.Order.NotBefore))
         ];
     }
 
@@ -400,6 +401,84 @@ public static class FluentDateTimeOffsetExtensionsTestData
         [
             new("Outside", (new DateTimeOffset(2020, 3, 1,  0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero), 1), new FluentExpected(true)),
             new("Within",  (new DateTimeOffset(2020, 1, 15, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero), 1), new FluentExpected(false, "Value must not be within the expected number of calendar months."))
+        ];
+    }
+
+    // ── Cross-property expression overloads ──────────────────────────
+
+    public static class BeforeExpression
+    {
+        public static TheoryData<FluentCase<(DateTimeOffset value, DateTimeOffset other)>> Cases =>
+        [
+            new("Before", (RefDateMinus1, RefDate), new FluentExpected(true)),
+            new("After", (RefDatePlus1, RefDate), new FluentExpected(false, "Value must be before the specified date/time.", Code: MustCodes.Date.Order.NotBefore))
+        ];
+    }
+
+    public static class BeforeNullableExpression
+    {
+        public static TheoryData<FluentCase<(DateTimeOffset? value, DateTimeOffset other)>> Cases =>
+        [
+            new("Before", (RefDateMinus1, RefDate), new FluentExpected(true)),
+            new("Null", (null, RefDate), new FluentExpected(true)),
+            new("After", (RefDatePlus1, RefDate), new FluentExpected(false, "Value must be before the specified date/time.", Code: MustCodes.Date.Order.NotBefore))
+        ];
+    }
+
+    public static class OnOrBeforeExpression
+    {
+        public static TheoryData<FluentCase<(DateTimeOffset value, DateTimeOffset other)>> Cases =>
+        [
+            new("Same", (RefDate, RefDate), new FluentExpected(true)),
+            new("After", (RefDatePlus1, RefDate), new FluentExpected(false, "Value must be on or before the specified date/time.", Code: MustCodes.Date.Order.After))
+        ];
+    }
+
+    public static class OnOrBeforeNullableExpression
+    {
+        public static TheoryData<FluentCase<(DateTimeOffset? value, DateTimeOffset other)>> Cases =>
+        [
+            new("Same", (RefDate, RefDate), new FluentExpected(true)),
+            new("Null", (null, RefDate), new FluentExpected(true)),
+            new("After", (RefDatePlus1, RefDate), new FluentExpected(false, "Value must be on or before the specified date/time.", Code: MustCodes.Date.Order.After))
+        ];
+    }
+
+    public static class AfterExpression
+    {
+        public static TheoryData<FluentCase<(DateTimeOffset value, DateTimeOffset other)>> Cases =>
+        [
+            new("After", (RefDatePlus1, RefDate), new FluentExpected(true)),
+            new("Before", (RefDateMinus1, RefDate), new FluentExpected(false, "Value must be after the specified date/time.", Code: MustCodes.Date.Order.NotAfter))
+        ];
+    }
+
+    public static class AfterNullableExpression
+    {
+        public static TheoryData<FluentCase<(DateTimeOffset? value, DateTimeOffset other)>> Cases =>
+        [
+            new("After", (RefDatePlus1, RefDate), new FluentExpected(true)),
+            new("Null", (null, RefDate), new FluentExpected(true)),
+            new("Before", (RefDateMinus1, RefDate), new FluentExpected(false, "Value must be after the specified date/time.", Code: MustCodes.Date.Order.NotAfter))
+        ];
+    }
+
+    public static class OnOrAfterExpression
+    {
+        public static TheoryData<FluentCase<(DateTimeOffset value, DateTimeOffset other)>> Cases =>
+        [
+            new("Same", (RefDate, RefDate), new FluentExpected(true)),
+            new("Before", (RefDateMinus1, RefDate), new FluentExpected(false, "Value must be on or after the specified date/time.", Code: MustCodes.Date.Order.Before))
+        ];
+    }
+
+    public static class OnOrAfterNullableExpression
+    {
+        public static TheoryData<FluentCase<(DateTimeOffset? value, DateTimeOffset other)>> Cases =>
+        [
+            new("Same", (RefDate, RefDate), new FluentExpected(true)),
+            new("Null", (null, RefDate), new FluentExpected(true)),
+            new("Before", (RefDateMinus1, RefDate), new FluentExpected(false, "Value must be on or after the specified date/time.", Code: MustCodes.Date.Order.Before))
         ];
     }
 }

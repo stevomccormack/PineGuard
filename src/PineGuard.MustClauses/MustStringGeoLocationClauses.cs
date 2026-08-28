@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 using PineGuard.Utils;
 
@@ -37,15 +38,15 @@ public static class MustStringGeoLocationClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<double>.Fail(NullMessage, paramName, value);
+            return MustResult<double>.Fail(MustCodes.Geo.Latitude.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid latitude.";
 
         if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, provider: CultureInfo.InvariantCulture))
-            return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<double>.FromBool(false, MustCodes.Geo.Latitude.Invalid, messageTemplate, paramName, value, result: default);
 
         var ok = GeoLocationRules.IsLatitude(parsed);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<double>.FromBool(ok, MustCodes.Geo.Latitude.Invalid, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -69,15 +70,15 @@ public static class MustStringGeoLocationClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<double>.Fail(NullMessage, paramName, value);
+            return MustResult<double>.Fail(MustCodes.Geo.Longitude.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid longitude.";
 
         if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, provider: CultureInfo.InvariantCulture))
-            return MustResult<double>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<double>.FromBool(false, MustCodes.Geo.Longitude.Invalid, messageTemplate, paramName, value, result: default);
 
         var ok = GeoLocationRules.IsLongitude(parsed);
-        return MustResult<double>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<double>.FromBool(ok, MustCodes.Geo.Longitude.Invalid, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -93,21 +94,21 @@ public static class MustStringGeoLocationClauses
         [CallerArgumentExpression(nameof(latitude))] string? paramName = null)
     {
         if (latitude is null)
-            return MustResult<(double Latitude, double Longitude)>.Fail(NullMessage, paramName, latitude);
+            return MustResult<(double Latitude, double Longitude)>.Fail(MustCodes.Geo.Coordinate.Invalid, NullMessage, paramName, latitude);
 
         if (longitude is null)
-            return MustResult<(double Latitude, double Longitude)>.Fail(NullMessage, nameof(longitude), longitude);
+            return MustResult<(double Latitude, double Longitude)>.Fail(MustCodes.Geo.Coordinate.Invalid, NullMessage, nameof(longitude), longitude);
 
         const string messageTemplate = "{paramName} must be a valid geo location.";
 
         if (!StringUtility.NumberTypes.TryParseDouble(latitude, out var parsedLat, provider: CultureInfo.InvariantCulture))
-            return MustResult<(double Latitude, double Longitude)>.FromBool(false, messageTemplate, paramName, (latitude, longitude));
+            return MustResult<(double Latitude, double Longitude)>.FromBool(false, MustCodes.Geo.Coordinate.Invalid, messageTemplate, paramName, (latitude, longitude), result: default);
 
         if (!StringUtility.NumberTypes.TryParseDouble(longitude, out var parsedLon, provider: CultureInfo.InvariantCulture))
-            return MustResult<(double Latitude, double Longitude)>.FromBool(false, messageTemplate, nameof(longitude), (latitude, longitude));
+            return MustResult<(double Latitude, double Longitude)>.FromBool(false, MustCodes.Geo.Coordinate.Invalid, messageTemplate, nameof(longitude), (latitude, longitude), result: default);
 
         var ok = GeoLocationRules.IsGeoLocation(parsedLat, parsedLon);
-        return MustResult<(double Latitude, double Longitude)>.FromBool(ok, messageTemplate, paramName, (latitude, longitude), (parsedLat, parsedLon));
+        return MustResult<(double Latitude, double Longitude)>.FromBool(ok, MustCodes.Geo.Coordinate.Invalid, messageTemplate, paramName, (latitude, longitude), (parsedLat, parsedLon));
     }
 }
 #endif

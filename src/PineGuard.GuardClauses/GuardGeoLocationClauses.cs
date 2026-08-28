@@ -50,7 +50,7 @@ public static class GuardGeoLocationClauses
     {
         var result = Must.Be.Latitude(value, paramName); // Guard.Against.NotLatitude => Must.Be.Latitude
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -95,7 +95,7 @@ public static class GuardGeoLocationClauses
     {
         var result = Must.Be.Longitude(value, paramName); // Guard.Against.NotLongitude => Must.Be.Longitude
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -142,7 +142,7 @@ public static class GuardGeoLocationClauses
     {
         var result = Must.Be.GeoLocation(latitude, longitude, paramName); // Guard.Against.NotGeoLocation => Must.Be.GeoLocation
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, (latitude, longitude), exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

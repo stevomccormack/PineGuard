@@ -1,4 +1,5 @@
 using PineGuard.GuardClauses;
+using PineGuard.MustClauses;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.GuardClauses;
@@ -7,209 +8,187 @@ namespace PineGuard.Core.UnitTests.GuardClauses;
 public sealed class GuardFailureTests : BaseUnitTest
 {
     [Theory]
-    [MemberData(nameof(GuardFailureTestData.Throw.Cases), MemberType = typeof(GuardFailureTestData.Throw))]
-    public void Throw_BehavesAsExpected(GuardFailureTestData.Throw.Case testCase)
+    [MemberData(nameof(GuardFailureTestData.NullResultGuard.Cases), MemberType = typeof(GuardFailureTestData.NullResultGuard))]
+    public void Throw_NullResult_ThrowsArgumentNullException(bool _) =>
+        Assert.Throws<ArgumentNullException>(() => GuardFailure.Throw(null!));
+
+    [Theory]
+    [MemberData(nameof(GuardFailureTestData.DefaultException.Cases), MemberType = typeof(GuardFailureTestData.DefaultException))]
+    public void Throw_NoPolicyNoCreator_ThrowsExpectedDefaultException(GuardFailureTestData.DefaultException.Case testCase)
     {
         // Arrange
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
+        var result = MustResult<object?>.Fail("sample.always-fails", "{paramName} is bad.", "value", testCase.Value);
+
+        // Act
+        var ex = Assert.Throws(testCase.Expected, () => GuardFailure.Throw(result));
+
+        // Assert
+        Assert.Equal("value", Assert.IsAssignableFrom<ArgumentException>(ex).ParamName);
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardFailureTestData.MessageOverride.Cases), MemberType = typeof(GuardFailureTestData.MessageOverride))]
+    public void Throw_MessageOverride_UsesGivenMessageInsteadOfResultMessage(bool _)
+    {
+        // Arrange
+        var result = MustResult<string>.Fail("sample.always-fails", "{paramName} is bad.", "value", "x");
+
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => GuardFailure.Throw(result, "custom message"));
+
+        // Assert
+        Assert.StartsWith("custom message", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardFailureTestData.MessageOverrideWithMapActive.Cases), MemberType = typeof(GuardFailureTestData.MessageOverrideWithMapActive))]
+    public void Throw_MessageOverride_WithMapActive_PassesGivenMessageToMap(bool _)
+    {
+        // Arrange
+        var result = MustResult<string>.Fail("sample.always-fails", "{paramName} is bad.", "value", "x");
+        GuardFailure? captured = null;
 
         try
         {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.ReplaceDefaultExceptions;
-            GuardExceptionPolicy.ExceptionReplacer = testCase.ConfigureReplacer
-                ? ex => new InvalidOperationException("wrapped", ex)
-                : null;
-
-            Func<Exception>? creator = null;
-            if (testCase.UseExceptionCreator)
+            GuardExceptionPolicy.Map(failure =>
             {
-                creator = () => testCase.ExpectedExceptionType == typeof(ApplicationException)
-                    ? new ApplicationException("boom")
-                    : null!;
-            }
-
-            void Act() => GuardFailure.Throw("bad", "value", testCase.Value, creator);
+                captured = failure;
+                return new NotSupportedException("mapped: " + failure.Message);
+            });
 
             // Act
-            var ex = Assert.Throws(testCase.ExpectedExceptionType, Act);
+            var ex = Assert.Throws<NotSupportedException>(() => GuardFailure.Throw(result, "custom message"));
 
             // Assert
-            if (testCase.ExpectedMessage is not null)
-            {
-                if (testCase.ExpectedExceptionType == typeof(InvalidOperationException))
-                {
-                    Assert.Equal(testCase.ExpectedMessage, ex.Message);
-                    Assert.IsType<ArgumentException>(ex.InnerException);
-                }
-                else
-                {
-                    switch (testCase.ExpectedMessage)
-                    {
-                        // For ArgumentExceptions, message contains "bad"
-                        case "bad":
-                            Assert.Contains(testCase.ExpectedMessage, ex.Message);
-                            break;
-                        // For ParamName
-                        case "value" when ex is ArgumentException argumentException:
-                            Assert.Equal(testCase.ExpectedMessage, argumentException.ParamName);
-                            break;
-                    }
-                }
-            }
-
-            if (testCase.ExpectedExceptionType == typeof(ApplicationException))
-                Assert.Equal("boom", ex.Message);
+            Assert.Equal("mapped: custom message", ex.Message);
+            Assert.NotNull(captured);
+            Assert.Equal("custom message", captured.Message);
         }
         finally
         {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
+            GuardExceptionPolicy.Clear();
         }
     }
 
     [Theory]
-    [MemberData(nameof(GuardFailureTestData.ThrowScoped.Cases), MemberType = typeof(GuardFailureTestData.ThrowScoped))]
-    public void Throw_WithScopedPolicy_BehavesAsExpected(GuardFailureTestData.ThrowScoped.Case testCase)
+    [MemberData(nameof(GuardFailureTestData.NullParamName.Cases), MemberType = typeof(GuardFailureTestData.NullParamName))]
+    public void Throw_NullParamName_StampsEmptyPropertyPath(bool _)
     {
         // Arrange
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
-        Func<Exception, Exception> scopedReplacer = ex => new NotSupportedException("scoped", ex);
+        var result = MustResult<string>.Fail("sample.always-fails", "No param name.", null, "x");
 
-        try
-        {
-            GuardExceptionPolicy.ExceptionReplacer = GlobalReplacer;
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.GlobalReplaceDefaultExceptions;
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => GuardFailure.Throw(result));
 
-            using (GuardExceptionPolicy.BeginScope(options =>
-                   {
-                       options.ExceptionReplacer = scopedReplacer;
-                       options.ReplaceDefaultExceptions = testCase.ScopedReplaceDefaultExceptions;
-                   }))
-            {
-                static void Act() => GuardFailure.Throw("bad", "value", value: "x");
-
-                // Act
-                var ex = Assert.Throws(testCase.ExpectedExceptionType, Act);
-
-                // Assert
-                if (testCase.ExpectedExceptionType == typeof(NotSupportedException))
-                {
-                    Assert.Equal(testCase.ExpectedMessage, ex.Message);
-                    Assert.IsType<ArgumentException>(ex.InnerException);
-                }
-                else if (ex is ArgumentException argumentException)
-                {
-                    Assert.Equal(testCase.ExpectedMessage, argumentException.ParamName);
-                }
-            }
-        }
-        finally
-        {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-        }
-
-        return;
-
-        static Exception GlobalReplacer(Exception ex) => new InvalidOperationException("global", ex);
+        // Assert
+        Assert.Equal(string.Empty, ex.GetMustPropertyPath());
     }
 
     [Theory]
-    [MemberData(nameof(GuardFailureTestData.ThrowCreatorPrecedence.Cases), MemberType = typeof(GuardFailureTestData.ThrowCreatorPrecedence))]
-    public void Throw_ExceptionCreatorBeatsScopedAndGlobalPolicy(GuardFailureTestData.ThrowCreatorPrecedence.Case testCase)
+    [MemberData(nameof(GuardFailureTestData.ExceptionCreatorPrecedence.Cases), MemberType = typeof(GuardFailureTestData.ExceptionCreatorPrecedence))]
+    public void Throw_ExceptionCreatorReturnsNonNull_ThrowsItDirectly_BypassingActiveMap(bool _)
     {
         // Arrange
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
+        var result = MustResult<string>.Fail("sample.always-fails", "{paramName} is bad.", "value", "x");
 
         try
         {
-            GuardExceptionPolicy.ExceptionReplacer = ex => new InvalidOperationException("global", ex);
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.GlobalReplaceDefaultExceptions;
-
-            using (GuardExceptionPolicy.BeginScope(options =>
-                   {
-                       options.ExceptionReplacer = ex => new NotSupportedException("scoped", ex);
-                       options.ReplaceDefaultExceptions = testCase.ScopedReplaceDefaultExceptions;
-                   }))
-            {
-                // Act
-                void Act() => GuardFailure.Throw("bad", "value", value: "x", exceptionCreator: () => new ApplicationException(testCase.ExpectedMessage));
-
-                var ex = Assert.Throws(testCase.ExpectedExceptionType, Act);
-
-                // Assert
-                Assert.Equal(testCase.ExpectedMessage, ex.Message);
-            }
-        }
-        finally
-        {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
-        }
-    }
-
-    [Theory]
-    [MemberData(nameof(GuardFailureTestData.ThrowAndReplace.Cases), MemberType = typeof(GuardFailureTestData.ThrowAndReplace))]
-    public void ThrowAndReplace_BehavesAsExpected(GuardFailureTestData.ThrowAndReplace.Case testCase)
-    {
-        // Arrange
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-
-        try
-        {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.ReplaceDefaultExceptions;
-
-            static void Act() => GuardFailure.ThrowAndReplace("bad", "value", value: "x", exceptionCreator: null, exceptionReplacer: defaultException => new InvalidOperationException("wrapped", defaultException));
+            GuardExceptionPolicy.Map(_ => new InvalidOperationException("should not be used"));
 
             // Act
-            var ex = Assert.Throws(testCase.ExpectedExceptionType, Act);
+            var ex = Assert.Throws<ApplicationException>(() =>
+                GuardFailure.Throw(result, exceptionCreator: () => new ApplicationException("from creator")));
 
             // Assert
-            Assert.Equal("wrapped", ex.Message);
-            Assert.IsType<ArgumentException>(ex.InnerException);
+            Assert.Equal("from creator", ex.Message);
         }
         finally
         {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
+            GuardExceptionPolicy.Clear();
         }
     }
 
     [Theory]
-    [MemberData(nameof(GuardFailureTestData.ThrowAndReplaceWithScopedPolicy.Cases), MemberType = typeof(GuardFailureTestData.ThrowAndReplaceWithScopedPolicy))]
-    public void ThrowAndReplace_PerCallReplacerBeatsScopedAndGlobalPolicy(GuardFailureTestData.ThrowAndReplaceWithScopedPolicy.Case testCase)
+    [MemberData(nameof(GuardFailureTestData.ExceptionCreatorReturnsNull.Cases), MemberType = typeof(GuardFailureTestData.ExceptionCreatorReturnsNull))]
+    public void Throw_ExceptionCreatorReturnsNull_FallsBackToDefaultException(bool _)
     {
         // Arrange
-        var originalReplaceDefaultExceptions = GuardExceptionPolicy.ReplaceDefaultExceptions;
-        var originalExceptionReplacer = GuardExceptionPolicy.ExceptionReplacer;
+        var result = MustResult<string>.Fail("sample.always-fails", "{paramName} is bad.", "value", "x");
+
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => GuardFailure.Throw(result, exceptionCreator: () => null!));
+
+        // Assert
+        Assert.Equal("value", ex.ParamName);
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardFailureTestData.MapReceivesFailure.Cases), MemberType = typeof(GuardFailureTestData.MapReceivesFailure))]
+    public void Throw_MapInstalled_ReceivesFailureWithResultFieldsAndDefaultException(bool _)
+    {
+        // Arrange
+        var result = MustResult<string>.Fail("sample.always-fails", "{paramName} is bad.", "value", "x");
+        GuardFailure? captured = null;
 
         try
         {
-            GuardExceptionPolicy.ExceptionReplacer = ex => new InvalidOperationException("global", ex);
-            GuardExceptionPolicy.ReplaceDefaultExceptions = testCase.GlobalReplaceDefaultExceptions;
-
-            using (GuardExceptionPolicy.BeginScope(options =>
-                   {
-                       options.ExceptionReplacer = ex => new NotSupportedException("scoped", ex);
-                       options.ReplaceDefaultExceptions = testCase.ScopedReplaceDefaultExceptions;
-                   }))
+            GuardExceptionPolicy.Map(failure =>
             {
-                static void Act() => GuardFailure.ThrowAndReplace("bad", "value", value: "x", exceptionCreator: null, exceptionReplacer: defaultException => new ApplicationException("per-call", defaultException));
+                captured = failure;
+                return new NotSupportedException("mapped: " + failure.Message);
+            });
 
-                // Act
-                var ex = Assert.Throws(testCase.ExpectedExceptionType, Act);
+            // Act
+            var ex = Assert.Throws<NotSupportedException>(() => GuardFailure.Throw(result));
 
-                // Assert
-                Assert.Equal("per-call", ex.Message);
-                Assert.IsType<ArgumentException>(ex.InnerException);
-            }
+            // Assert
+            Assert.Equal("mapped: value is bad.", ex.Message);
+            Assert.NotNull(captured);
+            Assert.Equal("sample.always-fails", captured.Code);
+            Assert.Equal("value is bad.", captured.Message);
+            Assert.Equal("value", captured.ParamName);
+            Assert.Equal("x", captured.Value);
+            Assert.IsType<ArgumentException>(captured.Exception);
         }
         finally
         {
-            GuardExceptionPolicy.ReplaceDefaultExceptions = originalReplaceDefaultExceptions;
-            GuardExceptionPolicy.ExceptionReplacer = originalExceptionReplacer;
+            GuardExceptionPolicy.Clear();
         }
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardFailureTestData.MapReturnsNull.Cases), MemberType = typeof(GuardFailureTestData.MapReturnsNull))]
+    public void Throw_MapReturnsNull_ThrowsArgumentNullException(bool _)
+    {
+        // Arrange
+        var result = MustResult<string>.Fail("sample.always-fails", "{paramName} is bad.", "value", "x");
+
+        try
+        {
+            GuardExceptionPolicy.Map(_ => null!);
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => GuardFailure.Throw(result));
+        }
+        finally
+        {
+            GuardExceptionPolicy.Clear();
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardFailureTestData.PrintMembers.Cases), MemberType = typeof(GuardFailureTestData.PrintMembers))]
+    public void ToString_ExcludesValue_ButIncludesOtherMembers(bool _)
+    {
+        // Arrange
+        var failure = new GuardFailure("sample.always-fails", "value is bad.", "value", "super-secret", new ArgumentException("value is bad.", "value"));
+
+        // Act
+        var text = failure.ToString();
+
+        // Assert
+        Assert.Contains("sample.always-fails", text, StringComparison.Ordinal);
+        Assert.Contains("value is bad.", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("super-secret", text, StringComparison.Ordinal);
     }
 }

@@ -42,7 +42,7 @@ public static class GuardTimeOnlyClauses
     {
         var result = Must.Be.Between(value, min, max, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -78,7 +78,7 @@ public static class GuardTimeOnlyClauses
     {
         var result = Must.Be.NotBetween(value, min, max, inclusion, paramName); // Guard.Against.Between => Must.Be.NotBetween (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -112,7 +112,7 @@ public static class GuardTimeOnlyClauses
     {
         var result = Must.Be.NotBefore(value, other, precision, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -146,7 +146,7 @@ public static class GuardTimeOnlyClauses
     {
         var result = Must.Be.NotOnOrBefore(value, other, precision, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -180,7 +180,7 @@ public static class GuardTimeOnlyClauses
     {
         var result = Must.Be.NotAfter(value, other, precision, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -214,7 +214,7 @@ public static class GuardTimeOnlyClauses
     {
         var result = Must.Be.NotOnOrAfter(value, other, precision, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -248,7 +248,7 @@ public static class GuardTimeOnlyClauses
     {
         var result = Must.Be.NotSame(value, other, precision, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -282,7 +282,7 @@ public static class GuardTimeOnlyClauses
     {
         var result = Must.Be.Same(value, other, precision, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -317,7 +317,7 @@ public static class GuardTimeOnlyClauses
         // Keeping Nullable for Range Helpers as per MustClauses
         var result = Must.Be.Chronological(start, end, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -351,7 +351,7 @@ public static class GuardTimeOnlyClauses
     {
         var result = Must.Be.NotChronological(start, end, inclusion, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -390,7 +390,7 @@ public static class GuardTimeOnlyClauses
         // Keeping Nullable for Range Helpers
         var result = Must.Be.NotOverlapping(start1, end1, start2, end2, inclusion, paramName); // Guard.Against.Overlapping => Must.Be.NotOverlapping (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start1, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -429,7 +429,7 @@ public static class GuardTimeOnlyClauses
         // Keeping Nullable for Range Helpers
         var result = Must.Be.Overlapping(start1, end1, start2, end2, inclusion, paramName); // Guard.Against.NotOverlapping => Must.Be.Overlapping (complement)
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, start1, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

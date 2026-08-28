@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -36,7 +37,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be in the past.";
 
         var ok = DateOnlyRules.IsInPast(value);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -62,7 +63,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be in the past or present.";
 
         var ok = DateOnlyRules.IsInPast(value, Inclusion.Inclusive);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -88,7 +89,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be in the future.";
 
         var ok = DateOnlyRules.IsInFuture(value);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -114,7 +115,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be in the future or present.";
 
         var ok = DateOnlyRules.IsInFuture(value, Inclusion.Inclusive);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -146,7 +147,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be within the expected range.";
 
         var ok = DateOnlyRules.IsBetween(value, min, max, inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Range.OutOfRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -178,7 +179,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must not be within the expected range.";
 
         var ok = !DateOnlyRules.IsBetween(value, min, max, inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Range.InRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -208,7 +209,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be before the specified date.";
 
         var ok = DateOnlyRules.IsBefore(value, other, Inclusion.Exclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotBefore, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -238,7 +239,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be on or before the specified date.";
 
         var ok = DateOnlyRules.IsBefore(value, other, Inclusion.Inclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.After, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -268,7 +269,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be after the specified date.";
 
         var ok = DateOnlyRules.IsAfter(value, other, Inclusion.Exclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotAfter, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -298,7 +299,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be on or after the specified date.";
 
         var ok = DateOnlyRules.IsAfter(value, other, Inclusion.Inclusive, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.Before, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -328,7 +329,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be the same date.";
 
         var ok = DateOnlyRules.IsSame(value, other, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Equality.NotEqual, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -358,7 +359,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must not be the same date.";
 
         var ok = !DateOnlyRules.IsSame(value, other, precision);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Equality.Equal, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -388,7 +389,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = DateOnlyRules.IsChronological(start, end, inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, start, start);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotChronological, messageTemplate, paramName, start, start);
     }
 
     /// <summary>
@@ -425,7 +426,7 @@ public static class MustDateOnlyClauses
         var range2Ok = DateOnlyRange.TryCreate(start2, end2, out var _);
 
         var ok = range1Ok && range2Ok && DateOnlyRules.IsOverlapping(start1, end1, start2, end2, inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, start1, start1);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Overlap.Missing, messageTemplate, paramName, start1, start1);
     }
 
     /// <summary>
@@ -462,7 +463,7 @@ public static class MustDateOnlyClauses
         var range2Ok = DateOnlyRange.TryCreate(start2, end2, out var _);
 
         var ok = !(range1Ok && range2Ok && DateOnlyRules.IsOverlapping(start1, end1, start2, end2, inclusion));
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, start1, start1);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Overlap.Present, messageTemplate, paramName, start1, start1);
     }
 
     /// <summary>
@@ -491,7 +492,7 @@ public static class MustDateOnlyClauses
     {
         const string messageTemplate = "{paramName} must be within the expected number of days.";
         var ok = DateOnlyRules.IsWithin(value, reference, days);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.NotWithin, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -520,7 +521,7 @@ public static class MustDateOnlyClauses
     {
         const string messageTemplate = "{paramName} must not be within the expected number of days.";
         var ok = !DateOnlyRules.IsWithin(value, reference, days);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.Within, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -549,7 +550,8 @@ public static class MustDateOnlyClauses
     {
         const string messageTemplate = "{paramName} must be within the expected number of calendar months.";
         var ok = DateOnlyRules.IsWithinCalendarMonths(value, reference, months);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.NotWithinCalendarMonths,
+            messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -578,7 +580,7 @@ public static class MustDateOnlyClauses
     {
         const string messageTemplate = "{paramName} must not be within the expected number of calendar months.";
         var ok = !DateOnlyRules.IsWithinCalendarMonths(value, reference, months);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.WithinCalendarMonths, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -608,7 +610,7 @@ public static class MustDateOnlyClauses
         const string messageTemplate = "{paramName} must not be chronological.";
 
         var ok = !DateOnlyRules.IsChronological(start, end, inclusion);
-        return MustResult<DateOnly>.FromBool(ok, messageTemplate, paramName, start, start);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.Chronological, messageTemplate, paramName, start, start);
     }
 }
 #endif

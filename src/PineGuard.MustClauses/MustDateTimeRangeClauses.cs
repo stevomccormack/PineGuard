@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -37,7 +38,7 @@ public static class MustDateTimeRangeClauses
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = DateTimeRangeRules.IsChronological(range, inclusion);
-        return MustResult<DateTimeRange>.FromBool(ok, messageTemplate, paramName, range, range);
+        return MustResult<DateTimeRange>.FromBool(ok, MustCodes.Range.Order.NotChronological, messageTemplate, paramName, range, range);
     }
 
     /// <summary>
@@ -67,7 +68,7 @@ public static class MustDateTimeRangeClauses
         const string messageTemplate = "{paramName} must be overlapping.";
 
         var ok = DateTimeRangeRules.IsOverlapping(range1, range2, inclusion);
-        return MustResult<DateTimeRange>.FromBool(ok, messageTemplate, paramName, range1, range1);
+        return MustResult<DateTimeRange>.FromBool(ok, MustCodes.Range.Overlap.Missing, messageTemplate, paramName, range1, range1);
     }
 
     /// <summary>
@@ -97,7 +98,7 @@ public static class MustDateTimeRangeClauses
         const string messageTemplate = "{paramName} must not be overlapping.";
 
         var ok = !DateTimeRangeRules.IsOverlapping(range1, range2, inclusion);
-        return MustResult<DateTimeRange>.FromBool(ok, messageTemplate, paramName, range1, range1);
+        return MustResult<DateTimeRange>.FromBool(ok, MustCodes.Range.Overlap.Present, messageTemplate, paramName, range1, range1);
     }
 
     /// <summary>
@@ -127,7 +128,7 @@ public static class MustDateTimeRangeClauses
         const string messageTemplate = "{paramName} must contain the specified date/time.";
 
         var ok = DateTimeRangeRules.Contains(range, value, inclusion);
-        return MustResult<DateTimeRange>.FromBool(ok, messageTemplate, paramName, range, range);
+        return MustResult<DateTimeRange>.FromBool(ok, MustCodes.Range.Bounds.NotContains, messageTemplate, paramName, range, range);
     }
 
     /// <summary>
@@ -157,6 +158,6 @@ public static class MustDateTimeRangeClauses
         const string messageTemplate = "{paramName} must not contain the specified date/time.";
 
         var ok = !DateTimeRangeRules.Contains(range, value, inclusion);
-        return MustResult<DateTimeRange>.FromBool(ok, messageTemplate, paramName, range, range);
+        return MustResult<DateTimeRange>.FromBool(ok, MustCodes.Range.Bounds.Contains, messageTemplate, paramName, range, range);
     }
 }

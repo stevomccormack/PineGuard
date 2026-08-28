@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -26,7 +27,7 @@ public static class FluentUriExtensions
     /// <seealso cref="MustUriClauses.AbsoluteUri"/>
     public static IRuleBuilderOptions<TModel, string?> AbsoluteUri<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.AbsoluteUri(val, paramName: null),
-            message);
+            message, MustCodes.Uri.Form.NotAbsolute);
 
     /// <summary>
     /// Validates that the string value is a relative URI.
@@ -44,7 +45,7 @@ public static class FluentUriExtensions
     /// <seealso cref="MustUriClauses.RelativeUri"/>
     public static IRuleBuilderOptions<TModel, string?> RelativeUri<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.RelativeUri(val, paramName: null),
-            message);
+            message, MustCodes.Uri.Form.NotRelative);
 
     /// <summary>
     /// Validates that the string value is a valid web URL (HTTP or HTTPS).
@@ -62,7 +63,7 @@ public static class FluentUriExtensions
     /// <seealso cref="MustUriClauses.Url"/>
     public static IRuleBuilderOptions<TModel, string?> WebUrl<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Url(val, paramName: null),
-            message);
+            message, MustCodes.Uri.Form.NotUrl);
 
     /// <summary>
     /// Validates that the string value is a valid web URL. Alias for <see cref="WebUrl{TModel}"/>.
@@ -92,7 +93,7 @@ public static class FluentUriExtensions
     /// <seealso cref="MustUriClauses.HttpsUrl"/>
     public static IRuleBuilderOptions<TModel, string?> HttpsUrl<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HttpsUrl(val, paramName: null),
-            message);
+            message, MustCodes.Uri.Scheme.NotHttps);
 
     /// <summary>
     /// Validates that the string value is a valid HTTP URL.
@@ -110,7 +111,7 @@ public static class FluentUriExtensions
     /// <seealso cref="MustUriClauses.HttpUrl"/>
     public static IRuleBuilderOptions<TModel, string?> HttpUrl<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HttpUrl(val, paramName: null),
-            message);
+            message, MustCodes.Uri.Scheme.NotHttp);
 
     /// <summary>
     /// Validates that the string value is a valid file:// URI.
@@ -128,7 +129,7 @@ public static class FluentUriExtensions
     /// <seealso cref="MustUriClauses.FileUri"/>
     public static IRuleBuilderOptions<TModel, string?> FileUri<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.FileUri(val, paramName: null),
-            message);
+            message, MustCodes.Uri.Scheme.NotFile);
 
     /// <summary>
     /// Validates that the string value is a valid file path.
@@ -146,7 +147,7 @@ public static class FluentUriExtensions
     /// <seealso cref="MustUriClauses.FilePath"/>
     public static IRuleBuilderOptions<TModel, string?> FilePath<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.FilePath(val, paramName: null),
-            message);
+            message, MustCodes.Uri.FilePath.Invalid);
 
     /// <summary>
     /// Validates that the string value is not a valid file path.
@@ -164,7 +165,7 @@ public static class FluentUriExtensions
     /// <seealso cref="MustUriClauses.NotFilePath"/>
     public static IRuleBuilderOptions<TModel, string?> NotFilePath<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotFilePath(val, paramName: null),
-            message);
+            message, MustCodes.Uri.FilePath.WellFormed);
 
     /// <summary>
     /// Validates that the URI string has the specified scheme.
@@ -185,7 +186,7 @@ public static class FluentUriExtensions
         string scheme,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasScheme(val, scheme, paramName: null),
-            message);
+            message, MustCodes.Uri.Scheme.Mismatch);
 
     /// <summary>
     /// Validates that the URI string does not have the specified scheme.
@@ -206,5 +207,5 @@ public static class FluentUriExtensions
         string scheme,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasScheme(val, scheme, paramName: null),
-            message);
+            message, MustCodes.Uri.Scheme.Match);
 }

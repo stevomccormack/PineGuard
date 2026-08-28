@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -36,7 +37,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringNumberTypesClauses.Decimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class DecimalStringAttribute(int decimalPlaces = 2) : ValidationAttributeBase(typeof(string))
+public sealed class DecimalStringAttribute(int decimalPlaces = 2) : ValidationAttributeBase(typeof(string), MustCodes.Number.Format.NotDecimal)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -84,7 +85,7 @@ public sealed class DecimalStringAttribute(int decimalPlaces = 2) : ValidationAt
 /// <seealso cref="MustStringNumberTypesClauses.ExactDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ExactDecimalStringAttribute(int exactDecimalPlaces = 2) : ValidationAttributeBase(typeof(string))
+public sealed class ExactDecimalStringAttribute(int exactDecimalPlaces = 2) : ValidationAttributeBase(typeof(string), MustCodes.Number.Scale.Mismatch)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -131,7 +132,7 @@ public sealed class ExactDecimalStringAttribute(int exactDecimalPlaces = 2) : Va
 /// <seealso cref="MustStringNumberTypesClauses.Int32"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Int32StringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class Int32StringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Format.NotInt32)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Integer;
@@ -173,7 +174,7 @@ public sealed class Int32StringAttribute() : ValidationAttributeBase(typeof(stri
 /// <seealso cref="MustStringNumberTypesClauses.Int64"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Int64StringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class Int64StringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Format.NotInt64)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Integer;
@@ -216,7 +217,7 @@ public sealed class Int64StringAttribute() : ValidationAttributeBase(typeof(stri
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class Int32InRangeStringAttribute(int min, int max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.OutOfRange)
 {
     /// <summary>Gets the lower boundary of the valid range.</summary>
     public int Min { get; } = min;
@@ -268,7 +269,7 @@ public sealed class Int32InRangeStringAttribute(int min, int max, Inclusion incl
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class Int32OutOfRangeStringAttribute(int min, int max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.InRange)
 {
     /// <summary>Gets the lower boundary of the excluded range.</summary>
     public int Min { get; } = min;
@@ -320,7 +321,7 @@ public sealed class Int32OutOfRangeStringAttribute(int min, int max, Inclusion i
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class Int64InRangeStringAttribute(long min, long max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.OutOfRange)
 {
     /// <summary>Gets the lower boundary of the valid range.</summary>
     public long Min { get; } = min;
@@ -372,7 +373,7 @@ public sealed class Int64InRangeStringAttribute(long min, long max, Inclusion in
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class Int64OutOfRangeStringAttribute(long min, long max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.InRange)
 {
     /// <summary>Gets the lower boundary of the excluded range.</summary>
     public long Min { get; } = min;

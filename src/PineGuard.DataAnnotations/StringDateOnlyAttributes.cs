@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -35,7 +36,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringDateOnlyClauses.PastDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotPast)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
@@ -79,7 +80,7 @@ public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(type
 /// <seealso cref="MustStringDateOnlyClauses.FutureDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotFuture)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
@@ -123,7 +124,7 @@ public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustStringDateOnlyClauses.PastOrPresentDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.Future)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
@@ -167,7 +168,7 @@ public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttribute
 /// <seealso cref="MustStringDateOnlyClauses.FutureOrPresentDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureOrPresentDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class FutureOrPresentDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.Past)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
@@ -212,7 +213,7 @@ public sealed class FutureOrPresentDateOnlyStringAttribute() : ValidationAttribu
 /// <seealso cref="MustStringDateOnlyClauses.BeforeDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class BeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotBefore)
 {
     /// <summary>Gets the reference date that the parsed value must precede.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -258,7 +259,7 @@ public sealed class BeforeDateOnlyStringAttribute(string other) : ValidationAttr
 /// <seealso cref="MustStringDateOnlyClauses.NotBeforeDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class NotBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.Before)
 {
     /// <summary>Gets the reference date; the parsed value must not precede it.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -304,7 +305,7 @@ public sealed class NotBeforeDateOnlyStringAttribute(string other) : ValidationA
 /// <seealso cref="MustStringDateOnlyClauses.OnOrBeforeDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OnOrBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class OnOrBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.After)
 {
     /// <summary>Gets the reference date that the parsed value must not exceed.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -350,7 +351,7 @@ public sealed class OnOrBeforeDateOnlyStringAttribute(string other) : Validation
 /// <seealso cref="MustStringDateOnlyClauses.NotOnOrBeforeDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOnOrBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class NotOnOrBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotAfter)
 {
     /// <summary>Gets the reference date; the parsed value must be strictly after it.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -396,7 +397,7 @@ public sealed class NotOnOrBeforeDateOnlyStringAttribute(string other) : Validat
 /// <seealso cref="MustStringDateOnlyClauses.AfterDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class AfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class AfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotAfter)
 {
     /// <summary>Gets the reference date that the parsed value must follow.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -442,7 +443,7 @@ public sealed class AfterDateOnlyStringAttribute(string other) : ValidationAttri
 /// <seealso cref="MustStringDateOnlyClauses.NotAfterDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class NotAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.After)
 {
     /// <summary>Gets the reference date; the parsed value must not be strictly after it.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -488,7 +489,7 @@ public sealed class NotAfterDateOnlyStringAttribute(string other) : ValidationAt
 /// <seealso cref="MustStringDateOnlyClauses.OnOrAfterDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OnOrAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class OnOrAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.Before)
 {
     /// <summary>Gets the reference date that the parsed value must meet or follow.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -534,7 +535,7 @@ public sealed class OnOrAfterDateOnlyStringAttribute(string other) : ValidationA
 /// <seealso cref="MustStringDateOnlyClauses.NotOnOrAfterDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOnOrAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class NotOnOrAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotBefore)
 {
     /// <summary>Gets the reference date; the parsed value must be strictly before it.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -580,7 +581,7 @@ public sealed class NotOnOrAfterDateOnlyStringAttribute(string other) : Validati
 /// <seealso cref="MustStringDateOnlyClauses.SameDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class SameDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class SameDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Equality.NotEqual)
 {
     /// <summary>Gets the reference date that the parsed value must equal.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -626,7 +627,7 @@ public sealed class SameDateOnlyStringAttribute(string other) : ValidationAttrib
 /// <seealso cref="MustStringDateOnlyClauses.NotSameDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotSameDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string))
+public sealed class NotSameDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Equality.Equal)
 {
     /// <summary>Gets the reference date that the parsed value must not equal.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -674,7 +675,7 @@ public sealed class NotSameDateOnlyStringAttribute(string other) : ValidationAtt
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalDateOnlyStringAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotChronological)
 {
     /// <summary>Gets the end date string for the chronological range.</summary>
     public string End { get; } = end;
@@ -725,7 +726,7 @@ public sealed class ChronologicalDateOnlyStringAttribute(string end, Inclusion i
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotChronologicalDateOnlyStringAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.Chronological)
 {
     /// <summary>Gets the end date string used to check the non-chronological constraint.</summary>
     public string End { get; } = end;
@@ -776,7 +777,7 @@ public sealed class NotChronologicalDateOnlyStringAttribute(string end, Inclusio
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class OverlappingDateOnlyStringAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Overlap.Missing)
 {
     /// <summary>Gets the end of the first interval as a string.</summary>
     public string End1 { get; } = end1;
@@ -833,7 +834,7 @@ public sealed class OverlappingDateOnlyStringAttribute(string end1, string start
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotOverlappingDateOnlyStringAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Overlap.Present)
 {
     /// <summary>Gets the end of the first interval as a string.</summary>
     public string End1 { get; } = end1;

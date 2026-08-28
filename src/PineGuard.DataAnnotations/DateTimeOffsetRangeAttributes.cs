@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -32,7 +33,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalDateTimeOffsetRangeAttribute(Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange))
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Order.NotChronological)
 {
     /// <summary>Gets whether the range boundaries are included or excluded when evaluating the constraint.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -75,7 +76,7 @@ public sealed class ChronologicalDateTimeOffsetRangeAttribute(Inclusion inclusio
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class OverlappingDateTimeOffsetRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange))
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Overlap.Missing)
 {
     /// <summary>Gets the reference range that the annotated range must overlap.</summary>
     public DateTimeOffsetRange Range2 { get; } = new(
@@ -123,7 +124,7 @@ public sealed class OverlappingDateTimeOffsetRangeAttribute(string start2, strin
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotOverlappingDateTimeOffsetRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange))
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Overlap.Present)
 {
     /// <summary>Gets the reference range that the annotated range must not overlap.</summary>
     public DateTimeOffsetRange Range2 { get; } = new(
@@ -170,7 +171,7 @@ public sealed class NotOverlappingDateTimeOffsetRangeAttribute(string start2, st
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ContainsDateTimeOffsetRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange))
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Bounds.NotContains)
 {
     /// <summary>Gets the date/time that the annotated range must contain.</summary>
     public DateTimeOffset Value { get; } = DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
@@ -215,7 +216,7 @@ public sealed class ContainsDateTimeOffsetRangeAttribute(string value, Inclusion
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotContainsDateTimeOffsetRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange))
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Bounds.Contains)
 {
     /// <summary>Gets the date/time that the annotated range must not contain.</summary>
     public DateTimeOffset Value { get; } = DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);

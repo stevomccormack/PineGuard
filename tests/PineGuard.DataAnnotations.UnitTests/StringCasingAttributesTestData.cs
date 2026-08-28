@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -23,7 +24,7 @@ public static class StringCasingAttributesTestData
     {
         public static TheoryData<DataAnnotationCase> Cases => F.IsCamelCase.AllScenarios.ToDataAnnotationCases(v => v, s => s.IsValid
             ? new DataAnnotationExpected(true)
-            : new DataAnnotationExpected(false));
+            : new DataAnnotationExpected(false, Code: MustCodes.Text.Casing.NotCamel));
     }
 
     public static class NotCamelCase
@@ -177,7 +178,7 @@ public static class StringCasingAttributesTestData
         [
             new("null", null, new DataAnnotationExpected(true)),
             new("upper with numbers", "ABC 123", new DataAnnotationExpected(true)),
-            new("lower", "abc", new DataAnnotationExpected(false))
+            new("lower", "abc", new DataAnnotationExpected(false, Code: MustCodes.Text.Casing.NotUpper))
         ];
     }
 
@@ -187,7 +188,7 @@ public static class StringCasingAttributesTestData
         [
             new("null", null, new DataAnnotationExpected(true)),
             new("lower", "abc", new DataAnnotationExpected(true)),
-            new("upper", "ABC", new DataAnnotationExpected(false))
+            new("upper", "ABC", new DataAnnotationExpected(false, Code: MustCodes.Text.Casing.Upper))
         ];
     }
 
@@ -197,7 +198,7 @@ public static class StringCasingAttributesTestData
         [
             new("null", null, new DataAnnotationExpected(true)),
             new("lower with numbers", "abc 123", new DataAnnotationExpected(true)),
-            new("upper", "ABC", new DataAnnotationExpected(false))
+            new("upper", "ABC", new DataAnnotationExpected(false, Code: MustCodes.Text.Casing.NotLower))
         ];
     }
 
@@ -207,7 +208,7 @@ public static class StringCasingAttributesTestData
         [
             new("null", null, new DataAnnotationExpected(true)),
             new("upper", "ABC", new DataAnnotationExpected(true)),
-            new("lower", "abc", new DataAnnotationExpected(false))
+            new("lower", "abc", new DataAnnotationExpected(false, Code: MustCodes.Text.Casing.Lower))
         ];
     }
 }

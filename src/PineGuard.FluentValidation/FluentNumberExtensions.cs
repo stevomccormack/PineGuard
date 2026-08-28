@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Numerics;
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -34,7 +35,7 @@ public static class FluentNumberExtensions
     public static IRuleBuilderOptions<TModel, T?> Positive<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Positive(val.Value, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Sign.NotPositive);
 
     /// <summary>
     /// Validates that the property value is negative (less than zero).
@@ -57,7 +58,7 @@ public static class FluentNumberExtensions
     public static IRuleBuilderOptions<TModel, T?> Negative<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Negative(val.Value, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Sign.NotNegative);
 
     /// <summary>
     /// Validates that the property value equals zero.
@@ -80,7 +81,7 @@ public static class FluentNumberExtensions
     public static IRuleBuilderOptions<TModel, T?> Zero<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Zero(val.Value, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Sign.NotZero);
 
     /// <summary>
     /// Validates that the property value does not equal zero.
@@ -103,7 +104,7 @@ public static class FluentNumberExtensions
     public static IRuleBuilderOptions<TModel, T?> NotZero<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotZero(val.Value, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Sign.Zero);
 
     /// <summary>
     /// Validates that the property value is zero or positive.
@@ -126,7 +127,7 @@ public static class FluentNumberExtensions
     public static IRuleBuilderOptions<TModel, T?> ZeroOrPositive<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.ZeroOrPositive(val.Value, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Sign.Negative);
 
     /// <summary>
     /// Validates that the property value is zero or negative.
@@ -149,7 +150,7 @@ public static class FluentNumberExtensions
     public static IRuleBuilderOptions<TModel, T?> ZeroOrNegative<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.ZeroOrNegative(val.Value, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Sign.Positive);
 
     /// <summary>
     /// Validates that the property value falls within the specified range.
@@ -179,7 +180,7 @@ public static class FluentNumberExtensions
         string? message = null)
         where T : struct, IComparable<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.InRange(val.Value, min, max, inclusion, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Range.OutOfRange);
 
     /// <summary>
     /// Validates that the property value falls outside the specified range.
@@ -209,7 +210,7 @@ public static class FluentNumberExtensions
         string? message = null)
         where T : struct, IComparable<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.OutOfRange(val.Value, min, max, inclusion, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Range.InRange);
 
     /// <summary>
     /// Validates that the property value is approximately equal to the target within the specified tolerance.
@@ -237,7 +238,7 @@ public static class FluentNumberExtensions
         string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Approximately(val.Value, target, tolerance, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Proximity.NotApproximate);
 
     /// <summary>
     /// Validates that the property value is not approximately equal to the target within the specified tolerance.
@@ -265,7 +266,7 @@ public static class FluentNumberExtensions
         string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotApproximately(val.Value, target, tolerance, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Proximity.Approximate);
 
     /// <summary>
     /// Validates that the property value is a multiple of the specified factor.
@@ -291,7 +292,7 @@ public static class FluentNumberExtensions
         string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.MultipleOf(val.Value, factor, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Divisibility.NotMultiple);
 
     /// <summary>
     /// Validates that the property value is not a multiple of the specified factor.
@@ -317,7 +318,7 @@ public static class FluentNumberExtensions
         string? message = null)
         where T : struct, INumber<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotMultipleOf(val.Value, factor, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Number.Divisibility.Multiple);
 
     /// <summary>
     /// Validates that the nullable <see cref="int"/> property value is even.
@@ -340,7 +341,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, int?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Even(val.Value, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Number.Parity.Odd);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="int"/> property value is even.
@@ -362,7 +363,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, int> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Even(val, paramName: null),
-            message);
+            message, MustCodes.Number.Parity.Odd);
 
     /// <summary>
     /// Validates that the nullable <see cref="long"/> property value is even.
@@ -385,7 +386,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, long?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Even(val.Value, paramName: null) : MustResult<long>.Ok(0),
-            message);
+            message, MustCodes.Number.Parity.Odd);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="long"/> property value is even.
@@ -407,7 +408,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, long> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Even(val, paramName: null),
-            message);
+            message, MustCodes.Number.Parity.Odd);
 
     /// <summary>
     /// Validates that the nullable <see cref="int"/> property value is odd.
@@ -430,7 +431,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, int?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Odd(val.Value, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Number.Parity.Even);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="int"/> property value is odd.
@@ -452,7 +453,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, int> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Odd(val, paramName: null),
-            message);
+            message, MustCodes.Number.Parity.Even);
 
     /// <summary>
     /// Validates that the nullable <see cref="long"/> property value is odd.
@@ -475,7 +476,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, long?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Odd(val.Value, paramName: null) : MustResult<long>.Ok(0),
-            message);
+            message, MustCodes.Number.Parity.Even);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="long"/> property value is odd.
@@ -497,7 +498,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, long> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Odd(val, paramName: null),
-            message);
+            message, MustCodes.Number.Parity.Even);
 
     /// <summary>
     /// Validates that the nullable <see cref="float"/> property value is finite (not infinity or NaN).
@@ -520,7 +521,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, float?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Finite(val.Value, paramName: null) : MustResult<float>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.NotFinite);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="float"/> property value is finite (not infinity or NaN).
@@ -542,7 +543,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, float> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Finite(val, paramName: null),
-            message);
+            message, MustCodes.Number.Form.NotFinite);
 
     /// <summary>
     /// Validates that the nullable <see cref="double"/> property value is finite (not infinity or NaN).
@@ -565,7 +566,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, double?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Finite(val.Value, paramName: null) : MustResult<double>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.NotFinite);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="double"/> property value is finite (not infinity or NaN).
@@ -587,7 +588,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, double> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Finite(val, paramName: null),
-            message);
+            message, MustCodes.Number.Form.NotFinite);
 
     /// <summary>
     /// Validates that the nullable <see cref="float"/> property value is not finite (is infinity or NaN).
@@ -610,7 +611,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, float?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotFinite(val.Value, paramName: null) : MustResult<float>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.Finite);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="float"/> property value is not finite (is infinity or NaN).
@@ -632,7 +633,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, float> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotFinite(val, paramName: null),
-            message);
+            message, MustCodes.Number.Form.Finite);
 
     /// <summary>
     /// Validates that the nullable <see cref="double"/> property value is not finite (is infinity or NaN).
@@ -655,7 +656,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, double?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotFinite(val.Value, paramName: null) : MustResult<double>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.Finite);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="double"/> property value is not finite (is infinity or NaN).
@@ -677,7 +678,7 @@ public static class FluentNumberExtensions
         this IRuleBuilder<TModel, double> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotFinite(val, paramName: null),
-            message);
+            message, MustCodes.Number.Form.Finite);
 
     /// <summary>
     /// Validates that the nullable <see cref="float"/> property value is not NaN (Not a Number).
@@ -698,7 +699,7 @@ public static class FluentNumberExtensions
     /// <seealso cref="MustNumberClauses.NotNaN(IMustClause, float, string)"/>
     public static IRuleBuilderOptions<TModel, float?> NotNaN<TModel>(this IRuleBuilder<TModel, float?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotNaN(val.Value, paramName: null) : MustResult<float>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.Nan);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="float"/> property value is not NaN (Not a Number).
@@ -718,7 +719,7 @@ public static class FluentNumberExtensions
     /// <seealso cref="MustNumberClauses.NotNaN(IMustClause, float, string)"/>
     public static IRuleBuilderOptions<TModel, float> NotNaN<TModel>(this IRuleBuilder<TModel, float> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotNaN(val, paramName: null),
-            message);
+            message, MustCodes.Number.Form.Nan);
 
     /// <summary>
     /// Validates that the nullable <see cref="double"/> property value is not NaN (Not a Number).
@@ -739,7 +740,7 @@ public static class FluentNumberExtensions
     /// <seealso cref="MustNumberClauses.NotNaN(IMustClause, double, string)"/>
     public static IRuleBuilderOptions<TModel, double?> NotNaN<TModel>(this IRuleBuilder<TModel, double?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotNaN(val.Value, paramName: null) : MustResult<double>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.Nan);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="double"/> property value is not NaN (Not a Number).
@@ -759,7 +760,7 @@ public static class FluentNumberExtensions
     /// <seealso cref="MustNumberClauses.NotNaN(IMustClause, double, string)"/>
     public static IRuleBuilderOptions<TModel, double> NotNaN<TModel>(this IRuleBuilder<TModel, double> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotNaN(val, paramName: null),
-            message);
+            message, MustCodes.Number.Form.Nan);
 
     /// <summary>
     /// Validates that the nullable <see cref="float"/> property value is NaN (Not a Number).
@@ -780,7 +781,7 @@ public static class FluentNumberExtensions
     /// <seealso cref="MustNumberClauses.NaN(IMustClause, float, string)"/>
     public static IRuleBuilderOptions<TModel, float?> NaN<TModel>(this IRuleBuilder<TModel, float?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NaN(val.Value, paramName: null) : MustResult<float>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.NotNan);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="float"/> property value is NaN (Not a Number).
@@ -800,7 +801,7 @@ public static class FluentNumberExtensions
     /// <seealso cref="MustNumberClauses.NaN(IMustClause, float, string)"/>
     public static IRuleBuilderOptions<TModel, float> NaN<TModel>(this IRuleBuilder<TModel, float> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NaN(val, paramName: null),
-            message);
+            message, MustCodes.Number.Form.NotNan);
 
     /// <summary>
     /// Validates that the nullable <see cref="double"/> property value is NaN (Not a Number).
@@ -821,7 +822,7 @@ public static class FluentNumberExtensions
     /// <seealso cref="MustNumberClauses.NaN(IMustClause, double, string)"/>
     public static IRuleBuilderOptions<TModel, double?> NaN<TModel>(this IRuleBuilder<TModel, double?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NaN(val.Value, paramName: null) : MustResult<double>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.NotNan);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="double"/> property value is NaN (Not a Number).
@@ -841,6 +842,6 @@ public static class FluentNumberExtensions
     /// <seealso cref="MustNumberClauses.NaN(IMustClause, double, string)"/>
     public static IRuleBuilderOptions<TModel, double> NaN<TModel>(this IRuleBuilder<TModel, double> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NaN(val, paramName: null),
-            message);
+            message, MustCodes.Number.Form.NotNan);
 }
 #endif

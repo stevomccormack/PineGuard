@@ -45,7 +45,7 @@ if (-not [string]::IsNullOrWhiteSpace($OutputPath)) {
 
 $projectFile = Resolve-PineGuardPath -RepoRoot $repoRootResolved -Path 'tools/audit-cli/solution/PineGuard.AuditCli.csproj'
 
-$reportPathResolved = Resolve-PineGuardPath -RepoRoot $repoRootResolved -Path $ReportPath
+$reportPathResolved = if ([System.IO.Path]::IsPathRooted($ReportPath)) { $ReportPath } else { Resolve-PineGuardPath -RepoRoot $repoRootResolved -Path $ReportPath }
 Ensure-PineGuardDirectory -Path (Split-Path -Parent $reportPathResolved)
 
 $runId = [Guid]::NewGuid().ToString('n')

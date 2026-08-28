@@ -25,9 +25,10 @@ namespace PineGuard.DataAnnotations.Common;
 /// </remarks>
 /// <param name="interfaceType">The open generic dictionary interface (e.g., <c>typeof(IDictionary&lt;,&gt;)</c>).</param>
 /// <param name="mustClausesType">The static class containing the must-clause methods to invoke.</param>
+/// <param name="code">The <c>MustCodes</c> catalogue constant identifying the clause the attribute adapts.</param>
 /// <seealso cref="ValidationAttributeBase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations">Annotation documentation</seealso>
-public abstract class GenericDictionaryAttributeBase(Type interfaceType, Type mustClausesType) : ValidationAttributeBase(typeof(object), allowNull: true)
+public abstract class GenericDictionaryAttributeBase(Type interfaceType, Type mustClausesType, string code) : ValidationAttributeBase(typeof(object), code, allowNull: true)
 {
     private static readonly ConcurrentDictionary<(Type RuntimeType, Type InterfaceType), Type?> InterfaceCache = new();
     private static readonly ConcurrentDictionary<(Type MustClausesType, string MethodName, Type TKey, Type TValue), MethodInfo> MethodCache = new();

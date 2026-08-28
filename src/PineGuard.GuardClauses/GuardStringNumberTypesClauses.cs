@@ -43,7 +43,7 @@ public static class GuardStringNumberTypesClauses
     {
         var result = Must.Be.Decimal(value, decimalPlaces, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -77,7 +77,7 @@ public static class GuardStringNumberTypesClauses
     {
         var result = Must.Be.ExactDecimal(value, exactDecimalPlaces, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -109,7 +109,7 @@ public static class GuardStringNumberTypesClauses
     {
         var result = Must.Be.Int32(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -141,7 +141,7 @@ public static class GuardStringNumberTypesClauses
     {
         var result = Must.Be.Int64(value, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -179,7 +179,7 @@ public static class GuardStringNumberTypesClauses
     {
         var result = Must.Be.Int32InRange(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -217,7 +217,7 @@ public static class GuardStringNumberTypesClauses
     {
         var result = Must.Be.Int32OutOfRange(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -255,7 +255,7 @@ public static class GuardStringNumberTypesClauses
     {
         var result = Must.Be.Int64InRange(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -293,7 +293,7 @@ public static class GuardStringNumberTypesClauses
     {
         var result = Must.Be.Int64OutOfRange(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }

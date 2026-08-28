@@ -49,7 +49,7 @@ public static class GuardJsonClauses
     {
         var result = Must.Be.Json(value, paramName); // Guard.Against.NotJson => Must.Be.Json
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -94,7 +94,7 @@ public static class GuardJsonClauses
     {
         var result = Must.Be.JsonContentType(headers, paramName); // Guard.Against.NotJsonContentType => Must.Be.JsonContentType
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -139,7 +139,7 @@ public static class GuardJsonClauses
     {
         var result = Must.Be.JsonObject(value, paramName); // Guard.Against.NotJsonObject => Must.Be.JsonObject
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -184,7 +184,7 @@ public static class GuardJsonClauses
     {
         var result = Must.Be.JsonArray(value, paramName); // Guard.Against.NotJsonArray => Must.Be.JsonArray
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

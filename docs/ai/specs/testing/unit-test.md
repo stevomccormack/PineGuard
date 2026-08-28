@@ -96,19 +96,28 @@ Related specs in this folder:
 | `ReturnExpected` | `(bool IsValid, string? Message = null)` — abstract base for result-returning layers. |
 | `ThrowExpected` | `(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null)` — abstract base for throwing layers. |
 | `RuleExpected` | `(bool IsValid)` — Core rules. |
-| `MustExpected` | `(bool IsValid, string? Message = null, string? ParamName = null)` — Must layer. |
-| `GuardExpected` | `(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null)` — Guard layer. |
-| `FluentExpected` | `(bool IsValid, string? Message = null, string? PropertyName = null)` — Fluent layer. |
-| `DataAnnotationExpected` | `(bool IsValid, string? Message = null, string? MemberName = null)` — Data Annotations layer. |
+| `MustExpected` | `(bool IsValid, string? Message = null, string? ParamName = null, string? Code = null)` — Must layer. |
+| `MustValidationExpected` | `(bool IsValid, string? Message = null, int? FailureCount = null, string? PropertyPath = null, string? Code = null)` — `MustValidator<T>` object validation. |
+| `GuardExpected` | `(bool IsValid, Type? ExceptionType = null, string? ParamName = null, string? MessageContains = null, string? Code = null)` — Guard layer. |
+| `FluentExpected` | `(bool IsValid, string? Message = null, string? PropertyName = null, string? Code = null)` — Fluent layer. |
+| `DataAnnotationExpected` | `(bool IsValid, string? Message = null, string? MemberName = null, string? Code = null)` — Data Annotations layer. |
+
+`Code` is a trailing optional parameter on every layer's `Expected` type (added alongside the `MustCodes`
+catalogue — see `docs/ai/specs/must-clauses/project.md` "Error codes"). Set it only on the representative
+spot-check cases; the base test class's `AssertResult`/`AssertThrow` asserts it only when the expectation
+carries one.
 
 **Layer case records, scenarios & extensions**
 
 | Type | Purpose |
 | :--- | :--- |
 | `RuleCase<TValue>` / `MustCase<TValue>` / `GuardCase<TValue>` / `FluentCase<TValue>` / `DataAnnotationCase` | Sealed per-layer case records pairing a `Value` with the layer's `Expected`. |
+| `MustValidationCase<TValue>` | `(string Name, TValue Value, MustValidationExpected Expected)` — pairs an object with the whole-object validation result it should produce. |
 | `RuleScenario<TInputs>` | `(string Name, TInputs Inputs, bool IsValid)` — the layer-neutral scenario a fixture publishes. |
 | `RuleScenarioExtension` | Filter combinators (`WhereValid`, `WhereInvalid`, `Except`, `Only`), `Project`, and `.ToRuleCases()`. |
 | `MustScenarioExtension` / `GuardScenarioExtension` / `FluentScenarioExtension` / `DataAnnotationScenarioExtension` | `.ToMustCases()`, `.ToGuardCases()`, `.ToFluentCases()`, `.ToDataAnnotationCases()` — scenario arrays to `TheoryData`. |
+| `MustValidationScenarioExtension` | `.ToMustValidationCases<T>()` — mirrors `GuardScenarioExtension`, for `IMustValidator<T>`-driven scenarios. |
+| `BaseMustValidationUnitTest` | Abstract base with `AssertResult<TValue>(MustValidationCase<TValue>, MustValidationResult)` — asserts `IsValid`, then `FailureCount`, then the first failure's `PropertyPath`/`Code`/`Message` when the expectation carries them. |
 | `*Fixtures` (in `Fixtures/`) | Shared input constants and their scenario arrays for cross-layer validations (§9). |
 
 **Superseded**

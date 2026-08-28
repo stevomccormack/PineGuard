@@ -384,4 +384,82 @@ public sealed class FluentDateTimeOffsetExtensionsTests(ITestOutputHelper output
         var result = new NotWithinCalendarMonthsNonNullableValidator(tc.Value.reference, tc.Value.months).Validate(new NonNullableModel { Value = tc.Value.value });
         AssertResult(tc, result);
     }
+
+    // ── Cross-property expression overloads ──────────────────────────
+
+    private sealed record ComparisonModel { public DateTimeOffset Value { get; init; } public DateTimeOffset Other { get; init; } }
+    private sealed record NullableComparisonModel { public DateTimeOffset? Value { get; init; } public DateTimeOffset Other { get; init; } }
+
+    private sealed class BeforeExpressionValidator : AbstractValidator<ComparisonModel> { public BeforeExpressionValidator() => RuleFor(x => x.Value).Before(m => m.Other); }
+    private sealed class BeforeNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public BeforeNullableExpressionValidator() => RuleFor(x => x.Value).Before(m => m.Other); }
+    private sealed class OnOrBeforeExpressionValidator : AbstractValidator<ComparisonModel> { public OnOrBeforeExpressionValidator() => RuleFor(x => x.Value).OnOrBefore(m => m.Other); }
+    private sealed class OnOrBeforeNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public OnOrBeforeNullableExpressionValidator() => RuleFor(x => x.Value).OnOrBefore(m => m.Other); }
+    private sealed class AfterExpressionValidator : AbstractValidator<ComparisonModel> { public AfterExpressionValidator() => RuleFor(x => x.Value).After(m => m.Other); }
+    private sealed class AfterNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public AfterNullableExpressionValidator() => RuleFor(x => x.Value).After(m => m.Other); }
+    private sealed class OnOrAfterExpressionValidator : AbstractValidator<ComparisonModel> { public OnOrAfterExpressionValidator() => RuleFor(x => x.Value).OnOrAfter(m => m.Other); }
+    private sealed class OnOrAfterNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public OnOrAfterNullableExpressionValidator() => RuleFor(x => x.Value).OnOrAfter(m => m.Other); }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.BeforeExpression.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.BeforeExpression))]
+    public void BeforeExpression_BehavesAsExpected(FluentCase<(DateTimeOffset value, DateTimeOffset other)> tc)
+    {
+        var result = new BeforeExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.BeforeNullableExpression.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.BeforeNullableExpression))]
+    public void BeforeNullableExpression_BehavesAsExpected(FluentCase<(DateTimeOffset? value, DateTimeOffset other)> tc)
+    {
+        var result = new BeforeNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.OnOrBeforeExpression.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.OnOrBeforeExpression))]
+    public void OnOrBeforeExpression_BehavesAsExpected(FluentCase<(DateTimeOffset value, DateTimeOffset other)> tc)
+    {
+        var result = new OnOrBeforeExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.OnOrBeforeNullableExpression.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.OnOrBeforeNullableExpression))]
+    public void OnOrBeforeNullableExpression_BehavesAsExpected(FluentCase<(DateTimeOffset? value, DateTimeOffset other)> tc)
+    {
+        var result = new OnOrBeforeNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.AfterExpression.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.AfterExpression))]
+    public void AfterExpression_BehavesAsExpected(FluentCase<(DateTimeOffset value, DateTimeOffset other)> tc)
+    {
+        var result = new AfterExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.AfterNullableExpression.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.AfterNullableExpression))]
+    public void AfterNullableExpression_BehavesAsExpected(FluentCase<(DateTimeOffset? value, DateTimeOffset other)> tc)
+    {
+        var result = new AfterNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.OnOrAfterExpression.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.OnOrAfterExpression))]
+    public void OnOrAfterExpression_BehavesAsExpected(FluentCase<(DateTimeOffset value, DateTimeOffset other)> tc)
+    {
+        var result = new OnOrAfterExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.OnOrAfterNullableExpression.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.OnOrAfterNullableExpression))]
+    public void OnOrAfterNullableExpression_BehavesAsExpected(FluentCase<(DateTimeOffset? value, DateTimeOffset other)> tc)
+    {
+        var result = new OnOrAfterNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other });
+        AssertResult(tc, result);
+    }
 }

@@ -49,7 +49,7 @@ public static class GuardXmlClauses
     {
         var result = Must.Be.Xml(value, paramName); // Guard.Against.NotXml => Must.Be.Xml
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -94,7 +94,7 @@ public static class GuardXmlClauses
     {
         var result = Must.Be.XmlContentType(headers, paramName); // Guard.Against.NotXmlContentType => Must.Be.XmlContentType
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, headers, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -139,7 +139,7 @@ public static class GuardXmlClauses
     {
         var result = Must.Be.XmlDocument(value, paramName); // Guard.Against.NotXmlDocument => Must.Be.XmlDocument
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

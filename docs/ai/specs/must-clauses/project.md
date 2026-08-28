@@ -76,7 +76,11 @@ The foundational types live in src/PineGuard.Core/MustClauses/\*\*:
 - `IMustClause`
 - `MustClause`
 - `Must` (exposes `Must.Be`)
-- `MustResult<T>`
+- `MustResult<T>` / `IMustResult` (the non-generic, boxed-`Result` view every layer above Core consumes)
+- `MustFailure` — one property-level failure (`PropertyPath`, `Code`, `Message`, `Value`) inside a `MustValidationResult`
+- `MustValidationResult` / `MustValidationException` — the object-level result an `IMustValidator<T>` returns, and the exception `ThrowIfFailed()` throws
+- `IMustValidator` / `IMustValidator<T>` / `MustValidator<T>` / `MustPropertyRule<T,TProperty>` / `InlineMustValidator<T>` — the `MustValidator<T>` object-validation keystone (see `docs/ai/plans/new-surfaces-missing-validation-cases-01-structural-validation.md` §4.8 for the full builder API)
+- `PropertyPathUtility` — builds/combines the dotted `PropertyPath` strings (`Combine`, `Index`, `Key`, `Transform`, `FromExpression`) that `MustFailure.PropertyPath` and `RuleForEach` use
 
 ### Must clause implementations (this spec covers these)
 
@@ -241,14 +245,62 @@ public static MustResult<int> Between(
     [CallerArgumentExpression(nameof(value))] string? paramName = null)
 {
     if (min > max)
-        return MustResult<int>.Fail("{paramName} requires a valid range.", nameof(min), min);
+        return MustResult<int>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
 
     const string messageTemplate = "{paramName} must be within the expected range.";
 
     var ok = NumberRules.IsBetween(value, min, max, inclusion);
-    return MustResult<int>.FromBool(ok, messageTemplate, paramName, value, value);
+    return MustResult<int>.FromBool(ok, MustCodes.Number.Range.OutOfRange, messageTemplate, paramName, value, value);
 }
 ```
+
+---
+
+## Error codes
+
+Every public `Must.Be.*` clause carries a stable, machine-readable code alongside its human-readable
+message, so callers can branch on *which rule failed* without parsing prose.
+
+### Format
+
+A code is an address, not a label — three segments, `<domain>.<aspect>.<condition>` (e.g.
+`email.address.invalid`):
+
+- **domain** — the family of value being validated; fixed by the clause class (`MustEmailClauses` →
+  `Email`).
+- **aspect** — the facet of the value the rule looks at (`Address`, `Order`, `Range`, …).
+- **condition** — the failure state observed on that aspect; the exact complement of the rule.
+
+### Catalogue
+
+Codes live in `src/PineGuard.Core/Codes/MustCodes.<Domain>.cs`, one partial file per domain, each
+declaring a nested class under `public static partial class MustCodes`. The identifier path mirrors
+the code one-to-one — `MustCodes.Email.Address.Invalid` ↔ `"email.address.invalid"` — and every value
+is composed from its parent's `Prefix` constant so each segment is spelled exactly once. See
+`docs/ai/plans/new-surfaces-missing-validation-cases-00-program.md` §5.4 for the full grammar, domain
+map, and controlled condition vocabulary.
+
+### One clause, one code
+
+Every `Fail(...)`/`FromBool(...)` call inside a public clause method passes exactly one `MustCodes`
+constant — never a string literal, never zero, never more than one. A clause with multiple failure
+paths (e.g. a guarded-parameter check before the main rule) picks the code that matches *that specific*
+failure, as in the `Between` example above where the range-guard and the range-check each carry their
+own code. Type-variant clauses of the same rule (e.g. `MustGuidClauses.NotEmpty(Guid)` and
+`MustStringGuidClauses.NotEmptyGuid(string)`) share one code — the rule is the same regardless of input
+type.
+
+### Rule13
+
+`tools/audit-cli/rules/Test-Rule13-MustCodes.ps1` audits the catalogue and its call sites via source
+scan (no build required): every public clause passes exactly one code; every declared constant is
+referenced somewhere; no hardcoded code string literal duplicates a catalogue domain outside
+`Codes/`; every DataAnnotations attribute's declared code matches a code the clause it invokes can
+actually produce; every `Guard.Against.*` clause passes its `IMustResult` (never a string) to
+`GuardFailure.Throw`, so the guarded exception's code is always the Must layer's own; every clause
+file only references its own mapped domain's constants; and the catalogue itself stays a
+dependency-free leaf (no `using PineGuard...` under `Codes/`). Run it via
+`pwsh tools/audit-cli/Run-All.ps1 -RuleId Rule13`.
 
 ---
 

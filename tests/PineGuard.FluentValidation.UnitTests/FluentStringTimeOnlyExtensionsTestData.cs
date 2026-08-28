@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -15,7 +16,7 @@ public static class FluentStringTimeOnlyExtensionsTestData
         public static TheoryData<FluentCase<string?>> Cases =>
         [
             new("in-range", S1100, new FluentExpected(true)),
-            new("out-of-range", S1300, new FluentExpected(false, "Value must be a time within the expected range.")),
+            new("out-of-range", S1300, new FluentExpected(false, "Value must be a time within the expected range.", Code: MustCodes.Time.Range.OutOfRange)),
             new("null", null, new FluentExpected(true))
         ];
     }

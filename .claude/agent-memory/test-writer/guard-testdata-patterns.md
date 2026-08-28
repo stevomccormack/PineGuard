@@ -40,6 +40,24 @@ Guard methods for Before/After/Same typically call Must methods with fixed inclu
 - Missing `using PineGuard.Testing.UnitTests.Rules;` → `.Except()` and `.Project()` not found
 - 4-arg `GuardCase` constructor in collection initializers → fix to tuple syntax: `new("name", (value, days), expected)`
 
+### Auxiliary-Parameter Precondition Attribution (post `GuardFailure.Throw(IMustResult, ...)` redesign, Aug 2026)
+`GuardFailure.Throw` now takes the `IMustResult` itself and throws using `result.Value`/`result.ParamName`
+directly (null Value → `ArgumentNullException`, else `ArgumentException`), instead of the guard's own outer
+`paramName`. Many `Must.Be.X` methods validate an auxiliary parameter (not the guard's primary `value`) as
+their own precondition BEFORE inspecting `value` at all, e.g.:
+- `HasExactCount`/`NotHasExactCount`/`HasIndex`/`NotHasIndex`: `count < 0` / `index < 0` → `Fail(code, msg, nameof(count), count)` → `ArgumentException("count")`/`"index"` (never `ArgumentNullException`, since the aux int is never null)
+- `SubsetOf`/`NotSubsetOf`: `other is null` → `Fail(code, msg, nameof(other), other)` → `ArgumentNullException("other")`
+- `StrictTransportSecurity`: `minMaxAgeSeconds <= 0` → `ArgumentException("minMaxAgeSeconds")`
+- `OutOfRange`: `min > max` → `ArgumentException("min")`
+- `Approximately`/`NotApproximately`: `tolerance is null` → `ArgumentNullException("tolerance")`
+- `MultipleOf`/`NotMultipleOf`: `factor == 0` → `ArgumentException("factor")`
+- `GeoLocation`: `latitude is null` → `ArgumentNullException("latitude")`; `longitude is null` → `ArgumentNullException("longitude")`; unparsable `longitude` (with parsable `latitude`) → `ArgumentException("longitude")`; everything else → `ArgumentException("latitude")` (the outer paramName)
+When a TestData blanket selector (`s.Inputs.value == null ? ArgumentNullException("value") : ArgumentException("value")`) bundles a scenario that trips one of these aux preconditions, it must become scenario-aware
+(inspect `s.Inputs.<auxField>` or switch on `s.Name`) — the true `Type`/`ParamName` come from the aux param,
+not the primary `value`. Read the actual `Must.Be.X` source for the precondition order before guessing;
+`AssertThrow` failure messages (`Assert.Equal() Failure: Strings differ` / `Assert.Throws() Failure`) name the
+real `Type`/`ParamName` directly — trust them over blanket assumptions.
+
 ### Guard Positive Variant Pattern (Char/TypeOnly/etc.)
 - Positive guard (e.g. `Control`) = complement of corresponding Negative guard (`NotControl`)
 - `NotControl.ValidCases` = `AllValid.ToGuardCases()` → `Control.ValidCases` = `AllInvalid.Except(Null).ToGuardCases(_ => new GuardExpected(true))`

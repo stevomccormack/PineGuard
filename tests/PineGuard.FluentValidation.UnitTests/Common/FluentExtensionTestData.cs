@@ -17,10 +17,10 @@ public static class FluentExtensionTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("Fail uses result message template", "test", MustResult<bool>.Fail("Failed {paramName}", null, "test"), null, null, false, "Failed Value"),
-            new("Fail uses custom message template", "test", MustResult<bool>.Fail("Failed", "param", "test"), "Custom {paramName}", null, false, "Custom Value"),
-            new("Fail uses override property name", "test", MustResult<bool>.Fail("Failed", "param", "test"), "Custom {paramName}", "CustomProp", false, "Custom Custom Prop"),
-            new("Fail uses property path when display name blank", "test", MustResult<bool>.Fail("Failed", "param", "test"), "Custom {paramName}", "", false, "Custom ")
+            new("Fail uses result message template", "test", MustResult<bool>.Fail("test.code", "Failed {paramName}", null, "test"), null, null, false, "Failed Value"),
+            new("Fail uses custom message template", "test", MustResult<bool>.Fail("test.code", "Failed", "param", "test"), "Custom {paramName}", null, false, "Custom Value"),
+            new("Fail uses override property name", "test", MustResult<bool>.Fail("test.code", "Failed", "param", "test"), "Custom {paramName}", "CustomProp", false, "Custom Custom Prop"),
+            new("Fail uses property path when display name blank", "test", MustResult<bool>.Fail("test.code", "Failed", "param", "test"), "Custom {paramName}", "", false, "Custom ")
         ];
 
         public static TheoryData<IThrowsCase> InvalidCases =>
@@ -69,8 +69,8 @@ public static class FluentExtensionTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("Fail uses result message template", "test", MustResult<bool>.Fail("Failed {paramName}", null, "test"), null, null, false, "Failed Value"),
-            new("Fail uses custom message template", "test", MustResult<bool>.Fail("Failed", "param", "test"), "Custom {paramName}", null, false, "Custom Value")
+            new("Fail uses result message template", "test", MustResult<bool>.Fail("test.code", "Failed {paramName}", null, "test"), null, null, false, "Failed Value"),
+            new("Fail uses custom message template", "test", MustResult<bool>.Fail("test.code", "Failed", "param", "test"), "Custom {paramName}", null, false, "Custom Value")
         ];
 
         public static TheoryData<IThrowsCase> InvalidCases =>
@@ -112,7 +112,7 @@ public static class FluentExtensionTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("Fail result returns invalid", null, MustResult<int?>.Fail("Null {paramName}", null, null), null, null, false, "Null Id")
+            new("Fail result returns invalid", null, MustResult<int?>.Fail("test.code", "Null {paramName}", null, null), null, null, false, "Null Id")
         ];
 
         public sealed record ValidCase(
@@ -124,5 +124,10 @@ public static class FluentExtensionTestData
             bool Expected,
             string? ExpectedErrorMessage)
             : ReturnCase<int?, bool>(Name, Value, Expected);
+    }
+
+    public static class ErrorCode
+    {
+        public static TheoryData<bool> Cases => [true];
     }
 }

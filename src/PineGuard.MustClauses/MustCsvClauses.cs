@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -46,12 +47,12 @@ public static class MustCsvClauses
         [CallerArgumentExpression(nameof(line))] string? paramName = null)
     {
         if (line is null)
-            return MustResult<string>.Fail(NullMessage, paramName, line);
+            return MustResult<string>.Fail(MustCodes.Csv.Line.Invalid, NullMessage, paramName, line);
 
         const string messageTemplate = "{paramName} must be a valid CSV line.";
 
         var ok = CsvRules.IsCsvLine(line);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, line, line);
+        return MustResult<string>.FromBool(ok, MustCodes.Csv.Line.Invalid, messageTemplate, paramName, line, line);
     }
 
     /// <summary>
@@ -93,12 +94,12 @@ public static class MustCsvClauses
         [CallerArgumentExpression(nameof(line))] string? paramName = null)
     {
         if (line is null)
-            return MustResult<string>.Fail(NullMessage, paramName, line);
+            return MustResult<string>.Fail(MustCodes.Csv.Header.Invalid, NullMessage, paramName, line);
 
         const string messageTemplate = "{paramName} must be a valid CSV header line.";
 
         var ok = CsvRules.IsCsvHeaderLine(line, expectedHeader, separator, comparison);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, line, line);
+        return MustResult<string>.FromBool(ok, MustCodes.Csv.Header.Invalid, messageTemplate, paramName, line, line);
     }
 
     /// <summary>
@@ -138,12 +139,12 @@ public static class MustCsvClauses
         [CallerArgumentExpression(nameof(line))] string? paramName = null)
     {
         if (line is null)
-            return MustResult<string>.Fail(NullMessage, paramName, line);
+            return MustResult<string>.Fail(MustCodes.Csv.Row.Invalid, NullMessage, paramName, line);
 
         const string messageTemplate = "{paramName} must be a valid CSV row line.";
 
         var ok = CsvRules.IsCsvRowLine(line, schema, separator);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, line, line);
+        return MustResult<string>.FromBool(ok, MustCodes.Csv.Row.Invalid, messageTemplate, paramName, line, line);
     }
 
     /// <summary>
@@ -187,11 +188,11 @@ public static class MustCsvClauses
         [CallerArgumentExpression(nameof(line))] string? paramName = null)
     {
         if (line is null)
-            return MustResult<string>.Fail(NullMessage, paramName, line);
+            return MustResult<string>.Fail(MustCodes.Csv.Row.Invalid, NullMessage, paramName, line);
 
         const string messageTemplate = "{paramName} must be a valid CSV row line.";
 
         var ok = CsvRules.IsCsvRowLine(line, header, types, separator, headerNameComparison);
-        return MustResult<string>.FromBool(ok, messageTemplate, paramName, line, line);
+        return MustResult<string>.FromBool(ok, MustCodes.Csv.Row.Invalid, messageTemplate, paramName, line, line);
     }
 }

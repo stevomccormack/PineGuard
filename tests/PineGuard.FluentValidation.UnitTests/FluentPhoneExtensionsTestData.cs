@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.PhoneRulesFixtures;
 
@@ -10,7 +11,7 @@ public static class FluentPhoneExtensionsTestData
         public static TheoryData<FluentCase<string?>> Cases => F.IsPhoneNumber.AllScenarios.ToFluentCases(s => s.Name switch
         {
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a valid phone number.")
+            _ => new FluentExpected(false, "Value must be a valid phone number.", Code: MustCodes.Phone.Number.Invalid)
         });
     }
 

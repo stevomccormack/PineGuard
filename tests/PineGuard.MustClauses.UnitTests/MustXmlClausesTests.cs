@@ -1,30 +1,44 @@
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
+using Xunit.Abstractions;
 
 namespace PineGuard.MustClauses.UnitTests;
 
-public class MustXmlClausesTests : BaseUnitTest
+public sealed class MustXmlClausesTests(ITestOutputHelper output)
+    : BaseMustUnitTest(output)
 {
     [Theory]
     [MemberData(nameof(MustXmlClausesTestData.Xml.ValidCases), MemberType = typeof(MustXmlClausesTestData.Xml))]
-    public void Xml_Checks(MustXmlClausesTestData.Xml.ValidCase testCase)
+    [MemberData(nameof(MustXmlClausesTestData.Xml.InvalidCases), MemberType = typeof(MustXmlClausesTestData.Xml))]
+    public void Xml_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.Xml(testCase.Input);
-        Assert.Equal(testCase.Expected, result.Success);
+        // Act
+        var result = Must.Be.Xml(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
     }
 
     [Theory]
     [MemberData(nameof(MustXmlClausesTestData.XmlContentType.ValidCases), MemberType = typeof(MustXmlClausesTestData.XmlContentType))]
-    public void XmlContentType_Checks(MustXmlClausesTestData.XmlContentType.ValidCase testCase)
+    [MemberData(nameof(MustXmlClausesTestData.XmlContentType.InvalidCases), MemberType = typeof(MustXmlClausesTestData.XmlContentType))]
+    public void XmlContentType_BehavesAsExpected(MustCase<IReadOnlyDictionary<string, IEnumerable<string>>?> tc)
     {
-        var result = Must.Be.XmlContentType(testCase.Input);
-        Assert.Equal(testCase.Expected, result.Success);
+        // Act
+        var result = Must.Be.XmlContentType(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
     }
 
     [Theory]
     [MemberData(nameof(MustXmlClausesTestData.XmlDocument.ValidCases), MemberType = typeof(MustXmlClausesTestData.XmlDocument))]
-    public void XmlDocument_Checks(MustXmlClausesTestData.XmlDocument.ValidCase testCase)
+    [MemberData(nameof(MustXmlClausesTestData.XmlDocument.InvalidCases), MemberType = typeof(MustXmlClausesTestData.XmlDocument))]
+    public void XmlDocument_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.XmlDocument(testCase.Input);
-        Assert.Equal(testCase.Expected, result.Success);
+        // Act
+        var result = Must.Be.XmlDocument(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
     }
 }

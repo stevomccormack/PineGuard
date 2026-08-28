@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 
 namespace PineGuard.MustClauses;
@@ -44,7 +45,7 @@ public static class MustBoolClauses
         const string messageTemplate = "{paramName} must be true.";
 
         var ok = BoolRules.IsTrue(value);
-        return MustResult<bool>.FromBool(ok, messageTemplate, paramName, value, result: true);
+        return MustResult<bool>.FromBool(ok, MustCodes.Boolean.Value.False, messageTemplate, paramName, value, result: true);
     }
 
     /// <summary>
@@ -81,6 +82,6 @@ public static class MustBoolClauses
         const string messageTemplate = "{paramName} must be false.";
 
         var ok = BoolRules.IsFalse(value);
-        return MustResult<bool>.FromBool(ok, messageTemplate, paramName, value, result: false);
+        return MustResult<bool>.FromBool(ok, MustCodes.Boolean.Value.True, messageTemplate, paramName, value, result: false);
     }
 }

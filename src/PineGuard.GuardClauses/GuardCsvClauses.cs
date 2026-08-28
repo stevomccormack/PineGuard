@@ -51,7 +51,7 @@ public static class GuardCsvClauses
     {
         var result = Must.Be.CsvLine(line, paramName); // Guard.Against.NotCsvLine => Must.Be.CsvLine
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, line, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -102,7 +102,7 @@ public static class GuardCsvClauses
     {
         var result = Must.Be.CsvHeaderLine(line, expectedHeader, separator, comparison, paramName); // Guard.Against.NotCsvHeaderLine => Must.Be.CsvHeaderLine
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, line, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -151,7 +151,7 @@ public static class GuardCsvClauses
     {
         var result = Must.Be.CsvRowLine(line, schema, separator, paramName); // Guard.Against.NotCsvRowLine => Must.Be.CsvRowLine
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, line, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }
@@ -204,7 +204,7 @@ public static class GuardCsvClauses
     {
         var result = Must.Be.CsvRowLine(line, header, types, separator, headerNameComparison, paramName); // Guard.Against.NotCsvRowLine => Must.Be.CsvRowLine
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, line, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

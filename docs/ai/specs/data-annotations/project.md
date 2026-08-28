@@ -68,7 +68,18 @@ Required pattern:
 
 - **Base Class**: Use `ValidationAttributeBase` (Namespace: `PineGuard.DataAnnotations.Common`).
 - **Constructors**: Use a single-line primary constructor per `docs/ai/specs/coding-standard.md` ("Primary Constructors (C# 12)").
-  - Example: `public sealed class TrueAttribute() : ValidationAttributeBase(typeof(bool))`
+  - Example: `public sealed class TrueAttribute() : ValidationAttributeBase(typeof(bool), MustCodes.Boolean.Value.False)`
+- **Error code**: `ValidationAttributeBase`'s second constructor parameter is `code` — the `MustCodes` catalogue
+  constant identifying the clause the attribute adapts, exposed as the public `Code` property. It must be the
+  same constant the invoked Must clause itself passes to `Fail`/`FromBool`; Rule13 check (d) audits this. Every
+  intermediate base (`NumberAttributeBase`, `CollectionAttributeBase`, `ObjectAttributeBase`,
+  `GenericDictionaryAttributeBase`, `ComparePropertyAttributeBase`) accepts and forwards `code` the same way.
+  See `../must-clauses/project.md` ("Error codes") for the format.
+- **No custom `ValidationResult` subtype**: the code is carried on the attribute (`Code`), never on a
+  subclass of `System.ComponentModel.DataAnnotations.ValidationResult` — that is a sealed framework type not
+  meant to be extended, and DataAnnotations consumers (model binders, ASP.NET Core) only ever see the base
+  `ValidationResult` shape. A caller that needs the code reads `attribute.Code` from the
+  `ValidationContext`'s member's attributes, not from the returned result.
 - **Naming Collisions**: If an attribute name would collide across domains (e.g., `Past` for `DateOnly` vs `DateTime`), suffix the Type/Domain to the attribute name for the **entire class** of that domain.
   - Example: `PastDateOnlyAttribute`, `FutureDateOnlyAttribute` (for DateOnly domain).
   - Example: `TrueStringAttribute` (for String domain if `True` exists for Bool).
@@ -102,6 +113,11 @@ Rationale:
 - **Collision Handling**: Follow `docs/ai/specs/language/naming-collisions.md` when a framework-native attribute name would create ambiguity or collision.
 - **File Name**: `[Domain]Attributes.cs` (Aggregated) OR `[AttributeName].cs` (Standalone).
   - **Aggregation Strategy**: Prefer grouping related attributes into a single file named after the domain (e.g., `BoolAttributes.cs`) to prevent file explosion.
+- **Cross-property comparison**: `[Comparison]Property` (e.g. `AfterPropertyAttribute`, `GreaterThanPropertyAttribute`,
+  `EqualToPropertyAttribute`) for an attribute that compares the annotated value against another named
+  property or field on the same object, resolved at validation time via `ComparePropertyAttributeBase`. The
+  framework's own `CompareAttribute` is equality-only, so this family is named distinctly rather than
+  extending it — see `docs/ai/specs/language/naming-collisions.md`.
 
 ## 4) Adapter conventions
 
@@ -126,7 +142,7 @@ Standard pattern:
 ```csharp
 // Primary constructor defaults to allowNull: true
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastDateOnlyAttribute() : ValidationAttributeBase(typeof(DateOnly))
+public sealed class PastDateOnlyAttribute() : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Relative.NotPast)
 {
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
@@ -168,7 +184,7 @@ Each `ValidationAttribute` implementation must adapt a specific Must clause:
 
 ```csharp
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class TrueAttribute() : ValidationAttributeBase(typeof(bool))
+public sealed class TrueAttribute() : ValidationAttributeBase(typeof(bool), MustCodes.Boolean.Value.False)
 {
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
@@ -187,7 +203,7 @@ reflection path — never through `dynamic`:
 
 ```csharp
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotDefaultAttribute : ObjectAttributeBase
+public sealed class NotDefaultAttribute() : ObjectAttributeBase(MustCodes.Value.State.Default)
 {
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
         InvokeGenericMust(nameof(MustDefaultEqualityClauses.NotDefault), value, validationContext);

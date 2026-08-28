@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -20,7 +21,7 @@ public static class FluentNetworkExtensions
     /// <example><code>RuleFor(x => x.ServerIp).IpAddress();</code></example>
     public static IRuleBuilderOptions<TModel, string?> IpAddress<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.IpAddress(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.Invalid);
 
     /// <summary>Validates that the string value is not a valid IP address.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -30,7 +31,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotIpAddress<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotIpAddress(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.WellFormed);
 
     /// <summary>Validates that the string value is a valid IPv4 address.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -41,7 +42,7 @@ public static class FluentNetworkExtensions
     /// <example><code>RuleFor(x => x.Ipv4).Ipv4();</code></example>
     public static IRuleBuilderOptions<TModel, string?> Ipv4<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Ipv4(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.NotIpv4);
 
     /// <summary>Validates that the string value is not a valid IPv4 address.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -51,7 +52,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotIpv4<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotIpv4(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.Ipv4);
 
     /// <summary>Validates that the string value is a valid IPv6 address.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -62,7 +63,7 @@ public static class FluentNetworkExtensions
     /// <example><code>RuleFor(x => x.Ipv6Addr).Ipv6();</code></example>
     public static IRuleBuilderOptions<TModel, string?> Ipv6<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Ipv6(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.NotIpv6);
 
     /// <summary>Validates that the string value is not a valid IPv6 address.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -72,7 +73,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotIpv6<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotIpv6(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.Ipv6);
 
     /// <summary>Validates that the string value is a valid IP address string representation.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -82,7 +83,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> IpAddressString<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.IpAddressString(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.Invalid);
 
     /// <summary>Validates that the string value is not a valid IP address string representation.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -92,7 +93,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotIpAddressString<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotIpAddressString(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.WellFormed);
 
     /// <summary>Validates that the string value is a valid IPv4 string representation.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -102,7 +103,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> Ipv4String<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Ipv4String(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.NotIpv4);
 
     /// <summary>Validates that the string value is not a valid IPv4 string representation.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -112,7 +113,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotIpv4String<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotIpv4String(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.Ipv4);
 
     /// <summary>Validates that the string value is a valid IPv6 string representation.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -122,7 +123,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> Ipv6String<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Ipv6String(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.NotIpv6);
 
     /// <summary>Validates that the string value is not a valid IPv6 string representation.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -132,7 +133,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotIpv6String<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotIpv6String(val, paramName: null),
-            message);
+            message, MustCodes.Network.Address.Ipv6);
 
     /// <summary>Validates that the IP address string falls within the specified CIDR range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -146,7 +147,7 @@ public static class FluentNetworkExtensions
         string cidr,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.InCidrRange(val, cidr, paramName: null),
-            message);
+            message, MustCodes.Network.Cidr.OutOfRange);
 
     /// <summary>Validates that the IP address string does not fall within the specified CIDR range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -159,7 +160,7 @@ public static class FluentNetworkExtensions
         string cidr,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotInCidrRange(val, cidr, paramName: null),
-            message);
+            message, MustCodes.Network.Cidr.InRange);
 
     /// <summary>Validates that the string value is a valid hostname.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -170,7 +171,7 @@ public static class FluentNetworkExtensions
     /// <example><code>RuleFor(x => x.Host).Hostname();</code></example>
     public static IRuleBuilderOptions<TModel, string?> Hostname<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Hostname(val, paramName: null),
-            message);
+            message, MustCodes.Network.Hostname.Invalid);
 
     /// <summary>Validates that the string value is not a valid hostname.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -180,7 +181,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotHostname<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHostname(val, paramName: null),
-            message);
+            message, MustCodes.Network.Hostname.WellFormed);
 
     /// <summary>Validates that the nullable <see cref="int"/> value is a valid network port number (0-65535).</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -191,7 +192,7 @@ public static class FluentNetworkExtensions
     /// <example><code>RuleFor(x => x.Port).PortNumber();</code></example>
     public static IRuleBuilderOptions<TModel, int?> PortNumber<TModel>(this IRuleBuilder<TModel, int?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.PortNumber(val.Value, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Network.Port.Invalid);
 
     /// <summary>Validates that the <see cref="int"/> value is a valid network port number (0-65535).</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -200,7 +201,7 @@ public static class FluentNetworkExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, int> PortNumber<TModel>(this IRuleBuilder<TModel, int> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.PortNumber(val, paramName: null),
-            message);
+            message, MustCodes.Network.Port.Invalid);
 
     /// <summary>Validates that the nullable <see cref="int"/> value is not a valid network port number.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -210,7 +211,7 @@ public static class FluentNetworkExtensions
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, int?> NotPortNumber<TModel>(this IRuleBuilder<TModel, int?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotPortNumber(val.Value, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Network.Port.WellFormed);
 
     /// <summary>Validates that the <see cref="int"/> value is not a valid network port number.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -219,5 +220,5 @@ public static class FluentNetworkExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, int> NotPortNumber<TModel>(this IRuleBuilder<TModel, int> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotPortNumber(val, paramName: null),
-            message);
+            message, MustCodes.Network.Port.WellFormed);
 }

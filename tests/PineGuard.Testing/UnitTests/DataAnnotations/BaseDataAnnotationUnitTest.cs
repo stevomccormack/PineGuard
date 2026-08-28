@@ -24,4 +24,17 @@ public abstract class BaseDataAnnotationUnitTest(ITestOutputHelper output) : Bas
         if (!isValid && testCase.Expected.MemberName is not null)
             Assert.Contains(testCase.Expected.MemberName, result!.MemberNames);
     }
+
+    /// <summary>
+    /// Overload asserting the attribute's <c>Code</c> alongside everything <see cref="AssertResult(DataAnnotationCase, ValidationResult?)"/>
+    /// checks. <paramref name="actualCode"/> is passed in by the caller (e.g. <c>attribute.Code</c>) rather
+    /// than read reflectively, because this project references only <c>PineGuard.Core</c> and must not gain
+    /// a <c>PineGuard.DataAnnotations</c> reference.
+    /// </summary>
+    protected static void AssertResult(DataAnnotationCase testCase, ValidationResult? result, string? actualCode)
+    {
+        AssertResult(testCase, result);
+        if (testCase.Expected.Code is not null)
+            Assert.Equal(testCase.Expected.Code, actualCode);
+    }
 }

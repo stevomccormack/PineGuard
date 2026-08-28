@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 using PineGuard.Utils;
@@ -42,16 +43,16 @@ public static class MustStringTimeSpanClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<TimeSpan>.Fail(NullMessage, paramName, value);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.OutOfRange, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a duration within the expected range.";
 
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
-            return MustResult<TimeSpan>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = TimeSpanRules.IsDurationBetween(parsedValue, min, max, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.OutOfRange, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -79,16 +80,16 @@ public static class MustStringTimeSpanClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<TimeSpan>.Fail(NullMessage, paramName, value);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotGreater, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a duration greater than the threshold.";
 
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
-            return MustResult<TimeSpan>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = TimeSpanRules.IsGreaterThan(parsedValue, threshold, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotGreater, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -116,16 +117,16 @@ public static class MustStringTimeSpanClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<TimeSpan>.Fail(NullMessage, paramName, value);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotLess, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a duration less than the threshold.";
 
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
-            return MustResult<TimeSpan>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = TimeSpanRules.IsLessThan(parsedValue, threshold, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotLess, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
@@ -155,15 +156,15 @@ public static class MustStringTimeSpanClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
-            return MustResult<TimeSpan>.Fail(NullMessage, paramName, value);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.InRange, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a duration not within the expected range.";
 
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
-            return MustResult<TimeSpan>.FromBool(false, messageTemplate, paramName, value);
+            return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed.GetValueOrDefault();
         var ok = !TimeSpanRules.IsDurationBetween(parsedValue, min, max, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.InRange, messageTemplate, paramName, value, parsedValue);
     }
 }

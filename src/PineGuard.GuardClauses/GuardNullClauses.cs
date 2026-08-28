@@ -50,7 +50,7 @@ public static class GuardNullClauses
     {
         var result = Must.Be.Null(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
@@ -96,7 +96,7 @@ public static class GuardNullClauses
     {
         var result = Must.Be.NotNull(value, paramName);
         if (result.Failed)
-            GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+            GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result!;
     }

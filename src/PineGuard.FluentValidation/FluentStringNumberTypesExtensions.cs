@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Globalization;
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -39,7 +40,7 @@ public static class FluentStringNumberTypesExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Decimal(val, decimalPlaces, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Format.NotDecimal);
 
     /// <summary>
     /// Validates that the property value is a parseable decimal number with exactly the specified number of decimal places.
@@ -65,7 +66,7 @@ public static class FluentStringNumberTypesExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ExactDecimal(val, exactDecimalPlaces, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Scale.Mismatch);
 
     /// <summary>
     /// Validates that the property value is parseable as a 32-bit integer.
@@ -89,7 +90,7 @@ public static class FluentStringNumberTypesExtensions
         string? message = null,
         NumberStyles styles = NumberStyles.Integer) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Int32(val, styles, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Number.Format.NotInt32);
 
     /// <summary>
     /// Validates that the property value is parseable as a 64-bit integer.
@@ -113,7 +114,7 @@ public static class FluentStringNumberTypesExtensions
         string? message = null,
         NumberStyles styles = NumberStyles.Integer) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Int64(val, styles, paramName: null) : MustResult<long>.Ok(0),
-            message);
+            message, MustCodes.Number.Format.NotInt64);
 
     /// <summary>
     /// Validates that the property value is parseable as a 32-bit integer within the specified range.
@@ -143,7 +144,7 @@ public static class FluentStringNumberTypesExtensions
         string? message = null,
         NumberStyles styles = NumberStyles.Integer) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Int32InRange(val, min, max, inclusion, styles, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.OutOfRange);
 
     /// <summary>
     /// Validates that the property value is parseable as a 32-bit integer outside the specified range.
@@ -173,7 +174,7 @@ public static class FluentStringNumberTypesExtensions
         string? message = null,
         NumberStyles styles = NumberStyles.Integer) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Int32OutOfRange(val, min, max, inclusion, styles, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.InRange);
 
     /// <summary>
     /// Validates that the property value is parseable as a 64-bit integer within the specified range.
@@ -203,7 +204,7 @@ public static class FluentStringNumberTypesExtensions
         string? message = null,
         NumberStyles styles = NumberStyles.Integer) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Int64InRange(val, min, max, inclusion, styles, paramName: null) : MustResult<long>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.OutOfRange);
 
     /// <summary>
     /// Validates that the property value is parseable as a 64-bit integer outside the specified range.
@@ -233,6 +234,6 @@ public static class FluentStringNumberTypesExtensions
         string? message = null,
         NumberStyles styles = NumberStyles.Integer) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Int64OutOfRange(val, min, max, inclusion, styles, paramName: null) : MustResult<long>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.InRange);
 }
 #endif

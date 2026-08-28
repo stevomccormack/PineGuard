@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 using PineGuard.Utils;
 
@@ -44,19 +45,19 @@ public static class MustBitWiseClauses
         if (string.IsNullOrWhiteSpace(mask))
         {
             const string equalTemplate = "{paramName} must be bitwise equal to the expected value.";
-            return MustResult<T>.FromBool(value == other, equalTemplate, paramName, value, value);
+            return MustResult<T>.FromBool(value == other, MustCodes.Bitwise.Equality.NotEqual, equalTemplate, paramName, value, value);
         }
 
         if (!BitWiseUtility.TryParseNonNegativeMask(mask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         const string messageTemplate = "{paramName} must be bitwise equal to the expected value.";
 
         var ok = BitWiseRules.IsBitwiseEqualTo(value, other, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Equality.NotEqual, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -87,19 +88,19 @@ public static class MustBitWiseClauses
         if (string.IsNullOrWhiteSpace(mask))
         {
             const string notEqualTemplate = "{paramName} must not be bitwise equal to the expected value.";
-            return MustResult<T>.FromBool(value != other, notEqualTemplate, paramName, value, value);
+            return MustResult<T>.FromBool(value != other, MustCodes.Bitwise.Equality.Equal, notEqualTemplate, paramName, value, value);
         }
 
         if (!BitWiseUtility.TryParseNonNegativeMask(mask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         const string messageTemplate = "{paramName} must not be bitwise equal to the expected value.";
 
         var ok = !BitWiseRules.IsBitwiseEqualTo(value, other, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Equality.Equal, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -126,18 +127,18 @@ public static class MustBitWiseClauses
         where T : struct, IBinaryInteger<T>
     {
         if (string.IsNullOrWhiteSpace(mask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (!BitWiseUtility.TryParseNonNegativeMask(mask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         const string messageTemplate = "{paramName} must contain all required bits.";
 
         var ok = BitWiseRules.HasAllBits(value, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Bits.NotAllSet, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -164,18 +165,18 @@ public static class MustBitWiseClauses
         where T : struct, IBinaryInteger<T>
     {
         if (string.IsNullOrWhiteSpace(mask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (!BitWiseUtility.TryParseNonNegativeMask(mask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         const string messageTemplate = "{paramName} must contain at least one required bit.";
 
         var ok = BitWiseRules.HasAnyBits(value, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Bits.NoneSet, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -202,18 +203,18 @@ public static class MustBitWiseClauses
         where T : struct, IBinaryInteger<T>
     {
         if (string.IsNullOrWhiteSpace(mask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (!BitWiseUtility.TryParseNonNegativeMask(mask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         const string messageTemplate = "{paramName} must contain none of the forbidden bits.";
 
         var ok = BitWiseRules.HasNoBits(value, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Bits.AnySet, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -240,18 +241,18 @@ public static class MustBitWiseClauses
         where T : struct, IBinaryInteger<T>
     {
         if (string.IsNullOrWhiteSpace(allowedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(allowedMask), allowedMask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(allowedMask), allowedMask);
 
         if (!BitWiseUtility.TryParseNonNegativeMask(allowedMask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(allowedMask), allowedMask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(allowedMask), allowedMask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(allowedMask), allowedMask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(allowedMask), allowedMask);
 
         const string messageTemplate = "{paramName} must contain only allowed bits.";
 
         var ok = BitWiseRules.HasOnlyBits(value, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Bits.NotSubset, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -278,7 +279,7 @@ public static class MustBitWiseClauses
         const string messageTemplate = "{paramName} must be a power of two.";
 
         var ok = BitWiseRules.IsPowerOfTwo<T>(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Value.NotPowerOfTwo, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -305,7 +306,7 @@ public static class MustBitWiseClauses
         const string messageTemplate = "{paramName} must not be a power of two.";
 
         var ok = !BitWiseRules.IsPowerOfTwo<T>(value);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Value.PowerOfTwo, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -332,18 +333,18 @@ public static class MustBitWiseClauses
         where T : struct, IBinaryInteger<T>
     {
         if (string.IsNullOrWhiteSpace(mask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (!BitWiseUtility.TryParseNonNegativeMask(mask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         const string messageTemplate = "{paramName} must not contain all required bits.";
 
         var ok = !BitWiseRules.HasAllBits(value, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Bits.AllSet, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -370,18 +371,18 @@ public static class MustBitWiseClauses
         where T : struct, IBinaryInteger<T>
     {
         if (string.IsNullOrWhiteSpace(mask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (!BitWiseUtility.TryParseNonNegativeMask(mask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         const string messageTemplate = "{paramName} must not contain any of the specified bits.";
 
         var ok = !BitWiseRules.HasAnyBits(value, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Bits.AnySet, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -408,18 +409,18 @@ public static class MustBitWiseClauses
         where T : struct, IBinaryInteger<T>
     {
         if (string.IsNullOrWhiteSpace(mask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (!BitWiseUtility.TryParseNonNegativeMask(mask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(mask), mask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(mask), mask);
 
         const string messageTemplate = "{paramName} must contain at least one of the forbidden bits.";
 
         var ok = !BitWiseRules.HasNoBits(value, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Bits.NoneSet, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -446,18 +447,18 @@ public static class MustBitWiseClauses
         where T : struct, IBinaryInteger<T>
     {
         if (string.IsNullOrWhiteSpace(allowedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(allowedMask), allowedMask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(allowedMask), allowedMask);
 
         if (!BitWiseUtility.TryParseNonNegativeMask(allowedMask, out T parsedMask))
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(allowedMask), allowedMask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(allowedMask), allowedMask);
 
         if (parsedMask == T.Zero)
-            return MustResult<T>.Fail(InvalidMaskMessage, nameof(allowedMask), allowedMask);
+            return MustResult<T>.Fail(MustCodes.Bitwise.Mask.Invalid, InvalidMaskMessage, nameof(allowedMask), allowedMask);
 
         const string messageTemplate = "{paramName} must contain bits not allowed by the mask.";
 
         var ok = !BitWiseRules.HasOnlyBits(value, parsedMask);
-        return MustResult<T>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<T>.FromBool(ok, MustCodes.Bitwise.Bits.Subset, messageTemplate, paramName, value, value);
     }
 }
 #endif

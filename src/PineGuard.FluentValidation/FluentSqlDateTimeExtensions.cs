@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ public static class FluentSqlDateTimeExtensions
         ruleBuilder.MustBe(val => val.HasValue
                 ? Must.Be.InSqlDateRange(val.Value, paramName: null)
                 : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Sql.OutOfRange);
 
     /// <summary>
     /// Validates that the <see cref="DateOnly"/> value falls within the SQL Server <c>date</c> type range.
@@ -46,7 +47,7 @@ public static class FluentSqlDateTimeExtensions
         this IRuleBuilder<TModel, DateOnly> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.InSqlDateRange(val, paramName: null),
-            message);
+            message, MustCodes.Date.Sql.OutOfRange);
 
     /// <summary>
     /// Validates that the nullable <see cref="DateTimeOffset"/> value falls within the SQL Server <c>datetime</c> type range.
@@ -67,7 +68,7 @@ public static class FluentSqlDateTimeExtensions
         ruleBuilder.MustBe(val => val.HasValue
                 ? Must.Be.InSqlDateTimeRange(val.Value, paramName: null)
                 : MustResult<DateTimeOffset>.Ok(default),
-            message);
+            message, MustCodes.Date.Sql.OutOfRange);
 
     /// <summary>
     /// Validates that the <see cref="DateTimeOffset"/> value falls within the SQL Server <c>datetime</c> type range.
@@ -83,7 +84,7 @@ public static class FluentSqlDateTimeExtensions
         this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.InSqlDateTimeRange(val, paramName: null),
-            message);
+            message, MustCodes.Date.Sql.OutOfRange);
 
     /// <summary>
     /// Validates that the nullable <see cref="DateTime"/> value falls within the SQL Server <c>datetime</c> type range.
@@ -104,6 +105,6 @@ public static class FluentSqlDateTimeExtensions
         ruleBuilder.MustBe(val => val.HasValue
             ? Must.Be.InSqlDateTimeRange(val.Value, paramName: null)
             : MustResult<DateTime>.Ok(default),
-            message);
+            message, MustCodes.Date.Sql.OutOfRange);
 }
 #endif

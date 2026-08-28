@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
 
@@ -50,12 +51,12 @@ public static class MustTimeSpanClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (min > max)
-            return MustResult<TimeSpan>.Fail("{paramName} requires a valid range.", nameof(min), min);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.OutOfRange, "{paramName} requires a valid range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must be within the expected duration range.";
 
         var ok = TimeSpanRules.IsDurationBetween(value, min, max, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.OutOfRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -97,12 +98,12 @@ public static class MustTimeSpanClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (min > max)
-            return MustResult<TimeSpan>.Fail("{paramName} requires a valid range.", nameof(min), min);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.InRange, "{paramName} requires a valid range.", nameof(min), min);
 
         const string messageTemplate = "{paramName} must not be within the expected duration range.";
 
         var ok = !TimeSpanRules.IsDurationBetween(value, min, max, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.InRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -143,7 +144,7 @@ public static class MustTimeSpanClauses
         const string messageTemplate = "{paramName} must be greater than the threshold.";
 
         var ok = TimeSpanRules.IsGreaterThan(value, threshold, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotGreater, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
@@ -184,6 +185,6 @@ public static class MustTimeSpanClauses
         const string messageTemplate = "{paramName} must be less than the threshold.";
 
         var ok = TimeSpanRules.IsLessThan(value, threshold, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, messageTemplate, paramName, value, value);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotLess, messageTemplate, paramName, value, value);
     }
 }

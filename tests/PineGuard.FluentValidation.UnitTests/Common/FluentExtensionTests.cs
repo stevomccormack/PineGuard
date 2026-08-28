@@ -1,5 +1,6 @@
 using FluentValidation;
 using PineGuard.FluentValidation.Common;
+using PineGuard.MustClauses;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
@@ -119,6 +120,70 @@ public sealed class FluentExtensionTests : BaseUnitTest
 
             var error = Assert.Single(result.Errors);
             Assert.Equal(testCase.ExpectedErrorMessage, error.ErrorMessage);
+        }
+    }
+
+    public static class ErrorCode
+    {
+        [Theory]
+        [MemberData(nameof(FluentExtensionTestData.ErrorCode.Cases), MemberType = typeof(FluentExtensionTestData.ErrorCode))]
+        public static void CodeNull_LeavesFluentValidationDefaultErrorCode(bool _)
+        {
+            // Arrange
+            var undecorated = new InlineValidator<Model>();
+            undecorated.RuleFor(x => x.Value).Must(_ => false);
+
+            var decorated = new InlineValidator<Model>();
+            decorated.RuleFor(x => x.Value).MustBe(_ => MustResult<bool>.Fail("test.code", "bad", null, "x"), null);
+
+            // Act
+            var undecoratedResult = undecorated.Validate(new Model());
+            var decoratedResult = decorated.Validate(new Model());
+
+            // Assert
+            Assert.Equal(undecoratedResult.Errors[0].ErrorCode, decoratedResult.Errors[0].ErrorCode);
+        }
+
+        [Theory]
+        [MemberData(nameof(FluentExtensionTestData.ErrorCode.Cases), MemberType = typeof(FluentExtensionTestData.ErrorCode))]
+        public static void CodeSet_BecomesErrorCode_OnAllThreeOverloads(bool _)
+        {
+            // Arrange
+            var single = new InlineValidator<Model>();
+            single.RuleFor(x => x.Value).MustBe(_ => MustResult<bool>.Fail("test.code", "bad", null, "x"), null, "sample.code");
+
+            var model = new InlineValidator<Model>();
+            model.RuleFor(x => x.Value).MustBe((_, _) => MustResult<bool>.Fail("test.code", "bad", null, "x"), null, "sample.code");
+
+            var structModel = new InlineValidator<ModelStub>();
+            structModel.RuleFor(x => x.Id).MustBe(_ => MustResult<int?>.Fail("test.code", "bad", null, null), null, "sample.code");
+
+            // Act
+            var singleResult = single.Validate(new Model());
+            var modelResult = model.Validate(new Model());
+            var structResult = structModel.Validate(new ModelStub());
+
+            // Assert
+            Assert.Equal("sample.code", singleResult.Errors[0].ErrorCode);
+            Assert.Equal("sample.code", modelResult.Errors[0].ErrorCode);
+            Assert.Equal("sample.code", structResult.Errors[0].ErrorCode);
+        }
+
+        [Theory]
+        [MemberData(nameof(FluentExtensionTestData.ErrorCode.Cases), MemberType = typeof(FluentExtensionTestData.ErrorCode))]
+        public static void ConsumerWithMessage_AfterExtension_StillWins(bool _)
+        {
+            // Arrange
+            var validator = new InlineValidator<Model>();
+            validator.RuleFor(x => x.Value)
+                .MustBe(_ => MustResult<bool>.Fail("test.code", "bad", null, "x"), null, "sample.code")
+                .WithMessage("consumer message");
+
+            // Act
+            var result = validator.Validate(new Model());
+
+            // Assert
+            Assert.Equal("consumer message", result.Errors[0].ErrorMessage);
         }
     }
 

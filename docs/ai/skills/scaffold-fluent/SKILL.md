@@ -14,6 +14,7 @@ Adapt a **MustClause** into a **FluentValidation** extension method (`IRuleBuild
 > 1.  **Strict Adaptation**: Do NOT write validation logic here. You **MUST** call `Must.Be.Xxx`.
 > 2.  **Use The Adapter**: You **MUST** use the `ruleBuilder.MustBe(...)` extension. Do not use `.Must(...)` directly.
 > 3.  **ParamName Null**: You **MUST** pass `paramName: null` to the MustClause. The adapter handles message formatting.
+> 3b. **Error code**: Pass the invoked clause's own `MustCodes` constant as `MustBe`'s trailing `code` argument — the same constant that clause itself passes to `Fail`/`FromBool`. `MustBe` sets it as the rule's FluentValidation `ErrorCode` directly; it does not read the delegate's own `MustResult.Code`. See `docs/ai/specs/must-clauses/project.md` ("Error codes").
 > 4.  **Chaining**: Return `IRuleBuilderOptions<T, TProp>`.
 > 5.  **Strict Coding**: File-scoped namespaces, arrow functions (`=>`) for implementation.
 > 6.  **Naming Collisions**: If a Must-aligned method name would collide with or strongly mimic a FluentValidation built-in, prefer the clearer PineGuard-specific adapter name documented in `docs/ai/specs/language/naming-collisions.md` (for example, `Required()` / `NotRequired()` instead of `NotNull()` / `Null()`).
@@ -37,7 +38,7 @@ Adapt a **MustClause** into a **FluentValidation** extension method (`IRuleBuild
         public static IRuleBuilderOptions<T, string?> MyExtension<T>(
             this IRuleBuilder<T, string?> ruleBuilder,
             string? message = null)
-            => ruleBuilder.MustBe(value => Must.Be.MyCondition(value, paramName: null), message);
+            => ruleBuilder.MustBe(value => Must.Be.MyCondition(value, paramName: null), message, MustCodes.Domain.Aspect.Condition);
     }
     ```
 
@@ -49,6 +50,7 @@ Adapt a **MustClause** into a **FluentValidation** extension method (`IRuleBuild
 - [ ] Code compiles.
 - [ ] Calls `Must.Be.*`.
 - [ ] Passes `paramName: null` to Must.
+- [ ] Passes the clause's `MustCodes` constant as `MustBe`'s `code` argument.
 
 ## 6. Success Criteria
 
@@ -59,6 +61,7 @@ Adapt a **MustClause** into a **FluentValidation** extension method (`IRuleBuild
 | 3 | paramName null | Every Must call passes `paramName: null` |
 | 4 | Returns chainable type | Return type is `IRuleBuilderOptions<T, TProp>` |
 | 5 | No validation logic | Method body is a single arrow expression delegating to Must |
+| 6 | Carries an error code | `MustBe`'s trailing `code` argument matches the invoked clause's own `MustCodes` constant |
 
 ## 7. Reference Material
 - `docs/ai/specs/fluent-validation/project.md`

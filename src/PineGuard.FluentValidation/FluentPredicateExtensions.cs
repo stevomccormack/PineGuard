@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -34,7 +35,7 @@ public static class FluentPredicateExtensions
         Func<T, bool> predicate,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Satisfies(val, predicate, paramName: null),
-            message);
+            message, MustCodes.Predicate.Result.False);
 
     /// <summary>
     /// Validates that the property value does not satisfy the specified predicate.
@@ -59,5 +60,5 @@ public static class FluentPredicateExtensions
         Func<T, bool> predicate,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotSatisfies(val, predicate, paramName: null),
-            message);
+            message, MustCodes.Predicate.Result.True);
 }

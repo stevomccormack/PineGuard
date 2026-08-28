@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -14,7 +15,7 @@ public static class StringTimeOnlyAttributesTestData
         public static TheoryData<DataAnnotationCase> Cases =>
         [
             new("in-range", Ref, new DataAnnotationExpected(true)),
-            new("out-of-range", new TimeOnly(15, 0).ToString("HH:mm"), new DataAnnotationExpected(false, "Value must be a time within the expected range.")),
+            new("out-of-range", new TimeOnly(15, 0).ToString("HH:mm"), new DataAnnotationExpected(false, "Value must be a time within the expected range.", Code: MustCodes.Time.Range.OutOfRange)),
             new("unparseable", "invalid", new DataAnnotationExpected(false, "Value must be a time within the expected range.")),
             new("null", null, new DataAnnotationExpected(true))
         ];
