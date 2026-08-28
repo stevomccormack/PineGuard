@@ -32,6 +32,28 @@ bool sqlSafe = OwaspRules.IsSqlInjectionSafe(userInput);
 bool strict = EmailRules.IsStrictEmail("alice@example.com");
 ```
 
+## The object-validation keystone lives here too
+
+`MustResult<T>`, `Must`/`IMustClause`, and the `MustValidator<T>` object-validation base class all live in
+Core — the `Must.Be.*` clause catalogue (`PineGuard.MustClauses`) is a consumer of these types, not their
+owner. That means you can derive from `MustValidator<T>` and build `MustResult<T>.Ok`/`Fail` results from
+your own predicates without installing any other PineGuard package:
+
+```csharp
+using PineGuard.MustClauses;
+
+public sealed class WidgetValidator : MustValidator<Widget>
+{
+    public WidgetValidator() =>
+        RuleFor(x => x.Name, name => MustResult<string>.FromBool(
+            !string.IsNullOrWhiteSpace(name), "widget.name.blank", "{paramName} must not be blank.", nameof(name), name));
+}
+```
+
+Every failure — whether it comes from a hand-rolled predicate here or a `Must.Be.*` clause in
+`PineGuard.MustClauses` — carries a stable, three-segment `Code` (`<domain>.<aspect>.<condition>`) alongside
+its message, so callers can branch on *which rule failed* without parsing prose.
+
 ## Prefer a higher layer for application code
 
 - **[PineGuard.MustClauses](https://www.nuget.org/packages/PineGuard.MustClauses)** — result-based, composable, never throws

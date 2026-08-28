@@ -51,6 +51,12 @@ extraction). Child project specs reference it rather than restating the bullets.
 ### 2.1 Namespace & File Structure
 - **One class per file**.
 - **File name must match class name**.
+  - **Named exception**: a generic interface's file name spells out its type parameter instead of using
+    the raw `<T>` syntax — `IMustValidatorOfT.cs` for `IMustValidator<T>`, mirroring the BCL source
+    convention (e.g. `IEnumerable.cs` vs a generic-arity file name). Reserve this for generic *interfaces*
+    that pair with a non-generic sibling of the same base name (`IMustValidator`/`IMustValidator<T>` in
+    `IMustValidator.cs`/`IMustValidatorOfT.cs`) — do not extend it to classes or to interfaces without a
+    non-generic sibling.
 - **File-scoped namespaces** required (`namespace PineGuard.Rules;`).
 - **Using statements**:
     - Place at the very top.

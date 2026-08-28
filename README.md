@@ -90,6 +90,10 @@ var safeInput = Must.Be.OwaspSafe(input).OrThrow();
 
 Must.Be.Email(email).ThrowIfFailed((message, paramName) =>
     new BusinessException($"{paramName}: {message}"));
+
+// Compose — later steps run only if earlier ones pass
+var orderIdResult = Must.Be.NotNull(orderId)
+    .AndThen(id => Must.Be.Guid(id));
 ```
 
 ### Guard Clauses &mdash; fail fast, and return parsed data when useful
@@ -257,6 +261,76 @@ public sealed class CreateEndpointRequest
 > DataAnnotations format attributes allow `null` by default. Pair them with `[NotNull]` when the property must be present and valid.
 
 > FluentValidation uses `Required()` / `NotRequired()` for presence checks to avoid built-in naming collisions. DataAnnotations uses `[NotNull]` / `[Null]` for the equivalent presence semantics today.
+
+### Object validation &mdash; one validator, every failure, with property paths
+
+**Best for:** validating a whole object graph in one pass and getting every failure back — not just the
+first — each attributed to the exact property (and array index) that produced it.
+
+```csharp
+using PineGuard.MustClauses;
+
+public sealed record OrderLine(string? Sku, int Quantity);
+public sealed record CreateOrder(string? Email, DateTime StartDate, DateTime EndDate, bool IsPhysical, decimal Weight, IReadOnlyList<OrderLine>? Lines);
+
+public sealed class OrderLineValidator : MustValidator<OrderLine>
+{
+    public OrderLineValidator()
+    {
+        RuleFor(x => x.Sku, sku => Must.Be.NotNullOrWhiteSpace(sku));
+        RuleFor(x => x.Quantity, qty => Must.Be.Positive(qty));
+    }
+}
+
+public sealed class CreateOrderValidator : MustValidator<CreateOrder>
+{
+    public CreateOrderValidator()
+    {
+        RuleFor(x => x.Email, email => Must.Be.Email(email));
+        RuleFor(x => x.EndDate, (order, end) => Must.Be.After(end, order.StartDate)); // cross-property
+        RuleFor(x => x.Weight, weight => Must.Be.Positive(weight)).When(x => x.IsPhysical); // conditional
+        RuleFor(x => x.Lines, lines => Must.Be.NotEmpty(lines));
+        RuleForEach(x => x.Lines, new OrderLineValidator()); // nested validator, per-element paths
+    }
+}
+
+var result = new CreateOrderValidator().Validate(order);
+if (result.Failed)
+    foreach (var failure in result.Failures)
+        Console.WriteLine($"{failure.PropertyPath}: {failure.Message} [{failure.Code}]");
+// Email: Email must be a valid email address. [email.address.invalid]
+// EndDate: EndDate must be after the specified date/time. [date.order.not-after]
+// Lines[1].Sku: Sku must not be null or whitespace. [text.content.blank]
+```
+
+`Must.Be.Positive` lives in `MustNumberClauses`, which targets `net8.0`/`net10.0` only — on `netstandard2.1`
+substitute a non-numeric clause. `RuleFor`'s two-argument overload — `(order, end) => ...` — hands the whole
+object to the rule so it can compare against a sibling property; `.When(...)` skips a rule based on the
+object's state; `RuleForEach` walks a collection and re-roots each element's own failures under
+`Lines[<index>]`.
+
+### Error codes &mdash; a stable, machine-readable key for every failure
+
+Every failure — from a bare `Must.Be.*` call up through Guard, FluentValidation and DataAnnotations —
+carries a three-segment code (`<domain>.<aspect>.<condition>`, e.g. `email.address.invalid`) alongside its
+human-readable message, so you can branch, log, or localise on *which rule failed* without parsing prose.
+Codes are stable across releases and safe to match as families (`code.StartsWith("owasp.")`,
+`code == MustCodes.Email.Address.Invalid`).
+
+Where the code reaches you differs by surface — a framework-owned result shape (like the base
+`ValidationResult` every `[Attribute]`-driven consumer sees) can't carry an extra field, so those rows are
+honest about being design-time-only until a coded runner exists:
+
+| Surface | Code reaches you as | Available |
+|---|---|---|
+| `Must.Be.*` / `MustValidator<T>` | `MustResult<T>.Code`, `MustFailure.Code` | yes |
+| Guard | `GuardFailure.Code` in `GuardExceptionPolicy.Map`; `Exception.Data["pineguard.code"]` downstream | yes |
+| FluentValidation | `ValidationFailure.ErrorCode` | yes |
+| DataAnnotations | `attribute.Code` (design-time); every framework validation path returns a code-less `ValidationResult` | design-time only |
+| MediatR / ErrorOr / FluentResults / OneOf pipelines you write | `MustValidationException.Result`, or your own mapping of `MustFailure.Code` | yes |
+| ASP.NET filters / exception handlers you write | `failure.Code` from a caught `MustValidationException` or a mapped `GuardFailure` | yes |
+
+See `docs/ai/specs/must-clauses/project.md` ("Error codes") for the code format and the catalogue's location.
 
 ---
 
