@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Globalization;
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -34,7 +35,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.BetweenTimeOnly(val, min, max, inclusion, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Range.OutOfRange);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> not between the specified bounds.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -53,7 +54,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotBetweenTimeOnly(val, min, max, inclusion, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Range.InRange);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> within the specified time window of a reference.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -70,7 +71,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.WithinTimeOnly(val, reference, window, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Proximity.NotWithin);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> not within the specified time window of a reference.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -87,7 +88,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotWithinTimeOnly(val, reference, window, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Proximity.Within);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> before the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -104,7 +105,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.BeforeTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.NotBefore);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> not before the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -121,7 +122,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotBeforeTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.Before);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> on or before the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -138,7 +139,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.OnOrBeforeTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.After);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> not on or before the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -155,7 +156,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotOnOrBeforeTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.NotAfter);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> after the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -172,7 +173,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.AfterTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.NotAfter);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> not after the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -189,7 +190,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotAfterTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.After);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> on or after the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -206,7 +207,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.OnOrAfterTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.Before);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> not on or after the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -223,7 +224,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotOnOrAfterTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.NotBefore);
 
     /// <summary>Validates that the string value represents the same <see cref="TimeOnly"/> as the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -240,7 +241,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.SameTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Equality.NotEqual);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> not the same as the specified time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -257,7 +258,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotSameTimeOnly(val, other, precision, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Equality.Equal);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> that is chronologically before the specified end time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -274,7 +275,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ChronologicalTimeOnly(val, end, inclusion, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.NotChronological);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> that is not chronologically before the specified end time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -291,7 +292,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotChronologicalTimeOnly(val, end, inclusion, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Order.Chronological);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> range that overlaps with another range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -312,7 +313,7 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.OverlappingTimeOnly(val, end1, start2, end2, inclusion, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Overlap.Missing);
 
     /// <summary>Validates that the string value represents a <see cref="TimeOnly"/> range that does not overlap with another range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -333,6 +334,6 @@ public static class FluentStringTimeOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotOverlappingTimeOnly(val, end1, start2, end2, inclusion, styles, paramName: null) : MustResult<TimeOnly>.Ok(default),
-            message);
+            message, MustCodes.Time.Overlap.Present);
 }
 #endif

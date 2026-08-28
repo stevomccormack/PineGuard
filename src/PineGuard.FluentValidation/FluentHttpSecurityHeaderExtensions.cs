@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -23,7 +24,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.ContentSecurityPolicyHeader(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.ContentSecurityPolicy.Missing);
 
     /// <summary>Validates that the header collection does not contain a Content-Security-Policy header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -32,7 +33,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotContentSecurityPolicyHeader<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotContentSecurityPolicyHeader(val, paramName: null),
-            message);
+            message, MustCodes.Http.ContentSecurityPolicy.Present);
 
     /// <summary>Validates that the header collection contains a Content-Security-Policy header with recommended default directives.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -44,7 +45,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.ContentSecurityPolicyWithDefaults(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.ContentSecurityPolicy.Weak);
 
     /// <summary>Validates that the header collection does not contain a Content-Security-Policy header with recommended default directives.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -53,7 +54,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotContentSecurityPolicyWithDefaults<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotContentSecurityPolicyWithDefaults(val, paramName: null),
-            message);
+            message, MustCodes.Http.ContentSecurityPolicy.Strong);
 
     /// <summary>Validates that the header collection contains a Content-Security-Policy header with the specified directive values.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -74,7 +75,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.ContentSecurityPolicy(val, requiredDefaultSrcValue, requiredObjectSrcValue, requiredBaseUriValue, requiredFrameAncestorsValue, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.ContentSecurityPolicy.Weak);
 
     /// <summary>Validates that the header collection contains a Strict-Transport-Security header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -86,7 +87,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.StrictTransportSecurityHeader(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.StrictTransportSecurity.Missing);
 
     /// <summary>Validates that the header collection does not contain a Strict-Transport-Security header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -95,7 +96,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotStrictTransportSecurityHeader<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotStrictTransportSecurityHeader(val, paramName: null),
-            message);
+            message, MustCodes.Http.StrictTransportSecurity.Present);
 
     /// <summary>Validates that the header collection contains a Strict-Transport-Security header with recommended defaults.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -107,7 +108,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.StrictTransportSecurityWithDefaults(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.StrictTransportSecurity.Weak);
 
     /// <summary>Validates that the header collection does not contain a Strict-Transport-Security header with recommended defaults.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -116,7 +117,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotStrictTransportSecurityWithDefaults<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotStrictTransportSecurityWithDefaults(val, paramName: null),
-            message);
+            message, MustCodes.Http.StrictTransportSecurity.Strong);
 
     /// <summary>Validates that the header collection contains a Strict-Transport-Security header with the specified constraints.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -135,7 +136,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.StrictTransportSecurity(val, minMaxAgeSeconds, requireIncludeSubDomains, requirePreload, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.StrictTransportSecurity.Weak);
 
     /// <summary>Validates that the header collection contains an X-Content-Type-Options header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -147,7 +148,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.XContentTypeOptionsHeader(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.ContentTypeOptions.Missing);
 
     /// <summary>Validates that the header collection does not contain an X-Content-Type-Options header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -156,7 +157,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotXContentTypeOptionsHeader<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotXContentTypeOptionsHeader(val, paramName: null),
-            message);
+            message, MustCodes.Http.ContentTypeOptions.Present);
 
     /// <summary>Validates that the header collection contains an X-Content-Type-Options header with the recommended "nosniff" value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -168,7 +169,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.XContentTypeOptionsWithDefaults(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.ContentTypeOptions.Mismatch);
 
     /// <summary>Validates that the header collection does not contain an X-Content-Type-Options header with the recommended "nosniff" value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -177,7 +178,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotXContentTypeOptionsWithDefaults<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotXContentTypeOptionsWithDefaults(val, paramName: null),
-            message);
+            message, MustCodes.Http.ContentTypeOptions.Match);
 
     /// <summary>Validates that the header collection contains an X-Content-Type-Options header with the specified value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -192,7 +193,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.XContentTypeOptions(val, expectedValue, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.ContentTypeOptions.Mismatch);
 
     /// <summary>Validates that the header collection contains an X-Frame-Options header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -204,7 +205,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.XFrameOptionsHeader(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.FrameOptions.Missing);
 
     /// <summary>Validates that the header collection does not contain an X-Frame-Options header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -213,7 +214,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotXFrameOptionsHeader<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotXFrameOptionsHeader(val, paramName: null),
-            message);
+            message, MustCodes.Http.FrameOptions.Present);
 
     /// <summary>Validates that the header collection contains an X-Frame-Options header with recommended defaults.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -225,7 +226,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.XFrameOptionsWithDefaults(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.FrameOptions.Mismatch);
 
     /// <summary>Validates that the header collection does not contain an X-Frame-Options header with recommended defaults.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -234,7 +235,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotXFrameOptionsWithDefaults<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotXFrameOptionsWithDefaults(val, paramName: null),
-            message);
+            message, MustCodes.Http.FrameOptions.Match);
 
     /// <summary>Validates that the header collection contains an X-Frame-Options header with the specified value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -249,7 +250,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.XFrameOptions(val, expectedValue, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.FrameOptions.Mismatch);
 
     /// <summary>Validates that the header collection contains a Referrer-Policy header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -261,7 +262,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.ReferrerPolicyHeader(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.ReferrerPolicy.Missing);
 
     /// <summary>Validates that the header collection does not contain a Referrer-Policy header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -270,7 +271,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotReferrerPolicyHeader<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotReferrerPolicyHeader(val, paramName: null),
-            message);
+            message, MustCodes.Http.ReferrerPolicy.Present);
 
     /// <summary>Validates that the header collection contains a Referrer-Policy header with recommended defaults.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -282,7 +283,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.ReferrerPolicyWithDefaults(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.ReferrerPolicy.Mismatch);
 
     /// <summary>Validates that the header collection does not contain a Referrer-Policy header with recommended defaults.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -291,7 +292,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotReferrerPolicyWithDefaults<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotReferrerPolicyWithDefaults(val, paramName: null),
-            message);
+            message, MustCodes.Http.ReferrerPolicy.Match);
 
     /// <summary>Validates that the header collection contains a Referrer-Policy header with the specified value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -306,7 +307,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.ReferrerPolicy(val, expectedValue, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.ReferrerPolicy.Mismatch);
 
     /// <summary>Validates that the header collection contains a Permissions-Policy header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -318,7 +319,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.PermissionsPolicyHeader(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.PermissionsPolicy.Missing);
 
     /// <summary>Validates that the header collection does not contain a Permissions-Policy header.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -327,7 +328,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotPermissionsPolicyHeader<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotPermissionsPolicyHeader(val, paramName: null),
-            message);
+            message, MustCodes.Http.PermissionsPolicy.Present);
 
     /// <summary>Validates that the header collection contains a Permissions-Policy header with recommended defaults.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -339,7 +340,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.PermissionsPolicyWithDefaults(val, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.PermissionsPolicy.NotContains);
 
     /// <summary>Validates that the header collection does not contain a Permissions-Policy header with recommended defaults.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -348,7 +349,7 @@ public static class FluentHttpSecurityHeaderExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> NotPermissionsPolicyWithDefaults<TModel>(this IRuleBuilder<TModel, IReadOnlyDictionary<string, IEnumerable<string>>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotPermissionsPolicyWithDefaults(val, paramName: null),
-            message);
+            message, MustCodes.Http.PermissionsPolicy.Contains);
 
     /// <summary>Validates that the header collection contains a Permissions-Policy header with the specified value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -363,7 +364,7 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.PermissionsPolicy(val, expectedValue, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.PermissionsPolicy.Mismatch);
 
     /// <summary>Validates that the header collection contains a Permissions-Policy header containing the specified policy fragments.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -378,5 +379,5 @@ public static class FluentHttpSecurityHeaderExtensions
         ruleBuilder.MustBe(val => val is not null
                 ? Must.Be.PermissionsPolicyContaining(val, requiredFragments, paramName: null)
                 : MustResult<IReadOnlyDictionary<string, IEnumerable<string>>?>.Ok(null),
-            message);
+            message, MustCodes.Http.PermissionsPolicy.NotContains);
 }

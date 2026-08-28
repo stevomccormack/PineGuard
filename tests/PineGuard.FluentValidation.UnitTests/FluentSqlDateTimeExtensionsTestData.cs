@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.SqlDateTimeRulesFixtures;
 
@@ -10,7 +11,7 @@ public static class FluentSqlDateTimeExtensionsTestData
     public static class InSqlDateRange
     {
         public static TheoryData<FluentCase<DateOnly>> Cases => F.IsInSqlDateRange.AllNonNullScenarios.ToFluentCases(s =>
-            s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be within the SQL date range."));
+            s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be within the SQL date range.", Code: MustCodes.Date.Sql.OutOfRange));
 
         public static TheoryData<FluentCase<DateOnly?>> NullableCases =>
         [

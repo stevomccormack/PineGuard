@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ public static class FluentBoolExtensions
     /// <seealso cref="MustBoolClauses.True"/>
     public static IRuleBuilderOptions<TModel, bool?> True<TModel>(this IRuleBuilder<TModel, bool?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.True(val.Value, paramName: null) : MustResult<bool>.Ok(false),
-            message);
+            message, MustCodes.Boolean.Value.False);
 
     /// <summary>
     /// Validates that the property value is <see langword="false"/>.
@@ -52,5 +53,5 @@ public static class FluentBoolExtensions
     /// <seealso cref="MustBoolClauses.False"/>
     public static IRuleBuilderOptions<TModel, bool?> False<TModel>(this IRuleBuilder<TModel, bool?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.False(val.Value, paramName: null) : MustResult<bool>.Ok(false),
-            message);
+            message, MustCodes.Boolean.Value.True);
 }

@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -12,7 +13,7 @@ public static class FluentStringBoolExtensionsTestData
         {
             nameof(F.BoolIsTrue.NullValue) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be true.")
+            _ => new FluentExpected(false, "Value must be true.", Code: MustCodes.Boolean.Value.False)
         });
     }
 

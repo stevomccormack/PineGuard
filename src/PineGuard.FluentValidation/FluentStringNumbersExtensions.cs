@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Globalization;
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -37,7 +38,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Positive(val, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Sign.NotPositive);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is negative (less than zero).
@@ -61,7 +62,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Negative(val, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Sign.NotNegative);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, equals zero.
@@ -85,7 +86,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Zero(val, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Sign.NotZero);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, does not equal zero.
@@ -109,7 +110,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotZero(val, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Sign.Zero);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is zero or positive.
@@ -133,7 +134,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ZeroOrPositive(val, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Sign.Negative);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is zero or negative.
@@ -157,7 +158,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ZeroOrNegative(val, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Sign.Positive);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is greater than the specified minimum.
@@ -183,7 +184,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.GreaterThan(val, min, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.NotGreater);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is greater than or equal to the specified minimum.
@@ -209,7 +210,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.GreaterThanOrEqual(val, min, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.BelowMinimum);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is less than the specified maximum.
@@ -235,7 +236,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.LessThan(val, max, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.NotLess);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is less than or equal to the specified maximum.
@@ -261,7 +262,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.LessThanOrEqual(val, max, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.Exceeded);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, falls within the specified range.
@@ -291,7 +292,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.InRange(val, min, max, inclusion, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.OutOfRange);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, falls outside the specified range.
@@ -321,7 +322,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.OutOfRange(val, min, max, inclusion, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Range.InRange);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is approximately equal to the target within the specified tolerance.
@@ -349,7 +350,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Approximately(val, target, tolerance, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Proximity.NotApproximate);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is not approximately equal to the target within the specified tolerance.
@@ -377,7 +378,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotApproximately(val, target, tolerance, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Proximity.Approximate);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is a multiple of the specified factor.
@@ -403,7 +404,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.MultipleOf(val, factor, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Divisibility.NotMultiple);
 
     /// <summary>
     /// Validates that the property value, parsed as a decimal number, is not a multiple of the specified factor.
@@ -429,7 +430,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotMultipleOf(val, factor, styles, paramName: null) : MustResult<decimal>.Ok(0),
-            message);
+            message, MustCodes.Number.Divisibility.Multiple);
 
     /// <summary>
     /// Validates that the property value, parsed as an integer, is even.
@@ -453,7 +454,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = NumberStyles.Integer) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Even(val, styles, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Number.Parity.Odd);
 
     /// <summary>
     /// Validates that the property value, parsed as an integer, is odd.
@@ -477,7 +478,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = NumberStyles.Integer) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Odd(val, styles, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Number.Parity.Even);
 
     /// <summary>
     /// Validates that the property value, parsed as a floating-point number, is finite (not infinity or NaN).
@@ -501,7 +502,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Finite(val, styles, paramName: null) : MustResult<double>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.NotFinite);
 
     /// <summary>
     /// Validates that the property value, parsed as a floating-point number, is not finite (is infinity or NaN).
@@ -525,7 +526,7 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotFinite(val, styles, paramName: null) : MustResult<double>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.Finite);
 
     /// <summary>
     /// Validates that the property value, parsed as a floating-point number, is not NaN (Not a Number).
@@ -549,6 +550,6 @@ public static class FluentStringNumbersExtensions
         string? message = null,
         NumberStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotNaN(val, styles, paramName: null) : MustResult<double>.Ok(0),
-            message);
+            message, MustCodes.Number.Form.Nan);
 }
 #endif

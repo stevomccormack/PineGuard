@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -24,7 +25,7 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Chronological(val.Value, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
-            message);
+            message, MustCodes.Range.Order.NotChronological);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> is chronologically ordered.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -38,7 +39,7 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Chronological(val, inclusion, paramName: null),
-            message);
+            message, MustCodes.Range.Order.NotChronological);
 
     /// <summary>Validates that the nullable <see cref="DateTimeRange"/> overlaps with the specified range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -54,7 +55,7 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Overlapping(val.Value, range2, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
-            message);
+            message, MustCodes.Range.Overlap.Missing);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> overlaps with the specified range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -69,7 +70,7 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Overlapping(val, range2, inclusion, paramName: null),
-            message);
+            message, MustCodes.Range.Overlap.Missing);
 
     /// <summary>Validates that the nullable <see cref="DateTimeRange"/> does not overlap with the specified range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -85,7 +86,7 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotOverlapping(val.Value, range2, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
-            message);
+            message, MustCodes.Range.Overlap.Present);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> does not overlap with the specified range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -100,7 +101,7 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotOverlapping(val, range2, inclusion, paramName: null),
-            message);
+            message, MustCodes.Range.Overlap.Present);
 
     /// <summary>Validates that the nullable <see cref="DateTimeRange"/> contains the specified value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -116,7 +117,7 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Contains(val.Value, value, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
-            message);
+            message, MustCodes.Range.Bounds.NotContains);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> contains the specified value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -131,7 +132,7 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Contains(val, value, inclusion, paramName: null),
-            message);
+            message, MustCodes.Range.Bounds.NotContains);
 
     /// <summary>Validates that the nullable <see cref="DateTimeRange"/> does not contain the specified value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -147,7 +148,7 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotContains(val.Value, value, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
-            message);
+            message, MustCodes.Range.Bounds.Contains);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> does not contain the specified value.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -162,5 +163,5 @@ public static class FluentDateTimeRangeExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotContains(val, value, inclusion, paramName: null),
-            message);
+            message, MustCodes.Range.Bounds.Contains);
 }

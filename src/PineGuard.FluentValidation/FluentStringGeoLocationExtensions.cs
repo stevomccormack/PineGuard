@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -26,7 +27,7 @@ public static class FluentStringGeoLocationExtensions
     /// <seealso cref="MustGeoLocationClauses.Latitude"/>
     public static IRuleBuilderOptions<TModel, string?> Latitude<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Latitude(val, paramName: null) : MustResult<double>.Ok(0),
-            message);
+            message, MustCodes.Geo.Latitude.Invalid);
 
     /// <summary>
     /// Validates that the string value represents a valid longitude (-180 to 180).
@@ -43,7 +44,7 @@ public static class FluentStringGeoLocationExtensions
     /// <seealso cref="MustGeoLocationClauses.Longitude"/>
     public static IRuleBuilderOptions<TModel, string?> Longitude<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Longitude(val, paramName: null) : MustResult<double>.Ok(0),
-            message);
+            message, MustCodes.Geo.Longitude.Invalid);
 
     /// <summary>
     /// Validates that the string values represent a valid geographic location (latitude and longitude pair).
@@ -63,6 +64,6 @@ public static class FluentStringGeoLocationExtensions
         string? longitude,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.GeoLocation(val, longitude, paramName: null) : MustResult<(double, double)>.Ok(default),
-            message);
+            message, MustCodes.Geo.Coordinate.Invalid);
 }
 #endif

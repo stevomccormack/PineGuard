@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.TimeOnlyRulesFixtures;
 
@@ -35,8 +36,8 @@ public static class FluentTimeOnlyExtensionsTestData
         public static TheoryData<FluentCase<TimeOnly?>> Cases =>
         [
             new("before", RefMinus1, new FluentExpected(true)),
-            new("after", RefPlus1, new FluentExpected(false, "Value must be before the specified time.")),
-            new("same", Ref, new FluentExpected(false, "Value must be before the specified time.")),
+            new("after", RefPlus1, new FluentExpected(false, "Value must be before the specified time.", Code: MustCodes.Time.Order.NotBefore)),
+            new("same", Ref, new FluentExpected(false, "Value must be before the specified time.", Code: MustCodes.Time.Order.NotBefore)),
             new("null", null, new FluentExpected(true))
         ];
     }
@@ -361,6 +362,84 @@ public static class FluentTimeOnlyExtensionsTestData
         [
             new("disjoint",    F.IsKnownTimes.T0930!.Value, new FluentExpected(true)),
             new("overlapping", F.IsKnownTimes.T0830!.Value, new FluentExpected(false, "Value must not be overlapping."))
+        ];
+    }
+
+    // ── Cross-property expression overloads ──────────────────────────
+
+    public static class BeforeExpression
+    {
+        public static TheoryData<FluentCase<(TimeOnly value, TimeOnly other)>> Cases =>
+        [
+            new("before", (RefMinus1, Ref), new FluentExpected(true)),
+            new("after", (RefPlus1, Ref), new FluentExpected(false, "Value must be before the specified time.", Code: MustCodes.Time.Order.NotBefore))
+        ];
+    }
+
+    public static class BeforeNullableExpression
+    {
+        public static TheoryData<FluentCase<(TimeOnly? value, TimeOnly other)>> Cases =>
+        [
+            new("before", (RefMinus1, Ref), new FluentExpected(true)),
+            new("null", (null, Ref), new FluentExpected(true)),
+            new("after", (RefPlus1, Ref), new FluentExpected(false, "Value must be before the specified time.", Code: MustCodes.Time.Order.NotBefore))
+        ];
+    }
+
+    public static class OnOrBeforeExpression
+    {
+        public static TheoryData<FluentCase<(TimeOnly value, TimeOnly other)>> Cases =>
+        [
+            new("same", (Ref, Ref), new FluentExpected(true)),
+            new("after", (RefPlus1, Ref), new FluentExpected(false, "Value must be on or before the specified time.", Code: MustCodes.Time.Order.After))
+        ];
+    }
+
+    public static class OnOrBeforeNullableExpression
+    {
+        public static TheoryData<FluentCase<(TimeOnly? value, TimeOnly other)>> Cases =>
+        [
+            new("same", (Ref, Ref), new FluentExpected(true)),
+            new("null", (null, Ref), new FluentExpected(true)),
+            new("after", (RefPlus1, Ref), new FluentExpected(false, "Value must be on or before the specified time.", Code: MustCodes.Time.Order.After))
+        ];
+    }
+
+    public static class AfterExpression
+    {
+        public static TheoryData<FluentCase<(TimeOnly value, TimeOnly other)>> Cases =>
+        [
+            new("after", (RefPlus1, Ref), new FluentExpected(true)),
+            new("before", (RefMinus1, Ref), new FluentExpected(false, "Value must be after the specified time.", Code: MustCodes.Time.Order.NotAfter))
+        ];
+    }
+
+    public static class AfterNullableExpression
+    {
+        public static TheoryData<FluentCase<(TimeOnly? value, TimeOnly other)>> Cases =>
+        [
+            new("after", (RefPlus1, Ref), new FluentExpected(true)),
+            new("null", (null, Ref), new FluentExpected(true)),
+            new("before", (RefMinus1, Ref), new FluentExpected(false, "Value must be after the specified time.", Code: MustCodes.Time.Order.NotAfter))
+        ];
+    }
+
+    public static class OnOrAfterExpression
+    {
+        public static TheoryData<FluentCase<(TimeOnly value, TimeOnly other)>> Cases =>
+        [
+            new("same", (Ref, Ref), new FluentExpected(true)),
+            new("before", (RefMinus1, Ref), new FluentExpected(false, "Value must be on or after the specified time.", Code: MustCodes.Time.Order.Before))
+        ];
+    }
+
+    public static class OnOrAfterNullableExpression
+    {
+        public static TheoryData<FluentCase<(TimeOnly? value, TimeOnly other)>> Cases =>
+        [
+            new("same", (Ref, Ref), new FluentExpected(true)),
+            new("null", (null, Ref), new FluentExpected(true)),
+            new("before", (RefMinus1, Ref), new FluentExpected(false, "Value must be on or after the specified time.", Code: MustCodes.Time.Order.Before))
         ];
     }
 }

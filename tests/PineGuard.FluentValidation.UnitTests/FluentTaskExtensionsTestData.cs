@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 
 namespace PineGuard.FluentValidation.UnitTests;
@@ -20,7 +21,7 @@ public static class FluentTaskExtensionsTestData
 
         public static TheoryData<FluentCase<Func<Task?>>> InvalidCases =>
         [
-            new("in-progress", GetInProgressTask, new FluentExpected(false, "Task must be completed.")),
+            new("in-progress", GetInProgressTask, new FluentExpected(false, "Task must be completed.", Code: MustCodes.Task.Status.NotCompleted)),
             new("null", () => null, new FluentExpected(false, "Task must be completed."))
         ];
     }

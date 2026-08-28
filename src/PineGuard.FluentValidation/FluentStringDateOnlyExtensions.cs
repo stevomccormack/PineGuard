@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Globalization;
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -28,7 +29,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.PastDateOnly(val, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> in the past or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -41,7 +42,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.PastOrPresentDateOnly(val, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> in the future.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -54,7 +55,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.FutureDateOnly(val, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> in the future or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -67,7 +68,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.FutureOrPresentDateOnly(val, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> between the specified bounds.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -86,7 +87,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.BetweenDateOnly(val, min, max, inclusion, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Range.OutOfRange);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> not between the specified bounds.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -105,7 +106,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotBetweenDateOnly(val, min, max, inclusion, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Range.InRange);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> within the specified number of days from a reference date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -122,7 +123,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.WithinDaysDateOnly(val, reference, days, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Proximity.NotWithin);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> not within the specified number of days from a reference date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -139,7 +140,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotWithinDaysDateOnly(val, reference, days, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Proximity.Within);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> within the specified number of calendar months from a reference date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -156,7 +157,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.WithinCalendarMonthsDateOnly(val, reference, months, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Proximity.NotWithinCalendarMonths);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> not within the specified number of calendar months from a reference date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -173,7 +174,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotWithinCalendarMonthsDateOnly(val, reference, months, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Proximity.WithinCalendarMonths);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> before the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -190,7 +191,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.BeforeDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.NotBefore);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> not before the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -207,7 +208,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotBeforeDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.Before);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> on or before the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -224,7 +225,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.OnOrBeforeDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.After);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> not on or before the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -241,7 +242,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotOnOrBeforeDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.NotAfter);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> after the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -258,7 +259,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.AfterDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.NotAfter);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> not after the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -275,7 +276,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotAfterDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.After);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> on or after the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -292,7 +293,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.OnOrAfterDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.Before);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> not on or after the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -309,7 +310,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotOnOrAfterDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.NotBefore);
 
     /// <summary>Validates that the string value represents the same <see cref="DateOnly"/> as the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -326,7 +327,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.SameDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Equality.NotEqual);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> not the same as the specified date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -343,7 +344,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotSameDateOnly(val, other, precision, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Equality.Equal);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> that is chronologically before the specified end date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -360,7 +361,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ChronologicalDateOnly(val, end, inclusion, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.NotChronological);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> that is not chronologically before the specified end date.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -377,7 +378,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotChronologicalDateOnly(val, end, inclusion, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Order.Chronological);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> range that overlaps with another range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -398,7 +399,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.OverlappingDateOnly(val, end1, start2, end2, inclusion, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Overlap.Missing);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> range that does not overlap with another range.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -419,6 +420,6 @@ public static class FluentStringDateOnlyExtensions
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotOverlappingDateOnly(val, end1, start2, end2, inclusion, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
-            message);
+            message, MustCodes.Date.Overlap.Present);
 }
 #endif

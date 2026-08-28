@@ -232,4 +232,58 @@ public sealed class FluentTimeOnlyExtensionsTests(ITestOutputHelper output) : Ba
     [MemberData(nameof(FluentTimeOnlyExtensionsTestData.NotOverlappingNonNullable.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.NotOverlappingNonNullable))]
     public void NotOverlappingNonNullable_BehavesAsExpected(FluentCase<TimeOnly> tc)
     { AssertResult(tc, new NotOverlappingNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value })); }
+
+    // ── Cross-property expression overloads ──────────────────────────
+
+    private sealed record ComparisonModel { public TimeOnly Value { get; init; } public TimeOnly Other { get; init; } }
+    private sealed record NullableComparisonModel { public TimeOnly? Value { get; init; } public TimeOnly Other { get; init; } }
+
+    private sealed class BeforeExpressionValidator : AbstractValidator<ComparisonModel> { public BeforeExpressionValidator() => RuleFor(x => x.Value).Before(m => m.Other); }
+    private sealed class BeforeNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public BeforeNullableExpressionValidator() => RuleFor(x => x.Value).Before(m => m.Other); }
+    private sealed class OnOrBeforeExpressionValidator : AbstractValidator<ComparisonModel> { public OnOrBeforeExpressionValidator() => RuleFor(x => x.Value).OnOrBefore(m => m.Other); }
+    private sealed class OnOrBeforeNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public OnOrBeforeNullableExpressionValidator() => RuleFor(x => x.Value).OnOrBefore(m => m.Other); }
+    private sealed class AfterExpressionValidator : AbstractValidator<ComparisonModel> { public AfterExpressionValidator() => RuleFor(x => x.Value).After(m => m.Other); }
+    private sealed class AfterNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public AfterNullableExpressionValidator() => RuleFor(x => x.Value).After(m => m.Other); }
+    private sealed class OnOrAfterExpressionValidator : AbstractValidator<ComparisonModel> { public OnOrAfterExpressionValidator() => RuleFor(x => x.Value).OnOrAfter(m => m.Other); }
+    private sealed class OnOrAfterNullableExpressionValidator : AbstractValidator<NullableComparisonModel> { public OnOrAfterNullableExpressionValidator() => RuleFor(x => x.Value).OnOrAfter(m => m.Other); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.BeforeExpression.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.BeforeExpression))]
+    public void BeforeExpression_BehavesAsExpected(FluentCase<(TimeOnly value, TimeOnly other)> tc)
+    { AssertResult(tc, new BeforeExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.BeforeNullableExpression.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.BeforeNullableExpression))]
+    public void BeforeNullableExpression_BehavesAsExpected(FluentCase<(TimeOnly? value, TimeOnly other)> tc)
+    { AssertResult(tc, new BeforeNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.OnOrBeforeExpression.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.OnOrBeforeExpression))]
+    public void OnOrBeforeExpression_BehavesAsExpected(FluentCase<(TimeOnly value, TimeOnly other)> tc)
+    { AssertResult(tc, new OnOrBeforeExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.OnOrBeforeNullableExpression.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.OnOrBeforeNullableExpression))]
+    public void OnOrBeforeNullableExpression_BehavesAsExpected(FluentCase<(TimeOnly? value, TimeOnly other)> tc)
+    { AssertResult(tc, new OnOrBeforeNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.AfterExpression.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.AfterExpression))]
+    public void AfterExpression_BehavesAsExpected(FluentCase<(TimeOnly value, TimeOnly other)> tc)
+    { AssertResult(tc, new AfterExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.AfterNullableExpression.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.AfterNullableExpression))]
+    public void AfterNullableExpression_BehavesAsExpected(FluentCase<(TimeOnly? value, TimeOnly other)> tc)
+    { AssertResult(tc, new AfterNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.OnOrAfterExpression.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.OnOrAfterExpression))]
+    public void OnOrAfterExpression_BehavesAsExpected(FluentCase<(TimeOnly value, TimeOnly other)> tc)
+    { AssertResult(tc, new OnOrAfterExpressionValidator().Validate(new ComparisonModel { Value = tc.Value.value, Other = tc.Value.other })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.OnOrAfterNullableExpression.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.OnOrAfterNullableExpression))]
+    public void OnOrAfterNullableExpression_BehavesAsExpected(FluentCase<(TimeOnly? value, TimeOnly other)> tc)
+    { AssertResult(tc, new OnOrAfterNullableExpressionValidator().Validate(new NullableComparisonModel { Value = tc.Value.value, Other = tc.Value.other })); }
 }

@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 
@@ -71,7 +72,7 @@ public static class FluentDateTimeOffsetRangeExtensionsTestData
         public static TheoryData<FluentCase<DateTimeOffsetRange>> Cases =>
         [
             new("Valid range",   RangeStandard, new FluentExpected(true)),
-            new("Zero duration", RangeNow,      new FluentExpected(false, "Value must be chronological."))
+            new("Zero duration", RangeNow,      new FluentExpected(false, "Value must be chronological.", Code: MustCodes.Range.Order.NotChronological))
         ];
     }
 

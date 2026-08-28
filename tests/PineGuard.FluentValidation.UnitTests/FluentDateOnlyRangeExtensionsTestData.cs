@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using PineGuard.Testing.UnitTests.Rules;
@@ -100,7 +101,7 @@ public static class FluentDateOnlyRangeExtensionsTestData
         public static TheoryData<FluentCase<DateOnlyRange>> Cases =>
         [
             new("Chronological", NnRangeChronological, new FluentExpected(true)),
-            new("Same day",      NnRangeSameDay,        new FluentExpected(false, "Value must be chronological."))
+            new("Same day",      NnRangeSameDay,        new FluentExpected(false, "Value must be chronological.", Code: MustCodes.Range.Order.NotChronological))
         ];
     }
 

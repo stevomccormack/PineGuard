@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -35,7 +36,7 @@ public static class FluentObjectExtensions
         T? other,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.EqualTo(val, other, paramName: null),
-            message);
+            message, MustCodes.Value.Equality.NotEqual);
 
     /// <summary>
     /// Validates that the property value is not equal to <paramref name="other"/>.
@@ -62,7 +63,7 @@ public static class FluentObjectExtensions
         T? other,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotEqualTo(val, other, paramName: null),
-            message);
+            message, MustCodes.Value.Equality.Equal);
 
     /// <summary>
     /// Validates that the property value is of type <typeparamref name="T"/>.
@@ -86,7 +87,7 @@ public static class FluentObjectExtensions
     /// <seealso cref="MustObjectClauses.OfType"/>
     public static IRuleBuilderOptions<TModel, object?> OfType<TModel, T>(this IRuleBuilder<TModel, object?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.OfType<T>(val, paramName: null),
-            message);
+            message, MustCodes.Value.Identity.WrongType);
 
     /// <summary>
     /// Validates that the property value is not of type <typeparamref name="T"/>.
@@ -108,7 +109,7 @@ public static class FluentObjectExtensions
     /// <seealso cref="MustObjectClauses.NotOfType"/>
     public static IRuleBuilderOptions<TModel, object?> NotOfType<TModel, T>(this IRuleBuilder<TModel, object?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotOfType<T>(val, paramName: null),
-            message);
+            message, MustCodes.Value.Identity.SameType);
 
     /// <summary>
     /// Validates that the property value is assignable to type <typeparamref name="T"/>.
@@ -132,7 +133,7 @@ public static class FluentObjectExtensions
     /// <seealso cref="MustObjectClauses.AssignableToType"/>
     public static IRuleBuilderOptions<TModel, object?> AssignableToType<TModel, T>(this IRuleBuilder<TModel, object?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.AssignableToType<T>(val, paramName: null),
-            message);
+            message, MustCodes.Value.Identity.NotAssignable);
 
     /// <summary>
     /// Validates that the property value is not assignable to type <typeparamref name="T"/>.
@@ -154,7 +155,7 @@ public static class FluentObjectExtensions
     /// <seealso cref="MustObjectClauses.NotAssignableToType"/>
     public static IRuleBuilderOptions<TModel, object?> NotAssignableToType<TModel, T>(this IRuleBuilder<TModel, object?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotAssignableToType<T>(val, paramName: null),
-            message);
+            message, MustCodes.Value.Identity.Assignable);
 
     /// <summary>
     /// Validates that the property value is the same reference as <paramref name="b"/>.
@@ -182,7 +183,7 @@ public static class FluentObjectExtensions
         string? message = null)
         where T : class =>
         ruleBuilder.MustBe(val => Must.Be.SameReferenceAs(val, b, paramName: null),
-            message);
+            message, MustCodes.Value.Identity.NotSameReference);
 
     /// <summary>
     /// Validates that the property value is not the same reference as <paramref name="b"/>.
@@ -210,5 +211,5 @@ public static class FluentObjectExtensions
         string? message = null)
         where T : class =>
         ruleBuilder.MustBe(val => Must.Be.NotSameReferenceAs(val, b, paramName: null),
-            message);
+            message, MustCodes.Value.Identity.SameReference);
 }

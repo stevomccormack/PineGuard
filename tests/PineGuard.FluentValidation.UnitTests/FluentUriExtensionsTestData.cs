@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.UriRulesFixtures;
@@ -14,7 +15,7 @@ public static class FluentUriExtensionsTestData
         {
             nameof(F.IsAbsoluteUri.NullValue) => new FluentExpected(false, "Value must not be null."),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a valid absolute URI.")
+            _ => new FluentExpected(false, "Value must be a valid absolute URI.", Code: MustCodes.Uri.Form.NotAbsolute)
         });
     }
 
