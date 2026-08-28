@@ -88,20 +88,18 @@ if ($targetCount -eq 0) {
 }
 
 . (Join-Path $PSScriptRoot '..\.shared\path.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
 
 # --- Resolve repo root ---
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
 # --- Scope resolution ---
 if ($Scope) {
-    $target = switch ($Scope) {
-        'Core'             { Join-Path $repoRoot 'src/PineGuard.Core/PineGuard.Core.csproj' }
-        'MustClauses'      { Join-Path $repoRoot 'src/PineGuard.MustClauses/PineGuard.MustClauses.csproj' }
-        'GuardClauses'     { Join-Path $repoRoot 'src/PineGuard.GuardClauses/PineGuard.GuardClauses.csproj' }
-        'FluentValidation' { Join-Path $repoRoot 'src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj' }
-        'DataAnnotations'  { Join-Path $repoRoot 'src/PineGuard.DataAnnotations/PineGuard.DataAnnotations.csproj' }
-        'Testing'          { Join-Path $repoRoot 'tests/PineGuard.Testing/PineGuard.Testing.csproj' }
-        'All'              { Join-Path $repoRoot 'PineGuard.slnx' }
+    $target = if ($Scope -eq 'All') {
+        Join-Path $repoRoot 'PineGuard.slnx'
+    }
+    else {
+        Join-Path $repoRoot (Get-PineGuardScope -Name $Scope).SourceCsproj
     }
     if (-not (Test-Path $target)) {
         throw "Resolved target not found: $target"

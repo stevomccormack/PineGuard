@@ -82,6 +82,7 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
 . (Join-Path $PSScriptRoot '../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../.shared/dotnet-projects.ps1')
 . (Join-Path $PSScriptRoot '../audit-cli/helpers/Load-AuditHelpers.ps1')
 
 function Get-QodanaConfigPath {
@@ -92,17 +93,11 @@ function Get-QodanaConfigPath {
         [string] $Scope
     )
 
-    switch ($Scope) {
-        'All' { return (Join-Path $RepoRootResolved 'tools/code-inspection/qodana/config/qodana.all.yaml') }
-        'Core' { return (Join-Path $RepoRootResolved 'tools/code-inspection/qodana/config/qodana.core.yaml') }
-        'MustClauses' { return (Join-Path $RepoRootResolved 'tools/code-inspection/qodana/config/qodana.must-clauses.yaml') }
-        'GuardClauses' { return (Join-Path $RepoRootResolved 'tools/code-inspection/qodana/config/qodana.guard-clauses.yaml') }
-        'FluentValidation' { return (Join-Path $RepoRootResolved 'tools/code-inspection/qodana/config/qodana.fluent-validation.yaml') }
-        'DataAnnotations' { return (Join-Path $RepoRootResolved 'tools/code-inspection/qodana/config/qodana.data-annotations.yaml') }
-        'Testing' { return (Join-Path $RepoRootResolved 'tools/code-inspection/qodana/config/qodana.testing.yaml') }
+    if ($Scope -eq 'All') {
+        return (Join-Path $RepoRootResolved 'tools/code-inspection/qodana/config/qodana.all.yaml')
     }
 
-    throw "Unhandled scope: $Scope"
+    return (Join-Path $RepoRootResolved (Get-PineGuardScope -Name $Scope).QodanaConfig)
 }
 
 function Get-DefaultResultsDir {
@@ -113,15 +108,7 @@ function Get-DefaultResultsDir {
         [string] $Scope
     )
 
-    $name = switch ($Scope) {
-        'Core' { 'core' }
-        'MustClauses' { 'must-clauses' }
-        'GuardClauses' { 'guard-clauses' }
-        'FluentValidation' { 'fluent-validation' }
-        'DataAnnotations' { 'data-annotations' }
-        'Testing' { 'testing' }
-        'All' { 'all' }
-    }
+    $name = if ($Scope -eq 'All') { 'all' } else { (Get-PineGuardScope -Name $Scope).QodanaSlug }
 
     return (Join-Path $RepoRootResolved (Join-Path 'artifacts/qodana' $name))
 }

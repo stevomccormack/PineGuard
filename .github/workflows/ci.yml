@@ -81,7 +81,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       - name: Cache NuGet packages
         uses: actions/cache@v6
@@ -191,7 +193,9 @@ jobs:
         if: steps.should-run.outputs.result == 'true'
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       - name: Download build output
         if: steps.should-run.outputs.result == 'true'
@@ -239,7 +243,7 @@ jobs:
   # 4. Coverage — merge reports and enforce 100%
   # ---------------------------------------------------------------------------
   coverage:
-    needs: test
+    needs: [changes, test]
     if: always() && !cancelled()
     runs-on: ubuntu-latest
     permissions:
@@ -285,6 +289,65 @@ jobs:
             echo "Coverage files: $FILES"
           fi
 
+      # A PR that runs only e.g. the GuardClauses matrix entry still produces coverlet output for
+      # PineGuard.Core/PineGuard.MustClauses, since GuardClauses tests transitively load and
+      # exercise those assemblies as dependencies — but only PARTIALLY, because Core's own
+      # dedicated test job (which alone provides Core's full 100%-verified coverage) never ran.
+      # Merged into one report ungated by assembly, that partial number can fail — or, worse,
+      # silently pass with an artificially-lowered number — for reasons unrelated to the PR's
+      # actual change. Restrict the merged report to only the assemblies whose OWN dedicated
+      # matrix entry actually ran, using the exact same run-if logic as the "Should run" step
+      # above (test job, per matrix.run-if). On push to main every scope always runs, so the
+      # filter includes all six assembly names (equivalent to no filtering).
+      - name: Compute coverage assembly filters
+        id: assembly-filters
+        if: steps.find-coverage.outputs.found == 'true'
+        shell: bash
+        run: |
+          IS_MAIN="${{ github.ref == 'refs/heads/main' }}"
+          CORE="${{ needs.changes.outputs.core }}"
+          MUST="${{ needs.changes.outputs.must-clauses }}"
+          GUARD="${{ needs.changes.outputs.guard-clauses }}"
+          FLUENT="${{ needs.changes.outputs.fluent-validation }}"
+          DATA="${{ needs.changes.outputs.data-annotations }}"
+          TESTING="${{ needs.changes.outputs.testing }}"
+
+          FILTERS=""
+
+          # PineGuard.Core — same run-if as the Core matrix entry: core-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.Core;"
+          fi
+
+          # PineGuard.MustClauses — core-or-must-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.MustClauses;"
+          fi
+
+          # PineGuard.GuardClauses — core-or-must-or-guard-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.GuardClauses;"
+          fi
+
+          # PineGuard.FluentValidation — core-or-must-or-fluent-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$FLUENT" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.FluentValidation;"
+          fi
+
+          # PineGuard.DataAnnotations — core-or-must-or-data-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DATA" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.DataAnnotations;"
+          fi
+
+          # PineGuard.Testing — testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.Testing;"
+          fi
+
+          FILTERS="${FILTERS%;}"
+          echo "Assembly filters: $FILTERS"
+          echo "filters=$FILTERS" >> "$GITHUB_OUTPUT"
+
       - name: Generate coverage report
         if: steps.find-coverage.outputs.found == 'true'
         run: >
@@ -292,6 +355,7 @@ jobs:
           -reports:"${{ steps.find-coverage.outputs.files }}"
           -targetdir:./coverage-report
           -reporttypes:"Cobertura;TextSummary;MarkdownSummaryGithub"
+          -assemblyfilters:"${{ steps.assembly-filters.outputs.filters }}"
 
       - name: Check coverage threshold
         id: coverage-check
@@ -421,7 +485,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       - name: Build and check warnings
         id: roslyn
