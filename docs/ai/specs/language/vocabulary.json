@@ -18,6 +18,17 @@
     "InSqlDateTimeOffsetRange": "InSqlDateTimeRange",
     "HasFileExtension": "FileExtension",
     "Required": "Null"
+    ,
+    "AfterProperty": "After",
+    "OnOrAfterProperty": "OnOrAfter",
+    "BeforeProperty": "Before",
+    "OnOrBeforeProperty": "OnOrBefore",
+    "GreaterThanProperty": "GreaterThan",
+    "GreaterThanOrEqualProperty": "GreaterThanOrEqual",
+    "LessThanProperty": "LessThan",
+    "LessThanOrEqualProperty": "LessThanOrEqual",
+    "EqualToProperty": "EqualTo",
+    "NotEqualToProperty": "NotEqualTo"
   },
   "concepts": [],
   "opposites": [
