@@ -41,6 +41,50 @@ public sealed class GuardFailureTests : BaseUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(GuardFailureTestData.MessageOverrideWithMapActive.Cases), MemberType = typeof(GuardFailureTestData.MessageOverrideWithMapActive))]
+    public void Throw_MessageOverride_WithMapActive_PassesGivenMessageToMap(bool _)
+    {
+        // Arrange
+        var result = MustResult<string>.Fail("sample.always-fails", "{paramName} is bad.", "value", "x");
+        GuardFailure? captured = null;
+
+        try
+        {
+            GuardExceptionPolicy.Map(failure =>
+            {
+                captured = failure;
+                return new NotSupportedException("mapped: " + failure.Message);
+            });
+
+            // Act
+            var ex = Assert.Throws<NotSupportedException>(() => GuardFailure.Throw(result, "custom message"));
+
+            // Assert
+            Assert.Equal("mapped: custom message", ex.Message);
+            Assert.NotNull(captured);
+            Assert.Equal("custom message", captured.Message);
+        }
+        finally
+        {
+            GuardExceptionPolicy.Clear();
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardFailureTestData.NullParamName.Cases), MemberType = typeof(GuardFailureTestData.NullParamName))]
+    public void Throw_NullParamName_StampsEmptyPropertyPath(bool _)
+    {
+        // Arrange
+        var result = MustResult<string>.Fail("sample.always-fails", "No param name.", null, "x");
+
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => GuardFailure.Throw(result));
+
+        // Assert
+        Assert.Equal(string.Empty, ex.GetMustPropertyPath());
+    }
+
+    [Theory]
     [MemberData(nameof(GuardFailureTestData.ExceptionCreatorPrecedence.Cases), MemberType = typeof(GuardFailureTestData.ExceptionCreatorPrecedence))]
     public void Throw_ExceptionCreatorReturnsNonNull_ThrowsItDirectly_BypassingActiveMap(bool _)
     {

@@ -27,18 +27,6 @@ public static class MustResultTestData
             : ReturnCase<(string? Result, object? Value, string? ParamName), (bool Success, string Message, string? ParamName, object? Value, string? Result)>(Name, (Result, InputValue, ParamName), (true, string.Empty, ParamName, InputValue, Result));
     }
 
-    public static class Fail
-    {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-            new("template with param", "{paramName} must be valid.", "value", 123, "value must be valid."),
-            new("no param name", "No param name.", null, 123, "No param name.")
-        ];
-
-        public sealed record ValidCase(string Name, string Template, string? ParamName, object? InputValue, string ExpectedMessage)
-            : ReturnCase<(string Template, string? ParamName, object? Value), (bool Success, string Message, string? ParamName, object? Value)>(Name, (Template, ParamName, InputValue), (false, ExpectedMessage, ParamName, InputValue));
-    }
-
     public static class FailCoded
     {
         public static TheoryData<ValidCase> ValidCases =>
@@ -61,30 +49,6 @@ public static class MustResultTestData
             : ThrowsCase<(string Code, string Template, string? ParamName, object? Value)>(Name, (Code, Template, ParamName, InputValue), ExpectedException);
     }
 
-    public static class FromBoolWithResult
-    {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-            new("ok", true, "{paramName} must be valid.", "value", 123, 7, true, string.Empty),
-            new("fail", false, "{paramName} must be valid.", "value", 123, 7, false, "value must be valid.")
-        ];
-
-        public sealed record ValidCase(string Name, bool IsOk, string Template, string? ParamName, object? InputValue, int Result, bool IsSuccess, string ExpectedMessage)
-            : ReturnCase<(bool Ok, string Template, string? ParamName, object? Value, int Result), (bool IsSuccess, string ExpectedMessage, string? ExpectedParamName, object? ExpectedValue, int ExpectedResult)>(Name, (IsOk, Template, ParamName, InputValue, Result), (IsSuccess, ExpectedMessage, ParamName, InputValue, IsSuccess ? Result : 0));
-    }
-
-    public static class FromBoolWithoutResult
-    {
-        public static TheoryData<ValidCase> ValidCases =>
-        [
-            new("ok", true, "{paramName} must be valid.", "value", 123, true, string.Empty),
-            new("fail", false, "{paramName} must be valid.", "value", 123, false, "value must be valid.")
-        ];
-
-        public sealed record ValidCase(string Name, bool IsOk, string Template, string? ParamName, object? InputValue, bool IsSuccess, string ExpectedMessage)
-            : ReturnCase<(bool Ok, string Template, string? ParamName, object? Value), (bool IsSuccess, string ExpectedMessage, string? ExpectedParamName, object? ExpectedValue)>(Name, (IsOk, Template, ParamName, InputValue), (IsSuccess, ExpectedMessage, ParamName, InputValue));
-    }
-
     public static class FromBoolCoded
     {
         public static TheoryData<ValidCase> ValidCases =>
@@ -97,24 +61,36 @@ public static class MustResultTestData
             : ReturnCase<(bool Ok, string Code, string Template, string? ParamName, object? Value, int Result), (bool IsSuccess, string ExpectedCode, string ExpectedMessage, string? ExpectedParamName, object? ExpectedValue, int ExpectedResult)>(Name, (IsOk, Code, Template, ParamName, InputValue, Result), (IsSuccess, IsSuccess ? string.Empty : Code, ExpectedMessage, ParamName, InputValue, IsSuccess ? Result : 0));
     }
 
+    public static class FromBoolCodedWithoutResult
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("ok", true, "test.code", "{paramName} must be valid.", "value", 123, true, string.Empty),
+            new("fail", false, "test.code", "{paramName} must be valid.", "value", 123, false, "value must be valid.")
+        ];
+
+        public sealed record ValidCase(string Name, bool IsOk, string Code, string Template, string? ParamName, object? InputValue, bool IsSuccess, string ExpectedMessage)
+            : ReturnCase<(bool Ok, string Code, string Template, string? ParamName, object? Value), (bool IsSuccess, string ExpectedCode, string ExpectedMessage, string? ExpectedParamName, object? ExpectedValue)>(Name, (IsOk, Code, Template, ParamName, InputValue), (IsSuccess, IsSuccess ? string.Empty : Code, ExpectedMessage, ParamName, InputValue));
+    }
+
     public static class ThrowIfFailed
     {
         public static TheoryData<InvalidCase> ThrowIfFailedInvalidCases =>
         [
-            new("fails with param", MustResult<int>.Fail("{paramName} must be valid.", "value", 123), new ExpectedException(typeof(ArgumentException), "value", "value must be valid.")),
-            new("fails with null param", MustResult<int>.Fail("No param name.", null, 123), new ExpectedException(typeof(ArgumentException), null, "No param name."))
+            new("fails with param", MustResult<int>.Fail("test.code", "{paramName} must be valid.", "value", 123), new ExpectedException(typeof(ArgumentException), "value", "value must be valid.")),
+            new("fails with null param", MustResult<int>.Fail("test.code", "No param name.", null, 123), new ExpectedException(typeof(ArgumentException), null, "No param name."))
         ];
 
         public static TheoryData<InvalidCase> ThrowNullIfFailedInvalidCases =>
         [
-            new("fails with param", MustResult<int>.Fail("{paramName} must be valid.", "value", 123), new ExpectedException(typeof(ArgumentNullException), "value")),
-            new("fails with null param", MustResult<int>.Fail("No param name.", null, 123), new ExpectedException(typeof(ArgumentNullException)))
+            new("fails with param", MustResult<int>.Fail("test.code", "{paramName} must be valid.", "value", 123), new ExpectedException(typeof(ArgumentNullException), "value")),
+            new("fails with null param", MustResult<int>.Fail("test.code", "No param name.", null, 123), new ExpectedException(typeof(ArgumentNullException)))
         ];
 
         public static TheoryData<InvalidCase> ThrowIfFailedGenericInvalidCases =>
         [
-            new("fails with param", MustResult<int>.Fail("{paramName} must be valid.", "value", 123), new ExpectedException(typeof(InvalidOperationException), null, "value must be valid.")),
-            new("fails with null param", MustResult<int>.Fail("No param name.", null, 123), new ExpectedException(typeof(InvalidOperationException), null, "No param name."))
+            new("fails with param", MustResult<int>.Fail("test.code", "{paramName} must be valid.", "value", 123), new ExpectedException(typeof(InvalidOperationException), null, "value must be valid.")),
+            new("fails with null param", MustResult<int>.Fail("test.code", "No param name.", null, 123), new ExpectedException(typeof(InvalidOperationException), null, "No param name."))
         ];
 
         public static TheoryData<InvalidCase> ThrowIfFailedResultInvalidCases =>
@@ -135,7 +111,7 @@ public static class MustResultTestData
         [
             new("null reference converts to false", null, false),
             new("non-null successful reference converts to true", MustResult<int>.Ok(1), true),
-            new("non-null failed reference converts to false", MustResult<int>.Fail("{paramName} failed.", "p", 1), false)
+            new("non-null failed reference converts to false", MustResult<int>.Fail("test.code", "{paramName} failed.", "p", 1), false)
         ];
 
         public sealed record ImplicitBoolCase(string Name, MustResult<int>? MustResult, bool Expected)
@@ -150,7 +126,7 @@ public static class MustResultTestData
         public static TheoryData<ValidCase> NullFactoryCases =>
         [
             new("successful result", MustResult<int>.Ok(1, "original", "value")),
-            new("failed result", MustResult<int>.Fail("{paramName} must be valid.", "value", 123))
+            new("failed result", MustResult<int>.Fail("test.code", "{paramName} must be valid.", "value", 123))
         ];
 
         public sealed record ValidCase(string Name, MustResult<int> MustResult)
@@ -171,7 +147,7 @@ public static class MustResultTestData
         [
             new InvalidCase(
                 "failed throws",
-                MustResult<int>.Fail("{paramName} must be valid.", "value", 123),
+                MustResult<int>.Fail("test.code", "{paramName} must be valid.", "value", 123),
                 new ExpectedException(typeof(ArgumentException), "value"))
         ];
 
@@ -232,8 +208,8 @@ public static class MustResultTestData
                 "joins failure messages and uses first failure param name",
                 [
                     MustResult<int>.Ok(1, value: "v1", paramName: "p1"),
-                    MustResult<int>.Fail("{paramName} failed.", "a", 1),
-                    MustResult<int>.Fail("{paramName} failed.", "b", 2)
+                    MustResult<int>.Fail("test.code", "{paramName} failed.", "a", 1),
+                    MustResult<int>.Fail("test.code", "{paramName} failed.", "b", 2)
                 ],
                 (
                     Success: false,
@@ -246,8 +222,8 @@ public static class MustResultTestData
             new(
                 "does not re-substitute a leftover placeholder from a failure with no param name",
                 [
-                    MustResult<int>.Fail("{paramName} must be positive.", "age", -1),
-                    MustResult<int>.Fail("{paramName} must not be empty.", null, "")
+                    MustResult<int>.Fail("test.code", "{paramName} must be positive.", "age", -1),
+                    MustResult<int>.Fail("test.code", "{paramName} must not be empty.", null, "")
                 ],
                 (
                     Success: false,

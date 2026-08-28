@@ -35,10 +35,10 @@ public static class BaseMustUnitTestTestData
                  MustResult<bool>.Ok(true, "x"))),
             new("invalid result with paramName",
                 (new MustCase<string>("c3", "x", new MustExpected(false, "error", "p")),
-                 MustResult<bool>.Fail("error", "p", "x"))),
+                 MustResult<bool>.Fail("test.code", "error", "p", "x"))),
             new("invalid result without paramName",
                 (new MustCase<string>("c4", "x", new MustExpected(false, "error")),
-                 MustResult<bool>.Fail("error", null, "x")))
+                 MustResult<bool>.Fail("test.code", "error", null, "x")))
         ];
     }
 }

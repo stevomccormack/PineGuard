@@ -134,7 +134,7 @@ public sealed class FluentExtensionTests : BaseUnitTest
             undecorated.RuleFor(x => x.Value).Must(_ => false);
 
             var decorated = new InlineValidator<Model>();
-            decorated.RuleFor(x => x.Value).MustBe(_ => MustResult<bool>.Fail("bad", null, "x"), null);
+            decorated.RuleFor(x => x.Value).MustBe(_ => MustResult<bool>.Fail("test.code", "bad", null, "x"), null);
 
             // Act
             var undecoratedResult = undecorated.Validate(new Model());
@@ -150,13 +150,13 @@ public sealed class FluentExtensionTests : BaseUnitTest
         {
             // Arrange
             var single = new InlineValidator<Model>();
-            single.RuleFor(x => x.Value).MustBe(_ => MustResult<bool>.Fail("bad", null, "x"), null, "sample.code");
+            single.RuleFor(x => x.Value).MustBe(_ => MustResult<bool>.Fail("test.code", "bad", null, "x"), null, "sample.code");
 
             var model = new InlineValidator<Model>();
-            model.RuleFor(x => x.Value).MustBe((_, _) => MustResult<bool>.Fail("bad", null, "x"), null, "sample.code");
+            model.RuleFor(x => x.Value).MustBe((_, _) => MustResult<bool>.Fail("test.code", "bad", null, "x"), null, "sample.code");
 
             var structModel = new InlineValidator<ModelStub>();
-            structModel.RuleFor(x => x.Id).MustBe(_ => MustResult<int?>.Fail("bad", null, null), null, "sample.code");
+            structModel.RuleFor(x => x.Id).MustBe(_ => MustResult<int?>.Fail("test.code", "bad", null, null), null, "sample.code");
 
             // Act
             var singleResult = single.Validate(new Model());
@@ -176,7 +176,7 @@ public sealed class FluentExtensionTests : BaseUnitTest
             // Arrange
             var validator = new InlineValidator<Model>();
             validator.RuleFor(x => x.Value)
-                .MustBe(_ => MustResult<bool>.Fail("bad", null, "x"), null, "sample.code")
+                .MustBe(_ => MustResult<bool>.Fail("test.code", "bad", null, "x"), null, "sample.code")
                 .WithMessage("consumer message");
 
             // Act

@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.GuardClauses;
 using PineGuard.MustClauses;
 using PineGuard.Testing.Common;
@@ -45,26 +46,6 @@ public sealed class MustResultTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(MustResultTestData.Fail.ValidCases), MemberType = typeof(MustResultTestData.Fail))]
-    public void Fail_SetsProperties_AndFormatsMessage(MustResultTestData.Fail.ValidCase testCase)
-    {
-        // Act
-        var mustResult = MustResult<int>.Fail(testCase.Template, testCase.ParamName, testCase.InputValue);
-        bool asBool = mustResult;
-
-        // Assert
-        Assert.False(mustResult.Success);
-        Assert.True(mustResult.Failed);
-        Assert.Equal(string.Empty, mustResult.Code);
-        Assert.Equal(testCase.ExpectedMessage, mustResult.Message);
-        Assert.Equal(testCase.Template, mustResult.MessageTemplate);
-        Assert.Equal(testCase.ParamName, mustResult.ParamName);
-        Assert.Equal(testCase.InputValue, mustResult.Value);
-        Assert.Equal(0, mustResult.Result);
-        Assert.False(asBool);
-    }
-
-    [Theory]
     [MemberData(nameof(MustResultTestData.FailCoded.ValidCases), MemberType = typeof(MustResultTestData.FailCoded))]
     public void FailCoded_SetsCodeAndMessageTemplate(MustResultTestData.FailCoded.ValidCase testCase)
     {
@@ -96,11 +77,11 @@ public sealed class MustResultTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(MustResultTestData.Fail.ValidCases), MemberType = typeof(MustResultTestData.Fail))]
-    public void Deconstruct_ExposesAllFields(MustResultTestData.Fail.ValidCase testCase)
+    [MemberData(nameof(MustResultTestData.FailCoded.ValidCases), MemberType = typeof(MustResultTestData.FailCoded))]
+    public void Deconstruct_ExposesAllFields(MustResultTestData.FailCoded.ValidCase testCase)
     {
         // Arrange
-        var mustResult = MustResult<int>.Fail(testCase.Template, testCase.ParamName, testCase.InputValue);
+        var mustResult = MustResult<int>.Fail(testCase.Code, testCase.Template, testCase.ParamName, testCase.InputValue);
 
         // Act
         mustResult.Deconstruct(out var success, out var message, out var deconstructedParamName, out var deconstructedValue, out var result);
@@ -111,37 +92,6 @@ public sealed class MustResultTests : BaseUnitTest
         Assert.Equal(testCase.ParamName, deconstructedParamName);
         Assert.Equal(testCase.InputValue, deconstructedValue);
         Assert.Equal(mustResult.Result, result);
-    }
-
-    [Theory]
-    [MemberData(nameof(MustResultTestData.FromBoolWithResult.ValidCases), MemberType = typeof(MustResultTestData.FromBoolWithResult))]
-    public void FromBool_WithResult_ReturnsOkOrFail(MustResultTestData.FromBoolWithResult.ValidCase testCase)
-    {
-        // Act
-        var mustResult = MustResult<int>.FromBool(testCase.IsOk, testCase.Template, testCase.ParamName, testCase.InputValue, testCase.Result);
-
-        // Assert
-        Assert.Equal(testCase.IsSuccess, mustResult.Success);
-        Assert.Equal(testCase.ExpectedMessage, mustResult.Message);
-        Assert.Equal(testCase.ParamName, mustResult.ParamName);
-        Assert.Equal(testCase.InputValue, mustResult.Value);
-
-        Assert.Equal(testCase.IsSuccess ? testCase.Result : 0, mustResult.Result);
-    }
-
-    [Theory]
-    [MemberData(nameof(MustResultTestData.FromBoolWithoutResult.ValidCases), MemberType = typeof(MustResultTestData.FromBoolWithoutResult))]
-    public void FromBool_WithoutResult_ReturnsOkOrFail(MustResultTestData.FromBoolWithoutResult.ValidCase testCase)
-    {
-        // Act
-        var mustResult = MustResult<int>.FromBool(testCase.IsOk, testCase.Template, testCase.ParamName, testCase.InputValue);
-
-        // Assert
-        Assert.Equal(testCase.IsSuccess, mustResult.Success);
-        Assert.Equal(testCase.ExpectedMessage, mustResult.Message);
-        Assert.Equal(testCase.ParamName, mustResult.ParamName);
-        Assert.Equal(testCase.InputValue, mustResult.Value);
-        Assert.Equal(0, mustResult.Result);
     }
 
     [Theory]
@@ -158,6 +108,22 @@ public sealed class MustResultTests : BaseUnitTest
         Assert.Equal(testCase.ParamName, mustResult.ParamName);
         Assert.Equal(testCase.InputValue, mustResult.Value);
         Assert.Equal(testCase.IsSuccess ? testCase.Result : 0, mustResult.Result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustResultTestData.FromBoolCodedWithoutResult.ValidCases), MemberType = typeof(MustResultTestData.FromBoolCodedWithoutResult))]
+    public void FromBool_CodedWithoutResult_ReturnsOkOrFail(MustResultTestData.FromBoolCodedWithoutResult.ValidCase testCase)
+    {
+        // Act
+        var mustResult = MustResult<int>.FromBool(testCase.IsOk, testCase.Code, testCase.Template, testCase.ParamName, testCase.InputValue);
+
+        // Assert
+        Assert.Equal(testCase.IsSuccess, mustResult.Success);
+        Assert.Equal(testCase.IsSuccess ? string.Empty : testCase.Code, mustResult.Code);
+        Assert.Equal(testCase.ExpectedMessage, mustResult.Message);
+        Assert.Equal(testCase.ParamName, mustResult.ParamName);
+        Assert.Equal(testCase.InputValue, mustResult.Value);
+        Assert.Equal(0, mustResult.Result);
     }
 
     [Theory]
@@ -377,6 +343,7 @@ public sealed class MustResultTests : BaseUnitTest
 
         // Assert
         Assert.Equal(testCase.Expected, combined.Success);
+        Assert.Equal(MustCodes.Value.State.Null, combined.Code);
         Assert.Equal("results", combined.ParamName);
         Assert.NotEmpty(combined.Message);
     }
@@ -425,7 +392,7 @@ public sealed class MustResultTests : BaseUnitTest
     {
         // Arrange
         var results = testCase.AnyFailed
-            ? new[] { MustResult<int>.Ok(1), MustResult<int>.Fail("{paramName} failed.", "x", 1) }
+            ? new[] { MustResult<int>.Ok(1), MustResult<int>.Fail("test.code", "{paramName} failed.", "x", 1) }
             : new[] { MustResult<int>.Ok(1), MustResult<int>.Ok(2) };
 
         // Act
