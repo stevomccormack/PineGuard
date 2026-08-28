@@ -18,7 +18,7 @@ public sealed class CsvAttributesTests(ITestOutputHelper output) : BaseDataAnnot
         var result = attr.GetValidationResult(tc.Value, ctx);
 
         // Assert
-        AssertResult(tc, result);
+        AssertResult(tc, result, attr.Code);
     }
 
     [Theory]
@@ -33,6 +33,6 @@ public sealed class CsvAttributesTests(ITestOutputHelper output) : BaseDataAnnot
         var result = attr.GetValidationResult(tc.Value, ctx);
 
         // Assert
-        AssertResult(tc, result);
+        AssertResult(tc, result, attr.Code);
     }
 }

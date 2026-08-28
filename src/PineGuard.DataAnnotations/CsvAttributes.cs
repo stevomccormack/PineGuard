@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustCsvClauses.CsvLine"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/csv">CSV Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CsvLineAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class CsvLineAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Csv.Line.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -71,7 +72,7 @@ public sealed class CsvLineAttribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustCsvClauses.CsvHeaderLine"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/csv">CSV Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CsvHeaderLineAttribute(params string[] expectedHeaders) : ValidationAttributeBase(typeof(string))
+public sealed class CsvHeaderLineAttribute(params string[] expectedHeaders) : ValidationAttributeBase(typeof(string), MustCodes.Csv.Header.Invalid)
 {
     /// <summary>Gets the expected header column names that the CSV header line must contain.</summary>
     public string[] ExpectedHeaders { get; } = expectedHeaders;

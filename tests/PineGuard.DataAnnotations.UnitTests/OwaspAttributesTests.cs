@@ -33,7 +33,7 @@ public sealed class OwaspAttributesTests(ITestOutputHelper output) : BaseDataAnn
         var result = attr.GetValidationResult(tc.Value, Ctx);
 
         // Assert
-        AssertResult(tc, result);
+        AssertResult(tc, result, attr.Code);
     }
 
     [Theory]

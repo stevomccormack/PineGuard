@@ -18,7 +18,7 @@ public sealed class CharAttributesTests(ITestOutputHelper output) : BaseDataAnno
         var result = attr.GetValidationResult(tc.Value, ctx);
 
         // Assert
-        AssertResult(tc, result);
+        AssertResult(tc, result, attr.Code);
     }
 
     [Theory]

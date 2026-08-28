@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.MustClauses;
 
 namespace PineGuard.DataAnnotations;
@@ -34,7 +35,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustDefaultEqualityClauses.NullOrDefault{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NullOrDefaultAttribute : ObjectAttributeBase
+public sealed class NullOrDefaultAttribute() : ObjectAttributeBase(MustCodes.Value.State.NotNullOrDefault)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -65,7 +66,7 @@ public sealed class NullOrDefaultAttribute : ObjectAttributeBase
 /// <seealso cref="MustDefaultEqualityClauses.NotNullOrDefault{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotNullOrDefaultAttribute : ObjectAttributeBase
+public sealed class NotNullOrDefaultAttribute() : ObjectAttributeBase(MustCodes.Value.State.NullOrDefault)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>

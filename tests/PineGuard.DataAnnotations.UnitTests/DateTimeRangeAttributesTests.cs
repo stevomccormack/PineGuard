@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -17,7 +18,11 @@ public sealed class DateTimeRangeAttributesTests
     [MemberData(nameof(DateTimeRangeAttributesTestData.ChronologicalDateTimeRange.EdgeCases), MemberType = typeof(DateTimeRangeAttributesTestData.ChronologicalDateTimeRange))]
     [MemberData(nameof(DateTimeRangeAttributesTestData.ChronologicalDateTimeRange.InvalidCases), MemberType = typeof(DateTimeRangeAttributesTestData.ChronologicalDateTimeRange))]
     public void ChronologicalDateTimeRange_ShouldReturnExpected(DateTimeRangeAttributesTestData.ValidCase testCase)
-        => Verify(new ChronologicalDateTimeRangeAttribute(), testCase);
+    {
+        var attribute = new ChronologicalDateTimeRangeAttribute();
+        Verify(attribute, testCase);
+        Assert.Equal(MustCodes.Range.Order.NotChronological, attribute.Code);
+    }
 
     [Theory]
     [MemberData(nameof(DateTimeRangeAttributesTestData.OverlappingDateTimeRange.ValidCases), MemberType = typeof(DateTimeRangeAttributesTestData.OverlappingDateTimeRange))]

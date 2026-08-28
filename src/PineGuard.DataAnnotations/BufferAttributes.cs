@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustBufferClauses.Hex"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/buffer">Buffer Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HexAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class HexAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Encoding.Hex.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -67,7 +68,7 @@ public sealed class HexAttribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustBufferClauses.Base64"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/buffer">Buffer Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Base64Attribute() : ValidationAttributeBase(typeof(string))
+public sealed class Base64Attribute() : ValidationAttributeBase(typeof(string), MustCodes.Encoding.Base64.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -104,7 +105,7 @@ public sealed class Base64Attribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustBufferClauses.NotHex"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/buffer">Buffer Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotHexAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotHexAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Encoding.Hex.WellFormed)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -141,7 +142,7 @@ public sealed class NotHexAttribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustBufferClauses.NotBase64"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/buffer">Buffer Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBase64Attribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotBase64Attribute() : ValidationAttributeBase(typeof(string), MustCodes.Encoding.Base64.WellFormed)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

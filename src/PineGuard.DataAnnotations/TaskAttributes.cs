@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -26,7 +27,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustTaskClauses.Completed"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/task">Task Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class TaskCompletedAttribute() : ValidationAttributeBase(typeof(Task))
+public sealed class TaskCompletedAttribute() : ValidationAttributeBase(typeof(Task), MustCodes.Task.Status.NotCompleted)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -59,7 +60,7 @@ public sealed class TaskCompletedAttribute() : ValidationAttributeBase(typeof(Ta
 /// <seealso cref="MustTaskClauses.NotCompleted"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/task">Task Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class TaskNotCompletedAttribute() : ValidationAttributeBase(typeof(Task))
+public sealed class TaskNotCompletedAttribute() : ValidationAttributeBase(typeof(Task), MustCodes.Task.Status.Completed)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -92,7 +93,7 @@ public sealed class TaskNotCompletedAttribute() : ValidationAttributeBase(typeof
 /// <seealso cref="MustTaskClauses.Canceled"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/task">Task Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class TaskCanceledAttribute() : ValidationAttributeBase(typeof(Task))
+public sealed class TaskCanceledAttribute() : ValidationAttributeBase(typeof(Task), MustCodes.Task.Status.NotCanceled)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -125,7 +126,7 @@ public sealed class TaskCanceledAttribute() : ValidationAttributeBase(typeof(Tas
 /// <seealso cref="MustTaskClauses.NotCanceled"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/task">Task Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class TaskNotCanceledAttribute() : ValidationAttributeBase(typeof(Task))
+public sealed class TaskNotCanceledAttribute() : ValidationAttributeBase(typeof(Task), MustCodes.Task.Status.Canceled)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -158,7 +159,7 @@ public sealed class TaskNotCanceledAttribute() : ValidationAttributeBase(typeof(
 /// <seealso cref="MustTaskClauses.Faulted"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/task">Task Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class TaskFaultedAttribute() : ValidationAttributeBase(typeof(Task))
+public sealed class TaskFaultedAttribute() : ValidationAttributeBase(typeof(Task), MustCodes.Task.Status.NotFaulted)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -191,7 +192,7 @@ public sealed class TaskFaultedAttribute() : ValidationAttributeBase(typeof(Task
 /// <seealso cref="MustTaskClauses.NotFaulted"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/task">Task Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class TaskNotFaultedAttribute() : ValidationAttributeBase(typeof(Task))
+public sealed class TaskNotFaultedAttribute() : ValidationAttributeBase(typeof(Task), MustCodes.Task.Status.Faulted)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -31,7 +32,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustBitWiseClauses.BitwiseEqualTo"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/bitwise">Bitwise Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BitwiseEqualToAttribute(int value) : ValidationAttributeBase(typeof(int))
+public sealed class BitwiseEqualToAttribute(int value) : ValidationAttributeBase(typeof(int), MustCodes.Bitwise.Equality.NotEqual)
 {
     /// <summary>Gets the expected bitwise value to compare against.</summary>
     public int Value { get; } = value;
@@ -70,7 +71,7 @@ public sealed class BitwiseEqualToAttribute(int value) : ValidationAttributeBase
 /// <seealso cref="MustBitWiseClauses.NotBitwiseEqualTo"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/bitwise">Bitwise Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBitwiseEqualToAttribute(int value) : ValidationAttributeBase(typeof(int))
+public sealed class NotBitwiseEqualToAttribute(int value) : ValidationAttributeBase(typeof(int), MustCodes.Bitwise.Equality.Equal)
 {
     /// <summary>Gets the bitwise value that the annotated field must not equal.</summary>
     public int Value { get; } = value;
@@ -110,7 +111,7 @@ public sealed class NotBitwiseEqualToAttribute(int value) : ValidationAttributeB
 /// <seealso cref="MustBitWiseClauses.HasAllBits"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/bitwise">Bitwise Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasAllBitsAttribute(int mask) : ValidationAttributeBase(typeof(int))
+public sealed class HasAllBitsAttribute(int mask) : ValidationAttributeBase(typeof(int), MustCodes.Bitwise.Bits.NotAllSet)
 {
     /// <summary>Gets the bitmask that all bits must be set in the annotated value.</summary>
     public int Mask { get; } = mask;
@@ -150,7 +151,7 @@ public sealed class HasAllBitsAttribute(int mask) : ValidationAttributeBase(type
 /// <seealso cref="MustBitWiseClauses.HasAnyBits"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/bitwise">Bitwise Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasAnyBitsAttribute(int mask) : ValidationAttributeBase(typeof(int))
+public sealed class HasAnyBitsAttribute(int mask) : ValidationAttributeBase(typeof(int), MustCodes.Bitwise.Bits.NoneSet)
 {
     /// <summary>Gets the bitmask of which at least one bit must be set in the annotated value.</summary>
     public int Mask { get; } = mask;
@@ -190,7 +191,7 @@ public sealed class HasAnyBitsAttribute(int mask) : ValidationAttributeBase(type
 /// <seealso cref="MustBitWiseClauses.HasNoBits"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/bitwise">Bitwise Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasNoBitsAttribute(int mask) : ValidationAttributeBase(typeof(int))
+public sealed class HasNoBitsAttribute(int mask) : ValidationAttributeBase(typeof(int), MustCodes.Bitwise.Bits.AnySet)
 {
     /// <summary>Gets the bitmask of which no bits must be set in the annotated value.</summary>
     public int Mask { get; } = mask;
@@ -231,7 +232,7 @@ public sealed class HasNoBitsAttribute(int mask) : ValidationAttributeBase(typeo
 /// <seealso cref="MustBitWiseClauses.HasOnlyBits"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/bitwise">Bitwise Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasOnlyBitsAttribute(int mask) : ValidationAttributeBase(typeof(int))
+public sealed class HasOnlyBitsAttribute(int mask) : ValidationAttributeBase(typeof(int), MustCodes.Bitwise.Bits.NotSubset)
 {
     /// <summary>Gets the bitmask that represents all permitted bits in the annotated value.</summary>
     public int Mask { get; } = mask;
@@ -270,7 +271,7 @@ public sealed class HasOnlyBitsAttribute(int mask) : ValidationAttributeBase(typ
 /// <seealso cref="MustBitWiseClauses.PowerOfTwo"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/bitwise">Bitwise Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PowerOfTwoAttribute() : ValidationAttributeBase(typeof(int))
+public sealed class PowerOfTwoAttribute() : ValidationAttributeBase(typeof(int), MustCodes.Bitwise.Value.NotPowerOfTwo)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -306,7 +307,7 @@ public sealed class PowerOfTwoAttribute() : ValidationAttributeBase(typeof(int))
 /// <seealso cref="MustBitWiseClauses.NotPowerOfTwo"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/bitwise">Bitwise Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotPowerOfTwoAttribute() : ValidationAttributeBase(typeof(int))
+public sealed class NotPowerOfTwoAttribute() : ValidationAttributeBase(typeof(int), MustCodes.Bitwise.Value.PowerOfTwo)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

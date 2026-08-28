@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.BufferRulesFixtures;
 
@@ -12,7 +13,7 @@ public static class BufferAttributesTestData
         {
             nameof(F.IsHex.Null) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false)
+            _ => new DataAnnotationExpected(false, Code: MustCodes.Encoding.Hex.Invalid)
         });
     }
 
@@ -22,8 +23,8 @@ public static class BufferAttributesTestData
         public static TheoryData<DataAnnotationCase> Cases => F.IsHex.AllScenarios.ToDataAnnotationCases(v => v, s => s.Name switch
         {
             nameof(F.IsHex.Null) => new DataAnnotationExpected(true),
-            _ when s.IsValid => new DataAnnotationExpected(false),  // IS hex → invalid for NotHex
-            _ => new DataAnnotationExpected(true)                   // NOT hex → valid for NotHex
+            _ when s.IsValid => new DataAnnotationExpected(false, Code: MustCodes.Encoding.Hex.WellFormed),  // IS hex → invalid for NotHex
+            _ => new DataAnnotationExpected(true)                                                            // NOT hex → valid for NotHex
         });
     }
 
@@ -34,7 +35,7 @@ public static class BufferAttributesTestData
         {
             nameof(F.IsBase64.Null) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false)
+            _ => new DataAnnotationExpected(false, Code: MustCodes.Encoding.Base64.Invalid)
         });
     }
 
@@ -44,8 +45,8 @@ public static class BufferAttributesTestData
         public static TheoryData<DataAnnotationCase> Cases => F.IsBase64.AllScenarios.ToDataAnnotationCases(v => v, s => s.Name switch
         {
             nameof(F.IsBase64.Null) => new DataAnnotationExpected(true),
-            _ when s.IsValid => new DataAnnotationExpected(false),  // IS base64 → invalid for NotBase64
-            _ => new DataAnnotationExpected(true)                   // NOT base64 → valid for NotBase64
+            _ when s.IsValid => new DataAnnotationExpected(false, Code: MustCodes.Encoding.Base64.WellFormed),  // IS base64 → invalid for NotBase64
+            _ => new DataAnnotationExpected(true)                                                               // NOT base64 → valid for NotBase64
         });
     }
 }
