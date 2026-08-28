@@ -176,7 +176,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must have the expected flag.";
 
         var ok = EnumRules.HasFlag(value, flag);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Flags.NotSet, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -205,7 +205,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not have the expected flag.";
 
         var ok = !EnumRules.HasFlag(value, flag);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Flags.Set, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -232,7 +232,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must have a description.";
 
         var ok = EnumRules.HasDescription<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Description.Missing, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -259,7 +259,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not have a description.";
 
         var ok = !EnumRules.HasDescription<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Description.Present, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -286,7 +286,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must have a display attribute.";
 
         var ok = EnumRules.HasDisplay<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Display.Missing, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -313,7 +313,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not have a display attribute.";
 
         var ok = !EnumRules.HasDisplay<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Display.Present, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -340,7 +340,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must have an enum member attribute.";
 
         var ok = EnumRules.HasEnumMember<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.MemberAttribute.Missing, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -367,7 +367,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not have an enum member attribute.";
 
         var ok = !EnumRules.HasEnumMember<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.MemberAttribute.Present, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -394,7 +394,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must be obsolete.";
 
         var ok = EnumRules.IsObsolete<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Obsolescence.Missing, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>
@@ -421,7 +421,7 @@ public static class MustEnumClauses
         const string messageTemplate = "{paramName} must not be obsolete.";
 
         var ok = !EnumRules.IsObsolete<TEnum>(value);
-        return MustResult<TEnum>.FromBool(ok, messageTemplate, paramName, value, result: value);
+        return MustResult<TEnum>.FromBool(ok, MustCodes.Enum.Obsolescence.Present, messageTemplate, paramName, value, result: value);
     }
 
     /// <summary>

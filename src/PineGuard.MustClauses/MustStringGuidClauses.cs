@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using PineGuard.Codes;
 using PineGuard.Rules;
 using PineGuard.Utils;
 
@@ -46,12 +47,12 @@ public static class MustStringGuidClauses
         string? paramName = null)
     {
         if (value is null)
-            return MustResult<Guid>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<Guid>.Fail(MustCodes.Guid.Format.Invalid, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid GUID.";
 
         var ok = StringUtility.Guid.TryParse(value, out Guid parsed);
-        return MustResult<Guid>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<Guid>.FromBool(ok, MustCodes.Guid.Format.Invalid, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -89,13 +90,13 @@ public static class MustStringGuidClauses
         string? paramName = null)
     {
         if (value is null)
-            return MustResult<Guid>.Fail("{paramName} must not be null.", paramName, value);
+            return MustResult<Guid>.Fail(MustCodes.Guid.Emptiness.Empty, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must not be an empty GUID.";
 
         var ok = StringUtility.Guid.TryParse(value, out Guid parsed)
                  && GuidRules.IsNotEmpty(parsed);
 
-        return MustResult<Guid>.FromBool(ok, messageTemplate, paramName, value, parsed);
+        return MustResult<Guid>.FromBool(ok, MustCodes.Guid.Emptiness.Empty, messageTemplate, paramName, value, parsed);
     }
 }

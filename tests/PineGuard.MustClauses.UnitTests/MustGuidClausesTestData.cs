@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.GuidRulesFixtures;
 
@@ -9,6 +10,6 @@ public static class MustGuidClausesTestData
     {
         public static TheoryData<MustCase<Guid>> ValidCases => F.NotEmpty.ValidScenarios.ToMustCases();
 
-        public static TheoryData<MustCase<Guid>> InvalidCases => F.NotEmpty.InvalidScenarios.ToMustCases(_ => new MustExpected(false, "value must not be an empty GUID."));
+        public static TheoryData<MustCase<Guid>> InvalidCases => F.NotEmpty.InvalidScenarios.ToMustCases(_ => new MustExpected(false, "value must not be an empty GUID.", Code: MustCodes.Guid.Emptiness.Empty));
     }
 }
