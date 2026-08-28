@@ -140,7 +140,8 @@ public static class MustCollectionClausesTestData
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, Func<string, bool>? predicate)>> ValidCases =>
         [
-            new("No match", (["b", "c"], IsA), new MustExpected(true))
+            new("No match", (["b", "c"], IsA), new MustExpected(true)),
+            new("Empty", ([], IsA), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, Func<string, bool>? predicate)>> InvalidCases =>
@@ -182,6 +183,7 @@ public static class MustCollectionClausesTestData
         [
             new("Null", (null, IsA), new MustExpected(false, "value must not be null.", "value")),
             new("All match", (["a", "a"], IsA), new MustExpected(false, "value must not have all items match the predicate.", Code: MustCodes.Collection.Items.AllMatch)),
+            new("Empty", ([], IsA), new MustExpected(false, "value must not have all items match the predicate.", Code: MustCodes.Collection.Items.AllMatch)),
             new("Null predicate", (["a"], null), new MustExpected(false, "predicate must not be null.", "predicate"))
         ];
     }
@@ -253,7 +255,8 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, string item)>> ValidCases =>
         [
-            new("Not contains", (["b", "c"], "a"), new MustExpected(true))
+            new("Not contains", (["b", "c"], "a"), new MustExpected(true)),
+            new("Empty", ([], "a"), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, string item)>> InvalidCases =>
@@ -316,7 +319,8 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int index)>> ValidCases =>
         [
-            new("No index", (["a", "b"], 5), new MustExpected(true))
+            new("No index", (["a", "b"], 5), new MustExpected(true)),
+            new("Empty", ([], 0), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int index)>> InvalidCases =>
@@ -331,7 +335,8 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int count)>> ValidCases =>
         [
-            new("Wrong count", (["a", "b"], 3), new MustExpected(true))
+            new("Wrong count", (["a", "b"], 3), new MustExpected(true)),
+            new("Empty", ([], 3), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int count)>> InvalidCases =>
@@ -346,7 +351,8 @@ public static class MustCollectionClausesTestData
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min)>> ValidCases =>
         [
-            new("Below min", (["a"], 3), new MustExpected(true))
+            new("Below min", (["a"], 3), new MustExpected(true)),
+            new("Empty", ([], 1), new MustExpected(true))
         ];
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min)>> InvalidCases =>
