@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -31,7 +32,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, TEnum?> Defined<TModel, TEnum>(this IRuleBuilder<TModel, TEnum?> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Defined(val.Value, paramName: null) : MustResult<TEnum>.Ok(default),
-            message);
+            message, MustCodes.Enum.Value.NotDefined);
 
     /// <summary>
     /// Validates that the non-nullable enum property value is a defined member of the <typeparamref name="TEnum"/> enumeration.
@@ -53,7 +54,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, TEnum> Defined<TModel, TEnum>(this IRuleBuilder<TModel, TEnum> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => Must.Be.Defined(val, paramName: null),
-            message);
+            message, MustCodes.Enum.Value.NotDefined);
 
     /// <summary>
     /// Validates that the nullable enum property value is not a defined member of the <typeparamref name="TEnum"/> enumeration.
@@ -76,7 +77,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, TEnum?> NotDefined<TModel, TEnum>(this IRuleBuilder<TModel, TEnum?> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotDefined(val.Value, paramName: null) : MustResult<TEnum>.Ok(default),
-            message);
+            message, MustCodes.Enum.Value.Defined);
 
     /// <summary>
     /// Validates that the non-nullable enum property value is not a defined member of the <typeparamref name="TEnum"/> enumeration.
@@ -98,7 +99,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, TEnum> NotDefined<TModel, TEnum>(this IRuleBuilder<TModel, TEnum> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => Must.Be.NotDefined(val, paramName: null),
-            message);
+            message, MustCodes.Enum.Value.Defined);
 
     /// <summary>
     /// Validates that the nullable <see cref="int"/> property value corresponds to a defined member of <typeparamref name="TEnum"/>.
@@ -121,7 +122,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, int?> DefinedValue<TModel, TEnum>(this IRuleBuilder<TModel, int?> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.DefinedValue<TEnum>(val.Value, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Enum.BackingValue.NotDefined);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="int"/> property value corresponds to a defined member of <typeparamref name="TEnum"/>.
@@ -143,7 +144,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, int> DefinedValue<TModel, TEnum>(this IRuleBuilder<TModel, int> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => Must.Be.DefinedValue<TEnum>(val, paramName: null),
-            message);
+            message, MustCodes.Enum.BackingValue.NotDefined);
 
     /// <summary>
     /// Validates that the nullable <see cref="int"/> property value does not correspond to a defined member of <typeparamref name="TEnum"/>.
@@ -166,7 +167,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, int?> NotDefinedValue<TModel, TEnum>(this IRuleBuilder<TModel, int?> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotDefinedValue<TEnum>(val.Value, paramName: null) : MustResult<int>.Ok(0),
-            message);
+            message, MustCodes.Enum.BackingValue.Defined);
 
     /// <summary>
     /// Validates that the non-nullable <see cref="int"/> property value does not correspond to a defined member of <typeparamref name="TEnum"/>.
@@ -188,7 +189,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, int> NotDefinedValue<TModel, TEnum>(this IRuleBuilder<TModel, int> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => Must.Be.NotDefinedValue<TEnum>(val, paramName: null),
-            message);
+            message, MustCodes.Enum.BackingValue.Defined);
 
     /// <summary>
     /// Validates that the string property value is a defined name of a <typeparamref name="TEnum"/> member.
@@ -214,7 +215,7 @@ public static class FluentEnumExtensions
         string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.DefinedName<TEnum>(val, ignoreCase, paramName: null) : MustResult<string>.Ok(string.Empty),
-            message);
+            message, MustCodes.Enum.Name.NotDefined);
 
     /// <summary>
     /// Validates that the string property value is not a defined name of a <typeparamref name="TEnum"/> member.
@@ -240,7 +241,7 @@ public static class FluentEnumExtensions
         string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotDefinedName<TEnum>(val, ignoreCase, paramName: null) : MustResult<string>.Ok(string.Empty),
-            message);
+            message, MustCodes.Enum.Name.Defined);
 
     /// <summary>
     /// Validates that the nullable enum property value is a valid combination of flags for a <c>[Flags]</c> enum.
@@ -263,7 +264,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, TEnum?> FlagsEnumCombination<TModel, TEnum>(this IRuleBuilder<TModel, TEnum?> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FlagsEnumCombination(val.Value, paramName: null) : MustResult<TEnum>.Ok(default),
-            message);
+            message, MustCodes.Enum.Flags.NotDefined);
 
     /// <summary>
     /// Validates that the non-nullable enum property value is a valid combination of flags for a <c>[Flags]</c> enum.
@@ -285,7 +286,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, TEnum> FlagsEnumCombination<TModel, TEnum>(this IRuleBuilder<TModel, TEnum> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => Must.Be.FlagsEnumCombination(val, paramName: null),
-            message);
+            message, MustCodes.Enum.Flags.NotDefined);
 
     /// <summary>
     /// Validates that the nullable enum property value is not a valid combination of flags for a <c>[Flags]</c> enum.
@@ -308,7 +309,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, TEnum?> NotFlagsEnumCombination<TModel, TEnum>(this IRuleBuilder<TModel, TEnum?> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotFlagsEnumCombination(val.Value, paramName: null) : MustResult<TEnum>.Ok(default),
-            message);
+            message, MustCodes.Enum.Flags.Defined);
 
     /// <summary>
     /// Validates that the non-nullable enum property value is not a valid combination of flags for a <c>[Flags]</c> enum.
@@ -330,7 +331,7 @@ public static class FluentEnumExtensions
     public static IRuleBuilderOptions<TModel, TEnum> NotFlagsEnumCombination<TModel, TEnum>(this IRuleBuilder<TModel, TEnum> ruleBuilder, string? message = null)
         where TEnum : struct, Enum =>
         ruleBuilder.MustBe(val => Must.Be.NotFlagsEnumCombination(val, paramName: null),
-            message);
+            message, MustCodes.Enum.Flags.Defined);
 
     /// <summary>
     /// Validates that the nullable enum property value has the <typeparamref name="TAttribute"/> attribute applied to its member.
@@ -355,7 +356,7 @@ public static class FluentEnumExtensions
         where TEnum : struct, Enum
         where TAttribute : Attribute =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.HasAttribute<TEnum, TAttribute>(val.Value, paramName: null) : MustResult<TEnum>.Ok(default),
-            message);
+            message, MustCodes.Enum.Attribute.Missing);
 
     /// <summary>
     /// Validates that the non-nullable enum property value has the <typeparamref name="TAttribute"/> attribute applied to its member.
@@ -379,7 +380,7 @@ public static class FluentEnumExtensions
         where TEnum : struct, Enum
         where TAttribute : Attribute =>
         ruleBuilder.MustBe(val => Must.Be.HasAttribute<TEnum, TAttribute>(val, paramName: null),
-            message);
+            message, MustCodes.Enum.Attribute.Missing);
 
     /// <summary>
     /// Validates that the nullable enum property value does not have the <typeparamref name="TAttribute"/> attribute applied to its member.
@@ -404,7 +405,7 @@ public static class FluentEnumExtensions
         where TEnum : struct, Enum
         where TAttribute : Attribute =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotHasAttribute<TEnum, TAttribute>(val.Value, paramName: null) : MustResult<TEnum>.Ok(default),
-            message);
+            message, MustCodes.Enum.Attribute.Present);
 
     /// <summary>
     /// Validates that the non-nullable enum property value does not have the <typeparamref name="TAttribute"/> attribute applied to its member.
@@ -428,7 +429,7 @@ public static class FluentEnumExtensions
         where TEnum : struct, Enum
         where TAttribute : Attribute =>
         ruleBuilder.MustBe(val => Must.Be.NotHasAttribute<TEnum, TAttribute>(val, paramName: null),
-            message);
+            message, MustCodes.Enum.Attribute.Present);
 
     /// <summary>
     /// Validates that the nullable enum property value has the specified flag set.

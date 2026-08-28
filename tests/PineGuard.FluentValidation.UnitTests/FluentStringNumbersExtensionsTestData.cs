@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class FluentStringNumbersExtensionsTestData
         {
             nameof(F.NumbersIsPositive.NullValue) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be positive.")
+            _ => new FluentExpected(false, "Value must be positive.", Code: MustCodes.Number.Sign.NotPositive)
         });
     }
 

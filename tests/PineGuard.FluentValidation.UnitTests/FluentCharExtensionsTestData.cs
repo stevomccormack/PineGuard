@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.CharRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class FluentCharExtensionsTestData
         {
             nameof(F.IsLetter.Null) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a letter.")
+            _ => new FluentExpected(false, "Value must be a letter.", Code: MustCodes.Character.Charset.NotLetter)
         });
     }
 

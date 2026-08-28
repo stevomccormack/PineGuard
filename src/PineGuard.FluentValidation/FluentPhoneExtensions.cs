@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 using PineGuard.Rules;
@@ -34,7 +35,7 @@ public static class FluentPhoneExtensions
         char[]? allowedNonDigitCharacters = null,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.PhoneNumber(val, minDigits, maxDigits, allowedNonDigitCharacters, paramName: null),
-            message);
+            message, MustCodes.Phone.Number.Invalid);
 
     /// <summary>
     /// Validates that the string value is a well-formed phone number string representation.
@@ -59,5 +60,5 @@ public static class FluentPhoneExtensions
         char[]? allowedNonDigitCharacters = null,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.PhoneNumberString(val, minDigits, maxDigits, allowedNonDigitCharacters, paramName: null),
-            message);
+            message, MustCodes.Phone.Number.Invalid);
 }

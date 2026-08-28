@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.HttpRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class FluentHttpExtensionsTestData
         {
             nameof(F.IsHeaderName.Null) => new FluentExpected(false, "Value must not be null."),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a valid HTTP header name.")
+            _ => new FluentExpected(false, "Value must be a valid HTTP header name.", Code: MustCodes.Http.HeaderName.Malformed)
         });
     }
 

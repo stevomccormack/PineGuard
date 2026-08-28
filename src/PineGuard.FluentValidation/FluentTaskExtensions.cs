@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ public static class FluentTaskExtensions
     /// <seealso cref="MustTaskClauses.Completed"/>
     public static IRuleBuilderOptions<TModel, Task?> Completed<TModel>(this IRuleBuilder<TModel, Task?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Completed(val, paramName: null),
-            message);
+            message, MustCodes.Task.Status.NotCompleted);
 
     /// <summary>
     /// Validates that the property value is not a completed <see cref="Task"/>.
@@ -51,7 +52,7 @@ public static class FluentTaskExtensions
     /// <seealso cref="MustTaskClauses.NotCompleted"/>
     public static IRuleBuilderOptions<TModel, Task?> NotCompleted<TModel>(this IRuleBuilder<TModel, Task?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotCompleted(val, paramName: null),
-            message);
+            message, MustCodes.Task.Status.Completed);
 
     /// <summary>
     /// Validates that the property value is a canceled <see cref="Task"/>.
@@ -73,7 +74,7 @@ public static class FluentTaskExtensions
     /// <seealso cref="MustTaskClauses.Canceled"/>
     public static IRuleBuilderOptions<TModel, Task?> Canceled<TModel>(this IRuleBuilder<TModel, Task?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Canceled(val, paramName: null),
-            message);
+            message, MustCodes.Task.Status.NotCanceled);
 
     /// <summary>
     /// Validates that the property value is not a canceled <see cref="Task"/>.
@@ -94,7 +95,7 @@ public static class FluentTaskExtensions
     /// <seealso cref="MustTaskClauses.NotCanceled"/>
     public static IRuleBuilderOptions<TModel, Task?> NotCanceled<TModel>(this IRuleBuilder<TModel, Task?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotCanceled(val, paramName: null),
-            message);
+            message, MustCodes.Task.Status.Canceled);
 
     /// <summary>
     /// Validates that the property value is a faulted <see cref="Task"/>.
@@ -116,7 +117,7 @@ public static class FluentTaskExtensions
     /// <seealso cref="MustTaskClauses.Faulted"/>
     public static IRuleBuilderOptions<TModel, Task?> Faulted<TModel>(this IRuleBuilder<TModel, Task?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Faulted(val, paramName: null),
-            message);
+            message, MustCodes.Task.Status.NotFaulted);
 
     /// <summary>
     /// Validates that the property value is not a faulted <see cref="Task"/>.
@@ -137,5 +138,5 @@ public static class FluentTaskExtensions
     /// <seealso cref="MustTaskClauses.NotFaulted"/>
     public static IRuleBuilderOptions<TModel, Task?> NotFaulted<TModel>(this IRuleBuilder<TModel, Task?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotFaulted(val, paramName: null),
-            message);
+            message, MustCodes.Task.Status.Faulted);
 }

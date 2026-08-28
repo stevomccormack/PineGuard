@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.NotNullOrEmpty"/>
     public static IRuleBuilderOptions<TModel, string?> NotNullOrEmpty<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotNullOrEmpty(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Content.NullOrEmpty);
 
     /// <summary>
     /// Validates that the property value is <see langword="null"/> or an empty string.
@@ -51,7 +52,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.NullOrEmpty"/>
     public static IRuleBuilderOptions<TModel, string?> NullOrEmpty<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NullOrEmpty(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Content.NotNullOrEmpty);
 
     /// <summary>
     /// Validates that the property value is not <see langword="null"/>, empty, or whitespace-only.
@@ -72,7 +73,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.NotNullOrWhiteSpace"/>
     public static IRuleBuilderOptions<TModel, string?> NotNullOrWhiteSpace<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotNullOrWhiteSpace(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Content.Blank);
 
     /// <summary>
     /// Validates that the property value is <see langword="null"/>, empty, or whitespace-only.
@@ -93,7 +94,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.NullOrWhiteSpace"/>
     public static IRuleBuilderOptions<TModel, string?> NullOrWhiteSpace<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NullOrWhiteSpace(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Content.NotBlank);
 
     /// <summary>
     /// Validates that the property value has exactly the specified character length.
@@ -117,7 +118,7 @@ public static class FluentStringExtensions
         int length,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ExactLength(val, length, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Length.Mismatch);
 
     /// <summary>
     /// Validates that the property value has a character length between the specified minimum and maximum.
@@ -143,7 +144,7 @@ public static class FluentStringExtensions
         int max,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.LengthBetween(val, min, max, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Length.OutOfRange);
 
     /// <summary>
     /// Validates that the property value has a character length greater than the specified length.
@@ -167,7 +168,7 @@ public static class FluentStringExtensions
         int length,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.LongerThan(val, length, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Length.TooShort);
 
     /// <summary>
     /// Validates that the property value has a character length greater than or equal to the specified length.
@@ -191,7 +192,7 @@ public static class FluentStringExtensions
         int length,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.LongerThanOrEqual(val, length, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Length.TooShort);
 
     /// <summary>
     /// Validates that the property value has a character length less than the specified length.
@@ -215,7 +216,7 @@ public static class FluentStringExtensions
         int length,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ShorterThan(val, length, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Length.TooLong);
 
     /// <summary>
     /// Validates that the property value has a character length less than or equal to the specified length.
@@ -239,7 +240,7 @@ public static class FluentStringExtensions
         int length,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ShorterThanOrEqual(val, length, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Length.TooLong);
 
     /// <summary>
     /// Validates that the property value matches the specified regular expression pattern.
@@ -263,7 +264,7 @@ public static class FluentStringExtensions
         Regex pattern,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Match(val, pattern, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Pattern.NoMatch);
 
     /// <summary>
     /// Validates that the property value does not match the specified regular expression pattern.
@@ -287,7 +288,7 @@ public static class FluentStringExtensions
         Regex pattern,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotMatch(val, pattern, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Pattern.Match);
 
     /// <summary>
     /// Validates that the property value contains only alphabetic characters, optionally including specified additional characters.
@@ -311,7 +312,7 @@ public static class FluentStringExtensions
         char[]? inclusions = null,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Alphabetic(val, inclusions, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotAlpha);
 
     /// <summary>
     /// Validates that the property value does not contain only alphabetic characters.
@@ -335,7 +336,7 @@ public static class FluentStringExtensions
         char[]? inclusions = null,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotAlphabetic(val, inclusions, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.Alpha);
 
     /// <summary>
     /// Validates that the property value contains only numeric characters, optionally including specified additional characters.
@@ -359,7 +360,7 @@ public static class FluentStringExtensions
         char[]? inclusions = null,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Numeric(val, inclusions, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotNumeric);
 
     /// <summary>
     /// Validates that the property value does not contain only numeric characters.
@@ -383,7 +384,7 @@ public static class FluentStringExtensions
         char[]? inclusions = null,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotNumeric(val, inclusions, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.Numeric);
 
     /// <summary>
     /// Validates that the property value contains only alphanumeric characters, optionally including specified additional characters.
@@ -407,7 +408,7 @@ public static class FluentStringExtensions
         char[]? inclusions = null,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Alphanumeric(val, inclusions, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotAlphanumeric);
 
     /// <summary>
     /// Validates that the property value does not contain only alphanumeric characters.
@@ -431,7 +432,7 @@ public static class FluentStringExtensions
         char[]? inclusions = null,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotAlphanumeric(val, inclusions, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.Alphanumeric);
 
     /// <summary>
     /// Validates that the property value contains at least one of the specified characters.
@@ -455,7 +456,7 @@ public static class FluentStringExtensions
         char[] anyOf,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ContainsAny(val, anyOf, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotContainsAny);
 
     /// <summary>
     /// Validates that the property value contains only digit characters (0–9).
@@ -476,7 +477,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.DigitsOnly(IMustClause, string, string)"/>
     public static IRuleBuilderOptions<TModel, string?> DigitsOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.DigitsOnly(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotDigits);
 
     /// <summary>
     /// Validates that the property value contains only digit characters (0–9) plus any explicitly allowed non-digit characters.
@@ -500,7 +501,7 @@ public static class FluentStringExtensions
         char[]? allowedNonDigitChars,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.DigitsOnly(val, allowedNonDigitChars, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotDigits);
 
     /// <summary>
     /// Validates that the property value does not contain only digit characters.
@@ -521,7 +522,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.NotDigitsOnly(IMustClause, string, string)"/>
     public static IRuleBuilderOptions<TModel, string?> NotDigitsOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotDigitsOnly(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.Digits);
 
     /// <summary>
     /// Validates that the property value does not contain only digit characters when considering the allowed non-digit characters.
@@ -545,7 +546,7 @@ public static class FluentStringExtensions
         char[]? allowedNonDigitChars,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotDigitsOnly(val, allowedNonDigitChars, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.Digits);
 
     /// <summary>
     /// Validates that the property value contains only uppercase letters.
@@ -569,7 +570,7 @@ public static class FluentStringExtensions
         bool lettersOnly = false,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Uppercase(val, lettersOnly, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotUpper);
 
     /// <summary>
     /// Validates that the property value does not contain only uppercase letters.
@@ -593,7 +594,7 @@ public static class FluentStringExtensions
         bool lettersOnly = false,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotUppercase(val, lettersOnly, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Upper);
 
     /// <summary>
     /// Validates that the property value contains only lowercase letters.
@@ -617,7 +618,7 @@ public static class FluentStringExtensions
         bool lettersOnly = false,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Lowercase(val, lettersOnly, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.NotLower);
 
     /// <summary>
     /// Validates that the property value does not contain only lowercase letters.
@@ -641,7 +642,7 @@ public static class FluentStringExtensions
         bool lettersOnly = false,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotLowercase(val, lettersOnly, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Casing.Lower);
 
     /// <summary>
     /// Validates that the property value contains only ASCII characters.
@@ -662,7 +663,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.Ascii"/>
     public static IRuleBuilderOptions<TModel, string?> Ascii<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.Ascii(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotAscii);
 
     /// <summary>
     /// Validates that the property value contains at least one non-ASCII character.
@@ -683,7 +684,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.NotAscii"/>
     public static IRuleBuilderOptions<TModel, string?> NotAscii<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotAscii(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.Ascii);
 
     /// <summary>
     /// Validates that the property value contains only printable ASCII characters.
@@ -707,7 +708,7 @@ public static class FluentStringExtensions
         bool allowCommonWhitespace = false,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.PrintableAscii(val, allowCommonWhitespace, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotPrintable);
 
     /// <summary>
     /// Validates that the property value contains at least one non-printable ASCII character.
@@ -731,7 +732,7 @@ public static class FluentStringExtensions
         bool allowCommonWhitespace = false,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotPrintableAscii(val, allowCommonWhitespace, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.Printable);
 
     /// <summary>
     /// Validates that the property value does not consist entirely of whitespace characters.
@@ -752,7 +753,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.NotWhitespace"/>
     public static IRuleBuilderOptions<TModel, string?> NotWhitespace<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotWhitespace(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Content.Whitespace);
 
     /// <summary>
     /// Validates that the property value contains at least one whitespace character.
@@ -773,7 +774,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.ContainsWhitespace"/>
     public static IRuleBuilderOptions<TModel, string?> ContainsWhitespace<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ContainsWhitespace(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotContainsWhitespace);
 
     /// <summary>
     /// Validates that the property value contains at least one control character.
@@ -794,7 +795,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.ContainsControlChars"/>
     public static IRuleBuilderOptions<TModel, string?> ContainsControlChars<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ContainsControlChars(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotContainsControl);
 
     /// <summary>
     /// Validates that the property value does not contain any control characters.
@@ -815,7 +816,7 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.NotContainsControlChars"/>
     public static IRuleBuilderOptions<TModel, string?> NotContainsControlChars<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotContainsControlChars(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.ContainsControl);
 
     /// <summary>
     /// Validates that the property value contains only characters from the specified allowed set.
@@ -839,7 +840,7 @@ public static class FluentStringExtensions
         char[] allowedChars,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ContainsAllowedOnly(val, allowedChars, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotSubset);
 
     /// <summary>
     /// Validates that the property value contains at least one character from the specified disallowed set.
@@ -863,7 +864,7 @@ public static class FluentStringExtensions
         char[] disallowedChars,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.ContainsDisallowed(val, disallowedChars, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.NotContainsDisallowed);
 
     /// <summary>
     /// Validates that the property value contains characters outside the specified allowed set.
@@ -887,7 +888,7 @@ public static class FluentStringExtensions
         char[] allowedChars,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotContainsAllowedOnly(val, allowedChars, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.Subset);
 
     /// <summary>
     /// Validates that the property value does not contain any character from the specified disallowed set.
@@ -911,7 +912,7 @@ public static class FluentStringExtensions
         char[] disallowedChars,
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotContainsDisallowed(val, disallowedChars, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.ContainsDisallowed);
 
     /// <summary>
     /// Validates that the property value does not contain any whitespace character.
@@ -932,5 +933,5 @@ public static class FluentStringExtensions
     /// <seealso cref="MustStringClauses.NotContainsWhitespace"/>
     public static IRuleBuilderOptions<TModel, string?> NotContainsWhitespace<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotContainsWhitespace(val, paramName: null) : MustResult<string>.Ok(null!),
-            message);
+            message, MustCodes.Text.Charset.ContainsWhitespace);
 }

@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using FR = PineGuard.Testing.Fixtures.TimeOnlyRangeRulesFixtures;
@@ -63,7 +64,7 @@ public static class FluentTimeOnlyRangeExtensionsTestData
         public static TheoryData<FluentCase<TimeOnlyRange>> Cases =>
         [
             new(nameof(FR.IsChronological.Chronological), FR.IsChronological.Chronological,   new FluentExpected(true)),
-            new(nameof(FR.IsChronological.EqualExclusive), FR.IsChronological.EqualExclusive, new FluentExpected(false, "Value must be chronological."))
+            new(nameof(FR.IsChronological.EqualExclusive), FR.IsChronological.EqualExclusive, new FluentExpected(false, "Value must be chronological.", Code: MustCodes.Range.Order.NotChronological))
         ];
     }
 

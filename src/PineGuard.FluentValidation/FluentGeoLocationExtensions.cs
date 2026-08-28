@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -34,7 +35,7 @@ public static class FluentGeoLocationExtensions
 
             var res = Must.Be.Latitude(val.Value, paramName: null);
             return MustResult<double?>.FromBool(res.Success, res.Message, res.ParamName, val, res.Result);
-        }, message);
+        }, message, MustCodes.Geo.Latitude.Invalid);
 
     /// <summary>
     /// Validates that the <see cref="double"/> value is a valid latitude (-90 to 90).
@@ -50,7 +51,7 @@ public static class FluentGeoLocationExtensions
         this IRuleBuilder<TModel, double> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Latitude(val, paramName: null),
-            message);
+            message, MustCodes.Geo.Latitude.Invalid);
 
     /// <summary>
     /// Validates that the nullable <see cref="double"/> value is a valid longitude (-180 to 180).
@@ -73,7 +74,7 @@ public static class FluentGeoLocationExtensions
             if (!val.HasValue) return MustResult<double?>.Ok(null);
             var res = Must.Be.Longitude(val.Value, paramName: null);
             return MustResult<double?>.FromBool(res.Success, res.Message, res.ParamName, val, res.Result);
-        }, message);
+        }, message, MustCodes.Geo.Longitude.Invalid);
 
     /// <summary>
     /// Validates that the <see cref="double"/> value is a valid longitude (-180 to 180).
@@ -89,7 +90,7 @@ public static class FluentGeoLocationExtensions
         this IRuleBuilder<TModel, double> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Longitude(val, paramName: null),
-            message);
+            message, MustCodes.Geo.Longitude.Invalid);
 
     /// <summary>
     /// Validates that the nullable latitude and longitude pair form a valid geographic location.
@@ -116,7 +117,7 @@ public static class FluentGeoLocationExtensions
 
             var res = Must.Be.GeoLocation(val.Value, longitude.Value, paramName: null);
             return MustResult<double?>.FromBool(res.Success, res.Message, res.ParamName, val, val.Value);
-        }, message);
+        }, message, MustCodes.Geo.Coordinate.Invalid);
 
     /// <summary>
     /// Validates that the latitude and longitude pair form a valid geographic location.
@@ -134,6 +135,6 @@ public static class FluentGeoLocationExtensions
         double longitude,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.GeoLocation(val, longitude, paramName: null),
-            message);
+            message, MustCodes.Geo.Coordinate.Invalid);
 }
 #endif

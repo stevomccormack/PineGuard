@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -12,7 +13,7 @@ public static class FluentStringTimeSpanExtensionsTestData
             {
                 nameof(F.TimeSpanIsDurationBetween.NullValue) => new FluentExpected(true),
                 _ when s.IsValid => new FluentExpected(true),
-                _ => new FluentExpected(false, "Value must be a duration within the expected range.")
+                _ => new FluentExpected(false, "Value must be a duration within the expected range.", Code: MustCodes.Time.Duration.OutOfRange)
             });
     }
 

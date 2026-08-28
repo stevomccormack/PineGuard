@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ public static class FluentDefaultEqualityExtensions
     /// <seealso cref="MustDefaultEqualityClauses.Default"/>
     public static IRuleBuilderOptions<TModel, T?> Default<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Default(val, paramName: null),
-            message);
+            message, MustCodes.Value.State.NotDefault);
 
     /// <summary>
     /// Validates that the property value is not the default value for its type.
@@ -54,7 +55,7 @@ public static class FluentDefaultEqualityExtensions
     /// <seealso cref="MustDefaultEqualityClauses.NotDefault"/>
     public static IRuleBuilderOptions<TModel, T?> NotDefault<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotDefault(val, paramName: null),
-            message);
+            message, MustCodes.Value.State.Default);
 
     /// <summary>
     /// Validates that the property value is <see langword="null"/> or the default value for its type.
@@ -76,7 +77,7 @@ public static class FluentDefaultEqualityExtensions
     /// <seealso cref="MustDefaultEqualityClauses.NullOrDefault"/>
     public static IRuleBuilderOptions<TModel, T?> NullOrDefault<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NullOrDefault(val, paramName: null),
-            message);
+            message, MustCodes.Value.State.NotNullOrDefault);
 
     /// <summary>
     /// Validates that the property value is not <see langword="null"/> and not the default value for its type.
@@ -98,5 +99,5 @@ public static class FluentDefaultEqualityExtensions
     /// <seealso cref="MustDefaultEqualityClauses.NotNullOrDefault"/>
     public static IRuleBuilderOptions<TModel, T?> NotNullOrDefault<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotNullOrDefault(val, paramName: null),
-            message);
+            message, MustCodes.Value.State.NullOrDefault);
 }

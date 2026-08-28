@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -35,7 +36,7 @@ public static class FluentReadOnlyDictionaryExtensions
         this IRuleBuilderInitial<TModel, IReadOnlyDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe<TModel, IReadOnlyDictionary<TKey, TValue>?, IReadOnlyDictionary<TKey, TValue>?>(val => Must.Be.Empty(val, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.NotEmpty);
 
     /// <summary>
     /// Validates that the property value is an empty read-only dictionary (overload for <see cref="IRuleBuilderOptions{TModel,TProperty}"/>).
@@ -62,7 +63,7 @@ public static class FluentReadOnlyDictionaryExtensions
         this IRuleBuilderOptions<TModel, IReadOnlyDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe<TModel, IReadOnlyDictionary<TKey, TValue>?, IReadOnlyDictionary<TKey, TValue>?>(val => Must.Be.Empty(val, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.NotEmpty);
 
     /// <summary>
     /// Validates that the property value is an empty read-only dictionary (overload for <see cref="IRuleBuilder{TModel,TProperty}"/>).
@@ -89,7 +90,7 @@ public static class FluentReadOnlyDictionaryExtensions
         this IRuleBuilder<TModel, IReadOnlyDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Empty(val, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.NotEmpty);
 
     /// <summary>
     /// Validates that the property value is a non-empty read-only dictionary (overload for <see cref="IRuleBuilderInitial{TModel,TProperty}"/>).
@@ -115,7 +116,7 @@ public static class FluentReadOnlyDictionaryExtensions
         this IRuleBuilderInitial<TModel, IReadOnlyDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe<TModel, IReadOnlyDictionary<TKey, TValue>?, IReadOnlyDictionary<TKey, TValue>?>(val => Must.Be.NotEmpty(val, paramName: null)!,
-            message);
+            message, MustCodes.Dictionary.Items.Empty);
 
     /// <summary>
     /// Validates that the property value is a non-empty read-only dictionary (overload for <see cref="IRuleBuilderOptions{TModel,TProperty}"/>).
@@ -141,7 +142,7 @@ public static class FluentReadOnlyDictionaryExtensions
         this IRuleBuilderOptions<TModel, IReadOnlyDictionary<TKey, TValue>?> ruleBuilder,
         string? message = null) =>
         ruleBuilder.MustBe<TModel, IReadOnlyDictionary<TKey, TValue>?, IReadOnlyDictionary<TKey, TValue>?>(val => Must.Be.NotEmpty(val, paramName: null)!,
-            message);
+            message, MustCodes.Dictionary.Items.Empty);
 
     /// <summary>
     /// Validates that the property value is a non-empty read-only dictionary (overload for <see cref="IRuleBuilder{TModel,TProperty}"/>).
@@ -165,7 +166,7 @@ public static class FluentReadOnlyDictionaryExtensions
     /// <seealso cref="MustDictionaryClauses.NotEmpty"/>
     public static IRuleBuilderOptions<TModel, IReadOnlyDictionary<TKey, TValue>?> NotEmpty<TModel, TKey, TValue>(this IRuleBuilder<TModel, IReadOnlyDictionary<TKey, TValue>?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotEmpty(val, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.Empty);
 
     /// <summary>
     /// Validates that the property value contains the specified key.
@@ -192,7 +193,7 @@ public static class FluentReadOnlyDictionaryExtensions
         TKey key,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasKey(val, key, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Keys.Missing);
 
     /// <summary>
     /// Validates that the property value does not contain the specified key.
@@ -218,7 +219,7 @@ public static class FluentReadOnlyDictionaryExtensions
         TKey key,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasKey(val, key, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Keys.Present);
 
     /// <summary>
     /// Validates that the property value contains the specified value.
@@ -245,7 +246,7 @@ public static class FluentReadOnlyDictionaryExtensions
         TValue value,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasValue(val, value, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Values.Missing);
 
     /// <summary>
     /// Validates that the property value does not contain the specified value.
@@ -271,7 +272,7 @@ public static class FluentReadOnlyDictionaryExtensions
         TValue value,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasValue(val, value, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Values.Present);
 
     /// <summary>
     /// Validates that the property value contains the specified key-value pair.
@@ -300,7 +301,7 @@ public static class FluentReadOnlyDictionaryExtensions
         TValue value,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasKeyValue(val, key, value, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.Missing);
 
     /// <summary>
     /// Validates that the property value does not contain the specified key-value pair.
@@ -328,7 +329,7 @@ public static class FluentReadOnlyDictionaryExtensions
         TValue value,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasKeyValue(val, key, value, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.Present);
 
     /// <summary>
     /// Validates that the property value contains at least one key matching the specified predicate.
@@ -355,7 +356,7 @@ public static class FluentReadOnlyDictionaryExtensions
         Func<TKey, bool> predicate,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasAnyKey(val, predicate, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Keys.NoMatch);
 
     /// <summary>
     /// Validates that the property value contains no keys matching the specified predicate.
@@ -381,7 +382,7 @@ public static class FluentReadOnlyDictionaryExtensions
         Func<TKey, bool> predicate,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasAnyKey(val, predicate, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Keys.Match);
 
     /// <summary>
     /// Validates that the property value contains at least one value matching the specified predicate.
@@ -408,7 +409,7 @@ public static class FluentReadOnlyDictionaryExtensions
         Func<TValue, bool> predicate,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasAnyValue(val, predicate, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Values.NoMatch);
 
     /// <summary>
     /// Validates that the property value contains no values matching the specified predicate.
@@ -434,7 +435,7 @@ public static class FluentReadOnlyDictionaryExtensions
         Func<TValue, bool> predicate,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasAnyValue(val, predicate, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Values.Match);
 
     /// <summary>
     /// Validates that the property value contains at least one item matching the specified key-value predicate.
@@ -461,7 +462,7 @@ public static class FluentReadOnlyDictionaryExtensions
         Func<TKey, TValue, bool> predicate,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.HasAnyItem(val, predicate, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.NoMatch);
 
     /// <summary>
     /// Validates that the property value contains no items matching the specified key-value predicate.
@@ -487,5 +488,5 @@ public static class FluentReadOnlyDictionaryExtensions
         Func<TKey, TValue, bool> predicate,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasAnyItem(val, predicate, paramName: null),
-            message);
+            message, MustCodes.Dictionary.Items.Match);
 }

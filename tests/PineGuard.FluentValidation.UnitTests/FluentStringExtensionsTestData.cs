@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
@@ -13,7 +14,7 @@ public static partial class FluentStringExtensionsTestData
         {
             nameof(F.IsNotNullOrEmpty.NullValue) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must not be null or empty.")
+            _ => new FluentExpected(false, "Value must not be null or empty.", Code: MustCodes.Text.Content.NullOrEmpty)
         });
     }
 

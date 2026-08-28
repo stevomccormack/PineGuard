@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
@@ -33,7 +34,7 @@ public static class FluentCollectionExtensions
     public static IRuleBuilderOptions<TModel, IEnumerable<T>?> Empty<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Empty(val, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.Empty(val, paramName: null), message, MustCodes.Collection.Items.NotEmpty);
 
     /// <summary>
     /// Validates that the property value is a non-empty collection.
@@ -57,7 +58,7 @@ public static class FluentCollectionExtensions
     public static IRuleBuilderOptions<TModel, IEnumerable<T>?> NotEmpty<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotEmpty(val, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotEmpty(val, paramName: null), message, MustCodes.Collection.Items.Empty);
 
     /// <summary>
     /// Validates that the property value has exactly the specified number of elements.
@@ -83,7 +84,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int count,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasExactCount(val, count, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.HasExactCount(val, count, paramName: null), message, MustCodes.Collection.Count.Mismatch);
 
     /// <summary>
     /// Validates that the property value does not have exactly the specified number of elements.
@@ -109,7 +110,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int count,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotHasExactCount(val, count, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotHasExactCount(val, count, paramName: null), message, MustCodes.Collection.Count.Match);
 
     /// <summary>
     /// Validates that the property value has at least the specified minimum number of elements.
@@ -135,7 +136,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int min,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasMinCount(val, min, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.HasMinCount(val, min, paramName: null), message, MustCodes.Collection.Count.TooFew);
 
     /// <summary>
     /// Validates that the property value does not have at least the specified minimum number of elements.
@@ -161,7 +162,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int min,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotHasMinCount(val, min, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotHasMinCount(val, min, paramName: null), message, MustCodes.Collection.Count.TooMany);
 
     /// <summary>
     /// Validates that the property value has at most the specified maximum number of elements.
@@ -187,7 +188,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int max,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasMaxCount(val, max, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.HasMaxCount(val, max, paramName: null), message, MustCodes.Collection.Count.TooMany);
 
     /// <summary>
     /// Validates that the property value exceeds the specified maximum number of elements.
@@ -213,7 +214,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int max,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotHasMaxCount(val, max, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotHasMaxCount(val, max, paramName: null), message, MustCodes.Collection.Count.TooFew);
 
     /// <summary>
     /// Validates that the property value has an element count within the specified range.
@@ -243,7 +244,7 @@ public static class FluentCollectionExtensions
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasCountBetween(val, min, max, inclusion, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.HasCountBetween(val, min, max, inclusion, paramName: null), message, MustCodes.Collection.Count.OutOfRange);
 
     /// <summary>
     /// Validates that the property value has an element count outside the specified range.
@@ -273,7 +274,7 @@ public static class FluentCollectionExtensions
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotHasCountBetween(val, min, max, inclusion, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotHasCountBetween(val, min, max, inclusion, paramName: null), message, MustCodes.Collection.Count.InRange);
 
     /// <summary>
     /// Validates that the property value contains at least one element matching the specified predicate.
@@ -299,7 +300,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         Func<T, bool> predicate,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasAny(val, predicate, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.HasAny(val, predicate, paramName: null), message, MustCodes.Collection.Items.NoMatch);
 
     /// <summary>
     /// Validates that the property value contains no elements matching the specified predicate.
@@ -325,7 +326,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         Func<T, bool> predicate,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotHasAny(val, predicate, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotHasAny(val, predicate, paramName: null), message, MustCodes.Collection.Items.Match);
 
     /// <summary>
     /// Validates that all elements in the property value match the specified predicate.
@@ -351,7 +352,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         Func<T, bool> predicate,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasAll(val, predicate, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.HasAll(val, predicate, paramName: null), message, MustCodes.Collection.Items.NotAllMatch);
 
     /// <summary>
     /// Validates that not all elements in the property value match the specified predicate.
@@ -377,7 +378,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         Func<T, bool> predicate,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotHasAll(val, predicate, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotHasAll(val, predicate, paramName: null), message, MustCodes.Collection.Items.AllMatch);
 
     /// <summary>
     /// Validates that the property value contains only distinct elements (no duplicates).
@@ -403,7 +404,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         IEqualityComparer<T>? comparer = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasDistinctItems(val, comparer, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.HasDistinctItems(val, comparer, paramName: null), message, MustCodes.Collection.Items.Duplicate);
 
     /// <summary>
     /// Validates that the property value contains at least one duplicate element.
@@ -429,7 +430,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         IEqualityComparer<T>? comparer = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasDuplicateItems(val, comparer, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.HasDuplicateItems(val, comparer, paramName: null), message, MustCodes.Collection.Items.Distinct);
 
     /// <summary>
     /// Validates that the property value does not contain any <see langword="null"/> elements.
@@ -454,7 +455,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T?>?> ruleBuilder,
         string? message = null)
         where T : class =>
-        ruleBuilder.MustBe(val => Must.Be.NotContainsNullItems(val, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotContainsNullItems(val, paramName: null), message, MustCodes.Collection.Items.ContainsNull);
 
     /// <summary>
     /// Validates that the property value contains the specified item.
@@ -480,7 +481,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         T item,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Contains(val, item, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.Contains(val, item, paramName: null), message, MustCodes.Collection.Items.Missing);
 
     /// <summary>
     /// Validates that the property value does not contain the specified item.
@@ -506,7 +507,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         T item,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotContains(val, item, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotContains(val, item, paramName: null), message, MustCodes.Collection.Items.Present);
 
     /// <summary>
     /// Validates that the property value is a subset of the specified collection.
@@ -532,7 +533,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         IEnumerable<T>? other,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.SubsetOf(val, other, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.SubsetOf(val, other, paramName: null), message, MustCodes.Collection.Items.NotSubset);
 
     /// <summary>
     /// Validates that the property value is not a subset of the specified collection.
@@ -558,7 +559,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         IEnumerable<T>? other,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotSubsetOf(val, other, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotSubsetOf(val, other, paramName: null), message, MustCodes.Collection.Items.Subset);
 
     /// <summary>
     /// Validates that the property value has an element at the specified index.
@@ -584,7 +585,7 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int index,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasIndex(val, index, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.HasIndex(val, index, paramName: null), message, MustCodes.Collection.Index.OutOfRange);
 
     /// <summary>
     /// Validates that the property value does not have an element at the specified index.
@@ -610,5 +611,5 @@ public static class FluentCollectionExtensions
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int index,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotHasIndex(val, index, paramName: null), message);
+        ruleBuilder.MustBe(val => Must.Be.NotHasIndex(val, index, paramName: null), message, MustCodes.Collection.Index.InRange);
 }

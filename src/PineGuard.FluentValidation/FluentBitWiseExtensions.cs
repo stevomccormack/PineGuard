@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Numerics;
 using FluentValidation;
+using PineGuard.Codes;
 using PineGuard.FluentValidation.Common;
 using PineGuard.MustClauses;
 
@@ -38,7 +39,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.BitwiseEqualTo(val.Value, other, mask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Equality.NotEqual);
 
     /// <summary>
     /// Validates that the property value is not bitwise equal to the specified value, optionally masked.
@@ -66,7 +67,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotBitwiseEqualTo(val.Value, other, mask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Equality.Equal);
 
     /// <summary>
     /// Validates that the property value has all bits set in the specified mask.
@@ -92,7 +93,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.HasAllBits(val.Value, mask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Bits.NotAllSet);
 
     /// <summary>
     /// Validates that the property value does not have all bits set in the specified mask.
@@ -118,7 +119,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotHasAllBits(val.Value, mask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Bits.AllSet);
 
     /// <summary>
     /// Validates that the property value has at least one bit set in the specified mask.
@@ -144,7 +145,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.HasAnyBits(val.Value, mask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Bits.NoneSet);
 
     /// <summary>
     /// Validates that the property value has no bits set in the specified mask.
@@ -170,7 +171,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotHasAnyBits(val.Value, mask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Bits.AnySet);
 
     /// <summary>
     /// Validates that the property value has none of the bits set in the specified mask.
@@ -196,7 +197,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.HasNoBits(val.Value, mask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Bits.AnySet);
 
     /// <summary>
     /// Validates that the property value has at least one bit set from the specified mask.
@@ -222,7 +223,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotHasNoBits(val.Value, mask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Bits.NoneSet);
 
     /// <summary>
     /// Validates that the property value has only bits that are in the specified allowed mask.
@@ -248,7 +249,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.HasOnlyBits(val.Value, allowedMask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Bits.NotSubset);
 
     /// <summary>
     /// Validates that the property value has bits set outside the specified allowed mask.
@@ -274,7 +275,7 @@ public static class FluentBitWiseExtensions
         string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotHasOnlyBits(val.Value, allowedMask, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Bits.Subset);
 
     /// <summary>
     /// Validates that the property value is a power of two.
@@ -297,7 +298,7 @@ public static class FluentBitWiseExtensions
     public static IRuleBuilderOptions<TModel, T?> PowerOfTwo<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.PowerOfTwo(val.Value, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Value.NotPowerOfTwo);
 
     /// <summary>
     /// Validates that the property value is not a power of two.
@@ -320,6 +321,6 @@ public static class FluentBitWiseExtensions
     public static IRuleBuilderOptions<TModel, T?> NotPowerOfTwo<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder, string? message = null)
         where T : struct, IBinaryInteger<T> =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotPowerOfTwo(val.Value, paramName: null) : MustResult<T>.Ok(default),
-            message);
+            message, MustCodes.Bitwise.Value.PowerOfTwo);
 }
 #endif
