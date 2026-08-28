@@ -45,19 +45,15 @@ $ProgressPreference = 'SilentlyContinue'
 # ── Scope → Build Target Mapping ──────────────────────────────────────────────
 
 . (Join-Path $PSScriptRoot '..\.shared\path.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
-$scopeTargets = @{
-    'All'              = Join-Path $repoRoot 'PineGuard.slnx'
-    'Core'             = Join-Path $repoRoot 'src\PineGuard.Core\PineGuard.Core.csproj'
-    'MustClauses'      = Join-Path $repoRoot 'src\PineGuard.MustClauses\PineGuard.MustClauses.csproj'
-    'GuardClauses'     = Join-Path $repoRoot 'src\PineGuard.GuardClauses\PineGuard.GuardClauses.csproj'
-    'FluentValidation' = Join-Path $repoRoot 'src\PineGuard.FluentValidation\PineGuard.FluentValidation.csproj'
-    'DataAnnotations'  = Join-Path $repoRoot 'src\PineGuard.DataAnnotations\PineGuard.DataAnnotations.csproj'
-    'Testing'          = Join-Path $repoRoot 'tests\PineGuard.Testing\PineGuard.Testing.csproj'
+$buildTarget = if ($Scope -eq 'All') {
+    Join-Path $repoRoot 'PineGuard.slnx'
 }
-
-$buildTarget = $scopeTargets[$Scope]
+else {
+    Join-Path $repoRoot (Get-PineGuardScope -Name $Scope).SourceCsproj
+}
 if (-not (Test-Path $buildTarget)) {
     throw "Build target not found: $buildTarget"
 }

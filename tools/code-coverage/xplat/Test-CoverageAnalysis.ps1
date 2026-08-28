@@ -75,15 +75,7 @@ if (-not (Test-Path $utilityPath)) {
 $repoRoot = Get-RepoRoot
 
 if ($Scope -notin @('All', 'Custom')) {
-    $scopeSourceDir = switch ($Scope) {
-        'Core' { Join-Path $repoRoot 'src\PineGuard.Core' }
-        'MustClauses' { Join-Path $repoRoot 'src\PineGuard.MustClauses' }
-        'GuardClauses' { Join-Path $repoRoot 'src\PineGuard.GuardClauses' }
-        'DataAnnotations' { Join-Path $repoRoot 'src\PineGuard.DataAnnotations' }
-        'FluentValidation' { Join-Path $repoRoot 'src\PineGuard.FluentValidation' }
-        'Testing' { Join-Path $repoRoot 'tests\PineGuard.Testing' }
-        default { $null }
-    }
+    $scopeSourceDir = Join-Path $repoRoot (Get-PineGuardScope -Name $Scope).SourceDir
 
     if (-not [string]::IsNullOrWhiteSpace($scopeSourceDir) -and (Test-Path $scopeSourceDir)) {
         $anyCs = Get-ChildItem -LiteralPath $scopeSourceDir -Recurse -File -Filter '*.cs' -ErrorAction SilentlyContinue |
@@ -103,44 +95,23 @@ if ([string]::IsNullOrWhiteSpace($ResultsRoot)) {
 $defaultSourcePrefix = 'src\PineGuard.Core'
 
 switch ($Scope) {
-    'Core' {
-        # Filter by source file path — includes ALL namespaces in the PineGuard.Core project
-        if (-not $IncludeFileRegex) { $IncludeFileRegex = '^src[/\\]+PineGuard\.Core[/\\]+' }
-        if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
-        $defaultSourcePrefix = 'src\PineGuard.Core'
-    }
-    'MustClauses' {
-        if (-not $IncludeFileRegex) { $IncludeFileRegex = '^src[/\\]+PineGuard\.MustClauses[/\\]+' }
-        if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
-        $defaultSourcePrefix = 'src\PineGuard.MustClauses'
-    }
-    'GuardClauses' {
-        if (-not $IncludeFileRegex) { $IncludeFileRegex = '^src[/\\]+PineGuard\.GuardClauses[/\\]+' }
-        if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
-        $defaultSourcePrefix = 'src\PineGuard.GuardClauses'
-    }
-    'DataAnnotations' {
-        if (-not $IncludeFileRegex) { $IncludeFileRegex = '^src[/\\]+PineGuard\.DataAnnotations[/\\]+' }
-        if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
-        $defaultSourcePrefix = 'src\PineGuard.DataAnnotations'
-    }
-    'FluentValidation' {
-        if (-not $IncludeFileRegex) { $IncludeFileRegex = '^src[/\\]+PineGuard\.FluentValidation[/\\]+' }
-        if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
-        $defaultSourcePrefix = 'src\PineGuard.FluentValidation'
-    }
     'All' {
-        if (-not $IncludeFileRegex) { $IncludeFileRegex = '^(src|tests)[/\\]+PineGuard\.(Core|MustClauses|GuardClauses|DataAnnotations|FluentValidation|Testing)[/\\]+' }
+        if (-not $IncludeFileRegex) {
+            $allNamesAlternation = (Get-PineGuardScope -All | ForEach-Object Name) -join '|'
+            $IncludeFileRegex = "^(src|tests)[/\\]+PineGuard\.($allNamesAlternation)[/\\]+"
+        }
         if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
-        $defaultSourcePrefix = 'src\PineGuard.Core'
-    }
-    'Testing' {
-        if (-not $IncludeFileRegex) { $IncludeFileRegex = '^tests[/\\]+PineGuard\.Testing[/\\]+' }
-        if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
-        $defaultSourcePrefix = 'tests\PineGuard.Testing'
+        $defaultSourcePrefix = (Get-PineGuardScope -Name 'Core').DefaultSourcePrefix
     }
     'Custom' {
         # No defaults.
+    }
+    default {
+        # Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Testing
+        $scopeEntry = Get-PineGuardScope -Name $Scope
+        if (-not $IncludeFileRegex) { $IncludeFileRegex = $scopeEntry.PathIncludeRegex }
+        if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
+        $defaultSourcePrefix = $scopeEntry.DefaultSourcePrefix
     }
 }
 

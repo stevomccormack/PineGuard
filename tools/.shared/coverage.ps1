@@ -6,10 +6,15 @@
     Dot-source this file to import coverage artifact path helpers, Coverlet RunSettings
     generation, and Cobertura XML parsing into the calling script's scope.
     Requires path.ps1 (Get-RepoRoot) to be loaded first.
+    Dot-sources dotnet-projects.ps1 itself (Get-PineGuardScope) so Normalize-CoberturaFilename
+    can resolve the registry's per-scope default source prefixes even if a future caller loads
+    this file directly instead of through Import-CodeCoverageUtility.ps1.
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+. (Join-Path $PSScriptRoot 'dotnet-projects.ps1')
 
 # -------------------------------------------------------------------------------------------------
 # Artifact Paths
@@ -212,7 +217,8 @@ function Normalize-CoberturaFilename {
 
         $resolved = $null
 
-        $prefixes = @($DefaultSourcePrefix, 'src\PineGuard.Core', 'src\PineGuard.MustClauses', 'src\PineGuard.GuardClauses', 'src\PineGuard.DataAnnotations', 'src\PineGuard.FluentValidation', 'tests\PineGuard.Testing') | Select-Object -Unique
+        $registryPrefixes = @(Get-PineGuardScope -All | ForEach-Object DefaultSourcePrefix)
+        $prefixes = @($DefaultSourcePrefix) + $registryPrefixes | Select-Object -Unique
         foreach ($prefix in $prefixes) {
             $candidate = Join-Path $prefix $matchFilename
             if (Test-Path -LiteralPath (Join-Path $repoRootNormalized $candidate)) {

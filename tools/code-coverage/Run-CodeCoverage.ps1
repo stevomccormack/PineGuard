@@ -113,14 +113,11 @@ $xplatAnalyze = Join-Path $PSScriptRoot 'xplat\Test-CoverageAnalysis.ps1'
 # (keeps coverage loops fast and avoids running unrelated test projects).
 $effectiveProjectFilter = $ProjectFilter
 if (-not $PSBoundParameters.ContainsKey('ProjectFilter')) {
-    switch ($Scope) {
-        'Core' { $effectiveProjectFilter = 'PineGuard.Core.UnitTests.csproj' }
-        'MustClauses' { $effectiveProjectFilter = 'PineGuard.MustClauses.UnitTests.csproj' }
-        'GuardClauses' { $effectiveProjectFilter = 'PineGuard.GuardClauses.UnitTests.csproj' }
-        'DataAnnotations' { $effectiveProjectFilter = 'PineGuard.DataAnnotations.UnitTests.csproj' }
-        'FluentValidation' { $effectiveProjectFilter = 'PineGuard.FluentValidation.UnitTests.csproj' }
-        'All' { $effectiveProjectFilter = '*.UnitTests.csproj' }
-        'Testing' { $effectiveProjectFilter = '*.UnitTests.csproj' }
+    if ($Scope -eq 'All') {
+        $effectiveProjectFilter = '*.UnitTests.csproj'
+    }
+    else {
+        $effectiveProjectFilter = (Get-PineGuardScope -Name $Scope).DefaultProjectFilter
     }
 }
 
