@@ -8,7 +8,9 @@
     (a) every public Must.Be.* clause passes exactly one MustCodes constant on every Fail(/FromBool(
     call; (b) every catalogue constant (other than Prefix) is referenced by at least one clause,
     DataAnnotations attribute, or Core/AspNetCore call site; (c) no code string literal duplicates a
-    catalogue domain outside src/PineGuard.Core/Codes/; (e) every Guard.Against.* clause passes its
+    catalogue domain outside src/PineGuard.Core/Codes/; (d) every DataAnnotations attribute's declared
+    code matches a code actually produced by the Must clause method(s) it dispatches to (direct
+    Must.Be.* calls and nameof(MustXClauses.Y) reflective dispatch alike); (e) every Guard.Against.* clause passes its
     IMustResult (never a string) as GuardFailure.Throw's first argument, so the code and property
     path on the thrown exception are always the Must layer's own; (f) every clause file only
     references constants from its mapped domain; (g) no "using PineGuard" line appears under
@@ -165,6 +167,10 @@ foreach ($extraRoot in @('src/PineGuard.Core', 'src/PineGuard.DataAnnotations', 
 $usedConstants = New-Object System.Collections.Generic.HashSet[string]
 $domainTokens = @($declaredConstants | ForEach-Object { $_.Split('.')[0] } | Sort-Object -Unique)
 
+# method name (e.g. "GreaterThan") -> set of qualified codes (without the "MustCodes." prefix) that
+# any overload of that name can produce. Built while scanning clause files below; consumed by (d).
+$methodCodesByName = @{}
+
 foreach ($file in $clauseFiles) {
     $baseName = $file.BaseName -replace '^Must', '' -replace 'Clauses$', ''
     $domain = $domainMap[$baseName]
@@ -206,6 +212,13 @@ foreach ($file in $clauseFiles) {
         $braceClose = Get-BalancedSpan -Content $content -OpenIndex $braceOpen -Open '{' -Close '}'
         $body = $content.Substring($braceOpen, $braceClose - $braceOpen)
 
+        if (-not $methodCodesByName.ContainsKey($methodName)) {
+            $methodCodesByName[$methodName] = New-Object System.Collections.Generic.HashSet[string]
+        }
+        foreach ($m in $codeRefPattern.Matches($body)) {
+            $methodCodesByName[$methodName].Add(($m.Value -replace '^MustCodes\.', '')) | Out-Null
+        }
+
         foreach ($callMatch in $callSitePattern.Matches($body)) {
             $callOpenParen = $body.IndexOf('(', $callMatch.Index + $callMatch.Length - 1)
             if ($callOpenParen -lt 0) { continue }
@@ -218,6 +231,77 @@ foreach ($file in $clauseFiles) {
             elseif ($codeRefs.Count -gt 1) {
                 Add-Finding "(a) $($file.Name): $methodName -> .$($callMatch.Groups[1].Value)(...) call passes $($codeRefs.Count) MustCodes constants, expected exactly one."
             }
+        }
+    }
+}
+
+# ---- (d) every DataAnnotations attribute's declared code matches a code its Must clause dispatch actually produces ----
+# Dispatch is recognized two ways: a direct Must.Be.<Method>(...) call, or reflective dispatch via
+# nameof(Must<X>Clauses.<Method>). A class is only checked when at least one such reference is found
+# in its body (attributes with no recognizable dispatch, e.g. purely structural ones, are skipped
+# rather than false-flagged) and when its own class name ends in the literal "Attribute" (abstract
+# bases like ValidationAttributeBase/ComparePropertyAttributeBase never match that boundary).
+
+$dataAnnotationsDir = Resolve-PineGuardPath -RepoRoot $repoRootResolved -Path 'src/PineGuard.DataAnnotations'
+if (-not (Test-Path $dataAnnotationsDir)) { throw "DataAnnotations directory not found: $dataAnnotationsDir" }
+
+$attributeFiles = @(Get-ChildItem -Path $dataAnnotationsDir -Filter '*.cs' -File -Recurse | Where-Object { $_.FullName -notmatch '\\Common\\' })
+$classNamePattern = [regex]::new('\bclass\s+(\w*Attribute)\b')
+$directCallPattern = [regex]::new('Must\.Be\.(\w+)\s*\(')
+$reflectiveCallPattern = [regex]::new('nameof\(Must\w+Clauses\.(\w+)\)')
+
+foreach ($file in $attributeFiles) {
+    $content = Get-Content -LiteralPath $file.FullName -Raw
+
+    foreach ($classMatch in $classNamePattern.Matches($content)) {
+        $className = $classMatch.Groups[1].Value
+        $pos = $classMatch.Index + $classMatch.Length
+
+        while ($pos -lt $content.Length -and [char]::IsWhiteSpace($content[$pos])) { $pos++ }
+        if ($pos -lt $content.Length -and $content[$pos] -eq '(') {
+            $pos = Get-BalancedSpan -Content $content -OpenIndex $pos -Open '(' -Close ')'
+        }
+        while ($pos -lt $content.Length -and [char]::IsWhiteSpace($content[$pos])) { $pos++ }
+
+        $declaredCode = $null
+        if ($pos -lt $content.Length -and $content[$pos] -eq ':') {
+            $pos++
+            while ($pos -lt $content.Length -and [char]::IsWhiteSpace($content[$pos])) { $pos++ }
+            $baseNameMatch = [regex]::Match($content.Substring($pos), '^\w+')
+            $pos += $baseNameMatch.Length
+            while ($pos -lt $content.Length -and [char]::IsWhiteSpace($content[$pos])) { $pos++ }
+            if ($pos -lt $content.Length -and $content[$pos] -eq '(') {
+                $baseCallEnd = Get-BalancedSpan -Content $content -OpenIndex $pos -Open '(' -Close ')'
+                $baseCallArgs = $content.Substring($pos + 1, $baseCallEnd - $pos - 2)
+                $codeMatches = @($codeRefPattern.Matches($baseCallArgs))
+                if ($codeMatches.Count -gt 0) {
+                    $declaredCode = ($codeMatches[0].Value -replace '^MustCodes\.', '')
+                }
+                $pos = $baseCallEnd
+            }
+        }
+        if (-not $declaredCode) { continue }
+
+        while ($pos -lt $content.Length -and $content[$pos] -ne '{') { $pos++ }
+        if ($pos -ge $content.Length) { continue }
+        $bodyEnd = Get-BalancedSpan -Content $content -OpenIndex $pos -Open '{' -Close '}'
+        $classBody = $content.Substring($pos, $bodyEnd - $pos)
+
+        $dispatchedMethods = New-Object System.Collections.Generic.List[string]
+        foreach ($m in $directCallPattern.Matches($classBody)) { $dispatchedMethods.Add($m.Groups[1].Value) | Out-Null }
+        foreach ($m in $reflectiveCallPattern.Matches($classBody)) { $dispatchedMethods.Add($m.Groups[1].Value) | Out-Null }
+        $dispatchedMethods = @($dispatchedMethods | Sort-Object -Unique)
+        if ($dispatchedMethods.Count -eq 0) { continue }
+
+        $matchesAny = $false
+        foreach ($methodName in $dispatchedMethods) {
+            if ($methodCodesByName.ContainsKey($methodName) -and $methodCodesByName[$methodName].Contains($declaredCode)) {
+                $matchesAny = $true
+                break
+            }
+        }
+        if (-not $matchesAny) {
+            Add-Finding "(d) $($file.Name): $className declares code $declaredCode but its Must clause dispatch ($($dispatchedMethods -join ', ')) doesn't produce that code."
         }
     }
 }
@@ -280,6 +364,7 @@ $summaryLines = @(
     "RepoRoot: $repoRootResolved",
     "Clause files scanned: $($clauseFiles.Count)",
     "Guard clause files scanned: $($guardClauseFiles.Count)",
+    "DataAnnotations attribute files scanned: $($attributeFiles.Count)",
     "Codes files scanned: $($codesFiles.Count)",
     "Declared constants (excl. Prefix): $($declaredConstants.Count)",
     "Findings: $($findings.Count)",
