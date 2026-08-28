@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -20,7 +21,11 @@ public sealed class XmlAttributesTests
     [MemberData(nameof(XmlAttributesTestData.XmlString.EdgeCases), MemberType = typeof(XmlAttributesTestData.XmlString))]
     [MemberData(nameof(XmlAttributesTestData.XmlString.InvalidCases), MemberType = typeof(XmlAttributesTestData.XmlString))]
     public void XmlString_ShouldReturnExpected(XmlAttributesTestData.ValidCase testCase)
-        => Verify(new XmlStringAttribute(), testCase);
+    {
+        var attribute = new XmlStringAttribute();
+        Assert.Equal(MustCodes.Xml.Document.Invalid, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(XmlAttributesTestData.XmlDocumentString.ValidCases), MemberType = typeof(XmlAttributesTestData.XmlDocumentString))]

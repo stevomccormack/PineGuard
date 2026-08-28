@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -17,7 +18,11 @@ public sealed class DefaultEqualityAttributesTests
     [MemberData(nameof(DefaultEqualityAttributesTestData.NullOrDefault.EdgeCases), MemberType = typeof(DefaultEqualityAttributesTestData.NullOrDefault))]
     [MemberData(nameof(DefaultEqualityAttributesTestData.NullOrDefault.InvalidCases), MemberType = typeof(DefaultEqualityAttributesTestData.NullOrDefault))]
     public void NullOrDefault_ShouldReturnExpected(DefaultEqualityAttributesTestData.ValidCase testCase)
-        => Verify(new NullOrDefaultAttribute(), testCase);
+    {
+        var attribute = new NullOrDefaultAttribute();
+        Assert.Equal(MustCodes.Value.State.NotNullOrDefault, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(DefaultEqualityAttributesTestData.NotNullOrDefault.ValidCases), MemberType = typeof(DefaultEqualityAttributesTestData.NotNullOrDefault))]

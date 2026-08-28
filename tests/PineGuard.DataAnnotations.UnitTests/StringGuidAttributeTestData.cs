@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class StringGuidAttributeTestData
         {
             nameof(F.GuidIsGuid.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be a valid GUID.")
+            _ => new DataAnnotationExpected(false, "Value must be a valid GUID.", Code: MustCodes.Guid.Format.Invalid)
         });
     }
 }

@@ -19,7 +19,7 @@ public sealed class StringBoolAttributesTests(ITestOutputHelper output) : BaseDa
         var result = attr.GetValidationResult(tc.Value, ctx);
 
         // Assert
-        AssertResult(tc, result);
+        AssertResult(tc, result, attr.Code);
     }
 
     // FalseStringAttribute
@@ -35,6 +35,6 @@ public sealed class StringBoolAttributesTests(ITestOutputHelper output) : BaseDa
         var result = attr.GetValidationResult(tc.Value, ctx);
 
         // Assert
-        AssertResult(tc, result);
+        AssertResult(tc, result, attr.Code);
     }
 }

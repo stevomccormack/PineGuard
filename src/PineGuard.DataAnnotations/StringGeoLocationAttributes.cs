@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -36,7 +37,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringGeoLocationClauses.Latitude"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LatitudeStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class LatitudeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Geo.Latitude.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -72,7 +73,7 @@ public sealed class LatitudeStringAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustStringGeoLocationClauses.Longitude"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LongitudeStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class LongitudeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Geo.Longitude.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

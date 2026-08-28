@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -20,7 +21,11 @@ public sealed class CollectionAttributesTests
     [MemberData(nameof(CollectionAttributesTestData.EmptyCollection.EdgeCases), MemberType = typeof(CollectionAttributesTestData.EmptyCollection))]
     [MemberData(nameof(CollectionAttributesTestData.EmptyCollection.InvalidCases), MemberType = typeof(CollectionAttributesTestData.EmptyCollection))]
     public void EmptyCollection_ShouldReturnExpected(CollectionAttributesTestData.ValidCase testCase)
-        => Verify(new EmptyCollectionAttribute(), testCase);
+    {
+        var attribute = new EmptyCollectionAttribute();
+        Assert.Equal(MustCodes.Collection.Items.NotEmpty, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(CollectionAttributesTestData.NotEmptyCollection.ValidCases), MemberType = typeof(CollectionAttributesTestData.NotEmptyCollection))]

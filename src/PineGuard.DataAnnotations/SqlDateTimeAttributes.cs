@@ -1,5 +1,6 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -28,7 +29,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustSqlDateTimeClauses.InSqlDateRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/sqldatetime">SQL DateTime Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class InSqlDateRangeAttribute() : ValidationAttributeBase(typeof(DateOnly))
+public sealed class InSqlDateRangeAttribute() : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Sql.OutOfRange)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -72,7 +73,7 @@ public sealed class InSqlDateRangeAttribute() : ValidationAttributeBase(typeof(D
 /// <seealso cref="MustSqlDateTimeClauses"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/sqldatetime">SQL DateTime Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class InSqlDateTimeRangeAttribute() : ValidationAttributeBase(typeof(object))
+public sealed class InSqlDateTimeRangeAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Date.Sql.OutOfRange)
 {
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -26,7 +27,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustCharClauses.Ascii"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharAsciiAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharAsciiAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.NotAscii)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -59,7 +60,7 @@ public sealed class CharAsciiAttribute() : ValidationAttributeBase(typeof(char))
 /// <seealso cref="MustCharClauses.Digit"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharDigitAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharDigitAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.NotDigit)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -92,7 +93,7 @@ public sealed class CharDigitAttribute() : ValidationAttributeBase(typeof(char))
 /// <seealso cref="MustCharClauses.Letter"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharLetterAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharLetterAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.NotLetter)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -125,7 +126,7 @@ public sealed class CharLetterAttribute() : ValidationAttributeBase(typeof(char)
 /// <seealso cref="MustCharClauses.LetterOrDigit"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharLetterOrDigitAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharLetterOrDigitAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.NotLetterOrDigit)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -158,7 +159,7 @@ public sealed class CharLetterOrDigitAttribute() : ValidationAttributeBase(typeo
 /// <seealso cref="MustCharClauses.Lowercase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharLowercaseAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharLowercaseAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Casing.NotLower)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -191,7 +192,7 @@ public sealed class CharLowercaseAttribute() : ValidationAttributeBase(typeof(ch
 /// <seealso cref="MustCharClauses.Uppercase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharUppercaseAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharUppercaseAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Casing.NotUpper)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -224,7 +225,7 @@ public sealed class CharUppercaseAttribute() : ValidationAttributeBase(typeof(ch
 /// <seealso cref="MustCharClauses.NotHexDigit"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharNotHexDigitAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharNotHexDigitAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.HexDigit)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -257,7 +258,7 @@ public sealed class CharNotHexDigitAttribute() : ValidationAttributeBase(typeof(
 /// <seealso cref="MustCharClauses.NotLetter"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharNotLetterAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharNotLetterAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.Letter)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -290,7 +291,7 @@ public sealed class CharNotLetterAttribute() : ValidationAttributeBase(typeof(ch
 /// <seealso cref="MustCharClauses.NotDigit"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharNotDigitAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharNotDigitAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.Digit)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -323,7 +324,7 @@ public sealed class CharNotDigitAttribute() : ValidationAttributeBase(typeof(cha
 /// <seealso cref="MustCharClauses.NotLetterOrDigit"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharNonLetterOrDigitAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharNonLetterOrDigitAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.LetterOrDigit)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -356,7 +357,7 @@ public sealed class CharNonLetterOrDigitAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustCharClauses.NotAscii"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharNonAsciiAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharNonAsciiAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.Ascii)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -390,7 +391,7 @@ public sealed class CharNonAsciiAttribute() : ValidationAttributeBase(typeof(cha
 /// <seealso cref="MustCharClauses.NotPrintableAscii"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharNonPrintableAsciiAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharNonPrintableAsciiAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.PrintableAscii)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -424,7 +425,7 @@ public sealed class CharNonPrintableAsciiAttribute() : ValidationAttributeBase(t
 /// <seealso cref="MustCharClauses.PrintableAscii"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharPrintableAsciiAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharPrintableAsciiAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.NotPrintableAscii)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -456,7 +457,7 @@ public sealed class CharPrintableAsciiAttribute() : ValidationAttributeBase(type
 /// <seealso cref="MustCharClauses.NotWhitespace"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharNonWhitespaceAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharNonWhitespaceAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Category.Whitespace)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -489,7 +490,7 @@ public sealed class CharNonWhitespaceAttribute() : ValidationAttributeBase(typeo
 /// <seealso cref="MustCharClauses.Control"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharControlAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharControlAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Category.NotControl)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -522,7 +523,7 @@ public sealed class CharControlAttribute() : ValidationAttributeBase(typeof(char
 /// <seealso cref="MustCharClauses.NotControl"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharNotControlAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharNotControlAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Category.Control)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -555,7 +556,7 @@ public sealed class CharNotControlAttribute() : ValidationAttributeBase(typeof(c
 /// <seealso cref="MustCharClauses.HexDigit"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/char">Char Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CharHexDigitAttribute() : ValidationAttributeBase(typeof(char))
+public sealed class CharHexDigitAttribute() : ValidationAttributeBase(typeof(char), MustCodes.Character.Charset.NotHexDigit)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

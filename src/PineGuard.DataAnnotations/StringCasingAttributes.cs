@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -31,7 +32,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringCasingClauses.CaseStyle"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CaseStyleAttribute(StringCasing casing) : ValidationAttributeBase(typeof(string))
+public sealed class CaseStyleAttribute(StringCasing casing) : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Mismatch)
 {
     /// <summary>Gets the required casing style.</summary>
     public StringCasing Casing { get; } = casing;
@@ -71,7 +72,7 @@ public sealed class CaseStyleAttribute(StringCasing casing) : ValidationAttribut
 /// <seealso cref="MustStringCasingClauses.NotCaseStyle"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotCaseStyleAttribute(StringCasing casing) : ValidationAttributeBase(typeof(string))
+public sealed class NotCaseStyleAttribute(StringCasing casing) : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Match)
 {
     /// <summary>Gets the casing style that the value must not conform to.</summary>
     public StringCasing Casing { get; } = casing;
@@ -111,7 +112,7 @@ public sealed class NotCaseStyleAttribute(StringCasing casing) : ValidationAttri
 /// <seealso cref="MustStringCasingClauses.CamelCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CamelCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class CamelCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotCamel)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -148,7 +149,7 @@ public sealed class CamelCaseAttribute() : ValidationAttributeBase(typeof(string
 /// <seealso cref="MustStringCasingClauses.PascalCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PascalCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class PascalCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotPascal)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -185,7 +186,7 @@ public sealed class PascalCaseAttribute() : ValidationAttributeBase(typeof(strin
 /// <seealso cref="MustStringCasingClauses.SnakeCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class SnakeCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class SnakeCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotSnake)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -222,7 +223,7 @@ public sealed class SnakeCaseAttribute() : ValidationAttributeBase(typeof(string
 /// <seealso cref="MustStringCasingClauses.UpperSnakeCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class UpperSnakeCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class UpperSnakeCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotUpperSnake)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -259,7 +260,7 @@ public sealed class UpperSnakeCaseAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustStringCasingClauses.KebabCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class KebabCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class KebabCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotKebab)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -296,7 +297,7 @@ public sealed class KebabCaseAttribute() : ValidationAttributeBase(typeof(string
 /// <seealso cref="MustStringCasingClauses.TrainCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class TrainCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class TrainCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotTrain)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -333,7 +334,7 @@ public sealed class TrainCaseAttribute() : ValidationAttributeBase(typeof(string
 /// <seealso cref="MustStringCasingClauses.DotCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class DotCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class DotCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotDot)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -370,7 +371,7 @@ public sealed class DotCaseAttribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustStringCasingClauses.SpaceCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class SpaceCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class SpaceCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotSpace)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -407,7 +408,7 @@ public sealed class SpaceCaseAttribute() : ValidationAttributeBase(typeof(string
 /// <seealso cref="MustStringCasingClauses.UpperInvariant"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class UpperInvariantAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class UpperInvariantAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotUpperInvariant)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -444,7 +445,7 @@ public sealed class UpperInvariantAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustStringCasingClauses.LowerInvariant"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LowerInvariantAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class LowerInvariantAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotLowerInvariant)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -480,7 +481,7 @@ public sealed class LowerInvariantAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustStringCasingClauses.NotCamelCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotCamelCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotCamelCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Camel)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -516,7 +517,7 @@ public sealed class NotCamelCaseAttribute() : ValidationAttributeBase(typeof(str
 /// <seealso cref="MustStringCasingClauses.NotPascalCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotPascalCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotPascalCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Pascal)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -552,7 +553,7 @@ public sealed class NotPascalCaseAttribute() : ValidationAttributeBase(typeof(st
 /// <seealso cref="MustStringCasingClauses.NotSnakeCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotSnakeCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotSnakeCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Snake)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -588,7 +589,7 @@ public sealed class NotSnakeCaseAttribute() : ValidationAttributeBase(typeof(str
 /// <seealso cref="MustStringCasingClauses.NotUpperSnakeCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotUpperSnakeCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotUpperSnakeCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.UpperSnake)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -624,7 +625,7 @@ public sealed class NotUpperSnakeCaseAttribute() : ValidationAttributeBase(typeo
 /// <seealso cref="MustStringCasingClauses.NotKebabCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotKebabCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotKebabCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Kebab)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -660,7 +661,7 @@ public sealed class NotKebabCaseAttribute() : ValidationAttributeBase(typeof(str
 /// <seealso cref="MustStringCasingClauses.NotTrainCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotTrainCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotTrainCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Train)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -696,7 +697,7 @@ public sealed class NotTrainCaseAttribute() : ValidationAttributeBase(typeof(str
 /// <seealso cref="MustStringCasingClauses.NotDotCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotDotCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotDotCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Dot)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -732,7 +733,7 @@ public sealed class NotDotCaseAttribute() : ValidationAttributeBase(typeof(strin
 /// <seealso cref="MustStringCasingClauses.NotSpaceCase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotSpaceCaseAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotSpaceCaseAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Space)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -768,7 +769,7 @@ public sealed class NotSpaceCaseAttribute() : ValidationAttributeBase(typeof(str
 /// <seealso cref="MustStringCasingClauses.NotUpperInvariant"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotUpperInvariantAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotUpperInvariantAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.UpperInvariant)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -804,7 +805,7 @@ public sealed class NotUpperInvariantAttribute() : ValidationAttributeBase(typeo
 /// <seealso cref="MustStringCasingClauses.NotLowerInvariant"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotLowerInvariantAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotLowerInvariantAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.LowerInvariant)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

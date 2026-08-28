@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -31,7 +32,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso href="https://pineguard.ai/docs/annotations/owasp">OWASP Attribute documentation</seealso>
 /// <seealso href="https://owasp.org/www-community/attacks/xss/">OWASP XSS prevention</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OwaspSafeAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class OwaspSafeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Owasp.Payload.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -68,7 +69,7 @@ public sealed class OwaspSafeAttribute() : ValidationAttributeBase(typeof(string
 /// <seealso cref="MustOwaspClauses.XssSafe"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/owasp">OWASP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class XssSafeAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class XssSafeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Owasp.Xss.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -105,7 +106,7 @@ public sealed class XssSafeAttribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustOwaspClauses.SqlInjectionSafe"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/owasp">OWASP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class SqlInjectionSafeAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class SqlInjectionSafeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Owasp.SqlInjection.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -142,7 +143,7 @@ public sealed class SqlInjectionSafeAttribute() : ValidationAttributeBase(typeof
 /// <seealso cref="MustOwaspClauses.PathTraversalSafe"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/owasp">OWASP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PathTraversalSafeAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class PathTraversalSafeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Owasp.PathTraversal.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -179,7 +180,7 @@ public sealed class PathTraversalSafeAttribute() : ValidationAttributeBase(typeo
 /// <seealso cref="MustOwaspClauses.CommandInjectionSafe"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/owasp">OWASP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CommandInjectionSafeAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class CommandInjectionSafeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Owasp.CommandInjection.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -216,7 +217,7 @@ public sealed class CommandInjectionSafeAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustOwaspClauses.CrLfSafe"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/owasp">OWASP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class CrLfSafeAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class CrLfSafeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Owasp.Crlf.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -253,7 +254,7 @@ public sealed class CrLfSafeAttribute() : ValidationAttributeBase(typeof(string)
 /// <seealso cref="MustOwaspClauses.LdapFilterSafe"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/owasp">OWASP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LdapFilterSafeAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class LdapFilterSafeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Owasp.LdapFilter.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -290,7 +291,7 @@ public sealed class LdapFilterSafeAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustOwaspClauses.OpenRedirectSafe"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/owasp">OWASP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OpenRedirectSafeAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class OpenRedirectSafeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Owasp.OpenRedirect.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -327,7 +328,7 @@ public sealed class OpenRedirectSafeAttribute() : ValidationAttributeBase(typeof
 /// <seealso cref="MustOwaspClauses.SsrfSchemeSafe"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/owasp">OWASP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class SsrfSchemeSafeAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class SsrfSchemeSafeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Owasp.SsrfScheme.Unsafe)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

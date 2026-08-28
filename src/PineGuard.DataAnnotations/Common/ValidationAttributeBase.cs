@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using PineGuard.Common;
 using PineGuard.MustClauses;
 
 namespace PineGuard.DataAnnotations.Common;
@@ -20,6 +21,11 @@ namespace PineGuard.DataAnnotations.Common;
 /// </para>
 /// </remarks>
 /// <param name="expectedType">The CLR type the attribute is designed to validate.</param>
+/// <param name="code">
+/// The <c>MustCodes</c> catalogue constant identifying the clause this attribute adapts. Every attribute
+/// passes the constant of the clause it invokes — PineGuard never subclasses a framework result type, so
+/// this is where the code lives for the DataAnnotations adapter (see <see cref="Code"/>).
+/// </param>
 /// <param name="allowNull">
 /// When <see langword="true"/>, <see langword="null"/> values pass validation without invoking
 /// <see cref="ValidateValue"/>; when <see langword="false"/>, <see langword="null"/> values are
@@ -27,9 +33,25 @@ namespace PineGuard.DataAnnotations.Common;
 /// </param>
 /// <seealso cref="GenericDictionaryAttributeBase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations">Annotation documentation</seealso>
-public abstract class ValidationAttributeBase(Type expectedType, bool allowNull = true) : ValidationAttribute
+public abstract class ValidationAttributeBase(Type expectedType, string code, bool allowNull = true) : ValidationAttribute
 {
     private const string ParamNameToken = "{paramName}";
+
+    /// <summary>
+    /// Gets the <c>MustCodes</c> catalogue constant identifying the clause this attribute adapts.
+    /// </summary>
+    /// <remarks>
+    /// The natural resource key for a later DataAnnotations localisation hook
+    /// (<see cref="ValidationAttribute.ErrorMessageResourceType"/>/<see cref="ValidationAttribute.ErrorMessageResourceName"/>),
+    /// and design-time metadata a form generator or OpenAPI enricher can read before any validation runs.
+    /// </remarks>
+    public string Code { get; } = RequireCode(code);
+
+    private static string RequireCode(string code)
+    {
+        ThrowHelper.ThrowIfNullOrWhiteSpace(code);
+        return code;
+    }
 
     /// <inheritdoc/>
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)

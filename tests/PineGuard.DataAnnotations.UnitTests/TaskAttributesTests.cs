@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -16,7 +17,11 @@ public sealed class TaskAttributesTests
     [MemberData(nameof(TaskAttributesTestData.TaskCompleted.EdgeCases), MemberType = typeof(TaskAttributesTestData.TaskCompleted))]
     [MemberData(nameof(TaskAttributesTestData.TaskCompleted.InvalidCases), MemberType = typeof(TaskAttributesTestData.TaskCompleted))]
     public void TaskCompleted_ShouldReturnExpected(TaskAttributesTestData.ValidCase testCase)
-        => Verify(new TaskCompletedAttribute(), testCase);
+    {
+        var attribute = new TaskCompletedAttribute();
+        Assert.Equal(MustCodes.Task.Status.NotCompleted, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(TaskAttributesTestData.TaskNotCompleted.ValidCases), MemberType = typeof(TaskAttributesTestData.TaskNotCompleted))]

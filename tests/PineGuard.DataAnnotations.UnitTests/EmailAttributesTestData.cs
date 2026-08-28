@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.EmailRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class EmailAttributesTestData
         {
             nameof(F.IsEmail.Null) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be a valid email address.")
+            _ => new DataAnnotationExpected(false, "Value must be a valid email address.", Code: MustCodes.Email.Address.Invalid)
         });
     }
 

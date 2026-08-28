@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -29,7 +30,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustHttpClauses.HeaderName"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/http">HTTP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HttpHeaderNameAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class HttpHeaderNameAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Http.HeaderName.Malformed)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -66,7 +67,7 @@ public sealed class HttpHeaderNameAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustHttpClauses.HeaderValue"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/http">HTTP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HttpHeaderValueAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class HttpHeaderValueAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Http.HeaderValue.Malformed)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -101,7 +102,7 @@ public sealed class HttpHeaderValueAttribute() : ValidationAttributeBase(typeof(
 /// <seealso cref="MustHttpClauses.HttpStatusCode"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/http">HTTP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HttpStatusCodeAttribute() : ValidationAttributeBase(typeof(int))
+public sealed class HttpStatusCodeAttribute() : ValidationAttributeBase(typeof(int), MustCodes.Http.Status.OutOfRange)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -136,7 +137,7 @@ public sealed class HttpStatusCodeAttribute() : ValidationAttributeBase(typeof(i
 /// <seealso cref="MustHttpClauses.HttpStatusSuccess"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/http">HTTP Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HttpStatusSuccessAttribute() : ValidationAttributeBase(typeof(int))
+public sealed class HttpStatusSuccessAttribute() : ValidationAttributeBase(typeof(int), MustCodes.Http.Status.NotSuccess)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

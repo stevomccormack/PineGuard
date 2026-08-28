@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -17,7 +18,11 @@ public sealed class StringGeoLocationAttributesTests
     [MemberData(nameof(StringGeoLocationAttributesTestData.LatitudeString.EdgeCases), MemberType = typeof(StringGeoLocationAttributesTestData.LatitudeString))]
     [MemberData(nameof(StringGeoLocationAttributesTestData.LatitudeString.InvalidCases), MemberType = typeof(StringGeoLocationAttributesTestData.LatitudeString))]
     public void LatitudeString_ShouldReturnExpected(StringGeoLocationAttributesTestData.ValidCase testCase)
-        => Verify(new LatitudeStringAttribute(), testCase);
+    {
+        var attribute = new LatitudeStringAttribute();
+        Assert.Equal(MustCodes.Geo.Latitude.Invalid, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(StringGeoLocationAttributesTestData.LongitudeString.ValidCases), MemberType = typeof(StringGeoLocationAttributesTestData.LongitudeString))]

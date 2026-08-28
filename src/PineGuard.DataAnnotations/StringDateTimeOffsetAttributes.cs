@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -36,7 +37,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringDateTimeOffsetClauses.PastDateTimeOffset"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotPast)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
@@ -82,7 +83,7 @@ public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBas
 /// <seealso cref="MustStringDateTimeOffsetClauses.FutureDateTimeOffset"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class FutureDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotFuture)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
@@ -133,7 +134,7 @@ public sealed class BetweenDateTimeOffsetStringAttribute(
     string min,
     string max,
     Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string))
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Range.OutOfRange)
 {
     /// <summary>Gets the lower boundary of the valid range.</summary>
     public DateTimeOffset Min { get; } = DateTimeOffset.Parse(min, CultureInfo.InvariantCulture);

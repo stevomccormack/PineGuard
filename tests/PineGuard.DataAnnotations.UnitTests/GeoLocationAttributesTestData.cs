@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.GeoLocationRulesFixtures;
 
@@ -14,7 +15,7 @@ public static class GeoLocationAttributesTestData
             nameof(F.IsLatitude.PosInfinity) => new DataAnnotationExpected(false),
             nameof(F.IsLatitude.NegInfinity) => new DataAnnotationExpected(false),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be a valid latitude.")
+            _ => new DataAnnotationExpected(false, "Value must be a valid latitude.", Code: MustCodes.Geo.Latitude.Invalid)
         });
     }
 

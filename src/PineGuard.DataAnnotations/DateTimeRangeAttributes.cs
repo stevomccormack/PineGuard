@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -32,7 +33,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalDateTimeRangeAttribute(Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange))
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Order.NotChronological)
 {
     /// <summary>Gets whether the range boundaries are included or excluded when evaluating the constraint.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -75,7 +76,7 @@ public sealed class ChronologicalDateTimeRangeAttribute(Inclusion inclusion = In
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class OverlappingDateTimeRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange))
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Overlap.Missing)
 {
     /// <summary>Gets the reference range that the annotated range must overlap.</summary>
     public DateTimeRange Range2 { get; } = new(
@@ -123,7 +124,7 @@ public sealed class OverlappingDateTimeRangeAttribute(string start2, string end2
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotOverlappingDateTimeRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange))
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Overlap.Present)
 {
     /// <summary>Gets the reference range that the annotated range must not overlap.</summary>
     public DateTimeRange Range2 { get; } = new(
@@ -170,7 +171,7 @@ public sealed class NotOverlappingDateTimeRangeAttribute(string start2, string e
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ContainsDateTimeRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange))
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Bounds.NotContains)
 {
     /// <summary>Gets the date/time that the annotated range must contain.</summary>
     public DateTime Value { get; } = DateTime.Parse(value, CultureInfo.InvariantCulture);
@@ -215,7 +216,7 @@ public sealed class ContainsDateTimeRangeAttribute(string value, Inclusion inclu
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotContainsDateTimeRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange))
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Bounds.Contains)
 {
     /// <summary>Gets the date/time that the annotated range must not contain.</summary>
     public DateTime Value { get; } = DateTime.Parse(value, CultureInfo.InvariantCulture);

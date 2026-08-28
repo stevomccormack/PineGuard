@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -30,7 +31,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustEmailClauses.Email"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/email">Email Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EmailAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class EmailAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Email.Address.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -70,7 +71,7 @@ public sealed class EmailAttribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustEmailClauses.StrictEmail"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/email">Email Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class StrictEmailAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class StrictEmailAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Email.Address.NotStrict)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -108,7 +109,7 @@ public sealed class StrictEmailAttribute() : ValidationAttributeBase(typeof(stri
 /// <seealso cref="MustEmailClauses.HasEmailAlias"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/email">Email Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasEmailAliasAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class HasEmailAliasAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Email.Alias.Missing)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -146,7 +147,7 @@ public sealed class HasEmailAliasAttribute() : ValidationAttributeBase(typeof(st
 /// <seealso cref="MustEmailClauses.NotHasEmailAlias"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/email">Email Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotHasEmailAliasAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotHasEmailAliasAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Email.Alias.Present)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -32,7 +33,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringClauses.ExactLength"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(typeof(string))
+public sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.Mismatch)
 {
     /// <summary>Gets the exact character length required.</summary>
     public int Length { get; } = length;
@@ -72,7 +73,7 @@ public sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(t
 /// <seealso cref="MustStringClauses.LengthBetween"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LengthBetweenAttribute(int min, int max) : ValidationAttributeBase(typeof(string))
+public sealed class LengthBetweenAttribute(int min, int max) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.OutOfRange)
 {
     /// <summary>Gets the minimum character length (inclusive).</summary>
     public int Min { get; } = min;
@@ -115,7 +116,7 @@ public sealed class LengthBetweenAttribute(int min, int max) : ValidationAttribu
 /// <seealso cref="MustStringClauses.LongerThan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LongerThanAttribute(int length) : ValidationAttributeBase(typeof(string))
+public sealed class LongerThanAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooShort)
 {
     /// <summary>Gets the minimum character count that the value must exceed (exclusive).</summary>
     public int Length { get; } = length;
@@ -155,7 +156,7 @@ public sealed class LongerThanAttribute(int length) : ValidationAttributeBase(ty
 /// <seealso cref="MustStringClauses.ShorterThan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ShorterThanAttribute(int length) : ValidationAttributeBase(typeof(string))
+public sealed class ShorterThanAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooLong)
 {
     /// <summary>Gets the maximum character count that the value must stay below (exclusive).</summary>
     public int Length { get; } = length;
@@ -196,7 +197,7 @@ public sealed class ShorterThanAttribute(int length) : ValidationAttributeBase(t
 /// <seealso cref="MustStringClauses.Match"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class MatchAttribute(string pattern) : ValidationAttributeBase(typeof(string))
+public sealed class MatchAttribute(string pattern) : ValidationAttributeBase(typeof(string), MustCodes.Text.Pattern.NoMatch)
 {
     /// <summary>Gets the regular expression pattern the value must match.</summary>
     public string Pattern { get; } = pattern;
@@ -236,7 +237,7 @@ public sealed class MatchAttribute(string pattern) : ValidationAttributeBase(typ
 /// <seealso cref="MustStringClauses.Alphabetic"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class AlphabeticAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class AlphabeticAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotAlpha)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -272,7 +273,7 @@ public sealed class AlphabeticAttribute() : ValidationAttributeBase(typeof(strin
 /// <seealso cref="MustStringClauses.Numeric"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NumericStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NumericStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotNumeric)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -309,7 +310,7 @@ public sealed class NumericStringAttribute() : ValidationAttributeBase(typeof(st
 /// <seealso cref="MustStringClauses.Alphanumeric"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class AlphanumericAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class AlphanumericAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotAlphanumeric)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -346,7 +347,7 @@ public sealed class AlphanumericAttribute() : ValidationAttributeBase(typeof(str
 /// <seealso cref="MustStringClauses.DigitsOnly(IMustClause, string, string)"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class DigitsOnlyAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class DigitsOnlyAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotDigits)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -383,7 +384,7 @@ public sealed class DigitsOnlyAttribute() : ValidationAttributeBase(typeof(strin
 /// <seealso cref="MustStringClauses.NotDigitsOnly(IMustClause, string, string)"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotDigitsOnlyAttribute(char[]? inclusions = null) : ValidationAttributeBase(typeof(string))
+public sealed class NotDigitsOnlyAttribute(char[]? inclusions = null) : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.Digits)
 {
     /// <summary>Gets additional characters that are allowed alongside non-digit characters.</summary>
     public char[]? Inclusions { get; } = inclusions;
@@ -423,7 +424,7 @@ public sealed class NotDigitsOnlyAttribute(char[]? inclusions = null) : Validati
 /// <seealso cref="MustStringClauses.Empty"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EmptyStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class EmptyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotEmpty)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -460,7 +461,7 @@ public sealed class EmptyStringAttribute() : ValidationAttributeBase(typeof(stri
 /// <seealso cref="MustStringClauses.NullOrEmpty"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NullOrEmptyStringAttribute() : ValidationAttributeBase(typeof(string), allowNull: true)
+public sealed class NullOrEmptyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotNullOrEmpty, allowNull: true)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -497,7 +498,7 @@ public sealed class NullOrEmptyStringAttribute() : ValidationAttributeBase(typeo
 /// <seealso cref="MustStringClauses.NotNullOrEmpty"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotNullOrEmptyStringAttribute() : ValidationAttributeBase(typeof(string), allowNull: false)
+public sealed class NotNullOrEmptyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NullOrEmpty, allowNull: false)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -540,7 +541,7 @@ public sealed class NotNullOrEmptyStringAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustStringClauses.NullOrWhiteSpace"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NullOrWhiteSpaceStringAttribute() : ValidationAttributeBase(typeof(string), allowNull: true)
+public sealed class NullOrWhiteSpaceStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotBlank, allowNull: true)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -577,7 +578,7 @@ public sealed class NullOrWhiteSpaceStringAttribute() : ValidationAttributeBase(
 /// <seealso cref="MustStringClauses.NotNullOrWhiteSpace"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotNullOrWhiteSpaceStringAttribute() : ValidationAttributeBase(typeof(string), allowNull: false)
+public sealed class NotNullOrWhiteSpaceStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.Blank, allowNull: false)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -620,7 +621,7 @@ public sealed class NotNullOrWhiteSpaceStringAttribute() : ValidationAttributeBa
 /// <seealso cref="MustStringClauses.LongerThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LongerThanOrEqualAttribute(int length) : ValidationAttributeBase(typeof(string))
+public sealed class LongerThanOrEqualAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooShort)
 {
     /// <summary>Gets the minimum character length (inclusive).</summary>
     public int Length { get; } = length;
@@ -660,7 +661,7 @@ public sealed class LongerThanOrEqualAttribute(int length) : ValidationAttribute
 /// <seealso cref="MustStringClauses.ShorterThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ShorterThanOrEqualAttribute(int length) : ValidationAttributeBase(typeof(string))
+public sealed class ShorterThanOrEqualAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooLong)
 {
     /// <summary>Gets the maximum character length (inclusive).</summary>
     public int Length { get; } = length;
@@ -701,7 +702,7 @@ public sealed class ShorterThanOrEqualAttribute(int length) : ValidationAttribut
 /// <seealso cref="MustStringClauses.Uppercase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class UppercaseStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class UppercaseStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotUpper)
 {
     /// <summary>
     /// Gets or sets a value indicating whether only alphabetic characters are checked for uppercase
@@ -745,7 +746,7 @@ public sealed class UppercaseStringAttribute() : ValidationAttributeBase(typeof(
 /// <seealso cref="MustStringClauses.NotUppercase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotUppercaseStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotUppercaseStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Upper)
 {
     /// <summary>
     /// Gets or sets a value indicating whether only alphabetic characters are checked for uppercase
@@ -789,7 +790,7 @@ public sealed class NotUppercaseStringAttribute() : ValidationAttributeBase(type
 /// <seealso cref="MustStringClauses.Lowercase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LowercaseStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class LowercaseStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.NotLower)
 {
     /// <summary>
     /// Gets or sets a value indicating whether only alphabetic characters are checked for lowercase
@@ -833,7 +834,7 @@ public sealed class LowercaseStringAttribute() : ValidationAttributeBase(typeof(
 /// <seealso cref="MustStringClauses.NotLowercase"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotLowercaseStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotLowercaseStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Casing.Lower)
 {
     /// <summary>
     /// Gets or sets a value indicating whether only alphabetic characters are checked for lowercase
@@ -876,7 +877,7 @@ public sealed class NotLowercaseStringAttribute() : ValidationAttributeBase(type
 /// <seealso cref="MustStringClauses.Ascii"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class AsciiStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class AsciiStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotAscii)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -913,7 +914,7 @@ public sealed class AsciiStringAttribute() : ValidationAttributeBase(typeof(stri
 /// <seealso cref="MustStringClauses.NotAscii"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotAsciiStringAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotAsciiStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.Ascii)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -951,7 +952,7 @@ public sealed class NotAsciiStringAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustStringClauses.NotMatch"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotMatchAttribute(string pattern) : ValidationAttributeBase(typeof(string))
+public sealed class NotMatchAttribute(string pattern) : ValidationAttributeBase(typeof(string), MustCodes.Text.Pattern.Match)
 {
     /// <summary>Gets the regular expression pattern the value must not match.</summary>
     public string Pattern { get; } = pattern;
@@ -992,7 +993,7 @@ public sealed class NotMatchAttribute(string pattern) : ValidationAttributeBase(
 /// <seealso cref="MustStringClauses.NotAlphabetic"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotAlphabeticAttribute(char[]? inclusions = null) : ValidationAttributeBase(typeof(string))
+public sealed class NotAlphabeticAttribute(char[]? inclusions = null) : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.Alpha)
 {
     /// <summary>Gets additional characters that are allowed alongside non-alphabetic content.</summary>
     public char[]? Inclusions { get; } = inclusions;
@@ -1032,7 +1033,7 @@ public sealed class NotAlphabeticAttribute(char[]? inclusions = null) : Validati
 /// <seealso cref="MustStringClauses.NotAlphanumeric"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotAlphanumericAttribute(char[]? inclusions = null) : ValidationAttributeBase(typeof(string))
+public sealed class NotAlphanumericAttribute(char[]? inclusions = null) : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.Alphanumeric)
 {
     /// <summary>Gets additional characters that are allowed alongside non-alphanumeric content.</summary>
     public char[]? Inclusions { get; } = inclusions;
@@ -1072,7 +1073,7 @@ public sealed class NotAlphanumericAttribute(char[]? inclusions = null) : Valida
 /// <seealso cref="MustStringClauses.NotNumeric"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotNumericStringAttribute(char[]? inclusions = null) : ValidationAttributeBase(typeof(string))
+public sealed class NotNumericStringAttribute(char[]? inclusions = null) : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.Numeric)
 {
     /// <summary>Gets additional characters that are allowed alongside non-numeric content.</summary>
     public char[]? Inclusions { get; } = inclusions;
@@ -1112,7 +1113,7 @@ public sealed class NotNumericStringAttribute(char[]? inclusions = null) : Valid
 /// <seealso cref="MustStringClauses.ContainsWhitespace"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ContainsWhitespaceAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class ContainsWhitespaceAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotContainsWhitespace)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -1149,7 +1150,7 @@ public sealed class ContainsWhitespaceAttribute() : ValidationAttributeBase(type
 /// <seealso cref="MustStringClauses.NotContainsWhitespace"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotContainsWhitespaceAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotContainsWhitespaceAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.ContainsWhitespace)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -1186,7 +1187,7 @@ public sealed class NotContainsWhitespaceAttribute() : ValidationAttributeBase(t
 /// <seealso cref="MustStringClauses.ContainsControlChars"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ContainsControlCharsAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class ContainsControlCharsAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotContainsControl)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -1223,7 +1224,7 @@ public sealed class ContainsControlCharsAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustStringClauses.NotContainsControlChars"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotContainsControlCharsAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotContainsControlCharsAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.ContainsControl)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -1260,7 +1261,7 @@ public sealed class NotContainsControlCharsAttribute() : ValidationAttributeBase
 /// <seealso cref="MustStringClauses.ContainsAllowedOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ContainsAllowedOnlyAttribute(char[] allowedChars) : ValidationAttributeBase(typeof(string))
+public sealed class ContainsAllowedOnlyAttribute(char[] allowedChars) : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotSubset)
 {
     /// <summary>Gets the set of characters that are the only ones permitted in the value.</summary>
     public char[] AllowedChars { get; } = allowedChars;
@@ -1300,7 +1301,7 @@ public sealed class ContainsAllowedOnlyAttribute(char[] allowedChars) : Validati
 /// <seealso cref="MustStringClauses.NotContainsAllowedOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotContainsAllowedOnlyAttribute(char[] allowedChars) : ValidationAttributeBase(typeof(string))
+public sealed class NotContainsAllowedOnlyAttribute(char[] allowedChars) : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.Subset)
 {
     /// <summary>Gets the allowed character set; the value must contain at least one character outside it.</summary>
     public char[] AllowedChars { get; } = allowedChars;
@@ -1340,7 +1341,7 @@ public sealed class NotContainsAllowedOnlyAttribute(char[] allowedChars) : Valid
 /// <seealso cref="MustStringClauses.ContainsDisallowed"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ContainsDisallowedAttribute(char[] disallowedChars) : ValidationAttributeBase(typeof(string))
+public sealed class ContainsDisallowedAttribute(char[] disallowedChars) : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotContainsDisallowed)
 {
     /// <summary>Gets the set of disallowed characters; at least one must be present in the value.</summary>
     public char[] DisallowedChars { get; } = disallowedChars;
@@ -1380,7 +1381,7 @@ public sealed class ContainsDisallowedAttribute(char[] disallowedChars) : Valida
 /// <seealso cref="MustStringClauses.NotContainsDisallowed"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotContainsDisallowedAttribute(char[] disallowedChars) : ValidationAttributeBase(typeof(string))
+public sealed class NotContainsDisallowedAttribute(char[] disallowedChars) : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.ContainsDisallowed)
 {
     /// <summary>Gets the set of characters that must not appear in the value.</summary>
     public char[] DisallowedChars { get; } = disallowedChars;
@@ -1419,7 +1420,7 @@ public sealed class NotContainsDisallowedAttribute(char[] disallowedChars) : Val
 /// <seealso cref="MustStringClauses.ContainsAny"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ContainsAnyAttribute(char[] characters) : ValidationAttributeBase(typeof(string))
+public sealed class ContainsAnyAttribute(char[] characters) : ValidationAttributeBase(typeof(string), MustCodes.Text.Charset.NotContainsAny)
 {
     /// <summary>Gets the set of characters; at least one must appear in the value.</summary>
     public char[] Characters { get; } = characters;

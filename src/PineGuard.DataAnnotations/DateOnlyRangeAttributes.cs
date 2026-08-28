@@ -1,6 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -33,7 +34,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalDateOnlyRangeAttribute(Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange))
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Order.NotChronological)
 {
     /// <summary>Gets whether the range boundaries are included or excluded when evaluating the constraint.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -76,7 +77,7 @@ public sealed class ChronologicalDateOnlyRangeAttribute(Inclusion inclusion = In
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class OverlappingDateOnlyRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange))
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Overlap.Missing)
 {
     /// <summary>Gets the reference range that the annotated range must overlap.</summary>
     public DateOnlyRange Range2 { get; } = new(
@@ -124,7 +125,7 @@ public sealed class OverlappingDateOnlyRangeAttribute(string start2, string end2
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotOverlappingDateOnlyRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange))
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Overlap.Present)
 {
     /// <summary>Gets the reference range that the annotated range must not overlap.</summary>
     public DateOnlyRange Range2 { get; } = new(
@@ -170,7 +171,7 @@ public sealed class NotOverlappingDateOnlyRangeAttribute(string start2, string e
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ContainsDateOnlyRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange))
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Bounds.NotContains)
 {
     /// <summary>Gets the date that the annotated range must contain.</summary>
     public DateOnly Value { get; } = DateOnly.Parse(value, CultureInfo.InvariantCulture);
@@ -215,7 +216,7 @@ public sealed class ContainsDateOnlyRangeAttribute(string value, Inclusion inclu
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotContainsDateOnlyRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange))
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Bounds.Contains)
 {
     /// <summary>Gets the date that the annotated range must not contain.</summary>
     public DateOnly Value { get; } = DateOnly.Parse(value, CultureInfo.InvariantCulture);

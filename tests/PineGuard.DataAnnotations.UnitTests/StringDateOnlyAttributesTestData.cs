@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -11,7 +12,7 @@ public static class StringDateOnlyAttributesTestData
         {
             nameof(F.DateOnlyIsInPast.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be a date in the past.")
+            _ => new DataAnnotationExpected(false, "Value must be a date in the past.", Code: MustCodes.Date.Relative.NotPast)
         });
     }
 

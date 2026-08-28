@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.DataAnnotations;
@@ -26,7 +27,7 @@ public static class SqlDateTimeAttributesTestData
             get
             {
                 var td = F.IsInSqlDateRange.AllNonNullScenarios.ToDataAnnotationCases(s =>
-                    s.IsValid ? new DataAnnotationExpected(true) : new DataAnnotationExpected(false));
+                    s.IsValid ? new DataAnnotationExpected(true) : new DataAnnotationExpected(false, Code: MustCodes.Date.Sql.OutOfRange));
                 td.Add(new DataAnnotationCase(nameof(F.IsInSqlDateRange.NullValue), null, new DataAnnotationExpected(true)));
                 return td;
             }

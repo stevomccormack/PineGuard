@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -26,7 +27,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustNullClauses.Null{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NullAttribute() : ValidationAttributeBase(typeof(object), allowNull: true)
+public sealed class NullAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Value.State.NotNull, allowNull: true)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -68,7 +69,7 @@ public sealed class NullAttribute() : ValidationAttributeBase(typeof(object), al
 /// <seealso cref="MustNullClauses.NotNull{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotNullAttribute() : ValidationAttributeBase(typeof(object), allowNull: false)
+public sealed class NotNullAttribute() : ValidationAttributeBase(typeof(object), MustCodes.Value.State.Null, allowNull: false)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -95,7 +96,7 @@ public sealed class NotNullAttribute() : ValidationAttributeBase(typeof(object),
 /// value, constructor arguments, or the <see cref="ValidationContext"/> member.
 /// </para>
 /// </remarks>
-public abstract class ObjectAttributeBase() : ValidationAttributeBase(typeof(object), allowNull: false)
+public abstract class ObjectAttributeBase(string code) : ValidationAttributeBase(typeof(object), code, allowNull: false)
 {
     /// <summary>
     /// Invokes the named method on <see cref="MustObjectClauses"/> or
@@ -178,7 +179,7 @@ public abstract class ObjectAttributeBase() : ValidationAttributeBase(typeof(obj
 /// <seealso cref="MustDefaultEqualityClauses.Default{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class IsDefaultAttribute : ObjectAttributeBase
+public sealed class IsDefaultAttribute() : ObjectAttributeBase(MustCodes.Value.State.NotDefault)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -208,7 +209,7 @@ public sealed class IsDefaultAttribute : ObjectAttributeBase
 /// <seealso cref="MustDefaultEqualityClauses.NotDefault{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotDefaultAttribute : ObjectAttributeBase
+public sealed class NotDefaultAttribute() : ObjectAttributeBase(MustCodes.Value.State.Default)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
@@ -247,7 +248,7 @@ public sealed class NotDefaultAttribute : ObjectAttributeBase
 /// <seealso cref="MustObjectClauses.EqualTo{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EqualToAttribute(object comparisonValue) : ObjectAttributeBase
+public sealed class EqualToAttribute(object comparisonValue) : ObjectAttributeBase(MustCodes.Value.Equality.NotEqual)
 {
     /// <summary>Gets the value that the property must equal.</summary>
     public object ComparisonValue { get; } = comparisonValue;
@@ -284,7 +285,7 @@ public sealed class EqualToAttribute(object comparisonValue) : ObjectAttributeBa
 /// <seealso cref="MustObjectClauses.NotEqualTo{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotEqualToAttribute(object comparisonValue) : ObjectAttributeBase
+public sealed class NotEqualToAttribute(object comparisonValue) : ObjectAttributeBase(MustCodes.Value.Equality.Equal)
 {
     /// <summary>Gets the value that the property must not equal.</summary>
     public object ComparisonValue { get; } = comparisonValue;
@@ -319,7 +320,7 @@ public sealed class NotEqualToAttribute(object comparisonValue) : ObjectAttribut
 /// <seealso cref="MustObjectClauses.OfType{TTarget}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OfTypeAttribute(Type targetType) : ValidationAttributeBase(typeof(object), allowNull: false)
+public sealed class OfTypeAttribute(Type targetType) : ValidationAttributeBase(typeof(object), MustCodes.Value.Identity.WrongType, allowNull: false)
 {
     /// <summary>Gets the type that the property value must be an instance of.</summary>
     public Type TargetType { get; } = targetType;
@@ -357,7 +358,7 @@ public sealed class OfTypeAttribute(Type targetType) : ValidationAttributeBase(t
 /// <seealso cref="MustObjectClauses.NotOfType{TTarget}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/object">Object Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOfTypeAttribute(Type targetType) : ValidationAttributeBase(typeof(object), allowNull: false)
+public sealed class NotOfTypeAttribute(Type targetType) : ValidationAttributeBase(typeof(object), MustCodes.Value.Identity.SameType, allowNull: false)
 {
     /// <summary>Gets the type that the property value must not be an instance of.</summary>
     public Type TargetType { get; } = targetType;

@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.UriRulesFixtures;
@@ -12,7 +13,7 @@ public static class UriAttributesTestData
         {
             nameof(F.IsAbsoluteUri.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be a valid absolute URI.")
+            _ => new DataAnnotationExpected(false, "Value must be a valid absolute URI.", Code: MustCodes.Uri.Form.NotAbsolute)
         });
     }
 
@@ -22,7 +23,7 @@ public static class UriAttributesTestData
         {
             nameof(F.IsRelativeUri.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be a valid relative URI.")
+            _ => new DataAnnotationExpected(false, "Value must be a valid relative URI.", Code: MustCodes.Uri.Form.NotRelative)
         });
     }
 
@@ -32,7 +33,7 @@ public static class UriAttributesTestData
         {
             nameof(F.IsUrl.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be a valid URL.")
+            _ => new DataAnnotationExpected(false, "Value must be a valid URL.", Code: MustCodes.Uri.Form.NotUrl)
         });
     }
 
@@ -42,7 +43,7 @@ public static class UriAttributesTestData
         {
             nameof(F.IsHttpsUrl.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            nameof(F.IsHttpsUrl.HttpUrl) => new DataAnnotationExpected(false, "Value must be a valid HTTPS URL."),
+            nameof(F.IsHttpsUrl.HttpUrl) => new DataAnnotationExpected(false, "Value must be a valid HTTPS URL.", Code: MustCodes.Uri.Scheme.NotHttps),
             _ => new DataAnnotationExpected(false, "Value must be a valid URL.")
         });
     }
@@ -53,7 +54,7 @@ public static class UriAttributesTestData
         {
             nameof(F.IsHttpUrl.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            nameof(F.IsHttpUrl.HttpsUrl) => new DataAnnotationExpected(false, "Value must be a valid HTTP URL."),
+            nameof(F.IsHttpUrl.HttpsUrl) => new DataAnnotationExpected(false, "Value must be a valid HTTP URL.", Code: MustCodes.Uri.Scheme.NotHttp),
             _ => new DataAnnotationExpected(false, "Value must be a valid URL.")
         });
     }
@@ -64,7 +65,7 @@ public static class UriAttributesTestData
         {
             nameof(F.IsFileUri.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            nameof(F.IsFileUri.HttpsUrl) => new DataAnnotationExpected(false, "Value must be a valid file URI."),
+            nameof(F.IsFileUri.HttpsUrl) => new DataAnnotationExpected(false, "Value must be a valid file URI.", Code: MustCodes.Uri.Scheme.NotFile),
             _ => new DataAnnotationExpected(false, "Value must be a valid absolute URI.")
         });
     }
@@ -75,7 +76,7 @@ public static class UriAttributesTestData
         {
             nameof(F.IsFilePath.NullValue) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
-            _ => new DataAnnotationExpected(false, "Value must be a valid file path.")
+            _ => new DataAnnotationExpected(false, "Value must be a valid file path.", Code: MustCodes.Uri.FilePath.Invalid)
         });
     }
 
@@ -84,7 +85,7 @@ public static class UriAttributesTestData
         public static TheoryData<DataAnnotationCase> Cases => F.IsFilePath.AllScenarios.ToDataAnnotationCases(s => s.Name switch
         {
             nameof(F.IsFilePath.NullValue) => new DataAnnotationExpected(true),
-            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be a valid file path."),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be a valid file path.", Code: MustCodes.Uri.FilePath.WellFormed),
             _ => new DataAnnotationExpected(true)
         });
     }
@@ -99,7 +100,7 @@ public static class UriAttributesTestData
             {
                 nameof(F.HasScheme.NullValue) => new DataAnnotationExpected(true),
                 _ when s.IsValid => new DataAnnotationExpected(true),
-                _ => new DataAnnotationExpected(false, "Value must have the expected scheme.")
+                _ => new DataAnnotationExpected(false, "Value must have the expected scheme.", Code: MustCodes.Uri.Scheme.Mismatch)
             });
     }
 
@@ -112,7 +113,7 @@ public static class UriAttributesTestData
             .ToDataAnnotationCases(inputs => inputs.value, s => s.Name switch
             {
                 nameof(F.HasScheme.NullValue) => new DataAnnotationExpected(true),
-                _ when s.IsValid => new DataAnnotationExpected(false, "Value must not have the expected scheme."),
+                _ when s.IsValid => new DataAnnotationExpected(false, "Value must not have the expected scheme.", Code: MustCodes.Uri.Scheme.Match),
                 _ => new DataAnnotationExpected(true)
             });
     }

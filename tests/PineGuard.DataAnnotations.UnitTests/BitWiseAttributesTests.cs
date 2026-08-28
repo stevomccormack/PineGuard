@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.MustClauses;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
@@ -36,6 +37,7 @@ public sealed class BitWiseAttributesTests : BaseUnitTest
 
         var expectedMessage = mustResult.Message.Replace("{paramName}", DisplayName);
         Assert.Equal(expectedMessage, result!.ErrorMessage);
+        Assert.Equal(MustCodes.Bitwise.Equality.NotEqual, attribute.Code);
     }
 
     [Theory]
@@ -80,6 +82,7 @@ public sealed class BitWiseAttributesTests : BaseUnitTest
 
         var expectedMessage = mustResult.Message.Replace("{paramName}", DisplayName);
         Assert.Equal(expectedMessage, result!.ErrorMessage);
+        Assert.Equal(MustCodes.Bitwise.Equality.Equal, attribute.Code);
     }
 
     [Theory]
@@ -124,6 +127,7 @@ public sealed class BitWiseAttributesTests : BaseUnitTest
 
         var expectedMessage = mustResult.Message.Replace("{paramName}", DisplayName);
         Assert.Equal(expectedMessage, result!.ErrorMessage);
+        Assert.Equal(MustCodes.Bitwise.Bits.NotAllSet, attribute.Code);
     }
 
     [Theory]
@@ -168,6 +172,7 @@ public sealed class BitWiseAttributesTests : BaseUnitTest
 
         var expectedMessage = mustResult.Message.Replace("{paramName}", DisplayName);
         Assert.Equal(expectedMessage, result!.ErrorMessage);
+        Assert.Equal(MustCodes.Bitwise.Bits.NoneSet, attribute.Code);
     }
 
     [Theory]
@@ -212,6 +217,7 @@ public sealed class BitWiseAttributesTests : BaseUnitTest
 
         var expectedMessage = mustResult.Message.Replace("{paramName}", DisplayName);
         Assert.Equal(expectedMessage, result!.ErrorMessage);
+        Assert.Equal(MustCodes.Bitwise.Bits.AnySet, attribute.Code);
     }
 
     [Theory]
@@ -256,6 +262,7 @@ public sealed class BitWiseAttributesTests : BaseUnitTest
 
         var expectedMessage = mustResult.Message.Replace("{paramName}", DisplayName);
         Assert.Equal(expectedMessage, result!.ErrorMessage);
+        Assert.Equal(MustCodes.Bitwise.Bits.NotSubset, attribute.Code);
     }
 
     [Theory]
@@ -300,6 +307,7 @@ public sealed class BitWiseAttributesTests : BaseUnitTest
 
         var expectedMessage = mustResult.Message.Replace("{paramName}", DisplayName);
         Assert.Equal(expectedMessage, result!.ErrorMessage);
+        Assert.Equal(MustCodes.Bitwise.Value.NotPowerOfTwo, attribute.Code);
     }
 
     [Theory]
@@ -344,6 +352,7 @@ public sealed class BitWiseAttributesTests : BaseUnitTest
 
         var expectedMessage = mustResult.Message.Replace("{paramName}", DisplayName);
         Assert.Equal(expectedMessage, result!.ErrorMessage);
+        Assert.Equal(MustCodes.Bitwise.Value.PowerOfTwo, attribute.Code);
     }
 
     [Theory]

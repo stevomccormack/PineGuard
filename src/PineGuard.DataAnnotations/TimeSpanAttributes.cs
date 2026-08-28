@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -34,7 +35,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso href="https://pineguard.ai/docs/annotations/timespan">TimeSpan Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class DurationBetweenTimeSpanAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(TimeSpan))
+    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.OutOfRange)
 {
     /// <summary>Gets the lower duration boundary.</summary>
     public TimeSpan Min { get; } = TimeSpan.Parse(min, CultureInfo.InvariantCulture);
@@ -85,7 +86,7 @@ public sealed class NotDurationBetweenTimeSpanAttribute(
     string min,
     string max,
     Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(TimeSpan))
+    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.InRange)
 {
     /// <summary>Gets the lower duration boundary of the excluded range.</summary>
     public TimeSpan Min { get; } = TimeSpan.Parse(min, CultureInfo.InvariantCulture);
@@ -133,7 +134,7 @@ public sealed class NotDurationBetweenTimeSpanAttribute(
 /// <seealso href="https://pineguard.ai/docs/annotations/timespan">TimeSpan Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class GreaterThanTimeSpanAttribute(string threshold, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeSpan))
+    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.NotGreater)
 {
     /// <summary>Gets the lower threshold that the duration must exceed.</summary>
     public TimeSpan Threshold { get; } = TimeSpan.Parse(threshold, CultureInfo.InvariantCulture);
@@ -178,7 +179,7 @@ public sealed class GreaterThanTimeSpanAttribute(string threshold, Inclusion inc
 /// <seealso href="https://pineguard.ai/docs/annotations/timespan">TimeSpan Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class LessThanTimeSpanAttribute(string threshold, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeSpan))
+    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.NotLess)
 {
     /// <summary>Gets the upper threshold that the duration must be below.</summary>
     public TimeSpan Threshold { get; } = TimeSpan.Parse(threshold, CultureInfo.InvariantCulture);

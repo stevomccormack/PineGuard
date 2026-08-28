@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
 
@@ -29,7 +30,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustUriClauses.AbsoluteUri"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class AbsoluteUriAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class AbsoluteUriAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Uri.Form.NotAbsolute)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -65,7 +66,7 @@ public sealed class AbsoluteUriAttribute() : ValidationAttributeBase(typeof(stri
 /// <seealso cref="MustUriClauses.RelativeUri"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class RelativeUriAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class RelativeUriAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Uri.Form.NotRelative)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -105,7 +106,7 @@ public sealed class RelativeUriAttribute() : ValidationAttributeBase(typeof(stri
 /// <seealso cref="MustUriClauses.Url"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class WebUrlAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class WebUrlAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Uri.Form.NotUrl)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -142,7 +143,7 @@ public sealed class WebUrlAttribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustUriClauses.HttpsUrl"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HttpsUrlAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class HttpsUrlAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Uri.Scheme.NotHttps)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -180,7 +181,7 @@ public sealed class HttpsUrlAttribute() : ValidationAttributeBase(typeof(string)
 /// <seealso cref="MustUriClauses.HttpUrl"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HttpUrlAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class HttpUrlAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Uri.Scheme.NotHttp)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -215,7 +216,7 @@ public sealed class HttpUrlAttribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustUriClauses.FileUri"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FileUriAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class FileUriAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Uri.Scheme.NotFile)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -251,7 +252,7 @@ public sealed class FileUriAttribute() : ValidationAttributeBase(typeof(string))
 /// <seealso cref="MustUriClauses.FilePath"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FilePathAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class FilePathAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Uri.FilePath.Invalid)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -287,7 +288,7 @@ public sealed class FilePathAttribute() : ValidationAttributeBase(typeof(string)
 /// <seealso cref="MustUriClauses.NotFilePath"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotFilePathAttribute() : ValidationAttributeBase(typeof(string))
+public sealed class NotFilePathAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Uri.FilePath.WellFormed)
 {
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
@@ -323,7 +324,7 @@ public sealed class NotFilePathAttribute() : ValidationAttributeBase(typeof(stri
 /// <seealso cref="MustUriClauses.HasScheme"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasSchemeAttribute(string scheme) : ValidationAttributeBase(typeof(string))
+public sealed class HasSchemeAttribute(string scheme) : ValidationAttributeBase(typeof(string), MustCodes.Uri.Scheme.Mismatch)
 {
     /// <summary>Gets the URI scheme to match (e.g., <c>"https"</c>, <c>"ftp"</c>).</summary>
     public string Scheme { get; } = scheme;
@@ -363,7 +364,7 @@ public sealed class HasSchemeAttribute(string scheme) : ValidationAttributeBase(
 /// <seealso cref="MustUriClauses.NotHasScheme"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/uri">URI Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotHasSchemeAttribute(string scheme) : ValidationAttributeBase(typeof(string))
+public sealed class NotHasSchemeAttribute(string scheme) : ValidationAttributeBase(typeof(string), MustCodes.Uri.Scheme.Match)
 {
     /// <summary>Gets the URI scheme that the annotated value must not use.</summary>
     public string Scheme { get; } = scheme;

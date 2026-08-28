@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
@@ -17,7 +18,11 @@ public sealed class StringTimeSpanAttributesTests
     [MemberData(nameof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString.EdgeCases), MemberType = typeof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString))]
     [MemberData(nameof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString.InvalidCases), MemberType = typeof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString))]
     public void DurationBetweenTimeSpanString_ShouldReturnExpected(StringTimeSpanAttributesTestData.ValidCase testCase)
-        => Verify(new DurationBetweenTimeSpanStringAttribute("00:05:00", "02:00:00"), testCase);
+    {
+        var attribute = new DurationBetweenTimeSpanStringAttribute("00:05:00", "02:00:00");
+        Assert.Equal(MustCodes.Time.Duration.OutOfRange, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(StringTimeSpanAttributesTestData.GreaterThanTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.GreaterThanTimeSpanString))]
