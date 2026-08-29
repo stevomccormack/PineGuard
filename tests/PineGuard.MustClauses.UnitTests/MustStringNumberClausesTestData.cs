@@ -188,6 +188,13 @@ public static class MustStringNumberClausesTestData
         public static TheoryData<MustCase<(string? text, decimal min, decimal max, Inclusion inclusion)>> LettersCases => F.NumbersIsInRange.InvalidScenarios.Only(nameof(F.NumbersIsInRange.Letters)).ToMustCases(_ => new MustExpected(false, "value must not be between '1' and '10'.", Code: MustCodes.Number.Range.InRange));
     }
 
+    public static class Percentage
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.NumbersIsPercentage.AllValid.ToMustCases();
+        public static TheoryData<MustCase<string?>> InvalidCases => F.NumbersIsPercentage.AllInvalid.Except(nameof(F.NumbersIsPercentage.NullValue)).ToMustCases(_ => new MustExpected(false, "value must be a percentage between 0 and 100.", Code: MustCodes.Number.Range.NotPercentage));
+        public static TheoryData<MustCase<string?>> NullCases => F.NumbersIsPercentage.InvalidScenarios.Only(nameof(F.NumbersIsPercentage.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Number.Range.NotPercentage));
+    }
+
     public static class NotApproximately
     {
         public static TheoryData<MustCase<(string? text, decimal target, decimal? tolerance)>> ValidCases => F.NumbersIsApproximately.InvalidScenarios.Except(nameof(F.NumbersIsApproximately.Letters), nameof(F.NumbersIsApproximately.NullValue)).ToMustCases(_ => new MustExpected(true));
