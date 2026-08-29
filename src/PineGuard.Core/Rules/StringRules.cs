@@ -395,6 +395,51 @@ public static partial class StringRules
         return false;
     }
 
+    /// <summary>
+    /// Determines whether the specified string contains the given substring.
+    /// </summary>
+    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="substring">The substring to search for. An empty substring is always contained (BCL semantics).</param>
+    /// <param name="comparison">The comparison rule used to locate <paramref name="substring"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> contains <paramref name="substring"/>; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="substring"/> is <see langword="null"/>.</exception>
+    public static bool Contains(string? value, string substring, StringComparison comparison = StringComparison.Ordinal)
+    {
+        ThrowHelper.ThrowIfNull(substring);
+
+        return value is not null && value.Contains(substring, comparison);
+    }
+
+    /// <summary>
+    /// Determines whether the specified string starts with the given prefix.
+    /// </summary>
+    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="prefix">The prefix to test for. An empty prefix always matches (BCL semantics).</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="prefix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> starts with <paramref name="prefix"/>; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="prefix"/> is <see langword="null"/>.</exception>
+    public static bool StartsWith(string? value, string prefix, StringComparison comparison = StringComparison.Ordinal)
+    {
+        ThrowHelper.ThrowIfNull(prefix);
+
+        return value is not null && value.StartsWith(prefix, comparison);
+    }
+
+    /// <summary>
+    /// Determines whether the specified string ends with the given suffix.
+    /// </summary>
+    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="suffix">The suffix to test for. An empty suffix always matches (BCL semantics).</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="suffix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> ends with <paramref name="suffix"/>; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="suffix"/> is <see langword="null"/>.</exception>
+    public static bool EndsWith(string? value, string suffix, StringComparison comparison = StringComparison.Ordinal)
+    {
+        ThrowHelper.ThrowIfNull(suffix);
+
+        return value is not null && value.EndsWith(suffix, comparison);
+    }
+
     private static bool AllCharsAreAllowed(string value, Func<char, bool> allowedCharPredicate,
         char[]? additionalAllowedChars)
     {

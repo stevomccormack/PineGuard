@@ -197,4 +197,43 @@ public static class StringRulesTestData
         public sealed record InvalidCase(string Name, (string? Value, char[] DisallowedChars) Input, ExpectedException ExpectedException)
             : ThrowsCase<(string? Value, char[] DisallowedChars)>(Name, Input, ExpectedException);
     }
+
+    public static class Contains
+    {
+        public static TheoryData<RuleCase<(string? value, string substring, StringComparison comparison)>> Cases => F.Contains.AllScenarios.ToRuleCases();
+
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new("null substring", ("abc", null!), new ExpectedException(typeof(ArgumentNullException), "substring"))
+        ];
+
+        public sealed record InvalidCase(string Name, (string? Value, string Substring) Input, ExpectedException ExpectedException)
+            : ThrowsCase<(string? Value, string Substring)>(Name, Input, ExpectedException);
+    }
+
+    public static class StartsWith
+    {
+        public static TheoryData<RuleCase<(string? value, string prefix, StringComparison comparison)>> Cases => F.StartsWith.AllScenarios.ToRuleCases();
+
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new("null prefix", ("abc", null!), new ExpectedException(typeof(ArgumentNullException), "prefix"))
+        ];
+
+        public sealed record InvalidCase(string Name, (string? Value, string Prefix) Input, ExpectedException ExpectedException)
+            : ThrowsCase<(string? Value, string Prefix)>(Name, Input, ExpectedException);
+    }
+
+    public static class EndsWith
+    {
+        public static TheoryData<RuleCase<(string? value, string suffix, StringComparison comparison)>> Cases => F.EndsWith.AllScenarios.ToRuleCases();
+
+        public static TheoryData<InvalidCase> InvalidCases =>
+        [
+            new("null suffix", ("abc", null!), new ExpectedException(typeof(ArgumentNullException), "suffix"))
+        ];
+
+        public sealed record InvalidCase(string Name, (string? Value, string Suffix) Input, ExpectedException ExpectedException)
+            : ThrowsCase<(string? Value, string Suffix)>(Name, Input, ExpectedException);
+    }
 }
