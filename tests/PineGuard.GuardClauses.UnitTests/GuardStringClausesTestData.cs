@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
@@ -556,5 +557,47 @@ public static partial class GuardStringClausesTestData
             new(nameof(NoDisallowed), NoDisallowed, new GuardExpected(false, typeof(ArgumentException), "value")),
             new(nameof(NullValue), NullValue, new GuardExpected(false, typeof(ArgumentNullException), "value"))
         ];
+    }
+
+    // Guard.Against.NotContains — throws when value does NOT contain the substring (calls Must.Be.Contains)
+    public static class NotContains
+    {
+        public static TheoryData<GuardCase<(string? value, string substring, StringComparison comparison)>> ValidCases => F.Contains.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, string substring, StringComparison comparison)>> InvalidCases => F.Contains.InvalidScenarios.ToGuardCases(s => s.Inputs.value is null ? new GuardExpected(false, typeof(ArgumentNullException), "value", Code: MustCodes.Text.Content.NotContains) : new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Content.NotContains));
+    }
+
+    // Guard.Against.Contains — throws when value DOES contain the substring (calls Must.Be.NotContains)
+    public static class Contains
+    {
+        public static TheoryData<GuardCase<(string? value, string substring, StringComparison comparison)>> ValidCases => F.Contains.InvalidScenarios.Except(nameof(F.Contains.NullValue)).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, string substring, StringComparison comparison)>> InvalidCases => [.. F.Contains.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")), .. F.Contains.InvalidScenarios.Only(nameof(F.Contains.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value"))];
+    }
+
+    // Guard.Against.NotStartsWith — throws when value does NOT start with the prefix (calls Must.Be.StartsWith)
+    public static class NotStartsWith
+    {
+        public static TheoryData<GuardCase<(string? value, string prefix, StringComparison comparison)>> ValidCases => F.StartsWith.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, string prefix, StringComparison comparison)>> InvalidCases => F.StartsWith.InvalidScenarios.ToGuardCases(s => s.Inputs.value is null ? new GuardExpected(false, typeof(ArgumentNullException), "value") : new GuardExpected(false, typeof(ArgumentException), "value"));
+    }
+
+    // Guard.Against.StartsWith — throws when value DOES start with the prefix (calls Must.Be.NotStartsWith)
+    public static class StartsWith
+    {
+        public static TheoryData<GuardCase<(string? value, string prefix, StringComparison comparison)>> ValidCases => F.StartsWith.InvalidScenarios.Except(nameof(F.StartsWith.NullValue)).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, string prefix, StringComparison comparison)>> InvalidCases => [.. F.StartsWith.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")), .. F.StartsWith.InvalidScenarios.Only(nameof(F.StartsWith.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value"))];
+    }
+
+    // Guard.Against.NotEndsWith — throws when value does NOT end with the suffix (calls Must.Be.EndsWith)
+    public static class NotEndsWith
+    {
+        public static TheoryData<GuardCase<(string? value, string suffix, StringComparison comparison)>> ValidCases => F.EndsWith.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, string suffix, StringComparison comparison)>> InvalidCases => F.EndsWith.InvalidScenarios.ToGuardCases(s => s.Inputs.value is null ? new GuardExpected(false, typeof(ArgumentNullException), "value") : new GuardExpected(false, typeof(ArgumentException), "value"));
+    }
+
+    // Guard.Against.EndsWith — throws when value DOES end with the suffix (calls Must.Be.NotEndsWith)
+    public static class EndsWith
+    {
+        public static TheoryData<GuardCase<(string? value, string suffix, StringComparison comparison)>> ValidCases => F.EndsWith.InvalidScenarios.Except(nameof(F.EndsWith.NullValue)).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, string suffix, StringComparison comparison)>> InvalidCases => [.. F.EndsWith.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")), .. F.EndsWith.InvalidScenarios.Only(nameof(F.EndsWith.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value"))];
     }
 }
