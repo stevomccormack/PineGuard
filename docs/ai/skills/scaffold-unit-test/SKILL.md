@@ -23,11 +23,17 @@ Add **xUnit** tests for rules, must clauses, guard clauses, or utilities.
 > - **Coverage Spec**: `docs/ai/specs/testing/coverage.md`
 
 > [!IMPORTANT]
-> Two non-negotiables, both enforced in CI:
+> Two non-negotiables:
 > 1.  **`[Theory]` + `TheoryData` + `[MemberData]` only.** `[Fact]` and `[InlineData]` are disallowed.
-> 2.  **Inherit the layer-specific base class**, not `BaseUnitTest` directly:
->     `BaseRuleUnitTest`, `BaseMustUnitTest`, `BaseGuardUnitTest`, `BaseFluentUnitTest`,
->     `BaseDataAnnotationUnitTest`.
+>     CI-enforced (audit-cli Rule50).
+> 2.  **If you are testing one of the five existing layers, inherit its layer-specific base
+>     class**, not `BaseUnitTest` directly: `BaseRuleUnitTest`, `BaseMustUnitTest`,
+>     `BaseGuardUnitTest`, `BaseFluentUnitTest`, `BaseDataAnnotationUnitTest`. This is a
+>     convention, not currently CI-gated. **Exception**: a package outside the five layers (no
+>     layer base exists yet) correctly inherits `BaseUnitTest` directly — see
+>     `docs/ai/specs/testing/unit-test.md` §2.1's "(Other)" row. Do not apply rule 2 to a new
+>     adapter package and conclude `BaseUnitTest` is forbidden; it is exactly the shape a new
+>     package's tests should take when no layer base fits.
 
 ## 4. Execution Steps
 

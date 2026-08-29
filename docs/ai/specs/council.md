@@ -58,6 +58,7 @@ Every council session MUST satisfy all of:
 5. **Output schema fidelity** — the verdict is rendered in chat using exactly the five sections defined in §5 below, in that order, with those headings.
 6. **Length caps** — advisors 150–300 words; peer reviews under 200 words; "The One Thing to Do First" is a single action, not a list.
 7. **No side files by default** — do not write HTML, PDFs, or auxiliary documents. Transcripts are written only under the conditions in §6.
+8. **Model: Fable** — every sub-agent spawned by the council (the five advisors, the five peer reviewers, and the chairman) runs on the Fable model. The council exists specifically for judgment the orchestrating session should not make alone; Fable is this repo's designated high-reasoning tier for exactly that kind of call (`docs/ai/plans/new-surfaces-orchestration.md` §4), and using it uniformly across all eleven sub-agents keeps every voice — including the chairman reconciling them — at the same reasoning tier.
 
 ## 5. Output Structure (Chairman Verdict)
 

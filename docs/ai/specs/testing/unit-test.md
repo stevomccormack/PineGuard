@@ -52,6 +52,16 @@ Related specs in this folder:
   | Data Annotations | `BaseDataAnnotationUnitTest(output)` | `AssertResult(DataAnnotationCase, ValidationResult?)` |
   | (Other) | `BaseUnitTest(output)` | — |
 
+  **"(Other)" means a package outside the five layers above — a new adapter package with no
+  layer base of its own (e.g. `PineGuard.Extensions.Options`, `PineGuard.AspNetCore`).** Such a
+  project inherits `BaseUnitTest` directly, defines a project-local `XxxExpected` (extending
+  `ReturnExpected`/`ThrowExpected`) and `XxxCase` (extending `ReturnCase<,>`) pair for the result
+  type it asserts, and keeps that pair in the test project rather than promoting it into
+  `PineGuard.Testing` — promotion only happens once a second project needs the same family (§3
+  rule 1 of `docs/ai/specs/testing/project.md`). Precedent: `tests/PineGuard.DataAnnotations.UnitTests/ThrowsCase.cs`.
+  This is the only case where inheriting `BaseUnitTest` directly is correct; every one of the
+  five layers above always uses its own base class.
+
   All classes use **primary constructor** syntax, with the inheritance clause wrapped per §1:
   ```csharp
   public sealed class BoolRulesTests(ITestOutputHelper output)

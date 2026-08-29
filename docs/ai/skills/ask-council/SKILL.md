@@ -26,6 +26,7 @@ Adapted from Karpathy's LLM Council methodology. Five advisor archetypes (Contra
 > 5. **Chairman may overrule the majority.** If a minority argument is strongest, the chairman sides with it and explains why.
 > 6. **Present the verdict in chat.** Do not generate HTML reports or side files unless the user asked to save the transcript.
 > 7. **Respect scope containment.** Context enrichment (Step 1A) is capped at 30 seconds and 2–3 highly relevant files; do not read the whole repo.
+> 8. **Every sub-agent runs on Fable.** Advisors (Step 2), reviewers (Step 3), and the chairman (Step 4) — all eleven — use the Fable model. See `docs/ai/specs/council.md` §4 invariant 8.
 
 ## 4. Execution Steps
 
@@ -47,16 +48,16 @@ If the question is too vague to frame, ask **one** clarifying question, then pro
 
 Save the framed question — it is reused verbatim in Steps 2, 3, and 4.
 
-### Step 2 — Convene the Council (5 sub-agents in parallel)
+### Step 2 — Convene the Council (5 sub-agents in parallel, model: Fable)
 
-Spawn five sub-agents in a single batched tool call. Each receives:
+Spawn five Fable-model sub-agents in a single batched tool call. Each receives:
 1. Its advisor identity and thinking style from [`docs/ai/roles/council.md`](../../roles/council.md)
 2. The framed question
 3. The instruction to lean fully into its angle (150–300 words, no preamble, no hedging)
 
 Template: see [`references/README.md`](references/README.md) "Advisor Prompt".
 
-### Step 3 — Peer Review (5 sub-agents in parallel, anonymized)
+### Step 3 — Peer Review (5 sub-agents in parallel, anonymized, model: Fable)
 
 1. Assign the five advisor responses to letters `A`–`E` using a random permutation. Record the mapping privately.
 2. Spawn five reviewer sub-agents in a single batched tool call. Each sees all five anonymized responses and answers:
@@ -66,9 +67,9 @@ Template: see [`references/README.md`](references/README.md) "Advisor Prompt".
 
 Template: see [`references/README.md`](references/README.md) "Reviewer Prompt".
 
-### Step 4 — Chairman Synthesis
+### Step 4 — Chairman Synthesis (model: Fable)
 
-Spawn a single chairman sub-agent with: the framed question, all five de-anonymized advisor responses, and all five peer reviews. It produces the verdict using the exact five-section structure defined in [`docs/ai/specs/council.md`](../../specs/council.md).
+Spawn a single Fable-model chairman sub-agent with: the framed question, all five de-anonymized advisor responses, and all five peer reviews. It produces the verdict using the exact five-section structure defined in [`docs/ai/specs/council.md`](../../specs/council.md).
 
 Template: see [`references/README.md`](references/README.md) "Chairman Prompt".
 
