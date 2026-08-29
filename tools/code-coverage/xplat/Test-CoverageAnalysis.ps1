@@ -97,8 +97,12 @@ $defaultSourcePrefix = 'src\PineGuard.Core'
 switch ($Scope) {
     'All' {
         if (-not $IncludeFileRegex) {
-            $allNamesAlternation = (Get-PineGuardScope -All | ForEach-Object Name) -join '|'
-            $IncludeFileRegex = "^(src|tests)[/\\]+PineGuard\.($allNamesAlternation)[/\\]+"
+            # 'All' = the union of the seven per-scope path filters. Each PathIncludeRegex is
+            # self-anchored (^src... / ^tests...), so a plain '|' join is the exact aggregate —
+            # and scopes whose folder is not 'PineGuard.<Name>' (Options ->
+            # PineGuard.Extensions.Options) stay correct because the registry regex, not the
+            # scope Name, is the source.
+            $IncludeFileRegex = (Get-PineGuardScope -All | ForEach-Object PathIncludeRegex) -join '|'
         }
         if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
         $defaultSourcePrefix = (Get-PineGuardScope -Name 'Core').DefaultSourcePrefix
