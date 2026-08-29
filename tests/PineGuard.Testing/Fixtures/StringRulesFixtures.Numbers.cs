@@ -167,6 +167,29 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? text, decimal min, decimal max, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
+    public static class NumbersIsPercentage
+    {
+        public static readonly string? Midpoint = "50";
+        public static readonly string? Fractional = "99.99";
+        public static readonly string? Padded = " 50 ";
+        public static readonly string? AtMin = "0";
+        public static readonly string? AtMax = "100";
+        public static readonly string? BelowMin = "-0.01";
+        public static readonly string? AboveMax = "100.01";
+        public static readonly string? Negative = "-1";
+        public static readonly string? AboveHundred = "101";
+        public static readonly string? NullValue = null;
+        public static readonly string? Letters = "abc";
+
+        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(Midpoint), Midpoint, true), new(nameof(Fractional), Fractional, true), new(nameof(Padded), Padded, true)];
+        public static RuleScenario<string?>[] ValidEdgeScenarios => [new(nameof(AtMin), AtMin, true), new(nameof(AtMax), AtMax, true)];
+        public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(Negative), Negative, false), new(nameof(AboveHundred), AboveHundred, false), new(nameof(NullValue), NullValue, false), new(nameof(Letters), Letters, false)];
+        public static RuleScenario<string?>[] InvalidEdgeScenarios => [new(nameof(BelowMin), BelowMin, false), new(nameof(AboveMax), AboveMax, false)];
+        public static RuleScenario<string?>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<string?>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<string?>[] AllScenarios => [.. AllValid, .. AllInvalid];
+    }
+
     public static class NumbersIsApproximately
     {
         public static readonly (string? text, decimal target, decimal? tolerance) WithinTolerance = ("10.0", 10.1m, 0.2m);

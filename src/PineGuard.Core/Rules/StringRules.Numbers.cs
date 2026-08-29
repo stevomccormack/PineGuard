@@ -126,6 +126,16 @@ public static partial class StringRules
             StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsInRange(parsed, min, max, inclusion);
 
         /// <summary>
+        /// Determines whether the specified string parses to a percentage — between
+        /// <see cref="NumberRules.MinPercentage"/> and <see cref="NumberRules.MaxPercentage"/> inclusive.
+        /// </summary>
+        /// <param name="value">The value to validate. If <see langword="null"/> or not a valid number, returns <see langword="false"/>.</param>
+        /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
+        /// <returns><see langword="true"/> if the parsed value is within 0–100; otherwise, <see langword="false"/>.</returns>
+        public static bool IsPercentage(string? value, NumberStyles styles = DefaultStyles) =>
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsPercentage<decimal>(parsed);
+
+        /// <summary>
         /// Determines whether the specified string parses to a number approximately equal to <paramref name="target"/>.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid number, returns <see langword="false"/>.</param>

@@ -128,6 +128,17 @@ public sealed class StringRulesNumbersTests(ITestOutputHelper output) : BaseRule
     }
 
     [Theory]
+    [MemberData(nameof(StringRulesNumbersTestData.IsPercentage.Cases), MemberType = typeof(StringRulesNumbersTestData.IsPercentage))]
+    public void IsPercentage_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.Numbers.IsPercentage(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(StringRulesNumbersTestData.IsApproximately.Cases), MemberType = typeof(StringRulesNumbersTestData.IsApproximately))]
     public void IsApproximately_BehavesAsExpected(RuleCase<(string? text, decimal target, decimal? tolerance)> tc)
     {
