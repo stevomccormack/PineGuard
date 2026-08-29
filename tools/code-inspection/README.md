@@ -64,7 +64,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-down.ps1
 
 | Parameter | Default | Description |
 |---|---|---|
-| `-Scope` | `Core` | `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`, `All` |
+| `-Scope` | `Core` | `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `Testing`, `All` |
 | `-Clean` | `$false` | Delete previous results before scanning |
 | `-OpenReport` | `$false` | Open HTML report in browser after scan |
 | `-ShowReport` | `$false` | Show inline SARIF summary after scan |
@@ -88,6 +88,7 @@ Each scope maps to a dedicated `.slnx` file and Qodana config. Per-scope solutio
 | `GuardClauses` | `tools/code-inspection/qodana/config/qodana.guard-clauses.yaml` |
 | `FluentValidation` | `tools/code-inspection/qodana/config/qodana.fluent-validation.yaml` |
 | `DataAnnotations` | `tools/code-inspection/qodana/config/qodana.data-annotations.yaml` |
+| `Options` | `tools/code-inspection/qodana/config/qodana.options.yaml` |
 | `Testing` | `tools/code-inspection/qodana/config/qodana.testing.yaml` |
 | `All` | `tools/code-inspection/qodana/config/qodana.all.yaml` |
 

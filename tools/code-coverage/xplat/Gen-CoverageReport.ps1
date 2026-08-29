@@ -36,7 +36,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release')] [string] $Configuration = 'Debug',
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'All', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'All', 'Testing')] [string] $Scope = 'Core',
     [switch] $Clean,
     [switch] $NoOpen,
     [switch] $SkipHtml,
@@ -82,7 +82,7 @@ function Test-CoverageLooksValid {
     }
 
     $repoRootForScopeCheck = Get-RepoRoot
-    $scopeRegistryEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Testing')) {
+    $scopeRegistryEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'Testing')) {
         Get-PineGuardScope -Name $Scope
     }
     else {
@@ -109,8 +109,13 @@ function Test-CoverageLooksValid {
         "(?i)(^|[\\/])($scopePrefixFolder[\\/]+)?$([regex]::Escape($scopeLeaf))[\\/]"
     }
     else {
-        $allNamesAlternation = (Get-PineGuardScope -All | ForEach-Object Name) -join '|'
-        "(?i)(^|[\\/])((src|tests)[\\/]+)?PineGuard\.($allNamesAlternation)[\\/]"
+        # Aggregate scopes: same derivation as the per-scope branch above — the real folder
+        # leaf from SourceDir (Name is not always the folder suffix: Options ->
+        # PineGuard.Extensions.Options). PathIncludeRegex is not reusable here: it is
+        # ^-anchored for repo-relative paths, and this pattern runs against raw report
+        # content where paths appear mid-string.
+        $allFolderLeaves = (Get-PineGuardScope -All | ForEach-Object { [regex]::Escape((Split-Path $_.SourceDir -Leaf)) }) -join '|'
+        "(?i)(^|[\\/])((src|tests)[\\/]+)?($allFolderLeaves)[\\/]"
     }
 
     if ($false) {
@@ -146,7 +151,7 @@ if ($Clean) {
 Ensure-Directory -Path $generatedRoot
 Ensure-Directory -Path $resultsRoot
 
-$generateScopeEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Testing')) {
+$generateScopeEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'Testing')) {
     Get-PineGuardScope -Name $Scope
 }
 else {

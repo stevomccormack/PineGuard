@@ -56,6 +56,7 @@ $paths = @(
     'src/PineGuard.GuardClauses/AGENTS.md',
     'src/PineGuard.FluentValidation/AGENTS.md',
     'src/PineGuard.DataAnnotations/AGENTS.md',
+    'src/PineGuard.Extensions.Options/AGENTS.md',
     'tests/AGENTS.md',
     'tools/AGENTS.md',
     'tools/code-diagnostics/AGENTS.md',

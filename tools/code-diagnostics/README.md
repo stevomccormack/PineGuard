@@ -27,7 +27,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-Comp
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `-Scope` | ValidateSet | `All` | `All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing` |
+| `-Scope` | ValidateSet | `All` | `All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `Testing` |
 | `-Filter` | string | _(none)_ | Regex pattern to filter warning codes (e.g. `CS86`, `CS0618`) |
 | `-OutputFormat` | ValidateSet | `Text` | `Text` (human-readable) or `Json` (structured) |
 | `-Configuration` | ValidateSet | `Debug` | `Debug` or `Release` |

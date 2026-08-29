@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>IValidateOptions&lt;T&gt; for configuration validated by PineGuard. AddOptions&lt;T&gt;().ValidateMustRules().ValidateOnStart() fails fast at host start with every violation listed.</Description>
+    <PackageTags>$(PackageTags);options;configuration;ioptions;validateonstart;startup-validation</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.Extensions.Options.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
+    <ProjectReference Include="..\PineGuard.MustClauses\PineGuard.MustClauses.csproj" />
+  </ItemGroup>
+
+</Project>
