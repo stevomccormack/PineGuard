@@ -83,7 +83,7 @@ same PR/commit that closes the unit out.** A tracker that lags reality is worse 
 | Phase 1 (1a–1d) | **Done** | `feature/structural-validation` (removed) | `357ab00` | All four sub-units shipped together, not as separate PRs — see Plan 01's archive banner |
 | Track 0 | **Done** | `feature/tooling-scope-registry` (removed) | `7ffaf40` | `Get-PineGuardScope` registry; unblocks 2, 3-PR1, 4-bridges, 6 |
 | CI coverage gate → 100% | **Done** | — | `18d7890` | Verified via live CI re-run (job `99088572473`), not assumed |
-| **2 — Options** | In progress — W1/W2 scaffolding done, fix pass running | `feature/options` (synced with `origin/main`, local commit `925dfbc`) | — (local only, not pushed) | W1/W2 landed but an independent Opus verification found real gaps before merge: no package `README.md`/`AGENTS.md` (broke `dotnet pack` and `Commit-Agent.ps1`), `ci.yml` wiring genuinely missing (§8.2, in scope per Plan 02 §3.4), and a latent Track-0 registry defect (`-Scope All`'s aggregate regex is built from scope `Name`, not the real folder path, so it silently never matches `PineGuard.Extensions.Options`). A fix-and-reverify workflow is running to close all of these before W3 (real feature code) starts on top of it. **Do not build on this worktree until the reverify pass confirms clean.** |
+| **2 — Options** | **W1/W2 done and independently verified** — ready for W3 | `feature/options` (synced with `origin/main` through `419d24c`; local commits `925dfbc`, `3877538`, `75a37c7`, `ac26f71`) | — (local only, not pushed) | Scaffolding (Plan 00 §8.1–8.3) is genuinely gate-clean: `dotnet build`/`pack` both succeed, `ci.yml` wired, the Track-0 `-Scope All` registry defect fixed and manually regex-traced correct (not just re-run), Rule13 root added, decision-log rows added to §12/§8.3. Package has zero `.cs` files yet by design — W3 is the actual feature implementation. Two independent verification passes were needed to get here (see §7 lesson on the interrupted first one) — trust the second, not the first. |
 | **4-bridges** | Not started | none yet | — | Blocked on owner decision D1 (scope) before opening |
 | **3-PR1 — async + DI** | Not started | none yet | — | Blocked on owner decision D4 (FV adapter scanner in/out of scope) before opening |
 | **3-PR2 — AspNetCore** | Not started | none yet | — | Hard-depends on 3-PR1 merged; 1d dependency already satisfied; decision D3 gates its W7 only |
@@ -321,6 +321,17 @@ a product-surface commitment rather than a naming/implementation detail:
   not fresh at each step — a run in flight when a variable changes still uses the old value.
   Verify a variable change with a genuinely new run (`gh run rerun` after the change), not the
   run that happened to be executing when you made it.
+- **A background workflow can die mid-flight with no error and no notification** — a session-level
+  disruption (observed cause: a permission-mode change) silently killed a workflow's final agent
+  after its prior stage had already committed real changes. The task-status tool later reported
+  "no task found," which reads exactly like "already handled" but is not the same thing. The tell
+  was checking the workflow's own `journal.jsonl` directly: the interrupted agent had a `started`
+  event with no matching `result` event. **Lesson**: when a background task's status becomes
+  ambiguous (silence, a stale ID, an unexpected "not found"), verify from the transcript/journal on
+  disk before trusting either "it must have finished" or "it must still be running" — and never
+  treat a prior stage's self-reported success as the checkpoint's actual verification if the
+  independent-verification stage itself didn't provably run. Re-dispatching the missing
+  verification from scratch is cheap; shipping on an unverified self-report is not.
 - The union-merge file set (Plan 00 §10.3) conflicts trivially and resolves by taking both
   sides; merge `origin/main` into a unit's worktree before every PR; never rebase a pushed branch.
 
