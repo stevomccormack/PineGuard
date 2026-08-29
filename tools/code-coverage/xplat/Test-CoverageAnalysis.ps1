@@ -48,7 +48,7 @@
 [CmdletBinding()]
 param(
     [ValidateRange(1, 500)] [int] $Top = 30,
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
     [string] $IncludeFileRegex,
     [string] $ExcludeFileRegex,
     [string] $IncludeClassNameRegex,

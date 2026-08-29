@@ -47,6 +47,7 @@ param(
         'PineGuard.GuardClauses',
         'PineGuard.FluentValidation',
         'PineGuard.DataAnnotations',
+        'PineGuard.Extensions.Options',
         'PineGuard.Testing'
     ),
     [switch] $All,

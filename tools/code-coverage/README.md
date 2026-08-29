@@ -61,7 +61,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-
 
 Generates fresh coverage output by:
 
-- discovering runnable unit test projects under `tests/**/*.UnitTests.csproj` (or narrowed to a single project for `-Scope Core|MustClauses|GuardClauses|DataAnnotations|FluentValidation|Testing` for speed)
+- discovering runnable unit test projects under `tests/**/*.UnitTests.csproj` (or narrowed to a single project for `-Scope Core|MustClauses|GuardClauses|DataAnnotations|FluentValidation|Options|Testing` for speed)
 - running `dotnet test` with `--collect:"XPlat Code Coverage"`
 - generating a scope-specific runsettings file under `artifacts/code-coverage/xplat/coverlet.<Scope>.runsettings`
 - producing HTML under `artifacts/code-coverage/xplat/html`
