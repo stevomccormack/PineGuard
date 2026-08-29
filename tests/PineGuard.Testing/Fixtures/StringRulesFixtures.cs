@@ -329,4 +329,46 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, char[] disallowedChars)>[] InvalidScenarios => [new(nameof(NoDisallowed), NoDisallowed, false), new(nameof(NullValue), NullValue, false)];
         public static RuleScenario<(string? value, char[] disallowedChars)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
+
+    public static class Contains
+    {
+        public static readonly (string? value, string substring, StringComparison comparison) Present = ("hello world", "lo wo", StringComparison.Ordinal);
+        public static readonly (string? value, string substring, StringComparison comparison) PresentIgnoringCase = ("Hello World", "LO WO", StringComparison.OrdinalIgnoreCase);
+        public static readonly (string? value, string substring, StringComparison comparison) EmptySubstring = ("hello world", "", StringComparison.Ordinal);
+        public static readonly (string? value, string substring, StringComparison comparison) Absent = ("hello world", "planet", StringComparison.Ordinal);
+        public static readonly (string? value, string substring, StringComparison comparison) CaseMismatch = ("Hello World", "LO WO", StringComparison.Ordinal);
+        public static readonly (string? value, string substring, StringComparison comparison) NullValue = (null, "lo wo", StringComparison.Ordinal);
+
+        public static RuleScenario<(string? value, string substring, StringComparison comparison)>[] ValidScenarios => [new(nameof(Present), Present, true), new(nameof(PresentIgnoringCase), PresentIgnoringCase, true), new(nameof(EmptySubstring), EmptySubstring, true)];
+        public static RuleScenario<(string? value, string substring, StringComparison comparison)>[] InvalidScenarios => [new(nameof(Absent), Absent, false), new(nameof(CaseMismatch), CaseMismatch, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<(string? value, string substring, StringComparison comparison)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class StartsWith
+    {
+        public static readonly (string? value, string prefix, StringComparison comparison) Prefixed = ("hello world", "hello", StringComparison.Ordinal);
+        public static readonly (string? value, string prefix, StringComparison comparison) PrefixedIgnoringCase = ("Hello World", "HELLO", StringComparison.OrdinalIgnoreCase);
+        public static readonly (string? value, string prefix, StringComparison comparison) EmptyPrefix = ("hello world", "", StringComparison.Ordinal);
+        public static readonly (string? value, string prefix, StringComparison comparison) Absent = ("hello world", "world", StringComparison.Ordinal);
+        public static readonly (string? value, string prefix, StringComparison comparison) CaseMismatch = ("Hello World", "HELLO", StringComparison.Ordinal);
+        public static readonly (string? value, string prefix, StringComparison comparison) NullValue = (null, "hello", StringComparison.Ordinal);
+
+        public static RuleScenario<(string? value, string prefix, StringComparison comparison)>[] ValidScenarios => [new(nameof(Prefixed), Prefixed, true), new(nameof(PrefixedIgnoringCase), PrefixedIgnoringCase, true), new(nameof(EmptyPrefix), EmptyPrefix, true)];
+        public static RuleScenario<(string? value, string prefix, StringComparison comparison)>[] InvalidScenarios => [new(nameof(Absent), Absent, false), new(nameof(CaseMismatch), CaseMismatch, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<(string? value, string prefix, StringComparison comparison)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class EndsWith
+    {
+        public static readonly (string? value, string suffix, StringComparison comparison) Suffixed = ("hello world", "world", StringComparison.Ordinal);
+        public static readonly (string? value, string suffix, StringComparison comparison) SuffixedIgnoringCase = ("Hello World", "WORLD", StringComparison.OrdinalIgnoreCase);
+        public static readonly (string? value, string suffix, StringComparison comparison) EmptySuffix = ("hello world", "", StringComparison.Ordinal);
+        public static readonly (string? value, string suffix, StringComparison comparison) Absent = ("hello world", "hello", StringComparison.Ordinal);
+        public static readonly (string? value, string suffix, StringComparison comparison) CaseMismatch = ("Hello World", "WORLD", StringComparison.Ordinal);
+        public static readonly (string? value, string suffix, StringComparison comparison) NullValue = (null, "world", StringComparison.Ordinal);
+
+        public static RuleScenario<(string? value, string suffix, StringComparison comparison)>[] ValidScenarios => [new(nameof(Suffixed), Suffixed, true), new(nameof(SuffixedIgnoringCase), SuffixedIgnoringCase, true), new(nameof(EmptySuffix), EmptySuffix, true)];
+        public static RuleScenario<(string? value, string suffix, StringComparison comparison)>[] InvalidScenarios => [new(nameof(Absent), Absent, false), new(nameof(CaseMismatch), CaseMismatch, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<(string? value, string suffix, StringComparison comparison)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
 }

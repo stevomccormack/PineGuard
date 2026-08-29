@@ -356,4 +356,82 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
         // Assert
         ThrowsCaseAssert.Expected(ex, testCase);
     }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.Contains.Cases), MemberType = typeof(StringRulesTestData.Contains))]
+    public void Contains_BehavesAsExpected(RuleCase<(string? value, string substring, StringComparison comparison)> tc)
+    {
+        // Arrange
+        var (value, substring, comparison) = tc.Value;
+
+        // Act
+        var result = PineGuard.Rules.StringRules.Contains(value, substring, comparison);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.Contains.InvalidCases), MemberType = typeof(StringRulesTestData.Contains))]
+    public void Contains_Throws_WhenSubstringNull(StringRulesTestData.Contains.InvalidCase testCase)
+    {
+        // Act
+        var ex = Assert.Throws(testCase.ExpectedException.Type,
+            () => PineGuard.Rules.StringRules.Contains(testCase.Input.Value, testCase.Input.Substring));
+
+        // Assert
+        ThrowsCaseAssert.Expected(ex, testCase);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.StartsWith.Cases), MemberType = typeof(StringRulesTestData.StartsWith))]
+    public void StartsWith_BehavesAsExpected(RuleCase<(string? value, string prefix, StringComparison comparison)> tc)
+    {
+        // Arrange
+        var (value, prefix, comparison) = tc.Value;
+
+        // Act
+        var result = PineGuard.Rules.StringRules.StartsWith(value, prefix, comparison);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.StartsWith.InvalidCases), MemberType = typeof(StringRulesTestData.StartsWith))]
+    public void StartsWith_Throws_WhenPrefixNull(StringRulesTestData.StartsWith.InvalidCase testCase)
+    {
+        // Act
+        var ex = Assert.Throws(testCase.ExpectedException.Type,
+            () => PineGuard.Rules.StringRules.StartsWith(testCase.Input.Value, testCase.Input.Prefix));
+
+        // Assert
+        ThrowsCaseAssert.Expected(ex, testCase);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.EndsWith.Cases), MemberType = typeof(StringRulesTestData.EndsWith))]
+    public void EndsWith_BehavesAsExpected(RuleCase<(string? value, string suffix, StringComparison comparison)> tc)
+    {
+        // Arrange
+        var (value, suffix, comparison) = tc.Value;
+
+        // Act
+        var result = PineGuard.Rules.StringRules.EndsWith(value, suffix, comparison);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.EndsWith.InvalidCases), MemberType = typeof(StringRulesTestData.EndsWith))]
+    public void EndsWith_Throws_WhenSuffixNull(StringRulesTestData.EndsWith.InvalidCase testCase)
+    {
+        // Act
+        var ex = Assert.Throws(testCase.ExpectedException.Type,
+            () => PineGuard.Rules.StringRules.EndsWith(testCase.Input.Value, testCase.Input.Suffix));
+
+        // Assert
+        ThrowsCaseAssert.Expected(ex, testCase);
+    }
 }
