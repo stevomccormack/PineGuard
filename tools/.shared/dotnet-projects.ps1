@@ -13,8 +13,9 @@ $ErrorActionPreference = 'Stop'
 function Get-PineGuardScope {
     <#
     .SYNOPSIS
-        Returns the per-scope path/identifier registry entry (or entries) for the six named
-        PineGuard scopes: Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Testing.
+        Returns the per-scope path/identifier registry entry (or entries) for the seven named
+        PineGuard scopes: Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation,
+        Testing, Options.
 
     .DESCRIPTION
         Centralises the per-scope source directory, project paths, coverage include pattern,
@@ -24,24 +25,23 @@ function Get-PineGuardScope {
 
         'All' (the aggregate pseudo-scope) and 'Custom' (Test-CoverageAnalysis.ps1 only) are
         NOT registry entries — callers that need the aggregate keep handling those cases
-        specially, using -All to enumerate the six real entries in a stable order
-        (Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Testing).
+        specially, using -All to enumerate the seven real entries in a stable order
+        (Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options, Testing).
 
-        Adding a new scope (e.g. Phase 2's Options) means adding one entry here plus one
-        ValidateSet token per consumer script — ValidateSet attributes must stay literal
-        (PowerShell requires compile-time constants), so the six/seven scope names are
-        necessarily still spelled out there too.
+        Adding a new scope means adding one entry here plus one ValidateSet token per consumer
+        script — ValidateSet attributes must stay literal (PowerShell requires compile-time
+        constants), so the scope names are necessarily still spelled out there too.
 
     .PARAMETER Name
-        One of the six scope names. Returns the single matching registry entry.
+        One of the seven scope names. Returns the single matching registry entry.
 
     .PARAMETER All
-        Returns all six registry entries, in the stable order used to build 'All' aggregates.
+        Returns all seven registry entries, in the stable order used to build 'All' aggregates.
     #>
     [CmdletBinding(DefaultParameterSetName = 'One')]
     param(
         [Parameter(Mandatory, ParameterSetName = 'One', Position = 0)]
-        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Testing')]
+        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'Testing')]
         [string] $Name,
 
         [Parameter(Mandatory, ParameterSetName = 'All')]
@@ -116,6 +116,19 @@ function Get-PineGuardScope {
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.fluent-validation.yaml'
             QodanaSlug               = 'fluent-validation'
             IncludeEmptyTestProjects = $true
+        }
+        Options           = [pscustomobject]@{
+            Name                     = 'Options'
+            SourceDir                = 'src\PineGuard.Extensions.Options'
+            SourceCsproj             = 'src\PineGuard.Extensions.Options\PineGuard.Extensions.Options.csproj'
+            TestCsproj               = 'tests\PineGuard.Extensions.Options.UnitTests\PineGuard.Extensions.Options.UnitTests.csproj'
+            DefaultProjectFilter     = 'PineGuard.Extensions.Options.UnitTests.csproj'
+            CoverageIncludePattern   = '[PineGuard.Extensions.Options]*'
+            PathIncludeRegex         = '^src[/\\]+PineGuard\.Extensions\.Options[/\\]+'
+            DefaultSourcePrefix      = 'src\PineGuard.Extensions.Options'
+            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.options.yaml'
+            QodanaSlug               = 'options'
+            IncludeEmptyTestProjects = $false
         }
         Testing           = [pscustomobject]@{
             Name                     = 'Testing'

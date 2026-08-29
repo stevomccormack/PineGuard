@@ -15,6 +15,7 @@ tools/git/
 ├── Commit-FluentValidation.ps1  # Scoped commit: PineGuard.FluentValidation
 ├── Commit-GuardClauses.ps1      # Scoped commit: PineGuard.GuardClauses
 ├── Commit-MustClauses.ps1       # Scoped commit: PineGuard.MustClauses
+├── Commit-Options.ps1           # Scoped commit: PineGuard.Extensions.Options
 ├── Commit-Solution.ps1          # Scoped commit: solution-level files
 ├── Commit-Testing.ps1           # Scoped commit: PineGuard.Testing
 └── Commit-Tools.ps1             # Scoped commit: tools/
@@ -64,6 +65,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -All -
 | `-GuardClauses` | Include PineGuard.GuardClauses |
 | `-FluentValidation` | Include PineGuard.FluentValidation |
 | `-DataAnnotations` | Include PineGuard.DataAnnotations |
+| `-Options` | Include PineGuard.Extensions.Options |
 | `-Testing` | Include PineGuard.Testing |
 | `-Docs` | Include docs/ |
 | `-Tools` | Include tools/ |
