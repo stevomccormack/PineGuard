@@ -128,6 +128,17 @@ public sealed class NumberRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
     }
 
     [Theory]
+    [MemberData(nameof(NumberRulesTestData.IsPercentage.Cases), MemberType = typeof(NumberRulesTestData.IsPercentage))]
+    public void IsPercentage_BehavesAsExpected(RuleCase<decimal?> tc)
+    {
+        // Act
+        var result = NumberRules.IsPercentage(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(NumberRulesTestData.IsApproximately.Cases), MemberType = typeof(NumberRulesTestData.IsApproximately))]
     public void IsApproximately_BehavesAsExpected(RuleCase<(decimal? value, decimal target, decimal? tolerance)> tc)
     {

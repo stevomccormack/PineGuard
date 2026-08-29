@@ -58,6 +58,9 @@ public static partial class MustCodes
             /// <summary><c>number.range.in-range</c></summary>
             public const string InRange = Prefix + ".in-range";
 
+            /// <summary><c>number.range.not-percentage</c></summary>
+            public const string NotPercentage = Prefix + ".not-percentage";
+
             /// <summary><c>number.range.invalid</c></summary>
             public const string Invalid = Prefix + ".invalid";
         }

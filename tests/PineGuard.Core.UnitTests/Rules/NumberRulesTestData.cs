@@ -60,6 +60,11 @@ public static class NumberRulesTestData
         public static TheoryData<RuleCase<(int? value, int min, int max, PineGuard.Common.Inclusion inclusion)>> Cases => F.IsInRange.AllScenarios.ToRuleCases();
     }
 
+    public static class IsPercentage
+    {
+        public static TheoryData<RuleCase<decimal?>> Cases => F.IsPercentage.AllScenarios.ToRuleCases();
+    }
+
     public static class IsApproximately
     {
         public static TheoryData<RuleCase<(decimal? value, decimal target, decimal? tolerance)>> Cases => F.IsApproximately.AllScenarios.ToRuleCases();
