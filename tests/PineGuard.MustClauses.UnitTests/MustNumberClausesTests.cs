@@ -115,6 +115,15 @@ public sealed class MustNumberClausesTests(ITestOutputHelper output) : BaseMustU
     }
 
     [Theory]
+    [MemberData(nameof(MustNumberClausesTestData.Percentage.ValidCases), MemberType = typeof(MustNumberClausesTestData.Percentage))]
+    [MemberData(nameof(MustNumberClausesTestData.Percentage.InvalidCases), MemberType = typeof(MustNumberClausesTestData.Percentage))]
+    public void Percentage_BehavesAsExpected(MustCase<decimal> tc)
+    {
+        var result = Must.Be.Percentage(tc.Value, paramName: "value");
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(MustNumberClausesTestData.Approximately.ValidCases), MemberType = typeof(MustNumberClausesTestData.Approximately))]
     [MemberData(nameof(MustNumberClausesTestData.Approximately.InvalidCases), MemberType = typeof(MustNumberClausesTestData.Approximately))]
     public void Approximately_BehavesAsExpected(MustCase<(decimal value, decimal target, decimal? tolerance)> tc)
