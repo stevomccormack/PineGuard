@@ -51,7 +51,7 @@ Statuses mirror each plan's `metadata_header` (`docs/ai/meta/taxonomy.md` §Plan
 | Plan | Status |
 |------|--------|
 | [Library Expansion Roadmap](plans/library-expansion-roadmap.md) | Planned |
-| [New Surfaces Program — charter + phase plans 01–06](plans/new-surfaces-missing-validation-cases-00-program.md) | Active — Phase 1 (Structural validation) complete |
+| [New Surfaces Program — charter + phase plans 01–06](plans/new-surfaces-missing-validation-cases-00-program.md) | Active — Phase 1 + Track 0 complete; see [orchestration & progress tracker](plans/new-surfaces-orchestration.md) |
 | [Cross-Platform Tools Migration](plans/cross-platform-tools-migration.md) | Planned |
 | [Core / Common API Decisions](plans/core-common-api-decisions.md) | Open — decisions awaiting an owner's call |
 | [Competitive Analysis](plans/competitive-analysis.md) | Living reference — not a work item |

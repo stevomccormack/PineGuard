@@ -12,13 +12,21 @@ children:
   - new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md
   - new-surfaces-missing-validation-cases-05-rule-batches.md
   - new-surfaces-missing-validation-cases-06-analyzers.md
+  - new-surfaces-orchestration.md
 -->
 
 # Plan 00 — New Surfaces Program: Charter & Shared Standards
 
 <!-- plan-nav -->
-> [Parent](new-surfaces-missing-validation-cases.md) · **00 Program** · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
+> [Parent](new-surfaces-missing-validation-cases.md) · **00 Program** · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md) · [Orchestration & progress](new-surfaces-orchestration.md)
 <!-- /plan-nav -->
+
+> [!IMPORTANT]
+> **Read [`new-surfaces-orchestration.md`](new-surfaces-orchestration.md) first, every session.**
+> It holds the live progress tracker (which units are done, in flight, or blocked), the
+> sub-agent model-routing rules, and the per-unit checkpoint discipline this program is executed
+> under. This charter says what to build; that file says how the work is actually run and where
+> it currently stands.
 
 > **Status**: Active | **Author**: Fable planning pass | **Created**: 2026-08-25
 >
@@ -712,5 +720,5 @@ last_verified: 2026-08-26
 -->
 
 <!-- plan-nav -->
-> [Parent](new-surfaces-missing-validation-cases.md) · **00 Program** · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
+> [Parent](new-surfaces-missing-validation-cases.md) · **00 Program** · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md) · [Orchestration & progress](new-surfaces-orchestration.md)
 <!-- /plan-nav -->
