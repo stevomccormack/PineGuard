@@ -77,7 +77,7 @@ Each section MUST be present. "Where the Council Clashes" MUST name at least one
 
 Write a transcript ONLY when:
 
-- The session is plan-gated per §1 → write `docs/ai/plans/<plan-slug>/council-transcript.md` and stamp the plan's `metadata_header` with `council_verdict_ref`.
+- The session is plan-gated per §1 → write `docs/ai/plans/<plan-slug>.council-transcript.md` and stamp the plan's `metadata_header` with `council_verdict_ref`.
 - The user explicitly requests it → write `artifacts/council/council-transcript-<yyyyMMdd-HHmm>.md`.
 
 Transcripts MUST include: framed question, all five advisor responses, all five peer reviews, the anonymization mapping used, and the chairman verdict.

@@ -81,13 +81,13 @@ Skills open with a title line and two bold metadata lines instead of a `metadata
 ## 3. Critical Rules (The "Must Dos")
 ...
 
-## 4. Steps
+## 4. Execution Steps
 ...
 
 ## 5. Definition of Done
 ...
 
-## References
+## 6. Reference Material
 ...
 ```
 

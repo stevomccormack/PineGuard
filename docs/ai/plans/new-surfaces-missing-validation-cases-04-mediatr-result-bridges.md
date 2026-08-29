@@ -15,7 +15,7 @@ parent: new-surfaces-program
 
 > **Status**: Planned | **Depends on**: the three result bridges — 1a + Track 0 only (Plan 00 unit **4-bridges**, Wave 1); MediatR — Phase 3 PR 1 (`PineGuard.Extensions.DependencyInjection`, async rules; Plan 00 unit **4-mediatr**, Wave 2). `MustValidationException` → 400 mapping (Phase 3 PR 2) is optional for both | **Unblocks**: nothing — leaf phase
 >
-> **Worktrees** (two PRs, independent): `.claude/worktrees/result-bridges` on `feature/result-bridges` (W1 for three scopes, W3–W5, W6–W7) and `.claude/worktrees/mediatr` on `feature/mediatr` (W1 for one scope, W2, W6–W7). The bridges never wait for ASP.NET; the keystone-freeze checkpoint (Plan 00 §10.2) needs them merged early.
+> **Worktrees** (two PRs, independent): `+ .claude/worktrees/result-bridges` on `feature/result-bridges` (W1 for three scopes, W3–W5, W6–W7) and `+ .claude/worktrees/mediatr` on `feature/mediatr` (W1 for one scope, W2, W6–W7). The bridges never wait for ASP.NET; the keystone-freeze checkpoint (Plan 00 §10.2) needs them merged early.
 >
 > Read [Plan 00](new-surfaces-missing-validation-cases-00-program.md) first; onboarding per Plan 02 §3.4's log.
 

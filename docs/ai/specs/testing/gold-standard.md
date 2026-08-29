@@ -71,6 +71,14 @@ Per-scope figures apply their own class filters and are not expected to sum to t
 `All` row, which matches 983 classes. No `[ExcludeFromCodeCoverage]` attributes were
 added to reach these numbers.
 
+**Update (2026-08-28)**: the Phase 1 structural-validation merge (commit `357ab00`) — error
+codes across every layer, the `MustValidator<T>` keystone, the `GuardExceptionPolicy` redesign,
+ten new cross-property DataAnnotations attributes, and Rule13 — reconfirmed `-Scope All` at
+100.00% line / 100.00% branch coverage on both net8.0 and net10.0, with all 6 test projects
+passing on both TFMs. The per-scope test/line/branch counts in the table above predate this
+merge and have not been re-verified at the granular level; re-run the coverage script (see
+"Re-verifying Coverage" below) to refresh them.
+
 Where a branch was genuinely unreachable through the public API, the enclosing private
 helper was widened to `internal` and tested directly rather than deleted or suppressed
 — see `NetworkUtility.IsValidIpv4Segment`, `NetworkUtility.IsValidHostnameLabel`,
@@ -149,5 +157,5 @@ If a scope comes back below 100%, demote that project to SILVER here, close the 
 | Parameterless/no-logic methods | 3 | `CreateCancelledToken()`, `OnDispose()`, etc. |
 
 <!-- footer
-last_verified: 2026-08-21
+last_verified: 2026-08-28
 -->

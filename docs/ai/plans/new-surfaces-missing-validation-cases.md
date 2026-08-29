@@ -2,7 +2,7 @@
 type: plan
 id: new-surfaces-missing-validation-cases
 version: 1.2
-status: planned
+status: active
 last_updated: 2026-08-26
 children:
   - new-surfaces-missing-validation-cases-00-program.md
@@ -21,7 +21,7 @@ children:
 <!-- /plan-nav -->
 
 
-> **Status**: Planned | **Author**: Fable intelligence pass | **Created**: 2026-08-20
+> **Status**: Active | **Author**: Fable intelligence pass | **Created**: 2026-08-20
 >
 > Companion documents: `competitive-analysis.md` (Section 6), `future-language.md` (Section 7).
 >

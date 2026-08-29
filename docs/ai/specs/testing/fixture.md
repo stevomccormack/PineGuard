@@ -83,13 +83,14 @@ AllScenarios = [..AllValid, ..AllInvalid]
 
 Rule: If Rule class defines `const`/`static readonly` boundary values OR method has numeric boundary params → 4 arrays + rollups. Otherwise → 2 arrays + `AllScenarios`.
 
-Constants may live in the Rule class itself OR in referenced Utils classes (e.g., `EmailUtility.MaxEmailLength`, `PanAlgorithm.PanMinLength`). Fixtures reference whichever class owns the constant.
+Constants may live in the Rule class itself OR in referenced Utils classes (e.g., `EmailUtility.MaxEmailLength`). Fixtures reference whichever class owns the constant.
 
 ## 3. Case Records
 
 ```csharp
 public sealed record RuleCase<TValue>(string Name, TValue Value, RuleExpected Expected) : ReturnCase<TValue, RuleExpected>(Name, Value, Expected);
 public sealed record MustCase<TValue>(string Name, TValue Value, MustExpected Expected) : ReturnCase<TValue, MustExpected>(Name, Value, Expected);
+public sealed record MustValidationCase<TValue>(string Name, TValue Value, MustValidationExpected Expected) : ReturnCase<TValue, MustValidationExpected>(Name, Value, Expected);
 public sealed record GuardCase<TValue>(string Name, TValue Value, GuardExpected Expected) : ReturnCase<TValue, GuardExpected>(Name, Value, Expected);
 public sealed record FluentCase<TValue>(string Name, TValue Value, FluentExpected Expected) : ReturnCase<TValue, FluentExpected>(Name, Value, Expected);
 public sealed record DataAnnotationCase(string Name, object? Value, DataAnnotationExpected Expected) : ReturnCase<object?, DataAnnotationExpected>(Name, Value, Expected);
@@ -97,7 +98,7 @@ public sealed record DataAnnotationCase(string Name, object? Value, DataAnnotati
 
 `IsCase<T>`, `HasCase<T>` are annotated `[Description("Use RuleCase<T> for rules.")]` — soft-deprecated, no compiler warning; do not use in new tests. They are not `[Obsolete]`: `Directory.Build.props` sets `TreatWarningsAsErrors`, so promoting them would break the build at every existing derivation site. A hard deprecation has to be its own migration.
 
-Case files live beside their layer: `UnitTests/Rules/RuleCase.cs`, `UnitTests/MustClauses/MustCase.cs`, `UnitTests/GuardClauses/GuardCase.cs`, `UnitTests/FluentValidation/FluentCase.cs`, `UnitTests/DataAnnotations/DataAnnotationCase.cs`. `IsCase<T>` and `HasCase<T>` remain at `UnitTests/`.
+Case files live beside their layer: `UnitTests/Rules/RuleCase.cs`, `UnitTests/MustClauses/MustCase.cs`, `UnitTests/MustClauses/MustValidationCase.cs`, `UnitTests/GuardClauses/GuardCase.cs`, `UnitTests/FluentValidation/FluentCase.cs`, `UnitTests/DataAnnotations/DataAnnotationCase.cs`. `IsCase<T>` and `HasCase<T>` remain at `UnitTests/`.
 
 ## 4. Extension Methods
 
@@ -106,6 +107,7 @@ Case files live beside their layer: `UnitTests/Rules/RuleCase.cs`, `UnitTests/Mu
 | `.ToRuleCases()` | `RuleScenario<T>[]` | `TheoryData<RuleCase<T>>` |
 | `.ToMustCases()` | `RuleScenario<T>[]` | `TheoryData<MustCase<T>>` |
 | `.ToMustCases(Func<RuleScenario<T>, MustExpected>)` | `RuleScenario<T>[]` | `TheoryData<MustCase<T>>` |
+| `.ToMustValidationCases()` | `RuleScenario<T>[]` | `TheoryData<MustValidationCase<T>>` |
 | `.ToGuardCases()` | `RuleScenario<T>[]` | `TheoryData<GuardCase<T>>` |
 | `.ToGuardCases(string paramName)` | `RuleScenario<T>[]` | `TheoryData<GuardCase<T>>` |
 | `.ToGuardCases(Func<RuleScenario<T>, GuardExpected>)` | `RuleScenario<T>[]` | `TheoryData<GuardCase<T>>` |
@@ -135,6 +137,7 @@ Auto-logic for `.ToGuardCases(string paramName)`: `IsValid` → valid, `IsNull` 
 ```csharp
 public abstract class BaseRuleUnitTest(ITestOutputHelper output) : BaseUnitTest(output)
 public abstract class BaseMustUnitTest(ITestOutputHelper output) : BaseUnitTest(output)
+public abstract class BaseMustValidationUnitTest(ITestOutputHelper output) : BaseUnitTest(output)
 public abstract class BaseGuardUnitTest(ITestOutputHelper output) : BaseUnitTest(output)
 public abstract class BaseFluentUnitTest(ITestOutputHelper output) : BaseUnitTest(output)
 public abstract class BaseDataAnnotationUnitTest(ITestOutputHelper output) : BaseUnitTest(output)
@@ -282,6 +285,7 @@ public static class CsvAttributesTestData
 |---|---|---|---|---|
 | Rules | `RuleExpected` | `RuleCase<T>` | `.ToRuleCases()` | `BaseRuleUnitTest` |
 | Must | `MustExpected` | `MustCase<T>` | `.ToMustCases()` | `BaseMustUnitTest` |
+| Must (object validator) | `MustValidationExpected` | `MustValidationCase<T>` | `.ToMustValidationCases()` | `BaseMustValidationUnitTest` |
 | Guard | `GuardExpected` | `GuardCase<T>` | `.ToGuardCases()` | `BaseGuardUnitTest` |
 | Fluent | `FluentExpected` | `FluentCase<T>` | `.ToFluentCases()` | `BaseFluentUnitTest` |
 | DA | `DataAnnotationExpected` | `DataAnnotationCase` | `.ToDataAnnotationCases()` | `BaseDataAnnotationUnitTest` |
@@ -316,7 +320,6 @@ public static readonly int AtMaxEmail = EmailUtility.MaxEmailLength;
 | `CsvRules` | `DefaultCsvSeparator` |
 | `StringRules` | `SignedIntegerPattern`, `DefaultAllowedDigitSeparators` |
 | `OwaspRegex` | ~23 pattern constants across nested classes |
-| `PanAlgorithm` | `PanMinLength`, `PanMaxLength` |
 | `EmailUtility` | `MaxEmailLength`, `MaxLocalPartLength`, `MaxDomainLength` |
 | `Inclusion` (enum) | `Inclusive`, `Exclusive` |
 | `TimeOnlyRange` | `TimeOnly.MinValue`, `TimeOnly.MaxValue` |
@@ -326,8 +329,8 @@ When creating `ValidEdgeScenarios` or `InvalidEdgeScenarios` (§2), reference th
 ```csharp
 public static RuleScenario<string?>[] ValidEdgeScenarios =>
 [
-    new(nameof(AtMinLength), AtMinLength, true),  // uses PanAlgorithm.PanMinLength
-    new(nameof(AtMaxLength), AtMaxLength, true),  // uses PanAlgorithm.PanMaxLength
+    new(nameof(AtMinLength), AtMinLength, true),  // uses the source class's MinLength constant
+    new(nameof(AtMaxLength), AtMaxLength, true),  // uses the source class's MaxLength constant
 ];
 ```
 

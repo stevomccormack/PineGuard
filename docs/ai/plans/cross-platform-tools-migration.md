@@ -101,7 +101,7 @@ The `tools/` directory contains 90 PowerShell scripts that only run natively on 
 ## Out of Scope
 
 - `tools/audit-cli/` (~40 scripts) — deferred to separate plan
-- `tools/code-inspection/Install-Scoop.ps1` — replaced, not converted (file already removed from the repo)
+- `Install-Scoop.ps1` in `tools/code-inspection/` — replaced, not converted (file already removed from the repo)
 
 ---
 

@@ -2,22 +2,12 @@
 
 **Role:** `docs/ai/roles/verifier.md`
 
-## Durable Patterns
+## Normative Rules
 
-- Every test is `[Theory]` + `TheoryData`/`[MemberData]` — `[Fact]` is prohibited and fails CI Rule50.
-- Mirror the source layout under `tests/PineGuard.*.UnitTests/`.
-- Keep `XxxTests.cs` and `XxxTestData.cs` side-by-side — the pairing is also gated by Rule50.
-- Use the testing specs before inventing any structure.
-- Treat 100% line and branch coverage as the target for any affected code.
-
-## Test Data Rules
-
-- Keep datasets in TestData classes, not inline in test methods.
-- Keep tuple property names as `Value`.
-- Keep tuple element names camelCase and aligned to source parameter names.
-- Use fixtures from `PineGuard.Testing.Fixtures` where the fixture architecture expects them.
-- Fixture partials mirror the source Rules partials — `XxxRules.Yyy.cs` gets `XxxRulesFixtures.Yyy.cs`;
-  a monolithic per-rule fixture file is drift.
+The structural rules for this role — `[Theory]` + `TheoryData`/`[MemberData]` only, `XxxTests.cs`/
+`XxxTestData.cs` pairing, tuple naming, fixture partial mirroring, the 100% line/branch target —
+are fully specified in `../specs/testing/unit-test.md`, `../specs/testing/fixture.md`, and
+`../rules/fixture-conventions.md`. Read those; this file records observations, not rules.
 
 ## Assertion Heuristics
 

@@ -2,18 +2,25 @@
 type: plan
 id: new-surfaces-01-structural-validation
 version: 1.2
-status: planned
+status: completed
 last_updated: 2026-08-26
 parent: new-surfaces-program
 -->
 
 # Plan 01 — Phase 1: Structural Validation
 
+> [!WARNING]
+> **Archived — the §4.1 code-generation tooling described below was never built.** The one-off
+> generator (`tools/audit-cli/utils/` `Run-Util03GenerateMustCodes.ps1`), its `must-codes.map.json`
+> artifact and the three-pass Draft/Curation/Render workflow do not exist; the shipped error-code
+> catalogue was hand-curated directly in-branch instead, and `MustCodes` now spans 29 domain files.
+> The living reference is `src/PineGuard.Core/Codes/`.
+
 <!-- plan-nav -->
 > [Parent](new-surfaces-missing-validation-cases.md) · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · **01 Structural validation** · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
 <!-- /plan-nav -->
 
-> **Status**: Planned | **Depends on**: nothing (first phase) | **Unblocks**: every later phase
+> **Status**: Completed | **Depends on**: nothing (first phase) | **Unblocks**: every later phase
 >
 > **Worktrees**: split into four PRs so the rest of the program can start as early as possible (Plan 00 §10): **1a** `feature/structural-validation` = W0–W3 + W7/W8 (the keystone everything else waits for); **1b** `feature/structural-validation-fluent` = W4–W5; **1c** `feature/structural-validation-annotations` = W6; **1d** `feature/structural-validation-guard` = W6b. 1b, 1c and 1d branch from `main` after 1a merges and run in parallel with each other and with Phases 2–6.
 >
@@ -127,7 +134,7 @@ src/PineGuard.Core/MustClauses/
   MustValidationResult.cs        (+)
   MustValidationException.cs     (+)
   IMustValidator.cs              (+, non-generic)
-  IMustValidatorOfT.cs           (+, generic — one type per file; `IMustValidatorOfT.cs` is a named exception to the file-name-equals-type-name rule, recorded in `docs/ai/specs/spec.md` §2.1 by W7, mirroring the BCL source convention)
+  IMustValidatorOfT.cs           (+, generic — one type per file; `IMustValidatorOfT.cs` is a named exception to the file-name-equals-type-name rule, recorded in `docs/ai/specs/project.md` §2.1, mirroring the BCL source convention)
   MustValidator.cs               (+)
   MustPropertyRule.cs            (+)
   InlineMustValidator.cs         (+)
@@ -500,7 +507,7 @@ public sealed record GuardFailure(string Code, string Message, string? ParamName
 - `MustResult<T>.ThrowIfFailed()`, `ThrowIfFailed<TException>(factory)` and `ThrowNullIfFailed()` stamp the same two keys, so the single-value escalation path and the Guard path agree.
 - Messages are unchanged: the code is machine data and lives in `Data`, not in the human text (BCL convention; contrast Options, whose `ValidateOptionsResult` has only strings and therefore gets `[code]` in the text).
 - Why this matters beyond Phase 3's guard handling: the map receives the structured failure, so a DDD team maps by code, by code family, or by exception type in one C# switch expression — no message parsing, no per-guard extension methods (the Ardalis gap). Rule13 gains a check that every guard passes its `result` to `Throw`.
-- `guard-clauses/project.md` §8 and §11 templates are updated to the new call shape; the vocabulary spec is untouched (no new names).
+- `docs/ai/specs/guard-clauses/project.md` §8 and §11 templates are updated to the new call shape; the vocabulary spec is untouched (no new names).
 
 #### 4.14.1 `GuardExceptionPolicy` — substituting your own exceptions (redesign)
 
@@ -560,7 +567,7 @@ All Phase 1 Core types compile on every TFM. `MustCodes` constants are plain str
 
 ### 4.16 Specs and docs to update (by PR — each PR updates only what it ships)
 
-**1a** (W7): `must-clauses/project.md`, the `Codes` items, the audit-cli spec/README, the test-spec `Code`/family rows for `MustExpected`, the root README *Object validation* + *Error codes* sections and the `AndThen` example, the memory files, `docs/ai/specs/spec.md` §2.1 (`IMustValidatorOfT.cs` exception). **1b**: `fluent-validation/project.md` §3/§4.3 and `scaffold-fluent`. **1c**: `data-annotations/project.md` and `scaffold-annotation`. **1d**: `guard-clauses/project.md` and the README Guard section (W6b step 5). The list:
+**1a** (W7): `docs/ai/specs/must-clauses/project.md`, the `Codes` items, the audit-cli spec/README, the test-spec `Code`/family rows for `MustExpected`, the root README *Object validation* + *Error codes* sections and the `AndThen` example, the memory files, `docs/ai/specs/project.md` §2.1 (`IMustValidatorOfT.cs` exception). **1b**: `docs/ai/specs/fluent-validation/project.md` §3/§4.3 and `scaffold-fluent`. **1c**: `docs/ai/specs/data-annotations/project.md` and `scaffold-annotation`. **1d**: `docs/ai/specs/guard-clauses/project.md` and the README Guard section (W6b step 5). The list:
 
 - `docs/ai/specs/must-clauses/project.md`: "Core types" list (+ the new types); a new *Error codes* section (format, catalogue, one-clause-one-code, Rule13); the canonical `Between` example updated to pass the code.
 - `docs/ai/specs/fluent-validation/project.md` §3: the `code` parameter and the static-code rationale; §4.3 example updated.
@@ -668,12 +675,12 @@ Commands are run from the worktree path. `<wt>` is the **absolute** worktree pat
 5. `pwsh -NoProfile -ExecutionPolicy Bypass -File "<wt>/tools/audit-cli/Run-All.ps1" -Configuration Release -RuleId Rule13,Rule06,Rule08,Rule50` → clean. Break one clause, confirm Rule13 fails, revert.
 6. Add `Code` to `MustExpected` (+ `BaseMustUnitTest`), the ≈50 representative code assertions (§5.3); `MustCodesTests` (§5.2).
 7. Coverage `-Scope MustClauses` and `-Scope Core` → 100/100.
-8. Commits: `feat(must): stamp every clause with its MustCodes constant` and `feat(tools): add audit Rule13 for Must codes`. Commit the JSON map as `tools/audit-cli/utils/must-codes.map.json` (W4 in PR 1b and W6 in PR 1c read it from `main`; `artifacts/` is not shared across worktrees); the last of 1b/1c/1d to merge deletes it, and the markdown review copy moves to `docs/ai/plans/completed/` (status `completed`) in that same PR. Also correct `tools/audit-cli/README.md`'s "Rule01–Rule10" description of `Run-AuditLibraryRules.ps1` to the real range while adding Rule13.
+8. Commits: `feat(must): stamp every clause with its MustCodes constant` and `feat(tools): add audit Rule13 for Must codes`. The catalogue was hand-curated directly in-branch rather than through the §4.1 generator, so no `must-codes.map.json` artifact was committed; the markdown review copy moves to `docs/ai/plans/completed/` (status `completed`) in that same PR. Also correct `tools/audit-cli/README.md`'s "Rule01–Rule10" description of `Run-AuditLibraryRules.ps1` to the real range while adding Rule13.
 
 ### W3 — Validator keystone
 
 1. Add `IMustValidator`, `IMustValidator<T>`, `MustValidator<T>`, `MustPropertyRule<T,TProperty>`, `InlineMustValidator<T>` and the internal runners/cast helper.
-2. Add the `MustValidationExpected`/`MustValidationCase<T>`/`MustValidationScenarioExtension`/`BaseMustValidationUnitTest` family to `tests/PineGuard.Testing/`, with tests following the existing convention: extend `tests/PineGuard.Testing.UnitTests/UnitTests/ExpectedTests(.TestData).cs` and `CaseRecordTests(.TestData).cs`, add `UnitTests/MustClauses/BaseMustValidationUnitTestTests.cs` + `…TestData.cs` covering every branch of `AssertResult` (IsValid only; + FailureCount; + PropertyPath/Code/Message; empty `Failures` guard).
+2. Add the `MustValidationExpected`/`MustValidationCase<T>`/`MustValidationScenarioExtension`/`BaseMustValidationUnitTest` family to `tests/PineGuard.Testing/`, with tests following the existing convention: extend `tests/PineGuard.Testing.UnitTests/UnitTests/ExpectedTests.cs`/`ExpectedTestData.cs` and `CaseRecordTests.cs`/`CaseRecordTestData.cs`, add `UnitTests/MustClauses/BaseMustValidationUnitTestTests.cs` + `…TestData.cs` covering every branch of `AssertResult` (IsValid only; + FailureCount; + PropertyPath/Code/Message; empty `Failures` guard).
 3. Write the validator tests (§5.2) with the sample types.
 4. Coverage `-Scope Core` and `-Scope Testing` → 100/100.
 5. Commit: `feat(core): add MustValidator<T> object validation keystone`.

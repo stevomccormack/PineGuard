@@ -45,7 +45,7 @@ function Get-TableRow {
     $inSection = $false
 
     foreach ($line in ($Text -split '\r?\n')) {
-        if ($line -match '^##\s') {
+        if ($line -match '^#{2,}\s') {
             $inSection = ($line -match $SectionPattern)
             continue
         }

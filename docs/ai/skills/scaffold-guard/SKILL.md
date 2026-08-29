@@ -45,7 +45,7 @@ Implement a new **GuardClause** method (`Guard.Against.Xxx`). A GuardClause ensu
             // Guard.Against.Negative => Must.Be.ZeroOrPositive (complement)
             var result = Must.Be.MyGoodCondition(value, paramName);
             if (result.Failed)
-                GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator);
+                GuardFailure.Throw(result, message, exceptionCreator);
 
             return result.Result!;
         }

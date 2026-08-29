@@ -55,7 +55,7 @@ public sealed record MustCase<TValue>(string Name, TValue Value, MustExpected Ex
 ### Expected Type: `MustExpected`
 
 ```csharp
-public sealed record MustExpected(bool IsValid, string? Message = null, string? ParamName = null)
+public sealed record MustExpected(bool IsValid, string? Message = null, string? ParamName = null, string? Code = null)
     : ReturnExpected(IsValid, Message);
 ```
 

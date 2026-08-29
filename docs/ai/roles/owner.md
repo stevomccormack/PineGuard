@@ -42,6 +42,9 @@ It is the “fix it properly” persona when tests/coverage/inspection fail and 
 - [Implement DataAnnotations](../skills/scaffold-annotation/SKILL.md)
 - [Implement Unit Tests](../skills/scaffold-unit-test/SKILL.md)
 - [Improve Code Coverage](../skills/improve-coverage/SKILL.md)
+- [Fix Roslyn Warnings](../skills/fix-roslyn/SKILL.md)
+- [Fix Sonar Issues](../skills/fix-sonar/SKILL.md)
+- [New Validation (Vertical Slice)](../skills/new-validation/SKILL.md)
 
 ### Workflows
 - [Run Tests](../workflows/test.md)
@@ -49,6 +52,8 @@ It is the “fix it properly” persona when tests/coverage/inspection fail and 
 - [Run Qodana](../workflows/scan-qodana.md)
 - [Debug & Fix Tests](../workflows/fix-test.md)
 - [Debug & Fix Coverage](../workflows/fix-coverage.md)
+- [Debug & Fix Roslyn Warnings](../workflows/fix-roslyn.md)
+- [Debug & Fix Sonar Issues](../workflows/fix-sonar.md)
 
 <!-- footer
 last_verified: 2026-02-26

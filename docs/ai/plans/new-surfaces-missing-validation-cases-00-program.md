@@ -2,7 +2,7 @@
 type: plan
 id: new-surfaces-program
 version: 1.2
-status: planned
+status: active
 last_updated: 2026-08-26
 parent: new-surfaces-missing-validation-cases
 children:
@@ -20,7 +20,7 @@ children:
 > [Parent](new-surfaces-missing-validation-cases.md) · **00 Program** · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
 <!-- /plan-nav -->
 
-> **Status**: Planned | **Author**: Fable planning pass | **Created**: 2026-08-25
+> **Status**: Active | **Author**: Fable planning pass | **Created**: 2026-08-25
 >
 > **Parent**: [new-surfaces-missing-validation-cases.md](new-surfaces-missing-validation-cases.md) (Part 5 phasing).
 > **Reconciled with**: [library-expansion-roadmap.md](library-expansion-roadmap.md) (which declares itself the successor of the parent — see §2).
@@ -51,7 +51,7 @@ You are working inside a repository with a fully specified Brain (`docs/ai/`). N
 | Need | Where | Notes |
 |---|---|---|
 | The invariants for the layer you touch | `docs/ai/rules/global.md` + `docs/ai/rules/<scope>.md` (`core`, `must`, `guard`, `fluent`, `annotation`, `testing`, `tools`) | Path-scoped adapters in `.claude/rules/` load them automatically in Claude Code |
-| Normative specs | `docs/ai/specs/spec.md` (root) · `orchestration.md` · `safety.md` (Tier 0/1/2 commands) · `coding-standard.md` · per layer `docs/ai/specs/<layer>/{project,unit-test,coverage}.md` · `language/{vocabulary.md,vocabulary.json,naming-collisions.md}` · `tools/spec.md`, `tools/audit-cli/spec.md` | A spec wins over a plan wherever they disagree; fix the plan |
+| Normative specs | `docs/ai/specs/spec.md` (root) · `orchestration.md` · `safety.md` (Tier 0/1/2 commands) · `coding-standard.md` · per layer `docs/ai/specs/<layer>/{project,unit-test,coverage}.md` · `language/{vocabulary.md,vocabulary.json,naming-collisions.md}` · `docs/ai/specs/tools/spec.md`, `docs/ai/specs/tools/audit-cli/spec.md` | A spec wins over a plan wherever they disagree; fix the plan |
 | Scaffolding one layer | Skills in `docs/ai/skills/` (index `INDEX.md`): `scaffold-rule`, `scaffold-must`, `scaffold-guard`, `scaffold-fluent`, `scaffold-annotation`, `scaffold-unit-test`; `new-validation` drives a predicate through every layer | Claude Code wrappers live in `.claude/skills/` — invoke by name |
 | A whole vertical slice (Phase 5) | Agent `docs/ai/agents/scaffold-vertical-slice.md` (`/scaffold-vertical-slice`) | It routes to the skills above and the per-layer specs |
 | Writing tests / closing coverage | Subagents `.claude/agents/test-writer.md` (Sonnet), `coverage-analyst.md`; skill `improve-coverage` | Their learned patterns persist in `docs/ai/memory/<agent>.md` (canonical) and `.claude/agent-memory/<agent>/` — read yours before starting, append what you learn |
@@ -469,7 +469,7 @@ Adding a package to this repository touches more than `src/` and `tests/`. This 
 | 17 | `tools/git/Commit-Agent.ps1` | Add `src/PineGuard.<Fw>/AGENTS.md` to the agent-file list |
 | 18 | `tools/release/Run-GithubRelease.ps1` line 278 | Package list |
 | 19 | `tools/release/Run-NugetUnlist.ps1` line 46 | Package list |
-| 20 | `tools/audit-cli/rules/Test-Rule53-TestOrphans.ps1` | Nothing to edit: it derives `src/<TestProject minus .UnitTests>` and skips projects whose source folder is absent. Consequences: a normal scope resolves automatically; `PineGuard.Analyzers.UnitTests` maps to `src/PineGuard.Analyzers` only, so code-fix tests live inside the analyzer test classes (Plan 06 §3.2); `PineGuard.Testing.UnitTests` is skipped entirely. Rule53 is a local convention check, not a CI gate |
+| 20 | `tools/audit-cli/rules/Test-Rule53-TestOrphans.ps1` | Nothing to edit: it derives `src/<TestProject minus .UnitTests>` and skips projects whose source folder is absent. Consequences: a normal scope resolves automatically; `PineGuard.Analyzers.UnitTests` maps to `+ src/PineGuard.Analyzers` only, so code-fix tests live inside the analyzer test classes (Plan 06 §3.2); `PineGuard.Testing.UnitTests` is skipped entirely. Rule53 is a local convention check, not a CI gate |
 | 21 | `.vscode/tasks.json` | `Test: <Fw> (fast)`, `Coverage: <Fw> (fast)`, `Format: <Fw>`, `Git: Commit <Fw> (auto message)`, `Inspect: Qodana: <Fw>` |
 
 **Recommended once, in Phase 2**: before adding the first scope, extract the per-scope *paths* (source dir, test csproj, include pattern, path regex) into one registry function `Get-PineGuardScope -Name <Scope>` in `tools/.shared/dotnet-projects.ps1`, and have items 8–15 read from it. `ValidateSet` attributes stay literal (PowerShell requires constants), so a new scope is then one `ValidateSet` token per script plus one registry entry, instead of five `switch` blocks per script. If this refactor is declined, the manual edits above are the fallback and each later phase repeats them.
@@ -509,7 +509,7 @@ The phase numbers are the **priority** order from the parent plan, not a require
 
 | Unit | What it is | Hard dependency (must be **merged** first) | Adds a scope? |
 |---|---|---|---|
-| **Track 0** | The `Get-PineGuardScope` registry in `tools/.shared/dotnet-projects.ps1` + the refactor of §8.3 items 8–15 to read it + the §8.2 CI changes (7e–7g, and 7b if approved) + a Rule13-style `Codes/` purity check is **not** here (it is Rule13 (g), Plan 01). Creates **no** `src/` or `tests/` project — the first scope (Options) is onboarded by Plan 02 using the registry | — | — (touches `tools/`, `.github/`, `.vscode/tasks.json` only; must not touch `tools/audit-cli/`, which 1a owns) |
+| **Track 0** | The `Get-PineGuardScope` registry in `tools/.shared/dotnet-projects.ps1` + the refactor of §8.3 items 8–15 to read it + the §8.2 CI changes (7e–7g, and 7b if approved) + a Rule13-style `Codes/` purity check is **not** here (it is Rule13 (g), Plan 01). Creates **no** `src/` or `tests/` project — the first scope (Options) is onboarded by Plan 02 using the registry. **Current state**: approved, running in Wave 0 (§12). | — | — (touches `tools/`, `.github/`, `.vscode/tasks.json` only; must not touch `tools/audit-cli/`, which 1a owns) |
 | **1a** | Phase 1 W1–W3: `IMustResult`, codes migration + Rule13, `MustValidationResult`, `MustValidator<T>` keystone, test family | — | no |
 | **1b** | Phase 1 W4–W5: Fluent `ErrorCode` + cross-property temporal overloads | 1a | no |
 | **1c** | Phase 1 W6: `ValidationAttributeBase.Code` + cross-property attributes | 1a | no |

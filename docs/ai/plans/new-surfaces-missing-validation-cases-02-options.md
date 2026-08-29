@@ -2,7 +2,7 @@
 type: plan
 id: new-surfaces-02-options
 version: 1.2
-status: planned
+status: active
 last_updated: 2026-08-26
 parent: new-surfaces-program
 -->
@@ -13,7 +13,7 @@ parent: new-surfaces-program
 > [Parent](new-surfaces-missing-validation-cases.md) · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · **02 Options** · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
 <!-- /plan-nav -->
 
-> **Status**: Planned | **Depends on**: Phase 1 (`IMustValidator<T>`, `MustValidationResult`, `InlineMustValidator<T>`) | **Unblocks**: Phases 3–4 reuse the scope-onboarding procedure this phase proves
+> **Status**: Active | **Depends on**: Phase 1 (`IMustValidator<T>`, `MustValidationResult`, `InlineMustValidator<T>`) | **Unblocks**: Phases 3–4 reuse the scope-onboarding procedure this phase proves
 >
 > **Worktree**: `.claude/worktrees/options` on `feature/options`.
 >
@@ -194,15 +194,15 @@ Do §8.1–§8.3 in this order, and log each item as *done*, *n/a*, or *checklis
 - §8.1 1–6 (solution via `dotnet sln`, `Directory.Packages.props`, `.editorconfig` brace list, no `InternalsVisibleTo` in Core — this package uses no `[CallerArgumentExpression]`, no Sonar entries needed, dependabot `microsoft-extensions` group).
 - §8.2 7 — `ci.yml`: filter `options`, output, matrix entry `Options` with `run-if: core-or-must-or-options-or-testing-or-main`, `case` arm.
 - §8.3 8–21 — add the `Options` entry to `Get-PineGuardScope` (`SourceDir`, `TestProject`, `IncludePattern`, `PathRegex`, `QodanaConfig`, `QodanaSlug`, `PackageId`) and the `Options` token to each script's `ValidateSet` (PowerShell needs the literal); `Commit-Options.ps1` in `tools/git/` and the `Run-Commits.ps1` switch; Qodana yaml + slnx; release scripts; tasks.json.
-- §8.4 22–29 — the Brain: `docs/ai/specs/options/{project,unit-test,coverage}.md` (templates in `docs/ai/meta/`), `docs/ai/rules/options.md` plus the rules-only adapter layer maps and `.claude/rules/options.md` / `.cursor/rules/options.mdc` / `.github/instructions/options.instructions.md`, taxonomy §N.4 row `options → PineGuard.Extensions.Options`, the nine agents cascaded with `docs/ai/skills/scaffold-workflow/SKILL.md`, command rows, workflow/all-agent tables, `coverage.md` library list, gold-standard row, root README.
+- §8.4 22–29 — the Brain: `docs/ai/specs/options/{project,unit-test,coverage}.md` (templates in `docs/ai/meta/`), `options.md` in `docs/ai/rules/` plus the rules-only adapter layer maps — `options.md` in `.claude/rules/`, `options.mdc` in `.cursor/rules/`, and `options.instructions.md` in `.github/instructions/` — taxonomy §N.4 row `options → PineGuard.Extensions.Options`, the nine agents cascaded with `docs/ai/skills/scaffold-workflow/SKILL.md`, command rows, workflow/all-agent tables, `coverage.md` library list, gold-standard row, root README.
 
 Record the actual list of files touched in the PR body; Phase 3 copies it.
 
 ### 3.5 Docs
 
-- `+ src/PineGuard.Extensions.Options/README.md`: masthead *"Configuration that refuses to start wrong."*; install; the §2.1 examples; a *What you get* list; *Supported frameworks*; the standard closer.
+- `README.md` in `+ src/PineGuard.Extensions.Options/`: masthead *"Configuration that refuses to start wrong."*; install; the §2.1 examples; a *What you get* list; *Supported frameworks*; the standard closer.
 - Root `README.md`: package table row, install snippet line, a short *Options validation* subsection under the surfaces list.
-- `docs/ai/specs/options/project.md`: the §3.2/§3.3 contract, the failure-format rule, the singleton-lifetime rule, and "adapters never catch validator exceptions".
+- `project.md` in `+ docs/ai/specs/options/`: the §3.2/§3.3 contract, the failure-format rule, the singleton-lifetime rule, and "adapters never catch validator exceptions".
 
 ## 4. Testing plan
 
@@ -240,7 +240,7 @@ Coverage: `pwsh … Run-CodeCoverage.ps1 -Mode GenerateAndAnalyze -Scope Options
 > The `Get-PineGuardScope` registry is **Track 0** in Plan 00 §10 (approved, §12) and is executed there, not here. W1 is a check: `git log --oneline origin/main | grep -i "scope registry"`. If Track 0 has not merged, execute it now as its own worktree/PR (`.claude/worktrees/track-0`, `feature/tooling-scope-registry`): add `Get-PineGuardScope` to `tools/.shared/dotnet-projects.ps1` seeded with the six existing scopes; refactor items 8–15 of Plan 00 §8.3 to consume it with identical behaviour (run `Run-CodeCoverage.ps1 -Scope Core -SkipHtml -Enforce100 -Framework net10.0` and `-Scope MustClauses` before and after, compare summaries); apply Plan 00 §8.2 items 7(e)–7(g); Rule09/Rule10 clean; commit `refactor(tools): centralise per-scope project paths in one registry`; merge; then continue here.
 
 ### W2 — Onboard the `Options` scope
-1. Create `src/PineGuard.Extensions.Options/PineGuard.Extensions.Options.csproj` (Plan 00 §4.4) and `tests/PineGuard.Extensions.Options.UnitTests/PineGuard.Extensions.Options.UnitTests.csproj` (§4.5 + the test-only packages); `dotnet sln PineGuard.slnx add …` for both (tests into the `tests` solution folder).
+1. Create `+ src/PineGuard.Extensions.Options/PineGuard.Extensions.Options.csproj` (Plan 00 §4.4) and `+ tests/PineGuard.Extensions.Options.UnitTests/PineGuard.Extensions.Options.UnitTests.csproj` (§4.5 + the test-only packages); `dotnet sln PineGuard.slnx add …` for both (tests into the `tests` solution folder).
 2. Plan 00 §8.1–8.3 for `Options`. `dotnet build <wt>/PineGuard.slnx -c Release` clean with the empty projects.
 3. Commit `build(options): add PineGuard.Extensions.Options project, tests and tooling scope`.
 

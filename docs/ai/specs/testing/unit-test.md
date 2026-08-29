@@ -61,8 +61,8 @@ Related specs in this folder:
 - **`UseCulture(...)`**: Use only if explicitly testing culture-specific behavior.
 - **Additional helpers**: `UseEnvironmentVariable(key, value)`, `CreateDeterministicRandom(seed)`, `CreateCancelledToken()`.
 - **Layer-specific addenda**: Each layer has its own spec addendum that overrides patterns here —
-  `core/unit-test.md`, `must-clauses/unit-test.md`, `guard-clauses/unit-test.md`,
-  `fluent-validation/unit-test.md`, `data-annotations/unit-test.md` (scope-id → directory map:
+  `docs/ai/specs/core/unit-test.md`, `docs/ai/specs/must-clauses/unit-test.md`, `docs/ai/specs/guard-clauses/unit-test.md`,
+  `docs/ai/specs/fluent-validation/unit-test.md`, `docs/ai/specs/data-annotations/unit-test.md` (scope-id → directory map:
   `spec.md` §11.2).
 
 ### 2.2 PineGuard.Testing — Shared Test Infrastructure Library
@@ -154,11 +154,11 @@ Define `public static class XxxTestData` containing nested **Operation Groups** 
 
 | Layer | Datasets per Operation Group | Addendum |
 |-------|------------------------------|----------|
-| Core | single `Cases` rollup | `core/unit-test.md` |
-| MustClauses | `ValidCases` + `InvalidCases` (no `EdgeCases`) | `must-clauses/unit-test.md` |
-| GuardClauses | `ValidCases` + `InvalidCases` | `guard-clauses/unit-test.md` |
-| FluentValidation | single `Cases` rollup | `fluent-validation/unit-test.md` |
-| DataAnnotations | single `Cases` rollup | `data-annotations/unit-test.md` |
+| Core | single `Cases` rollup | `docs/ai/specs/core/unit-test.md` |
+| MustClauses | `ValidCases` + `InvalidCases` (no `EdgeCases`) | `docs/ai/specs/must-clauses/unit-test.md` |
+| GuardClauses | `ValidCases` + `InvalidCases` | `docs/ai/specs/guard-clauses/unit-test.md` |
+| FluentValidation | single `Cases` rollup | `docs/ai/specs/fluent-validation/unit-test.md` |
+| DataAnnotations | single `Cases` rollup | `docs/ai/specs/data-annotations/unit-test.md` |
 
 The `Cases` rollup is built from a fixture's scenario arrays (§9, `fixture.md` §2) via
 `AllScenarios` + `.ToXxxCases()`: `Cases` (`TheoryData<RuleCase<T>>`, `TheoryData<MustCase<T>>`, …)

@@ -39,3 +39,4 @@ Sets enforcement back to `active` on the `main-branch` ruleset (or a named alter
 
 - Paired agent: [`github-ruleset-disable.md`](github-ruleset-disable.md)
 - Script: [`tools/release/Run-GithubRuleset.ps1`](../../../tools/release/Run-GithubRuleset.ps1)
+- Used by: [`github-release-publish.md`](github-release-publish.md) when `-BypassPR` is requested.

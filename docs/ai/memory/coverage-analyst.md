@@ -23,7 +23,7 @@ The flags, valid scopes, and output paths are operational docs owned by
 `tools/code-coverage/README.md` — read that, don't rely on remembered commands. Gotchas this
 agent has actually hit:
 
-- `-Format cobertura` MUST be supplied explicitly — omitting it fails the `Gen-CoverageReport.ps1` ValidateSet.
+- `-Format` defaults to `cobertura` in `Gen-CoverageReport.ps1` — it does not need to be supplied explicitly.
 - There is no `-Engine` parameter. Any stored command carrying one is stale — delete the flag, do not translate it.
 - Drop `-Isolated` on multi-targeted projects (Core, MustClauses, GuardClauses); the non-isolated run is equally authoritative.
 

@@ -16,6 +16,8 @@ applies_to:
   - ".agent/**"
   - ".pi/**"
   - ".github/**"
+  - ".agents/**"
+  - ".codex/**"
   - ".clinerules/**"
   - ".cursor/**"
   - ".windsurf/**"

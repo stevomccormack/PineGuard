@@ -29,7 +29,7 @@ For full usage examples, parameters, and directory structure, see:
 
 Notes:
 
-- The job uses `JetBrains/qodana-action@v2025.3` with `upload-result: true` — results are attached as a workflow artifact and sent to Qodana Cloud. There is no SARIF upload to GitHub Code Scanning.
+- The job uses `JetBrains/qodana-action@v2026.2` with `upload-result: true` — results are attached as a workflow artifact and sent to Qodana Cloud. There is no SARIF upload to GitHub Code Scanning.
 - The analysis uses `tools/code-inspection/qodana/config/qodana.all.yaml` and builds `tools/code-inspection/qodana/PineGuard.All.Qodana.slnx`.
 
 ## Local Installation
@@ -60,5 +60,5 @@ qodana scan
 
 - Each scope uses a dedicated `.slnx` solution file under `tools/code-inspection/qodana/` (keeps analysis focused).
 - The wrapper forces non-interactive mode by default (CI-safe).
-- Docker is the default runtime; use `-Native` for Docker-free runs.
+- Docker is the default runtime.
 - Hard timeout (`-TimeoutMinutes 30`) prevents hung Qodana processes.

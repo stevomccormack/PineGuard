@@ -34,10 +34,14 @@ It is responsible for keeping Clean Architecture boundaries clear and ensuring t
 
 ### Skills
 - [Create Workflow](../skills/scaffold-workflow/SKILL.md)
+- [Ask Council](../skills/ask-council/SKILL.md)
 
 ### Specs
 - [Engineering Standards](../specs/coding-standard.md)
 - [Root Spec](../specs/spec.md)
+
+### Workflows
+- [Plan with Council](../workflows/plan-with-council.md)
 
 <!-- footer
 last_verified: 2026-02-26

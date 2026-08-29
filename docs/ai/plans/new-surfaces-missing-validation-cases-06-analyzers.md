@@ -15,7 +15,7 @@ parent: new-surfaces-program
 
 > **Status**: Planned | **Depends on**: a stable Guard surface (nothing structural; runs last by choice) and Phase 1's `MustResult<T>` shape | **Unblocks**: nothing — leaf phase
 >
-> **Worktree**: `.claude/worktrees/analyzers` on `feature/analyzers`.
+> **Worktree**: `+ .claude/worktrees/analyzers` on `feature/analyzers`.
 >
 > Read [Plan 00](new-surfaces-missing-validation-cases-00-program.md) first; onboarding per Plan 02 §3.4's log, with the TFM exceptions in §3.1 below.
 
@@ -44,7 +44,7 @@ The analyzer advertises the Guard surface; it should advertise names that will n
 | `PG1001` | Use `Guard.Against.Null` | Usage | Info | `if (x is null) throw new ArgumentNullException(nameof(x));` (also `== null`, `x ?? throw new ArgumentNullException(…)`, `ArgumentNullException.ThrowIfNull(x)`) | `Guard.Against.Null(x);` (statement form) or `Guard.Against.Null(x)` (expression form replacing the `??` throw); adds `using PineGuard.GuardClauses;` |
 | `PG1002` | Use `Guard.Against.NullOrWhiteSpace` | Usage | Info | `if (string.IsNullOrWhiteSpace(x)) throw new ArgumentException(…);`, `ArgumentException.ThrowIfNullOrWhiteSpace(x)` | `Guard.Against.NullOrWhiteSpace(x);` |
 | `PG1003` | Use `Guard.Against.NullOrEmpty` | Usage | Info | `string.IsNullOrEmpty` throw forms, `ArgumentException.ThrowIfNullOrEmpty(x)` | `Guard.Against.NullOrEmpty(x);` |
-| `PG1004` | Use `Guard.Against.OutOfRange` | Usage | Info | `if (x < min \|\| x > max) throw new ArgumentOutOfRangeException(nameof(x));` where all three operands are simple identifiers/literals and the guarded identifier is the same on both sides | `Guard.Against.OutOfRange(x, min, max);` (verify the exact Guard name at implementation — `guard-clauses/project.md` §5.4.5 prescribes `OutOfRange`) |
+| `PG1004` | Use `Guard.Against.OutOfRange` | Usage | Info | `if (x < min \|\| x > max) throw new ArgumentOutOfRangeException(nameof(x));` where all three operands are simple identifiers/literals and the guarded identifier is the same on both sides | `Guard.Against.OutOfRange(x, min, max);` (verify the exact Guard name at implementation — `docs/ai/specs/guard-clauses/project.md` §5.4.5 prescribes `OutOfRange`) |
 | `PG2001` | Must result is discarded | Reliability | Warning | An expression statement whose expression type is `PineGuard.MustClauses.MustResult<T>` (i.e. `Must.Be.X(...);` on its own line) | two fixes: *Throw if failed* (`….ThrowIfFailed();`) and *Assign the result* (`var result = …;`) |
 | `PG2002` | Must validation result is discarded | Reliability | Warning | An expression statement whose expression type is `PineGuard.MustClauses.MustValidationResult` (`validator.Validate(order);` on its own line — the same silent no-op) | the same two fixes |
 
@@ -90,11 +90,11 @@ Files (`+ src/PineGuard.Analyzers/…`): `DiagnosticIds.cs` (`internal static cl
 
 ### 3.2 Onboarding differences
 
-Plan 00 §8 applies with these deltas: two source projects map to one test project and one coverage scope (`Analyzers`). The coverage scripts resolve one source directory and one path regex per scope, so the registry entry is `SourceDir = src/PineGuard.Analyzers` (existence probe), `PathRegex = '(?i)(^|[\\/])(src[\\/]+)?PineGuard\.Analyzers(\.CodeFixes)?[\\/]'` and `IncludePattern = @('[PineGuard.Analyzers]*', '[PineGuard.Analyzers.CodeFixes]*')` — the `switch` blocks take the regex, not an array of directories; `ci.yml` filter covers both `src/` folders; Qodana slnx lists both; `tools/release/Run-GithubRelease.ps1` / `Run-NugetUnlist.ps1` list `PineGuard.Analyzers` only; the `.editorconfig` test brace list gains `PineGuard.Analyzers.UnitTests`; Rule53 maps `PineGuard.Analyzers.UnitTests` → `src/PineGuard.Analyzers` — code-fix assertions live inside the analyzer test classes as `Fix` operation groups so no orphan allowlist entry is needed.
+Plan 00 §8 applies with these deltas: two source projects map to one test project and one coverage scope (`Analyzers`). The coverage scripts resolve one source directory and one path regex per scope, so the registry entry is `SourceDir = src/PineGuard.Analyzers` (existence probe), `PathRegex = '(?i)(^|[\\/])(src[\\/]+)?PineGuard\.Analyzers(\.CodeFixes)?[\\/]'` and `IncludePattern = @('[PineGuard.Analyzers]*', '[PineGuard.Analyzers.CodeFixes]*')` — the `switch` blocks take the regex, not an array of directories; `ci.yml` filter covers both `src/` folders; Qodana slnx lists both; `tools/release/Run-GithubRelease.ps1` / `Run-NugetUnlist.ps1` list `PineGuard.Analyzers` only; the `.editorconfig` test brace list gains `PineGuard.Analyzers.UnitTests`; Rule53 maps `PineGuard.Analyzers.UnitTests` → `+ src/PineGuard.Analyzers` — code-fix assertions live inside the analyzer test classes as `Fix` operation groups so no orphan allowlist entry is needed.
 
 ### 3.3 Docs
 
-`README.md` with a table of the five diagnostics and a before/after per row; root README *Analyzers* subsection and package table row; `docs/ai/specs/analyzers/` triad (the `project.md` states: analyzers are silent without the PineGuard reference; never fire in `PineGuard.*`; every diagnostic has a fix and a fix-all; release tracking files are mandatory).
+`README.md` with a table of the five diagnostics and a before/after per row; root README *Analyzers* subsection and package table row; the `analyzers/` triad under docs/ai/specs (the `project.md` states: analyzers are silent without the PineGuard reference; never fire in `PineGuard.*`; every diagnostic has a fix and a fix-all; release tracking files are mandatory).
 
 ## 4. Testing plan
 
@@ -142,7 +142,7 @@ Plan 00 §7, plus §2.2 in full; the unpacked package layout checked; a scratch 
 | Risk | Mitigation |
 |---|---|
 | Analyzer package noise in projects that do not use PineGuard | Well-known-type gating; tested |
-| Fixes emit a Guard name that no longer exists | Names are read from `guard-clauses/project.md`; the test project references the real `PineGuard.GuardClauses` assembly so a wrong name fails compilation of the fixed source |
+| Fixes emit a Guard name that no longer exists | Names are read from `docs/ai/specs/guard-clauses/project.md`; the test project references the real `PineGuard.GuardClauses` assembly so a wrong name fails compilation of the fixed source |
 | `TreatWarningsAsErrors` + `EnforceExtendedAnalyzerRules` friction (RS1xxx/RS2xxx) | Fix root causes (release tracking, `ConfigureGeneratedCodeAnalysis`, `EnableConcurrentExecution`); never `NoWarn` |
 | Roslyn version skew with consumers' SDKs | 4.14 is conservative for .NET 10-era SDKs; the README states the minimum SDK |
 

@@ -47,7 +47,7 @@ See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface invento
 
    Notes:
    - If the script prompts for a token, the user must generate one at `http://localhost:9001`.
-   - See `tools/sonar-scanner/README.md` § "Create a local project and token" for first-run setup.
+   - See `tools/sonar-scanner/README.md` § "3. Commission the server (first run only)" for first-run setup.
 
 4. **Review findings**
 

@@ -61,7 +61,7 @@ public sealed record FluentCase<TValue>(string Name, TValue Value, FluentExpecte
 ### Expected Type: `FluentExpected`
 
 ```csharp
-public sealed record FluentExpected(bool IsValid, string? Message = null, string? PropertyName = null)
+public sealed record FluentExpected(bool IsValid, string? Message = null, string? PropertyName = null, string? Code = null)
     : ReturnExpected(IsValid, Message);
 ```
 

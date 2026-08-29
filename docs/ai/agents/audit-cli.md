@@ -21,7 +21,7 @@ version: 1.0
      pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RepoRoot "." -RuleId Rule50
      ```
 
-   - **Audit libraries (Rule01..Rule10)** — Rule01 fails on a fresh checkout (it needs a `naming-spec.json` bootstrap that the repo does not ship); treat its output as noise, not a regression.
+   - **Audit libraries (Rule01..Rule10, Rule13)** — Rule01 fails on a fresh checkout (it needs a `naming-spec.json` bootstrap that the repo does not ship); treat its output as noise, not a regression.
 
      ```powershell
      pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-AuditLibraryRules.ps1" -Configuration Release -RepoRoot "."

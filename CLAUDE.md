@@ -152,16 +152,10 @@ line. The playbook is authoritative: if the two ever disagree, the playbook wins
 
 ## 3. Native Claude Code Features
 
-Claude Code has native features in `.claude/` that **reference** the Brain (never duplicate it):
-
-| Feature | Directory | Purpose |
-|---------|-----------|---------|
-| Rules | `.claude/rules/` | Path-scoped adapters → `docs/ai/rules/` |
-| Skills | `.claude/skills/` | `context: fork` wrappers → `docs/ai/skills/` |
-| Agents | `.claude/agents/` | Subagents with persistent memory |
-| Agent Memory | `.claude/agent-memory/` | Learned patterns persisted across sessions |
-| Hooks | `.claude/hooks/` | File hygiene enforcement |
-| Commands | `.claude/commands/` | Slash command adapters → `docs/ai/agents/` |
+Claude Code has native features in `.claude/` that **reference** the Brain (never duplicate it) —
+rules, skills, agents, agent memory, hooks, and commands, each mapping to a Brain counterpart. The
+full breakdown lives in **[docs/ai/README.md](docs/ai/README.md)** (the "Claude Code Adapter"
+section) so it is stated once, not twice.
 
 `.claude/` is one of several adapter surfaces in this repository. The full inventory — root boot
 files, full adapters, rules-only adapters, and the parity policy — lives in
