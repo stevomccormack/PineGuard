@@ -17,7 +17,7 @@ A simple domain has a single public static class directly in `MustClauses/`.
 - Uses `[CallerArgumentExpression(nameof(value))]` for automatic `paramName`
 - Calls Core Rule for logic — no raw validation in Must
 - Returns `MustResult<T>.FromBool(...)` or `MustResult<T>.Fail(...)` — never throws
-- Null check: return `Fail("{paramName} must not be null.", paramName, value)` for null inputs
+- Null check: return `Fail(MustCodes.Domain.Aspect.Condition, "{paramName} must not be null.", paramName, value)` for null inputs
 
 ## Decision Tree
 

@@ -6,11 +6,12 @@ spec:
   template:
     - ../../meta/template-project.md
   parent:
-    - ../spec.md
+    - ../project.md
   dependencies:
     - ../dependencies.md
 applies_to:
   - "src/PineGuard.GuardClauses/**"
+  - "src/PineGuard.Core/GuardClauses/**"
 ---
 
 # PineGuard.GuardClauses Project Spec

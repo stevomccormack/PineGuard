@@ -138,7 +138,8 @@ recorded once in **docs/ai/meta/adapter-surfaces.md**.
 
 ### Council Workflows
 
-- `/ask-council`: Act as **Architect**. Execute `docs/ai/agents/ask-council.md`.
+- `/ask-council`: Act as **Architect / Council**. Execute `docs/ai/agents/ask-council.md`.
+- `/plan-with-council`: Act as **Architect / Council**. Execute `docs/ai/workflows/plan-with-council.md`.
 
 ## 3. PI-Native Features
 

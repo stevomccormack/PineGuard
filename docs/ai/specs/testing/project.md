@@ -42,8 +42,8 @@ What this file does NOT restate:
 
 | Namespace | Folder | Contents |
 |-----------|--------|----------|
-| `PineGuard.Testing.Common` | `Common/` | Abstract/shared types (`IExpectedResult`, `ReturnExpected`, `ThrowExpected`, `BaseUnitTest`) |
-| `PineGuard.Testing.UnitTests` | `UnitTests/` | Layer-agnostic helpers (`ValueCase`, `ThrowsCase`, `ExpectedException`, `ThrowsCaseAssert`, soft-deprecated `IsCase<T>`/`HasCase<T>`) |
+| `PineGuard.Testing.Common` | `Common/` | Abstract/shared types (`IExpectedResult`, `ReturnExpected`, `ThrowExpected`, `ExpectedException`) |
+| `PineGuard.Testing.UnitTests` | `UnitTests/` | Layer-agnostic helpers (`BaseUnitTest`, `ValueCase`, `ThrowsCase`, `ThrowsCaseAssert`, soft-deprecated `IsCase<T>`/`HasCase<T>`) |
 | `PineGuard.Testing.UnitTests.{Rules, MustClauses, GuardClauses, FluentValidation, DataAnnotations}` | `UnitTests/<Layer>/` | One folder per layer: its `*Expected`, `*Case`, scenario-extension and base-test types |
 | `PineGuard.Testing.Fixtures` | `Fixtures/` | `XxxRulesFixtures` partials mirroring `src/PineGuard.Core/Rules/` (`fixture.md` §10) |
 

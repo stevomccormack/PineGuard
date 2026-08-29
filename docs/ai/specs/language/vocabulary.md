@@ -3,8 +3,6 @@ spec:
   id: pineguard.ai.language.vocabulary
   title: "PineGuard Vocabulary Map (Opposites + Alternatives)"
   version: 1
-  template:
-    - ../../meta/template-project.md
   parent:
     - ../spec.md
   dependencies:

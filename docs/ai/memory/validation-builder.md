@@ -2,13 +2,13 @@
 
 **Role:** `docs/ai/roles/builder.md`
 
-## Durable Patterns
+## Normative Rules
 
-- Respect the layer order: Core Utils -> Core Rules -> MustClauses -> GuardClauses -> Integrations.
-- `Must` owns user-facing messages. Guard, FluentValidation, and DataAnnotations reuse them.
-- Guard methods call Must methods and throw through `GuardFailure.Throw(...)`; they do not duplicate validation logic.
-- Core stays pure: no IO, no user-facing messages, and no architectural shortcuts around Must.
-- Every clause passes its `MustCodes` constant on every `Fail(...)`/`FromBool(...)` call — there is no code-less overload. Guard, FluentValidation (`MustBe`'s trailing `code` argument) and DataAnnotations (`ValidationAttributeBase`'s `code` constructor parameter) all carry the same constant the clause itself uses. Rule13 enforces this; see `docs/ai/specs/must-clauses/project.md` ("Error codes").
+The layer architecture — Core Utils -> Core Rules -> MustClauses -> GuardClauses -> Integrations,
+Must owns user-facing messages, Guard/FluentValidation/DataAnnotations reuse them, Core stays pure,
+and every clause passes its `MustCodes` constant on every `Fail(...)`/`FromBool(...)` call (Rule13) —
+is fully specified in `../rules/global.md`, `../rules/must.md`, `../rules/guard.md`, and
+`../specs/must-clauses/project.md` ("Error codes"). Read those; this file records observations, not rules.
 
 ## Signature Heuristics
 

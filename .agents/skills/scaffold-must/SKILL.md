@@ -28,4 +28,4 @@ Do NOT improvise. Do NOT skip steps.
 - Returns `MustResult<T>` — never throws
 - Owns canonical message with `{paramName}` placeholder
 - Calls Core Rules/Utils for logic (no raw parsing in Must)
-- Uses `Utility.TryXxx()` (not `Rules.IsXxx()`) when `result:` needs the parsed/normalized value (see core/project.md §4.1)
+- Uses `Utility.TryXxx()` (not `Rules.IsXxx()`) when `result:` needs the parsed/normalized value (see docs/ai/specs/core/project.md §4.1)

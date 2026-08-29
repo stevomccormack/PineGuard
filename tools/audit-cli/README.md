@@ -63,6 +63,8 @@ The rule catalog is defined in `rules/Load-Catalog.ps1` (single source of truth)
 | Rule08 | Ordering | Method ordering parity across layers |
 | Rule09 | CatalogIntegrity | Rule catalog self-consistency |
 | Rule10 | PsNormalization | PowerShell parse-safety compliance |
+| Rule11 | DocLinks | Doc/markdown/script/front-matter path reference resolution |
+| Rule12 | AdapterParity | Command parity between docs/ai/agents and declared adapter surfaces |
 | Rule13 | MustCodes | Must error-code catalogue integrity (one code per clause, every code used, no hardcoded literals, DataAnnotations attribute ↔ clause code parity, Guard.Against.* passes its IMustResult to GuardFailure.Throw, domain isolation, dependency-free leaf) |
 
 ### Testing Rules

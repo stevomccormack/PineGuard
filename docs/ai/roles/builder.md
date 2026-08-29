@@ -47,6 +47,7 @@ MustClauses, GuardClauses, FluentValidation, DataAnnotations) while preserving C
 - [Implement Unit Tests](../skills/scaffold-unit-test/SKILL.md)
 - [Improve Code Coverage](../skills/improve-coverage/SKILL.md)
 - [Format Code](../skills/format-code/SKILL.md)
+- [Generate XML Documentation](../skills/document/SKILL.md)
 
 ### Workflows
 - [Run Tests](../workflows/test.md)

@@ -88,7 +88,7 @@ public sealed record DataAnnotationCase(string Name, object? Value, DataAnnotati
 `DataAnnotationExpected` is the **only** allowed expected type:
 
 ```csharp
-public sealed record DataAnnotationExpected(bool IsValid, string? Message = null, string? MemberName = null)
+public sealed record DataAnnotationExpected(bool IsValid, string? Message = null, string? MemberName = null, string? Code = null)
     : ReturnExpected(IsValid, Message);
 ```
 
@@ -530,6 +530,10 @@ The following patterns are **explicitly forbidden** and must never appear in DA 
 | `ThrowsCase` as method parameter type | `IThrowsCase` |
 
 ---
+
+## Default Test Project
+
+- `tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj`
 
 ## References
 

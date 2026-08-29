@@ -33,11 +33,17 @@ It is the primary persona for code inspection and static analysis workflows (e.g
 
 ## Capabilities
 
+### Skills
+- [Run Roslyn Diagnostics](../skills/scan-roslyn/SKILL.md)
+- [Run Sonar Analysis](../skills/scan-sonar/SKILL.md)
+
 ### Specs
 - [Engineering Standards](../specs/coding-standard.md)
 
 ### Workflows
 - [Run Qodana](../workflows/scan-qodana.md)
+- [Run Roslyn](../workflows/scan-roslyn.md)
+- [Run Sonar](../workflows/scan-sonar.md)
 
 <!-- footer
 last_verified: 2026-02-26

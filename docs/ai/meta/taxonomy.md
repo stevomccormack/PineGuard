@@ -48,7 +48,7 @@ Make PineGuard’s AI documentation:
 - **What**: A scope-scoped summary of the invariants that apply to a directory or layer.
 - **Where**: `docs/ai/rules/*.md`, all inheriting from `docs/ai/rules/global.md`.
 - **Used by**: Path-scoped adapters (`.claude/rules/`, `.github/instructions/`, `.clinerules/`,
-  `.cursor/rules/`, `.windsurf/rules/`, `.amazonq/rules/`).
+  `.cursor/rules/`, `.windsurf/rules/`, `.amazonq/rules/`, `.junie/guidelines.md`).
 - **Rule**: Rules summarise and point at Specs. They never restate a Spec in full,
   and they never carry intent-routing tables (that is what Commands are for).
 

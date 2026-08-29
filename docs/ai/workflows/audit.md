@@ -12,7 +12,7 @@ version: 1.0
 
 ## Context
 
-- **Role**: [Software Engineer](../roles/builder.md)
+- **Role**: [DevOps Engineer](../roles/shipper.md)
 - **Reference**: `tools/audit-cli/Run-All.ps1` (compat: `tools/audit-cli/Run-AuditRules.ps1`)
 
 ## Rule08 Notes (ordering parity)
@@ -24,7 +24,7 @@ version: 1.0
 
 - **Scope**: (`All`, `Library`, `Testing`) — implemented via wrapper scripts under `tools/audit-cli/`.
 - **RuleId**: (optional, alias `-Rule`) any RuleId present in `tools/audit-cli/rules/Load-Catalog.ps1`.
-  - Library rules: Rule01..Rule10
+  - Library rules: Rule01..Rule13
   - Testing rules: Rule50..Rule54
 - **Configuration**: (`Debug`, `Release`) — used by rules that build/analyze compiled output
 - **RepoRoot**: (optional) repo root path; defaults to auto-resolve

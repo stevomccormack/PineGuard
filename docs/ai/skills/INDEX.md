@@ -1,7 +1,7 @@
 # PineGuard Skills Catalog
 
-> Quick-reference index of all skills across the Brain and its three skill-hosting adapter
-> surfaces (`.claude/`, `.github/`, `.pi/`). Each entry links to its canonical SKILL.md.
+> Quick-reference index of all skills across the Brain and its four skill-hosting adapter
+> surfaces (`.claude/`, `.github/`, `.pi/`, `.agents/`). Each entry links to its canonical SKILL.md.
 > The full surface inventory lives in [`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md).
 
 ## Brain Skills (`docs/ai/skills/`)
@@ -122,12 +122,41 @@ Copilot-compatible adapters for GitHub-hosted workflows.
 
 ---
 
+## Agents Adapter Skills (`.agents/skills/`)
+
+Generic `AGENTS.md`-convention adapters. Same delegation contract as the Claude Code set.
+
+| Skill | Brain Delegate | Description |
+|-------|---------------|-------------|
+| [scaffold-rule](../../../.agents/skills/scaffold-rule/SKILL.md) | `scaffold-rule` | Core Rule/Util implementation |
+| [scaffold-must](../../../.agents/skills/scaffold-must/SKILL.md) | `scaffold-must` | MustClause implementation |
+| [scaffold-guard](../../../.agents/skills/scaffold-guard/SKILL.md) | `scaffold-guard` | GuardClause implementation |
+| [scaffold-fluent](../../../.agents/skills/scaffold-fluent/SKILL.md) | `scaffold-fluent` | FluentValidation extension |
+| [scaffold-annotation](../../../.agents/skills/scaffold-annotation/SKILL.md) | `scaffold-annotation` | DataAnnotations attribute |
+| [scaffold-unit-test](../../../.agents/skills/scaffold-unit-test/SKILL.md) | `scaffold-unit-test` | xUnit test implementation |
+| [improve-coverage](../../../.agents/skills/improve-coverage/SKILL.md) | `improve-coverage` | Coverage gap analysis |
+| [new-validation](../../../.agents/skills/new-validation/SKILL.md) | `new-validation` | Simple in-memory predicate vertical slice |
+| [format-code](../../../.agents/skills/format-code/SKILL.md) | `format-code` | Code formatting |
+| [scan-roslyn](../../../.agents/skills/scan-roslyn/SKILL.md) | `scan-roslyn` | Roslyn diagnostics |
+| [fix-roslyn](../../../.agents/skills/fix-roslyn/SKILL.md) | `fix-roslyn` | Roslyn warning fixes |
+| [scan-sonar](../../../.agents/skills/scan-sonar/SKILL.md) | `scan-sonar` | SonarQube analysis |
+| [fix-sonar](../../../.agents/skills/fix-sonar/SKILL.md) | `fix-sonar` | SonarQube issue fixes |
+| [document](../../../.agents/skills/document/SKILL.md) | `document` | XML documentation generation |
+| [scaffold-workflow](../../../.agents/skills/scaffold-workflow/SKILL.md) | `scaffold-workflow` | New agent playbook + adapter cascade |
+| [scaffold-quality-tool](../../../.agents/skills/scaffold-quality-tool/SKILL.md) | `scaffold-quality-tool` | New quality/inspection tool scaffold |
+| [changelog](../../../.agents/skills/changelog/SKILL.md) | *(standalone)* | Generate changelog from git history |
+| [dependency-audit](../../../.agents/skills/dependency-audit/SKILL.md) | *(standalone)* | Check NuGet vulnerabilities and outdated packages |
+| [ask-council](../../../.agents/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
+
+---
+
 ## Skill Architecture
 
 ```
 .claude/skills/        ← Claude Code adapters (context: fork)
 .github/skills/        ← GitHub Copilot adapters
 .pi/skills/            ← Pi adapters
+.agents/skills/        ← Generic AGENTS.md-convention adapters
 docs/ai/skills/        ← Brain (canonical, model-agnostic)
     ├── INDEX.md       ← This file
     └── <skill-name>/

@@ -41,6 +41,7 @@ and repo tooling (often PowerShell-first in this repo).
 - [Run Audit CLI](../workflows/audit.md)
 - [Rebuild All Libraries](../workflows/build-all.md)
 - [Format Code](../workflows/format.md)
+- [Run Commit](../workflows/commit.md)
 
 <!-- footer
 last_verified: 2026-02-26

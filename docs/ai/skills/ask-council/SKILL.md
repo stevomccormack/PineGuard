@@ -13,7 +13,7 @@ Adapted from Karpathy's LLM Council methodology. Five advisor archetypes (Contra
 
 - **Question**: a decision, plan recommendation, strategy, or trade-off the user wants pressure-tested.
 - **Context Files** (auto-discovered): `CLAUDE.md`, `AGENTS.md`, `docs/ai/plans/*.md`, any file the user attaches.
-- **Save Transcript**: optional — `true` persists the session under `docs/ai/plans/<plan>/council-transcript.md` or `artifacts/council/`.
+- **Save Transcript**: optional — `true` persists the session under `docs/ai/plans/<plan>.council-transcript.md` or `artifacts/council/`.
 
 ## 3. Critical Rules (The "Must Dos")
 
@@ -92,7 +92,7 @@ No HTML. No side files — unless Step 6 triggers.
 
 Save only if the user asked, or the question is plan-gated by [`docs/ai/specs/council.md`](../../specs/council.md):
 
-- **Plan-gated**: write `docs/ai/plans/<plan-slug>/council-transcript.md` and stamp the plan's `metadata_header` with `council_verdict_ref: <path>`.
+- **Plan-gated**: write `docs/ai/plans/<plan-slug>.council-transcript.md` and stamp the plan's `metadata_header` with `council_verdict_ref: <path>`.
 - **Ad-hoc**: write `artifacts/council/council-transcript-<yyyyMMdd-HHmm>.md`.
 
 Transcript includes: framed question, all five advisor responses, all five peer reviews, the anonymization map, and the chairman verdict.

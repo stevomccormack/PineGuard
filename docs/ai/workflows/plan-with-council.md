@@ -38,11 +38,11 @@ Not auto-approved on any adapter. The council is intentional.
    - Include relevant context from the plan body (≤3 snippets).
 
 4. **Run the council.**
-   - Follow [`../agents/ask-council.md`](../agents/ask-council.md) Steps 2–5 exactly.
+   - Follow [`../agents/ask-council.md`](../agents/ask-council.md) Steps 3–5 exactly.
    - Parallel advisor spawning, anonymized peer review, chairman synthesis.
 
 5. **Persist the transcript.**
-   - Save to `docs/ai/plans/<plan-slug>/council-transcript.md`.
+   - Save to `docs/ai/plans/<plan-slug>.council-transcript.md`.
    - Include: framed question, advisor responses, peer reviews, anonymization map, chairman verdict.
 
 6. **Revise the plan.**
@@ -53,7 +53,7 @@ Not auto-approved on any adapter. The council is intentional.
 7. **Stamp the plan.**
    - Update the plan's `metadata_header`:
      ```yaml
-     council_verdict_ref: docs/ai/plans/<plan-slug>/council-transcript.md
+     council_verdict_ref: docs/ai/plans/<plan-slug>.council-transcript.md
      council_verdict_date: <yyyy-MM-dd>
      council_trigger: <api|scope|cascade|release-ip|explicit>
      ```

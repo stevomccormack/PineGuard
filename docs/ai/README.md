@@ -51,7 +51,7 @@ Statuses mirror each plan's `metadata_header` (`docs/ai/meta/taxonomy.md` §Plan
 | Plan | Status |
 |------|--------|
 | [Library Expansion Roadmap](plans/library-expansion-roadmap.md) | Planned |
-| [New Surfaces Program — charter + phase plans 01–06](plans/new-surfaces-missing-validation-cases-00-program.md) | Planned |
+| [New Surfaces Program — charter + phase plans 01–06](plans/new-surfaces-missing-validation-cases-00-program.md) | Active — Phase 1 (Structural validation) complete |
 | [Cross-Platform Tools Migration](plans/cross-platform-tools-migration.md) | Planned |
 | [Core / Common API Decisions](plans/core-common-api-decisions.md) | Open — decisions awaiting an owner's call |
 | [Competitive Analysis](plans/competitive-analysis.md) | Living reference — not a work item |
@@ -164,21 +164,10 @@ a family of thin agents); three are **standalone** conveniences reachable from r
 
 ## Roles Inventory
 
-All roles are defined in `docs/ai/roles/` and registered in `docs/ai/business-units/engineering.md`.
-
-| Role | Archetype | File | Primary Responsibility |
-|------|-----------|------|----------------------|
-| Principal Engineer | System Thinker | `roles/principal-engineer.md` | Protocol, tooling strategy, release governance |
-| Architect | Guardian | `roles/architect.md` | Strategic design, pattern enforcement |
-| Lead Engineer | Coordinator | `roles/lead-engineer.md` | Planning, slicing work, PR coordination |
-| Senior Engineer | Owner | `roles/owner.md` | Implement + debug, root-cause analysis |
-| Software Engineer | Builder | `roles/builder.md` | Tactical implementation, bug fixing |
-| Test Engineer | Verifier | `roles/verifier.md` | Writing tests, running coverage |
-| Test Analyst | Planner | `roles/planner.md` | Test strategy, case design, gap analysis |
-| Code Reviewer | Critic | `roles/reviewer.md` | PR review, catching drift from specs |
-| DevOps Engineer | Shipper | `roles/shipper.md` | CI/CD, packaging, release automation |
-| Business Analyst | Clarifier | `roles/business-analyst.md` | Requirements, acceptance criteria |
-| Council (Contrarian / First Principles / Expansionist / Outsider / Executor / Chairman) | Multi-perspective Reviewer | `roles/council.md` | Stateless advisor personas used only in the ask-council procedure |
+All 11 roles are defined in `docs/ai/roles/` and registered — with the fuller responsibility
+descriptions and the reference-persona notes — in
+[`docs/ai/business-units/engineering.md`](business-units/engineering.md), which `CLAUDE.md` §1
+points to for role adoption. That file is the single roster; this index does not keep a second copy.
 
 ### Claude Code Agent ↔ Brain Role Mapping
 

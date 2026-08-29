@@ -28,6 +28,8 @@ Runs static analysis using the specified tool. Scanning is read-only and auto-ap
 | `/scan-qodana-testing` | Qodana, PineGuard.Testing | `docs/ai/agents/scan-qodana-testing.md` |
 | `/scan-sonar` | SonarQube, whole solution (no per-scope variants) | `docs/ai/agents/scan-sonar.md` |
 
+**Shared orchestration**: `docs/ai/workflows/scan-roslyn.md`, `docs/ai/workflows/scan-qodana.md`, `docs/ai/workflows/scan-sonar.md` — each tool's agents delegate to its matching master workflow.
+
 ## Repairing what a scan reports
 
 Contracted in [`fix.md`](fix.md): `/fix-roslyn-all` for Roslyn, `/fix-sonar-{severity}` for

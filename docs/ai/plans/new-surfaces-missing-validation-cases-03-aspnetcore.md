@@ -16,8 +16,8 @@ parent: new-surfaces-program
 > **Status**: Planned | **Depends on**: PR 1 — 1a + Track 0 (Plan 00 §10.1; Plan 02's onboarding log is used if it has merged, otherwise this phase executes Plan 00 §8 itself and files the same log); PR 2 — PR 1 **and 1d** (the exception handler reads codes through `ExceptionExtension`) | **Unblocks**: Phase 4 MediatR (reuses the DI package and the async seam)
 >
 > **Worktrees** (two PRs, in this order):
-> 1. `.claude/worktrees/must-async-di` on `feature/must-async-di` — W1–W3 (async seam, validation mode, `PineGuard.Extensions.DependencyInjection`).
-> 2. `.claude/worktrees/aspnetcore` on `feature/aspnetcore` — W4–W8 (`PineGuard.AspNetCore`).
+> 1. `+ .claude/worktrees/must-async-di` on `feature/must-async-di` — W1–W3 (async seam, validation mode, `PineGuard.Extensions.DependencyInjection`).
+> 2. `+ .claude/worktrees/aspnetcore` on `feature/aspnetcore` — W4–W8 (`PineGuard.AspNetCore`).
 >
 > Read [Plan 00](new-surfaces-missing-validation-cases-00-program.md) first; Plan 02 §3.4's onboarding log is the procedure for the two new scopes here.
 
@@ -255,7 +255,7 @@ Two scopes — `DependencyInjection` (`di`) and `AspNetCore` (`aspnetcore`) — 
 
 ### 4.5 Docs
 
-`README.md` per package; root README *ASP.NET Core* subsection (stories 1–6 verbatim); `docs/ai/specs/di/` and `docs/ai/specs/aspnetcore/` triads; `docs/ai/specs/must-clauses/project.md` async section (Async lives in Must and above; Core never; Rule14); `docs/ai/specs/fluent-validation/project.md` `MustBeAsync`; `docs/ai/specs/testing/unit-test.md` §5.1 addendum; `docs/ai/memory/*` durable patterns ("filters never read `MustFailure.Value`", "only `MustValidationException` maps to 400 by default").
+`README.md` per package; root README *ASP.NET Core* subsection (stories 1–6 verbatim); the `di` and `aspnetcore` triads (`project.md`, `unit-test.md`, `coverage.md`) planned under docs/ai/specs/; `docs/ai/specs/must-clauses/project.md` async section (Async lives in Must and above; Core never; Rule14); `docs/ai/specs/fluent-validation/project.md` `MustBeAsync`; `docs/ai/specs/testing/unit-test.md` §5.1 addendum; `docs/ai/memory/*` durable patterns ("filters never read `MustFailure.Value`", "only `MustValidationException` maps to 400 by default").
 
 ## 5. Testing plan
 
@@ -292,7 +292,7 @@ End-to-end coverage (`TestServer` via `WebApplication.CreateBuilder` + `builder.
 
 ### PR 1 — `feature/must-async-di`
 
-**W0** Plan 00 §6 (`<slug> = must-async-di`); read `docs/ai/specs/must-clauses/project.md`, `fluent-validation/project.md`, `testing/unit-test.md`, `tools/spec.md`, Plan 02's onboarding log. Baseline gates.
+**W0** Plan 00 §6 (`<slug> = must-async-di`); read `docs/ai/specs/must-clauses/project.md`, `docs/ai/specs/fluent-validation/project.md`, `docs/ai/specs/testing/unit-test.md`, `docs/ai/specs/tools/spec.md`, Plan 02's onboarding log. Baseline gates.
 
 **W1** Async rules + `MustValidationMode` in Core (§3.1–3.2); tests; `-Scope Core` 100/100; Rule14 script + catalogue + tasks + docs; `Run-All.ps1 -RuleId Rule14` clean. Commit `feat(core): add async validator rules and StopOnFirstFailure mode` and `feat(tools): add audit Rule14 keeping Core synchronous`.
 

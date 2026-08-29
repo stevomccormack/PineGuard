@@ -39,6 +39,7 @@ and to ensure changes don’t introduce regressions.
 
 ### Workflows
 - [Run Tests](../workflows/test.md)
+- [Run Last Test](../workflows/test-last.md)
 - [Run Coverage](../workflows/coverage.md)
 - [Debug & Fix Tests](../workflows/fix-test.md)
 

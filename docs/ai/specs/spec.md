@@ -98,8 +98,8 @@ Notes:
   - `docs/ai/meta/template-coverage.md`
 
   Root and process specs (this file, `protocol.md`, `orchestration.md`, `dependencies.md`,
-  `safety.md`, `coding-standard.md`, `council.md`, and the `language/`, `scan/`, `tools/`
-  specs) have no template and omit the field.
+  `safety.md`, `coding-standard.md`, `council.md`, `project.md`, and the `language/`, `scan/`,
+  `tools/` specs) have no template and omit the field.
 - All header paths are relative to the spec's own location, so the depth varies: `../meta/…` and `parent: spec.md` for a spec directly under `docs/ai/specs/`, `../../meta/…` and `parent: ../spec.md` one directory deeper, and so on.
 
 Recommended extended header:
