@@ -235,9 +235,9 @@ Coverage: `pwsh … Run-CodeCoverage.ps1 -Mode GenerateAndAnalyze -Scope Options
 2. Read `docs/ai/specs/spec.md`, `docs/ai/specs/project.md`, `docs/ai/specs/testing/unit-test.md`, `docs/ai/specs/testing/project.md`, `docs/ai/specs/tools/spec.md`, `docs/ai/meta/adapter-surfaces.md`, `docs/ai/skills/scaffold-workflow/SKILL.md`.
 3. Baseline build + test (Plan 00 §9).
 
-### W1 — Track 0 must be on `main`
+### W1 — Track 0 is on `main` (done)
 
-> The `Get-PineGuardScope` registry is **Track 0** in Plan 00 §10 (approved, §12) and is executed there, not here. W1 is a check: `git log --oneline origin/main | grep -i "scope registry"`. If Track 0 has not merged, execute it now as its own worktree/PR (`.claude/worktrees/track-0`, `feature/tooling-scope-registry`): add `Get-PineGuardScope` to `tools/.shared/dotnet-projects.ps1` seeded with the six existing scopes; refactor items 8–15 of Plan 00 §8.3 to consume it with identical behaviour (run `Run-CodeCoverage.ps1 -Scope Core -SkipHtml -Enforce100 -Framework net10.0` and `-Scope MustClauses` before and after, compare summaries); apply Plan 00 §8.2 items 7(e)–7(g); Rule09/Rule10 clean; commit `refactor(tools): centralise per-scope project paths in one registry`; merge; then continue here.
+The `Get-PineGuardScope` registry is **Track 0** in Plan 00 §10 (merged 2026-08-29, commit `8f28479`; decision log §12) — no further action needed here. Verify with `git log --oneline main | grep -i "scope registry"` before starting W2.
 
 ### W2 — Onboard the `Options` scope
 1. Create `+ src/PineGuard.Extensions.Options/PineGuard.Extensions.Options.csproj` (Plan 00 §4.4) and `+ tests/PineGuard.Extensions.Options.UnitTests/PineGuard.Extensions.Options.UnitTests.csproj` (§4.5 + the test-only packages); `dotnet sln PineGuard.slnx add …` for both (tests into the `tests` solution folder).
