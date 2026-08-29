@@ -13,7 +13,7 @@ public static class OptionsBuilderExtensionTestData
     private static readonly SmtpOptions ValidSmtpOptions = new() { Host = "smtp.example.com", Port = 25, From = "noreply@example.com", UseTls = false };
     private static readonly SmtpOptions InvalidHostSmtpOptions = new() { Host = "not a valid host", Port = 25, From = "noreply@example.com", UseTls = false };
 
-    public sealed record ResolveExpected(Type? ExceptionType = null, string? MessageContains = null);
+    public sealed record ResolveExpected(Type? ExceptionType = null, string? MessageContains = null, IReadOnlyList<string>? MessageContainsAll = null);
 
     public static class ValidateMustRules
     {
@@ -76,6 +76,34 @@ public static class OptionsBuilderExtensionTestData
 
         private sealed record ActionThrowsCase(string Name, Action Value, ExpectedException ExpectedException)
             : ThrowsCase<Action>(Name, Value, ExpectedException);
+    }
+
+    public static class ValidateOnStart
+    {
+        private static readonly Dictionary<string, string?> ValidSmtpConfiguration = new()
+        {
+            ["Smtp:Host"] = "smtp.example.com",
+            ["Smtp:Port"] = "25",
+            ["Smtp:From"] = "noreply@example.com",
+            ["Smtp:UseTls"] = "false"
+        };
+
+        private static readonly Dictionary<string, string?> InvalidSmtpConfiguration = new()
+        {
+            ["Smtp:Host"] = "not a valid host",
+            ["Smtp:Port"] = "25",
+            ["Smtp:From"] = "not-an-email",
+            ["Smtp:UseTls"] = "false"
+        };
+
+        public static TheoryData<Case> Cases =>
+        [
+            new("valid-configuration-starts-host-successfully", ValidSmtpConfiguration, new ResolveExpected()),
+            new("invalid-configuration-throws-once-listing-every-failure", InvalidSmtpConfiguration, new ResolveExpected(typeof(OptionsValidationException), null, ["SmtpOptions.Host", "SmtpOptions.From"]))
+        ];
+
+        public sealed record Case(string Name, Dictionary<string, string?> Value, ResolveExpected Expected)
+            : ReturnCase<Dictionary<string, string?>, ResolveExpected>(Name, Value, Expected);
     }
 
     private static OptionsBuilder<SmtpOptions> NewSmtpBuilder() => new(new ServiceCollection(), MicrosoftOptions.DefaultName);
