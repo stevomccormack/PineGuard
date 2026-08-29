@@ -65,6 +65,29 @@ In short: optimize *how much of the work* sits in your context, never *how caref
 itself gets done. Cheap orchestration and expert-level output are not in tension here — they
 come from the same rule, which is to delegate the doing and keep only the deciding.
 
+**Handing off to a genuinely new session (not a `--resume`/`--continue` of this one).** Two things
+do not travel with the rest of this file, because they are tied to the live session process, not
+to disk state:
+
+1. **The `/goal` Stop hook is session-scoped.** If the prior session set one up to keep working
+   until every phase is done, a new session does not inherit it — re-issue `/goal` there if you
+   want that enforcement to continue. Point it at this file rather than retyping the goal text;
+   everything durable is already here.
+2. **An in-flight background `Workflow` call belongs to the session that launched it.** A new
+   session gets no completion notification for it and most likely cannot query its task ID
+   either. If §2's tracker shows a unit "in progress" with no merge commit yet, **do not assume
+   it is still running or that it failed** — check for real:
+   - `git -C .claude/worktrees/<unit> log --oneline -5` and `git status --short` — has a commit
+     landed since the tracker was last updated? Is the tree clean?
+   - If a task ID and transcript path were recorded for the in-flight run (see the tracker row),
+     read that workflow's `journal.jsonl` directly (path pattern:
+     `<claude projects dir>/<session id>/subagents/workflows/wf_<id>/journal.jsonl`) — a `result`
+     event for every dispatched agent means it finished; a dangling `started` with no matching
+     `result` means it died mid-flight (§7's lesson) and needs re-dispatching from that step, not
+     from the beginning of the unit.
+   - Never resume a unit's work by re-reading only the tracker's prose — the tracker is a
+     summary written by a prior session; the git log and the journal are ground truth.
+
 ## 1. Why this file exists
 
 The program is roughly 18–28 focused work-session's worth of content across ~12 PR-sized units
@@ -83,7 +106,7 @@ same PR/commit that closes the unit out.** A tracker that lags reality is worse 
 | Phase 1 (1a–1d) | **Done** | `feature/structural-validation` (removed) | `357ab00` | All four sub-units shipped together, not as separate PRs — see Plan 01's archive banner |
 | Track 0 | **Done** | `feature/tooling-scope-registry` (removed) | `7ffaf40` | `Get-PineGuardScope` registry; unblocks 2, 3-PR1, 4-bridges, 6 |
 | CI coverage gate → 100% | **Done** | — | `18d7890` | Verified via live CI re-run (job `99088572473`), not assumed |
-| **2 — Options** | **W1/W2 done and independently verified** — ready for W3 | `feature/options` (synced with `origin/main` through `419d24c`; local commits `925dfbc`, `3877538`, `75a37c7`, `ac26f71`) | — (local only, not pushed) | Scaffolding (Plan 00 §8.1–8.3) is genuinely gate-clean: `dotnet build`/`pack` both succeed, `ci.yml` wired, the Track-0 `-Scope All` registry defect fixed and manually regex-traced correct (not just re-run), Rule13 root added, decision-log rows added to §12/§8.3. Package has zero `.cs` files yet by design — W3 is the actual feature implementation. Two independent verification passes were needed to get here (see §7 lesson on the interrupted first one) — trust the second, not the first. |
+| **2 — Options** | W1/W2 done and independently verified; **W3 (feature implementation) running now** | `feature/options` (synced with `origin/main` through `419d24c`; local commits `925dfbc`, `3877538`, `75a37c7`, `ac26f71`) | — (local only, not pushed) | Scaffolding (Plan 00 §8.1–8.3) is gate-clean: `dotnet build`/`pack` both succeed, `ci.yml` wired, the Track-0 `-Scope All` registry defect fixed and manually regex-traced correct, Rule13 root added, decision-log rows added to §12/§8.3. **W3 in flight**: `MustRulesValidateOptions`/`OptionsBuilderExtension` implementation + Opus re-verify, launched as Workflow task `wo4ln9jh8`, transcript `subagents/workflows/wf_efb67fbe-25f/journal.jsonl` under this session's Claude projects dir. If you are a new session reading this and no merge commit newer than `ac26f71` exists in the worktree yet, check that journal per §0's handoff note before assuming the run is still active — a background run belongs to the session that launched it and does not survive a genuinely new session. |
 | **4-bridges** | Not started | none yet | — | Blocked on owner decision D1 (scope) before opening |
 | **3-PR1 — async + DI** | Not started | none yet | — | Blocked on owner decision D4 (FV adapter scanner in/out of scope) before opening |
 | **3-PR2 — AspNetCore** | Not started | none yet | — | Hard-depends on 3-PR1 merged; 1d dependency already satisfied; decision D3 gates its W7 only |
