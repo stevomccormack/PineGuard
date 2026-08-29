@@ -82,15 +82,13 @@ function Test-CoverageLooksValid {
     }
 
     $repoRootForScopeCheck = Get-RepoRoot
-    $scopeSourceDir = switch ($Scope) {
-        'Core' { Join-Path $repoRootForScopeCheck 'src\PineGuard.Core' }
-        'MustClauses' { Join-Path $repoRootForScopeCheck 'src\PineGuard.MustClauses' }
-        'GuardClauses' { Join-Path $repoRootForScopeCheck 'src\PineGuard.GuardClauses' }
-        'DataAnnotations' { Join-Path $repoRootForScopeCheck 'src\PineGuard.DataAnnotations' }
-        'FluentValidation' { Join-Path $repoRootForScopeCheck 'src\PineGuard.FluentValidation' }
-        'Testing' { Join-Path $repoRootForScopeCheck 'tests\PineGuard.Testing' }
-        default { $null }
+    $scopeRegistryEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Testing')) {
+        Get-PineGuardScope -Name $Scope
     }
+    else {
+        $null
+    }
+    $scopeSourceDir = if ($null -ne $scopeRegistryEntry) { Join-Path $repoRootForScopeCheck $scopeRegistryEntry.SourceDir } else { $null }
 
     $scopeHasAnySourceFiles = $true
     if (-not [string]::IsNullOrWhiteSpace($scopeSourceDir) -and (Test-Path $scopeSourceDir)) {
@@ -105,14 +103,14 @@ function Test-CoverageLooksValid {
         return $false
     }
 
-    $expected = switch ($Scope) {
-        'Core' { '(?i)(^|[\\/])(src[\\/]+)?PineGuard\.Core[\\/]' }
-        'MustClauses' { '(?i)(^|[\\/])(src[\\/]+)?PineGuard\.MustClauses[\\/]' }
-        'GuardClauses' { '(?i)(^|[\\/])(src[\\/]+)?PineGuard\.GuardClauses[\\/]' }
-        'DataAnnotations' { '(?i)(^|[\\/])(src[\\/]+)?PineGuard\.DataAnnotations[\\/]' }
-        'FluentValidation' { '(?i)(^|[\\/])(src[\\/]+)?PineGuard\.FluentValidation[\\/]' }
-        'Testing' { '(?i)(^|[\\/])(tests[\\/]+)?PineGuard\.Testing[\\/]' }
-        default { '(?i)(^|[\\/])((src|tests)[\\/]+)?PineGuard\.(Core|MustClauses|GuardClauses|DataAnnotations|FluentValidation|Testing)[\\/]' }
+    $expected = if ($null -ne $scopeRegistryEntry) {
+        $scopePrefixFolder = ($scopeRegistryEntry.SourceDir -split '\\')[0]
+        $scopeLeaf = Split-Path $scopeRegistryEntry.SourceDir -Leaf
+        "(?i)(^|[\\/])($scopePrefixFolder[\\/]+)?$([regex]::Escape($scopeLeaf))[\\/]"
+    }
+    else {
+        $allNamesAlternation = (Get-PineGuardScope -All | ForEach-Object Name) -join '|'
+        "(?i)(^|[\\/])((src|tests)[\\/]+)?PineGuard\.($allNamesAlternation)[\\/]"
     }
 
     if ($false) {
@@ -148,34 +146,30 @@ if ($Clean) {
 Ensure-Directory -Path $generatedRoot
 Ensure-Directory -Path $resultsRoot
 
-$includePatterns = switch ($Scope) {
-    'Core' { @('[PineGuard.Core]*') }
-    'MustClauses' { @('[PineGuard.MustClauses]*') }
-    'GuardClauses' { @('[PineGuard.GuardClauses]*') }
-    'DataAnnotations' { @('[PineGuard.DataAnnotations]*') }
-    'FluentValidation' { @('[PineGuard.FluentValidation]*') }
-    'Testing' { @('[PineGuard.Testing]*') }
-    default { @('[PineGuard.Core]*', '[PineGuard.MustClauses]*', '[PineGuard.GuardClauses]*', '[PineGuard.DataAnnotations]*', '[PineGuard.FluentValidation]*', '[PineGuard.Testing]*') }
+$generateScopeEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Testing')) {
+    Get-PineGuardScope -Name $Scope
+}
+else {
+    $null
+}
+
+$includePatterns = if ($null -ne $generateScopeEntry) {
+    @($generateScopeEntry.CoverageIncludePattern)
+}
+else {
+    @(Get-PineGuardScope -All | ForEach-Object CoverageIncludePattern)
 }
 
 # For speed, default to the single most relevant test project for the selected scope.
 # (You can override by passing -ProjectFilter explicitly.)
 if ($ProjectFilter -eq '*.UnitTests.csproj') {
-    $ProjectFilter = switch ($Scope) {
-        'Core' { 'PineGuard.Core.UnitTests.csproj' }
-        'MustClauses' { 'PineGuard.MustClauses.UnitTests.csproj' }
-        'GuardClauses' { 'PineGuard.GuardClauses.UnitTests.csproj' }
-        'DataAnnotations' { 'PineGuard.DataAnnotations.UnitTests.csproj' }
-        'FluentValidation' { 'PineGuard.FluentValidation.UnitTests.csproj' }
-        'Testing' { '*.UnitTests.csproj' }
-        default { '*.UnitTests.csproj' }
-    }
+    $ProjectFilter = if ($null -ne $generateScopeEntry) { $generateScopeEntry.DefaultProjectFilter } else { '*.UnitTests.csproj' }
 }
 
 $runSettingsPath = Join-Path $generatedRoot ("coverlet.$Scope.runsettings")
 Write-CoverletRunSettings -OutputPath $runSettingsPath -IncludePatterns $includePatterns -Format $Format
 
-$includeEmptyTestProjects = $Scope -in @('DataAnnotations', 'FluentValidation')
+$includeEmptyTestProjects = if ($null -ne $generateScopeEntry) { [bool]$generateScopeEntry.IncludeEmptyTestProjects } else { $false }
 $testProjects = @(Get-TestProjects -RepoRoot $repoRoot -ProjectFilter $ProjectFilter -IncludeEmpty:$includeEmptyTestProjects)
 
 Write-Host "Repo root: $repoRoot" -ForegroundColor DarkGray
