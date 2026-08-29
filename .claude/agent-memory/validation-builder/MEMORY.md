@@ -35,6 +35,24 @@
 - Nullable string handling: `val is not null ? Must.Be.X(val, paramName: null) : MustResult<string>.Ok(null!)`
 - Optional `string? message = null` parameter for custom error override
 - Type mismatches: use explicit generic args `ruleBuilder.MustBe<T, string?, string>(...)`
+- Parameter order mirrors the Must clause minus `paramName`: value config params first, then
+  optional forwarded config with a default (`StringComparison comparison = StringComparison.Ordinal`),
+  then `string? message = null` **last** (project.md §4.3)
+- Names may duplicate an existing Fluent name on a different receiver type (`Contains` exists on
+  collection and range rule builders) — no collision, the property type disambiguates
+
+### Fluent complement (`Not*`) TestData without duplicating fixture data
+- Both the positive and the complement project the **same** `AllScenarios` array; the complement
+  just flips the switch arms:
+  `nameof(F.X.NullValue) => new FluentExpected(true), _ when s.IsValid => new FluentExpected(false, "<complement message>", Code: ...), _ => new FluentExpected(true)`
+- The null arm stays `true` in BOTH directions — FluentValidation skips null (project.md §5), unlike
+  Must (failure) and Guard (throw). Same fixture, three different null expectations per layer.
+- Older Fluent test files declare a private local `Scenarios` array for the `Not*` half; that
+  duplicates data. Prefer the flipped-switch projection.
+- When a family ships inverted code pairs (positive carries `not-x`, complement carries `x`),
+  assert `Code:` on **every** group's invalid arm, not just one spot check — the inversion is
+  exactly the wiring a single spot check leaves unguarded. `AssertResult` only reads `Code` when
+  `Expected.Code is not null`, so never set it on a valid expectation (it indexes `Errors[0]`).
 
 ### DataAnnotations Signatures
 - `sealed class`, inherits `ValidationAttributeBase(typeof(T), MustCodes.X.Y.Z)` — the `code` argument is now required and sits **before** `allowNull:`; see [MustCodes catalogue](must-codes-catalogue.md)
