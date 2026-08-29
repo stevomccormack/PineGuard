@@ -65,6 +65,29 @@ In short: optimize *how much of the work* sits in your context, never *how caref
 itself gets done. Cheap orchestration and expert-level output are not in tension here — they
 come from the same rule, which is to delegate the doing and keep only the deciding.
 
+**Handing off to a genuinely new session (not a `--resume`/`--continue` of this one).** Two things
+do not travel with the rest of this file, because they are tied to the live session process, not
+to disk state:
+
+1. **The `/goal` Stop hook is session-scoped.** If the prior session set one up to keep working
+   until every phase is done, a new session does not inherit it — re-issue `/goal` there if you
+   want that enforcement to continue. Point it at this file rather than retyping the goal text;
+   everything durable is already here.
+2. **An in-flight background `Workflow` call belongs to the session that launched it.** A new
+   session gets no completion notification for it and most likely cannot query its task ID
+   either. If §2's tracker shows a unit "in progress" with no merge commit yet, **do not assume
+   it is still running or that it failed** — check for real:
+   - `git -C .claude/worktrees/<unit> log --oneline -5` and `git status --short` — has a commit
+     landed since the tracker was last updated? Is the tree clean?
+   - If a task ID and transcript path were recorded for the in-flight run (see the tracker row),
+     read that workflow's `journal.jsonl` directly (path pattern:
+     `<claude projects dir>/<session id>/subagents/workflows/wf_<id>/journal.jsonl`) — a `result`
+     event for every dispatched agent means it finished; a dangling `started` with no matching
+     `result` means it died mid-flight (§7's lesson) and needs re-dispatching from that step, not
+     from the beginning of the unit.
+   - Never resume a unit's work by re-reading only the tracker's prose — the tracker is a
+     summary written by a prior session; the git log and the journal are ground truth.
+
 ## 1. Why this file exists
 
 The program is roughly 18–28 focused work-session's worth of content across ~12 PR-sized units
@@ -83,7 +106,7 @@ same PR/commit that closes the unit out.** A tracker that lags reality is worse 
 | Phase 1 (1a–1d) | **Done** | `feature/structural-validation` (removed) | `357ab00` | All four sub-units shipped together, not as separate PRs — see Plan 01's archive banner |
 | Track 0 | **Done** | `feature/tooling-scope-registry` (removed) | `7ffaf40` | `Get-PineGuardScope` registry; unblocks 2, 3-PR1, 4-bridges, 6 |
 | CI coverage gate → 100% | **Done** | — | `18d7890` | Verified via live CI re-run (job `99088572473`), not assumed |
-| **2 — Options** | In progress — W1/W2 scaffolding done, fix pass running | `feature/options` (synced with `origin/main`, local commit `925dfbc`) | — (local only, not pushed) | W1/W2 landed but an independent Opus verification found real gaps before merge: no package `README.md`/`AGENTS.md` (broke `dotnet pack` and `Commit-Agent.ps1`), `ci.yml` wiring genuinely missing (§8.2, in scope per Plan 02 §3.4), and a latent Track-0 registry defect (`-Scope All`'s aggregate regex is built from scope `Name`, not the real folder path, so it silently never matches `PineGuard.Extensions.Options`). A fix-and-reverify workflow is running to close all of these before W3 (real feature code) starts on top of it. **Do not build on this worktree until the reverify pass confirms clean.** |
+| **2 — Options** | W1/W2 done and independently verified; **W3 (feature implementation) done**; **W4 (tests) not started — next dispatch**; W5 (Brain/adapters) and W6 (unit close-out) not started | `feature/options` (synced with `origin/main` through `419d24c`; local commits `925dfbc`, `3877538`, `75a37c7`, `ac26f71`, `e7a63d1`, `977576f`) | — (local only, not pushed) | Scaffolding (Plan 00 §8.1–8.3) is gate-clean: `dotnet build`/`pack` both succeed, `ci.yml` wired, the Track-0 `-Scope All` registry defect fixed and manually regex-traced correct, Rule13 root added, decision-log rows added to §12/§8.3. **W3 workflow task `wo4ln9jh8` (transcript `wf_efb67fbe-25f/journal.jsonl`) died mid-flight per §7's lesson** — confirmed by a new session picking this up cold: journal showed one `started` event with no matching `result`; `git log`/`status` showed a real but partial commit (`a546034`, the two source files, no tests) plus an uncommitted README edit. Recovered without data loss: an Opus completeness audit read the source against Plan 02 §3.2/§3.3, confirmed `MustRulesValidateOptions`/`OptionsBuilderExtension` are correct and complete (build/format/naming all pass — this stands in for the workflow's never-run Opus re-verify step for the source code specifically), and found 3 small gaps (README net8+ clause note, two stale Plan 02 corrections in §2.1/§4). A Sonnet agent closed all three and committed (`e7a63d1` amends `a546034` to fold in the README; `977576f` is the plan-doc fix). Build clean, 0 warnings, all 3 TFMs, working tree clean. **W4 is unstarted and is the largest remaining piece**: no files exist yet under `tests/PineGuard.Extensions.Options.UnitTests/` beyond the csproj — needs README-derived sample types, project-local `ValidateOptionsExpected`/`ValidateOptionsCase<TValue>` records, `MustRulesValidateOptionsTests(.TestData).cs`, `OptionsBuilderExtensionTests(.TestData).cs`, then two-TFM coverage runs (Plan 02 §4, orchestration §3.2's bootstrap rule). W5 (Brain specs/rules/agents/adapter cascade, root README row) and W6 (full-solution build/test/format gates, Rule50/Rule11/Rule12, PR) are both fully outstanding — see Plan 02 §5 for the W-step list. |
 | **4-bridges** | Not started | none yet | — | Blocked on owner decision D1 (scope) before opening |
 | **3-PR1 — async + DI** | Not started | none yet | — | Blocked on owner decision D4 (FV adapter scanner in/out of scope) before opening |
 | **3-PR2 — AspNetCore** | Not started | none yet | — | Hard-depends on 3-PR1 merged; 1d dependency already satisfied; decision D3 gates its W7 only |
@@ -321,6 +344,17 @@ a product-surface commitment rather than a naming/implementation detail:
   not fresh at each step — a run in flight when a variable changes still uses the old value.
   Verify a variable change with a genuinely new run (`gh run rerun` after the change), not the
   run that happened to be executing when you made it.
+- **A background workflow can die mid-flight with no error and no notification** — a session-level
+  disruption (observed cause: a permission-mode change) silently killed a workflow's final agent
+  after its prior stage had already committed real changes. The task-status tool later reported
+  "no task found," which reads exactly like "already handled" but is not the same thing. The tell
+  was checking the workflow's own `journal.jsonl` directly: the interrupted agent had a `started`
+  event with no matching `result` event. **Lesson**: when a background task's status becomes
+  ambiguous (silence, a stale ID, an unexpected "not found"), verify from the transcript/journal on
+  disk before trusting either "it must have finished" or "it must still be running" — and never
+  treat a prior stage's self-reported success as the checkpoint's actual verification if the
+  independent-verification stage itself didn't provably run. Re-dispatching the missing
+  verification from scratch is cheap; shipping on an unverified self-report is not.
 - The union-merge file set (Plan 00 §10.3) conflicts trivially and resolves by taking both
   sides; merge `origin/main` into a unit's worktree before every PR; never rebase a pushed branch.
 
