@@ -74,7 +74,7 @@ Configuration is the input every .NET application validates last and worst. `ser
        .ValidateOnStart();
    ```
 
-   (Clause names above are the existing ones; confirm each against `src/PineGuard.MustClauses/` when writing the README. `Must.Be.Positive`/`PortNumber` are net8+ clauses — say so beside the example. Once `PineGuard.Extensions.DependencyInjection` ships (Phase 3), the preferred registration is `builder.Services.AddMustValidator<SmtpOptionsValidator>()`; Plan 03 W3 updates this README.)
+   (Clause names above are the existing ones; confirm each against `src/PineGuard.MustClauses/` when writing the README. `Must.Be.Positive` is a net8+ clause — say so beside the example. Once `PineGuard.Extensions.DependencyInjection` ships (Phase 3), the preferred registration is `builder.Services.AddMustValidator<SmtpOptionsValidator>()`; Plan 03 W3 updates this README.)
 
 2. As a developer with a small options class I validate inline without a class:
 
@@ -221,7 +221,7 @@ Samples in `+ tests/PineGuard.Extensions.Options.UnitTests/Samples/` — `SmtpOp
 
 | Tests / TestData | Operation groups |
 |---|---|
-| `MustValidateOptionsTests` | `Constructor` (null validator → ANE via `ThrowsCase`); `Validate` — default name match, named match, named mismatch → Skipped, `Name == null` validates any name, null options → ANE, valid → Success, one failure, three failures in result order, root-path failure format; `FormatFailure` (internal, `InternalsVisibleTo`) — with and without property path |
+| `MustRulesValidateOptionsTests.cs` / `MustRulesValidateOptionsTestData.cs` | `Constructor` (null validator → ANE via `ThrowsCase`); `Validate` — default name match, named match, named mismatch → Skipped, `Name == null` validates any name, null options → ANE, valid → Success, one failure, three failures in result order, root-path failure format; `FormatFailure` (internal, `InternalsVisibleTo`) — with and without property path |
 | `OptionsBuilderExtensionTests` | `ValidateMustRules` (DI-resolved: registers `IValidateOptions<T>`; `IOptions<T>.Value` throws `OptionsValidationException` with expected `Failures`; missing validator registration → `InvalidOperationException` — assert the type and that the message contains `nameof(IMustValidator<SmtpOptions>)`, never the framework's full sentence); `ValidateMustRulesInstance`; `ValidateMustRulesInline` (configure invoked once; rules honoured); `ValidateOnStart` (in-memory `IConfiguration` → `BindConfiguration` → `IStartupValidator.Validate()` throws once listing every failure); null-argument cases via `ThrowsCase` |
 
 Coverage: `pwsh … Run-CodeCoverage.ps1 -Mode GenerateAndAnalyze -Scope Options -SkipHtml -Enforce100` → 100/100 (the `Options` scope must exist in the coverage scripts before this can run — §3.4 first).

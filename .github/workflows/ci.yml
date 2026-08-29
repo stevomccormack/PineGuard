@@ -31,6 +31,7 @@ jobs:
       guard-clauses: ${{ steps.filter.outputs.guard-clauses }}
       fluent-validation: ${{ steps.filter.outputs.fluent-validation }}
       data-annotations: ${{ steps.filter.outputs.data-annotations }}
+      options: ${{ steps.filter.outputs.options }}
       testing: ${{ steps.filter.outputs.testing }}
       any-src: ${{ steps.filter.outputs.any-src }}
     steps:
@@ -55,6 +56,9 @@ jobs:
             data-annotations:
               - 'src/PineGuard.DataAnnotations/**'
               - 'tests/PineGuard.DataAnnotations.UnitTests/**'
+            options:
+              - 'src/PineGuard.Extensions.Options/**'
+              - 'tests/PineGuard.Extensions.Options.UnitTests/**'
             testing:
               - 'tests/PineGuard.Testing/**'
               - 'tests/PineGuard.Testing.UnitTests/**'
@@ -147,6 +151,11 @@ jobs:
             name: DataAnnotations
             run-if: core-or-must-or-data-or-testing-or-main
 
+          # Options tests: run if core, must, options, testing, or main
+          - project: tests/PineGuard.Extensions.Options.UnitTests/PineGuard.Extensions.Options.UnitTests.csproj
+            name: Options
+            run-if: core-or-must-or-options-or-testing-or-main
+
           # Testing (fixture library) tests: run if testing or main
           - project: tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj
             name: Testing
@@ -167,6 +176,7 @@ jobs:
           GUARD="${{ needs.changes.outputs.guard-clauses }}"
           FLUENT="${{ needs.changes.outputs.fluent-validation }}"
           DATA="${{ needs.changes.outputs.data-annotations }}"
+          OPTIONS="${{ needs.changes.outputs.options }}"
           TESTING="${{ needs.changes.outputs.testing }}"
           RUN_IF="${{ matrix.run-if }}"
 
@@ -183,6 +193,8 @@ jobs:
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$FLUENT" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-data-or-testing-or-main)
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DATA" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-must-or-options-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$OPTIONS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             testing-or-main)
               [[ "$IS_MAIN" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
           esac
@@ -298,7 +310,7 @@ jobs:
       # actual change. Restrict the merged report to only the assemblies whose OWN dedicated
       # matrix entry actually ran, using the exact same run-if logic as the "Should run" step
       # above (test job, per matrix.run-if). On push to main every scope always runs, so the
-      # filter includes all six assembly names (equivalent to no filtering).
+      # filter includes all seven assembly names (equivalent to no filtering).
       - name: Compute coverage assembly filters
         id: assembly-filters
         if: steps.find-coverage.outputs.found == 'true'
@@ -310,6 +322,7 @@ jobs:
           GUARD="${{ needs.changes.outputs.guard-clauses }}"
           FLUENT="${{ needs.changes.outputs.fluent-validation }}"
           DATA="${{ needs.changes.outputs.data-annotations }}"
+          OPTIONS="${{ needs.changes.outputs.options }}"
           TESTING="${{ needs.changes.outputs.testing }}"
 
           FILTERS=""
@@ -337,6 +350,11 @@ jobs:
           # PineGuard.DataAnnotations — core-or-must-or-data-or-testing-or-main
           if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DATA" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.DataAnnotations;"
+          fi
+
+          # PineGuard.Extensions.Options — core-or-must-or-options-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$OPTIONS" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.Extensions.Options;"
           fi
 
           # PineGuard.Testing — testing-or-main

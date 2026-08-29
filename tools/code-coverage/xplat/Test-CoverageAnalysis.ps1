@@ -48,7 +48,7 @@
 [CmdletBinding()]
 param(
     [ValidateRange(1, 500)] [int] $Top = 30,
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
     [string] $IncludeFileRegex,
     [string] $ExcludeFileRegex,
     [string] $IncludeClassNameRegex,
@@ -97,8 +97,12 @@ $defaultSourcePrefix = 'src\PineGuard.Core'
 switch ($Scope) {
     'All' {
         if (-not $IncludeFileRegex) {
-            $allNamesAlternation = (Get-PineGuardScope -All | ForEach-Object Name) -join '|'
-            $IncludeFileRegex = "^(src|tests)[/\\]+PineGuard\.($allNamesAlternation)[/\\]+"
+            # 'All' = the union of the seven per-scope path filters. Each PathIncludeRegex is
+            # self-anchored (^src... / ^tests...), so a plain '|' join is the exact aggregate —
+            # and scopes whose folder is not 'PineGuard.<Name>' (Options ->
+            # PineGuard.Extensions.Options) stay correct because the registry regex, not the
+            # scope Name, is the source.
+            $IncludeFileRegex = (Get-PineGuardScope -All | ForEach-Object PathIncludeRegex) -join '|'
         }
         if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
         $defaultSourcePrefix = (Get-PineGuardScope -Name 'Core').DefaultSourcePrefix
