@@ -934,4 +934,160 @@ public static class FluentStringExtensions
     public static IRuleBuilderOptions<TModel, string?> NotContainsWhitespace<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotContainsWhitespace(val, paramName: null) : MustResult<string>.Ok(null!),
             message, MustCodes.Text.Charset.ContainsWhitespace);
+
+    /// <summary>
+    /// Validates that the property value contains the specified substring.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="substring">The substring the value must contain. An empty substring is always contained.</param>
+    /// <param name="comparison">The comparison rule used to locate <paramref name="substring"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.Contains"/>. If the value is <see langword="null"/>,
+    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.Description).Contains("PineGuard");
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.Contains"/>
+    public static IRuleBuilderOptions<TModel, string?> Contains<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string substring,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.Contains(val, substring, comparison, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Content.NotContains);
+
+    /// <summary>
+    /// Validates that the property value does not contain the specified substring.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="substring">The substring that must be absent. An empty substring is always contained.</param>
+    /// <param name="comparison">The comparison rule used to locate <paramref name="substring"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.NotContains"/>. If the value is <see langword="null"/>,
+    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.Comment).NotContains("password");
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.NotContains"/>
+    public static IRuleBuilderOptions<TModel, string?> NotContains<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string substring,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotContains(val, substring, comparison, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Content.Contains);
+
+    /// <summary>
+    /// Validates that the property value starts with the specified prefix.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="prefix">The prefix the value must start with. An empty prefix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="prefix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.StartsWith"/>. If the value is <see langword="null"/>,
+    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.SkuCode).StartsWith("PG-");
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.StartsWith"/>
+    public static IRuleBuilderOptions<TModel, string?> StartsWith<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string prefix,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.StartsWith(val, prefix, comparison, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Content.NotStartsWith);
+
+    /// <summary>
+    /// Validates that the property value does not start with the specified prefix.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="prefix">The prefix that must be absent. An empty prefix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="prefix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.NotStartsWith"/>. If the value is <see langword="null"/>,
+    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.Username).NotStartsWith("admin");
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.NotStartsWith"/>
+    public static IRuleBuilderOptions<TModel, string?> NotStartsWith<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string prefix,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotStartsWith(val, prefix, comparison, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Content.StartsWith);
+
+    /// <summary>
+    /// Validates that the property value ends with the specified suffix.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="suffix">The suffix the value must end with. An empty suffix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="suffix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.EndsWith"/>. If the value is <see langword="null"/>,
+    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.FileName).EndsWith(".pdf");
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.EndsWith"/>
+    public static IRuleBuilderOptions<TModel, string?> EndsWith<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string suffix,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.EndsWith(val, suffix, comparison, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Content.NotEndsWith);
+
+    /// <summary>
+    /// Validates that the property value does not end with the specified suffix.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="suffix">The suffix that must be absent. An empty suffix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="suffix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.NotEndsWith"/>. If the value is <see langword="null"/>,
+    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.FileName).NotEndsWith(".exe");
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.NotEndsWith"/>
+    public static IRuleBuilderOptions<TModel, string?> NotEndsWith<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string suffix,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotEndsWith(val, suffix, comparison, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Content.EndsWith);
 }
