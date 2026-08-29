@@ -15,11 +15,19 @@
 - Facade Pattern: Simple domains = public static class. Standard domains = internal impl + public facade (flatten API)
 
 ### GuardClause Signatures
-- Always: `this IGuardClause _`, value param, `CallerArgumentExpression`, `string? message = null`, `Func<Exception>? exceptionCreator = null`
+- Fixed parameter order: `this IGuardClause _`, `value`, required config params, optional forwarded
+  config with a default (`StringComparison comparison = StringComparison.Ordinal`,
+  `Inclusion inclusion = ...`), then `string? message = null`, `Func<Exception>? exceptionCreator = null`,
+  and `[CallerArgumentExpression(nameof(value))] string? paramName = null` **last** — an explicit
+  argument must never displace the caller-expression capture
 - ALWAYS call corresponding MustClause (complement logic: Guard.Against.X calls Must.Be.Y where Y is the positive)
-- Throw via `GuardFailure.Throw(message ?? result.Message, paramName, value, exceptionCreator)`
+- Throw via `GuardFailure.Throw(result, message, exceptionCreator)` — pass the `IMustResult` itself,
+  never a message string, so the exception carries the clause's own `Code` and `ParamName`
+- Add the end-of-line complement comment on the Must call: `// Guard.Against.NotX => Must.Be.X (complement)`
 - Return the typed result (`result.Result!`) on success — Guard methods return `T` not `MustResult`
 - Method named after forbidden state (`Guard.Against.NullOrEmpty`)
+- File ordering is by the Must clause each guard invokes, mirroring the Must file's order — NOT
+  alphabetical and not "all negatives first" (guard-clauses/project.md §4)
 
 ### FluentValidation Signatures
 - Extension on `IRuleBuilder<TModel, T>`, returns `IRuleBuilderOptions<TModel, T>`
@@ -94,6 +102,18 @@ When implementing new validations, tests should follow the v2 architecture:
 - Expected types: `RuleExpected`, `MustExpected`, `GuardExpected`, `FluentExpected`, `DataAnnotationExpected`
 - Case records: `RuleCase<T>`, `MustCase<T>`, `GuardCase<T>`, `FluentCase<T>`, `DataAnnotationCase`
 - Zero comments, single-line entries, flat test classes, edge case constants from Rule classes
+
+### Guard TestData pitfall: `ToGuardCases(paramName)` and tuple fixtures
+- The `ToGuardCases(string paramName)` overload picks `ArgumentNullException` vs `ArgumentException`
+  from `RuleScenario<T>.IsNull`, which is `Inputs is null` — **always false for tuple-shaped
+  fixtures** (`(string? value, string substring, ...)`), so a null *inner* value silently expects
+  the wrong exception type
+- For tuple fixtures use the `expectedFactory` overload instead:
+  `.ToGuardCases(s => s.Inputs.value is null ? new GuardExpected(false, typeof(ArgumentNullException), "value") : new GuardExpected(false, typeof(ArgumentException), "value"))`
+- Guard groups keep exactly two datasets (`ValidCases`/`InvalidCases`); when a null-value scenario
+  has to be split off from the fixture side it is re-joined with a collection expression
+  (`[.. a.ToGuardCases(...), .. b.Only(nameof(...)).ToGuardCases(...)]`), not a third dataset —
+  unlike the Must layer, which does add `NullCases`
 
 ## Topic Files
 - [MustCodes catalogue](must-codes-catalogue.md) — wiring codes into Must + Fluent + DataAnnotations: arg positions, one-clause-one-code and its bitwise exception, fixed-at-build ErrorCode
