@@ -19,6 +19,52 @@ parent: new-surfaces-program
 > Where this file and a phase plan disagree on content, the phase plan wins; where they disagree
 > on process, this file wins; `docs/ai/specs/safety.md` wins over both, always.
 
+## 0. Handoff — read this first, every session
+
+**You (the session reading this) are the orchestrator.** Whatever model is running this
+session — expect Sonnet 5 — your job for this program is coordination, not implementation.
+This holds across a single long session and across a compaction boundary or a brand-new session
+picking this back up cold; either way, start here.
+
+**Your loop, every time you pick this up:**
+1. Read §2 (progress tracker) to see what's done and what's next. Trust it over memory.
+2. Read the next unit's phase plan section in full, fresh from disk (§6 rule 4) — not a
+   paraphrase from earlier in this conversation, which may have drifted or been compacted away.
+3. Dispatch sub-agents per §4's model routing. **You do not write code, tests, or docs
+   yourself** — every edit happens inside a dispatched agent. Your own tool calls are for
+   reading state, launching agents, and running the §6 checkpoint.
+4. Run the §6 checkpoint after every unit merges. Update §2. Compact. Re-read. Repeat from 1.
+
+**Why "you never implement" is also the token-optimization strategy, not a separate concern.**
+A sub-agent's context is disposable — it reads what it needs, does the work, reports back, and
+its context (the full file contents, the search dead-ends, the intermediate diffs) never has to
+live in yours. If you read a 700-line phase plan and a 300-line source file yourself before
+implementing, that's ~1000 lines sitting in your context for the rest of the session, compounding
+across twelve units. Dispatch it instead: a Haiku agent bulk-reads and distills, a Sonnet agent
+implements and reports a summary, and only the summary — not the underlying reads — ever touches
+your context. This is the mechanism, not a slogan: **every file read for content (not just
+existence) belongs in a sub-agent, not in your own tool calls**, specifically so this program can
+run across however many sessions it takes without your context filling up first.
+
+**Where token-optimization stops being a valid reason to do something.** None of the above
+trades away rigor, and the distinction matters:
+- Batching, delegating reads, and keeping your own context thin: yes, always — this is what
+  makes the program long-running at all.
+- Skipping a Fable/council escalation §4 calls for for because it's "just" a naming or design
+  question: no, never — §3.3 exists because a wrong name is a permanent defect, not a fixable
+  one, and that cost dwarfs any tokens saved by skipping the consultation.
+- Under-testing, under-documenting, or accepting an implementation agent's "close enough" to
+  avoid another verification pass: no, never — §3.1's "never trade correctness, coverage, or
+  docs for speed" is absolute regardless of how long the program is taking.
+- Reusing a stale summary instead of the §6 checkpoint's mandatory fresh re-read because
+  re-reading costs tokens: no, never — a plan can be amended by the very PR that just merged
+  (§1's own rule), and orchestrating off a stale copy is exactly the drift this file exists to
+  prevent.
+
+In short: optimize *how much of the work* sits in your context, never *how carefully* the work
+itself gets done. Cheap orchestration and expert-level output are not in tension here — they
+come from the same rule, which is to delegate the doing and keep only the deciding.
+
 ## 1. Why this file exists
 
 The program is roughly 18–28 focused work-session's worth of content across ~12 PR-sized units
@@ -69,7 +115,123 @@ pre-decided — so the work is largely mechanical *given* the plans, but the vol
 
 **Chunk exactly along Plan 00 §10.1's units** (one worktree = one PR = one checkpoint). Do not
 invent a finer decomposition — each unit's own W-step playbook is already the intra-unit
-structure. Phase 5 chunks per batch, as Plan 05 already mandates.
+structure. Phase 5 chunks per batch, as Plan 05 already mandates. Within a unit, checkpoint at
+each W-step rather than only at the end — a stub-scaffolding step (W1/W2) is cheap to verify in
+isolation and expensive to debug retroactively once real feature code sits on top of it.
+
+## 3.1 Standing policy: best practice wins every tradeoff
+
+**The goal of this program is the highest level of expertise and simplicity achievable — not the
+fastest path to green.** When an implementer (any model tier) hits a genuine tradeoff the phase
+plan doesn't resolve, the default is always the objectively best-practice answer, never the
+expedient one. This is stronger than the §4 escalation policy's "take Fable's recommendation and
+proceed" — it constrains *what a good recommendation looks like* in the first place:
+
+- Prefer the solution that is simplest to read and maintain over one that is merely shorter to
+  write. Simplicity is a design goal here, not an afterthought — a clever one-liner that a future
+  reader has to puzzle over is not "simple," a straightforward reader-obvious version is.
+- Prefer the pattern already established elsewhere in this codebase over inventing a new one,
+  even a technically-nicer one — consistency across ~550 Must clauses and five layers is itself
+  a best practice this program must not erode. Deviating from an established pattern needs a
+  stated reason, not just a preference.
+- Never trade correctness, test coverage, or documentation completeness for speed. "Ship it and
+  fix the gap later" is not an option this program uses — Plan 00 §7's Definition of Done applies
+  in full to every unit, no partial credit.
+- Best practice never widens scope. The phase plan's "Out of scope" / "Not in this phase" lists
+  bind every tradeoff: the best-practice answer is chosen among implementations of the planned
+  scope, never by adding surface, abstractions, or shared infrastructure the plan didn't ask
+  for. Premature generalization — e.g. promoting a project-local test helper into
+  `tests/PineGuard.Testing/` before a second consumer exists — is a tradeoff loss dressed as a
+  win. If best practice genuinely seems to demand new surface, that is a §4 escalation, not an
+  implementation call.
+- When genuinely uncertain which of two established practices applies, escalate per §4 rather
+  than picking either arbitrarily.
+
+## 3.2 Testing conventions are non-negotiable — read before writing a single test
+
+**Every test written under this program follows the repo's existing testing conventions exactly.
+Inventing a new test shape, even a reasonable-looking one, is a defect, not a style choice.** The
+normative sources, read in this order before writing any test code for a unit:
+
+1. `docs/ai/specs/testing/unit-test.md` — `[Theory]` + `TheoryData`/`[MemberData]` only (never
+   `[Fact]` or `[InlineData]`; CI-gated by audit-cli Rule50, §11); `XxxTests.cs` beside
+   `XxxTestData.cs` (also Rule50-gated); the per-layer `*Expected`/`*Case` record shapes (§2.2,
+   authoritative definitions in `fixture.md` §1/§3; layer addenda in
+   `docs/ai/specs/<layer>/unit-test.md`); `IsValid` as the uniform expectation boolean.
+2. `docs/ai/specs/testing/fixture.md` — the `AllScenarios`/`ValidScenarios`/`InvalidScenarios`
+   shape, fixture partials mirroring their source Rules partials 1:1 (`XxxRules.Yyy.cs` →
+   `XxxRulesFixtures.Yyy.cs`), camelCase tuple element names aligned to source parameter names.
+3. `docs/ai/specs/testing/gold-standard.md` — the compliance criteria and per-project index a new
+   test project must join at GOLD; the code-level exemplar of a compliant suite is
+   `unit-test.md` §8's canonical trio.
+4. `docs/ai/skills/scaffold-unit-test/SKILL.md` — the implementation recipe that ties the above
+   together procedurally. **Precedence: where the skill and a spec disagree, the spec wins** —
+   e.g. the skill's "never inherit `BaseUnitTest` directly" applies only to the five existing
+   layers, not to a new package with no layer base (`unit-test.md` §2.1's "(Other)" row).
+
+A new package (Options, AspNetCore, the result bridges, Analyzers) has no layer base and no
+existing `*Expected`/`*Case` family. The bootstrap rule is Plan 00 §4.5: inherit `BaseUnitTest`
+directly, define a project-local `XxxExpected` (extending `ReturnExpected`/`ThrowExpected`) and
+`XxxCase` (extending `ReturnCase<,>`), and keep them in the test project — promote to
+`tests/PineGuard.Testing/` only once two projects need the family
+(`docs/ai/specs/testing/project.md` §3 rule 1; precedent:
+`tests/PineGuard.DataAnnotations.UnitTests/ThrowsCase.cs`). Everything else about the new
+project follows the specs unchanged: flat test classes, instance `public void`
+`<Member>_BehavesAsExpected(tc)` methods, datasets-before-records, AAA markers. Do **not** copy
+`tests/PineGuard.Testing.UnitTests/` — its nested-static-class operation groups and static
+`Should*` methods are grandfathered violations of `unit-test.md` §5.1, not a precedent. If any
+phase plan's own test-spec section appears to conflict with these sources, the normative specs
+win (Plan 00 §1's own rule: "a spec wins over a plan wherever they disagree; fix the plan") —
+flag the conflict in the unit's lessons capture (§6) so the plan gets corrected.
+
+## 3.3 Naming is the highest-value decision a unit makes
+
+**Experts explain things simply; good engineers narrate a simple story. In this library the
+story is told almost entirely by names** — the surface is read far more often than it is written
+(`Must.Be.Positive(value)`, `Guard.Against.Null(value)`, `email.address.invalid` in a 400 body),
+and the reader is often not the developer who wrote the call: a reviewer, a support engineer
+grepping logs, a consumer skimming IntelliSense. Convention, consistency and naming therefore
+matter at the highest level of this program. A wrong name is a permanent defect — codes and
+public identifiers freeze at the first release (Plan 00 §4.6, §5.4 rule 7) — where a wrong
+implementation is a fixable one.
+
+The normative content already exists; this section adds process, not a second philosophy.
+Plan 00 §5 is the canon: "Names are the product. Every public identifier introduced by this
+program is listed here with the one-sentence story it tells." Per unit, that means:
+
+- **The story comes first.** Before typing a new public identifier, write its §5.2 "on the tin"
+  sentence; the test is that a non-developer could match name to sentence. `MustValidationResult`
+  passes ("everything a validator found — the object-level counterpart of `MustResult<T>`"); its
+  rejected alternatives fail exactly this test — `MustResultSet` tells a false story (implies it
+  contains `MustResult<T>` instances; it contains failures), `MustResults` is one letter from
+  `MustResult` and unpronounceable in a code review, `MustReport` uses a noun no validation
+  library uses (Plan 00 §5.2). For codes, §5.4's reading test is the same test: "domain → aspect
+  → condition" must read as the problem the way a support ticket would state it.
+- **The two canon rules bind every candidate.** Members, verbs and parameters *align* with the
+  ecosystem's mass language (`RuleFor`, `PropertyPath`, `BeginScope`); importable type names
+  *distinguish* with the `Must` qualifier (`MustCodes`, not `ErrorCodes`) — Plan 00 §5.1, owner
+  rule 2026-08-26. Never derive a name mechanically from a method name or an implementation
+  detail; names are curated the way messages are (§5.4 rule 4's principle, applied everywhere).
+- **A name with no rejected alternatives has not been decided, only generated.** Every new
+  public name lands as a Plan 00 §5 table row with its one-sentence story *and* its
+  rejected-alternatives column filled, is logged as a §4 decision row, and gets owner sign-off
+  at the unit's PR gate.
+
+**Escalation trigger rule.** The owner's instruction "if blocked on naming, apply a council"
+means the real five-advisor procedure — `/ask-council`, gated by `docs/ai/specs/council.md` and
+executed per `docs/ai/skills/ask-council/SKILL.md` (every one of its eleven sub-agents runs on
+Fable) — never an informal second opinion. It is also expensive (≥10 sub-agent invocations,
+`council.md` §7), so the routes are tiered:
+
+| Situation | Route |
+|---|---|
+| Name fully determined by existing convention — a new Must clause beside ~550 precedents, test/fixture file names (Rule50, `fixture.md`), private/internal/test-local identifiers | No escalation. Follow the convention; convening the council here violates `council.md` §3. |
+| New public name with clear precedent to lean on — a same-shape row in Plan 00 §5.1–§5.3, an ecosystem mass-language word, an established repo pattern | Single Fable agent (§4): identify the precedent, apply it, record the rejected alternatives, log the decision row. Implementation-tier agents never mint a public name themselves — §4's table routes naming to the Fable tier. |
+| Name enters the §5 canon / frozen public API **and** no precedent decides it **and** there is a real trade-off with non-trivial cost of being wrong (`council.md` §2) — typically two canon rules pulling opposite directions, or several defensible candidates | Full `/ask-council`. Precedent: D3's `AddMustValidatorResolver()` is a council recommendation. The verdict lands as a §4 decision row; transcript only under `council.md` §6's conditions. |
+
+If a single Fable pass returns a recommendation the dispatcher finds genuinely contestable on a
+canon-entering name, escalate it to the council rather than proceeding on a coin-flip — that is
+the "blocked" the owner's instruction names.
 
 ## 4. Roles and model routing
 
@@ -87,10 +249,27 @@ structure. Phase 5 chunks per batch, as Plan 05 already mandates.
 | Implementation | **Sonnet 5** | All coding, test writing, tooling edits, mechanical doc generation | The plans' own stated audience |
 | Bulk IO | **Haiku** | Reading many files and returning a distillation; inventory sweeps | W0 spec-list reads; grep-and-summarize sweeps |
 
-**Escalation policy**: when implementation surfaces an open judgment call, dispatch a Fable
-agent, take its recommendation, log it as a Plan 00 §12-format decision-log row, and proceed —
-do not stop the unit to ask the owner mid-flight. Present the accumulated rows to the owner at
-the unit's PR gate (§5), where they can still be reversed before merge.
+**Escalation policy.** Two halves, both binding:
+
+1. **Most questions are not escalations — read first.** The plans are unusually complete (§3):
+   signatures, file lists, even commit messages are pre-decided; test shape is decided by §3.2's
+   spec chain; names by Plan 00 §5 via §3.3. Before dispatching anything, re-read the governing
+   plan section and spec. An agent that escalates a question the plan already answers is not
+   exercising judgment, it is skipping the reading — and a stream of unnecessary escalations is
+   its own scope creep (§3.1: best practice never widens scope). "Genuinely blocked" means one
+   of: the plans/specs are silent; they contradict each other (the spec wins — flag it per §3.2
+   so the plan gets fixed); two established practices both apply and disagree (§3.1); or the
+   answer would create new public surface or a new canon name. "I haven't found it in the plan
+   yet" is none of these.
+
+2. **On a genuine blocker or high-stakes call, Fable consultation is unconditional.** Never
+   guess, never take the expedient reading, never proceed silently on either. Dispatch a Fable
+   agent — or run the full `/ask-council` procedure where §3.3's threshold is met — take the
+   recommendation, log it as a Plan 00 §12-format decision-log row, and proceed; do not stop the
+   unit to ask the owner mid-flight. Present the accumulated rows at the unit's PR gate (§5),
+   where each can still be reversed before merge. The exception is the rows §5 marks "present to
+   owner" (product-surface commitments; D5-class sign-offs): those wait at their stated gate for
+   the owner's answer and are never applied on a recommendation alone.
 
 **This policy never overrides `docs/ai/specs/safety.md`.** Commit-and-merge-to-`main` for this
 program is pre-authorized by the owner (2026-08-29 — see `feedback_new-surfaces-authorization`
