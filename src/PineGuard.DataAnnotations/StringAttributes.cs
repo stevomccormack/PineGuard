@@ -1768,3 +1768,79 @@ public sealed class NotHasByteOrderMarkAttribute() : ValidationAttributeBase(typ
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is well-formed UTF-16 — every
+/// surrogate code unit forms a complete pair.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.WellFormedUtf16"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// A string carrying an unpaired surrogate cannot be encoded to UTF-8, so it otherwise fails at the
+/// serialization boundary far from the model that produced it.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class MessageModel
+/// {
+///     [WellFormedUtf16]
+///     public string Body { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotWellFormedUtf16Attribute"/>
+/// <seealso cref="MustStringClauses.WellFormedUtf16"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class WellFormedUtf16Attribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Unicode.Malformed)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.WellFormedUtf16(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is not well-formed UTF-16 — it
+/// carries at least one unpaired surrogate.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.NotWellFormedUtf16"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class DecoderFixtureModel
+/// {
+///     [NotWellFormedUtf16]
+///     public string MalformedSample { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="WellFormedUtf16Attribute"/>
+/// <seealso cref="MustStringClauses.NotWellFormedUtf16"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotWellFormedUtf16Attribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Unicode.WellFormed)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.NotWellFormedUtf16(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}

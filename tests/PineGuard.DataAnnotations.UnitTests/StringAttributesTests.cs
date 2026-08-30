@@ -574,4 +574,34 @@ public sealed class StringAttributesTests(ITestOutputHelper output) : BaseDataAn
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.WellFormedUtf16.Cases), MemberType = typeof(StringAttributesTestData.WellFormedUtf16))]
+    public void WellFormedUtf16_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new WellFormedUtf16Attribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.NotWellFormedUtf16.Cases), MemberType = typeof(StringAttributesTestData.NotWellFormedUtf16))]
+    public void NotWellFormedUtf16_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotWellFormedUtf16Attribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }
