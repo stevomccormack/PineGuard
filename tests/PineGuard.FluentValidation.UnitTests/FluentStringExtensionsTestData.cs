@@ -604,4 +604,24 @@ public static partial class FluentStringExtensionsTestData
             _ => new FluentExpected(true)
         });
     }
+
+    public static class HasByteOrderMark
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.HasByteOrderMark.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.HasByteOrderMark.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must start with a byte-order mark.", Code: MustCodes.Text.Bom.Missing)
+        });
+    }
+
+    public static class NotHasByteOrderMark
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.HasByteOrderMark.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.HasByteOrderMark.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(false, "Value must not start with a byte-order mark.", Code: MustCodes.Text.Bom.Present),
+            _ => new FluentExpected(true)
+        });
+    }
 }
