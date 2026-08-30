@@ -517,7 +517,7 @@ resharper_unused_member_global_highlighting = none
 # legitimately trigger warnings irrelevant to production code.
 # Relax rules here to reduce noise without weakening library standards.
 # -------------------------------------------------------------------
-[tests/{PineGuard.Core.UnitTests,PineGuard.DataAnnotations.UnitTests,PineGuard.Extensions.Options.UnitTests,PineGuard.FluentValidation.UnitTests,PineGuard.GuardClauses.UnitTests,PineGuard.MustClauses.UnitTests,PineGuard.Testing,PineGuard.Testing.UnitTests}/**/*.cs]
+[tests/{PineGuard.Core.UnitTests,PineGuard.DataAnnotations.UnitTests,PineGuard.ErrorOr.UnitTests,PineGuard.Extensions.Options.UnitTests,PineGuard.FluentResults.UnitTests,PineGuard.FluentValidation.UnitTests,PineGuard.GuardClauses.UnitTests,PineGuard.MustClauses.UnitTests,PineGuard.OneOf.UnitTests,PineGuard.Testing,PineGuard.Testing.UnitTests}/**/*.cs]
 max_line_length = 400
 csharp_style_namespace_declarations = file_scoped:warning
 csharp_allow_blank_lines_between_consecutive_braces = true
