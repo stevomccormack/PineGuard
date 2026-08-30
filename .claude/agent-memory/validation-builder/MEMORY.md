@@ -14,7 +14,7 @@
 
 ## Topic Files
 
-- [Layer signatures](layer-signatures.md) — per-layer method shape, parameter ordering, the parsed-result contract, DA `init`/netstandard2.1 trap, recurring mistakes
+- [Layer signatures](layer-signatures.md) — per-layer method shape, parameter ordering, the parsed-result contract, enum-config pass-through, DA `init`/netstandard2.1 trap, recurring mistakes
 - [Test data shapes](test-data-shapes.md) — fixture-v2 Case/Expected types, per-layer dataset rules, tuple-fixture and DA-config traps, null differing at every layer
 - [MustCodes catalogue](must-codes-catalogue.md) — wiring codes into Must + Fluent + DataAnnotations: arg positions, one-clause-one-code and its bitwise exception, fixed-at-build ErrorCode
 - [Batch D vocabulary aliases deferred](project_batch-d-vocabulary-aliases-deferred.md) — ScaleAbove/PrecisionAbove shipped without their vocabulary.json rows; docs/ freeze, not a defect
