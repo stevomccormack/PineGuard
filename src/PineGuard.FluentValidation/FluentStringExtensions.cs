@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using FluentValidation;
 using PineGuard.Codes;
@@ -1183,4 +1184,57 @@ public static class FluentStringExtensions
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotWellFormedUtf16(val, paramName: null) : MustResult<string>.Ok(null!),
             message, MustCodes.Text.Unicode.WellFormed);
+
+    /// <summary>
+    /// Validates that the property value is already in the specified Unicode normalization form.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="form">The <see cref="NormalizationForm"/> the value must already be in. Defaults to <see cref="NormalizationForm.FormC"/>.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.Normalized"/>. Unnormalized input silently breaks equality and
+    /// uniqueness: the two spellings of <c>"é"</c> look identical but are not ordinally equal. If the value is
+    /// <see langword="null"/>, validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// A <paramref name="form"/> that is not a defined <see cref="NormalizationForm"/> fails with a message naming
+    /// that parameter rather than the property.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.UserName).Normalized(NormalizationForm.FormC);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.Normalized"/>
+    public static IRuleBuilderOptions<TModel, string?> Normalized<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        NormalizationForm form = NormalizationForm.FormC,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.Normalized(val, form, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Unicode.NotNormalized);
+
+    /// <summary>
+    /// Validates that the property value is not already in the specified Unicode normalization form.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="form">The <see cref="NormalizationForm"/> the value must not already be in. Defaults to <see cref="NormalizationForm.FormC"/>.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.NotNormalized"/>. If the value is <see langword="null"/>,
+    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// A <paramref name="form"/> that is not a defined <see cref="NormalizationForm"/> fails with a message naming
+    /// that parameter rather than the property.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.RawInput).NotNormalized(NormalizationForm.FormC);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.NotNormalized"/>
+    public static IRuleBuilderOptions<TModel, string?> NotNormalized<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        NormalizationForm form = NormalizationForm.FormC,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotNormalized(val, form, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Unicode.Normalized);
 }
