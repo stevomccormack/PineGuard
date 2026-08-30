@@ -26,8 +26,23 @@ parent: new-surfaces-program
 > cascade (what Unit 2 called "W5") is deferred program-wide, to be done later in one batched
 > pass across all units rather than per-unit — do not attempt a partial version of it, and do not
 > let a gate that depends on it (e.g. an audit-cli rule checking Brain-doc completeness for a new
-> package) block a unit's merge; skip that specific gate and note the skip in the PR body and in
-> this tracker. Note this in each unit's checkpoint so the deferred work stays visible.
+> package) block a unit's merge; skip that specific gate and note the skip in the unit's close-out
+> notes and in this tracker. Note this in each unit's checkpoint so the deferred work stays visible.
+>
+> **Standing process rule (owner instruction, 2026-08-30): no GitHub Pull Requests.** We have
+> direct push access to `main` — use it. A unit's close-out step is a local `git merge --no-ff
+> feature/xxx` into `main` followed by `git push origin main`, never `gh pr create`. Still a real
+> merge commit (not squash/fast-forward), matching the one-merge-commit-per-unit shape Phase 1,
+> Track 0, and Unit 2 (Options, PR #28 — the last unit that used the now-retired PR flow)
+> established. CI is still worth checking after the push, but it is no longer a merge gate mediated
+> by review; a unit's own independent build/test/format/coverage verification is what the merge
+> decision rests on. Every "close out unit" dispatch must say this explicitly — several agents
+> defaulted to the old PR pattern when not told otherwise.
+>
+> **Standing guidance (owner instruction, 2026-08-30): `audit-cli` is not an authoritative quality
+> signal.** Its dependencies are kept patched when they block a build, but its Rule06/07/08/11/13/50
+> etc. checks reflect possibly-stale conventions and are informational only — never a merge gate.
+> The real bar is the specs under `docs/ai/specs/` plus build/test/coverage green.
 
 ## 0. Handoff — read this first, every session
 
