@@ -9,7 +9,7 @@ public static partial class MustCodes
         /// <summary>The code prefix for this node (<c>"text"</c>).</summary>
         public const string Prefix = "text";
 
-        /// <summary>Presence of usable content: null, empty, whitespace-only.</summary>
+        /// <summary>Presence of usable content: null, empty, whitespace-only, and the substrings the text carries.</summary>
         public static class Content
         {
             /// <summary>The code prefix for this node (<c>"text.content"</c>).</summary>
@@ -35,6 +35,24 @@ public static partial class MustCodes
 
             /// <summary><c>text.content.whitespace</c></summary>
             public const string Whitespace = Prefix + ".whitespace";
+
+            /// <summary><c>text.content.not-contains</c></summary>
+            public const string NotContains = Prefix + ".not-contains";
+
+            /// <summary><c>text.content.contains</c></summary>
+            public const string Contains = Prefix + ".contains";
+
+            /// <summary><c>text.content.not-starts-with</c></summary>
+            public const string NotStartsWith = Prefix + ".not-starts-with";
+
+            /// <summary><c>text.content.starts-with</c></summary>
+            public const string StartsWith = Prefix + ".starts-with";
+
+            /// <summary><c>text.content.not-ends-with</c></summary>
+            public const string NotEndsWith = Prefix + ".not-ends-with";
+
+            /// <summary><c>text.content.ends-with</c></summary>
+            public const string EndsWith = Prefix + ".ends-with";
         }
 
         /// <summary>Character count against an exact length, a range, or a bound.</summary>
