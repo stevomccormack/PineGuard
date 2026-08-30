@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../../../src/PineGuard.Extensions.DependencyInjection/PineGuard.Extensions.DependencyInjection.csproj" />
+  <Project Path="../../../tests/PineGuard.Extensions.DependencyInjection.UnitTests/PineGuard.Extensions.DependencyInjection.UnitTests.csproj" />
+</Solution>
