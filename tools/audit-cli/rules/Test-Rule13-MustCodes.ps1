@@ -67,7 +67,7 @@ $domainMap = @{
     'Phone' = 'Phone'
     'Uri' = 'Uri'
     'Network' = 'Network'
-    'FilePath' = 'File'
+    'FilePath' = 'File'; 'FileSignature' = 'File'
     'GeoLocation' = 'Geo'; 'StringGeoLocation' = 'Geo'
     'Http' = 'Http'; 'HttpSecurityHeader' = 'Http'
     'Json' = 'Json'
