@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.MustClauses;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.NetworkRulesFixtures;
@@ -123,6 +124,17 @@ public static class MustNetworkClausesTestData
         public static TheoryData<MustCase<int?>> ValidCases => F.IsPortNumber.AllValid.ToMustCases();
 
         public static TheoryData<MustCase<int?>> InvalidCases => F.IsPortNumber.AllInvalid.Except(nameof(F.IsPortNumber.Null)).ToMustCases(_ => new MustExpected(false, "value must be a valid port number."));
+    }
+
+    public static class MacAddress
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.IsMacAddress.AllValid.ToMustCases();
+
+        public static TheoryData<MustCase<string?>> InvalidCases => F.IsMacAddress.AllInvalid.ToMustCases(s => s.Name switch
+        {
+            nameof(F.IsMacAddress.Null) => new MustExpected(false, "value must not be null.", "value", MustCodes.Network.Mac.Invalid),
+            _ => new MustExpected(false, "value must be a valid MAC address.", Code: MustCodes.Network.Mac.Invalid)
+        });
     }
 
     public static class NotIpAddress

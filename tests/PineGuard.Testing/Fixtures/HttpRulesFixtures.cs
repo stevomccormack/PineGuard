@@ -292,4 +292,33 @@ public static class HttpRulesFixtures
         public static readonly IReadOnlyDictionary<string, IEnumerable<string>> NonContentTypeHeaders =
             new Dictionary<string, IEnumerable<string>> { ["X"] = ["y"] };
     }
+
+    public static class IsMediaType
+    {
+        public static readonly string? PlainText = "text/plain";
+        public static readonly string? Json = "application/json";
+        public static readonly string? StructuredSuffix = "application/vnd.api+json";
+        public static readonly string? VendorTree = "application/vnd.ms-excel";
+        public static readonly string? UpperCase = "TEXT/PLAIN";
+        public static readonly string? WithParameter = "text/plain; charset=utf-8";
+        public static readonly string? WithMultipleParameters = "multipart/form-data; boundary=----x; charset=utf-8";
+        public static readonly string? TrailingSemicolon = "application/json;";
+        public static readonly string? Trimmed = "  text/plain  ";
+        public static readonly string? Wildcard = "*/*";
+        public static readonly string? NoSubtype = "application/";
+        public static readonly string? NoType = "/json";
+        public static readonly string? NoSlash = "application";
+        public static readonly string? DoubleSlash = "application/json/extra";
+        public static readonly string? SpacedSlash = "text / plain";
+        public static readonly string? NonTokenChar = "text/pl(ain)";
+        public static readonly string? EmbeddedSpace = "text/pl ain";
+        public static readonly string? ParametersOnly = "; charset=utf-8";
+        public static readonly string? NullValue = null;
+        public static readonly string? Empty = "";
+        public static readonly string? Whitespace = "  ";
+
+        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(PlainText), PlainText, true), new(nameof(Json), Json, true), new(nameof(StructuredSuffix), StructuredSuffix, true), new(nameof(VendorTree), VendorTree, true), new(nameof(UpperCase), UpperCase, true), new(nameof(WithParameter), WithParameter, true), new(nameof(WithMultipleParameters), WithMultipleParameters, true), new(nameof(TrailingSemicolon), TrailingSemicolon, true), new(nameof(Trimmed), Trimmed, true), new(nameof(Wildcard), Wildcard, true)];
+        public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(NoSubtype), NoSubtype, false), new(nameof(NoType), NoType, false), new(nameof(NoSlash), NoSlash, false), new(nameof(DoubleSlash), DoubleSlash, false), new(nameof(SpacedSlash), SpacedSlash, false), new(nameof(NonTokenChar), NonTokenChar, false), new(nameof(EmbeddedSpace), EmbeddedSpace, false), new(nameof(ParametersOnly), ParametersOnly, false), new(nameof(NullValue), NullValue, false), new(nameof(Empty), Empty, false), new(nameof(Whitespace), Whitespace, false)];
+        public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
 }

@@ -14,4 +14,19 @@ public sealed class MustIdentifierClausesTests(ITestOutputHelper output) : BaseM
         var result = Must.Be.Slug(value);
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(MustIdentifierClausesTestData.Ulid.ValidCases), MemberType = typeof(MustIdentifierClausesTestData.Ulid))]
+    [MemberData(nameof(MustIdentifierClausesTestData.Ulid.InvalidCases), MemberType = typeof(MustIdentifierClausesTestData.Ulid))]
+    public void Ulid_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Arrange
+        var value = tc.Value;
+
+        // Act
+        var result = Must.Be.Ulid(value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

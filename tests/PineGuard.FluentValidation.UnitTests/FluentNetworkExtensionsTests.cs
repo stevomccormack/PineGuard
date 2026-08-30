@@ -271,4 +271,21 @@ public sealed class FluentNetworkExtensionsTests(ITestOutputHelper output) : Bas
         var result = new NotPortNumberNullableValidator().Validate(new NullableIntModel { Value = tc.Value });
         AssertResult(tc, result);
     }
+
+    private sealed class MacAddressValidator : AbstractValidator<Model>
+    {
+        public MacAddressValidator() => RuleFor(x => x.Value).MacAddress();
+    }
+
+    // FluentNetworkExtensions.MacAddress
+    [Theory]
+    [MemberData(nameof(FluentNetworkExtensionsTestData.MacAddress.Cases), MemberType = typeof(FluentNetworkExtensionsTestData.MacAddress))]
+    public void MacAddress_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new MacAddressValidator().Validate(new Model { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

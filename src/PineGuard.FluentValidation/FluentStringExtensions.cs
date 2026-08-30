@@ -292,6 +292,32 @@ public static class FluentStringExtensions
             message, MustCodes.Text.Pattern.Match);
 
     /// <summary>
+    /// Validates that the property value is itself a well-formed regular expression pattern.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// This validates the pattern, not a value against a pattern — <see cref="Match{TModel}"/> does the latter.
+    /// It is what a model carrying a caller-supplied or configured pattern needs, so a malformed one is reported
+    /// against the property instead of thrown from deep inside whatever later compiles it. Delegates to
+    /// <see cref="MustStringClauses.RegexPattern"/>, which checks syntax only: a pattern that compiles can still
+    /// be catastrophically slow. If the value is <see langword="null"/>, validation passes (null values should be
+    /// handled by a separate <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.SearchPattern).RegexPattern();
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.RegexPattern"/>
+    public static IRuleBuilderOptions<TModel, string?> RegexPattern<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.RegexPattern(val, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Pattern.Invalid);
+
+    /// <summary>
     /// Validates that the property value contains only alphabetic characters, optionally including specified additional characters.
     /// </summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>

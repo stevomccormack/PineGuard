@@ -347,4 +347,21 @@ public sealed class FluentHttpExtensionsTests(ITestOutputHelper output) : BaseFl
         var result = new NotHasContentTypeValidator(tc.Value.allowed).Validate(new HeadersModel { Value = tc.Value.headers });
         AssertResult(tc, result);
     }
+
+    private sealed class MediaTypeValidator : AbstractValidator<StringModel>
+    {
+        public MediaTypeValidator() => RuleFor(x => x.Value).MediaType();
+    }
+
+    // FluentHttpExtensions.MediaType
+    [Theory]
+    [MemberData(nameof(FluentHttpExtensionsTestData.MediaType.Cases), MemberType = typeof(FluentHttpExtensionsTestData.MediaType))]
+    public void MediaType_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new MediaTypeValidator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

@@ -78,4 +78,14 @@ public static class NetworkAttributesTestData
             _ => new DataAnnotationExpected(false, "Value must be a valid port number.", Code: MustCodes.Network.Port.Invalid)
         });
     }
+
+    public static class MacAddress
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsMacAddress.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.IsMacAddress.Null) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a valid MAC address.", Code: MustCodes.Network.Mac.Invalid)
+        });
+    }
 }

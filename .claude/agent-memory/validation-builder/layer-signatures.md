@@ -17,6 +17,31 @@ the parts that are easy to get wrong or that only show up when a build fails.
 - A config-param null/validity check attributes failure to `nameof(configParam)`, **not** `value`.
 - Facade pattern: simple domains are a public static class; standard domains are an internal impl plus a public facade that flattens the API.
 
+## Enum config parameters are passed through, not guarded
+
+`project.md` §"Parameter validation order" says to guard "enum-like parameters" as programmer misuse,
+but **no clause in the repo does** — `Inclusion`, `StringComparison`, `CronFormat` are all forwarded
+straight to the Core rule, which answers `false` for an undefined value. Follow the code, not that
+line: guarding one would need either a second code (breaking one-clause-one-code, since the domain
+catalogue usually ships a single constant) or a `nameof(format)` attribution that reads no differently
+to the caller. The guarded cases that *do* exist are numeric/range config (`precision`, `min > max`)
+and lookup config (`FileSignatureUtility.IsKnownExtension(extension)`) — i.e. where the catalogue
+already carries a distinct `…Unknown`/`…Invalid` code for the configuration error. Fixtures reflect
+this: `CronRulesFixtures.IsCronExpression.UnknownFormat` is an ordinary invalid-*value* scenario.
+
+## Verifying one new clause's coverage
+
+`Run-CodeCoverage.ps1 -Scope MustClauses` prints only a `-Top 30` lowest-covered list, so an
+alphabetically-late new class (`MustToken*`, `MustVersion*`) is absent from the output even at 100%.
+Do not read that as "not covered" — confirm with
+`-Mode Analyze -Scope <layer> -IncludeClassNameRegex 'MustToken|MustCron'`, which prints a summary
+scoped to just those classes.
+
+The scope-wide `Line coverage:` / `Branch coverage:` summary is printed *above* that Top-30 table, so
+piping the run to `tail` shows the table and hides the only numbers that matter. Grep instead:
+`| grep -E 'Scope:|Found [0-9]+ classes|Line coverage|Branch coverage|<YourClass>'`. Single-TFM runs
+take `-Framework net8.0` / `-Framework net10.0`; with `-Enforce100` the script's exit code is the gate.
+
 ## MustClause parsed-result contract
 
 When `MustResult<T>.Result` should carry the parsed/normalized value, call `Utility.TryXxx(value, out var parsed)`

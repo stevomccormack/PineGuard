@@ -62,4 +62,34 @@ public sealed class GuardBufferClausesTests(ITestOutputHelper output) : BaseGuar
 
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
+
+    // Guard.Against.NotBase64Url
+    [Theory]
+    [MemberData(nameof(GuardBufferClausesTestData.NotBase64Url.ValidCases), MemberType = typeof(GuardBufferClausesTestData.NotBase64Url))]
+    [MemberData(nameof(GuardBufferClausesTestData.NotBase64Url.InvalidCases), MemberType = typeof(GuardBufferClausesTestData.NotBase64Url))]
+    public void NotBase64Url_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        // Arrange
+        var value = tc.Value;
+
+        // Act + Assert
+        var result = AssertResult(tc, () => Guard.Against.NotBase64Url(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotBase64Url(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    // Guard.Against.NotUtf8
+    [Theory]
+    [MemberData(nameof(GuardBufferClausesTestData.NotUtf8.ValidCases), MemberType = typeof(GuardBufferClausesTestData.NotUtf8))]
+    [MemberData(nameof(GuardBufferClausesTestData.NotUtf8.InvalidCases), MemberType = typeof(GuardBufferClausesTestData.NotUtf8))]
+    public void NotUtf8_BehavesAsExpected(GuardCase<byte[]?> tc)
+    {
+        // Arrange
+        var value = tc.Value;
+
+        // Act + Assert
+        var result = AssertResult(tc, () => Guard.Against.NotUtf8(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotUtf8(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
 }

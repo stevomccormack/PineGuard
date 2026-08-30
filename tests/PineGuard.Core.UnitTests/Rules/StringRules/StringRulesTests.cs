@@ -437,6 +437,17 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
     }
 
     [Theory]
+    [MemberData(nameof(StringRulesTestData.IsRegexPattern.Cases), MemberType = typeof(StringRulesTestData.IsRegexPattern))]
+    public void IsRegexPattern_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.IsRegexPattern(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(StringRulesTestData.HasByteOrderMark.Cases), MemberType = typeof(StringRulesTestData.HasByteOrderMark))]
     public void HasByteOrderMark_BehavesAsExpected(RuleCase<string?> tc)
     {

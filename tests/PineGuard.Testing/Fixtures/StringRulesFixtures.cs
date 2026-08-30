@@ -374,6 +374,29 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, string suffix, StringComparison comparison)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class IsRegexPattern
+    {
+        public static readonly string? Literal = "abc";
+        public static readonly string? Anchored = "^abc$";
+        public static readonly string? CharacterClass = "[a-z]+";
+        public static readonly string? Quantified = @"^\d{3}-\d{4}$";
+        public static readonly string? Alternation = "cat|dog";
+        public static readonly string? NamedGroup = @"(?<year>\d{4})";
+        public static readonly string? Space = " ";
+        public static readonly string? NullValue = null;
+        public static readonly string? Empty = "";
+        public static readonly string? UnclosedCharacterClass = "[unclosed";
+        public static readonly string? UnclosedGroup = "(unclosed";
+        public static readonly string? UnbalancedCloseParen = "a)b";
+        public static readonly string? DanglingQuantifier = "*";
+        public static readonly string? ReversedQuantifierRange = "a{3,1}";
+        public static readonly string? UnknownUnicodeCategory = @"\p{NotACategory}";
+
+        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(Literal), Literal, true), new(nameof(Anchored), Anchored, true), new(nameof(CharacterClass), CharacterClass, true), new(nameof(Quantified), Quantified, true), new(nameof(Alternation), Alternation, true), new(nameof(NamedGroup), NamedGroup, true), new(nameof(Space), Space, true)];
+        public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(NullValue), NullValue, false), new(nameof(Empty), Empty, false), new(nameof(UnclosedCharacterClass), UnclosedCharacterClass, false), new(nameof(UnclosedGroup), UnclosedGroup, false), new(nameof(UnbalancedCloseParen), UnbalancedCloseParen, false), new(nameof(DanglingQuantifier), DanglingQuantifier, false), new(nameof(ReversedQuantifierRange), ReversedQuantifierRange, false), new(nameof(UnknownUnicodeCategory), UnknownUnicodeCategory, false)];
+        public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class HasByteOrderMark
     {
         public static readonly string? Leading = StringRules.ByteOrderMark + "hello";
