@@ -52,4 +52,48 @@ public static class MustIdentifierClauses
         var ok = IdentifierRules.IsSlug(value);
         return MustResult<string>.FromBool(ok, MustCodes.Identifier.Slug.Invalid, messageTemplate, paramName, value, value);
     }
+
+    /// <summary>
+    /// Validates that the specified string is a canonical ULID (Universally Unique Lexicographically
+    /// Sortable Identifier).
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate as a ULID.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> is a canonical ULID, or <see langword="false"/> with a descriptive
+    /// <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
+    /// Delegates to <see cref="IdentifierRules.IsUlid"/>, which checks the textual form only and does not
+    /// interpret the embedded timestamp. The failure message follows the pattern
+    /// <c>"{paramName} must be a valid ULID."</c>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = Must.Be.Ulid(eventId);
+    /// if (result.Failed)
+    ///     Console.WriteLine(result.Message);
+    /// </code>
+    /// </example>
+    /// <seealso cref="IdentifierRules.IsUlid"/>
+    /// <seealso href="https://pineguard.ai/docs/must/identifier">Identifier Must Clauses documentation</seealso>
+    public static MustResult<string> Ulid(
+        this IMustClause _,
+        string? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Identifier.Ulid.Invalid, "{paramName} must not be null.", paramName, value);
+
+        const string messageTemplate = "{paramName} must be a valid ULID.";
+
+        var ok = IdentifierRules.IsUlid(value);
+        return MustResult<string>.FromBool(ok, MustCodes.Identifier.Ulid.Invalid, messageTemplate, paramName, value, value);
+    }
 }
