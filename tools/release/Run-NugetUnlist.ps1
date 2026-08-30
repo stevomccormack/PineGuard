@@ -49,6 +49,7 @@ param(
         'PineGuard.DataAnnotations',
         'PineGuard.Extensions.Options',
         'PineGuard.Extensions.DependencyInjection',
+        'PineGuard.AspNetCore',
         'PineGuard.ErrorOr',
         'PineGuard.FluentResults',
         'PineGuard.OneOf',

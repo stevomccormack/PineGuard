@@ -11,6 +11,10 @@
     <PackageVersion Include="ErrorOr" Version="2.1.1" />
     <PackageVersion Include="FluentResults" Version="3.16.0" />
     <PackageVersion Include="FluentValidation" Version="11.12.0" />
+    <!-- TestHost is version-locked to the shared framework it hosts, so PineGuard.AspNetCore.UnitTests
+         takes the matching line per TFM rather than one central version -->
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="8.0.21" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="10.0.11" Condition="'$(TargetFramework)' != 'net8.0'" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.7.8" />
     <!-- Direct pins for audit-cli lifting vulnerable transitives (NU1903) -->
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="18.7.1" />

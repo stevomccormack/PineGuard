@@ -33,6 +33,7 @@ jobs:
       data-annotations: ${{ steps.filter.outputs.data-annotations }}
       options: ${{ steps.filter.outputs.options }}
       di: ${{ steps.filter.outputs.di }}
+      aspnetcore: ${{ steps.filter.outputs.aspnetcore }}
       erroror: ${{ steps.filter.outputs.erroror }}
       fluentresults: ${{ steps.filter.outputs.fluentresults }}
       oneof: ${{ steps.filter.outputs.oneof }}
@@ -66,6 +67,9 @@ jobs:
             di:
               - 'src/PineGuard.Extensions.DependencyInjection/**'
               - 'tests/PineGuard.Extensions.DependencyInjection.UnitTests/**'
+            aspnetcore:
+              - 'src/PineGuard.AspNetCore/**'
+              - 'tests/PineGuard.AspNetCore.UnitTests/**'
             erroror:
               - 'src/PineGuard.ErrorOr/**'
               - 'tests/PineGuard.ErrorOr.UnitTests/**'
@@ -177,6 +181,11 @@ jobs:
             name: DependencyInjection
             run-if: core-or-di-or-testing-or-main
 
+          # AspNetCore tests: run if core, must, di, aspnetcore, testing, or main
+          - project: tests/PineGuard.AspNetCore.UnitTests/PineGuard.AspNetCore.UnitTests.csproj
+            name: AspNetCore
+            run-if: core-or-must-or-di-or-aspnetcore-or-testing-or-main
+
           # ErrorOr bridge tests: run if core, erroror, testing, or main
           - project: tests/PineGuard.ErrorOr.UnitTests/PineGuard.ErrorOr.UnitTests.csproj
             name: ErrorOr
@@ -214,6 +223,7 @@ jobs:
           DATA="${{ needs.changes.outputs.data-annotations }}"
           OPTIONS="${{ needs.changes.outputs.options }}"
           DI="${{ needs.changes.outputs.di }}"
+          ASPNETCORE="${{ needs.changes.outputs.aspnetcore }}"
           ERROROR="${{ needs.changes.outputs.erroror }}"
           FLUENTRESULTS="${{ needs.changes.outputs.fluentresults }}"
           ONEOF="${{ needs.changes.outputs.oneof }}"
@@ -237,6 +247,8 @@ jobs:
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$OPTIONS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-di-or-testing-or-main)
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$DI" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-must-or-di-or-aspnetcore-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DI" == "true" || "$ASPNETCORE" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-erroror-or-testing-or-main)
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ERROROR" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-fluentresults-or-testing-or-main)
@@ -372,6 +384,7 @@ jobs:
           DATA="${{ needs.changes.outputs.data-annotations }}"
           OPTIONS="${{ needs.changes.outputs.options }}"
           DI="${{ needs.changes.outputs.di }}"
+          ASPNETCORE="${{ needs.changes.outputs.aspnetcore }}"
           ERROROR="${{ needs.changes.outputs.erroror }}"
           FLUENTRESULTS="${{ needs.changes.outputs.fluentresults }}"
           ONEOF="${{ needs.changes.outputs.oneof }}"
@@ -412,6 +425,11 @@ jobs:
           # PineGuard.Extensions.DependencyInjection — core-or-di-or-testing-or-main
           if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$DI" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.Extensions.DependencyInjection;"
+          fi
+
+          # PineGuard.AspNetCore — core-or-must-or-di-or-aspnetcore-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DI" == "true" || "$ASPNETCORE" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.AspNetCore;"
           fi
 
           # PineGuard.ErrorOr — core-or-erroror-or-testing-or-main
