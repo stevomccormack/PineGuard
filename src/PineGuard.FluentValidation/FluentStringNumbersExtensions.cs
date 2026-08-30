@@ -325,6 +325,30 @@ public static class FluentStringNumbersExtensions
             message, MustCodes.Number.Range.InRange);
 
     /// <summary>
+    /// Validates that the property value, parsed as a decimal number, is a percentage between 0 and 100.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <param name="styles">The <see cref="NumberStyles"/> used when parsing the string value.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringNumbersClauses.Percentage"/>. If the value is <see langword="null"/>,
+    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.DiscountRate).Percentage();
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringNumbersClauses.Percentage"/>
+    public static IRuleBuilderOptions<TModel, string?> Percentage<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string? message = null,
+        NumberStyles styles = DefaultStyles) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.Percentage(val, styles, paramName: null) : MustResult<decimal>.Ok(0),
+            message, MustCodes.Number.Range.NotPercentage);
+
+    /// <summary>
     /// Validates that the property value, parsed as a decimal number, is approximately equal to the target within the specified tolerance.
     /// </summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
