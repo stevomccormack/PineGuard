@@ -249,6 +249,16 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
         public NotHasByteOrderMarkValidator() => RuleFor(x => x.Value).NotHasByteOrderMark();
     }
 
+    private sealed class WellFormedUtf16Validator : AbstractValidator<StringModel>
+    {
+        public WellFormedUtf16Validator() => RuleFor(x => x.Value).WellFormedUtf16();
+    }
+
+    private sealed class NotWellFormedUtf16Validator : AbstractValidator<StringModel>
+    {
+        public NotWellFormedUtf16Validator() => RuleFor(x => x.Value).NotWellFormedUtf16();
+    }
+
     [Theory]
     [MemberData(nameof(FluentStringExtensionsTestData.NotNullOrEmpty.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotNullOrEmpty))]
     public void NotNullOrEmpty_BehavesAsExpected(FluentCase<string?> tc)
@@ -636,6 +646,30 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
     {
         // Act
         var result = new NotHasByteOrderMarkValidator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.WellFormedUtf16
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.WellFormedUtf16.Cases), MemberType = typeof(FluentStringExtensionsTestData.WellFormedUtf16))]
+    public void WellFormedUtf16_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new WellFormedUtf16Validator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.NotWellFormedUtf16
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.NotWellFormedUtf16.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotWellFormedUtf16))]
+    public void NotWellFormedUtf16_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new NotWellFormedUtf16Validator().Validate(new StringModel { Value = tc.Value });
 
         // Assert
         AssertResult(tc, result);
