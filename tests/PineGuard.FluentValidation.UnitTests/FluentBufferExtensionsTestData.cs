@@ -55,4 +55,14 @@ public static class FluentBufferExtensionsTestData
             _ => new FluentExpected(false, "Value must be a valid base64url string.", Code: MustCodes.Encoding.Base64url.Invalid)
         });
     }
+
+    public static class Utf8
+    {
+        public static TheoryData<FluentCase<byte[]?>> Cases => F.IsUtf8.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsUtf8.Null) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be a valid UTF-8 byte sequence.", Code: MustCodes.Encoding.Utf8.Invalid)
+        });
+    }
 }

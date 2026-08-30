@@ -8,6 +8,8 @@ public sealed class FluentBufferExtensionsTests(ITestOutputHelper output) : Base
 {
     private sealed record Model { public string? Value { get; init; } }
 
+    private sealed record BytesModel { public byte[]? Value { get; init; } }
+
     private sealed class HexValidator : AbstractValidator<Model>
     {
         public HexValidator() => RuleFor(x => x.Value).Hex();
@@ -31,6 +33,11 @@ public sealed class FluentBufferExtensionsTests(ITestOutputHelper output) : Base
     private sealed class Base64UrlValidator : AbstractValidator<Model>
     {
         public Base64UrlValidator() => RuleFor(x => x.Value).Base64Url();
+    }
+
+    private sealed class Utf8Validator : AbstractValidator<BytesModel>
+    {
+        public Utf8Validator() => RuleFor(x => x.Value).Utf8();
     }
 
     [Theory]
@@ -72,6 +79,28 @@ public sealed class FluentBufferExtensionsTests(ITestOutputHelper output) : Base
     {
         // Act
         var result = new NotBase64Validator().Validate(new Model { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentBufferExtensionsTestData.Base64Url.Cases), MemberType = typeof(FluentBufferExtensionsTestData.Base64Url))]
+    public void Base64Url_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new Base64UrlValidator().Validate(new Model { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentBufferExtensionsTestData.Utf8.Cases), MemberType = typeof(FluentBufferExtensionsTestData.Utf8))]
+    public void Utf8_BehavesAsExpected(FluentCase<byte[]?> tc)
+    {
+        // Act
+        var result = new Utf8Validator().Validate(new BytesModel { Value = tc.Value });
 
         // Assert
         AssertResult(tc, result);
