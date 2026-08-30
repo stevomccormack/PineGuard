@@ -463,6 +463,43 @@ public static partial class StringRules
         return value[0] == ByteOrderMark;
     }
 
+    /// <summary>
+    /// Determines whether the specified string is well-formed UTF-16 — every surrogate code unit forms a complete
+    /// high/low pair.
+    /// </summary>
+    /// <remarks>
+    /// A <see cref="string"/> is a sequence of UTF-16 code units, and nothing stops one from holding a high surrogate
+    /// with no low surrogate after it (or a low surrogate with no high surrogate before it). The usual cause is a string
+    /// sliced through the middle of a surrogate pair. Such a string cannot be encoded to UTF-8, so it fails at the
+    /// serialization boundary far from where it was created — this rule catches it at the input boundary instead.
+    /// The empty string is well-formed; <see langword="null"/> is not a string and returns <see langword="false"/>.
+    /// </remarks>
+    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> contains no unpaired surrogate; otherwise, <see langword="false"/>.</returns>
+    public static bool IsWellFormedUtf16(string? value)
+    {
+        if (value is null)
+            return false;
+
+        for (var i = 0; i < value.Length; i++)
+        {
+            var ch = value[i];
+
+            if (char.IsLowSurrogate(ch))
+                return false;
+
+            if (!char.IsHighSurrogate(ch))
+                continue;
+
+            i++;
+
+            if (i == value.Length || !char.IsLowSurrogate(value[i]))
+                return false;
+        }
+
+        return true;
+    }
+
     private static bool AllCharsAreAllowed(string value, Func<char, bool> allowedCharPredicate,
         char[]? additionalAllowedChars)
     {

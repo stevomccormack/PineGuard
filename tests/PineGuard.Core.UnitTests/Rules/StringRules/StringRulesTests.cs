@@ -445,4 +445,15 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.IsWellFormedUtf16.Cases), MemberType = typeof(StringRulesTestData.IsWellFormedUtf16))]
+    public void IsWellFormedUtf16_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.IsWellFormedUtf16(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

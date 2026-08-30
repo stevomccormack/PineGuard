@@ -386,4 +386,19 @@ public static partial class StringRulesFixtures
         public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(Interior), Interior, false), new(nameof(NoMark), NoMark, false), new(nameof(Empty), Empty, false), new(nameof(NullValue), NullValue, false)];
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
+
+    public static class IsWellFormedUtf16
+    {
+        public static readonly string? Ascii = "abc";
+        public static readonly string? SurrogatePair = "a\uD83D\uDE00b";
+        public static readonly string? Empty = "";
+        public static readonly string? LoneHighSurrogate = "a\uD83D";
+        public static readonly string? HighSurrogateThenAscii = "\uD83Dz";
+        public static readonly string? LoneLowSurrogate = "a\uDE00";
+        public static readonly string? NullValue = null;
+
+        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(Ascii), Ascii, true), new(nameof(SurrogatePair), SurrogatePair, true), new(nameof(Empty), Empty, true)];
+        public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(LoneHighSurrogate), LoneHighSurrogate, false), new(nameof(HighSurrogateThenAscii), HighSurrogateThenAscii, false), new(nameof(LoneLowSurrogate), LoneLowSurrogate, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
 }
