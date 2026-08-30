@@ -543,6 +543,44 @@ public static class GuardNumberClauses
     }
 
     /// <summary>
+    /// Throws if <paramref name="value"/> is not a percentage between 0 and 100.
+    /// </summary>
+    /// <typeparam name="T">The numeric type to guard.</typeparam>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustNumberClauses.Percentage{T}"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is outside the 0–100 percentage scale and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustNumberClauses.Percentage{T}"/>
+    public static T NotPercentage<T>(this IGuardClause _,
+        T value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        where T : struct, INumber<T>
+    {
+        var result = Must.Be.Percentage(value, paramName); // Guard.Against.NotPercentage => Must.Be.Percentage (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
     /// Throws if <paramref name="value"/> is not approximately equal to <paramref name="target"/>.
     /// </summary>
     /// <typeparam name="T">The numeric type to guard.</typeparam>
