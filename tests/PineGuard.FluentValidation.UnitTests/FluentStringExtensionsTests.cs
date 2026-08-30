@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using FluentValidation;
 using PineGuard.Testing.UnitTests.FluentValidation;
@@ -257,6 +258,16 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
     private sealed class NotWellFormedUtf16Validator : AbstractValidator<StringModel>
     {
         public NotWellFormedUtf16Validator() => RuleFor(x => x.Value).NotWellFormedUtf16();
+    }
+
+    private sealed class NormalizedValidator : AbstractValidator<StringModel>
+    {
+        public NormalizedValidator(NormalizationForm form) => RuleFor(x => x.Value).Normalized(form);
+    }
+
+    private sealed class NotNormalizedValidator : AbstractValidator<StringModel>
+    {
+        public NotNormalizedValidator(NormalizationForm form) => RuleFor(x => x.Value).NotNormalized(form);
     }
 
     [Theory]
@@ -670,6 +681,30 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
     {
         // Act
         var result = new NotWellFormedUtf16Validator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.Normalized
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.Normalized.Cases), MemberType = typeof(FluentStringExtensionsTestData.Normalized))]
+    public void Normalized_BehavesAsExpected(FluentCase<(string? value, NormalizationForm form)> tc)
+    {
+        // Act
+        var result = new NormalizedValidator(tc.Value.form).Validate(new StringModel { Value = tc.Value.value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.NotNormalized
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.NotNormalized.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotNormalized))]
+    public void NotNormalized_BehavesAsExpected(FluentCase<(string? value, NormalizationForm form)> tc)
+    {
+        // Act
+        var result = new NotNormalizedValidator(tc.Value.form).Validate(new StringModel { Value = tc.Value.value });
 
         // Assert
         AssertResult(tc, result);
