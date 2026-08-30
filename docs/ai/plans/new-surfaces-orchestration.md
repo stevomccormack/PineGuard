@@ -26,8 +26,23 @@ parent: new-surfaces-program
 > cascade (what Unit 2 called "W5") is deferred program-wide, to be done later in one batched
 > pass across all units rather than per-unit — do not attempt a partial version of it, and do not
 > let a gate that depends on it (e.g. an audit-cli rule checking Brain-doc completeness for a new
-> package) block a unit's merge; skip that specific gate and note the skip in the PR body and in
-> this tracker. Note this in each unit's checkpoint so the deferred work stays visible.
+> package) block a unit's merge; skip that specific gate and note the skip in the unit's close-out
+> notes and in this tracker. Note this in each unit's checkpoint so the deferred work stays visible.
+>
+> **Standing process rule (owner instruction, 2026-08-30): no GitHub Pull Requests.** We have
+> direct push access to `main` — use it. A unit's close-out step is a local `git merge --no-ff
+> feature/xxx` into `main` followed by `git push origin main`, never `gh pr create`. Still a real
+> merge commit (not squash/fast-forward), matching the one-merge-commit-per-unit shape Phase 1,
+> Track 0, and Unit 2 (Options, PR #28 — the last unit that used the now-retired PR flow)
+> established. CI is still worth checking after the push, but it is no longer a merge gate mediated
+> by review; a unit's own independent build/test/format/coverage verification is what the merge
+> decision rests on. Every "close out unit" dispatch must say this explicitly — several agents
+> defaulted to the old PR pattern when not told otherwise.
+>
+> **Standing guidance (owner instruction, 2026-08-30): `audit-cli` is not an authoritative quality
+> signal.** Its dependencies are kept patched when they block a build, but its Rule06/07/08/11/13/50
+> etc. checks reflect possibly-stale conventions and are informational only — never a merge gate.
+> The real bar is the specs under `docs/ai/specs/` plus build/test/coverage green.
 
 ## 0. Handoff — read this first, every session
 
@@ -121,10 +136,10 @@ same PR/commit that closes the unit out.** A tracker that lags reality is worse 
 | **3-PR1 — async + DI** | Not started | none yet | — | Blocked on owner decision D4 (FV adapter scanner in/out of scope) before opening |
 | **3-PR2 — AspNetCore** | Not started | none yet | — | Hard-depends on 3-PR1 merged; 1d dependency already satisfied; decision D3 gates its W7 only |
 | **4-mediatr** | Not started | none yet | — | Hard-depends on 3-PR1 merged (soft dependency per Plan 00 §10.1 note — do not reorder without a plan edit) |
-| **5-A** (string content) | Not started | none yet | — | No blockers |
+| **5-A** (string content) | **Merged to `main`.** All 5 layers done: Core/Must/Guard/Fluent/DataAnnotations for `Contains`/`StartsWith`/`EndsWith` + `Not*` complements, each independently verified 100%/100% line+branch on both TFMs. `-Scope All` also 100%/100% both TFMs post-merge (16521/16521 lines net8.0/net10.0). DataAnnotations needed an internal `IsExternalInit` polyfill for netstandard2.1 (`init` accessors per plan's literal shape) — flagged as a reversible-if-wrong call, not escalated. | `feature/rules-string-content` (deleted, merged) | `d1df562` (direct `git merge --no-ff` + push — **no PR**, per the 2026-08-30 no-PR standing rule) | First batch built one-layer-per-dispatch after Options W4 showed full-batch dispatches die silently; every layer here committed incrementally and none lost work. Vocabulary/spec-file items the plan's W-steps call for are deferred per the docs/ restriction. |
 | **5-B** (identifiers) | Not started | none yet | — | No blockers; biggest batch (cron parser, JWT shape, SemVer) — budget 2–3 sessions |
 | **5-C** (Unicode) | Not started | none yet | — | Has an at-risk row (globalization-invariant mode) — verify on CI early |
-| **5-D** (numeric/financial) | Not started | none yet | — | No blockers |
+| **5-D** (numeric/financial) | **In progress — Core/Must/Guard done, Fluent + DataAnnotations + close-out remain.** Core: percentage (Number+String), Luhn checksum (+`ChecksumUtility`), Decimal precision/scale (+`DecimalUtility`) — 100%/100% both TFMs. Must and Guard both fully wired for all three areas, also 100%/100%. `vocabulary.json` aliases (`ScaleAbove→ScaleAtMost` etc.) the plan calls for are deferred per the docs/ restriction (noted in agent memory so it isn't misread later as a naming defect). | `feature/rules-numeric` (open) | — | Two dispatches (initial Core, initial Must) made real progress but died before committing at all — recovered by having the orchestrator verify+commit directly rather than redispatching from scratch. Branch name drifted from the planned `rules-numeric-financial` to `rules-numeric` (worktree/branch naming isn't always followed exactly — check `git worktree list`, don't assume). |
 | **5-E** (temporal + clock injection) | Not started | none yet | — | Riskiest batch: scripted `TimeProvider?` signature insertion across every temporal member and call site; budget 2–3 sessions |
 | **5-F** (file signatures) | Not started | none yet | — | No blockers |
 | **6 — Analyzers** | Not started | none yet | — | Deliberately run last (Plan 00 §3.2); no blockers |

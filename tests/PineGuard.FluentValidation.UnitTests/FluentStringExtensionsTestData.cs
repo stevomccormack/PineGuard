@@ -544,4 +544,64 @@ public static partial class FluentStringExtensionsTestData
             _ => new FluentExpected(false, "Value must not contain any disallowed characters.")
         });
     }
+
+    public static class Contains
+    {
+        public static TheoryData<FluentCase<(string? value, string substring, StringComparison comparison)>> Cases => F.Contains.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.Contains.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must contain the specified substring.", Code: MustCodes.Text.Content.NotContains)
+        });
+    }
+
+    public static class NotContains
+    {
+        public static TheoryData<FluentCase<(string? value, string substring, StringComparison comparison)>> Cases => F.Contains.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.Contains.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(false, "Value must not contain the specified substring.", Code: MustCodes.Text.Content.Contains),
+            _ => new FluentExpected(true)
+        });
+    }
+
+    public static class StartsWith
+    {
+        public static TheoryData<FluentCase<(string? value, string prefix, StringComparison comparison)>> Cases => F.StartsWith.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.StartsWith.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must start with the specified prefix.", Code: MustCodes.Text.Content.NotStartsWith)
+        });
+    }
+
+    public static class NotStartsWith
+    {
+        public static TheoryData<FluentCase<(string? value, string prefix, StringComparison comparison)>> Cases => F.StartsWith.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.StartsWith.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(false, "Value must not start with the specified prefix.", Code: MustCodes.Text.Content.StartsWith),
+            _ => new FluentExpected(true)
+        });
+    }
+
+    public static class EndsWith
+    {
+        public static TheoryData<FluentCase<(string? value, string suffix, StringComparison comparison)>> Cases => F.EndsWith.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.EndsWith.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must end with the specified suffix.", Code: MustCodes.Text.Content.NotEndsWith)
+        });
+    }
+
+    public static class NotEndsWith
+    {
+        public static TheoryData<FluentCase<(string? value, string suffix, StringComparison comparison)>> Cases => F.EndsWith.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.EndsWith.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(false, "Value must not end with the specified suffix.", Code: MustCodes.Text.Content.EndsWith),
+            _ => new FluentExpected(true)
+        });
+    }
 }

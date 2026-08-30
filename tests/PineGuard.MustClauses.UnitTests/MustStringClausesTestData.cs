@@ -1,5 +1,9 @@
 using System.Text.RegularExpressions;
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
+using PineGuard.Testing.UnitTests.Rules;
+using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.MustClauses.UnitTests;
 
@@ -464,5 +468,77 @@ public static partial class MustStringClausesTestData
 
         public sealed record AllowedEdgeCase(string Name, (string? Value, char[] Chars) Value, bool Expected, string ParamName)
             : IsCase<(string? Value, char[] Chars)>(Name, Value, Expected);
+    }
+
+    public static class Contains
+    {
+        public static TheoryData<MustCase<(string? value, string substring, StringComparison comparison)>> ValidCases => F.Contains.ValidScenarios.ToMustCases();
+        public static TheoryData<MustCase<(string? value, string substring, StringComparison comparison)>> InvalidCases => F.Contains.InvalidScenarios.Except(nameof(F.Contains.NullValue)).ToMustCases(_ => new MustExpected(false, "value must contain the specified substring.", Code: MustCodes.Text.Content.NotContains));
+        public static TheoryData<MustCase<(string? value, string substring, StringComparison comparison)>> NullCases => F.Contains.InvalidScenarios.Only(nameof(F.Contains.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Content.NotContains));
+
+        public static TheoryData<MustCase<(string? value, string substring, StringComparison comparison)>> NullSubstringCases =>
+        [
+            new("null substring", ("hello world", null!, StringComparison.Ordinal), new MustExpected(false, "substring must not be null.", "substring", MustCodes.Text.Content.NotContains))
+        ];
+    }
+
+    public static class NotContains
+    {
+        public static TheoryData<MustCase<(string? value, string substring, StringComparison comparison)>> ValidCases => F.Contains.InvalidScenarios.Except(nameof(F.Contains.NullValue)).ToMustCases(_ => new MustExpected(true));
+        public static TheoryData<MustCase<(string? value, string substring, StringComparison comparison)>> InvalidCases => F.Contains.ValidScenarios.ToMustCases(_ => new MustExpected(false, "value must not contain the specified substring.", Code: MustCodes.Text.Content.Contains));
+        public static TheoryData<MustCase<(string? value, string substring, StringComparison comparison)>> NullCases => F.Contains.InvalidScenarios.Only(nameof(F.Contains.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Content.Contains));
+
+        public static TheoryData<MustCase<(string? value, string substring, StringComparison comparison)>> NullSubstringCases =>
+        [
+            new("null substring", ("hello world", null!, StringComparison.Ordinal), new MustExpected(false, "substring must not be null.", "substring", MustCodes.Text.Content.Contains))
+        ];
+    }
+
+    public static class StartsWith
+    {
+        public static TheoryData<MustCase<(string? value, string prefix, StringComparison comparison)>> ValidCases => F.StartsWith.ValidScenarios.ToMustCases();
+        public static TheoryData<MustCase<(string? value, string prefix, StringComparison comparison)>> InvalidCases => F.StartsWith.InvalidScenarios.Except(nameof(F.StartsWith.NullValue)).ToMustCases(_ => new MustExpected(false, "value must start with the specified prefix.", Code: MustCodes.Text.Content.NotStartsWith));
+        public static TheoryData<MustCase<(string? value, string prefix, StringComparison comparison)>> NullCases => F.StartsWith.InvalidScenarios.Only(nameof(F.StartsWith.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Content.NotStartsWith));
+
+        public static TheoryData<MustCase<(string? value, string prefix, StringComparison comparison)>> NullPrefixCases =>
+        [
+            new("null prefix", ("hello world", null!, StringComparison.Ordinal), new MustExpected(false, "prefix must not be null.", "prefix", MustCodes.Text.Content.NotStartsWith))
+        ];
+    }
+
+    public static class NotStartsWith
+    {
+        public static TheoryData<MustCase<(string? value, string prefix, StringComparison comparison)>> ValidCases => F.StartsWith.InvalidScenarios.Except(nameof(F.StartsWith.NullValue)).ToMustCases(_ => new MustExpected(true));
+        public static TheoryData<MustCase<(string? value, string prefix, StringComparison comparison)>> InvalidCases => F.StartsWith.ValidScenarios.ToMustCases(_ => new MustExpected(false, "value must not start with the specified prefix.", Code: MustCodes.Text.Content.StartsWith));
+        public static TheoryData<MustCase<(string? value, string prefix, StringComparison comparison)>> NullCases => F.StartsWith.InvalidScenarios.Only(nameof(F.StartsWith.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Content.StartsWith));
+
+        public static TheoryData<MustCase<(string? value, string prefix, StringComparison comparison)>> NullPrefixCases =>
+        [
+            new("null prefix", ("hello world", null!, StringComparison.Ordinal), new MustExpected(false, "prefix must not be null.", "prefix", MustCodes.Text.Content.StartsWith))
+        ];
+    }
+
+    public static class EndsWith
+    {
+        public static TheoryData<MustCase<(string? value, string suffix, StringComparison comparison)>> ValidCases => F.EndsWith.ValidScenarios.ToMustCases();
+        public static TheoryData<MustCase<(string? value, string suffix, StringComparison comparison)>> InvalidCases => F.EndsWith.InvalidScenarios.Except(nameof(F.EndsWith.NullValue)).ToMustCases(_ => new MustExpected(false, "value must end with the specified suffix.", Code: MustCodes.Text.Content.NotEndsWith));
+        public static TheoryData<MustCase<(string? value, string suffix, StringComparison comparison)>> NullCases => F.EndsWith.InvalidScenarios.Only(nameof(F.EndsWith.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Content.NotEndsWith));
+
+        public static TheoryData<MustCase<(string? value, string suffix, StringComparison comparison)>> NullSuffixCases =>
+        [
+            new("null suffix", ("hello world", null!, StringComparison.Ordinal), new MustExpected(false, "suffix must not be null.", "suffix", MustCodes.Text.Content.NotEndsWith))
+        ];
+    }
+
+    public static class NotEndsWith
+    {
+        public static TheoryData<MustCase<(string? value, string suffix, StringComparison comparison)>> ValidCases => F.EndsWith.InvalidScenarios.Except(nameof(F.EndsWith.NullValue)).ToMustCases(_ => new MustExpected(true));
+        public static TheoryData<MustCase<(string? value, string suffix, StringComparison comparison)>> InvalidCases => F.EndsWith.ValidScenarios.ToMustCases(_ => new MustExpected(false, "value must not end with the specified suffix.", Code: MustCodes.Text.Content.EndsWith));
+        public static TheoryData<MustCase<(string? value, string suffix, StringComparison comparison)>> NullCases => F.EndsWith.InvalidScenarios.Only(nameof(F.EndsWith.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Content.EndsWith));
+
+        public static TheoryData<MustCase<(string? value, string suffix, StringComparison comparison)>> NullSuffixCases =>
+        [
+            new("null suffix", ("hello world", null!, StringComparison.Ordinal), new MustExpected(false, "suffix must not be null.", "suffix", MustCodes.Text.Content.EndsWith))
+        ];
     }
 }
