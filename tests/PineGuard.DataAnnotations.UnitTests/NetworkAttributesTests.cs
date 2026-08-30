@@ -95,4 +95,19 @@ public sealed class NetworkAttributesTests(ITestOutputHelper output) : BaseDataA
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(NetworkAttributesTestData.MacAddress.Cases), MemberType = typeof(NetworkAttributesTestData.MacAddress))]
+    public void MacAddress_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new MacAddressAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }
