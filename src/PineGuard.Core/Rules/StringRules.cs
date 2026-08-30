@@ -87,6 +87,28 @@ public static partial class StringRules
     }
 
     /// <summary>
+    /// Determines whether the specified string is itself a syntactically valid regular expression.
+    /// </summary>
+    /// <param name="value">The pattern to validate. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> compiles as a regular expression; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// This validates the pattern, not a value against a pattern — <see cref="IsMatch(string?, Regex)"/> does the
+    /// latter. It is what a caller reaches for when the pattern is configuration or user input, so that a malformed
+    /// one is reported rather than thrown from deep inside a validator. The value is not trimmed, since whitespace is
+    /// significant in a pattern, and an empty pattern is rejected as naming no expression. Only the syntax is checked:
+    /// a pattern that parses can still be catastrophically slow, which is why
+    /// <see cref="Utils.StringUtility.RegexMatchTimeout"/> is applied to the expression that is built from it.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// bool valid = StringRules.IsRegexPattern(@"^\d{3}-\d{4}$"); // true
+    /// bool invalid = StringRules.IsRegexPattern("[unclosed");    // false
+    /// </code>
+    /// </example>
+    public static bool IsRegexPattern(string? value) =>
+        StringUtility.TryCreateRegex(value, out _);
+
+    /// <summary>
     /// Determines whether the specified string contains only Unicode letters, with optional additional allowed characters.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
