@@ -1,6 +1,7 @@
 #if !NET8_0_OR_GREATER
 using System.Buffers;
 #endif
+using System.Text;
 using PineGuard.Rules;
 
 namespace PineGuard.Utils;
@@ -114,4 +115,35 @@ public static class BufferUtility
 
     private static bool IsBase64UrlChar(char value) =>
         value is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z') or (>= '0' and <= '9') or '-' or '_';
+
+    /// <summary>
+    /// Attempts to decode the specified bytes as UTF-8 text, rejecting any byte sequence that is not
+    /// well-formed UTF-8 (overlong encodings, unpaired surrogates, truncated sequences, out-of-range code points).
+    /// </summary>
+    /// <param name="value">The bytes to decode. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
+    /// <param name="text">When this method returns, contains the decoded text if successful; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the bytes decoded as UTF-8; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// The decoder never substitutes U+FFFD for a malformed sequence, so a successful decode means the bytes
+    /// round-trip. A leading byte-order mark is retained in <paramref name="text"/> rather than stripped.
+    /// </remarks>
+    public static bool TryDecodeUtf8(byte[]? value, out string? text)
+    {
+        text = null;
+
+        if (value is null || value.Length == 0)
+            return false;
+
+        try
+        {
+            text = StrictUtf8.GetString(value);
+            return true;
+        }
+        catch (DecoderFallbackException)
+        {
+            return false;
+        }
+    }
+
+    private static readonly UTF8Encoding StrictUtf8 = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
 }

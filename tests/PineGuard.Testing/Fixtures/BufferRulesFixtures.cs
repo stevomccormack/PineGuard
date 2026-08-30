@@ -171,4 +171,58 @@ public static class BufferRulesFixtures
         public static RuleScenario<string?>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
         public static RuleScenario<string?>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
+
+    public static class IsUtf8
+    {
+        public static readonly byte[]? Ascii = [0x48, 0x65, 0x6C, 0x6C, 0x6F];
+        public static readonly byte[]? TwoByteSequence = [0xC3, 0xA9];
+        public static readonly byte[]? ThreeByteSequence = [0xE2, 0x82, 0xAC];
+        public static readonly byte[]? FourByteSequence = [0xF0, 0x9F, 0x98, 0x80];
+        public static readonly byte[]? ByteOrderMark = [0xEF, 0xBB, 0xBF];
+        public static readonly byte[]? NullByte = [0x00];
+        public static readonly byte[]? MaxCodePoint = [0xF4, 0x8F, 0xBF, 0xBF];
+        public static readonly byte[]? Null = null;
+        public static readonly byte[]? Empty = [];
+        public static readonly byte[]? OverlongEncoding = [0xC0, 0x80];
+        public static readonly byte[]? SurrogateHalf = [0xED, 0xA0, 0x80];
+        public static readonly byte[]? TruncatedSequence = [0xE2, 0x82];
+        public static readonly byte[]? LoneContinuation = [0x80];
+        public static readonly byte[]? FiveByteSequence = [0xF8, 0x88, 0x80, 0x80, 0x80];
+        public static readonly byte[]? AboveMaxCodePoint = [0xF4, 0x90, 0x80, 0x80];
+
+        public static RuleScenario<byte[]?>[] ValidScenarios =>
+        [
+            new(nameof(Ascii),             Ascii,             true),
+            new(nameof(TwoByteSequence),   TwoByteSequence,   true),
+            new(nameof(ThreeByteSequence), ThreeByteSequence, true),
+            new(nameof(FourByteSequence),  FourByteSequence,  true)
+        ];
+
+        public static RuleScenario<byte[]?>[] ValidEdgeScenarios =>
+        [
+            new(nameof(ByteOrderMark), ByteOrderMark, true),
+            new(nameof(NullByte),      NullByte,      true),
+            new(nameof(MaxCodePoint),  MaxCodePoint,  true)
+        ];
+
+        public static RuleScenario<byte[]?>[] InvalidScenarios =>
+        [
+            new(nameof(OverlongEncoding),  OverlongEncoding,  false),
+            new(nameof(SurrogateHalf),     SurrogateHalf,     false),
+            new(nameof(TruncatedSequence), TruncatedSequence, false),
+            new(nameof(LoneContinuation),  LoneContinuation,  false)
+        ];
+
+        public static RuleScenario<byte[]?>[] InvalidEdgeScenarios =>
+        [
+            new(nameof(Null),              Null,              false),
+            new(nameof(Empty),             Empty,             false),
+            new(nameof(FiveByteSequence),  FiveByteSequence,  false),
+            new(nameof(AboveMaxCodePoint), AboveMaxCodePoint, false)
+        ];
+
+        public static RuleScenario<byte[]?>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<byte[]?>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<byte[]?>[] AllScenarios => [.. AllValid, .. AllInvalid];
+    }
 }

@@ -44,5 +44,15 @@ public static partial class MustCodes
             /// <summary><c>encoding.hex.well-formed</c></summary>
             public const string WellFormed = Prefix + ".well-formed";
         }
+
+        /// <summary>The UTF-8 form of the value: whether the bytes decode as well-formed UTF-8 text.</summary>
+        public static class Utf8
+        {
+            /// <summary>The code prefix for this node (<c>"encoding.utf8"</c>).</summary>
+            public const string Prefix = Encoding.Prefix + ".utf8";
+
+            /// <summary><c>encoding.utf8.invalid</c></summary>
+            public const string Invalid = Prefix + ".invalid";
+        }
     }
 }
