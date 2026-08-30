@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Bridges PineGuard results into OneOf. ToOneOf() turns a MustResult&lt;T&gt; into OneOf&lt;T, MustFailure&gt; and a MustValidationResult into OneOf&lt;T, MustValidationResult&gt;, so a caller matches on the value or the failure with no exceptions.</Description>
+    <PackageTags>$(PackageTags);oneof;union;discriminated-union;result-pattern;bridge</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.OneOf.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OneOf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
+  </ItemGroup>
+
+</Project>

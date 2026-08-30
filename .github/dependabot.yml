@@ -16,6 +16,8 @@ updates:
         patterns: ["Microsoft.CodeAnalysis*"]
       microsoft-extensions:
         patterns: ["Microsoft.Extensions.*"]
+      result-libraries:
+        patterns: ["ErrorOr", "FluentResults", "OneOf"]
     open-pull-requests-limit: 10
     commit-message:
       prefix: "deps"
