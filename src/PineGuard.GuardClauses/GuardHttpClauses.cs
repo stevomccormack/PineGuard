@@ -444,6 +444,53 @@ public static class GuardHttpClauses
     }
 
     /// <summary>
+    /// Throws if <paramref name="value"/> is not a valid media type.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string to guard as a media type.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustHttpClauses.MediaType"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is not a valid media type and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// This guard is the complement of <see cref="MustHttpClauses.MediaType"/>:
+    /// <c>Guard.Against.NotMediaType</c> passes when the value leads with a well-formed
+    /// <c>type/subtype</c>, optionally carrying a <c>+suffix</c> and a <c>; parameter=value</c> list —
+    /// the parameter list is accepted and ignored rather than validated.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// Guard.Against.NotMediaType(requestedFormat);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustHttpClauses.MediaType"/>
+    public static string NotMediaType(this IGuardClause _,
+        string? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.MediaType(value, paramName); // Guard.Against.NotMediaType => Must.Be.MediaType (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
     /// Throws if <paramref name="name"/> violates the HeaderName constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
