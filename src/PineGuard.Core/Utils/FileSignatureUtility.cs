@@ -60,7 +60,7 @@ public static class FileSignatureUtility
     /// otherwise, <see langword="false"/>.
     /// </returns>
     public static bool IsKnownExtension(string? extension) =>
-        TryNormalizeExtension(extension, out var normalized) && KnownExtensions.Contains(normalized);
+        StringUtility.TryGetTrimmed(extension, out var trimmed) && KnownExtensions.Contains(NormalizeExtension(trimmed));
 
     /// <summary>
     /// Attempts to detect the file extension whose signature matches the specified header bytes.
@@ -102,10 +102,14 @@ public static class FileSignatureUtility
         return false;
     }
 
-    internal static bool HasSignature(byte[]? header, string? extension)
+    // Callers reach this through FileSignatureRules.HasSignature, which has already rejected an
+    // extension that IsKnownExtension does not recognise.
+    internal static bool HasSignature(byte[]? header, string extension)
     {
-        if (header is null || !TryNormalizeExtension(extension, out var normalized))
+        if (header is null)
             return false;
+
+        var normalized = NormalizeExtension(extension);
 
         foreach (var signature in Signatures)
         {
@@ -116,17 +120,11 @@ public static class FileSignatureUtility
         return false;
     }
 
-    private static bool TryNormalizeExtension(string? extension, out string normalized)
+    private static string NormalizeExtension(string extension)
     {
-        if (!StringUtility.TryGetTrimmed(extension, out var trimmed))
-        {
-            normalized = string.Empty;
-            return false;
-        }
+        var trimmed = extension.Trim();
 
-        normalized = (trimmed.StartsWith('.') ? trimmed : "." + trimmed).ToLowerInvariant();
-
-        return true;
+        return (trimmed.StartsWith('.') ? trimmed : "." + trimmed).ToLowerInvariant();
     }
 
     // A registered signature: the extension it identifies, plus every leading-byte pattern that
