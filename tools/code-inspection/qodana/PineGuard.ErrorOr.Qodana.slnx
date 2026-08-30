@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../../../src/PineGuard.ErrorOr/PineGuard.ErrorOr.csproj" />
+  <Project Path="../../../tests/PineGuard.ErrorOr.UnitTests/PineGuard.ErrorOr.UnitTests.csproj" />
+</Solution>

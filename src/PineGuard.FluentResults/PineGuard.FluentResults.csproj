@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Bridges PineGuard results into FluentResults. ToResult() turns a MustResult&lt;T&gt; or MustValidationResult into a Result, failing with MustError — a FluentResults.Error that carries the rule code and property path.</Description>
+    <PackageTags>$(PackageTags);fluentresults;result;result-pattern;railway-oriented;bridge</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.FluentResults.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentResults" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
+  </ItemGroup>
+
+</Project>

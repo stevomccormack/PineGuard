@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Run Roslyn Compiler Diagnostics
 
@@ -25,7 +25,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateSet('All', 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'Testing')]
+    [ValidateSet('All', 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing')]
     [string] $Scope = 'All',
 
     [string] $Filter,
