@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
@@ -1841,6 +1842,91 @@ public sealed class NotWellFormedUtf16Attribute() : ValidationAttributeBase(type
     {
         var strValue = (string)value!;
         var result = Must.Be.NotWellFormedUtf16(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is already in the given Unicode
+/// normalization form.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.Normalized"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// Unnormalized input silently breaks equality and uniqueness: the two spellings of <c>"é"</c> look
+/// identical but are not ordinally equal, so they survive a duplicate check and then compare unequal.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class AccountModel
+/// {
+///     [Normalized]
+///     public string UserName { get; set; }
+///
+///     [Normalized(Form = NormalizationForm.FormD)]
+///     public string SortKey { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotNormalizedAttribute"/>
+/// <seealso cref="MustStringClauses.Normalized"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NormalizedAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Unicode.NotNormalized)
+{
+    /// <summary>Gets the normalization form the value must already be in. Defaults to <see cref="NormalizationForm.FormC"/>.</summary>
+    public NormalizationForm Form { get; init; } = NormalizationForm.FormC;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.Normalized(strValue, Form, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is not already in the given Unicode
+/// normalization form.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.NotNormalized"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class NormalizationSampleModel
+/// {
+///     [NotNormalized(Form = NormalizationForm.FormC)]
+///     public string DecomposedSample { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NormalizedAttribute"/>
+/// <seealso cref="MustStringClauses.NotNormalized"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotNormalizedAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Unicode.Normalized)
+{
+    /// <summary>Gets the normalization form the value must not already be in. Defaults to <see cref="NormalizationForm.FormC"/>.</summary>
+    public NormalizationForm Form { get; init; } = NormalizationForm.FormC;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.NotNormalized(strValue, Form, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }

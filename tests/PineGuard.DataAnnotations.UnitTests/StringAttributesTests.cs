@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using Xunit.Abstractions;
@@ -600,6 +601,38 @@ public sealed class StringAttributesTests(ITestOutputHelper output) : BaseDataAn
 
         // Act
         var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.Normalized.Cases), MemberType = typeof(StringAttributesTestData.Normalized))]
+    public void Normalized_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, form) = ((string? value, NormalizationForm form))tc.Value!;
+        var attr = new NormalizedAttribute { Form = form };
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.NotNormalized.Cases), MemberType = typeof(StringAttributesTestData.NotNormalized))]
+    public void NotNormalized_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, form) = ((string? value, NormalizationForm form))tc.Value!;
+        var attr = new NotNormalizedAttribute { Form = form };
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
 
         // Assert
         AssertResult(tc, result, attr.Code);
