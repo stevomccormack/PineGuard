@@ -150,6 +150,18 @@ public sealed class GuardNumberClausesTests(ITestOutputHelper output) : BaseGuar
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
+    // Guard.Against.NotPercentage
+    [Theory]
+    [MemberData(nameof(GuardNumberClausesTestData.NotPercentage.ValidCases), MemberType = typeof(GuardNumberClausesTestData.NotPercentage))]
+    [MemberData(nameof(GuardNumberClausesTestData.NotPercentage.InvalidCases), MemberType = typeof(GuardNumberClausesTestData.NotPercentage))]
+    public void NotPercentage_BehavesAsExpected(GuardCase<decimal> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.NotPercentage(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotPercentage(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
     // Guard.Against.NotApproximately
     [Theory]
     [MemberData(nameof(GuardNumberClausesTestData.NotApproximately.ValidCases), MemberType = typeof(GuardNumberClausesTestData.NotApproximately))]

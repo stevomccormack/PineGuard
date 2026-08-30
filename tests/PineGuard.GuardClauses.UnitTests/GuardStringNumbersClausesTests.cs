@@ -100,6 +100,16 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     }
 
     [Theory]
+    [MemberData(nameof(TD.NotPercentage.ValidCases), MemberType = typeof(TD.NotPercentage))]
+    [MemberData(nameof(TD.NotPercentage.InvalidCases), MemberType = typeof(TD.NotPercentage))]
+    public void NotPercentage_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        var value = tc.Value;
+        AssertResult(tc, () => Guard.Against.NotPercentage(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotPercentage(value, message: CustomMessage));
+    }
+
+    [Theory]
     [MemberData(nameof(TD.Finite.ValidCases), MemberType = typeof(TD.Finite))]
     [MemberData(nameof(TD.Finite.InvalidCases), MemberType = typeof(TD.Finite))]
     public void Finite_BehavesAsExpected(GuardCase<string?> tc)

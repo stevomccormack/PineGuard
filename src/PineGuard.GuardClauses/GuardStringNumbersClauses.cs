@@ -419,6 +419,38 @@ public static class GuardStringNumbersClauses
     }
 
     /// <summary>
+    /// Throws if <paramref name="value"/> does not parse to a percentage between 0 and 100.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="styles">The number or date-time parsing styles.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The parsed percentage if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustStringNumbersClauses.Percentage"/>
+    public static decimal NotPercentage(this IGuardClause _,
+        string? value,
+        NumberStyles styles = DefaultStyles,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Percentage(value, styles, paramName); // Guard.Against.NotPercentage => Must.Be.Percentage (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
     /// Throws if <paramref name="value"/> violates the NotApproximately constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
