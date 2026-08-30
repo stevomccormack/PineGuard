@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Cut a GitHub Release that triggers publish.yml, optionally bypassing
     branch protection to push local commits first and unlisting older
@@ -275,6 +275,6 @@ if ($Unlist) {
 
 Write-Step "Done"
 Write-Info "Packages will appear on nuget.org within a few minutes of workflow completion:"
-foreach ($p in 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Extensions.Options', 'Testing') {
+foreach ($p in 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Extensions.Options', 'Extensions.DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing') {
     Write-Info "  https://www.nuget.org/packages/PineGuard.$p/$semver"
 }

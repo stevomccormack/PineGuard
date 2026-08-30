@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Codes;
 using PineGuard.Common;
@@ -16,6 +17,7 @@ public static class MustStringClauses
 {
     private const string NullMessage = "{paramName} must not be null.";
     private const string NonNegativeLengthMessage = "{paramName} requires a non-negative length.";
+    private const string DefinedNormalizationFormMessage = "{paramName} requires a defined normalization form.";
 
     /// <summary>
     /// Validates that the specified string is <see langword="null"/> or empty.
@@ -1751,5 +1753,219 @@ public static class MustStringClauses
 
         var ok = !StringRules.EndsWith(value, suffix, comparison);
         return MustResult<string>.FromBool(ok, MustCodes.Text.Content.EndsWith, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string starts with the Unicode byte-order mark (<c>U+FEFF</c>).
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> starts with the byte-order mark, or <see langword="false"/> with a descriptive
+    /// <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.HasByteOrderMark"/>. Only a leading <c>U+FEFF</c> counts — the same
+    /// character anywhere else is a zero-width no-break space.
+    /// The failure message follows the pattern <c>"{paramName} must start with a byte-order mark."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> HasByteOrderMark(this IMustClause _,
+        string? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Bom.Missing, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must start with a byte-order mark.";
+
+        var ok = StringRules.HasByteOrderMark(value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Bom.Missing, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string does not start with the Unicode byte-order mark (<c>U+FEFF</c>).
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> does not start with the byte-order mark, or <see langword="false"/> with a
+    /// descriptive <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.HasByteOrderMark"/>. This is the forbidden state most callers want:
+    /// a byte-order mark that survives decoding silently breaks equality, prefix matching, and numeric parsing.
+    /// The failure message follows the pattern <c>"{paramName} must not start with a byte-order mark."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> NotHasByteOrderMark(this IMustClause _,
+        string? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Bom.Present, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must not start with a byte-order mark.";
+
+        var ok = !StringRules.HasByteOrderMark(value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Bom.Present, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string is well-formed UTF-16 — every surrogate code unit forms a complete pair.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> contains no unpaired surrogate, or <see langword="false"/> with a descriptive
+    /// <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.IsWellFormedUtf16"/>. A string carrying an unpaired surrogate cannot be
+    /// encoded to UTF-8, so it otherwise fails at the serialization boundary far from where it was created.
+    /// The failure message follows the pattern <c>"{paramName} must be well-formed UTF-16."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> WellFormedUtf16(this IMustClause _,
+        string? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Unicode.Malformed, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must be well-formed UTF-16.";
+
+        var ok = StringRules.IsWellFormedUtf16(value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Unicode.Malformed, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string is not well-formed UTF-16 — it carries at least one unpaired surrogate.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> contains an unpaired surrogate, or <see langword="false"/> with a descriptive
+    /// <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.IsWellFormedUtf16"/>.
+    /// The failure message follows the pattern <c>"{paramName} must not be well-formed UTF-16."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> NotWellFormedUtf16(this IMustClause _,
+        string? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Unicode.WellFormed, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must not be well-formed UTF-16.";
+
+        var ok = !StringRules.IsWellFormedUtf16(value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Unicode.WellFormed, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string is already in the given Unicode normalization form.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="form">The <see cref="NormalizationForm"/> to require. Defaults to <see cref="NormalizationForm.FormC"/>.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> is already in <paramref name="form"/>, or <see langword="false"/> with a
+    /// descriptive <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>, or attributed to
+    /// <paramref name="form"/> if that form is not a defined <see cref="NormalizationForm"/>.
+    /// Delegates to <see cref="StringRules.IsNormalized"/>. Unnormalized input silently breaks equality and
+    /// uniqueness: the two spellings of <c>"é"</c> look identical but are not ordinally equal.
+    /// The failure message follows the pattern <c>"{paramName} must be in the specified normalization form."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> Normalized(this IMustClause _,
+        string? value,
+        NormalizationForm form = NormalizationForm.FormC,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Unicode.NotNormalized, NullMessage, paramName, value);
+
+        if (!EnumRules.IsDefined<NormalizationForm>(form))
+            return MustResult<string>.Fail(MustCodes.Text.Unicode.NotNormalized, DefinedNormalizationFormMessage, nameof(form), form);
+
+        const string messageTemplate = "{paramName} must be in the specified normalization form.";
+
+        var ok = StringRules.IsNormalized(value, form);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Unicode.NotNormalized, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string is not already in the given Unicode normalization form.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="form">The <see cref="NormalizationForm"/> that must not already apply. Defaults to <see cref="NormalizationForm.FormC"/>.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> is not already in <paramref name="form"/>, or <see langword="false"/> with a
+    /// descriptive <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>, or attributed to
+    /// <paramref name="form"/> if that form is not a defined <see cref="NormalizationForm"/>.
+    /// Delegates to <see cref="StringRules.IsNormalized"/>.
+    /// The failure message follows the pattern <c>"{paramName} must not be in the specified normalization form."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> NotNormalized(this IMustClause _,
+        string? value,
+        NormalizationForm form = NormalizationForm.FormC,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Unicode.Normalized, NullMessage, paramName, value);
+
+        if (!EnumRules.IsDefined<NormalizationForm>(form))
+            return MustResult<string>.Fail(MustCodes.Text.Unicode.Normalized, DefinedNormalizationFormMessage, nameof(form), form);
+
+        const string messageTemplate = "{paramName} must not be in the specified normalization form.";
+
+        var ok = !StringRules.IsNormalized(value, form);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Unicode.Normalized, messageTemplate, paramName, value, value);
     }
 }

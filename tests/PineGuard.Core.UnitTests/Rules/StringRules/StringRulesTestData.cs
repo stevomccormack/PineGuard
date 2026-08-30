@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Common;
 using PineGuard.Testing.Common;
@@ -240,5 +241,20 @@ public static class StringRulesTestData
     public static class IsRegexPattern
     {
         public static TheoryData<RuleCase<string?>> Cases => F.IsRegexPattern.AllScenarios.ToRuleCases();
+    }
+
+    public static class HasByteOrderMark
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.HasByteOrderMark.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsWellFormedUtf16
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.IsWellFormedUtf16.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsNormalized
+    {
+        public static TheoryData<RuleCase<(string? value, NormalizationForm form)>> Cases => F.IsNormalized.AllScenarios.ToRuleCases();
     }
 }

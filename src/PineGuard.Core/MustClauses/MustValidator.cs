@@ -13,7 +13,9 @@ namespace PineGuard.MustClauses;
 /// <typeparam name="T">The type this validator validates.</typeparam>
 /// <remarks>
 /// <para>
-/// Rules run in registration order and every failure is collected (aggregate mode; fail-fast is a later phase).
+/// Rules run in registration order and every failure is collected (<see cref="MustValidationMode.Aggregate"/>);
+/// pass <see cref="MustValidationMode.StopOnFirstFailure"/> to
+/// <see cref="ValidateAsync(T, MustValidationMode, CancellationToken)"/> to stop at the first failing rule.
 /// A rule's member path is derived from its expression (<c>x =&gt; x.Email</c> → <c>"Email"</c>) via
 /// <see cref="PropertyPathUtility.FromExpression"/>, so a lambda parameter name (<c>e =&gt; Must.Be.Email(e)</c>)
 /// never leaks into a failure message — the check's <see cref="MustResult{T}.MessageTemplate"/> is re-rendered
@@ -31,6 +33,12 @@ public abstract class MustValidator<T> : IMustValidator<T>
     where T : notnull
 {
     private readonly List<IMustRuleRunner<T>> _runners = [];
+
+    /// <summary>
+    /// Gets a value indicating whether any registered rule is asynchronous, in which case
+    /// <see cref="Validate"/> is unusable and <see cref="ValidateAsync(T, CancellationToken)"/> must be called instead.
+    /// </summary>
+    protected bool HasAsyncRules { get; private set; }
 
     /// <summary>
     /// Registers a rule that checks one property in isolation.
@@ -142,6 +150,69 @@ public abstract class MustValidator<T> : IMustValidator<T>
     }
 
     /// <summary>
+    /// Registers an asynchronous rule that checks one property in isolation.
+    /// </summary>
+    /// <typeparam name="TProperty">The property type.</typeparam>
+    /// <typeparam name="TResult">The result type of <paramref name="check"/>.</typeparam>
+    /// <param name="expression">A member-access expression identifying the property (e.g. <c>x =&gt; x.Email</c>).</param>
+    /// <param name="check">The asynchronous Must check to run against the property value.</param>
+    protected MustPropertyRule<T, TProperty> RuleForAsync<TProperty, TResult>(Expression<Func<T, TProperty>> expression, Func<TProperty, CancellationToken, ValueTask<MustResult<TResult>>> check)
+    {
+        ThrowHelper.ThrowIfNull(expression);
+        ThrowHelper.ThrowIfNull(check);
+
+        return AddAsyncRule<TProperty>(new MustAsyncPropertyRuleRunner<T, TProperty, TResult>(PropertyPathUtility.FromExpression(expression), expression.Compile(), check));
+    }
+
+    /// <summary>
+    /// Registers an asynchronous cross-property rule: the check also receives the whole instance, so it
+    /// can compare the property against another property on the same object.
+    /// </summary>
+    /// <typeparam name="TProperty">The property type.</typeparam>
+    /// <typeparam name="TResult">The result type of <paramref name="check"/>.</typeparam>
+    /// <param name="expression">A member-access expression identifying the property being attributed.</param>
+    /// <param name="check">The asynchronous Must check, receiving <c>(instance, propertyValue, cancellationToken)</c>.</param>
+    protected MustPropertyRule<T, TProperty> RuleForAsync<TProperty, TResult>(Expression<Func<T, TProperty>> expression, Func<T, TProperty, CancellationToken, ValueTask<MustResult<TResult>>> check)
+    {
+        ThrowHelper.ThrowIfNull(expression);
+        ThrowHelper.ThrowIfNull(check);
+
+        return AddAsyncRule<TProperty>(new MustAsyncCrossPropertyRuleRunner<T, TProperty, TResult>(PropertyPathUtility.FromExpression(expression), expression.Compile(), check));
+    }
+
+    /// <summary>
+    /// Registers an asynchronous rule that checks every element of a collection property in isolation,
+    /// reporting failures at <c>Property[i]</c>. Skips a <see langword="null"/> collection; enumerates once.
+    /// </summary>
+    /// <typeparam name="TItem">The collection element type.</typeparam>
+    /// <typeparam name="TResult">The result type of <paramref name="check"/>.</typeparam>
+    /// <param name="expression">A member-access expression identifying the collection property.</param>
+    /// <param name="check">The asynchronous Must check to run against each element.</param>
+    protected MustPropertyRule<T, TItem> RuleForEachAsync<TItem, TResult>(Expression<Func<T, IEnumerable<TItem>?>> expression, Func<TItem, CancellationToken, ValueTask<MustResult<TResult>>> check)
+    {
+        ThrowHelper.ThrowIfNull(expression);
+        ThrowHelper.ThrowIfNull(check);
+
+        return AddAsyncRule<TItem>(new MustAsyncCollectionRuleRunner<T, TItem, TResult>(PropertyPathUtility.FromExpression(expression), expression.Compile(), check));
+    }
+
+    /// <summary>
+    /// Registers an asynchronous cross-property rule that checks every element of a collection property,
+    /// reporting failures at <c>Property[i]</c>. Skips a <see langword="null"/> collection; enumerates once.
+    /// </summary>
+    /// <typeparam name="TItem">The collection element type.</typeparam>
+    /// <typeparam name="TResult">The result type of <paramref name="check"/>.</typeparam>
+    /// <param name="expression">A member-access expression identifying the collection property.</param>
+    /// <param name="check">The asynchronous Must check, receiving <c>(instance, item, cancellationToken)</c>.</param>
+    protected MustPropertyRule<T, TItem> RuleForEachAsync<TItem, TResult>(Expression<Func<T, IEnumerable<TItem>?>> expression, Func<T, TItem, CancellationToken, ValueTask<MustResult<TResult>>> check)
+    {
+        ThrowHelper.ThrowIfNull(expression);
+        ThrowHelper.ThrowIfNull(check);
+
+        return AddAsyncRule<TItem>(new MustAsyncCollectionCrossPropertyRuleRunner<T, TItem, TResult>(PropertyPathUtility.FromExpression(expression), expression.Compile(), check));
+    }
+
+    /// <summary>
     /// Validates <paramref name="value"/> against every registered rule.
     /// </summary>
     /// <param name="value">The instance to validate. Never throws when <see langword="null"/>.</param>
@@ -149,15 +220,40 @@ public abstract class MustValidator<T> : IMustValidator<T>
     /// A single failure at the root (<see cref="MustCodes.Value.State.Null"/>) when <paramref name="value"/> is
     /// <see langword="null"/>; otherwise every failure from every rule, in registration order.
     /// </returns>
-    public MustValidationResult Validate(T value) =>
-        value is null ? FailNull() : RunRules(value);
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <see cref="HasAsyncRules"/> is <see langword="true"/> — an async rule has no synchronous
+    /// form, so the validator can only answer through <see cref="ValidateAsync(T, CancellationToken)"/>.
+    /// </exception>
+    public MustValidationResult Validate(T value)
+    {
+        if (HasAsyncRules)
+            throw MustAsyncRuleRunnerBase<T>.AsyncRulesRequireValidateAsync();
+
+        return value is null ? FailNull() : RunRules(value);
+    }
 
     /// <summary>
-    /// Validates <paramref name="value"/> against every registered rule, asynchronously.
+    /// Validates <paramref name="value"/> against every registered rule, asynchronously, collecting
+    /// every failure (<see cref="MustValidationMode.Aggregate"/>).
     /// </summary>
     /// <param name="value">The instance to validate. Never throws when <see langword="null"/>.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    public virtual async ValueTask<MustValidationResult> ValidateAsync(T value, CancellationToken cancellationToken = default)
+    public virtual ValueTask<MustValidationResult> ValidateAsync(T value, CancellationToken cancellationToken = default) =>
+        ValidateAsync(value, MustValidationMode.Aggregate, cancellationToken);
+
+    /// <summary>
+    /// Validates <paramref name="value"/> against every registered rule, asynchronously, stopping as
+    /// <paramref name="mode"/> dictates.
+    /// </summary>
+    /// <param name="value">The instance to validate. Never throws when <see langword="null"/>.</param>
+    /// <param name="mode">Whether to collect every failure or stop at the first rule that fails.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <remarks>
+    /// Rules run sequentially in registration order — never in parallel — so the failure order is
+    /// deterministic and <see cref="MustValidationMode.StopOnFirstFailure"/> stops at a well-defined rule.
+    /// The token is observed before each rule.
+    /// </remarks>
+    public virtual async ValueTask<MustValidationResult> ValidateAsync(T value, MustValidationMode mode, CancellationToken cancellationToken = default)
     {
         if (value is null)
             return FailNull();
@@ -167,9 +263,19 @@ public abstract class MustValidator<T> : IMustValidator<T>
         {
             cancellationToken.ThrowIfCancellationRequested();
             failures.AddRange(await runner.RunAsync(value, cancellationToken).ConfigureAwait(false));
+
+            if (mode == MustValidationMode.StopOnFirstFailure && failures.Count > 0)
+                break;
         }
 
         return failures.Count == 0 ? MustValidationResult.Ok() : MustValidationResult.Fail(failures);
+    }
+
+    private MustPropertyRule<T, TProperty> AddAsyncRule<TProperty>(IMustRuleRunner<T> runner)
+    {
+        HasAsyncRules = true;
+        _runners.Add(runner);
+        return new MustPropertyRule<T, TProperty>(runner);
     }
 
     private MustValidationResult RunRules(T value)
@@ -190,4 +296,7 @@ public abstract class MustValidator<T> : IMustValidator<T>
 
     ValueTask<MustValidationResult> IMustValidator.ValidateAsync(object? value, CancellationToken cancellationToken) =>
         ValidateAsync(MustValidatorCast.To<T>(value), cancellationToken);
+
+    ValueTask<MustValidationResult> IMustValidator.ValidateAsync(object? value, MustValidationMode mode, CancellationToken cancellationToken) =>
+        ValidateAsync(MustValidatorCast.To<T>(value), mode, cancellationToken);
 }

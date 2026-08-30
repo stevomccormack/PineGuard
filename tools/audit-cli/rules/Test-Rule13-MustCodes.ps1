@@ -80,7 +80,7 @@ $domainMap = @{
     'Task' = 'Task'
     'Buffer' = 'Encoding'
     'Null' = 'Value'; 'DefaultEquality' = 'Value'; 'Object' = 'Value'
-    'String' = 'Text'; 'StringCasing' = 'Text'
+    'String' = 'Text'; 'StringCasing' = 'Text'; 'StringGraphemes' = 'Text'
 }
 
 $codesDir = Resolve-PineGuardPath -RepoRoot $repoRootResolved -Path 'src/PineGuard.Core/Codes'

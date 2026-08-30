@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Commit Agent
 
@@ -57,6 +57,10 @@ $paths = @(
     'src/PineGuard.FluentValidation/AGENTS.md',
     'src/PineGuard.DataAnnotations/AGENTS.md',
     'src/PineGuard.Extensions.Options/AGENTS.md',
+    'src/PineGuard.Extensions.DependencyInjection/AGENTS.md',
+    'src/PineGuard.ErrorOr/AGENTS.md',
+    'src/PineGuard.FluentResults/AGENTS.md',
+    'src/PineGuard.OneOf/AGENTS.md',
     'tests/AGENTS.md',
     'tools/AGENTS.md',
     'tools/code-diagnostics/AGENTS.md',

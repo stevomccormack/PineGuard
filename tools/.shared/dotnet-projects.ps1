@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Shared .NET project discovery helpers for the PineGuard PowerShell toolchain.
 
@@ -13,9 +13,9 @@ $ErrorActionPreference = 'Stop'
 function Get-PineGuardScope {
     <#
     .SYNOPSIS
-        Returns the per-scope path/identifier registry entry (or entries) for the seven named
+        Returns the per-scope path/identifier registry entry (or entries) for the eleven named
         PineGuard scopes: Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation,
-        Testing, Options.
+        Options, DependencyInjection, ErrorOr, FluentResults, OneOf, Testing.
 
     .DESCRIPTION
         Centralises the per-scope source directory, project paths, coverage include pattern,
@@ -25,23 +25,24 @@ function Get-PineGuardScope {
 
         'All' (the aggregate pseudo-scope) and 'Custom' (Test-CoverageAnalysis.ps1 only) are
         NOT registry entries — callers that need the aggregate keep handling those cases
-        specially, using -All to enumerate the seven real entries in a stable order
-        (Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options, Testing).
+        specially, using -All to enumerate the eleven real entries in a stable order
+        (Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options,
+        DependencyInjection, ErrorOr, FluentResults, OneOf, Testing).
 
         Adding a new scope means adding one entry here plus one ValidateSet token per consumer
         script — ValidateSet attributes must stay literal (PowerShell requires compile-time
         constants), so the scope names are necessarily still spelled out there too.
 
     .PARAMETER Name
-        One of the seven scope names. Returns the single matching registry entry.
+        One of the eleven scope names. Returns the single matching registry entry.
 
     .PARAMETER All
-        Returns all seven registry entries, in the stable order used to build 'All' aggregates.
+        Returns all eleven registry entries, in the stable order used to build 'All' aggregates.
     #>
     [CmdletBinding(DefaultParameterSetName = 'One')]
     param(
         [Parameter(Mandatory, ParameterSetName = 'One', Position = 0)]
-        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'Testing')]
+        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing')]
         [string] $Name,
 
         [Parameter(Mandatory, ParameterSetName = 'All')]
@@ -128,6 +129,58 @@ function Get-PineGuardScope {
             DefaultSourcePrefix      = 'src\PineGuard.Extensions.Options'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.options.yaml'
             QodanaSlug               = 'options'
+            IncludeEmptyTestProjects = $false
+        }
+        DependencyInjection = [pscustomobject]@{
+            Name                     = 'DependencyInjection'
+            SourceDir                = 'src\PineGuard.Extensions.DependencyInjection'
+            SourceCsproj             = 'src\PineGuard.Extensions.DependencyInjection\PineGuard.Extensions.DependencyInjection.csproj'
+            TestCsproj               = 'tests\PineGuard.Extensions.DependencyInjection.UnitTests\PineGuard.Extensions.DependencyInjection.UnitTests.csproj'
+            DefaultProjectFilter     = 'PineGuard.Extensions.DependencyInjection.UnitTests.csproj'
+            CoverageIncludePattern   = '[PineGuard.Extensions.DependencyInjection]*'
+            PathIncludeRegex         = '^src[/\\]+PineGuard\.Extensions\.DependencyInjection[/\\]+'
+            DefaultSourcePrefix      = 'src\PineGuard.Extensions.DependencyInjection'
+            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.dependency-injection.yaml'
+            QodanaSlug               = 'dependency-injection'
+            IncludeEmptyTestProjects = $false
+        }
+        ErrorOr           = [pscustomobject]@{
+            Name                     = 'ErrorOr'
+            SourceDir                = 'src\PineGuard.ErrorOr'
+            SourceCsproj             = 'src\PineGuard.ErrorOr\PineGuard.ErrorOr.csproj'
+            TestCsproj               = 'tests\PineGuard.ErrorOr.UnitTests\PineGuard.ErrorOr.UnitTests.csproj'
+            DefaultProjectFilter     = 'PineGuard.ErrorOr.UnitTests.csproj'
+            CoverageIncludePattern   = '[PineGuard.ErrorOr]*'
+            PathIncludeRegex         = '^src[/\\]+PineGuard\.ErrorOr[/\\]+'
+            DefaultSourcePrefix      = 'src\PineGuard.ErrorOr'
+            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.erroror.yaml'
+            QodanaSlug               = 'erroror'
+            IncludeEmptyTestProjects = $false
+        }
+        FluentResults     = [pscustomobject]@{
+            Name                     = 'FluentResults'
+            SourceDir                = 'src\PineGuard.FluentResults'
+            SourceCsproj             = 'src\PineGuard.FluentResults\PineGuard.FluentResults.csproj'
+            TestCsproj               = 'tests\PineGuard.FluentResults.UnitTests\PineGuard.FluentResults.UnitTests.csproj'
+            DefaultProjectFilter     = 'PineGuard.FluentResults.UnitTests.csproj'
+            CoverageIncludePattern   = '[PineGuard.FluentResults]*'
+            PathIncludeRegex         = '^src[/\\]+PineGuard\.FluentResults[/\\]+'
+            DefaultSourcePrefix      = 'src\PineGuard.FluentResults'
+            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.fluentresults.yaml'
+            QodanaSlug               = 'fluentresults'
+            IncludeEmptyTestProjects = $false
+        }
+        OneOf             = [pscustomobject]@{
+            Name                     = 'OneOf'
+            SourceDir                = 'src\PineGuard.OneOf'
+            SourceCsproj             = 'src\PineGuard.OneOf\PineGuard.OneOf.csproj'
+            TestCsproj               = 'tests\PineGuard.OneOf.UnitTests\PineGuard.OneOf.UnitTests.csproj'
+            DefaultProjectFilter     = 'PineGuard.OneOf.UnitTests.csproj'
+            CoverageIncludePattern   = '[PineGuard.OneOf]*'
+            PathIncludeRegex         = '^src[/\\]+PineGuard\.OneOf[/\\]+'
+            DefaultSourcePrefix      = 'src\PineGuard.OneOf'
+            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.oneof.yaml'
+            QodanaSlug               = 'oneof'
             IncludeEmptyTestProjects = $false
         }
         Testing           = [pscustomobject]@{
