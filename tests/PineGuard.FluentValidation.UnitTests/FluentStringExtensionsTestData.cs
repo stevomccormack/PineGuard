@@ -624,4 +624,24 @@ public static partial class FluentStringExtensionsTestData
             _ => new FluentExpected(true)
         });
     }
+
+    public static class WellFormedUtf16
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.IsWellFormedUtf16.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsWellFormedUtf16.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be well-formed UTF-16.", Code: MustCodes.Text.Unicode.Malformed)
+        });
+    }
+
+    public static class NotWellFormedUtf16
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.IsWellFormedUtf16.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsWellFormedUtf16.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(false, "Value must not be well-formed UTF-16.", Code: MustCodes.Text.Unicode.WellFormed),
+            _ => new FluentExpected(true)
+        });
+    }
 }
