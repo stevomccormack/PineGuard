@@ -54,4 +54,16 @@ public sealed class MustBufferClausesTests(ITestOutputHelper output) : BaseMustU
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(MustBufferClausesTestData.Base64Url.ValidCases), MemberType = typeof(MustBufferClausesTestData.Base64Url))]
+    [MemberData(nameof(MustBufferClausesTestData.Base64Url.InvalidCases), MemberType = typeof(MustBufferClausesTestData.Base64Url))]
+    public void Base64Url_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Act
+        var result = Must.Be.Base64Url(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

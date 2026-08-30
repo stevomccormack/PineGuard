@@ -50,4 +50,15 @@ public static class MustBufferClausesTestData
         public static TheoryData<MustCase<string?>> NullCases => F.IsBase64.AllInvalid.Only(nameof(F.IsBase64.Null)).ToMustCases(
             _ => new MustExpected(false, "value must not be null.", "value"));
     }
+
+    public static class Base64Url
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.IsBase64Url.AllValid.ToMustCases();
+
+        public static TheoryData<MustCase<string?>> InvalidCases => F.IsBase64Url.AllInvalid.ToMustCases(s => s.Name switch
+        {
+            nameof(F.IsBase64Url.Null) => new MustExpected(false, "value must not be null.", "value", MustCodes.Encoding.Base64url.Invalid),
+            _ => new MustExpected(false, "value must be a valid base64url string.", "value", MustCodes.Encoding.Base64url.Invalid)
+        });
+    }
 }
