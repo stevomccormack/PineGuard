@@ -273,5 +273,30 @@ public static partial class MustCodes
             /// <summary><c>text.unicode.normalized</c></summary>
             public const string Normalized = Prefix + ".normalized";
         }
+
+        /// <summary>How many grapheme clusters — user-perceived characters — the text holds.</summary>
+        public static class Graphemes
+        {
+            /// <summary>The code prefix for this node (<c>"text.graphemes"</c>).</summary>
+            public const string Prefix = Text.Prefix + ".graphemes";
+
+            /// <summary><c>text.graphemes.mismatch</c></summary>
+            public const string Mismatch = Prefix + ".mismatch";
+
+            /// <summary><c>text.graphemes.match</c></summary>
+            public const string Match = Prefix + ".match";
+
+            /// <summary><c>text.graphemes.too-few</c></summary>
+            public const string TooFew = Prefix + ".too-few";
+
+            /// <summary><c>text.graphemes.too-many</c></summary>
+            public const string TooMany = Prefix + ".too-many";
+
+            /// <summary><c>text.graphemes.out-of-range</c></summary>
+            public const string OutOfRange = Prefix + ".out-of-range";
+
+            /// <summary><c>text.graphemes.in-range</c></summary>
+            public const string InRange = Prefix + ".in-range";
+        }
     }
 }
