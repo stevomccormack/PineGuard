@@ -221,4 +221,20 @@ public static class FluentNetworkExtensions
     public static IRuleBuilderOptions<TModel, int> NotPortNumber<TModel>(this IRuleBuilder<TModel, int> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotPortNumber(val, paramName: null),
             message, MustCodes.Network.Port.WellFormed);
+
+    /// <summary>Validates that the string value is a valid MAC address.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustNetworkClauses.MacAddress"/>, which accepts the colon-separated,
+    /// hyphen-separated and Cisco dotted forms in either case, but requires the separators to be consistent.
+    /// If the value is <see langword="null"/>, validation passes.
+    /// </remarks>
+    /// <example><code>RuleFor(x => x.HardwareAddress).MacAddress();</code></example>
+    /// <seealso cref="MustNetworkClauses.MacAddress"/>
+    public static IRuleBuilderOptions<TModel, string?> MacAddress<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.MacAddress(val, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Network.Mac.Invalid);
 }

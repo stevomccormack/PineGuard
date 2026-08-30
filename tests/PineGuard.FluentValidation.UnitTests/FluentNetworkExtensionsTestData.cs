@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.NetworkRulesFixtures;
@@ -261,6 +262,16 @@ public static class FluentNetworkExtensionsTestData
             nameof(F.IsPortNumber.Null) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(false, "Value must not be a valid port number."),
             _ => new FluentExpected(true)
+        });
+    }
+
+    public static class MacAddress
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.IsMacAddress.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsMacAddress.Null) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be a valid MAC address.", Code: MustCodes.Network.Mac.Invalid)
         });
     }
 }
