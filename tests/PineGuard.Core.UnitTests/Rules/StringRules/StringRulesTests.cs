@@ -1,3 +1,4 @@
+using System.Text;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
@@ -452,6 +453,17 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
     {
         // Act
         var result = PineGuard.Rules.StringRules.IsWellFormedUtf16(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.IsNormalized.Cases), MemberType = typeof(StringRulesTestData.IsNormalized))]
+    public void IsNormalized_BehavesAsExpected(RuleCase<(string? value, NormalizationForm form)> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.IsNormalized(tc.Value.value, tc.Value.form);
 
         // Assert
         AssertResult(tc, result);
