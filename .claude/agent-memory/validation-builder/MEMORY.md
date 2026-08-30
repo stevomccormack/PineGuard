@@ -97,3 +97,4 @@ When implementing new validations, tests should follow the v2 architecture:
 
 ## Topic Files
 - [MustCodes catalogue](must-codes-catalogue.md) — wiring codes into Must + Fluent + DataAnnotations: arg positions, one-clause-one-code and its bitwise exception, fixed-at-build ErrorCode
+- [Batch D vocabulary aliases deferred](project_batch-d-vocabulary-aliases-deferred.md) — ScaleAbove/PrecisionAbove shipped without their vocabulary.json rows; docs/ freeze, not a defect
