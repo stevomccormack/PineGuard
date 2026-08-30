@@ -454,4 +454,82 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         AssertCustomMessage(tc, () => Guard.Against.NotContainsDisallowed(value, disallowedChars, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
+
+    [Theory]
+    [MemberData(nameof(TD.NotContains.ValidCases), MemberType = typeof(TD.NotContains))]
+    [MemberData(nameof(TD.NotContains.InvalidCases), MemberType = typeof(TD.NotContains))]
+    public void NotContains_BehavesAsExpected(GuardCase<(string? value, string substring, StringComparison comparison)> tc)
+    {
+        var value = tc.Value.value;
+        var substring = tc.Value.substring;
+        var comparison = tc.Value.comparison;
+        var result = AssertResult(tc, () => Guard.Against.NotContains(value, substring, comparison));
+        AssertCustomMessage(tc, () => Guard.Against.NotContains(value, substring, comparison, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.Contains.ValidCases), MemberType = typeof(TD.Contains))]
+    [MemberData(nameof(TD.Contains.InvalidCases), MemberType = typeof(TD.Contains))]
+    public void Contains_BehavesAsExpected(GuardCase<(string? value, string substring, StringComparison comparison)> tc)
+    {
+        var value = tc.Value.value;
+        var substring = tc.Value.substring;
+        var comparison = tc.Value.comparison;
+        var result = AssertResult(tc, () => Guard.Against.Contains(value, substring, comparison));
+        AssertCustomMessage(tc, () => Guard.Against.Contains(value, substring, comparison, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.NotStartsWith.ValidCases), MemberType = typeof(TD.NotStartsWith))]
+    [MemberData(nameof(TD.NotStartsWith.InvalidCases), MemberType = typeof(TD.NotStartsWith))]
+    public void NotStartsWith_BehavesAsExpected(GuardCase<(string? value, string prefix, StringComparison comparison)> tc)
+    {
+        var value = tc.Value.value;
+        var prefix = tc.Value.prefix;
+        var comparison = tc.Value.comparison;
+        var result = AssertResult(tc, () => Guard.Against.NotStartsWith(value, prefix, comparison));
+        AssertCustomMessage(tc, () => Guard.Against.NotStartsWith(value, prefix, comparison, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.StartsWith.ValidCases), MemberType = typeof(TD.StartsWith))]
+    [MemberData(nameof(TD.StartsWith.InvalidCases), MemberType = typeof(TD.StartsWith))]
+    public void StartsWith_BehavesAsExpected(GuardCase<(string? value, string prefix, StringComparison comparison)> tc)
+    {
+        var value = tc.Value.value;
+        var prefix = tc.Value.prefix;
+        var comparison = tc.Value.comparison;
+        var result = AssertResult(tc, () => Guard.Against.StartsWith(value, prefix, comparison));
+        AssertCustomMessage(tc, () => Guard.Against.StartsWith(value, prefix, comparison, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.NotEndsWith.ValidCases), MemberType = typeof(TD.NotEndsWith))]
+    [MemberData(nameof(TD.NotEndsWith.InvalidCases), MemberType = typeof(TD.NotEndsWith))]
+    public void NotEndsWith_BehavesAsExpected(GuardCase<(string? value, string suffix, StringComparison comparison)> tc)
+    {
+        var value = tc.Value.value;
+        var suffix = tc.Value.suffix;
+        var comparison = tc.Value.comparison;
+        var result = AssertResult(tc, () => Guard.Against.NotEndsWith(value, suffix, comparison));
+        AssertCustomMessage(tc, () => Guard.Against.NotEndsWith(value, suffix, comparison, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.EndsWith.ValidCases), MemberType = typeof(TD.EndsWith))]
+    [MemberData(nameof(TD.EndsWith.InvalidCases), MemberType = typeof(TD.EndsWith))]
+    public void EndsWith_BehavesAsExpected(GuardCase<(string? value, string suffix, StringComparison comparison)> tc)
+    {
+        var value = tc.Value.value;
+        var suffix = tc.Value.suffix;
+        var comparison = tc.Value.comparison;
+        var result = AssertResult(tc, () => Guard.Against.EndsWith(value, suffix, comparison));
+        AssertCustomMessage(tc, () => Guard.Against.EndsWith(value, suffix, comparison, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
 }

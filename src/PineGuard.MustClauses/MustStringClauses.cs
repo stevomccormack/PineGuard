@@ -1475,4 +1475,244 @@ public static class MustStringClauses
         var ok = StringRules.ContainsDisallowed(value, characters);
         return MustResult<string>.FromBool(ok, MustCodes.Text.Charset.NotContainsAny, messageTemplate, paramName, value, value);
     }
+
+    /// <summary>
+    /// Validates that the specified string contains the given substring.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="substring">The substring to search for. An empty substring is always contained.</param>
+    /// <param name="comparison">The comparison rule used to locate <paramref name="substring"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> contains <paramref name="substring"/>, or <see langword="false"/> with a descriptive
+    /// <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> or <paramref name="substring"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.Contains"/>.
+    /// The failure message follows the pattern <c>"{paramName} must contain the specified substring."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> Contains(this IMustClause _,
+        string? value,
+        string substring,
+        StringComparison comparison = StringComparison.Ordinal,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotContains, NullMessage, paramName, value);
+
+        if (substring is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotContains, NullMessage, nameof(substring), substring);
+
+        const string messageTemplate = "{paramName} must contain the specified substring.";
+
+        var ok = StringRules.Contains(value, substring, comparison);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.NotContains, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string does not contain the given substring.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="substring">The substring that must be absent. An empty substring is always contained.</param>
+    /// <param name="comparison">The comparison rule used to locate <paramref name="substring"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> does not contain <paramref name="substring"/>, or <see langword="false"/> with a
+    /// descriptive <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> or <paramref name="substring"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.Contains"/>.
+    /// The failure message follows the pattern <c>"{paramName} must not contain the specified substring."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> NotContains(this IMustClause _,
+        string? value,
+        string substring,
+        StringComparison comparison = StringComparison.Ordinal,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.Contains, NullMessage, paramName, value);
+
+        if (substring is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.Contains, NullMessage, nameof(substring), substring);
+
+        const string messageTemplate = "{paramName} must not contain the specified substring.";
+
+        var ok = !StringRules.Contains(value, substring, comparison);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.Contains, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string starts with the given prefix.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="prefix">The prefix to test for. An empty prefix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="prefix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> starts with <paramref name="prefix"/>, or <see langword="false"/> with a descriptive
+    /// <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> or <paramref name="prefix"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.StartsWith"/>.
+    /// The failure message follows the pattern <c>"{paramName} must start with the specified prefix."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> StartsWith(this IMustClause _,
+        string? value,
+        string prefix,
+        StringComparison comparison = StringComparison.Ordinal,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotStartsWith, NullMessage, paramName, value);
+
+        if (prefix is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotStartsWith, NullMessage, nameof(prefix), prefix);
+
+        const string messageTemplate = "{paramName} must start with the specified prefix.";
+
+        var ok = StringRules.StartsWith(value, prefix, comparison);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.NotStartsWith, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string does not start with the given prefix.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="prefix">The prefix that must be absent. An empty prefix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="prefix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> does not start with <paramref name="prefix"/>, or <see langword="false"/> with a
+    /// descriptive <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> or <paramref name="prefix"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.StartsWith"/>.
+    /// The failure message follows the pattern <c>"{paramName} must not start with the specified prefix."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> NotStartsWith(this IMustClause _,
+        string? value,
+        string prefix,
+        StringComparison comparison = StringComparison.Ordinal,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.StartsWith, NullMessage, paramName, value);
+
+        if (prefix is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.StartsWith, NullMessage, nameof(prefix), prefix);
+
+        const string messageTemplate = "{paramName} must not start with the specified prefix.";
+
+        var ok = !StringRules.StartsWith(value, prefix, comparison);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.StartsWith, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string ends with the given suffix.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="suffix">The suffix to test for. An empty suffix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="suffix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> ends with <paramref name="suffix"/>, or <see langword="false"/> with a descriptive
+    /// <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> or <paramref name="suffix"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.EndsWith"/>.
+    /// The failure message follows the pattern <c>"{paramName} must end with the specified suffix."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> EndsWith(this IMustClause _,
+        string? value,
+        string suffix,
+        StringComparison comparison = StringComparison.Ordinal,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotEndsWith, NullMessage, paramName, value);
+
+        if (suffix is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotEndsWith, NullMessage, nameof(suffix), suffix);
+
+        const string messageTemplate = "{paramName} must end with the specified suffix.";
+
+        var ok = StringRules.EndsWith(value, suffix, comparison);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.NotEndsWith, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified string does not end with the given suffix.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="suffix">The suffix that must be absent. An empty suffix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="suffix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> does not end with <paramref name="suffix"/>, or <see langword="false"/> with a
+    /// descriptive <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> or <paramref name="suffix"/> is <see langword="null"/>.
+    /// Delegates to <see cref="StringRules.EndsWith"/>.
+    /// The failure message follows the pattern <c>"{paramName} must not end with the specified suffix."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> NotEndsWith(this IMustClause _,
+        string? value,
+        string suffix,
+        StringComparison comparison = StringComparison.Ordinal,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.EndsWith, NullMessage, paramName, value);
+
+        if (suffix is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.EndsWith, NullMessage, nameof(suffix), suffix);
+
+        const string messageTemplate = "{paramName} must not end with the specified suffix.";
+
+        var ok = !StringRules.EndsWith(value, suffix, comparison);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Content.EndsWith, messageTemplate, paramName, value, value);
+    }
 }
