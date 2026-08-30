@@ -14,7 +14,8 @@ public static class ChecksumUtilityTestData
         public static TheoryData<ValidCase> EdgeCases =>
         [
             new("empty span returns false", "", false),
-            new("non-digit character returns false", "4539a", false),
+            new("character above the digit range returns false", "4539a", false),
+            new("character below the digit range returns false", "4539/", false),
             new("digits fail the Luhn checksum", "79927398711", false)
         ];
 
