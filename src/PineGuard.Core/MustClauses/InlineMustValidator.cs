@@ -42,4 +42,20 @@ public sealed class InlineMustValidator<T> : MustValidator<T>
     public new MustPropertyRule<T, TItem> RuleForEach<TItem>(Expression<Func<T, IEnumerable<TItem>?>> expression, IMustValidator<TItem> validator)
         where TItem : notnull =>
         base.RuleForEach(expression, validator);
+
+    /// <inheritdoc cref="MustValidator{T}.RuleForAsync{TProperty,TResult}(Expression{Func{T,TProperty}},Func{TProperty,CancellationToken,ValueTask{MustResult{TResult}}})"/>
+    public new MustPropertyRule<T, TProperty> RuleForAsync<TProperty, TResult>(Expression<Func<T, TProperty>> expression, Func<TProperty, CancellationToken, ValueTask<MustResult<TResult>>> check) =>
+        base.RuleForAsync(expression, check);
+
+    /// <inheritdoc cref="MustValidator{T}.RuleForAsync{TProperty,TResult}(Expression{Func{T,TProperty}},Func{T,TProperty,CancellationToken,ValueTask{MustResult{TResult}}})"/>
+    public new MustPropertyRule<T, TProperty> RuleForAsync<TProperty, TResult>(Expression<Func<T, TProperty>> expression, Func<T, TProperty, CancellationToken, ValueTask<MustResult<TResult>>> check) =>
+        base.RuleForAsync(expression, check);
+
+    /// <inheritdoc cref="MustValidator{T}.RuleForEachAsync{TItem,TResult}(Expression{Func{T,IEnumerable{TItem}}},Func{TItem,CancellationToken,ValueTask{MustResult{TResult}}})"/>
+    public new MustPropertyRule<T, TItem> RuleForEachAsync<TItem, TResult>(Expression<Func<T, IEnumerable<TItem>?>> expression, Func<TItem, CancellationToken, ValueTask<MustResult<TResult>>> check) =>
+        base.RuleForEachAsync(expression, check);
+
+    /// <inheritdoc cref="MustValidator{T}.RuleForEachAsync{TItem,TResult}(Expression{Func{T,IEnumerable{TItem}}},Func{T,TItem,CancellationToken,ValueTask{MustResult{TResult}}})"/>
+    public new MustPropertyRule<T, TItem> RuleForEachAsync<TItem, TResult>(Expression<Func<T, IEnumerable<TItem>?>> expression, Func<T, TItem, CancellationToken, ValueTask<MustResult<TResult>>> check) =>
+        base.RuleForEachAsync(expression, check);
 }
