@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using PineGuard.Testing.UnitTests.Rules;
@@ -93,6 +94,16 @@ public static class FluentNumberExtensionsTestData
             "NullValue" => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must be out of the expected range.")
+        });
+    }
+
+    public static class Percentage
+    {
+        public static TheoryData<FluentCase<decimal?>> Cases => F.IsPercentage.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsPercentage.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be a percentage between 0 and 100.", Code: MustCodes.Number.Range.NotPercentage)
         });
     }
 

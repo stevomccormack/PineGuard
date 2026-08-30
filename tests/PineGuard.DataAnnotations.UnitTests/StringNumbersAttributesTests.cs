@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class StringNumbersAttributesTests
+public sealed class StringNumbersAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     private static void Verify<TAttribute>(TAttribute attribute, StringNumbersAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
@@ -143,4 +145,19 @@ public sealed class StringNumbersAttributesTests
     [MemberData(nameof(StringNumbersAttributesTestData.NotNaNString.InvalidCases), MemberType = typeof(StringNumbersAttributesTestData.NotNaNString))]
     public void NotNaNString_ShouldReturnExpected(StringNumbersAttributesTestData.ValidCase testCase)
         => Verify(new NotNaNStringAttribute(), testCase);
+
+    [Theory]
+    [MemberData(nameof(StringNumbersAttributesTestData.PercentageString.Cases), MemberType = typeof(StringNumbersAttributesTestData.PercentageString))]
+    public void PercentageString_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new PercentageStringAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

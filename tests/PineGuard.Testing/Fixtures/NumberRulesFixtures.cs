@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Rules;
 using PineGuard.Testing.UnitTests.Rules;
 
 namespace PineGuard.Testing.Fixtures;
@@ -239,6 +240,27 @@ public static class NumberRulesFixtures
         ];
 
         public static RuleScenario<(int? value, int min, int max, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsPercentage
+    {
+        public static readonly decimal? Midpoint = 50m;
+        public static readonly decimal? Fractional = 99.99m;
+        public static readonly decimal? AtMin = NumberRules.MinPercentage;
+        public static readonly decimal? AtMax = NumberRules.MaxPercentage;
+        public static readonly decimal? BelowMin = NumberRules.MinPercentage - 0.01m;
+        public static readonly decimal? AboveMax = NumberRules.MaxPercentage + 0.01m;
+        public static readonly decimal? Negative = -1m;
+        public static readonly decimal? AboveHundred = 101m;
+        public static readonly decimal? NullValue = null;
+
+        public static RuleScenario<decimal?>[] ValidScenarios => [new(nameof(Midpoint), Midpoint, true), new(nameof(Fractional), Fractional, true)];
+        public static RuleScenario<decimal?>[] ValidEdgeScenarios => [new(nameof(AtMin), AtMin, true), new(nameof(AtMax), AtMax, true)];
+        public static RuleScenario<decimal?>[] InvalidScenarios => [new(nameof(Negative), Negative, false), new(nameof(AboveHundred), AboveHundred, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<decimal?>[] InvalidEdgeScenarios => [new(nameof(BelowMin), BelowMin, false), new(nameof(AboveMax), AboveMax, false)];
+        public static RuleScenario<decimal?>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<decimal?>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<decimal?>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
     public static class IsApproximately

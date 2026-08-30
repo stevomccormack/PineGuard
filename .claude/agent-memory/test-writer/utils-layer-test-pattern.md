@@ -54,6 +54,23 @@ Useful trick for asserting a "must NOT invoke this callback" short-circuit contr
 short-circuited result. If the SUT wrongly invokes the callback, the test fails loudly via the
 unexpected exception instead of silently passing.
 
+### Diagnose "Rule pre-filters its Utils call" branch gaps before adding Utils tests
+Don't assume a Utils method needs its own direct test file just because it's coverage-target-listed
+alongside its Rule — check whether the Rule's own precondition logic makes some Utils branches
+unreachable through the Rule call path first (read the Utils method's full branch list, then trace
+whether the Rule's short-circuit `&&` chain can ever hand it an input hitting each branch). Concrete
+example from Batch D: `ChecksumRules.IsLuhn` only calls `ChecksumUtility.IsLuhn(digits.AsSpan())`
+after (a) `StringUtility.TryParseDigits` has already guaranteed every character is `0`-`9`, and
+(b) `digits.Length >= MinLuhnLength(2)` — so `ChecksumUtility.IsLuhn`'s own `digits.IsEmpty` and
+`character is < '0' or > '9'` branches are dead code from the Rule's perspective and need a direct
+`ChecksumUtilityTests.cs` (2 extra one-line cases) to hit. By contrast `DecimalRules`' three methods
+impose no such pre-filtering on `DecimalUtility.TryGetPrecisionAndScale` (every branch — null check,
+fractional-loop entered/not-entered, significant-digit-loop entered/not-entered — is reachable through
+some already-required Rule-level boundary fixture case), so it reached 100%/100% with zero direct
+`DecimalUtilityTests.cs`, confirmed empirically via `Test-CoverageAnalysis.ps1 -IncludeClassNameRegex`
+scoped to just the four target classes rather than guessing. Always verify this way instead of
+reflexively writing a full Utils test file for every Utils class a task's coverage target line names.
+
 ### CallerArgumentExpression is a non-issue here
 `fixture.md` §12.1's "extract `tc.Value` to a local first" warning only applies when the method under
 test itself re-exposes `[CallerArgumentExpression]` on its own public parameter (the Guard-layer

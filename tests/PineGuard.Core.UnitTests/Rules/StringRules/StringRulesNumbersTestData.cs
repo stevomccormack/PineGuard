@@ -61,6 +61,11 @@ public static class StringRulesNumbersTestData
         public static TheoryData<RuleCase<(string? text, decimal min, decimal max, Inclusion inclusion)>> Cases => F.NumbersIsInRange.AllScenarios.ToRuleCases();
     }
 
+    public static class IsPercentage
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.NumbersIsPercentage.AllScenarios.ToRuleCases();
+    }
+
     public static class IsApproximately
     {
         public static TheoryData<RuleCase<(string? text, decimal target, decimal? tolerance)>> Cases => F.NumbersIsApproximately.AllScenarios.ToRuleCases();

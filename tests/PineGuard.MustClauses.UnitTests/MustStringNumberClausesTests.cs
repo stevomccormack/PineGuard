@@ -174,6 +174,16 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     }
 
     [Theory]
+    [MemberData(nameof(MustStringNumberClausesTestData.Percentage.ValidCases), MemberType = typeof(MustStringNumberClausesTestData.Percentage))]
+    [MemberData(nameof(MustStringNumberClausesTestData.Percentage.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.Percentage))]
+    [MemberData(nameof(MustStringNumberClausesTestData.Percentage.NullCases), MemberType = typeof(MustStringNumberClausesTestData.Percentage))]
+    public void Percentage_BehavesAsExpected(MustCase<string?> tc)
+    {
+        var result = Must.Be.Percentage(tc.Value, paramName: "value");
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(MustStringNumberClausesTestData.NotApproximately.ValidCases), MemberType = typeof(MustStringNumberClausesTestData.NotApproximately))]
     [MemberData(nameof(MustStringNumberClausesTestData.NotApproximately.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.NotApproximately))]
     [MemberData(nameof(MustStringNumberClausesTestData.NotApproximately.NullCases), MemberType = typeof(MustStringNumberClausesTestData.NotApproximately))]

@@ -896,4 +896,50 @@ public sealed class NotNaNStringAttribute() : ValidationAttributeBase(typeof(str
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field represents a percentage
+/// between 0 and 100 inclusive.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringNumbersClauses.Percentage"/>. Supported on properties, fields,
+/// and parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// The scale is 0–100, not 0–1: a value of <c>"0.5"</c> is half a percent, not fifty percent.
+/// The <see cref="Styles"/> property controls parsing flags; defaults to
+/// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
+/// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class DiscountModel
+/// {
+///     [PercentageString]
+///     public string Rate { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="PercentageNumberAttribute"/>
+/// <seealso cref="MustStringNumbersClauses.Percentage"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class PercentageStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.NotPercentage)
+{
+    private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
+
+    /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
+    public NumberStyles Styles { get; set; } = DefaultStyles;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.Percentage(strValue, Styles, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
 #endif

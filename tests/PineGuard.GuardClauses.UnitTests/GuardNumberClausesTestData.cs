@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using PineGuard.Testing.UnitTests.Rules;
@@ -167,6 +168,13 @@ public static class GuardNumberClausesTestData
             F.IsInRange.ValidScenarios
             .Select(s => new RuleScenario<(int value, int min, int max, Inclusion inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.min, s.Inputs.max, s.Inputs.inclusion), s.IsValid)).ToArray()
             .ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+    }
+
+    // Guard.Against.NotPercentage — throws when value is NOT a percentage (delegates to Must.Be.Percentage)
+    public static class NotPercentage
+    {
+        public static TheoryData<GuardCase<decimal>> ValidCases => F.IsPercentage.AllValid.Project(v => v!.Value).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<decimal>> InvalidCases => F.IsPercentage.AllInvalid.Except(nameof(F.IsPercentage.NullValue)).Project(v => v!.Value).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Number.Range.NotPercentage));
     }
 
     // Guard.Against.NotApproximately — throws when value IS approximately target (delegates to Must.Be.Approximately)

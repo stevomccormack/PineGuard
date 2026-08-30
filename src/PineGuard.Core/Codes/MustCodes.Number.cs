@@ -1,6 +1,6 @@
 namespace PineGuard.Codes;
 
-// Serves: MustNumberClauses.cs, MustStringNumbersClauses.cs, MustStringNumberTypesClauses.cs
+// Serves: MustNumberClauses.cs, MustStringNumbersClauses.cs, MustStringNumberTypesClauses.cs, MustDecimalClauses.cs
 public static partial class MustCodes
 {
     /// <summary>The <c>number</c> domain: numeric values and the numeric strings that encode them.</summary>
@@ -57,6 +57,9 @@ public static partial class MustCodes
 
             /// <summary><c>number.range.in-range</c></summary>
             public const string InRange = Prefix + ".in-range";
+
+            /// <summary><c>number.range.not-percentage</c></summary>
+            public const string NotPercentage = Prefix + ".not-percentage";
 
             /// <summary><c>number.range.invalid</c></summary>
             public const string Invalid = Prefix + ".invalid";
@@ -145,8 +148,30 @@ public static partial class MustCodes
             /// <summary><c>number.scale.mismatch</c></summary>
             public const string Mismatch = Prefix + ".mismatch";
 
+            /// <summary><c>number.scale.exceeded</c></summary>
+            public const string Exceeded = Prefix + ".exceeded";
+
             /// <summary><c>number.scale.negative</c></summary>
             public const string Negative = Prefix + ".negative";
+
+            /// <summary><c>number.scale.invalid</c></summary>
+            public const string Invalid = Prefix + ".invalid";
+        }
+
+        /// <summary>The number of significant digits, and the validity of the allowed digit budget.</summary>
+        public static class Precision
+        {
+            /// <summary>The code prefix for this node (<c>"number.precision"</c>).</summary>
+            public const string Prefix = Number.Prefix + ".precision";
+
+            /// <summary><c>number.precision.exceeded</c></summary>
+            public const string Exceeded = Prefix + ".exceeded";
+
+            /// <summary><c>number.precision.out-of-range</c></summary>
+            public const string OutOfRange = Prefix + ".out-of-range";
+
+            /// <summary><c>number.precision.invalid</c></summary>
+            public const string Invalid = Prefix + ".invalid";
         }
 
         /// <summary>The tolerance a proximity comparison was configured with.</summary>

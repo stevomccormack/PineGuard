@@ -893,4 +893,36 @@ public sealed class NotApproximatelyNumberAttribute(double target) : NumberAttri
         return InvokeAndMap(nameof(MustNumberClauses.NotApproximately), value, validationContext, typedTarget, typedTolerance);
     }
 }
+
+/// <summary>
+/// Validates that the annotated numeric property or field is a percentage between 0 and 100 inclusive.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustNumberClauses.Percentage"/>. Supported on properties, fields, and parameters
+/// of any primitive numeric type. If the value is <see langword="null"/>, validation passes silently.
+/// </para>
+/// <para>
+/// The scale is 0–100, not 0–1: a value of <c>0.5</c> is half a percent, not fifty percent.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class DiscountModel
+/// {
+///     [PercentageNumber]
+///     public decimal Rate { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="PercentageStringAttribute"/>
+/// <seealso cref="MustNumberClauses.Percentage"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class PercentageNumberAttribute() : NumberAttributeBase(MustCodes.Number.Range.NotPercentage)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) =>
+        InvokeAndMap(nameof(MustNumberClauses.Percentage), value, validationContext);
+}
 #endif

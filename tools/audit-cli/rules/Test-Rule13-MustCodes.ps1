@@ -54,7 +54,8 @@ function Add-Finding {
 $domainMap = @{
     'Bool' = 'Boolean'; 'StringBool' = 'Boolean'
     'Char' = 'Character'
-    'Number' = 'Number'; 'StringNumbers' = 'Number'; 'StringNumberTypes' = 'Number'
+    'Number' = 'Number'; 'StringNumbers' = 'Number'; 'StringNumberTypes' = 'Number'; 'Decimal' = 'Number'
+    'Checksum' = 'Checksum'
     'BitWise' = 'Bitwise'
     'Enum' = 'Enum'
     'Guid' = 'Guid'; 'StringGuid' = 'Guid'

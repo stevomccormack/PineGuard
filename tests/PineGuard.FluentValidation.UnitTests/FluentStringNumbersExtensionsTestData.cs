@@ -128,6 +128,16 @@ public static class FluentStringNumbersExtensionsTestData
         ];
     }
 
+    public static class Percentage
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.NumbersIsPercentage.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.NumbersIsPercentage.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be a percentage between 0 and 100.", Code: MustCodes.Number.Range.NotPercentage)
+        });
+    }
+
     public static class Approximately
     {
         public static TheoryData<FluentCase<(string? value, decimal target, decimal? tolerance)>> Cases => F.NumbersIsApproximately.AllScenarios.ToFluentCases(s => s.Name switch
