@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.BufferRulesFixtures;
@@ -36,5 +37,13 @@ public static class GuardBufferClausesTestData
         public static TheoryData<GuardCase<string?>> InvalidCases => F.IsBase64.AllValid.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
 
         public static TheoryData<GuardCase<string?>> NullCases => F.IsBase64.AllInvalid.Only(nameof(F.IsBase64.Null)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value"));
+    }
+
+    // Guard.Against.NotBase64Url — throws when value is NOT valid base64url (delegates to Must.Be.Base64Url)
+    public static class NotBase64Url
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.IsBase64Url.AllValid.ToGuardCases();
+
+        public static TheoryData<GuardCase<string?>> InvalidCases => F.IsBase64Url.AllInvalid.ToGuardCases(s => new GuardExpected(false, s.IsNull ? typeof(ArgumentNullException) : typeof(ArgumentException), "value", Code: MustCodes.Encoding.Base64url.Invalid));
     }
 }
