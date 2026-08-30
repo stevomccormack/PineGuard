@@ -434,4 +434,15 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
         // Assert
         ThrowsCaseAssert.Expected(ex, testCase);
     }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.IsRegexPattern.Cases), MemberType = typeof(StringRulesTestData.IsRegexPattern))]
+    public void IsRegexPattern_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.IsRegexPattern(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }
