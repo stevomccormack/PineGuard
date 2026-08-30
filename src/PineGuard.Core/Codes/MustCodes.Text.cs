@@ -266,6 +266,12 @@ public static partial class MustCodes
 
             /// <summary><c>text.unicode.well-formed</c></summary>
             public const string WellFormed = Prefix + ".well-formed";
+
+            /// <summary><c>text.unicode.not-normalized</c></summary>
+            public const string NotNormalized = Prefix + ".not-normalized";
+
+            /// <summary><c>text.unicode.normalized</c></summary>
+            public const string Normalized = Prefix + ".normalized";
         }
     }
 }

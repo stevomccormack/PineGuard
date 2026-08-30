@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Common;
 using PineGuard.Rules;
@@ -400,5 +401,30 @@ public static partial class StringRulesFixtures
         public static RuleScenario<string?>[] ValidScenarios => [new(nameof(Ascii), Ascii, true), new(nameof(SurrogatePair), SurrogatePair, true), new(nameof(Empty), Empty, true)];
         public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(LoneHighSurrogate), LoneHighSurrogate, false), new(nameof(HighSurrogateThenAscii), HighSurrogateThenAscii, false), new(nameof(LoneLowSurrogate), LoneLowSurrogate, false), new(nameof(NullValue), NullValue, false)];
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsNormalized
+    {
+        public const string Precomposed = "caf\u00E9";
+        public const string Decomposed = "cafe\u0301";
+
+        public static readonly (string? value, NormalizationForm form) PrecomposedFormC = (Precomposed, NormalizationForm.FormC);
+        public static readonly (string? value, NormalizationForm form) PrecomposedFormKC = (Precomposed, NormalizationForm.FormKC);
+        public static readonly (string? value, NormalizationForm form) DecomposedFormD = (Decomposed, NormalizationForm.FormD);
+        public static readonly (string? value, NormalizationForm form) DecomposedFormKD = (Decomposed, NormalizationForm.FormKD);
+        public static readonly (string? value, NormalizationForm form) AsciiFormC = ("abc", NormalizationForm.FormC);
+        public static readonly (string? value, NormalizationForm form) EmptyFormC = ("", NormalizationForm.FormC);
+        public static readonly (string? value, NormalizationForm form) PrecomposedFormD = (Precomposed, NormalizationForm.FormD);
+        public static readonly (string? value, NormalizationForm form) PrecomposedFormKD = (Precomposed, NormalizationForm.FormKD);
+        public static readonly (string? value, NormalizationForm form) DecomposedFormC = (Decomposed, NormalizationForm.FormC);
+        public static readonly (string? value, NormalizationForm form) DecomposedFormKC = (Decomposed, NormalizationForm.FormKC);
+        public static readonly (string? value, NormalizationForm form) LoneHighSurrogate = ("a\uD83D", NormalizationForm.FormC);
+        public static readonly (string? value, NormalizationForm form) LoneLowSurrogate = ("a\uDE00", NormalizationForm.FormC);
+        public static readonly (string? value, NormalizationForm form) UnknownForm = ("abc", (NormalizationForm)999);
+        public static readonly (string? value, NormalizationForm form) NullValue = (null, NormalizationForm.FormC);
+
+        public static RuleScenario<(string? value, NormalizationForm form)>[] ValidScenarios => [new(nameof(PrecomposedFormC), PrecomposedFormC, true), new(nameof(PrecomposedFormKC), PrecomposedFormKC, true), new(nameof(DecomposedFormD), DecomposedFormD, true), new(nameof(DecomposedFormKD), DecomposedFormKD, true), new(nameof(AsciiFormC), AsciiFormC, true), new(nameof(EmptyFormC), EmptyFormC, true)];
+        public static RuleScenario<(string? value, NormalizationForm form)>[] InvalidScenarios => [new(nameof(PrecomposedFormD), PrecomposedFormD, false), new(nameof(PrecomposedFormKD), PrecomposedFormKD, false), new(nameof(DecomposedFormC), DecomposedFormC, false), new(nameof(DecomposedFormKC), DecomposedFormKC, false), new(nameof(LoneHighSurrogate), LoneHighSurrogate, false), new(nameof(LoneLowSurrogate), LoneLowSurrogate, false), new(nameof(UnknownForm), UnknownForm, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<(string? value, NormalizationForm form)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 }
