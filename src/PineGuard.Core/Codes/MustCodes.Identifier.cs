@@ -18,5 +18,15 @@ public static partial class MustCodes
             /// <summary><c>identifier.slug.invalid</c></summary>
             public const string Invalid = Prefix + ".invalid";
         }
+
+        /// <summary>The ULID form: 26 Crockford base32 characters, lexicographically sortable.</summary>
+        public static class Ulid
+        {
+            /// <summary>The code prefix for this node (<c>"identifier.ulid"</c>).</summary>
+            public const string Prefix = Identifier.Prefix + ".ulid";
+
+            /// <summary><c>identifier.ulid.invalid</c></summary>
+            public const string Invalid = Prefix + ".invalid";
+        }
     }
 }
