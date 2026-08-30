@@ -36,6 +36,20 @@ DataAnnotations inherits this verbatim: `ValidationAttributeBase.BuildFailureRes
 `{paramName}` `Replace`, so a config-param failure surfaces the same config-named message there, with
 the attribute's own fixed `Code` still asserted beside it.
 
+When a clause has **several** config guards (a bound pair's `min`/`max`, plus an inverted-range check),
+each gets its own named switch arm above `_ when s.IsValid`, each with its own literal message
+(`"min requires a non-negative minimum count."`, `"max requires a non-negative maximum count."`,
+`"min requires a valid count range."` — the range check is attributed to `min`). The complement's
+switch repeats those arms unchanged except for the swapped `Code:`, because a config guard fires
+before the check is negated and so fails identically in both directions.
+
+**Which file a new adapter goes in mirrors the Must layer's file split.** Clauses living in
+`MustStringClauses` append to `FluentStringExtensions`; a clause file that is its own sub-scope type
+(`MustStringGraphemesClauses`) gets its own `FluentStringGraphemesExtensions`, even though the property
+type is still `string?` and the domain is still "string". Reading the two files side by side is the
+point, so method order follows the Must file — each positive immediately followed by its complement —
+not alphabetical and not all-positives-first.
+
 **Extra scenarios fold into `Cases`, they do not get their own dataset.**
 `docs/ai/specs/fluent-validation/unit-test.md` explicitly forbids `ValidCases`/`InvalidCases`/etc. at
 this layer (Must and Guard allow them; Fluent does not). To add a config-failure or other off-fixture

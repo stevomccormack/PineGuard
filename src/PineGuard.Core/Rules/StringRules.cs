@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Common;
 using PineGuard.Utils;
@@ -27,6 +28,11 @@ namespace PineGuard.Rules;
 /// <seealso href="https://pineguard.ai/docs/rules/string">String Rules documentation</seealso>
 public static partial class StringRules
 {
+    /// <summary>
+    /// The Unicode byte-order mark character (<c>U+FEFF</c>), also known as the zero-width no-break space.
+    /// </summary>
+    public const char ByteOrderMark = '\uFEFF';
+
     /// <summary>
     /// Determines whether the specified string has exactly <paramref name="length"/> characters.
     /// </summary>
@@ -438,6 +444,101 @@ public static partial class StringRules
         ThrowHelper.ThrowIfNull(suffix);
 
         return value is not null && value.EndsWith(suffix, comparison);
+    }
+
+    /// <summary>
+    /// Determines whether the specified string begins with the Unicode byte-order mark (<see cref="ByteOrderMark"/>, <c>U+FEFF</c>).
+    /// </summary>
+    /// <remarks>
+    /// A byte-order mark that survives decoding is a leading character of the string like any other: it breaks equality
+    /// comparisons, prefix matching, and numeric parsing. This rule reports its presence at the start of the string only —
+    /// a <c>U+FEFF</c> anywhere else is a zero-width no-break space, not a byte-order mark.
+    /// </remarks>
+    /// <param name="value">The value to validate. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if the first character of <paramref name="value"/> is the byte-order mark; otherwise, <see langword="false"/>.</returns>
+    public static bool HasByteOrderMark(string? value)
+    {
+        if (value is null || value.Length == 0)
+            return false;
+
+        return value[0] == ByteOrderMark;
+    }
+
+    /// <summary>
+    /// Determines whether the specified string is well-formed UTF-16 — every surrogate code unit forms a complete
+    /// high/low pair.
+    /// </summary>
+    /// <remarks>
+    /// A <see cref="string"/> is a sequence of UTF-16 code units, and nothing stops one from holding a high surrogate
+    /// with no low surrogate after it (or a low surrogate with no high surrogate before it). The usual cause is a string
+    /// sliced through the middle of a surrogate pair. Such a string cannot be encoded to UTF-8, so it fails at the
+    /// serialization boundary far from where it was created — this rule catches it at the input boundary instead.
+    /// The empty string is well-formed; <see langword="null"/> is not a string and returns <see langword="false"/>.
+    /// </remarks>
+    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> contains no unpaired surrogate; otherwise, <see langword="false"/>.</returns>
+    public static bool IsWellFormedUtf16(string? value)
+    {
+        if (value is null)
+            return false;
+
+        for (var i = 0; i < value.Length; i++)
+        {
+            var ch = value[i];
+
+            if (char.IsLowSurrogate(ch))
+                return false;
+
+            if (!char.IsHighSurrogate(ch))
+                continue;
+
+            i++;
+
+            if (i == value.Length || !char.IsLowSurrogate(value[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Determines whether the specified string is already in the given Unicode normalization form.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The same text can be spelled with different code points — <c>"é"</c> is either the precomposed
+    /// <c>U+00E9</c> or an <c>"e"</c> followed by the combining acute accent <c>U+0301</c>. The two are visually
+    /// identical but not ordinally equal, so unnormalized input silently breaks equality, uniqueness constraints
+    /// and lookups. This rule reports whether the value is already in the requested form, so a caller can reject
+    /// it rather than store two spellings of the same name.
+    /// </para>
+    /// <para>
+    /// A value that is not well-formed UTF-16 returns <see langword="false"/> rather than propagating the
+    /// <see cref="ArgumentException"/> the underlying framework raises: an unpaired surrogate has no normalized
+    /// spelling, and rules do not throw on the validated value.
+    /// </para>
+    /// <para>
+    /// Under globalization-invariant mode the framework treats every string as normalized, so this rule reports
+    /// <see langword="true"/> for input it would reject on an ICU-backed runtime. The checks that do not depend
+    /// on the mode — null, an undefined <paramref name="form"/>, and malformed UTF-16 — behave identically in
+    /// both.
+    /// </para>
+    /// </remarks>
+    /// <param name="value">The value to validate. If <see langword="null"/> or not well-formed UTF-16, returns <see langword="false"/>.</param>
+    /// <param name="form">The <see cref="NormalizationForm"/> to test against. Defaults to <see cref="NormalizationForm.FormC"/>. An undefined form returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is already in <paramref name="form"/>; otherwise, <see langword="false"/>.</returns>
+    public static bool IsNormalized(string? value, NormalizationForm form = NormalizationForm.FormC)
+    {
+        if (value is null)
+            return false;
+
+        if (!EnumRules.IsDefined<NormalizationForm>(form))
+            return false;
+
+        if (!IsWellFormedUtf16(value))
+            return false;
+
+        return value.IsNormalized(form);
     }
 
     private static bool AllCharsAreAllowed(string value, Func<char, bool> allowedCharPredicate,

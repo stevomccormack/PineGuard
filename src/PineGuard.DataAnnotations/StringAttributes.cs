@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
@@ -1688,6 +1689,244 @@ public sealed class NotEndsWithAttribute(string suffix) : ValidationAttributeBas
     {
         var strValue = (string)value!;
         var result = Must.Be.NotEndsWith(strValue, Suffix, Comparison, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field starts with the Unicode byte-order
+/// mark (<c>U+FEFF</c>).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.HasByteOrderMark"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// Only a leading <c>U+FEFF</c> counts — the same character anywhere else is a zero-width no-break space.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ExportModel
+/// {
+///     [HasByteOrderMark]
+///     public string CsvPayload { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotHasByteOrderMarkAttribute"/>
+/// <seealso cref="MustStringClauses.HasByteOrderMark"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class HasByteOrderMarkAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Bom.Missing)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.HasByteOrderMark(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field does not start with the Unicode
+/// byte-order mark (<c>U+FEFF</c>).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.NotHasByteOrderMark"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// This is the forbidden state most models want: a byte-order mark that survives decoding silently breaks
+/// equality, prefix matching, and numeric parsing.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ImportModel
+/// {
+///     [NotHasByteOrderMark]
+///     public string AccountNumber { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="HasByteOrderMarkAttribute"/>
+/// <seealso cref="MustStringClauses.NotHasByteOrderMark"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotHasByteOrderMarkAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Bom.Present)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.NotHasByteOrderMark(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is well-formed UTF-16 — every
+/// surrogate code unit forms a complete pair.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.WellFormedUtf16"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// A string carrying an unpaired surrogate cannot be encoded to UTF-8, so it otherwise fails at the
+/// serialization boundary far from the model that produced it.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class MessageModel
+/// {
+///     [WellFormedUtf16]
+///     public string Body { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotWellFormedUtf16Attribute"/>
+/// <seealso cref="MustStringClauses.WellFormedUtf16"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class WellFormedUtf16Attribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Unicode.Malformed)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.WellFormedUtf16(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is not well-formed UTF-16 — it
+/// carries at least one unpaired surrogate.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.NotWellFormedUtf16"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class DecoderFixtureModel
+/// {
+///     [NotWellFormedUtf16]
+///     public string MalformedSample { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="WellFormedUtf16Attribute"/>
+/// <seealso cref="MustStringClauses.NotWellFormedUtf16"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotWellFormedUtf16Attribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Unicode.WellFormed)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.NotWellFormedUtf16(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is already in the given Unicode
+/// normalization form.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.Normalized"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// Unnormalized input silently breaks equality and uniqueness: the two spellings of <c>"é"</c> look
+/// identical but are not ordinally equal, so they survive a duplicate check and then compare unequal.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class AccountModel
+/// {
+///     [Normalized]
+///     public string UserName { get; set; }
+///
+///     [Normalized(Form = NormalizationForm.FormD)]
+///     public string SortKey { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotNormalizedAttribute"/>
+/// <seealso cref="MustStringClauses.Normalized"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NormalizedAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Unicode.NotNormalized)
+{
+    /// <summary>Gets the normalization form the value must already be in. Defaults to <see cref="NormalizationForm.FormC"/>.</summary>
+    public NormalizationForm Form { get; init; } = NormalizationForm.FormC;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.Normalized(strValue, Form, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is not already in the given Unicode
+/// normalization form.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.NotNormalized"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class NormalizationSampleModel
+/// {
+///     [NotNormalized(Form = NormalizationForm.FormC)]
+///     public string DecomposedSample { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NormalizedAttribute"/>
+/// <seealso cref="MustStringClauses.NotNormalized"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotNormalizedAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Unicode.Normalized)
+{
+    /// <summary>Gets the normalization form the value must not already be in. Defaults to <see cref="NormalizationForm.FormC"/>.</summary>
+    public NormalizationForm Form { get; init; } = NormalizationForm.FormC;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.NotNormalized(strValue, Form, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }

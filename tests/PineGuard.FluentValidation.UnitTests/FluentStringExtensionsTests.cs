@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using FluentValidation;
 using PineGuard.Testing.UnitTests.FluentValidation;
@@ -237,6 +238,36 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
     private sealed class NotEndsWithValidator : AbstractValidator<StringModel>
     {
         public NotEndsWithValidator(string suffix, StringComparison comparison) => RuleFor(x => x.Value).NotEndsWith(suffix, comparison);
+    }
+
+    private sealed class HasByteOrderMarkValidator : AbstractValidator<StringModel>
+    {
+        public HasByteOrderMarkValidator() => RuleFor(x => x.Value).HasByteOrderMark();
+    }
+
+    private sealed class NotHasByteOrderMarkValidator : AbstractValidator<StringModel>
+    {
+        public NotHasByteOrderMarkValidator() => RuleFor(x => x.Value).NotHasByteOrderMark();
+    }
+
+    private sealed class WellFormedUtf16Validator : AbstractValidator<StringModel>
+    {
+        public WellFormedUtf16Validator() => RuleFor(x => x.Value).WellFormedUtf16();
+    }
+
+    private sealed class NotWellFormedUtf16Validator : AbstractValidator<StringModel>
+    {
+        public NotWellFormedUtf16Validator() => RuleFor(x => x.Value).NotWellFormedUtf16();
+    }
+
+    private sealed class NormalizedValidator : AbstractValidator<StringModel>
+    {
+        public NormalizedValidator(NormalizationForm form) => RuleFor(x => x.Value).Normalized(form);
+    }
+
+    private sealed class NotNormalizedValidator : AbstractValidator<StringModel>
+    {
+        public NotNormalizedValidator(NormalizationForm form) => RuleFor(x => x.Value).NotNormalized(form);
     }
 
     [Theory]
@@ -604,6 +635,78 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
     public void NotEndsWith_BehavesAsExpected(FluentCase<(string? value, string suffix, StringComparison comparison)> tc)
     {
         var result = new NotEndsWithValidator(tc.Value.suffix, tc.Value.comparison).Validate(new StringModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.HasByteOrderMark
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.HasByteOrderMark.Cases), MemberType = typeof(FluentStringExtensionsTestData.HasByteOrderMark))]
+    public void HasByteOrderMark_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new HasByteOrderMarkValidator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.NotHasByteOrderMark
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.NotHasByteOrderMark.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotHasByteOrderMark))]
+    public void NotHasByteOrderMark_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new NotHasByteOrderMarkValidator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.WellFormedUtf16
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.WellFormedUtf16.Cases), MemberType = typeof(FluentStringExtensionsTestData.WellFormedUtf16))]
+    public void WellFormedUtf16_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new WellFormedUtf16Validator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.NotWellFormedUtf16
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.NotWellFormedUtf16.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotWellFormedUtf16))]
+    public void NotWellFormedUtf16_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new NotWellFormedUtf16Validator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.Normalized
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.Normalized.Cases), MemberType = typeof(FluentStringExtensionsTestData.Normalized))]
+    public void Normalized_BehavesAsExpected(FluentCase<(string? value, NormalizationForm form)> tc)
+    {
+        // Act
+        var result = new NormalizedValidator(tc.Value.form).Validate(new StringModel { Value = tc.Value.value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.NotNormalized
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.NotNormalized.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotNormalized))]
+    public void NotNormalized_BehavesAsExpected(FluentCase<(string? value, NormalizationForm form)> tc)
+    {
+        // Act
+        var result = new NotNormalizedValidator(tc.Value.form).Validate(new StringModel { Value = tc.Value.value });
+
+        // Assert
         AssertResult(tc, result);
     }
 }

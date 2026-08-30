@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
@@ -601,6 +602,68 @@ public static partial class FluentStringExtensionsTestData
         {
             nameof(F.EndsWith.NullValue) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(false, "Value must not end with the specified suffix.", Code: MustCodes.Text.Content.EndsWith),
+            _ => new FluentExpected(true)
+        });
+    }
+
+    public static class HasByteOrderMark
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.HasByteOrderMark.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.HasByteOrderMark.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must start with a byte-order mark.", Code: MustCodes.Text.Bom.Missing)
+        });
+    }
+
+    public static class NotHasByteOrderMark
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.HasByteOrderMark.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.HasByteOrderMark.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(false, "Value must not start with a byte-order mark.", Code: MustCodes.Text.Bom.Present),
+            _ => new FluentExpected(true)
+        });
+    }
+
+    public static class WellFormedUtf16
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.IsWellFormedUtf16.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsWellFormedUtf16.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be well-formed UTF-16.", Code: MustCodes.Text.Unicode.Malformed)
+        });
+    }
+
+    public static class NotWellFormedUtf16
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.IsWellFormedUtf16.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsWellFormedUtf16.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(false, "Value must not be well-formed UTF-16.", Code: MustCodes.Text.Unicode.WellFormed),
+            _ => new FluentExpected(true)
+        });
+    }
+
+    public static class Normalized
+    {
+        public static TheoryData<FluentCase<(string? value, NormalizationForm form)>> Cases => F.IsNormalized.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsNormalized.NullValue) => new FluentExpected(true),
+            nameof(F.IsNormalized.UnknownForm) => new FluentExpected(false, "form requires a defined normalization form.", Code: MustCodes.Text.Unicode.NotNormalized),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be in the specified normalization form.", Code: MustCodes.Text.Unicode.NotNormalized)
+        });
+    }
+
+    public static class NotNormalized
+    {
+        public static TheoryData<FluentCase<(string? value, NormalizationForm form)>> Cases => F.IsNormalized.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsNormalized.NullValue) => new FluentExpected(true),
+            nameof(F.IsNormalized.UnknownForm) => new FluentExpected(false, "form requires a defined normalization form.", Code: MustCodes.Text.Unicode.Normalized),
+            _ when s.IsValid => new FluentExpected(false, "Value must not be in the specified normalization form.", Code: MustCodes.Text.Unicode.Normalized),
             _ => new FluentExpected(true)
         });
     }

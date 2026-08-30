@@ -385,4 +385,66 @@ public static class StringAttributesTestData
             new(nameof(F.EndsWith.SuffixedIgnoringCase), F.EndsWith.SuffixedIgnoringCase.value, new DataAnnotationExpected(false, "Value must not end with the specified suffix.", Code: MustCodes.Text.Content.EndsWith))
         ];
     }
+
+    public static class HasByteOrderMark
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.HasByteOrderMark.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.HasByteOrderMark.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must start with a byte-order mark.", Code: MustCodes.Text.Bom.Missing)
+        });
+    }
+
+    public static class NotHasByteOrderMark
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.HasByteOrderMark.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.HasByteOrderMark.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not start with a byte-order mark.", Code: MustCodes.Text.Bom.Present),
+            _ => new DataAnnotationExpected(true)
+        });
+    }
+
+    public static class WellFormedUtf16
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsWellFormedUtf16.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.IsWellFormedUtf16.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be well-formed UTF-16.", Code: MustCodes.Text.Unicode.Malformed)
+        });
+    }
+
+    public static class NotWellFormedUtf16
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsWellFormedUtf16.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.IsWellFormedUtf16.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be well-formed UTF-16.", Code: MustCodes.Text.Unicode.WellFormed),
+            _ => new DataAnnotationExpected(true)
+        });
+    }
+
+    public static class Normalized
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsNormalized.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsNormalized.NullValue) => new DataAnnotationExpected(true),
+            nameof(F.IsNormalized.UnknownForm) => new DataAnnotationExpected(false, "form requires a defined normalization form.", Code: MustCodes.Text.Unicode.NotNormalized),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be in the specified normalization form.", Code: MustCodes.Text.Unicode.NotNormalized)
+        });
+    }
+
+    public static class NotNormalized
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsNormalized.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsNormalized.NullValue) => new DataAnnotationExpected(true),
+            nameof(F.IsNormalized.UnknownForm) => new DataAnnotationExpected(false, "form requires a defined normalization form.", Code: MustCodes.Text.Unicode.Normalized),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be in the specified normalization form.", Code: MustCodes.Text.Unicode.Normalized),
+            _ => new DataAnnotationExpected(true)
+        });
+    }
 }
