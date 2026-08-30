@@ -13,9 +13,9 @@ $ErrorActionPreference = 'Stop'
 function Get-PineGuardScope {
     <#
     .SYNOPSIS
-        Returns the per-scope path/identifier registry entry (or entries) for the eleven named
+        Returns the per-scope path/identifier registry entry (or entries) for the twelve named
         PineGuard scopes: Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation,
-        Options, DependencyInjection, ErrorOr, FluentResults, OneOf, Testing.
+        Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, Testing.
 
     .DESCRIPTION
         Centralises the per-scope source directory, project paths, coverage include pattern,
@@ -25,24 +25,24 @@ function Get-PineGuardScope {
 
         'All' (the aggregate pseudo-scope) and 'Custom' (Test-CoverageAnalysis.ps1 only) are
         NOT registry entries — callers that need the aggregate keep handling those cases
-        specially, using -All to enumerate the eleven real entries in a stable order
+        specially, using -All to enumerate the twelve real entries in a stable order
         (Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options,
-        DependencyInjection, ErrorOr, FluentResults, OneOf, Testing).
+        DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, Testing).
 
         Adding a new scope means adding one entry here plus one ValidateSet token per consumer
         script — ValidateSet attributes must stay literal (PowerShell requires compile-time
         constants), so the scope names are necessarily still spelled out there too.
 
     .PARAMETER Name
-        One of the eleven scope names. Returns the single matching registry entry.
+        One of the twelve scope names. Returns the single matching registry entry.
 
     .PARAMETER All
-        Returns all eleven registry entries, in the stable order used to build 'All' aggregates.
+        Returns all twelve registry entries, in the stable order used to build 'All' aggregates.
     #>
     [CmdletBinding(DefaultParameterSetName = 'One')]
     param(
         [Parameter(Mandatory, ParameterSetName = 'One', Position = 0)]
-        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing')]
+        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing')]
         [string] $Name,
 
         [Parameter(Mandatory, ParameterSetName = 'All')]
@@ -142,6 +142,19 @@ function Get-PineGuardScope {
             DefaultSourcePrefix      = 'src\PineGuard.Extensions.DependencyInjection'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.dependency-injection.yaml'
             QodanaSlug               = 'dependency-injection'
+            IncludeEmptyTestProjects = $false
+        }
+        AspNetCore        = [pscustomobject]@{
+            Name                     = 'AspNetCore'
+            SourceDir                = 'src\PineGuard.AspNetCore'
+            SourceCsproj             = 'src\PineGuard.AspNetCore\PineGuard.AspNetCore.csproj'
+            TestCsproj               = 'tests\PineGuard.AspNetCore.UnitTests\PineGuard.AspNetCore.UnitTests.csproj'
+            DefaultProjectFilter     = 'PineGuard.AspNetCore.UnitTests.csproj'
+            CoverageIncludePattern   = '[PineGuard.AspNetCore]*'
+            PathIncludeRegex         = '^src[/\\]+PineGuard\.AspNetCore[/\\]+'
+            DefaultSourcePrefix      = 'src\PineGuard.AspNetCore'
+            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.aspnetcore.yaml'
+            QodanaSlug               = 'aspnetcore'
             IncludeEmptyTestProjects = $false
         }
         ErrorOr           = [pscustomobject]@{
