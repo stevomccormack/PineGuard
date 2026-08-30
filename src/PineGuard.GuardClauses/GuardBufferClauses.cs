@@ -188,4 +188,51 @@ public static class GuardBufferClauses
 
         return result.Result!;
     }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> is not a valid base64url-encoded string.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string to guard as base64url.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustBufferClauses.Base64Url"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is not valid base64url and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// This guard is the complement of <see cref="MustBufferClauses.Base64Url"/>:
+    /// <c>Guard.Against.NotBase64Url</c> passes for the URL-safe RFC 4648 §5 alphabet, where
+    /// <c>-</c> and <c>_</c> replace <c>+</c> and <c>/</c> and the trailing padding is optional.
+    /// A plain Base64 string carrying <c>+</c> or <c>/</c> therefore fails this guard.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// Guard.Against.NotBase64Url(jwtSegment);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustBufferClauses.Base64Url"/>
+    public static string NotBase64Url(this IGuardClause _,
+        string? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Base64Url(value, paramName); // Guard.Against.NotBase64Url => Must.Be.Base64Url (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
 }
