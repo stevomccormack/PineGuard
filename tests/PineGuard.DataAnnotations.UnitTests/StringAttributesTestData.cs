@@ -425,4 +425,26 @@ public static class StringAttributesTestData
             _ => new DataAnnotationExpected(true)
         });
     }
+
+    public static class Normalized
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsNormalized.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsNormalized.NullValue) => new DataAnnotationExpected(true),
+            nameof(F.IsNormalized.UnknownForm) => new DataAnnotationExpected(false, "form requires a defined normalization form.", Code: MustCodes.Text.Unicode.NotNormalized),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be in the specified normalization form.", Code: MustCodes.Text.Unicode.NotNormalized)
+        });
+    }
+
+    public static class NotNormalized
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsNormalized.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsNormalized.NullValue) => new DataAnnotationExpected(true),
+            nameof(F.IsNormalized.UnknownForm) => new DataAnnotationExpected(false, "form requires a defined normalization form.", Code: MustCodes.Text.Unicode.Normalized),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be in the specified normalization form.", Code: MustCodes.Text.Unicode.Normalized),
+            _ => new DataAnnotationExpected(true)
+        });
+    }
 }
