@@ -1433,3 +1433,261 @@ public sealed class ContainsAnyAttribute(char[] characters) : ValidationAttribut
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field contains the specified substring.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.Contains"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// An empty <see cref="Substring"/> is always contained, matching <see cref="string.Contains(string)"/>.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ReferenceModel
+/// {
+///     [Contains("-", Comparison = StringComparison.OrdinalIgnoreCase)]
+///     public string Reference { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotContainsAttribute"/>
+/// <seealso cref="MustStringClauses.Contains"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class ContainsAttribute(string substring) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotContains)
+{
+    /// <summary>Gets the substring the value must contain.</summary>
+    public string Substring { get; } = substring;
+
+    /// <summary>Gets the comparison rule used to locate <see cref="Substring"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</summary>
+    public StringComparison Comparison { get; init; } = StringComparison.Ordinal;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.Contains(strValue, Substring, Comparison, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field does not contain the specified substring.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.NotContains"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// An empty <see cref="Substring"/> is always contained, matching <see cref="string.Contains(string)"/>.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class UsernameModel
+/// {
+///     [NotContains(" ")]
+///     public string Username { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="ContainsAttribute"/>
+/// <seealso cref="MustStringClauses.NotContains"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotContainsAttribute(string substring) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.Contains)
+{
+    /// <summary>Gets the substring that must not appear in the value.</summary>
+    public string Substring { get; } = substring;
+
+    /// <summary>Gets the comparison rule used to locate <see cref="Substring"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</summary>
+    public StringComparison Comparison { get; init; } = StringComparison.Ordinal;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.NotContains(strValue, Substring, Comparison, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field starts with the specified prefix.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.StartsWith"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// An empty <see cref="Prefix"/> always matches, matching <see cref="string.StartsWith(string)"/>.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class AccountModel
+/// {
+///     [StartsWith("ACC-")]
+///     public string AccountNumber { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotStartsWithAttribute"/>
+/// <seealso cref="MustStringClauses.StartsWith"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class StartsWithAttribute(string prefix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotStartsWith)
+{
+    /// <summary>Gets the prefix the value must start with.</summary>
+    public string Prefix { get; } = prefix;
+
+    /// <summary>Gets the comparison rule used to test <see cref="Prefix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</summary>
+    public StringComparison Comparison { get; init; } = StringComparison.Ordinal;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.StartsWith(strValue, Prefix, Comparison, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field does not start with the specified prefix.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.NotStartsWith"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// An empty <see cref="Prefix"/> always matches, matching <see cref="string.StartsWith(string)"/>.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class SlugModel
+/// {
+///     [NotStartsWith("-")]
+///     public string Slug { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="StartsWithAttribute"/>
+/// <seealso cref="MustStringClauses.NotStartsWith"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotStartsWithAttribute(string prefix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.StartsWith)
+{
+    /// <summary>Gets the prefix the value must not start with.</summary>
+    public string Prefix { get; } = prefix;
+
+    /// <summary>Gets the comparison rule used to test <see cref="Prefix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</summary>
+    public StringComparison Comparison { get; init; } = StringComparison.Ordinal;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.NotStartsWith(strValue, Prefix, Comparison, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field ends with the specified suffix.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.EndsWith"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// An empty <see cref="Suffix"/> always matches, matching <see cref="string.EndsWith(string)"/>.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class DocumentModel
+/// {
+///     [EndsWith(".pdf", Comparison = StringComparison.OrdinalIgnoreCase)]
+///     public string FileName { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotEndsWithAttribute"/>
+/// <seealso cref="MustStringClauses.EndsWith"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class EndsWithAttribute(string suffix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotEndsWith)
+{
+    /// <summary>Gets the suffix the value must end with.</summary>
+    public string Suffix { get; } = suffix;
+
+    /// <summary>Gets the comparison rule used to test <see cref="Suffix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</summary>
+    public StringComparison Comparison { get; init; } = StringComparison.Ordinal;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.EndsWith(strValue, Suffix, Comparison, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field does not end with the specified suffix.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.NotEndsWith"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// An empty <see cref="Suffix"/> always matches, matching <see cref="string.EndsWith(string)"/>.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class DocumentModel
+/// {
+///     [NotEndsWith(".exe", Comparison = StringComparison.OrdinalIgnoreCase)]
+///     public string FileName { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="EndsWithAttribute"/>
+/// <seealso cref="MustStringClauses.NotEndsWith"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotEndsWithAttribute(string suffix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.EndsWith)
+{
+    /// <summary>Gets the suffix the value must not end with.</summary>
+    public string Suffix { get; } = suffix;
+
+    /// <summary>Gets the comparison rule used to test <see cref="Suffix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</summary>
+    public StringComparison Comparison { get; init; } = StringComparison.Ordinal;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.NotEndsWith(strValue, Suffix, Comparison, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
