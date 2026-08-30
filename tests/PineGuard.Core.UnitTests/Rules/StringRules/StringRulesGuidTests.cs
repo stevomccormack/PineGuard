@@ -27,4 +27,15 @@ public sealed class StringRulesGuidTests(ITestOutputHelper output)
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(StringRulesGuidTestData.HasVersion.Cases), MemberType = typeof(StringRulesGuidTestData.HasVersion))]
+    public void HasVersion_BehavesAsExpected(RuleCase<(string? value, int version)> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.Guid.HasVersion(tc.Value.value, tc.Value.version);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }
