@@ -195,5 +195,62 @@ public static class DateOnlyRules
         var diffDays = Math.Abs(value.Value.DayNumber - reference.Value.DayNumber);
         return diffDays <= days;
     }
+
+    /// <summary>
+    /// Determines whether the specified date falls on a weekday (Monday through Friday).
+    /// </summary>
+    /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a weekday; otherwise, <see langword="false"/>.</returns>
+    public static bool IsWeekday(DateOnly? value)
+    {
+        // ReSharper disable once UseNullPropagation
+        if (value is null)
+            return false;
+
+        var dayOfWeek = value.Value.DayOfWeek;
+        return dayOfWeek is >= DayOfWeek.Monday and <= DayOfWeek.Friday;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date falls on a weekend (Saturday or Sunday).
+    /// </summary>
+    /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a weekend day; otherwise, <see langword="false"/>.</returns>
+    public static bool IsWeekend(DateOnly? value)
+    {
+        // ReSharper disable once UseNullPropagation
+        if (value is null)
+            return false;
+
+        var dayOfWeek = value.Value.DayOfWeek;
+        return dayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date falls on the first day of its month.
+    /// </summary>
+    /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is the first day of the month; otherwise, <see langword="false"/>.</returns>
+    public static bool IsFirstDayOfMonth(DateOnly? value)
+    {
+        if (value is null)
+            return false;
+
+        return value.Value.Day == 1;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date falls on the last day of its month.
+    /// </summary>
+    /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is the last day of the month; otherwise, <see langword="false"/>.</returns>
+    public static bool IsLastDayOfMonth(DateOnly? value)
+    {
+        if (value is null)
+            return false;
+
+        var date = value.Value;
+        return date.Day == DateTime.DaysInMonth(date.Year, date.Month);
+    }
 }
 #endif

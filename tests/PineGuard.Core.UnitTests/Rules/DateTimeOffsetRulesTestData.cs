@@ -89,4 +89,24 @@ public static class DateTimeOffsetRulesTestData
     {
         public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset? reference, int months)>> Cases => F.IsWithinCalendarMonths.AllScenarios.ToRuleCases();
     }
+
+    public static class IsWeekday
+    {
+        public static TheoryData<RuleCase<DateTimeOffset?>> Cases => F.IsWeekday.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsWeekend
+    {
+        public static TheoryData<RuleCase<DateTimeOffset?>> Cases => F.IsWeekend.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsFirstDayOfMonth
+    {
+        public static TheoryData<RuleCase<DateTimeOffset?>> Cases => F.IsFirstDayOfMonth.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsLastDayOfMonth
+    {
+        public static TheoryData<RuleCase<DateTimeOffset?>> Cases => F.IsLastDayOfMonth.AllScenarios.ToRuleCases();
+    }
 }

@@ -257,6 +257,94 @@ public static class DateOnlyRulesFixtures
         public static RuleScenario<(DateOnly? value, DateOnly? reference, int days)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class IsWeekday
+    {
+        public static readonly DateOnly? Monday = new DateOnly(2024, 01, 01);
+        public static readonly DateOnly? Friday = new DateOnly(2024, 01, 05);
+        public static readonly DateOnly? Saturday = new DateOnly(2024, 01, 06);
+        public static readonly DateOnly? Sunday = new DateOnly(2024, 01, 07);
+        public static readonly DateOnly? NullValue = null;
+
+        public static RuleScenario<DateOnly?>[] ValidScenarios =>
+        [
+            new(nameof(Monday), Monday, true),
+            new(nameof(Friday), Friday, true)
+        ];
+
+        public static RuleScenario<DateOnly?>[] InvalidScenarios =>
+        [
+            new(nameof(Saturday), Saturday, false),
+            new(nameof(Sunday), Sunday, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsWeekend
+    {
+        public static readonly DateOnly? Saturday = new DateOnly(2024, 01, 06);
+        public static readonly DateOnly? Sunday = new DateOnly(2024, 01, 07);
+        public static readonly DateOnly? Monday = new DateOnly(2024, 01, 01);
+        public static readonly DateOnly? NullValue = null;
+
+        public static RuleScenario<DateOnly?>[] ValidScenarios =>
+        [
+            new(nameof(Saturday), Saturday, true),
+            new(nameof(Sunday), Sunday, true)
+        ];
+
+        public static RuleScenario<DateOnly?>[] InvalidScenarios =>
+        [
+            new(nameof(Monday), Monday, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsFirstDayOfMonth
+    {
+        public static readonly DateOnly? FirstDay = new DateOnly(2024, 02, 01);
+        public static readonly DateOnly? NotFirst = new DateOnly(2024, 02, 02);
+        public static readonly DateOnly? NullValue = null;
+
+        public static RuleScenario<DateOnly?>[] ValidScenarios =>
+        [
+            new(nameof(FirstDay), FirstDay, true)
+        ];
+
+        public static RuleScenario<DateOnly?>[] InvalidScenarios =>
+        [
+            new(nameof(NotFirst), NotFirst, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsLastDayOfMonth
+    {
+        public static readonly DateOnly? LastDayOfLeapFebruary = new DateOnly(2024, 02, 29);
+        public static readonly DateOnly? LastDayOfNonLeapFebruary = new DateOnly(2023, 02, 28);
+        public static readonly DateOnly? NotLast = new DateOnly(2024, 02, 28);
+        public static readonly DateOnly? NullValue = null;
+
+        public static RuleScenario<DateOnly?>[] ValidScenarios =>
+        [
+            new(nameof(LastDayOfLeapFebruary), LastDayOfLeapFebruary, true),
+            new(nameof(LastDayOfNonLeapFebruary), LastDayOfNonLeapFebruary, true)
+        ];
+
+        public static RuleScenario<DateOnly?>[] InvalidScenarios =>
+        [
+            new(nameof(NotLast), NotLast, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class IsPast
     {
         public static readonly DateOnly? PastDate = new DateOnly(2000, 01, 10);

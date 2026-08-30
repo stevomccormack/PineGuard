@@ -138,4 +138,48 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsWeekday.Cases), MemberType = typeof(DateOnlyRulesTestData.IsWeekday))]
+    public void IsWeekday_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsWeekday(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsWeekend.Cases), MemberType = typeof(DateOnlyRulesTestData.IsWeekend))]
+    public void IsWeekend_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsWeekend(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsFirstDayOfMonth.Cases), MemberType = typeof(DateOnlyRulesTestData.IsFirstDayOfMonth))]
+    public void IsFirstDayOfMonth_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsFirstDayOfMonth(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsLastDayOfMonth.Cases), MemberType = typeof(DateOnlyRulesTestData.IsLastDayOfMonth))]
+    public void IsLastDayOfMonth_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsLastDayOfMonth(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

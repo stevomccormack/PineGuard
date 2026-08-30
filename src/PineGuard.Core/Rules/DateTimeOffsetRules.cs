@@ -189,4 +189,65 @@ public static class DateTimeOffsetRules
         var monthDiff = Math.Abs(valueMonthIndex - referenceMonthIndex);
         return monthDiff <= months;
     }
+
+    /// <summary>
+    /// Determines whether the specified date/time offset falls on a weekday (Monday through Friday).
+    /// </summary>
+    /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a weekday; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>The calendar day is read from the value's own offset (its wall-clock date), not from UTC.</remarks>
+    public static bool IsWeekday(DateTimeOffset? value)
+    {
+        // ReSharper disable once UseNullPropagation
+        if (value is null)
+            return false;
+
+        var dayOfWeek = value.Value.DayOfWeek;
+        return dayOfWeek is >= DayOfWeek.Monday and <= DayOfWeek.Friday;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date/time offset falls on a weekend (Saturday or Sunday).
+    /// </summary>
+    /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a weekend day; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>The calendar day is read from the value's own offset (its wall-clock date), not from UTC.</remarks>
+    public static bool IsWeekend(DateTimeOffset? value)
+    {
+        // ReSharper disable once UseNullPropagation
+        if (value is null)
+            return false;
+
+        var dayOfWeek = value.Value.DayOfWeek;
+        return dayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date/time offset falls on the first day of its month.
+    /// </summary>
+    /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is the first day of the month; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>The calendar day is read from the value's own offset (its wall-clock date), not from UTC.</remarks>
+    public static bool IsFirstDayOfMonth(DateTimeOffset? value)
+    {
+        if (value is null)
+            return false;
+
+        return value.Value.Day == 1;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date/time offset falls on the last day of its month.
+    /// </summary>
+    /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is the last day of the month; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>The calendar day is read from the value's own offset (its wall-clock date), not from UTC.</remarks>
+    public static bool IsLastDayOfMonth(DateTimeOffset? value)
+    {
+        if (value is null)
+            return false;
+
+        var date = value.Value;
+        return date.Day == DateTime.DaysInMonth(date.Year, date.Month);
+    }
 }
