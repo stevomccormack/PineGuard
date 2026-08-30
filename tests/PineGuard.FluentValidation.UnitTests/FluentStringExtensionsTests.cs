@@ -154,6 +154,11 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
         public NotMatchValidator(Regex pattern) => RuleFor(x => x.Value).NotMatch(pattern);
     }
 
+    private sealed class RegexPatternValidator : AbstractValidator<StringModel>
+    {
+        public RegexPatternValidator() => RuleFor(x => x.Value).RegexPattern();
+    }
+
     private sealed class NotWhitespaceValidator : AbstractValidator<StringModel>
     {
         public NotWhitespaceValidator() => RuleFor(x => x.Value).NotWhitespace();
@@ -468,6 +473,18 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
     public void NotMatch_BehavesAsExpected(FluentCase<(string? value, Regex pattern)> tc)
     {
         var result = new NotMatchValidator(tc.Value.pattern).Validate(new StringModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.RegexPattern
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.RegexPattern.Cases), MemberType = typeof(FluentStringExtensionsTestData.RegexPattern))]
+    public void RegexPattern_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new RegexPatternValidator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
         AssertResult(tc, result);
     }
 
