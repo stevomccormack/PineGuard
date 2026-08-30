@@ -27,4 +27,15 @@ public sealed class IdentifierRulesTests(ITestOutputHelper output) : BaseRuleUni
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(IdentifierRulesTestData.IsUlid.Cases), MemberType = typeof(IdentifierRulesTestData.IsUlid))]
+    public void IsUlid_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = IdentifierRules.IsUlid(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }
