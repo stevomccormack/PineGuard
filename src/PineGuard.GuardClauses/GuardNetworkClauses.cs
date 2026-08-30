@@ -283,6 +283,53 @@ public static class GuardNetworkClauses
     }
 
     /// <summary>
+    /// Throws if <paramref name="value"/> is not a valid MAC address.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string to guard as a MAC address.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustNetworkClauses.MacAddress"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is not a valid MAC address and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// This guard is the complement of <see cref="MustNetworkClauses.MacAddress"/>:
+    /// <c>Guard.Against.NotMacAddress</c> passes for the colon-separated, hyphen-separated and
+    /// Cisco dot-separated forms, in either hex case. Separators may not be mixed within one
+    /// address.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// Guard.Against.NotMacAddress(adapterAddress);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustNetworkClauses.MacAddress"/>
+    public static string NotMacAddress(this IGuardClause _,
+        string? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.MacAddress(value, paramName); // Guard.Against.NotMacAddress => Must.Be.MacAddress (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
     /// Throws if <paramref name="value"/> violates the IpAddress constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
