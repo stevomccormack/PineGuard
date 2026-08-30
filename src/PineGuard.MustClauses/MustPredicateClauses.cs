@@ -98,4 +98,100 @@ public static class MustPredicateClauses
         var ok = !PredicateRules.Satisfies(value, predicate);
         return MustResult<T>.FromBool(ok, MustCodes.Predicate.Result.True, messageTemplate, paramName, value, result: value!);
     }
+
+    /// <summary>
+    /// Validates that the specified value satisfies the given asynchronous predicate.
+    /// </summary>
+    /// <typeparam name="T">The type of the value being validated.</typeparam>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="predicate">The asynchronous predicate function that the value must satisfy. Must not be <see langword="null"/>.</param>
+    /// <param name="cancellationToken">A token to cancel the predicate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> satisfies <paramref name="predicate"/>, or <see langword="false"/> with
+    /// a descriptive <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// The asynchronous counterpart of <see cref="Satisfies{T}"/>, sharing its code — one rule, one code,
+    /// however it is evaluated. Returns a failed result immediately if <paramref name="predicate"/> is
+    /// <see langword="null"/>, and fails without invoking <paramref name="predicate"/> when
+    /// <paramref name="value"/> is <see langword="null"/>, exactly as <see cref="PredicateRules.Satisfies{T}"/> does.
+    /// The failure message follows the pattern <c>"{paramName} must satisfy the predicate."</c>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = await Must.Be.SatisfiesAsync(email, users.IsAvailableAsync, cancellationToken);
+    /// if (result.Failed)
+    ///     Console.WriteLine(result.Message);
+    /// </code>
+    /// </example>
+    /// <seealso cref="Satisfies{T}"/>
+    /// <seealso href="https://pineguard.ai/docs/must/predicate">Predicate Must Clauses documentation</seealso>
+    public static async ValueTask<MustResult<T>> SatisfiesAsync<T>(this IMustClause _,
+        T? value,
+        Func<T, CancellationToken, ValueTask<bool>> predicate,
+        CancellationToken cancellationToken = default,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (predicate is null)
+            return MustResult<T>.Fail(MustCodes.Predicate.Callback.Null, "{paramName} must not be null.", nameof(predicate), predicate);
+
+        const string messageTemplate = "{paramName} must satisfy the predicate.";
+
+        var ok = value is not null && await predicate(value, cancellationToken).ConfigureAwait(false);
+        return MustResult<T>.FromBool(ok, MustCodes.Predicate.Result.False, messageTemplate, paramName, value, result: value!);
+    }
+
+    /// <summary>
+    /// Validates that the specified value does not satisfy the given asynchronous predicate.
+    /// </summary>
+    /// <typeparam name="T">The type of the value being validated.</typeparam>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="predicate">The asynchronous predicate function that the value must not satisfy. Must not be <see langword="null"/>.</param>
+    /// <param name="cancellationToken">A token to cancel the predicate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> does not satisfy <paramref name="predicate"/>, or <see langword="false"/> with
+    /// a descriptive <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// The asynchronous counterpart of <see cref="NotSatisfies{T}"/>, sharing its code — one rule, one code,
+    /// however it is evaluated. Returns a failed result immediately if <paramref name="predicate"/> is
+    /// <see langword="null"/>, and passes without invoking <paramref name="predicate"/> when
+    /// <paramref name="value"/> is <see langword="null"/>, exactly as <see cref="PredicateRules.Satisfies{T}"/> does.
+    /// The failure message follows the pattern <c>"{paramName} must not satisfy the predicate."</c>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = await Must.Be.NotSatisfiesAsync(sku, catalogue.IsDiscontinuedAsync, cancellationToken);
+    /// if (result.Failed)
+    ///     Console.WriteLine(result.Message);
+    /// </code>
+    /// </example>
+    /// <seealso cref="NotSatisfies{T}"/>
+    /// <seealso href="https://pineguard.ai/docs/must/predicate">Predicate Must Clauses documentation</seealso>
+    public static async ValueTask<MustResult<T>> NotSatisfiesAsync<T>(this IMustClause _,
+        T? value,
+        Func<T, CancellationToken, ValueTask<bool>> predicate,
+        CancellationToken cancellationToken = default,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (predicate is null)
+            return MustResult<T>.Fail(MustCodes.Predicate.Callback.Null, "{paramName} must not be null.", nameof(predicate), predicate);
+
+        const string messageTemplate = "{paramName} must not satisfy the predicate.";
+
+        var ok = value is null || !await predicate(value, cancellationToken).ConfigureAwait(false);
+        return MustResult<T>.FromBool(ok, MustCodes.Predicate.Result.True, messageTemplate, paramName, value, result: value!);
+    }
 }
