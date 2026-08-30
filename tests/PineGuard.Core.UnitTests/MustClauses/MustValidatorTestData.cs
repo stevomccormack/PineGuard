@@ -114,6 +114,115 @@ public static class MustValidatorTestData
         public static TheoryData<bool> Cases => [true];
     }
 
+    public static class AsyncRuleFor
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("available email passes the async rule", new CreateOrder("free@b.com", DateTime.MinValue, DateTime.MinValue, false, 0m, null), true),
+            new("taken email fails the async rule", new CreateOrder("taken@b.com", DateTime.MinValue, DateTime.MinValue, false, 0m, null), false)
+        ];
+
+        public sealed record Case(string Name, CreateOrder Order, bool ExpectedSuccess)
+            : ValueCase<CreateOrder>(Name, Order);
+    }
+
+    public static class AsyncRuleForEach
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("every line passes the async rule", [new OrderLine("SKU-1", 1), new OrderLine("SKU-2", 2)], true, null),
+            new("second line fails and reports its index", [new OrderLine("SKU-1", 1), new OrderLine("TAKEN", 2)], false, "Lines[1]"),
+            new("null collection is skipped", null, true, null)
+        ];
+
+        public sealed record Case(string Name, IReadOnlyList<OrderLine>? Lines, bool ExpectedSuccess, string? ExpectedPropertyPath)
+            : ValueCase<IReadOnlyList<OrderLine>?>(Name, Lines);
+    }
+
+    public static class AsyncMode
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("aggregate collects every failing rule", MustValidationMode.Aggregate, 3),
+            new("stop-on-first-failure keeps only the first failing rule", MustValidationMode.StopOnFirstFailure, 1)
+        ];
+
+        public sealed record Case(string Name, MustValidationMode Mode, int ExpectedFailureCount)
+            : ValueCase<MustValidationMode>(Name, Mode);
+    }
+
+    public static class AsyncNullArguments
+    {
+        public static TheoryData<bool> Cases => [true];
+    }
+
+    public static class AsyncSynchronousUse
+    {
+        public static TheoryData<bool> Cases => [true];
+    }
+
+    public static class AsyncOrderingAndCancellation
+    {
+        public static TheoryData<bool> Cases => [true];
+    }
+
+    public static class AsyncConditions
+    {
+        public static TheoryData<bool> Cases => [true];
+    }
+
+    public static class ModeDispatch
+    {
+        public static TheoryData<bool> Cases => [true];
+    }
+
+    public static class HasAsyncRulesProbe
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("a validator with only sync rules declares no async rules", false),
+            new("a validator with one async rule declares async rules", true)
+        ];
+
+        public sealed record Case(string Name, bool RegisterAsyncRule)
+            : ValueCase<bool>(Name, RegisterAsyncRule);
+    }
+
+    /// <summary>
+    /// Exposes the <see langword="protected"/> <c>HasAsyncRules</c> flag of a derived validator, which is
+    /// the only way a subclass author sees it.
+    /// </summary>
+    public sealed class AsyncRuleProbeValidator : MustValidator<OrderLine>
+    {
+        public AsyncRuleProbeValidator(bool registerAsyncRule)
+        {
+            RuleFor(x => x.Quantity, quantity => MustResult<int>.Ok(quantity));
+
+            if (registerAsyncRule)
+                RuleForAsync(x => x.Sku, (sku, _) => new ValueTask<MustResult<string>>(MustResult<string>.Ok(sku!)));
+        }
+
+        public bool AsyncRulesRegistered => HasAsyncRules;
+    }
+
+    /// <summary>
+    /// Implements the non-generic contract only, so the <see cref="IMustValidator"/> mode default
+    /// interface member — the one <see cref="IMustValidator{T}"/> reimplements for typed validators — is
+    /// the member that actually runs.
+    /// </summary>
+    public sealed class HandRolledNonGenericValidator : IMustValidator
+    {
+        public Type ValidatedType => typeof(OrderLine);
+
+        public MustValidationResult Validate(object? value) =>
+            value is OrderLine { Sku: not null }
+                ? MustValidationResult.Ok()
+                : MustValidationResult.Fail(new MustFailure("Sku", "sample.sku.blank", "Sku must not be blank.", null));
+
+        public ValueTask<MustValidationResult> ValidateAsync(object? value, CancellationToken cancellationToken = default) =>
+            new(Validate(value));
+    }
+
     public sealed class HandRolledOrderLineValidator : IMustValidator<OrderLine>
     {
         public MustValidationResult Validate(OrderLine value) =>

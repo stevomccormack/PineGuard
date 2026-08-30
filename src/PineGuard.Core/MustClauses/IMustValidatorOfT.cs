@@ -31,6 +31,19 @@ public interface IMustValidator<in T> : IMustValidator
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     ValueTask<MustValidationResult> ValidateAsync(T value, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Validates <paramref name="value"/> asynchronously, stopping as <paramref name="mode"/> dictates.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="mode">Whether to collect every failure or stop at the first rule that fails.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <remarks>
+    /// A default interface member so the mode was additive: a validator that does not honour it still
+    /// answers in <see cref="MustValidationMode.Aggregate"/>, which is the documented default.
+    /// </remarks>
+    ValueTask<MustValidationResult> ValidateAsync(T value, MustValidationMode mode, CancellationToken cancellationToken = default) =>
+        ValidateAsync(value, cancellationToken);
+
     /// <inheritdoc/>
     Type IMustValidator.ValidatedType => typeof(T);
 
@@ -40,4 +53,8 @@ public interface IMustValidator<in T> : IMustValidator
     /// <inheritdoc/>
     ValueTask<MustValidationResult> IMustValidator.ValidateAsync(object? value, CancellationToken cancellationToken) =>
         ValidateAsync(MustValidatorCast.To<T>(value), cancellationToken);
+
+    /// <inheritdoc/>
+    ValueTask<MustValidationResult> IMustValidator.ValidateAsync(object? value, MustValidationMode mode, CancellationToken cancellationToken) =>
+        ValidateAsync(MustValidatorCast.To<T>(value), mode, cancellationToken);
 }

@@ -136,6 +136,56 @@ public static class FluentExtension
         where TProp : struct
         => ruleBuilder.MustBe<T, TProp?, TProp?>(check, message, code);
 
+    /// <summary>
+    /// Validates the property value by delegating to a PineGuard asynchronous
+    /// <see cref="MustResult{T}"/>-returning check function.
+    /// </summary>
+    /// <typeparam name="T">The type of the model being validated.</typeparam>
+    /// <typeparam name="TProp">The type of the property being validated.</typeparam>
+    /// <typeparam name="TResult">The result type returned by the PineGuard check.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="check">A function that accepts the property value and a cancellation token and returns a <see cref="MustResult{T}"/>.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the message from the <see cref="MustResult{T}"/>.</param>
+    /// <param name="code">
+    /// The <c>MustCodes</c> catalogue constant identifying the clause being adapted. When non-<see langword="null"/>,
+    /// emitted as the rule's <c>ErrorCode</c> via <c>WithErrorCode</c>.
+    /// Fixed at rule-build time — FluentValidation's <c>ErrorCode</c> cannot vary per invocation.
+    /// </param>
+    /// <returns>An <see cref="IRuleBuilderOptions{T, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Built on FluentValidation's <c>MustAsync</c>, so the rule only runs under <c>ValidateAsync</c>;
+    /// a synchronous <c>Validate</c> on a validator carrying one throws, which is FluentValidation's own behaviour.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// ruleBuilder.MustBeAsync((val, ct) => Must.Be.SatisfiesAsync(val, users.IsAvailableAsync, ct, paramName: null), message, MustCodes.Predicate.Result.False);
+    /// </code>
+    /// </example>
+    public static IRuleBuilderOptions<T, TProp> MustBeAsync<T, TProp, TResult>(this IRuleBuilder<T, TProp> ruleBuilder,
+        Func<TProp, CancellationToken, ValueTask<MustResult<TResult>>> check,
+        string? message,
+        string? code = null)
+    {
+        ThrowHelper.ThrowIfNull(ruleBuilder);
+        ThrowHelper.ThrowIfNull(check);
+
+        var rule = ruleBuilder
+            .MustAsync(async (_, value, context, cancellationToken) =>
+            {
+                var result = await check(value, cancellationToken).ConfigureAwait(false);
+                if (result.Success)
+                    return true;
+
+                var propertyName = GetPropertyName(context);
+                var errorMessage = FormatMessage(message ?? result.Message, propertyName);
+                context.MessageFormatter.AppendArgument("ErrorMessage", errorMessage);
+                return false;
+            })
+            .WithMessage("{ErrorMessage}");
+
+        return code is null ? rule : rule.WithErrorCode(code);
+    }
+
     private static string FormatMessage(string template, string paramName) =>
         template.Replace(ParamNameToken, paramName, StringComparison.Ordinal);
 
