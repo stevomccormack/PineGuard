@@ -1,4 +1,6 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.HttpRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -87,5 +89,15 @@ public static class HttpAttributesTestData
             new(nameof(F.IsHttpStatusClientError.InRange),   F.IsHttpStatusClientError.InRange,   false),
             new(nameof(F.IsHttpStatusServerError.InRange),   F.IsHttpStatusServerError.InRange,   false)
         ];
+    }
+
+    public static class MediaType
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsMediaType.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.IsMediaType.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a valid media type.", Code: MustCodes.Http.MediaType.Invalid)
+        });
     }
 }
