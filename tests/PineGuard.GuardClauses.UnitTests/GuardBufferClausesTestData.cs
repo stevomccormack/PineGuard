@@ -46,4 +46,12 @@ public static class GuardBufferClausesTestData
 
         public static TheoryData<GuardCase<string?>> InvalidCases => F.IsBase64Url.AllInvalid.ToGuardCases(s => new GuardExpected(false, s.IsNull ? typeof(ArgumentNullException) : typeof(ArgumentException), "value", Code: MustCodes.Encoding.Base64url.Invalid));
     }
+
+    // Guard.Against.NotUtf8 — throws when value is NOT well-formed UTF-8 (delegates to Must.Be.Utf8)
+    public static class NotUtf8
+    {
+        public static TheoryData<GuardCase<byte[]?>> ValidCases => F.IsUtf8.AllValid.ToGuardCases();
+
+        public static TheoryData<GuardCase<byte[]?>> InvalidCases => F.IsUtf8.AllInvalid.ToGuardCases(s => new GuardExpected(false, s.IsNull ? typeof(ArgumentNullException) : typeof(ArgumentException), "value", Code: MustCodes.Encoding.Utf8.Invalid));
+    }
 }
