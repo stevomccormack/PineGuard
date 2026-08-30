@@ -59,4 +59,36 @@ public static class BufferUtilityTestData
         public sealed record ValidCase(string Name, string? Value, bool Expected)
             : IsCase<string?>(Name, Value, Expected);
     }
+
+    public static class IsBase64UrlString
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("unpadded", "SGVsbG8", true),
+            new("padded", "SGVsbG8=", true),
+            new("url-safe alphabet", "-_-_", true),
+            new("trimmed", "  SGVsbG8  ", true)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("two chars unpadded", "QQ", true),
+            new("two chars padded", "AA==", true),
+            new("null", null, false),
+            new("empty", "", false),
+            new("whitespace", " ", false),
+            new("base64 plus", "SGVsbG8+", false),
+            new("base64 slash", "SGVsbG8/", false),
+            new("embedded space", "SG Vsb", false),
+            new("padding in middle", "A=BC", false),
+            new("length 1", "A", false),
+            new("length 5", "AAAAA", false),
+            new("bad padding", "QQ=", false),
+            new("too much padding", "====", false),
+            new("only padding", "==", false)
+        ];
+
+        public sealed record ValidCase(string Name, string? Value, bool Expected)
+            : IsCase<string?>(Name, Value, Expected);
+    }
 }
