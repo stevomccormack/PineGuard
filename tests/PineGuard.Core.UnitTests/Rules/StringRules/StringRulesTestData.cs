@@ -241,4 +241,9 @@ public static class StringRulesTestData
     {
         public static TheoryData<RuleCase<string?>> Cases => F.HasByteOrderMark.AllScenarios.ToRuleCases();
     }
+
+    public static class IsWellFormedUtf16
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.IsWellFormedUtf16.AllScenarios.ToRuleCases();
+    }
 }

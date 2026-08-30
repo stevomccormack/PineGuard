@@ -254,5 +254,18 @@ public static partial class MustCodes
             /// <summary><c>text.bom.present</c></summary>
             public const string Present = Prefix + ".present";
         }
+
+        /// <summary>Unicode integrity: surrogate pairing and normalization form.</summary>
+        public static class Unicode
+        {
+            /// <summary>The code prefix for this node (<c>"text.unicode"</c>).</summary>
+            public const string Prefix = Text.Prefix + ".unicode";
+
+            /// <summary><c>text.unicode.malformed</c></summary>
+            public const string Malformed = Prefix + ".malformed";
+
+            /// <summary><c>text.unicode.well-formed</c></summary>
+            public const string WellFormed = Prefix + ".well-formed";
+        }
     }
 }
