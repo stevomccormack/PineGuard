@@ -148,3 +148,41 @@ public sealed class HttpStatusSuccessAttribute() : ValidationAttributeBase(typeo
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is a valid media type.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustHttpClauses.MediaType"/>. Supported on properties, fields, and parameters
+/// of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// The RFC 6838 <c>type/subtype</c> shape is required, with an optional <c>+suffix</c> and an optional
+/// trailing parameter list. The parameters are accepted and ignored: the verdict is about the media type
+/// the value leads with. If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class RequestModel
+/// {
+///     [MediaType]
+///     public string RequestedFormat { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="MustHttpClauses.MediaType"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/http">HTTP Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class MediaTypeAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Http.MediaType.Invalid)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+
+        var result = Must.Be.MediaType(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
