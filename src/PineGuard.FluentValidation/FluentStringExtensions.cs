@@ -1090,4 +1090,51 @@ public static class FluentStringExtensions
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotEndsWith(val, suffix, comparison, paramName: null) : MustResult<string>.Ok(null!),
             message, MustCodes.Text.Content.EndsWith);
+
+    /// <summary>
+    /// Validates that the property value starts with the Unicode byte-order mark (<c>U+FEFF</c>).
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.HasByteOrderMark"/>. Only a leading <c>U+FEFF</c> counts — the same
+    /// character anywhere else is a zero-width no-break space. If the value is <see langword="null"/>,
+    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.FileContent).HasByteOrderMark();
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.HasByteOrderMark"/>
+    public static IRuleBuilderOptions<TModel, string?> HasByteOrderMark<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.HasByteOrderMark(val, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Bom.Missing);
+
+    /// <summary>
+    /// Validates that the property value does not start with the Unicode byte-order mark (<c>U+FEFF</c>).
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustStringClauses.NotHasByteOrderMark"/>. This is the forbidden state most callers want:
+    /// a byte-order mark that survives decoding silently breaks equality, prefix matching, and numeric parsing.
+    /// If the value is <see langword="null"/>, validation passes (null values should be handled by a separate
+    /// <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.ImportedField).NotHasByteOrderMark();
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.NotHasByteOrderMark"/>
+    public static IRuleBuilderOptions<TModel, string?> NotHasByteOrderMark<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotHasByteOrderMark(val, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Text.Bom.Present);
 }

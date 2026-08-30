@@ -239,6 +239,16 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
         public NotEndsWithValidator(string suffix, StringComparison comparison) => RuleFor(x => x.Value).NotEndsWith(suffix, comparison);
     }
 
+    private sealed class HasByteOrderMarkValidator : AbstractValidator<StringModel>
+    {
+        public HasByteOrderMarkValidator() => RuleFor(x => x.Value).HasByteOrderMark();
+    }
+
+    private sealed class NotHasByteOrderMarkValidator : AbstractValidator<StringModel>
+    {
+        public NotHasByteOrderMarkValidator() => RuleFor(x => x.Value).NotHasByteOrderMark();
+    }
+
     [Theory]
     [MemberData(nameof(FluentStringExtensionsTestData.NotNullOrEmpty.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotNullOrEmpty))]
     public void NotNullOrEmpty_BehavesAsExpected(FluentCase<string?> tc)
@@ -604,6 +614,30 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
     public void NotEndsWith_BehavesAsExpected(FluentCase<(string? value, string suffix, StringComparison comparison)> tc)
     {
         var result = new NotEndsWithValidator(tc.Value.suffix, tc.Value.comparison).Validate(new StringModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.HasByteOrderMark
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.HasByteOrderMark.Cases), MemberType = typeof(FluentStringExtensionsTestData.HasByteOrderMark))]
+    public void HasByteOrderMark_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new HasByteOrderMarkValidator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringExtensions.NotHasByteOrderMark
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.NotHasByteOrderMark.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotHasByteOrderMark))]
+    public void NotHasByteOrderMark_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new NotHasByteOrderMarkValidator().Validate(new StringModel { Value = tc.Value });
+
+        // Assert
         AssertResult(tc, result);
     }
 }
