@@ -138,4 +138,48 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsWeekday.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsWeekday))]
+    public void IsWeekday_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsWeekday(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsWeekend.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsWeekend))]
+    public void IsWeekend_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsWeekend(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsFirstDayOfMonth.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsFirstDayOfMonth))]
+    public void IsFirstDayOfMonth_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsFirstDayOfMonth(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsLastDayOfMonth.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsLastDayOfMonth))]
+    public void IsLastDayOfMonth_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsLastDayOfMonth(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

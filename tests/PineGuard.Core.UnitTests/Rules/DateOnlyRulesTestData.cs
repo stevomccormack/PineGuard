@@ -91,4 +91,24 @@ public static class DateOnlyRulesTestData
     {
         public static TheoryData<RuleCase<(DateOnly? value, DateOnly? reference, int days)>> Cases => F.IsWithin.AllScenarios.ToRuleCases();
     }
+
+    public static class IsWeekday
+    {
+        public static TheoryData<RuleCase<DateOnly?>> Cases => F.IsWeekday.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsWeekend
+    {
+        public static TheoryData<RuleCase<DateOnly?>> Cases => F.IsWeekend.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsFirstDayOfMonth
+    {
+        public static TheoryData<RuleCase<DateOnly?>> Cases => F.IsFirstDayOfMonth.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsLastDayOfMonth
+    {
+        public static TheoryData<RuleCase<DateOnly?>> Cases => F.IsLastDayOfMonth.AllScenarios.ToRuleCases();
+    }
 }

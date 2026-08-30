@@ -253,6 +253,106 @@ public static class DateTimeOffsetRulesFixtures
         public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? reference, int months)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class IsWeekday
+    {
+        public static readonly DateTimeOffset? Monday = new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset? Friday = new DateTimeOffset(2024, 01, 05, 0, 0, 0, TimeSpan.Zero);
+        // Wall-clock Friday, but 2024-01-06T04:00Z (Saturday) in UTC — pins the offset-local reading.
+        public static readonly DateTimeOffset? FridayLateNegativeOffset = new DateTimeOffset(2024, 01, 05, 23, 0, 0, TimeSpan.FromHours(-5));
+        public static readonly DateTimeOffset? Saturday = new DateTimeOffset(2024, 01, 06, 0, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset? Sunday = new DateTimeOffset(2024, 01, 07, 0, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset? NullValue = null;
+
+        public static RuleScenario<DateTimeOffset?>[] ValidScenarios =>
+        [
+            new(nameof(Monday), Monday, true),
+            new(nameof(Friday), Friday, true),
+            new(nameof(FridayLateNegativeOffset), FridayLateNegativeOffset, true)
+        ];
+
+        public static RuleScenario<DateTimeOffset?>[] InvalidScenarios =>
+        [
+            new(nameof(Saturday), Saturday, false),
+            new(nameof(Sunday), Sunday, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateTimeOffset?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsWeekend
+    {
+        public static readonly DateTimeOffset? Saturday = new DateTimeOffset(2024, 01, 06, 0, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset? Sunday = new DateTimeOffset(2024, 01, 07, 0, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset? Monday = new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero);
+        // Wall-clock Friday, but 2024-01-06T04:00Z (Saturday) in UTC — pins the offset-local reading.
+        public static readonly DateTimeOffset? FridayLateNegativeOffset = new DateTimeOffset(2024, 01, 05, 23, 0, 0, TimeSpan.FromHours(-5));
+        public static readonly DateTimeOffset? NullValue = null;
+
+        public static RuleScenario<DateTimeOffset?>[] ValidScenarios =>
+        [
+            new(nameof(Saturday), Saturday, true),
+            new(nameof(Sunday), Sunday, true)
+        ];
+
+        public static RuleScenario<DateTimeOffset?>[] InvalidScenarios =>
+        [
+            new(nameof(Monday), Monday, false),
+            new(nameof(FridayLateNegativeOffset), FridayLateNegativeOffset, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateTimeOffset?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsFirstDayOfMonth
+    {
+        public static readonly DateTimeOffset? FirstDay = new DateTimeOffset(2024, 02, 01, 12, 0, 0, TimeSpan.Zero);
+        // Wall-clock 1 February, but 2024-01-31T20:00Z in UTC — pins the offset-local reading.
+        public static readonly DateTimeOffset? FirstDayEarlyPositiveOffset = new DateTimeOffset(2024, 02, 01, 1, 0, 0, TimeSpan.FromHours(5));
+        public static readonly DateTimeOffset? NotFirst = new DateTimeOffset(2024, 02, 02, 12, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset? NullValue = null;
+
+        public static RuleScenario<DateTimeOffset?>[] ValidScenarios =>
+        [
+            new(nameof(FirstDay), FirstDay, true),
+            new(nameof(FirstDayEarlyPositiveOffset), FirstDayEarlyPositiveOffset, true)
+        ];
+
+        public static RuleScenario<DateTimeOffset?>[] InvalidScenarios =>
+        [
+            new(nameof(NotFirst), NotFirst, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateTimeOffset?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsLastDayOfMonth
+    {
+        public static readonly DateTimeOffset? LastDayOfLeapFebruary = new DateTimeOffset(2024, 02, 29, 12, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset? LastDayOfNonLeapFebruary = new DateTimeOffset(2023, 02, 28, 12, 0, 0, TimeSpan.Zero);
+        // Wall-clock 29 February, but 2024-03-01T04:00Z in UTC — pins the offset-local reading.
+        public static readonly DateTimeOffset? LastDayLateNegativeOffset = new DateTimeOffset(2024, 02, 29, 23, 0, 0, TimeSpan.FromHours(-5));
+        public static readonly DateTimeOffset? NotLast = new DateTimeOffset(2024, 02, 28, 12, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset? NullValue = null;
+
+        public static RuleScenario<DateTimeOffset?>[] ValidScenarios =>
+        [
+            new(nameof(LastDayOfLeapFebruary), LastDayOfLeapFebruary, true),
+            new(nameof(LastDayOfNonLeapFebruary), LastDayOfNonLeapFebruary, true),
+            new(nameof(LastDayLateNegativeOffset), LastDayLateNegativeOffset, true)
+        ];
+
+        public static RuleScenario<DateTimeOffset?>[] InvalidScenarios =>
+        [
+            new(nameof(NotLast), NotLast, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateTimeOffset?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class IsPast
     {
         public static readonly DateTimeOffset? PastDate = new DateTimeOffset(2000, 01, 10, 0, 0, 0, TimeSpan.Zero);
