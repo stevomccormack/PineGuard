@@ -156,6 +156,17 @@ public static partial class MustStringClausesTestData
            : IsCase<(string? Value, Regex Pattern)>(Name, Value, Expected);
     }
 
+    public static class RegexPattern
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.IsRegexPattern.ValidScenarios.ToMustCases();
+
+        public static TheoryData<MustCase<string?>> InvalidCases => F.IsRegexPattern.InvalidScenarios.ToMustCases(s => s.Name switch
+        {
+            nameof(F.IsRegexPattern.NullValue) => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Pattern.Invalid),
+            _ => new MustExpected(false, "value must be a valid regular expression pattern.", Code: MustCodes.Text.Pattern.Invalid)
+        });
+    }
+
     public static class Alphabetic
     {
         public static TheoryData<ValidCase> ValidCases =>

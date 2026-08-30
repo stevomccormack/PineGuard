@@ -499,6 +499,43 @@ public static class MustStringClauses
     }
 
     /// <summary>
+    /// Validates that the specified string is itself a well-formed regular expression pattern.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The pattern to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> compiles as a regular expression, or <see langword="false"/> with a descriptive
+    /// <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// This validates the pattern, not a value against a pattern — <see cref="Match"/> does the latter. It is what
+    /// a caller reaches for when the pattern arrives as configuration or user input, so that a malformed one is
+    /// reported as a failure rather than thrown from deep inside a validator. Returns a failed result immediately
+    /// if <paramref name="value"/> is <see langword="null"/>. Delegates to <see cref="StringRules.IsRegexPattern"/>,
+    /// which checks syntax only: a pattern that compiles can still be catastrophically slow. The failure message
+    /// follows the pattern <c>"{paramName} must be a valid regular expression pattern."</c>
+    /// </remarks>
+    /// <seealso cref="StringRules.IsRegexPattern"/>
+    /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
+    public static MustResult<string> RegexPattern(this IMustClause _,
+        string? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Pattern.Invalid, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must be a valid regular expression pattern.";
+
+        var ok = StringRules.IsRegexPattern(value);
+        return MustResult<string>.FromBool(ok, MustCodes.Text.Pattern.Invalid, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
     /// Validates that the specified string contains only alphabetic characters.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>

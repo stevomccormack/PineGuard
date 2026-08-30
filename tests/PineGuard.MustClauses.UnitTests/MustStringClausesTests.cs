@@ -154,6 +154,18 @@ public class MustStringClausesTests(ITestOutputHelper output) : BaseMustUnitTest
     }
 
     [Theory]
+    [MemberData(nameof(MustStringClausesTestData.RegexPattern.ValidCases), MemberType = typeof(MustStringClausesTestData.RegexPattern))]
+    [MemberData(nameof(MustStringClausesTestData.RegexPattern.InvalidCases), MemberType = typeof(MustStringClausesTestData.RegexPattern))]
+    public void RegexPattern_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Act
+        var result = Must.Be.RegexPattern(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(MustStringClausesTestData.Alphabetic.ValidCases), MemberType = typeof(MustStringClausesTestData.Alphabetic))]
     public void Alphabetic_Checks(MustStringClausesTestData.Alphabetic.ValidCase testCase)
     {
