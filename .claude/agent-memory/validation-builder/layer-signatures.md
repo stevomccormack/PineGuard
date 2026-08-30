@@ -37,6 +37,11 @@ Do not read that as "not covered" — confirm with
 `-Mode Analyze -Scope <layer> -IncludeClassNameRegex 'MustToken|MustCron'`, which prints a summary
 scoped to just those classes.
 
+The scope-wide `Line coverage:` / `Branch coverage:` summary is printed *above* that Top-30 table, so
+piping the run to `tail` shows the table and hides the only numbers that matter. Grep instead:
+`| grep -E 'Scope:|Found [0-9]+ classes|Line coverage|Branch coverage|<YourClass>'`. Single-TFM runs
+take `-Framework net8.0` / `-Framework net10.0`; with `-Enforce100` the script's exit code is the gate.
+
 ## MustClause parsed-result contract
 
 When `MustResult<T>.Result` should carry the parsed/normalized value, call `Utility.TryXxx(value, out var parsed)`
