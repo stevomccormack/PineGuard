@@ -405,4 +405,24 @@ public static class StringAttributesTestData
             _ => new DataAnnotationExpected(true)
         });
     }
+
+    public static class WellFormedUtf16
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsWellFormedUtf16.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.IsWellFormedUtf16.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be well-formed UTF-16.", Code: MustCodes.Text.Unicode.Malformed)
+        });
+    }
+
+    public static class NotWellFormedUtf16
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsWellFormedUtf16.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.IsWellFormedUtf16.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be well-formed UTF-16.", Code: MustCodes.Text.Unicode.WellFormed),
+            _ => new DataAnnotationExpected(true)
+        });
+    }
 }
