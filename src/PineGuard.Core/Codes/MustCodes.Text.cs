@@ -240,6 +240,9 @@ public static partial class MustCodes
 
             /// <summary><c>text.pattern.match</c></summary>
             public const string Match = Prefix + ".match";
+
+            /// <summary><c>text.pattern.invalid</c></summary>
+            public const string Invalid = Prefix + ".invalid";
         }
     }
 }
