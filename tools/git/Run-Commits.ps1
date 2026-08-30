@@ -23,6 +23,9 @@
 .PARAMETER DataAnnotations
     See the param block for details.
 
+.PARAMETER Options
+    See the param block for details.
+
 .PARAMETER Testing
     See the param block for details.
 
@@ -68,6 +71,7 @@ param(
     [switch]$GuardClauses,
     [switch]$FluentValidation,
     [switch]$DataAnnotations,
+    [switch]$Options,
     [switch]$Testing,
     [switch]$Docs,
     [switch]$Tools,
@@ -101,6 +105,7 @@ if ($All.IsPresent) {
     $GuardClauses = $true
     $FluentValidation = $true
     $DataAnnotations = $true
+    $Options = $true
     $Testing = $true
     $Docs = $true
     $Tools = $true
@@ -108,7 +113,7 @@ if ($All.IsPresent) {
     $IncludeTests = $true
 }
 
-$any = $Agent -or $Core -or $MustClauses -or $GuardClauses -or $FluentValidation -or $DataAnnotations -or $Testing -or $Docs -or $Tools -or $Solution
+$any = $Agent -or $Core -or $MustClauses -or $GuardClauses -or $FluentValidation -or $DataAnnotations -or $Options -or $Testing -or $Docs -or $Tools -or $Solution
 if (-not $any) {
     throw 'No scopes selected. Use -All or specify one or more scopes (e.g. -Core -Tools).'
 }
@@ -156,6 +161,7 @@ if ($MustClauses) { Invoke-ScopedCommit -ScriptName 'Commit-MustClauses.ps1' -In
 if ($GuardClauses) { Invoke-ScopedCommit -ScriptName 'Commit-GuardClauses.ps1' -IncludeTests:$IncludeTests.IsPresent }
 if ($FluentValidation) { Invoke-ScopedCommit -ScriptName 'Commit-FluentValidation.ps1' -IncludeTests:$IncludeTests.IsPresent }
 if ($DataAnnotations) { Invoke-ScopedCommit -ScriptName 'Commit-DataAnnotations.ps1' -IncludeTests:$IncludeTests.IsPresent }
+if ($Options) { Invoke-ScopedCommit -ScriptName 'Commit-Options.ps1' -IncludeTests:$IncludeTests.IsPresent }
 
 if ($AutoRebase.IsPresent -and -not $DryRun.IsPresent) {
     Invoke-AutoRebaseIfNeeded -RepoRoot $repoRoot -Remote $Remote
