@@ -1,4 +1,6 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -244,5 +246,143 @@ public static class StringAttributesTestData
         public static TheoryData<ValidCase> ValidCases => [new("has x", "axb", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases => [new("none", "abc", false)];
+    }
+
+    public static class Contains
+    {
+        public static readonly string Substring = F.Contains.Present.substring;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.Contains.Present), F.Contains.Present.value, new DataAnnotationExpected(true)),
+            new(nameof(F.Contains.CaseMismatch), F.Contains.CaseMismatch.value, new DataAnnotationExpected(false, "Value must contain the specified substring.", Code: MustCodes.Text.Content.NotContains)),
+            new(nameof(F.Contains.NullValue), F.Contains.NullValue.value, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class ContainsIgnoringCase
+    {
+        public static readonly string Substring = F.Contains.PresentIgnoringCase.substring;
+        public static readonly StringComparison Comparison = F.Contains.PresentIgnoringCase.comparison;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.Contains.PresentIgnoringCase), F.Contains.PresentIgnoringCase.value, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class NotContains
+    {
+        public static readonly string Substring = F.Contains.Present.substring;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.Contains.CaseMismatch), F.Contains.CaseMismatch.value, new DataAnnotationExpected(true)),
+            new(nameof(F.Contains.Present), F.Contains.Present.value, new DataAnnotationExpected(false, "Value must not contain the specified substring.", Code: MustCodes.Text.Content.Contains)),
+            new(nameof(F.Contains.NullValue), F.Contains.NullValue.value, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class NotContainsIgnoringCase
+    {
+        public static readonly string Substring = F.Contains.PresentIgnoringCase.substring;
+        public static readonly StringComparison Comparison = F.Contains.PresentIgnoringCase.comparison;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.Contains.PresentIgnoringCase), F.Contains.PresentIgnoringCase.value, new DataAnnotationExpected(false, "Value must not contain the specified substring.", Code: MustCodes.Text.Content.Contains))
+        ];
+    }
+
+    public static class StartsWith
+    {
+        public static readonly string Prefix = F.StartsWith.Prefixed.prefix;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.StartsWith.Prefixed), F.StartsWith.Prefixed.value, new DataAnnotationExpected(true)),
+            new(nameof(F.StartsWith.CaseMismatch), F.StartsWith.CaseMismatch.value, new DataAnnotationExpected(false, "Value must start with the specified prefix.", Code: MustCodes.Text.Content.NotStartsWith)),
+            new(nameof(F.StartsWith.NullValue), F.StartsWith.NullValue.value, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class StartsWithIgnoringCase
+    {
+        public static readonly string Prefix = F.StartsWith.PrefixedIgnoringCase.prefix;
+        public static readonly StringComparison Comparison = F.StartsWith.PrefixedIgnoringCase.comparison;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.StartsWith.PrefixedIgnoringCase), F.StartsWith.PrefixedIgnoringCase.value, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class NotStartsWith
+    {
+        public static readonly string Prefix = F.StartsWith.Prefixed.prefix;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.StartsWith.CaseMismatch), F.StartsWith.CaseMismatch.value, new DataAnnotationExpected(true)),
+            new(nameof(F.StartsWith.Prefixed), F.StartsWith.Prefixed.value, new DataAnnotationExpected(false, "Value must not start with the specified prefix.", Code: MustCodes.Text.Content.StartsWith)),
+            new(nameof(F.StartsWith.NullValue), F.StartsWith.NullValue.value, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class NotStartsWithIgnoringCase
+    {
+        public static readonly string Prefix = F.StartsWith.PrefixedIgnoringCase.prefix;
+        public static readonly StringComparison Comparison = F.StartsWith.PrefixedIgnoringCase.comparison;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.StartsWith.PrefixedIgnoringCase), F.StartsWith.PrefixedIgnoringCase.value, new DataAnnotationExpected(false, "Value must not start with the specified prefix.", Code: MustCodes.Text.Content.StartsWith))
+        ];
+    }
+
+    public static class EndsWith
+    {
+        public static readonly string Suffix = F.EndsWith.Suffixed.suffix;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.EndsWith.Suffixed), F.EndsWith.Suffixed.value, new DataAnnotationExpected(true)),
+            new(nameof(F.EndsWith.CaseMismatch), F.EndsWith.CaseMismatch.value, new DataAnnotationExpected(false, "Value must end with the specified suffix.", Code: MustCodes.Text.Content.NotEndsWith)),
+            new(nameof(F.EndsWith.NullValue), F.EndsWith.NullValue.value, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class EndsWithIgnoringCase
+    {
+        public static readonly string Suffix = F.EndsWith.SuffixedIgnoringCase.suffix;
+        public static readonly StringComparison Comparison = F.EndsWith.SuffixedIgnoringCase.comparison;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.EndsWith.SuffixedIgnoringCase), F.EndsWith.SuffixedIgnoringCase.value, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class NotEndsWith
+    {
+        public static readonly string Suffix = F.EndsWith.Suffixed.suffix;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.EndsWith.CaseMismatch), F.EndsWith.CaseMismatch.value, new DataAnnotationExpected(true)),
+            new(nameof(F.EndsWith.Suffixed), F.EndsWith.Suffixed.value, new DataAnnotationExpected(false, "Value must not end with the specified suffix.", Code: MustCodes.Text.Content.EndsWith)),
+            new(nameof(F.EndsWith.NullValue), F.EndsWith.NullValue.value, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class NotEndsWithIgnoringCase
+    {
+        public static readonly string Suffix = F.EndsWith.SuffixedIgnoringCase.suffix;
+        public static readonly StringComparison Comparison = F.EndsWith.SuffixedIgnoringCase.comparison;
+
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new(nameof(F.EndsWith.SuffixedIgnoringCase), F.EndsWith.SuffixedIgnoringCase.value, new DataAnnotationExpected(false, "Value must not end with the specified suffix.", Code: MustCodes.Text.Content.EndsWith))
+        ];
     }
 }

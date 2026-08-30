@@ -1,9 +1,10 @@
 using PineGuard.Codes;
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
+using Xunit.Abstractions;
 
 namespace PineGuard.MustClauses.UnitTests;
 
-public class MustStringClausesTests : BaseUnitTest
+public class MustStringClausesTests(ITestOutputHelper output) : BaseMustUnitTest(output)
 {
     [Theory]
     [MemberData(nameof(MustStringClausesTestData.NullOrEmpty.ValidCases), MemberType = typeof(MustStringClausesTestData.NullOrEmpty))]
@@ -834,6 +835,108 @@ public class MustStringClausesTests : BaseUnitTest
         var result = Must.Be.ContainsAny(input, testCase.Value.Chars);
         Assert.Equal(testCase.Expected, result.Success);
         Assert.Equal(testCase.ParamName, result.ParamName);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.Contains.ValidCases), MemberType = typeof(MustStringClausesTestData.Contains))]
+    [MemberData(nameof(MustStringClausesTestData.Contains.InvalidCases), MemberType = typeof(MustStringClausesTestData.Contains))]
+    [MemberData(nameof(MustStringClausesTestData.Contains.NullCases), MemberType = typeof(MustStringClausesTestData.Contains))]
+    [MemberData(nameof(MustStringClausesTestData.Contains.NullSubstringCases), MemberType = typeof(MustStringClausesTestData.Contains))]
+    public void Contains_BehavesAsExpected(MustCase<(string? value, string substring, StringComparison comparison)> tc)
+    {
+        // Arrange
+        var (value, substring, comparison) = tc.Value;
+
+        // Act
+        var result = Must.Be.Contains(value, substring, comparison, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.NotContains.ValidCases), MemberType = typeof(MustStringClausesTestData.NotContains))]
+    [MemberData(nameof(MustStringClausesTestData.NotContains.InvalidCases), MemberType = typeof(MustStringClausesTestData.NotContains))]
+    [MemberData(nameof(MustStringClausesTestData.NotContains.NullCases), MemberType = typeof(MustStringClausesTestData.NotContains))]
+    [MemberData(nameof(MustStringClausesTestData.NotContains.NullSubstringCases), MemberType = typeof(MustStringClausesTestData.NotContains))]
+    public void NotContains_BehavesAsExpected(MustCase<(string? value, string substring, StringComparison comparison)> tc)
+    {
+        // Arrange
+        var (value, substring, comparison) = tc.Value;
+
+        // Act
+        var result = Must.Be.NotContains(value, substring, comparison, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.StartsWith.ValidCases), MemberType = typeof(MustStringClausesTestData.StartsWith))]
+    [MemberData(nameof(MustStringClausesTestData.StartsWith.InvalidCases), MemberType = typeof(MustStringClausesTestData.StartsWith))]
+    [MemberData(nameof(MustStringClausesTestData.StartsWith.NullCases), MemberType = typeof(MustStringClausesTestData.StartsWith))]
+    [MemberData(nameof(MustStringClausesTestData.StartsWith.NullPrefixCases), MemberType = typeof(MustStringClausesTestData.StartsWith))]
+    public void StartsWith_BehavesAsExpected(MustCase<(string? value, string prefix, StringComparison comparison)> tc)
+    {
+        // Arrange
+        var (value, prefix, comparison) = tc.Value;
+
+        // Act
+        var result = Must.Be.StartsWith(value, prefix, comparison, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.NotStartsWith.ValidCases), MemberType = typeof(MustStringClausesTestData.NotStartsWith))]
+    [MemberData(nameof(MustStringClausesTestData.NotStartsWith.InvalidCases), MemberType = typeof(MustStringClausesTestData.NotStartsWith))]
+    [MemberData(nameof(MustStringClausesTestData.NotStartsWith.NullCases), MemberType = typeof(MustStringClausesTestData.NotStartsWith))]
+    [MemberData(nameof(MustStringClausesTestData.NotStartsWith.NullPrefixCases), MemberType = typeof(MustStringClausesTestData.NotStartsWith))]
+    public void NotStartsWith_BehavesAsExpected(MustCase<(string? value, string prefix, StringComparison comparison)> tc)
+    {
+        // Arrange
+        var (value, prefix, comparison) = tc.Value;
+
+        // Act
+        var result = Must.Be.NotStartsWith(value, prefix, comparison, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.EndsWith.ValidCases), MemberType = typeof(MustStringClausesTestData.EndsWith))]
+    [MemberData(nameof(MustStringClausesTestData.EndsWith.InvalidCases), MemberType = typeof(MustStringClausesTestData.EndsWith))]
+    [MemberData(nameof(MustStringClausesTestData.EndsWith.NullCases), MemberType = typeof(MustStringClausesTestData.EndsWith))]
+    [MemberData(nameof(MustStringClausesTestData.EndsWith.NullSuffixCases), MemberType = typeof(MustStringClausesTestData.EndsWith))]
+    public void EndsWith_BehavesAsExpected(MustCase<(string? value, string suffix, StringComparison comparison)> tc)
+    {
+        // Arrange
+        var (value, suffix, comparison) = tc.Value;
+
+        // Act
+        var result = Must.Be.EndsWith(value, suffix, comparison, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.NotEndsWith.ValidCases), MemberType = typeof(MustStringClausesTestData.NotEndsWith))]
+    [MemberData(nameof(MustStringClausesTestData.NotEndsWith.InvalidCases), MemberType = typeof(MustStringClausesTestData.NotEndsWith))]
+    [MemberData(nameof(MustStringClausesTestData.NotEndsWith.NullCases), MemberType = typeof(MustStringClausesTestData.NotEndsWith))]
+    [MemberData(nameof(MustStringClausesTestData.NotEndsWith.NullSuffixCases), MemberType = typeof(MustStringClausesTestData.NotEndsWith))]
+    public void NotEndsWith_BehavesAsExpected(MustCase<(string? value, string suffix, StringComparison comparison)> tc)
+    {
+        // Arrange
+        var (value, suffix, comparison) = tc.Value;
+
+        // Act
+        var result = Must.Be.NotEndsWith(value, suffix, comparison, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
     }
 
     private static void AssertCode(string expectedCode, MustResult<string> result)
