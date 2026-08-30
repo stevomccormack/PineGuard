@@ -21,4 +21,4 @@
 - [DA per-scenario config](data-annotations-per-scenario-config.md) — box the fixture tuple into `DataAnnotationCase.Value` when config varies per row; Pattern C only fits a fixed config
 - [Rule06/Rule08 publish defect](project_audit-rule06-rule08-publish-defect.md) — those audits fail on a multi-TFM `dotnet publish` bug, not your code; orchestrator needs pwsh 7
 - [Must complement test wiring](must-complement-test-wiring.md) — projecting one fixture group into a positive/`Not*` pair: the null-value case that can't be inverted, `Except`/`Only`, legacy `BaseUnitTest` migration
-- [Fluent adapter nuances](fluent-adapter-nuances.md) — the two null conventions in-repo and which is normative, config-param messages arriving pre-formatted, folding extra scenarios into the single `Cases`
+- [Fluent adapter nuances](fluent-adapter-nuances.md) — the two null conventions in-repo and which is normative, config-param messages arriving pre-formatted, folding extra scenarios into `Cases`, unconsumed validators hiding gaps
