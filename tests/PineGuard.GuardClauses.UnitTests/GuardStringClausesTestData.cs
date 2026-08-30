@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.GuardClauses;
@@ -607,5 +608,47 @@ public static partial class GuardStringClausesTestData
     {
         public static TheoryData<GuardCase<(string? value, string suffix, StringComparison comparison)>> ValidCases => F.EndsWith.InvalidScenarios.Except(nameof(F.EndsWith.NullValue)).ToGuardCases(_ => new GuardExpected(true));
         public static TheoryData<GuardCase<(string? value, string suffix, StringComparison comparison)>> InvalidCases => [.. F.EndsWith.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")), .. F.EndsWith.InvalidScenarios.Only(nameof(F.EndsWith.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value"))];
+    }
+
+    // Guard.Against.NotHasByteOrderMark — throws when value does NOT start with the byte-order mark (calls Must.Be.HasByteOrderMark)
+    public static class NotHasByteOrderMark
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.HasByteOrderMark.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<string?>> InvalidCases => F.HasByteOrderMark.InvalidScenarios.ToGuardCases(s => s.Inputs is null ? new GuardExpected(false, typeof(ArgumentNullException), "value", Code: MustCodes.Text.Bom.Missing) : new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Bom.Missing));
+    }
+
+    // Guard.Against.HasByteOrderMark — throws when value DOES start with the byte-order mark (calls Must.Be.NotHasByteOrderMark)
+    public static class HasByteOrderMark
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.HasByteOrderMark.InvalidScenarios.Except(nameof(F.HasByteOrderMark.NullValue)).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<string?>> InvalidCases => [.. F.HasByteOrderMark.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Bom.Present)), .. F.HasByteOrderMark.InvalidScenarios.Only(nameof(F.HasByteOrderMark.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value", Code: MustCodes.Text.Bom.Present))];
+    }
+
+    // Guard.Against.NotWellFormedUtf16 — throws when value carries an unpaired surrogate (calls Must.Be.WellFormedUtf16)
+    public static class NotWellFormedUtf16
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.IsWellFormedUtf16.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<string?>> InvalidCases => F.IsWellFormedUtf16.InvalidScenarios.ToGuardCases(s => s.Inputs is null ? new GuardExpected(false, typeof(ArgumentNullException), "value", Code: MustCodes.Text.Unicode.Malformed) : new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Unicode.Malformed));
+    }
+
+    // Guard.Against.WellFormedUtf16 — throws when value IS well-formed UTF-16 (calls Must.Be.NotWellFormedUtf16)
+    public static class WellFormedUtf16
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.IsWellFormedUtf16.InvalidScenarios.Except(nameof(F.IsWellFormedUtf16.NullValue)).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<string?>> InvalidCases => [.. F.IsWellFormedUtf16.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Unicode.WellFormed)), .. F.IsWellFormedUtf16.InvalidScenarios.Only(nameof(F.IsWellFormedUtf16.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value", Code: MustCodes.Text.Unicode.WellFormed))];
+    }
+
+    // Guard.Against.NotNormalized — throws when value is NOT in the given normalization form (calls Must.Be.Normalized)
+    public static class NotNormalized
+    {
+        public static TheoryData<GuardCase<(string? value, NormalizationForm form)>> ValidCases => F.IsNormalized.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, NormalizationForm form)>> InvalidCases => [.. F.IsNormalized.InvalidScenarios.Except(nameof(F.IsNormalized.NullValue), nameof(F.IsNormalized.UnknownForm)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Unicode.NotNormalized)), .. F.IsNormalized.InvalidScenarios.Only(nameof(F.IsNormalized.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value", Code: MustCodes.Text.Unicode.NotNormalized)), .. F.IsNormalized.InvalidScenarios.Only(nameof(F.IsNormalized.UnknownForm)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "form", Code: MustCodes.Text.Unicode.NotNormalized))];
+    }
+
+    // Guard.Against.Normalized — throws when value IS already in the given normalization form (calls Must.Be.NotNormalized)
+    public static class Normalized
+    {
+        public static TheoryData<GuardCase<(string? value, NormalizationForm form)>> ValidCases => F.IsNormalized.InvalidScenarios.Except(nameof(F.IsNormalized.NullValue), nameof(F.IsNormalized.UnknownForm)).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, NormalizationForm form)>> InvalidCases => [.. F.IsNormalized.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Unicode.Normalized)), .. F.IsNormalized.InvalidScenarios.Only(nameof(F.IsNormalized.NullValue)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value", Code: MustCodes.Text.Unicode.Normalized)), .. F.IsNormalized.InvalidScenarios.Only(nameof(F.IsNormalized.UnknownForm)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "form", Code: MustCodes.Text.Unicode.Normalized))];
     }
 }

@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
@@ -551,5 +552,49 @@ public static partial class MustStringClausesTestData
         [
             new("null suffix", ("hello world", null!, StringComparison.Ordinal), new MustExpected(false, "suffix must not be null.", "suffix", MustCodes.Text.Content.EndsWith))
         ];
+    }
+
+    public static class HasByteOrderMark
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.HasByteOrderMark.ValidScenarios.ToMustCases();
+        public static TheoryData<MustCase<string?>> InvalidCases => F.HasByteOrderMark.InvalidScenarios.Except(nameof(F.HasByteOrderMark.NullValue)).ToMustCases(_ => new MustExpected(false, "value must start with a byte-order mark.", Code: MustCodes.Text.Bom.Missing));
+        public static TheoryData<MustCase<string?>> NullCases => F.HasByteOrderMark.InvalidScenarios.Only(nameof(F.HasByteOrderMark.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Bom.Missing));
+    }
+
+    public static class NotHasByteOrderMark
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.HasByteOrderMark.InvalidScenarios.Except(nameof(F.HasByteOrderMark.NullValue)).ToMustCases(_ => new MustExpected(true));
+        public static TheoryData<MustCase<string?>> InvalidCases => F.HasByteOrderMark.ValidScenarios.ToMustCases(_ => new MustExpected(false, "value must not start with a byte-order mark.", Code: MustCodes.Text.Bom.Present));
+        public static TheoryData<MustCase<string?>> NullCases => F.HasByteOrderMark.InvalidScenarios.Only(nameof(F.HasByteOrderMark.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Bom.Present));
+    }
+
+    public static class WellFormedUtf16
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.IsWellFormedUtf16.ValidScenarios.ToMustCases();
+        public static TheoryData<MustCase<string?>> InvalidCases => F.IsWellFormedUtf16.InvalidScenarios.Except(nameof(F.IsWellFormedUtf16.NullValue)).ToMustCases(_ => new MustExpected(false, "value must be well-formed UTF-16.", Code: MustCodes.Text.Unicode.Malformed));
+        public static TheoryData<MustCase<string?>> NullCases => F.IsWellFormedUtf16.InvalidScenarios.Only(nameof(F.IsWellFormedUtf16.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Unicode.Malformed));
+    }
+
+    public static class NotWellFormedUtf16
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.IsWellFormedUtf16.InvalidScenarios.Except(nameof(F.IsWellFormedUtf16.NullValue)).ToMustCases(_ => new MustExpected(true));
+        public static TheoryData<MustCase<string?>> InvalidCases => F.IsWellFormedUtf16.ValidScenarios.ToMustCases(_ => new MustExpected(false, "value must not be well-formed UTF-16.", Code: MustCodes.Text.Unicode.WellFormed));
+        public static TheoryData<MustCase<string?>> NullCases => F.IsWellFormedUtf16.InvalidScenarios.Only(nameof(F.IsWellFormedUtf16.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Unicode.WellFormed));
+    }
+
+    public static class Normalized
+    {
+        public static TheoryData<MustCase<(string? value, NormalizationForm form)>> ValidCases => F.IsNormalized.ValidScenarios.ToMustCases();
+        public static TheoryData<MustCase<(string? value, NormalizationForm form)>> InvalidCases => F.IsNormalized.InvalidScenarios.Except(nameof(F.IsNormalized.NullValue), nameof(F.IsNormalized.UnknownForm)).ToMustCases(_ => new MustExpected(false, "value must be in the specified normalization form.", Code: MustCodes.Text.Unicode.NotNormalized));
+        public static TheoryData<MustCase<(string? value, NormalizationForm form)>> NullCases => F.IsNormalized.InvalidScenarios.Only(nameof(F.IsNormalized.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Unicode.NotNormalized));
+        public static TheoryData<MustCase<(string? value, NormalizationForm form)>> UndefinedFormCases => F.IsNormalized.InvalidScenarios.Only(nameof(F.IsNormalized.UnknownForm)).ToMustCases(_ => new MustExpected(false, "form requires a defined normalization form.", "form", MustCodes.Text.Unicode.NotNormalized));
+    }
+
+    public static class NotNormalized
+    {
+        public static TheoryData<MustCase<(string? value, NormalizationForm form)>> ValidCases => F.IsNormalized.InvalidScenarios.Except(nameof(F.IsNormalized.NullValue), nameof(F.IsNormalized.UnknownForm)).ToMustCases(_ => new MustExpected(true));
+        public static TheoryData<MustCase<(string? value, NormalizationForm form)>> InvalidCases => F.IsNormalized.ValidScenarios.ToMustCases(_ => new MustExpected(false, "value must not be in the specified normalization form.", Code: MustCodes.Text.Unicode.Normalized));
+        public static TheoryData<MustCase<(string? value, NormalizationForm form)>> NullCases => F.IsNormalized.InvalidScenarios.Only(nameof(F.IsNormalized.NullValue)).ToMustCases(_ => new MustExpected(false, "value must not be null.", "value", MustCodes.Text.Unicode.Normalized));
+        public static TheoryData<MustCase<(string? value, NormalizationForm form)>> UndefinedFormCases => F.IsNormalized.InvalidScenarios.Only(nameof(F.IsNormalized.UnknownForm)).ToMustCases(_ => new MustExpected(false, "form requires a defined normalization form.", "form", MustCodes.Text.Unicode.Normalized));
     }
 }

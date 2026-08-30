@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Bridges PineGuard results into ErrorOr. ToErrorOr() and ToErrors() turn a MustResult&lt;T&gt; or MustValidationResult into ErrorOr&lt;T&gt;, carrying the rule code, message and property path onto every Error.Validation.</Description>
+    <PackageTags>$(PackageTags);erroror;result;result-pattern;railway-oriented;bridge</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.ErrorOr.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ErrorOr" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
+  </ItemGroup>
+
+</Project>

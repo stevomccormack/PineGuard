@@ -1,3 +1,4 @@
+using System.Text;
 using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.MustClauses;
 using Xunit.Abstractions;
@@ -946,6 +947,92 @@ public class MustStringClausesTests(ITestOutputHelper output) : BaseMustUnitTest
 
         // Act
         var result = Must.Be.NotEndsWith(value, suffix, comparison, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.HasByteOrderMark.ValidCases), MemberType = typeof(MustStringClausesTestData.HasByteOrderMark))]
+    [MemberData(nameof(MustStringClausesTestData.HasByteOrderMark.InvalidCases), MemberType = typeof(MustStringClausesTestData.HasByteOrderMark))]
+    [MemberData(nameof(MustStringClausesTestData.HasByteOrderMark.NullCases), MemberType = typeof(MustStringClausesTestData.HasByteOrderMark))]
+    public void HasByteOrderMark_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Act
+        var result = Must.Be.HasByteOrderMark(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.NotHasByteOrderMark.ValidCases), MemberType = typeof(MustStringClausesTestData.NotHasByteOrderMark))]
+    [MemberData(nameof(MustStringClausesTestData.NotHasByteOrderMark.InvalidCases), MemberType = typeof(MustStringClausesTestData.NotHasByteOrderMark))]
+    [MemberData(nameof(MustStringClausesTestData.NotHasByteOrderMark.NullCases), MemberType = typeof(MustStringClausesTestData.NotHasByteOrderMark))]
+    public void NotHasByteOrderMark_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Act
+        var result = Must.Be.NotHasByteOrderMark(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.WellFormedUtf16.ValidCases), MemberType = typeof(MustStringClausesTestData.WellFormedUtf16))]
+    [MemberData(nameof(MustStringClausesTestData.WellFormedUtf16.InvalidCases), MemberType = typeof(MustStringClausesTestData.WellFormedUtf16))]
+    [MemberData(nameof(MustStringClausesTestData.WellFormedUtf16.NullCases), MemberType = typeof(MustStringClausesTestData.WellFormedUtf16))]
+    public void WellFormedUtf16_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Act
+        var result = Must.Be.WellFormedUtf16(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.NotWellFormedUtf16.ValidCases), MemberType = typeof(MustStringClausesTestData.NotWellFormedUtf16))]
+    [MemberData(nameof(MustStringClausesTestData.NotWellFormedUtf16.InvalidCases), MemberType = typeof(MustStringClausesTestData.NotWellFormedUtf16))]
+    [MemberData(nameof(MustStringClausesTestData.NotWellFormedUtf16.NullCases), MemberType = typeof(MustStringClausesTestData.NotWellFormedUtf16))]
+    public void NotWellFormedUtf16_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Act
+        var result = Must.Be.NotWellFormedUtf16(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.Normalized.ValidCases), MemberType = typeof(MustStringClausesTestData.Normalized))]
+    [MemberData(nameof(MustStringClausesTestData.Normalized.InvalidCases), MemberType = typeof(MustStringClausesTestData.Normalized))]
+    [MemberData(nameof(MustStringClausesTestData.Normalized.NullCases), MemberType = typeof(MustStringClausesTestData.Normalized))]
+    [MemberData(nameof(MustStringClausesTestData.Normalized.UndefinedFormCases), MemberType = typeof(MustStringClausesTestData.Normalized))]
+    public void Normalized_BehavesAsExpected(MustCase<(string? value, NormalizationForm form)> tc)
+    {
+        // Arrange
+        var (value, form) = tc.Value;
+
+        // Act
+        var result = Must.Be.Normalized(value, form, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringClausesTestData.NotNormalized.ValidCases), MemberType = typeof(MustStringClausesTestData.NotNormalized))]
+    [MemberData(nameof(MustStringClausesTestData.NotNormalized.InvalidCases), MemberType = typeof(MustStringClausesTestData.NotNormalized))]
+    [MemberData(nameof(MustStringClausesTestData.NotNormalized.NullCases), MemberType = typeof(MustStringClausesTestData.NotNormalized))]
+    [MemberData(nameof(MustStringClausesTestData.NotNormalized.UndefinedFormCases), MemberType = typeof(MustStringClausesTestData.NotNormalized))]
+    public void NotNormalized_BehavesAsExpected(MustCase<(string? value, NormalizationForm form)> tc)
+    {
+        // Arrange
+        var (value, form) = tc.Value;
+
+        // Act
+        var result = Must.Be.NotNormalized(value, form, paramName: "value");
 
         // Assert
         AssertResult(tc, result);

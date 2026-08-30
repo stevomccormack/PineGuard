@@ -1,3 +1,4 @@
+using System.Text;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using Xunit.Abstractions;
 using TD = PineGuard.GuardClauses.UnitTests.GuardStringClausesTestData;
@@ -545,6 +546,74 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var comparison = tc.Value.comparison;
         var result = AssertResult(tc, () => Guard.Against.EndsWith(value, suffix, comparison));
         AssertCustomMessage(tc, () => Guard.Against.EndsWith(value, suffix, comparison, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.NotHasByteOrderMark.ValidCases), MemberType = typeof(TD.NotHasByteOrderMark))]
+    [MemberData(nameof(TD.NotHasByteOrderMark.InvalidCases), MemberType = typeof(TD.NotHasByteOrderMark))]
+    public void NotHasByteOrderMark_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.NotHasByteOrderMark(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasByteOrderMark(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.HasByteOrderMark.ValidCases), MemberType = typeof(TD.HasByteOrderMark))]
+    [MemberData(nameof(TD.HasByteOrderMark.InvalidCases), MemberType = typeof(TD.HasByteOrderMark))]
+    public void HasByteOrderMark_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.HasByteOrderMark(value));
+        AssertCustomMessage(tc, () => Guard.Against.HasByteOrderMark(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.NotWellFormedUtf16.ValidCases), MemberType = typeof(TD.NotWellFormedUtf16))]
+    [MemberData(nameof(TD.NotWellFormedUtf16.InvalidCases), MemberType = typeof(TD.NotWellFormedUtf16))]
+    public void NotWellFormedUtf16_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.NotWellFormedUtf16(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotWellFormedUtf16(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.WellFormedUtf16.ValidCases), MemberType = typeof(TD.WellFormedUtf16))]
+    [MemberData(nameof(TD.WellFormedUtf16.InvalidCases), MemberType = typeof(TD.WellFormedUtf16))]
+    public void WellFormedUtf16_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.WellFormedUtf16(value));
+        AssertCustomMessage(tc, () => Guard.Against.WellFormedUtf16(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.NotNormalized.ValidCases), MemberType = typeof(TD.NotNormalized))]
+    [MemberData(nameof(TD.NotNormalized.InvalidCases), MemberType = typeof(TD.NotNormalized))]
+    public void NotNormalized_BehavesAsExpected(GuardCase<(string? value, NormalizationForm form)> tc)
+    {
+        var value = tc.Value.value;
+        var form = tc.Value.form;
+        var result = AssertResult(tc, () => Guard.Against.NotNormalized(value, form));
+        AssertCustomMessage(tc, () => Guard.Against.NotNormalized(value, form, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.Normalized.ValidCases), MemberType = typeof(TD.Normalized))]
+    [MemberData(nameof(TD.Normalized.InvalidCases), MemberType = typeof(TD.Normalized))]
+    public void Normalized_BehavesAsExpected(GuardCase<(string? value, NormalizationForm form)> tc)
+    {
+        var value = tc.Value.value;
+        var form = tc.Value.form;
+        var result = AssertResult(tc, () => Guard.Against.Normalized(value, form));
+        AssertCustomMessage(tc, () => Guard.Against.Normalized(value, form, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

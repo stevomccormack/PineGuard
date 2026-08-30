@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Unlist prerelease versions of PineGuard packages on nuget.org.
 
@@ -48,6 +48,10 @@ param(
         'PineGuard.FluentValidation',
         'PineGuard.DataAnnotations',
         'PineGuard.Extensions.Options',
+        'PineGuard.Extensions.DependencyInjection',
+        'PineGuard.ErrorOr',
+        'PineGuard.FluentResults',
+        'PineGuard.OneOf',
         'PineGuard.Testing'
     ),
     [switch] $All,

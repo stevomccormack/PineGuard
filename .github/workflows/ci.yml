@@ -32,6 +32,10 @@ jobs:
       fluent-validation: ${{ steps.filter.outputs.fluent-validation }}
       data-annotations: ${{ steps.filter.outputs.data-annotations }}
       options: ${{ steps.filter.outputs.options }}
+      di: ${{ steps.filter.outputs.di }}
+      erroror: ${{ steps.filter.outputs.erroror }}
+      fluentresults: ${{ steps.filter.outputs.fluentresults }}
+      oneof: ${{ steps.filter.outputs.oneof }}
       testing: ${{ steps.filter.outputs.testing }}
       any-src: ${{ steps.filter.outputs.any-src }}
     steps:
@@ -59,6 +63,18 @@ jobs:
             options:
               - 'src/PineGuard.Extensions.Options/**'
               - 'tests/PineGuard.Extensions.Options.UnitTests/**'
+            di:
+              - 'src/PineGuard.Extensions.DependencyInjection/**'
+              - 'tests/PineGuard.Extensions.DependencyInjection.UnitTests/**'
+            erroror:
+              - 'src/PineGuard.ErrorOr/**'
+              - 'tests/PineGuard.ErrorOr.UnitTests/**'
+            fluentresults:
+              - 'src/PineGuard.FluentResults/**'
+              - 'tests/PineGuard.FluentResults.UnitTests/**'
+            oneof:
+              - 'src/PineGuard.OneOf/**'
+              - 'tests/PineGuard.OneOf.UnitTests/**'
             testing:
               - 'tests/PineGuard.Testing/**'
               - 'tests/PineGuard.Testing.UnitTests/**'
@@ -156,6 +172,26 @@ jobs:
             name: Options
             run-if: core-or-must-or-options-or-testing-or-main
 
+          # DependencyInjection tests: run if core, di, testing, or main
+          - project: tests/PineGuard.Extensions.DependencyInjection.UnitTests/PineGuard.Extensions.DependencyInjection.UnitTests.csproj
+            name: DependencyInjection
+            run-if: core-or-di-or-testing-or-main
+
+          # ErrorOr bridge tests: run if core, erroror, testing, or main
+          - project: tests/PineGuard.ErrorOr.UnitTests/PineGuard.ErrorOr.UnitTests.csproj
+            name: ErrorOr
+            run-if: core-or-erroror-or-testing-or-main
+
+          # FluentResults bridge tests: run if core, fluentresults, testing, or main
+          - project: tests/PineGuard.FluentResults.UnitTests/PineGuard.FluentResults.UnitTests.csproj
+            name: FluentResults
+            run-if: core-or-fluentresults-or-testing-or-main
+
+          # OneOf bridge tests: run if core, oneof, testing, or main
+          - project: tests/PineGuard.OneOf.UnitTests/PineGuard.OneOf.UnitTests.csproj
+            name: OneOf
+            run-if: core-or-oneof-or-testing-or-main
+
           # Testing (fixture library) tests: run if testing or main
           - project: tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj
             name: Testing
@@ -177,6 +213,10 @@ jobs:
           FLUENT="${{ needs.changes.outputs.fluent-validation }}"
           DATA="${{ needs.changes.outputs.data-annotations }}"
           OPTIONS="${{ needs.changes.outputs.options }}"
+          DI="${{ needs.changes.outputs.di }}"
+          ERROROR="${{ needs.changes.outputs.erroror }}"
+          FLUENTRESULTS="${{ needs.changes.outputs.fluentresults }}"
+          ONEOF="${{ needs.changes.outputs.oneof }}"
           TESTING="${{ needs.changes.outputs.testing }}"
           RUN_IF="${{ matrix.run-if }}"
 
@@ -195,6 +235,14 @@ jobs:
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DATA" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-options-or-testing-or-main)
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$OPTIONS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-di-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$DI" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-erroror-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ERROROR" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-fluentresults-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$FLUENTRESULTS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-oneof-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ONEOF" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             testing-or-main)
               [[ "$IS_MAIN" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
           esac
@@ -310,7 +358,7 @@ jobs:
       # actual change. Restrict the merged report to only the assemblies whose OWN dedicated
       # matrix entry actually ran, using the exact same run-if logic as the "Should run" step
       # above (test job, per matrix.run-if). On push to main every scope always runs, so the
-      # filter includes all seven assembly names (equivalent to no filtering).
+      # filter includes all ten assembly names (equivalent to no filtering).
       - name: Compute coverage assembly filters
         id: assembly-filters
         if: steps.find-coverage.outputs.found == 'true'
@@ -323,6 +371,10 @@ jobs:
           FLUENT="${{ needs.changes.outputs.fluent-validation }}"
           DATA="${{ needs.changes.outputs.data-annotations }}"
           OPTIONS="${{ needs.changes.outputs.options }}"
+          DI="${{ needs.changes.outputs.di }}"
+          ERROROR="${{ needs.changes.outputs.erroror }}"
+          FLUENTRESULTS="${{ needs.changes.outputs.fluentresults }}"
+          ONEOF="${{ needs.changes.outputs.oneof }}"
           TESTING="${{ needs.changes.outputs.testing }}"
 
           FILTERS=""
@@ -355,6 +407,26 @@ jobs:
           # PineGuard.Extensions.Options — core-or-must-or-options-or-testing-or-main
           if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$OPTIONS" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.Extensions.Options;"
+          fi
+
+          # PineGuard.Extensions.DependencyInjection — core-or-di-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$DI" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.Extensions.DependencyInjection;"
+          fi
+
+          # PineGuard.ErrorOr — core-or-erroror-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ERROROR" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.ErrorOr;"
+          fi
+
+          # PineGuard.FluentResults — core-or-fluentresults-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$FLUENTRESULTS" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.FluentResults;"
+          fi
+
+          # PineGuard.OneOf — core-or-oneof-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ONEOF" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.OneOf;"
           fi
 
           # PineGuard.Testing — testing-or-main
