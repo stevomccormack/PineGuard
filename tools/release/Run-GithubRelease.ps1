@@ -275,6 +275,6 @@ if ($Unlist) {
 
 Write-Step "Done"
 Write-Info "Packages will appear on nuget.org within a few minutes of workflow completion:"
-foreach ($p in 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Testing') {
+foreach ($p in 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Extensions.Options', 'Testing') {
     Write-Info "  https://www.nuget.org/packages/PineGuard.$p/$semver"
 }

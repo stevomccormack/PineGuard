@@ -7,7 +7,7 @@
     (src/PineGuard.Core/Codes/) against the clause tree via textual source analysis (no build):
     (a) every public Must.Be.* clause passes exactly one MustCodes constant on every Fail(/FromBool(
     call; (b) every catalogue constant (other than Prefix) is referenced by at least one clause,
-    DataAnnotations attribute, or Core/AspNetCore call site; (c) no code string literal duplicates a
+    DataAnnotations attribute, or Core/AspNetCore/Extensions.Options call site; (c) no code string literal duplicates a
     catalogue domain outside src/PineGuard.Core/Codes/; (d) every DataAnnotations attribute's declared
     code matches a code actually produced by the Must clause method(s) it dispatches to (direct
     Must.Be.* calls and nameof(MustXClauses.Y) reflective dispatch alike); (e) every Guard.Against.* clause passes its
@@ -157,7 +157,7 @@ function Get-BalancedSpan {
 }
 
 $allUsageFiles = New-Object System.Collections.Generic.List[string]
-foreach ($extraRoot in @('src/PineGuard.Core', 'src/PineGuard.DataAnnotations', 'src/PineGuard.AspNetCore')) {
+foreach ($extraRoot in @('src/PineGuard.Core', 'src/PineGuard.DataAnnotations', 'src/PineGuard.AspNetCore', 'src/PineGuard.Extensions.Options')) {
     $full = Resolve-PineGuardPath -RepoRoot $repoRootResolved -Path $extraRoot
     if (Test-Path $full) {
         Get-ChildItem -Path $full -Recurse -File -Filter '*.cs' | Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' } | ForEach-Object { $allUsageFiles.Add($_.FullName) | Out-Null }
