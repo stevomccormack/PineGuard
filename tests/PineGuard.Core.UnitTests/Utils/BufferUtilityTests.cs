@@ -40,4 +40,17 @@ public sealed class BufferUtilityTests : BaseUnitTest
         // Assert
         Assert.Equal(testCase.Expected, result);
     }
+
+    [Theory]
+    [MemberData(nameof(BufferUtilityTestData.TryDecodeUtf8.ValidCases), MemberType = typeof(BufferUtilityTestData.TryDecodeUtf8))]
+    [MemberData(nameof(BufferUtilityTestData.TryDecodeUtf8.EdgeCases), MemberType = typeof(BufferUtilityTestData.TryDecodeUtf8))]
+    public void TryDecodeUtf8_ReturnsExpected(BufferUtilityTestData.TryDecodeUtf8.ValidCase testCase)
+    {
+        // Act
+        var result = BufferUtility.TryDecodeUtf8(testCase.Value, out var text);
+
+        // Assert
+        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedOutValue, text);
+    }
 }

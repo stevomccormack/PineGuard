@@ -93,4 +93,36 @@ public static class BufferRules
     /// </example>
     public static bool IsBase64Url(string? value) =>
         BufferUtility.IsBase64UrlString(value);
+
+    /// <summary>
+    /// Determines whether the specified bytes are well-formed UTF-8 text.
+    /// </summary>
+    /// <param name="value">The bytes to validate. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> decodes as UTF-8 without substitution;
+    /// otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// Overlong encodings, unpaired surrogates, truncated sequences and code points above U+10FFFF are all
+    /// rejected, so a value that passes can be decoded without silently becoming U+FFFD replacement characters.
+    /// An empty buffer carries no text and is reported as invalid, consistent with how the other members of this
+    /// class treat an empty value.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// bool valid = BufferRules.IsUtf8([0xE2, 0x82, 0xAC]);   // true (U+20AC EURO SIGN)
+    /// bool invalid = BufferRules.IsUtf8([0xC0, 0x80]);       // false (overlong encoding of U+0000)
+    /// </code>
+    /// </example>
+    public static bool IsUtf8(byte[]? value)
+    {
+        if (value is null || value.Length == 0)
+            return false;
+
+#if NET8_0_OR_GREATER
+        return System.Text.Unicode.Utf8.IsValid(value);
+#else
+        return BufferUtility.TryDecodeUtf8(value, out _);
+#endif
+    }
 }

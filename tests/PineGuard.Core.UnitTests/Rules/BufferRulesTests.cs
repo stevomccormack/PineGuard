@@ -38,4 +38,15 @@ public sealed class BufferRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(BufferRulesTestData.IsUtf8.Cases), MemberType = typeof(BufferRulesTestData.IsUtf8))]
+    public void IsUtf8_BehavesAsExpected(RuleCase<byte[]?> tc)
+    {
+        // Act
+        var result = BufferRules.IsUtf8(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }
