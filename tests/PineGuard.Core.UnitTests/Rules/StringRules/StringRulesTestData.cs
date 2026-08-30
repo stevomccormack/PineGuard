@@ -236,4 +236,9 @@ public static class StringRulesTestData
         public sealed record InvalidCase(string Name, (string? Value, string Suffix) Input, ExpectedException ExpectedException)
             : ThrowsCase<(string? Value, string Suffix)>(Name, Input, ExpectedException);
     }
+
+    public static class HasByteOrderMark
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.HasByteOrderMark.AllScenarios.ToRuleCases();
+    }
 }

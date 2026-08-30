@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using PineGuard.Common;
+using PineGuard.Rules;
 using PineGuard.Testing.UnitTests.Rules;
 
 #pragma warning disable CS8795 // Partial method must have an implementation part (source generator provides it)
@@ -370,5 +371,19 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, string suffix, StringComparison comparison)>[] ValidScenarios => [new(nameof(Suffixed), Suffixed, true), new(nameof(SuffixedIgnoringCase), SuffixedIgnoringCase, true), new(nameof(EmptySuffix), EmptySuffix, true)];
         public static RuleScenario<(string? value, string suffix, StringComparison comparison)>[] InvalidScenarios => [new(nameof(Absent), Absent, false), new(nameof(CaseMismatch), CaseMismatch, false), new(nameof(NullValue), NullValue, false)];
         public static RuleScenario<(string? value, string suffix, StringComparison comparison)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class HasByteOrderMark
+    {
+        public static readonly string? Leading = StringRules.ByteOrderMark + "hello";
+        public static readonly string? MarkOnly = StringRules.ByteOrderMark.ToString();
+        public static readonly string? Interior = "he" + StringRules.ByteOrderMark + "llo";
+        public static readonly string? NoMark = "hello";
+        public static readonly string? Empty = "";
+        public static readonly string? NullValue = null;
+
+        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(Leading), Leading, true), new(nameof(MarkOnly), MarkOnly, true)];
+        public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(Interior), Interior, false), new(nameof(NoMark), NoMark, false), new(nameof(Empty), Empty, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 }
