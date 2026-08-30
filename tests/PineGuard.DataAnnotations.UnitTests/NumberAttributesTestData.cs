@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Codes;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.NumberRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -196,5 +198,15 @@ public static class NumberAttributesTestData
             new ActionThrowsCase("fractional bound rounds silently on int", () => new LessThanOrEqualNumberAttribute(10.99).GetValidationResult(11, new ValidationContext(new object())), new ExpectedException(typeof(InvalidOperationException), null, "cannot be represented exactly")),
             new ActionThrowsCase("out-of-range bound overflows byte", () => new InRangeNumberAttribute(0, 1000).GetValidationResult((byte)5, new ValidationContext(new object())), new ExpectedException(typeof(InvalidOperationException), null, "does not fit in"))
         ];
+    }
+
+    public static class PercentageNumber
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsPercentage.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsPercentage.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a percentage between 0 and 100.", Code: MustCodes.Number.Range.NotPercentage)
+        });
     }
 }
