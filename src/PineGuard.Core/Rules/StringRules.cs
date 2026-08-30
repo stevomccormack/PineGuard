@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.Common;
 using PineGuard.Utils;
@@ -498,6 +499,46 @@ public static partial class StringRules
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Determines whether the specified string is already in the given Unicode normalization form.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The same text can be spelled with different code points — <c>"é"</c> is either the precomposed
+    /// <c>U+00E9</c> or an <c>"e"</c> followed by the combining acute accent <c>U+0301</c>. The two are visually
+    /// identical but not ordinally equal, so unnormalized input silently breaks equality, uniqueness constraints
+    /// and lookups. This rule reports whether the value is already in the requested form, so a caller can reject
+    /// it rather than store two spellings of the same name.
+    /// </para>
+    /// <para>
+    /// A value that is not well-formed UTF-16 returns <see langword="false"/> rather than propagating the
+    /// <see cref="ArgumentException"/> the underlying framework raises: an unpaired surrogate has no normalized
+    /// spelling, and rules do not throw on the validated value.
+    /// </para>
+    /// <para>
+    /// Under globalization-invariant mode the framework treats every string as normalized, so this rule reports
+    /// <see langword="true"/> for input it would reject on an ICU-backed runtime. The checks that do not depend
+    /// on the mode — null, an undefined <paramref name="form"/>, and malformed UTF-16 — behave identically in
+    /// both.
+    /// </para>
+    /// </remarks>
+    /// <param name="value">The value to validate. If <see langword="null"/> or not well-formed UTF-16, returns <see langword="false"/>.</param>
+    /// <param name="form">The <see cref="NormalizationForm"/> to test against. Defaults to <see cref="NormalizationForm.FormC"/>. An undefined form returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is already in <paramref name="form"/>; otherwise, <see langword="false"/>.</returns>
+    public static bool IsNormalized(string? value, NormalizationForm form = NormalizationForm.FormC)
+    {
+        if (value is null)
+            return false;
+
+        if (!EnumRules.IsDefined<NormalizationForm>(form))
+            return false;
+
+        if (!IsWellFormedUtf16(value))
+            return false;
+
+        return value.IsNormalized(form);
     }
 
     private static bool AllCharsAreAllowed(string value, Func<char, bool> allowedCharPredicate,
