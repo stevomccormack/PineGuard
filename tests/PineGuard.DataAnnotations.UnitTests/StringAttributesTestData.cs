@@ -385,4 +385,14 @@ public static class StringAttributesTestData
             new(nameof(F.EndsWith.SuffixedIgnoringCase), F.EndsWith.SuffixedIgnoringCase.value, new DataAnnotationExpected(false, "Value must not end with the specified suffix.", Code: MustCodes.Text.Content.EndsWith))
         ];
     }
+
+    public static class RegexPattern
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsRegexPattern.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.IsRegexPattern.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a valid regular expression pattern.", Code: MustCodes.Text.Pattern.Invalid)
+        });
+    }
 }

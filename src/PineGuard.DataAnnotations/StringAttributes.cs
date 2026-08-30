@@ -1691,3 +1691,45 @@ public sealed class NotEndsWithAttribute(string suffix) : ValidationAttributeBas
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is a valid regular expression
+/// pattern.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.RegexPattern"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// This is the mirror image of <see cref="MatchAttribute"/>: that one validates a value against a pattern,
+/// this one validates that the value <em>is</em> a pattern. It belongs on a property carrying a
+/// caller-supplied or configured pattern, where the alternative is an <see cref="ArgumentException"/> thrown
+/// much later by whatever eventually compiles it. Syntax is all that is checked — a pattern that compiles
+/// can still be catastrophically slow. If the value is <see langword="null"/>, validation is skipped by the
+/// base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class SearchModel
+/// {
+///     [RegexPattern]
+///     public string SearchPattern { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="MatchAttribute"/>
+/// <seealso cref="MustStringClauses.RegexPattern"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class RegexPatternAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Pattern.Invalid)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.RegexPattern(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
