@@ -71,4 +71,15 @@ public sealed class NetworkRulesTests(ITestOutputHelper output) : BaseRuleUnitTe
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(NetworkRulesTestData.IsMacAddress.Cases), MemberType = typeof(NetworkRulesTestData.IsMacAddress))]
+    public void IsMacAddress_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = NetworkRules.IsMacAddress(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

@@ -34,4 +34,9 @@ public static class NetworkRulesTestData
     {
         public static TheoryData<RuleCase<int?>> Cases => F.IsPortNumber.AllScenarios.ToRuleCases();
     }
+
+    public static class IsMacAddress
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.IsMacAddress.AllScenarios.ToRuleCases();
+    }
 }
