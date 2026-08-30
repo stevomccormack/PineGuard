@@ -411,6 +411,16 @@ public static partial class FluentStringExtensionsTestData
         });
     }
 
+    public static class RegexPattern
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.IsRegexPattern.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsRegexPattern.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be a valid regular expression pattern.", Code: MustCodes.Text.Pattern.Invalid)
+        });
+    }
+
     public static class NotWhitespace
     {
         public static TheoryData<FluentCase<string?>> Cases => F.IsWhitespace.AllScenarios.ToFluentCases(s => s.Name switch
