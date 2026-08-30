@@ -66,4 +66,16 @@ public sealed class MustBufferClausesTests(ITestOutputHelper output) : BaseMustU
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(MustBufferClausesTestData.Utf8.ValidCases), MemberType = typeof(MustBufferClausesTestData.Utf8))]
+    [MemberData(nameof(MustBufferClausesTestData.Utf8.InvalidCases), MemberType = typeof(MustBufferClausesTestData.Utf8))]
+    public void Utf8_BehavesAsExpected(MustCase<byte[]?> tc)
+    {
+        // Act
+        var result = Must.Be.Utf8(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }
