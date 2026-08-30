@@ -6,7 +6,7 @@ using PineGuard.MustClauses;
 namespace PineGuard.FluentValidation;
 
 /// <summary>
-/// Provides FluentValidation extension methods for binary buffer encoding validation (Hex and Base64).
+/// Provides FluentValidation extension methods for binary buffer encoding validation (Hex, Base64 and Base64Url).
 /// </summary>
 /// <seealso href="https://pineguard.ai/docs/fluent/buffer">Fluent Buffer Extensions documentation</seealso>
 public static class FluentBufferExtensions
@@ -94,4 +94,28 @@ public static class FluentBufferExtensions
     public static IRuleBuilderOptions<TModel, string?> NotBase64<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotBase64(val, paramName: null) : MustResult<string>.Ok(null!),
             message, MustCodes.Encoding.Base64.WellFormed);
+
+    /// <summary>
+    /// Validates that the property value is a valid Base64Url-encoded string.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustBufferClauses.Base64Url"/>, so the RFC 4648 §5 alphabet applies and a value
+    /// carrying Base64's <c>+</c> or <c>/</c> is rejected — which is the distinction that matters for anything
+    /// travelling in a URL or a JWT segment, where those two characters do not survive. Padding is optional.
+    /// If the value is <see langword="null"/>, validation passes (null values should be handled by a separate
+    /// <c>.NotNull()</c> rule).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.ContinuationToken).Base64Url();
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustBufferClauses.Base64Url"/>
+    public static IRuleBuilderOptions<TModel, string?> Base64Url<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.Base64Url(val, paramName: null) : MustResult<string>.Ok(null!),
+            message, MustCodes.Encoding.Base64url.Invalid);
 }
