@@ -122,6 +122,16 @@ public static partial class MustCodes
             public const string Allowed = Prefix + ".allowed";
         }
 
+        /// <summary>The <c>type/subtype</c> form of a media type, independent of any header that carries it.</summary>
+        public static class MediaType
+        {
+            /// <summary>The code prefix for this node (<c>"http.media-type"</c>).</summary>
+            public const string Prefix = Http.Prefix + ".media-type";
+
+            /// <summary><c>http.media-type.invalid</c></summary>
+            public const string Invalid = Prefix + ".invalid";
+        }
+
         /// <summary>The <c>Content-Security-Policy</c> header: its presence and the strength of its directives.</summary>
         public static class ContentSecurityPolicy
         {
