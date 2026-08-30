@@ -14,4 +14,9 @@ public static class BufferRulesTestData
     {
         public static TheoryData<RuleCase<string?>> Cases => F.IsBase64.AllScenarios.ToRuleCases();
     }
+
+    public static class IsBase64Url
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.IsBase64Url.AllScenarios.ToRuleCases();
+    }
 }

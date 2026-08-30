@@ -19,6 +19,16 @@ public static class BufferRules
     public const int Base64BytesPerQuantum = 3;
 
     /// <summary>
+    /// The character that pads a Base64 value out to a whole quantum (<c>'='</c>).
+    /// </summary>
+    public const char Base64PaddingChar = '=';
+
+    /// <summary>
+    /// The greatest number of <see cref="Base64PaddingChar"/> characters a Base64 value can end with.
+    /// </summary>
+    public const int MaxBase64PaddingChars = 2;
+
+    /// <summary>
     /// Determines whether the specified value is a valid hexadecimal string.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
@@ -59,4 +69,28 @@ public static class BufferRules
     /// </example>
     public static bool IsBase64(string? value) =>
         BufferUtility.IsBase64String(value);
+
+    /// <summary>
+    /// Determines whether the specified value is a valid Base64Url-encoded string
+    /// (RFC 4648 §5, the URL- and filename-safe alphabet).
+    /// </summary>
+    /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> is a valid Base64Url string; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// The alphabet substitutes <c>-</c> and <c>_</c> for Base64's <c>+</c> and <c>/</c>, so a value carrying
+    /// either of the latter is rejected. Trailing <see cref="Base64PaddingChar"/> padding is optional — the form
+    /// used in JSON Web Tokens omits it — but when present the value must still be a whole number of quanta.
+    /// Unlike <see cref="IsBase64(string?)"/>, embedded whitespace is not tolerated: a Base64Url value is meant
+    /// to survive a URL or a token segment unaltered. Leading and trailing whitespace is trimmed before validation.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// bool valid = BufferRules.IsBase64Url("SGVsbG8_d29ybGQ");  // true
+    /// bool invalid = BufferRules.IsBase64Url("SGVsbG8/d29ybGQ"); // false ('/' is Base64, not Base64Url)
+    /// </code>
+    /// </example>
+    public static bool IsBase64Url(string? value) =>
+        BufferUtility.IsBase64UrlString(value);
 }
