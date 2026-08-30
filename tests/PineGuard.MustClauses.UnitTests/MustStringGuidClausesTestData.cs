@@ -27,4 +27,16 @@ public static class MustStringGuidClausesTestData
             _ => new MustExpected(false, "value must not be an empty GUID.", Code: MustCodes.Guid.Emptiness.Empty)
         });
     }
+
+    public static class HasGuidVersion
+    {
+        public static TheoryData<MustCase<(string? value, int version)>> ValidCases => F.GuidHasVersion.AllValid.ToMustCases();
+
+        public static TheoryData<MustCase<(string? value, int version)>> InvalidCases => F.GuidHasVersion.AllInvalid.ToMustCases(s => s.Name switch
+        {
+            nameof(F.GuidHasVersion.VersionBelowMin) or nameof(F.GuidHasVersion.VersionAboveMax) => new MustExpected(false, "version requires a value between 1 and 8.", "version", MustCodes.Guid.Version.Mismatch),
+            nameof(F.GuidHasVersion.NullValue) => new MustExpected(false, "value must not be null.", "value", MustCodes.Guid.Version.Mismatch),
+            _ => new MustExpected(false, "value must have the specified GUID version.", "value", MustCodes.Guid.Version.Mismatch)
+        });
+    }
 }
