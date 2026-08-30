@@ -177,4 +177,46 @@ public static class MustBufferClauses
         var ok = !BufferRules.IsHex(value);
         return MustResult<string>.FromBool(ok, MustCodes.Encoding.Hex.WellFormed, messageTemplate, paramName, value, result: value);
     }
+
+    /// <summary>
+    /// Validates that the specified string is a valid Base64Url-encoded value.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The string to validate as a Base64Url-encoded value.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
+    /// if <paramref name="value"/> is a valid Base64Url string, or <see langword="false"/> with a descriptive
+    /// <see cref="MustResult{T}.Message"/>.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
+    /// Delegates to <see cref="BufferRules.IsBase64Url"/>, so the RFC 4648 §5 alphabet applies and a value
+    /// carrying Base64's <c>+</c> or <c>/</c> is rejected. The failure message follows the pattern
+    /// <c>"{paramName} must be a valid base64url string."</c>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = Must.Be.Base64Url(tokenSegment);
+    /// if (result.Failed)
+    ///     Console.WriteLine(result.Message);
+    /// </code>
+    /// </example>
+    /// <seealso cref="BufferRules.IsBase64Url"/>
+    /// <seealso href="https://pineguard.ai/docs/must/buffer">Buffer Must Clauses documentation</seealso>
+    public static MustResult<string> Base64Url(this IMustClause _,
+        string? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Encoding.Base64url.Invalid, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must be a valid base64url string.";
+
+        var ok = BufferRules.IsBase64Url(value);
+        return MustResult<string>.FromBool(ok, MustCodes.Encoding.Base64url.Invalid, messageTemplate, paramName, value, result: value);
+    }
 }
