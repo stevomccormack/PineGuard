@@ -48,6 +48,7 @@ param(
         'PineGuard.FluentValidation',
         'PineGuard.DataAnnotations',
         'PineGuard.Extensions.Options',
+        'PineGuard.Extensions.DependencyInjection',
         'PineGuard.ErrorOr',
         'PineGuard.FluentResults',
         'PineGuard.OneOf',
