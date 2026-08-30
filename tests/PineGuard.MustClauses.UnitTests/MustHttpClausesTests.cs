@@ -177,6 +177,18 @@ public sealed class MustHttpClausesTests(ITestOutputHelper output) : BaseMustUni
     }
 
     [Theory]
+    [MemberData(nameof(MustHttpClausesTestData.MediaType.ValidCases), MemberType = typeof(MustHttpClausesTestData.MediaType))]
+    [MemberData(nameof(MustHttpClausesTestData.MediaType.InvalidCases), MemberType = typeof(MustHttpClausesTestData.MediaType))]
+    public void MediaType_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Act
+        var result = Must.Be.MediaType(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(MustHttpClausesTestData.NotIsHeaderName.ValidCases), MemberType = typeof(MustHttpClausesTestData.NotIsHeaderName))]
     [MemberData(nameof(MustHttpClausesTestData.NotIsHeaderName.InvalidCases), MemberType = typeof(MustHttpClausesTestData.NotIsHeaderName))]
     public void NotIsHeaderName_BehavesAsExpected(MustCase<string?> tc)
