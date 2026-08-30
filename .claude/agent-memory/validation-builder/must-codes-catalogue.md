@@ -1,6 +1,6 @@
 ---
 name: must-codes-catalogue
-description: How to wire a MustCodes error-code constant into the Must, FluentValidation and DataAnnotations layers — argument positions, the one-clause-one-code rule and its exceptions, and the reflection tests that will reject a bad catalogue entry
+description: How to wire a MustCodes error-code constant into the Must, FluentValidation and DataAnnotations layers — argument positions, the one-clause-one-code rule and its exceptions, complement/bound code pairing, the Rule13 domain map a new clause file needs, and the reflection tests that will reject a bad catalogue entry
 metadata:
   type: project
 ---
@@ -44,6 +44,20 @@ from method names. The plan's §5.4 is authoritative — read it before proposin
   single factory — that is the only per-method granularity the projection offers.
 - Audit Rule13 forbids code string literals outside `src/PineGuard.Core/Codes/`, so test data must
   reference the constant (`MustCodes.Dictionary.Keys.Missing`), never `"dictionary.keys.missing"`.
+- **A brand-new `MustXxxClauses.cs` file needs a Rule13 `$domainMap` entry** in
+  `tools/audit-cli/rules/Test-Rule13-MustCodes.ps1` (e.g. `'StringGraphemes' = 'Text'`). Without it the
+  script skips the file, so you get one `(f) no domain mapping` finding *plus* one `(b) declared but
+  never referenced` per code the file uses — which reads like a broken catalogue but is a one-line map
+  fix. The script's own finding text tells you to add it. `tools/` is outside the 2026-08-30 `docs/`
+  freeze, so making the audit correct is preferred over suppressing it.
+
+**Complement code pairing for bound pairs.** A `Min`/`Max` clause and its `Not*` complement do not each
+need a new condition — the pair *swaps*: `HasMin…` → `TooFew`, `NotHasMin…` → `TooMany`,
+`HasMax…` → `TooMany`, `NotHasMax…` → `TooFew`; exact pairs use `Mismatch`/`Match` and range pairs
+`OutOfRange`/`InRange`. Eight clauses therefore consume exactly six catalogue entries.
+`MustCollectionClauses`' count family is the reference implementation; `MustStringGraphemesClauses`
+mirrors it code-for-code, message-for-message, including the guard order (null value → negative bound →
+inverted range) and the single-code-across-all-failure-paths shape.
 
 **Adapter layers carry the code too.** `FluentExtension.MustBe(check, message, code = null)` ends the
 rule chain with `.WithErrorCode(code)`; the convention is `message, MustCodes.X.Y.Z);` appended on the
