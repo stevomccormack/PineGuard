@@ -1691,3 +1691,80 @@ public sealed class NotEndsWithAttribute(string suffix) : ValidationAttributeBas
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field starts with the Unicode byte-order
+/// mark (<c>U+FEFF</c>).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.HasByteOrderMark"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// Only a leading <c>U+FEFF</c> counts — the same character anywhere else is a zero-width no-break space.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ExportModel
+/// {
+///     [HasByteOrderMark]
+///     public string CsvPayload { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotHasByteOrderMarkAttribute"/>
+/// <seealso cref="MustStringClauses.HasByteOrderMark"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class HasByteOrderMarkAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Bom.Missing)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.HasByteOrderMark(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field does not start with the Unicode
+/// byte-order mark (<c>U+FEFF</c>).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringClauses.NotHasByteOrderMark"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// This is the forbidden state most models want: a byte-order mark that survives decoding silently breaks
+/// equality, prefix matching, and numeric parsing.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ImportModel
+/// {
+///     [NotHasByteOrderMark]
+///     public string AccountNumber { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="HasByteOrderMarkAttribute"/>
+/// <seealso cref="MustStringClauses.NotHasByteOrderMark"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotHasByteOrderMarkAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Text.Bom.Present)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.NotHasByteOrderMark(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
