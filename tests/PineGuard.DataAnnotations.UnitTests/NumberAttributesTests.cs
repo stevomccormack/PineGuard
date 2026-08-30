@@ -267,4 +267,19 @@ public sealed class NumberAttributesTests(ITestOutputHelper output) : BaseDataAn
         var ex = Assert.Throws(tc.ExpectedException.Type, action);
         ThrowsCaseAssert.Expected(ex, tc);
     }
+
+    [Theory]
+    [MemberData(nameof(NumberAttributesTestData.PercentageNumber.Cases), MemberType = typeof(NumberAttributesTestData.PercentageNumber))]
+    public void PercentageNumber_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new PercentageNumberAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }
