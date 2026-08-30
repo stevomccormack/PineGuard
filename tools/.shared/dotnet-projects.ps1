@@ -41,7 +41,7 @@ function Get-PineGuardScope {
     [CmdletBinding(DefaultParameterSetName = 'One')]
     param(
         [Parameter(Mandatory, ParameterSetName = 'One', Position = 0)]
-        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'Testing')]
+        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing')]
         [string] $Name,
 
         [Parameter(Mandatory, ParameterSetName = 'All')]
