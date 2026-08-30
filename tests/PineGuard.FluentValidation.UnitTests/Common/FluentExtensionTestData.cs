@@ -126,6 +126,50 @@ public static class FluentExtensionTestData
             : ReturnCase<int?, bool>(Name, Value, Expected);
     }
 
+    public static class MustBeAsync
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("Ok result returns valid", "test", MustResult<bool>.Ok(true), "Error", null, true, null)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("Fail uses result message template", "test", MustResult<bool>.Fail("test.code", "Failed {paramName}", null, "test"), null, null, false, "Failed Value"),
+            new("Fail uses custom message template", "test", MustResult<bool>.Fail("test.code", "Failed", "param", "test"), "Custom {paramName}", null, false, "Custom Value"),
+            new("Fail uses override property name", "test", MustResult<bool>.Fail("test.code", "Failed", "param", "test"), "Custom {paramName}", "CustomProp", false, "Custom Custom Prop")
+        ];
+
+        public static TheoryData<IThrowsCase> InvalidCases =>
+        [
+            new InvalidCase("Null ruleBuilder throws", () =>
+            {
+                IRuleBuilder<object, string?>? builder = null;
+                builder!.MustBeAsync((_, _) => new ValueTask<MustResult<bool>>(MustResult<bool>.Ok(true)), "message");
+            }, new ExpectedException(typeof(ArgumentNullException), "ruleBuilder")),
+            new InvalidCase("Null check throws", () =>
+            {
+                var validator = new InlineValidator<string?>();
+                var builder = validator.RuleFor(x => x);
+                Func<string?, CancellationToken, ValueTask<MustResult<bool>>>? check = null;
+                builder.MustBeAsync(check!, "message");
+            }, new ExpectedException(typeof(ArgumentNullException), "check"))
+        ];
+
+        public sealed record ValidCase(
+            string Name,
+            string? Value,
+            MustResult<bool> Result,
+            string? Message,
+            string? PropertyNameOverride,
+            bool Expected,
+            string? ExpectedErrorMessage)
+            : ReturnCase<string?, bool>(Name, Value, Expected);
+
+        public sealed record InvalidCase(string Name, Action Value, ExpectedException ExpectedException)
+            : ThrowsCase<Action>(Name, Value, ExpectedException);
+    }
+
     public static class ErrorCode
     {
         public static TheoryData<bool> Cases => [true];

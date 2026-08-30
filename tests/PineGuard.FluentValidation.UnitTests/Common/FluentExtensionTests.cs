@@ -123,6 +123,49 @@ public sealed class FluentExtensionTests : BaseUnitTest
         }
     }
 
+    public static class MustBeAsync
+    {
+        [Theory]
+        [MemberData(nameof(FluentExtensionTestData.MustBeAsync.ValidCases), MemberType = typeof(FluentExtensionTestData.MustBeAsync))]
+        [MemberData(nameof(FluentExtensionTestData.MustBeAsync.EdgeCases), MemberType = typeof(FluentExtensionTestData.MustBeAsync))]
+        public static async Task BehavesAsExpected(FluentExtensionTestData.MustBeAsync.ValidCase testCase)
+        {
+            // Arrange
+            var validator = new InlineValidator<Model>();
+            var rule = validator.RuleFor(x => x.Value).MustBeAsync((_, _) => new ValueTask<MustResult<bool>>(testCase.Result), testCase.Message);
+            if (testCase.PropertyNameOverride is not null)
+                rule.OverridePropertyName(testCase.PropertyNameOverride);
+
+            // Act
+            var result = await validator.ValidateAsync(new Model { Value = testCase.Value });
+
+            // Assert
+            Assert.Equal(testCase.Expected, result.IsValid);
+            if (testCase.Expected)
+            {
+                Assert.Empty(result.Errors);
+                return;
+            }
+
+            var error = Assert.Single(result.Errors);
+            Assert.Equal(testCase.ExpectedErrorMessage, error.ErrorMessage);
+        }
+
+        [Theory]
+        [MemberData(nameof(FluentExtensionTestData.MustBeAsync.InvalidCases), MemberType = typeof(FluentExtensionTestData.MustBeAsync))]
+        public static void ThrowsExpected(IThrowsCase testCase)
+        {
+            // Arrange
+            var actionCase = Assert.IsType<ThrowsCase<Action>>(testCase, exactMatch: false);
+
+            // Act
+            var ex = Assert.Throws(testCase.ExpectedException.Type, () => actionCase.Value.Invoke());
+
+            // Assert
+            ThrowsCaseAssert.Expected(ex, testCase);
+        }
+    }
+
     public static class ErrorCode
     {
         [Theory]
@@ -167,6 +210,22 @@ public sealed class FluentExtensionTests : BaseUnitTest
             Assert.Equal("sample.code", singleResult.Errors[0].ErrorCode);
             Assert.Equal("sample.code", modelResult.Errors[0].ErrorCode);
             Assert.Equal("sample.code", structResult.Errors[0].ErrorCode);
+        }
+
+        [Theory]
+        [MemberData(nameof(FluentExtensionTestData.ErrorCode.Cases), MemberType = typeof(FluentExtensionTestData.ErrorCode))]
+        public static async Task CodeSet_BecomesErrorCode_OnTheAsyncOverload(bool _)
+        {
+            // Arrange
+            var validator = new InlineValidator<Model>();
+            validator.RuleFor(x => x.Value)
+                .MustBeAsync((_, _) => new ValueTask<MustResult<bool>>(MustResult<bool>.Fail("test.code", "bad", null, "x")), null, "sample.code");
+
+            // Act
+            var result = await validator.ValidateAsync(new Model());
+
+            // Assert
+            Assert.Equal("sample.code", result.Errors[0].ErrorCode);
         }
 
         [Theory]
