@@ -11,6 +11,8 @@
   <Project Path="../../../tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj" />
   <Project Path="../../../src/PineGuard.Extensions.Options/PineGuard.Extensions.Options.csproj" />
   <Project Path="../../../tests/PineGuard.Extensions.Options.UnitTests/PineGuard.Extensions.Options.UnitTests.csproj" />
+  <Project Path="../../../src/PineGuard.Extensions.DependencyInjection/PineGuard.Extensions.DependencyInjection.csproj" />
+  <Project Path="../../../tests/PineGuard.Extensions.DependencyInjection.UnitTests/PineGuard.Extensions.DependencyInjection.UnitTests.csproj" />
   <Project Path="../../../src/PineGuard.ErrorOr/PineGuard.ErrorOr.csproj" />
   <Project Path="../../../tests/PineGuard.ErrorOr.UnitTests/PineGuard.ErrorOr.UnitTests.csproj" />
   <Project Path="../../../src/PineGuard.FluentResults/PineGuard.FluentResults.csproj" />

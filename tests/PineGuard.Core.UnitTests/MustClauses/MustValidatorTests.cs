@@ -431,4 +431,280 @@ public sealed class MustValidatorTests(ITestOutputHelper output)
         Assert.False(syncFailure.Success);
         Assert.True(asyncSuccess.Success);
     }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncRuleFor.Cases), MemberType = typeof(MustValidatorTestData.AsyncRuleFor))]
+    public async Task RuleForAsync_SingleArgument_AttributesFailureToThePropertyPath(MustValidatorTestData.AsyncRuleFor.Case testCase)
+    {
+        // Arrange
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleForAsync(x => x.Email, (email, cancellationToken) => IsEmailAvailableAsync(email, cancellationToken));
+
+        // Act
+        var result = await validator.ValidateAsync(testCase.Value);
+
+        // Assert
+        Assert.Equal(testCase.ExpectedSuccess, result.Success);
+        if (!testCase.ExpectedSuccess)
+            Assert.Equal("Email", result.Failures[0].PropertyPath);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncRuleFor.Cases), MemberType = typeof(MustValidatorTestData.AsyncRuleFor))]
+    public async Task RuleForAsync_CrossProperty_ReceivesTheWholeInstance(MustValidatorTestData.AsyncRuleFor.Case testCase)
+    {
+        // Arrange
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleForAsync(x => x.Email, (CreateOrder order, string? email, CancellationToken cancellationToken) =>
+            IsEmailAvailableAsync(order.Email == email ? email : "taken@b.com", cancellationToken));
+
+        // Act
+        var result = await validator.ValidateAsync(testCase.Value);
+
+        // Assert
+        Assert.Equal(testCase.ExpectedSuccess, result.Success);
+        if (!testCase.ExpectedSuccess)
+            Assert.Equal("Email", result.Failures[0].PropertyPath);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncRuleForEach.Cases), MemberType = typeof(MustValidatorTestData.AsyncRuleForEach))]
+    public async Task RuleForEachAsync_SingleArgument_ReportsFailuresAtTheElementIndex(MustValidatorTestData.AsyncRuleForEach.Case testCase)
+    {
+        // Arrange
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleForEachAsync(x => x.Lines, (OrderLine line, CancellationToken cancellationToken) => IsEmailAvailableAsync(line.Sku, cancellationToken));
+
+        // Act
+        var result = await validator.ValidateAsync(OrderWith(testCase.Value));
+
+        // Assert
+        Assert.Equal(testCase.ExpectedSuccess, result.Success);
+        if (testCase.ExpectedPropertyPath is { } expectedPath)
+            Assert.Equal(expectedPath, result.Failures[0].PropertyPath);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncRuleForEach.Cases), MemberType = typeof(MustValidatorTestData.AsyncRuleForEach))]
+    public async Task RuleForEachAsync_CrossProperty_ReportsFailuresAtTheElementIndex(MustValidatorTestData.AsyncRuleForEach.Case testCase)
+    {
+        // Arrange
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleForEachAsync(x => x.Lines, (CreateOrder order, OrderLine line, CancellationToken cancellationToken) =>
+            IsEmailAvailableAsync(order.Lines is null ? "taken" : line.Sku, cancellationToken));
+
+        // Act
+        var result = await validator.ValidateAsync(OrderWith(testCase.Value));
+
+        // Assert
+        Assert.Equal(testCase.ExpectedSuccess, result.Success);
+        if (testCase.ExpectedPropertyPath is { } expectedPath)
+            Assert.Equal(expectedPath, result.Failures[0].PropertyPath);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncNullArguments.Cases), MemberType = typeof(MustValidatorTestData.AsyncNullArguments))]
+    public void RuleForAsync_NullExpressionOrCheck_ThrowsArgumentNullException(bool _)
+    {
+        // Arrange
+        var validator = new InlineMustValidator<CreateOrder>();
+        Func<string?, CancellationToken, ValueTask<MustResult<string>>> check = IsEmailAvailableAsync;
+        Func<CreateOrder, string?, CancellationToken, ValueTask<MustResult<string>>> crossCheck = (_, email, cancellationToken) => IsEmailAvailableAsync(email, cancellationToken);
+        Func<OrderLine, CancellationToken, ValueTask<MustResult<string>>> itemCheck = (line, cancellationToken) => IsEmailAvailableAsync(line.Sku, cancellationToken);
+        Func<CreateOrder, OrderLine, CancellationToken, ValueTask<MustResult<string>>> crossItemCheck = (_, line, cancellationToken) => IsEmailAvailableAsync(line.Sku, cancellationToken);
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => validator.RuleForAsync(null!, check));
+        Assert.Throws<ArgumentNullException>(() => validator.RuleForAsync(x => x.Email, (Func<string?, CancellationToken, ValueTask<MustResult<string>>>)null!));
+        Assert.Throws<ArgumentNullException>(() => validator.RuleForAsync(null!, crossCheck));
+        Assert.Throws<ArgumentNullException>(() => validator.RuleForAsync(x => x.Email, (Func<CreateOrder, string?, CancellationToken, ValueTask<MustResult<string>>>)null!));
+        Assert.Throws<ArgumentNullException>(() => validator.RuleForEachAsync(null!, itemCheck));
+        Assert.Throws<ArgumentNullException>(() => validator.RuleForEachAsync(x => x.Lines, (Func<OrderLine, CancellationToken, ValueTask<MustResult<string>>>)null!));
+        Assert.Throws<ArgumentNullException>(() => validator.RuleForEachAsync(null!, crossItemCheck));
+        Assert.Throws<ArgumentNullException>(() => validator.RuleForEachAsync(x => x.Lines, (Func<CreateOrder, OrderLine, CancellationToken, ValueTask<MustResult<string>>>)null!));
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncSynchronousUse.Cases), MemberType = typeof(MustValidatorTestData.AsyncSynchronousUse))]
+    public void Validate_WithAsyncRules_ThrowsInvalidOperationException(bool _)
+    {
+        // Arrange
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleForAsync(x => x.Email, (email, cancellationToken) => IsEmailAvailableAsync(email, cancellationToken));
+        var order = new CreateOrder("free@b.com", DateTime.MinValue, DateTime.MinValue, false, 0m, null);
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.Validate(order));
+        Assert.Equal("CreateOrder has async rules; call ValidateAsync.", exception.Message);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncSynchronousUse.Cases), MemberType = typeof(MustValidatorTestData.AsyncSynchronousUse))]
+    public void AsyncRuleRunner_Run_ThrowsInvalidOperationException(bool _)
+    {
+        // Arrange
+        MustAsyncRuleRunnerBase<OrderLine> runner = new MustAsyncPropertyRuleRunner<OrderLine, string?, string>(
+            "Sku",
+            line => line.Sku,
+            IsEmailAvailableAsync);
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => runner.Run(new OrderLine("SKU-1", 1)));
+        Assert.Equal("OrderLine has async rules; call ValidateAsync.", exception.Message);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.HasAsyncRulesProbe.Cases), MemberType = typeof(MustValidatorTestData.HasAsyncRulesProbe))]
+    public void HasAsyncRules_ReflectsWhetherAnAsyncRuleWasRegistered(MustValidatorTestData.HasAsyncRulesProbe.Case testCase)
+    {
+        // Arrange
+        var validator = new MustValidatorTestData.AsyncRuleProbeValidator(testCase.RegisterAsyncRule);
+
+        // Act
+        var hasAsyncRules = validator.AsyncRulesRegistered;
+
+        // Assert
+        Assert.Equal(testCase.RegisterAsyncRule, hasAsyncRules);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncOrderingAndCancellation.Cases), MemberType = typeof(MustValidatorTestData.AsyncOrderingAndCancellation))]
+    public async Task ValidateAsync_RunsSyncAndAsyncRulesSequentiallyInRegistrationOrder(bool _)
+    {
+        // Arrange
+        var executed = new List<string>();
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleFor(x => x.Email, email => Record(executed, "first-sync", MustResult<string>.Ok(email!)));
+        validator.RuleForAsync(x => x.Email, (email, _) => new ValueTask<MustResult<string>>(Record(executed, "async", MustResult<string>.Ok(email!))));
+        validator.RuleFor(x => x.Email, email => Record(executed, "second-sync", MustResult<string>.Ok(email!)));
+
+        // Act
+        var result = await validator.ValidateAsync(new CreateOrder("free@b.com", DateTime.MinValue, DateTime.MinValue, false, 0m, null));
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(["first-sync", "async", "second-sync"], executed);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncOrderingAndCancellation.Cases), MemberType = typeof(MustValidatorTestData.AsyncOrderingAndCancellation))]
+    public async Task ValidateAsync_ObservesCancellationBetweenRules(bool _)
+    {
+        // Arrange
+        using var cancellation = new CancellationTokenSource();
+        var executed = new List<string>();
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleForAsync(x => x.Email, (email, _) =>
+        {
+            executed.Add("first");
+            cancellation.Cancel();
+            return new ValueTask<MustResult<string>>(MustResult<string>.Ok(email!));
+        });
+        validator.RuleForAsync(x => x.Email, (email, _) => new ValueTask<MustResult<string>>(Record(executed, "second", MustResult<string>.Ok(email!))));
+        var order = new CreateOrder("free@b.com", DateTime.MinValue, DateTime.MinValue, false, 0m, null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(() => validator.ValidateAsync(order, cancellation.Token).AsTask());
+        Assert.Equal(["first"], executed);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncMode.Cases), MemberType = typeof(MustValidatorTestData.AsyncMode))]
+    public async Task ValidateAsync_Mode_AggregatesOrStopsAtTheFirstFailingRule(MustValidatorTestData.AsyncMode.Case testCase)
+    {
+        // Arrange
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleForAsync(x => x.Email, (email, cancellationToken) => IsEmailAvailableAsync("taken@b.com", cancellationToken));
+        validator.RuleFor(x => x.Weight, weight => MustResult<decimal>.Fail("sample.weight.not-positive", "{paramName} must be positive.", "weight", weight));
+        validator.RuleFor(x => x.StartDate, start => MustResult<DateTime>.Fail("sample.start-date.missing", "{paramName} must be supplied.", "start", start));
+        var order = new CreateOrder("taken@b.com", DateTime.MinValue, DateTime.MinValue, false, 0m, null);
+
+        // Act
+        var result = await validator.ValidateAsync(order, testCase.Mode);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(testCase.ExpectedFailureCount, result.Failures.Count);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncMode.Cases), MemberType = typeof(MustValidatorTestData.AsyncMode))]
+    public async Task ValidateAsync_Mode_SucceedsWhenNoRuleFails(MustValidatorTestData.AsyncMode.Case testCase)
+    {
+        // Arrange
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleForAsync(x => x.Email, (email, cancellationToken) => IsEmailAvailableAsync(email, cancellationToken));
+
+        // Act
+        var result = await validator.ValidateAsync(new CreateOrder("free@b.com", DateTime.MinValue, DateTime.MinValue, false, 0m, null), testCase.Mode);
+        var nullResult = await validator.ValidateAsync(null!, testCase.Mode);
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.False(nullResult.Success);
+        Assert.Equal(MustCodes.Value.State.Null, nullResult.Failures[0].Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.ModeDispatch.Cases), MemberType = typeof(MustValidatorTestData.ModeDispatch))]
+    public async Task ValidateAsync_Mode_DispatchesThroughEveryInterfaceForm(bool _)
+    {
+        // Arrange
+        var invalidOrder = new CreateOrder("bad", new DateTime(2026, 1, 2), new DateTime(2026, 1, 1), false, 0m, null);
+        var invalidLine = new OrderLine(null, 1);
+        IMustValidator baseClassNonGeneric = new CreateOrderValidator();
+        IMustValidator<OrderLine> handRolled = new MustValidatorTestData.HandRolledOrderLineValidator();
+        IMustValidator handRolledNonGeneric = handRolled;
+        IMustValidator nonGenericOnly = new MustValidatorTestData.HandRolledNonGenericValidator();
+
+        // Act
+        var baseClassResult = await baseClassNonGeneric.ValidateAsync(invalidOrder, MustValidationMode.StopOnFirstFailure);
+        var handRolledResult = await handRolled.ValidateAsync(invalidLine, MustValidationMode.StopOnFirstFailure);
+        var reimplementedResult = await handRolledNonGeneric.ValidateAsync(invalidLine, MustValidationMode.Aggregate);
+        var nonGenericOnlyResult = await nonGenericOnly.ValidateAsync(invalidLine, MustValidationMode.Aggregate);
+
+        // Assert
+        Assert.Single(baseClassResult.Failures);
+        Assert.False(handRolledResult.Success);
+        Assert.False(reimplementedResult.Success);
+        Assert.False(nonGenericOnlyResult.Success);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatorTestData.AsyncConditions.Cases), MemberType = typeof(MustValidatorTestData.AsyncConditions))]
+    public async Task AsyncRules_ConditionFalse_SkipEveryAsyncRunner(bool _)
+    {
+        // Arrange
+        var validator = new InlineMustValidator<CreateOrder>();
+        validator.RuleForAsync(x => x.Email, (email, cancellationToken) => IsEmailAvailableAsync("taken@b.com", cancellationToken)).When(_ => false);
+        validator.RuleForAsync(x => x.Email, (CreateOrder order, string? email, CancellationToken cancellationToken) => IsEmailAvailableAsync("taken@b.com", cancellationToken)).When(_ => false);
+        validator.RuleForEachAsync(x => x.Lines, (OrderLine line, CancellationToken cancellationToken) => IsEmailAvailableAsync("taken@b.com", cancellationToken)).When(_ => false);
+        validator.RuleForEachAsync(x => x.Lines, (CreateOrder order, OrderLine line, CancellationToken cancellationToken) => IsEmailAvailableAsync("taken@b.com", cancellationToken)).When(_ => false);
+        var order = new CreateOrder("taken@b.com", DateTime.MinValue, DateTime.MinValue, false, 0m, [new OrderLine("TAKEN", 1)]);
+
+        // Act
+        var result = await validator.ValidateAsync(order);
+
+        // Assert
+        Assert.True(result.Success);
+    }
+
+    private static ValueTask<MustResult<string>> IsEmailAvailableAsync(string? email, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var available = email is not null && !email.StartsWith("taken", StringComparison.OrdinalIgnoreCase) && !email.StartsWith("TAKEN", StringComparison.OrdinalIgnoreCase);
+        return new ValueTask<MustResult<string>>(available
+            ? MustResult<string>.Ok(email!, email, nameof(email))
+            : MustResult<string>.Fail("sample.email.taken", "{paramName} must be available.", nameof(email), email));
+    }
+
+    private static CreateOrder OrderWith(IReadOnlyList<OrderLine>? lines) =>
+        new(null, DateTime.MinValue, DateTime.MinValue, false, 0m, lines);
+
+    private static MustResult<string> Record(List<string> executed, string name, MustResult<string> result)
+    {
+        executed.Add(name);
+        return result;
+    }
 }

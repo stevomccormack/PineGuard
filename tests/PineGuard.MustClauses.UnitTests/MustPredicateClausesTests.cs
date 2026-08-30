@@ -28,4 +28,47 @@ public sealed class MustPredicateClausesTests(ITestOutputHelper output) : BaseMu
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(MustPredicateClausesTestData.SatisfiesAsync.ValidCases), MemberType = typeof(MustPredicateClausesTestData.SatisfiesAsync))]
+    [MemberData(nameof(MustPredicateClausesTestData.SatisfiesAsync.InvalidCases), MemberType = typeof(MustPredicateClausesTestData.SatisfiesAsync))]
+    public async Task SatisfiesAsync_BehavesAsExpected(MustCase<(string? value, Func<string, CancellationToken, ValueTask<bool>>? predicate)> tc)
+    {
+        // Act
+        var result = await Must.Be.SatisfiesAsync(tc.Value.value, tc.Value.predicate!, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustPredicateClausesTestData.NotSatisfiesAsync.ValidCases), MemberType = typeof(MustPredicateClausesTestData.NotSatisfiesAsync))]
+    [MemberData(nameof(MustPredicateClausesTestData.NotSatisfiesAsync.InvalidCases), MemberType = typeof(MustPredicateClausesTestData.NotSatisfiesAsync))]
+    public async Task NotSatisfiesAsync_BehavesAsExpected(MustCase<(string? value, Func<string, CancellationToken, ValueTask<bool>>? predicate)> tc)
+    {
+        // Act
+        var result = await Must.Be.NotSatisfiesAsync(tc.Value.value, tc.Value.predicate!, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustPredicateClausesTestData.AsyncCancellation.Cases), MemberType = typeof(MustPredicateClausesTestData.AsyncCancellation))]
+    public async Task SatisfiesAsync_PassesTheTokenToThePredicate(bool _)
+    {
+        // Arrange
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+
+        static ValueTask<bool> Observing(string value, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return new ValueTask<bool>(true);
+        }
+
+        // Act & Assert
+        await Assert.ThrowsAsync<OperationCanceledException>(() => Must.Be.SatisfiesAsync("hello", Observing, cancellation.Token, paramName: "value").AsTask());
+        await Assert.ThrowsAsync<OperationCanceledException>(() => Must.Be.NotSatisfiesAsync("hello", Observing, cancellation.Token, paramName: "value").AsTask());
+    }
 }

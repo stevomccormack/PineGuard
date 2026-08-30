@@ -92,6 +92,20 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: DependencyInjection (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.Extensions.DependencyInjection.UnitTests/PineGuard.Extensions.DependencyInjection.UnitTests.csproj"
+            ],
+            "problemMatcher": []
+        },        {
             "label": "Test: ErrorOr (fast)",
             "type": "shell",
             "command": "pwsh",
@@ -161,6 +175,7 @@
                 "Test: FluentValidation (fast)",
                 "Test: DataAnnotations (fast)",
                 "Test: Options (fast)",
+                "Test: DependencyInjection (fast)",
                 "Test: ErrorOr (fast)",
                 "Test: FluentResults (fast)",
                 "Test: OneOf (fast)",
@@ -614,6 +629,12 @@
             "problemMatcher": []
         },
         {
+            "label": "Inspect: Qodana: DependencyInjection",
+            "dependsOn": [
+                "Quality: Qodana: DependencyInjection"
+            ],
+            "problemMatcher": []
+        },        {
             "label": "Inspect: Qodana: ErrorOr",
             "dependsOn": [
                 "Quality: Qodana: ErrorOr"
@@ -651,6 +672,7 @@
                 "Inspect: Qodana: FluentValidation",
                 "Inspect: Qodana: DataAnnotations",
                 "Inspect: Qodana: Options",
+                "Inspect: Qodana: DependencyInjection",
                 "Inspect: Qodana: ErrorOr",
                 "Inspect: Qodana: FluentResults",
                 "Inspect: Qodana: OneOf",
@@ -986,6 +1008,24 @@
             "problemMatcher": []
         },
         {
+            "label": "Coverage: DependencyInjection (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-coverage/Run-CodeCoverage.ps1",
+                "-Mode",
+                "GenerateAndAnalyze",
+                "-Scope",
+                "DependencyInjection",
+                "-NoOpen",
+                "-SkipHtml"
+            ],
+            "problemMatcher": []
+        },        {
             "label": "Coverage: ErrorOr (fast)",
             "type": "shell",
             "command": "pwsh",
@@ -1071,6 +1111,7 @@
                 "Coverage: FluentValidation (fast)",
                 "Coverage: DataAnnotations (fast)",
                 "Coverage: Options (fast)",
+                "Coverage: DependencyInjection (fast)",
                 "Coverage: ErrorOr (fast)",
                 "Coverage: FluentResults (fast)",
                 "Coverage: OneOf (fast)",
@@ -1194,6 +1235,22 @@
             "problemMatcher": []
         },
         {
+            "label": "Quality: Qodana: DependencyInjection",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "DependencyInjection",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },        {
             "label": "Quality: Qodana: ErrorOr",
             "type": "shell",
             "command": "pwsh",
@@ -1450,6 +1507,19 @@
             "problemMatcher": []
         },
         {
+            "label": "Git: Commit DependencyInjection (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-DependencyInjection.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },        {
             "label": "Git: Commit ErrorOr (auto message)",
             "type": "shell",
             "command": "pwsh",
@@ -1628,6 +1698,20 @@
             "problemMatcher": []
         },
         {
+            "label": "Format: DependencyInjection",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-formatter/Run-Format.ps1",
+                "-Scope",
+                "DependencyInjection"
+            ],
+            "problemMatcher": []
+        },        {
             "label": "Format: ErrorOr",
             "type": "shell",
             "command": "pwsh",
@@ -1712,6 +1796,7 @@
                 "Format: FluentValidation",
                 "Format: DataAnnotations",
                 "Format: Options",
+                "Format: DependencyInjection",
                 "Format: ErrorOr",
                 "Format: FluentResults",
                 "Format: OneOf",
