@@ -215,6 +215,22 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
         AssertResult(tc, result);
     }
 
+    private sealed class PercentageValidator : AbstractValidator<Model>
+    {
+        public PercentageValidator() => RuleFor(x => x.Value).Percentage();
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringNumbersExtensionsTestData.Percentage.Cases), MemberType = typeof(FluentStringNumbersExtensionsTestData.Percentage))]
+    public void Percentage_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new PercentageValidator().Validate(new Model { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
     private sealed class ApproximatelyValidator : AbstractValidator<Model>
     {
         public ApproximatelyValidator(decimal target, decimal? tolerance) => RuleFor(x => x.Value).Approximately(target, tolerance);

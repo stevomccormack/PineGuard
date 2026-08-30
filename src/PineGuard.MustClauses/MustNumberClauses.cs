@@ -366,6 +366,33 @@ public static class MustNumberClauses
     }
 
     /// <summary>
+    /// Validates that the specified value must be a percentage between 0 and 100.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must be a percentage between 0 and 100."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/number">Number Must Clauses documentation</seealso>
+    public static MustResult<T> Percentage<T>(this IMustClause _,
+        T value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        where T : struct, INumber<T>
+    {
+        const string messageTemplate = "{paramName} must be a percentage between 0 and 100.";
+
+        var ok = NumberRules.IsPercentage<T>(value);
+        return MustResult<T>.FromBool(ok, MustCodes.Number.Range.NotPercentage, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
     /// Validates that the specified value requires a non-null tolerance.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>

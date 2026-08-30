@@ -448,6 +448,40 @@ public static class MustStringNumbersClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="styles">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
+    public static MustResult<decimal> Percentage(this IMustClause _,
+        string? value,
+        NumberStyles styles = DefaultStyles,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.NotPercentage, "{paramName} must not be null.", paramName, value);
+
+        const string messageTemplate = "{paramName} must be a percentage between 0 and 100.";
+
+        if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.NotPercentage, messageTemplate, paramName, value, result: default);
+
+        var ok = NumberRules.IsPercentage<decimal>(parsed);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.NotPercentage, messageTemplate, paramName, value, parsed);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must not be null.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
     /// <param name="target">The target value to compare against.</param>
     /// <param name="tolerance">The tolerance for approximate comparison.</param>
     /// <param name="styles">The value to validate.</param>

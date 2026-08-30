@@ -96,6 +96,12 @@ public static class MustNumberClausesTestData
         }
     }
 
+    public static class Percentage
+    {
+        public static TheoryData<MustCase<decimal>> ValidCases => F.IsPercentage.AllValid.Project(v => v!.Value).ToMustCases();
+        public static TheoryData<MustCase<decimal>> InvalidCases => F.IsPercentage.AllInvalid.Except(nameof(F.IsPercentage.NullValue)).Project(v => v!.Value).ToMustCases(_ => new MustExpected(false, "value must be a percentage between 0 and 100.", Code: MustCodes.Number.Range.NotPercentage));
+    }
+
     public static class Approximately
     {
         public static TheoryData<MustCase<(decimal value, decimal target, decimal? tolerance)>> ValidCases => F.IsApproximately.ValidScenarios.Except(nameof(F.IsApproximately.NullValue)).Project(v => (v.value!.Value, v.target, v.tolerance)).ToMustCases();

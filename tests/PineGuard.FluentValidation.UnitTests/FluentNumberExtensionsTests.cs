@@ -121,6 +121,19 @@ public sealed class FluentNumberExtensionsTests(ITestOutputHelper output) : Base
         AssertResult(tc, result);
     }
 
+    private sealed class PercentageValidator : AbstractValidator<DecimalModel>
+    {
+        public PercentageValidator() => RuleFor(x => x.Value).Percentage();
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentNumberExtensionsTestData.Percentage.Cases), MemberType = typeof(FluentNumberExtensionsTestData.Percentage))]
+    public void Percentage_BehavesAsExpected(FluentCase<decimal?> tc)
+    {
+        var result = new PercentageValidator().Validate(new DecimalModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
     private sealed class ApproximatelyValidator : AbstractValidator<DecimalModel>
     {
         public ApproximatelyValidator(decimal target, decimal? tolerance) => RuleFor(x => x.Value).Approximately(target, tolerance);

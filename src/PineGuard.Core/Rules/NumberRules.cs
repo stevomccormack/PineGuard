@@ -11,6 +11,16 @@ namespace PineGuard.Rules;
 public static class NumberRules
 {
     /// <summary>
+    /// The smallest value a percentage can take (<c>0</c>).
+    /// </summary>
+    public const int MinPercentage = 0;
+
+    /// <summary>
+    /// The largest value a percentage can take (<c>100</c>).
+    /// </summary>
+    public const int MaxPercentage = 100;
+
+    /// <summary>
     /// Determines whether the specified value is strictly positive (greater than zero).
     /// </summary>
     /// <typeparam name="T">A numeric value type that implements <see cref="INumber{TSelf}"/>.</typeparam>
@@ -116,6 +126,20 @@ public static class NumberRules
     public static bool IsInRange<T>(T? value, T min, T max, Inclusion inclusion = Inclusion.Inclusive)
         where T : struct, IComparable<T> =>
         value is not null && RuleComparison.IsBetween(value.Value, min, max, inclusion);
+
+    /// <summary>
+    /// Determines whether the specified value is a percentage — between
+    /// <see cref="MinPercentage"/> and <see cref="MaxPercentage"/> inclusive.
+    /// </summary>
+    /// <typeparam name="T">A numeric value type that implements <see cref="INumber{TSelf}"/>.</typeparam>
+    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is within 0–100; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// The scale is the everyday one a human reads off a form — <c>0</c> to <c>100</c>, not <c>0.0</c> to
+    /// <c>1.0</c> — so <c>0.5</c> is half a percent, not fifty percent.
+    /// </remarks>
+    public static bool IsPercentage<T>(T? value) where T : struct, INumber<T> =>
+        IsInRange(value, T.CreateChecked(MinPercentage), T.CreateChecked(MaxPercentage));
 
     /// <summary>
     /// Determines whether the specified value is approximately equal to <paramref name="target"/>

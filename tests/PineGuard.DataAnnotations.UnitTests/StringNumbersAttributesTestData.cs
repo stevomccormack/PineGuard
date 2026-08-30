@@ -1,4 +1,6 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -153,5 +155,15 @@ public static class StringNumbersAttributesTestData
         public static TheoryData<ValidCase> ValidCases => [new("finite", "1", true), new("infinity", "Infinity", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases => [new("nan", F.NumbersIsNaN.NaN, false)];
+    }
+
+    public static class PercentageString
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.NumbersIsPercentage.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.NumbersIsPercentage.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a percentage between 0 and 100.", Code: MustCodes.Number.Range.NotPercentage)
+        });
     }
 }

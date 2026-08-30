@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
@@ -60,6 +61,12 @@ public static class GuardStringNumbersClausesTestData
     {
         public static TheoryData<GuardCase<string?>> ValidCases => F.NumbersIsFinite.ValidScenarios.ToGuardCases();
         public static TheoryData<GuardCase<string?>> InvalidCases => F.NumbersIsFinite.InvalidScenarios.ToGuardCases("value");
+    }
+
+    public static class NotPercentage
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.NumbersIsPercentage.AllValid.ToGuardCases();
+        public static TheoryData<GuardCase<string?>> InvalidCases => F.NumbersIsPercentage.AllInvalid.ToGuardCases(s => new GuardExpected(false, s.IsNull ? typeof(ArgumentNullException) : typeof(ArgumentException), "value", Code: MustCodes.Number.Range.NotPercentage));
     }
 
     // ── Simple string? ops (INVERTED — unparseable values stay in InvalidCases) ──
