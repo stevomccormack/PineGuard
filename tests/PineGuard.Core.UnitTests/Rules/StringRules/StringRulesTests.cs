@@ -434,4 +434,15 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
         // Assert
         ThrowsCaseAssert.Expected(ex, testCase);
     }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.HasByteOrderMark.Cases), MemberType = typeof(StringRulesTestData.HasByteOrderMark))]
+    public void HasByteOrderMark_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.HasByteOrderMark(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

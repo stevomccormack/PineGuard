@@ -241,5 +241,18 @@ public static partial class MustCodes
             /// <summary><c>text.pattern.match</c></summary>
             public const string Match = Prefix + ".match";
         }
+
+        /// <summary>The leading Unicode byte-order mark (<c>U+FEFF</c>) the text carries.</summary>
+        public static class Bom
+        {
+            /// <summary>The code prefix for this node (<c>"text.bom"</c>).</summary>
+            public const string Prefix = Text.Prefix + ".bom";
+
+            /// <summary><c>text.bom.missing</c></summary>
+            public const string Missing = Prefix + ".missing";
+
+            /// <summary><c>text.bom.present</c></summary>
+            public const string Present = Prefix + ".present";
+        }
     }
 }

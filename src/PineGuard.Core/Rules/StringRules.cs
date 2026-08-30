@@ -28,6 +28,11 @@ namespace PineGuard.Rules;
 public static partial class StringRules
 {
     /// <summary>
+    /// The Unicode byte-order mark character (<c>U+FEFF</c>), also known as the zero-width no-break space.
+    /// </summary>
+    public const char ByteOrderMark = '\uFEFF';
+
+    /// <summary>
     /// Determines whether the specified string has exactly <paramref name="length"/> characters.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
@@ -438,6 +443,24 @@ public static partial class StringRules
         ThrowHelper.ThrowIfNull(suffix);
 
         return value is not null && value.EndsWith(suffix, comparison);
+    }
+
+    /// <summary>
+    /// Determines whether the specified string begins with the Unicode byte-order mark (<see cref="ByteOrderMark"/>, <c>U+FEFF</c>).
+    /// </summary>
+    /// <remarks>
+    /// A byte-order mark that survives decoding is a leading character of the string like any other: it breaks equality
+    /// comparisons, prefix matching, and numeric parsing. This rule reports its presence at the start of the string only —
+    /// a <c>U+FEFF</c> anywhere else is a zero-width no-break space, not a byte-order mark.
+    /// </remarks>
+    /// <param name="value">The value to validate. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if the first character of <paramref name="value"/> is the byte-order mark; otherwise, <see langword="false"/>.</returns>
+    public static bool HasByteOrderMark(string? value)
+    {
+        if (value is null || value.Length == 0)
+            return false;
+
+        return value[0] == ByteOrderMark;
     }
 
     private static bool AllCharsAreAllowed(string value, Func<char, bool> allowedCharPredicate,
