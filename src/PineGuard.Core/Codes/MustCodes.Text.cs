@@ -241,5 +241,62 @@ public static partial class MustCodes
             /// <summary><c>text.pattern.match</c></summary>
             public const string Match = Prefix + ".match";
         }
+
+        /// <summary>The leading Unicode byte-order mark (<c>U+FEFF</c>) the text carries.</summary>
+        public static class Bom
+        {
+            /// <summary>The code prefix for this node (<c>"text.bom"</c>).</summary>
+            public const string Prefix = Text.Prefix + ".bom";
+
+            /// <summary><c>text.bom.missing</c></summary>
+            public const string Missing = Prefix + ".missing";
+
+            /// <summary><c>text.bom.present</c></summary>
+            public const string Present = Prefix + ".present";
+        }
+
+        /// <summary>Unicode integrity: surrogate pairing and normalization form.</summary>
+        public static class Unicode
+        {
+            /// <summary>The code prefix for this node (<c>"text.unicode"</c>).</summary>
+            public const string Prefix = Text.Prefix + ".unicode";
+
+            /// <summary><c>text.unicode.malformed</c></summary>
+            public const string Malformed = Prefix + ".malformed";
+
+            /// <summary><c>text.unicode.well-formed</c></summary>
+            public const string WellFormed = Prefix + ".well-formed";
+
+            /// <summary><c>text.unicode.not-normalized</c></summary>
+            public const string NotNormalized = Prefix + ".not-normalized";
+
+            /// <summary><c>text.unicode.normalized</c></summary>
+            public const string Normalized = Prefix + ".normalized";
+        }
+
+        /// <summary>How many grapheme clusters — user-perceived characters — the text holds.</summary>
+        public static class Graphemes
+        {
+            /// <summary>The code prefix for this node (<c>"text.graphemes"</c>).</summary>
+            public const string Prefix = Text.Prefix + ".graphemes";
+
+            /// <summary><c>text.graphemes.mismatch</c></summary>
+            public const string Mismatch = Prefix + ".mismatch";
+
+            /// <summary><c>text.graphemes.match</c></summary>
+            public const string Match = Prefix + ".match";
+
+            /// <summary><c>text.graphemes.too-few</c></summary>
+            public const string TooFew = Prefix + ".too-few";
+
+            /// <summary><c>text.graphemes.too-many</c></summary>
+            public const string TooMany = Prefix + ".too-many";
+
+            /// <summary><c>text.graphemes.out-of-range</c></summary>
+            public const string OutOfRange = Prefix + ".out-of-range";
+
+            /// <summary><c>text.graphemes.in-range</c></summary>
+            public const string InRange = Prefix + ".in-range";
+        }
     }
 }

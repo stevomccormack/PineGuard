@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using PineGuard.MustClauses;
 
@@ -1801,6 +1802,258 @@ public static class GuardStringClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         var result = Must.Be.NotEndsWith(value, suffix, comparison, paramName); // Guard.Against.EndsWith => Must.Be.NotEndsWith (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> does not start with the Unicode byte-order mark (<c>U+FEFF</c>).
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.HasByteOrderMark"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> does not start with the byte-order mark and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// Only a leading <c>U+FEFF</c> counts — the same character anywhere else is a zero-width no-break space.
+    /// </remarks>
+    /// <seealso cref="MustStringClauses.HasByteOrderMark"/>
+    public static string NotHasByteOrderMark(this IGuardClause _,
+        string? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.HasByteOrderMark(value, paramName); // Guard.Against.NotHasByteOrderMark => Must.Be.HasByteOrderMark (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> starts with the Unicode byte-order mark (<c>U+FEFF</c>).
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.NotHasByteOrderMark"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> starts with the byte-order mark and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// This is the forbidden state most callers want: a byte-order mark that survives decoding silently
+    /// breaks equality, prefix matching, and numeric parsing.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// Guard.Against.HasByteOrderMark(line);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.NotHasByteOrderMark"/>
+    public static string HasByteOrderMark(this IGuardClause _,
+        string? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotHasByteOrderMark(value, paramName); // Guard.Against.HasByteOrderMark => Must.Be.NotHasByteOrderMark (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> is not well-formed UTF-16 — it carries at least one unpaired surrogate.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.WellFormedUtf16"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> contains an unpaired surrogate and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// A string carrying an unpaired surrogate cannot be encoded to UTF-8, so it otherwise fails at the
+    /// serialization boundary far from where it was created.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// Guard.Against.NotWellFormedUtf16(payload);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.WellFormedUtf16"/>
+    public static string NotWellFormedUtf16(this IGuardClause _,
+        string? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.WellFormedUtf16(value, paramName); // Guard.Against.NotWellFormedUtf16 => Must.Be.WellFormedUtf16 (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> is well-formed UTF-16 — every surrogate code unit forms a complete pair.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.NotWellFormedUtf16"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is well-formed UTF-16 and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustStringClauses.NotWellFormedUtf16"/>
+    public static string WellFormedUtf16(this IGuardClause _,
+        string? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotWellFormedUtf16(value, paramName); // Guard.Against.WellFormedUtf16 => Must.Be.NotWellFormedUtf16 (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> is not already in the given Unicode normalization form.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="form">The <see cref="NormalizationForm"/> to require. Defaults to <see cref="NormalizationForm.FormC"/>.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.Normalized"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is not in <paramref name="form"/>, or when
+    /// <paramref name="form"/> is not a defined <see cref="NormalizationForm"/>, and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// Unnormalized input silently breaks equality and uniqueness: the two spellings of <c>"é"</c> look
+    /// identical but are not ordinally equal.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// Guard.Against.NotNormalized(username);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustStringClauses.Normalized"/>
+    public static string NotNormalized(this IGuardClause _,
+        string? value,
+        NormalizationForm form = NormalizationForm.FormC,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Normalized(value, form, paramName); // Guard.Against.NotNormalized => Must.Be.Normalized (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> is already in the given Unicode normalization form.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="form">The <see cref="NormalizationForm"/> that must not already apply. Defaults to <see cref="NormalizationForm.FormC"/>.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.NotNormalized"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is already in <paramref name="form"/>, or when
+    /// <paramref name="form"/> is not a defined <see cref="NormalizationForm"/>, and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustStringClauses.NotNormalized"/>
+    public static string Normalized(this IGuardClause _,
+        string? value,
+        NormalizationForm form = NormalizationForm.FormC,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotNormalized(value, form, paramName); // Guard.Against.Normalized => Must.Be.NotNormalized (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
