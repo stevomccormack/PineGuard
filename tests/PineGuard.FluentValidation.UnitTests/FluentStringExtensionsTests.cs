@@ -209,6 +209,36 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
         public NotContainsDisallowedValidator(char[] disallowedChars) => RuleFor(x => x.Value).NotContainsDisallowed(disallowedChars);
     }
 
+    private sealed class ContainsValidator : AbstractValidator<StringModel>
+    {
+        public ContainsValidator(string substring, StringComparison comparison) => RuleFor(x => x.Value).Contains(substring, comparison);
+    }
+
+    private sealed class NotContainsValidator : AbstractValidator<StringModel>
+    {
+        public NotContainsValidator(string substring, StringComparison comparison) => RuleFor(x => x.Value).NotContains(substring, comparison);
+    }
+
+    private sealed class StartsWithValidator : AbstractValidator<StringModel>
+    {
+        public StartsWithValidator(string prefix, StringComparison comparison) => RuleFor(x => x.Value).StartsWith(prefix, comparison);
+    }
+
+    private sealed class NotStartsWithValidator : AbstractValidator<StringModel>
+    {
+        public NotStartsWithValidator(string prefix, StringComparison comparison) => RuleFor(x => x.Value).NotStartsWith(prefix, comparison);
+    }
+
+    private sealed class EndsWithValidator : AbstractValidator<StringModel>
+    {
+        public EndsWithValidator(string suffix, StringComparison comparison) => RuleFor(x => x.Value).EndsWith(suffix, comparison);
+    }
+
+    private sealed class NotEndsWithValidator : AbstractValidator<StringModel>
+    {
+        public NotEndsWithValidator(string suffix, StringComparison comparison) => RuleFor(x => x.Value).NotEndsWith(suffix, comparison);
+    }
+
     [Theory]
     [MemberData(nameof(FluentStringExtensionsTestData.NotNullOrEmpty.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotNullOrEmpty))]
     public void NotNullOrEmpty_BehavesAsExpected(FluentCase<string?> tc)
@@ -526,6 +556,54 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
     public void NotContainsDisallowed_BehavesAsExpected(FluentCase<(string? value, char[] disallowedChars)> tc)
     {
         var result = new NotContainsDisallowedValidator(tc.Value.disallowedChars).Validate(new StringModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.Contains.Cases), MemberType = typeof(FluentStringExtensionsTestData.Contains))]
+    public void Contains_BehavesAsExpected(FluentCase<(string? value, string substring, StringComparison comparison)> tc)
+    {
+        var result = new ContainsValidator(tc.Value.substring, tc.Value.comparison).Validate(new StringModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.NotContains.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotContains))]
+    public void NotContains_BehavesAsExpected(FluentCase<(string? value, string substring, StringComparison comparison)> tc)
+    {
+        var result = new NotContainsValidator(tc.Value.substring, tc.Value.comparison).Validate(new StringModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.StartsWith.Cases), MemberType = typeof(FluentStringExtensionsTestData.StartsWith))]
+    public void StartsWith_BehavesAsExpected(FluentCase<(string? value, string prefix, StringComparison comparison)> tc)
+    {
+        var result = new StartsWithValidator(tc.Value.prefix, tc.Value.comparison).Validate(new StringModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.NotStartsWith.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotStartsWith))]
+    public void NotStartsWith_BehavesAsExpected(FluentCase<(string? value, string prefix, StringComparison comparison)> tc)
+    {
+        var result = new NotStartsWithValidator(tc.Value.prefix, tc.Value.comparison).Validate(new StringModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.EndsWith.Cases), MemberType = typeof(FluentStringExtensionsTestData.EndsWith))]
+    public void EndsWith_BehavesAsExpected(FluentCase<(string? value, string suffix, StringComparison comparison)> tc)
+    {
+        var result = new EndsWithValidator(tc.Value.suffix, tc.Value.comparison).Validate(new StringModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.NotEndsWith.Cases), MemberType = typeof(FluentStringExtensionsTestData.NotEndsWith))]
+    public void NotEndsWith_BehavesAsExpected(FluentCase<(string? value, string suffix, StringComparison comparison)> tc)
+    {
+        var result = new NotEndsWithValidator(tc.Value.suffix, tc.Value.comparison).Validate(new StringModel { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 }

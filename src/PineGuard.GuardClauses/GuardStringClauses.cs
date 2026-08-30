@@ -1566,4 +1566,244 @@ public static class GuardStringClauses
 
         return result.Result!;
     }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> does not contain <paramref name="substring"/>.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="substring">The substring that must be present. An empty substring is always contained.</param>
+    /// <param name="comparison">The comparison rule used to locate <paramref name="substring"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.Contains"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> does not contain <paramref name="substring"/> and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustStringClauses.Contains"/>
+    public static string NotContains(this IGuardClause _,
+        string? value,
+        string substring,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Contains(value, substring, comparison, paramName); // Guard.Against.NotContains => Must.Be.Contains (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> contains <paramref name="substring"/>.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="substring">The substring that must be absent. An empty substring is always contained.</param>
+    /// <param name="comparison">The comparison rule used to locate <paramref name="substring"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.NotContains"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> contains <paramref name="substring"/> and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustStringClauses.NotContains"/>
+    public static string Contains(this IGuardClause _,
+        string? value,
+        string substring,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotContains(value, substring, comparison, paramName); // Guard.Against.Contains => Must.Be.NotContains (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> does not start with <paramref name="prefix"/>.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="prefix">The prefix that must be present. An empty prefix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="prefix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.StartsWith"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> does not start with <paramref name="prefix"/> and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustStringClauses.StartsWith"/>
+    public static string NotStartsWith(this IGuardClause _,
+        string? value,
+        string prefix,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.StartsWith(value, prefix, comparison, paramName); // Guard.Against.NotStartsWith => Must.Be.StartsWith (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> starts with <paramref name="prefix"/>.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="prefix">The prefix that must be absent. An empty prefix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="prefix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.NotStartsWith"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> starts with <paramref name="prefix"/> and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustStringClauses.NotStartsWith"/>
+    public static string StartsWith(this IGuardClause _,
+        string? value,
+        string prefix,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotStartsWith(value, prefix, comparison, paramName); // Guard.Against.StartsWith => Must.Be.NotStartsWith (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> does not end with <paramref name="suffix"/>.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="suffix">The suffix that must be present. An empty suffix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="suffix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.EndsWith"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> does not end with <paramref name="suffix"/> and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustStringClauses.EndsWith"/>
+    public static string NotEndsWith(this IGuardClause _,
+        string? value,
+        string suffix,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.EndsWith(value, suffix, comparison, paramName); // Guard.Against.NotEndsWith => Must.Be.EndsWith (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> ends with <paramref name="suffix"/>.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string value to guard.</param>
+    /// <param name="suffix">The suffix that must be absent. An empty suffix always matches.</param>
+    /// <param name="comparison">The comparison rule used to test <paramref name="suffix"/>. Defaults to <see cref="StringComparison.Ordinal"/>.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustStringClauses.NotEndsWith"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> ends with <paramref name="suffix"/> and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustStringClauses.NotEndsWith"/>
+    public static string EndsWith(this IGuardClause _,
+        string? value,
+        string suffix,
+        StringComparison comparison = StringComparison.Ordinal,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotEndsWith(value, suffix, comparison, paramName); // Guard.Against.EndsWith => Must.Be.NotEndsWith (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
 }

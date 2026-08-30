@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using PineGuard.Codes;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class StringAttributesTests
+public sealed class StringAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     private static void Verify<TAttribute>(TAttribute attribute, StringAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
@@ -361,5 +363,185 @@ public sealed class StringAttributesTests
         var attribute = new ContainsAnyAttribute(['x', 'y']);
         Assert.Equal(MustCodes.Text.Charset.NotContainsAny, attribute.Code);
         Verify(attribute, testCase);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.Contains.Cases), MemberType = typeof(StringAttributesTestData.Contains))]
+    public void Contains_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new ContainsAttribute(StringAttributesTestData.Contains.Substring);
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.ContainsIgnoringCase.Cases), MemberType = typeof(StringAttributesTestData.ContainsIgnoringCase))]
+    public void ContainsIgnoringCase_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new ContainsAttribute(StringAttributesTestData.ContainsIgnoringCase.Substring) { Comparison = StringAttributesTestData.ContainsIgnoringCase.Comparison };
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.NotContains.Cases), MemberType = typeof(StringAttributesTestData.NotContains))]
+    public void NotContains_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotContainsAttribute(StringAttributesTestData.NotContains.Substring);
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.NotContainsIgnoringCase.Cases), MemberType = typeof(StringAttributesTestData.NotContainsIgnoringCase))]
+    public void NotContainsIgnoringCase_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotContainsAttribute(StringAttributesTestData.NotContainsIgnoringCase.Substring) { Comparison = StringAttributesTestData.NotContainsIgnoringCase.Comparison };
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.StartsWith.Cases), MemberType = typeof(StringAttributesTestData.StartsWith))]
+    public void StartsWith_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new StartsWithAttribute(StringAttributesTestData.StartsWith.Prefix);
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.StartsWithIgnoringCase.Cases), MemberType = typeof(StringAttributesTestData.StartsWithIgnoringCase))]
+    public void StartsWithIgnoringCase_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new StartsWithAttribute(StringAttributesTestData.StartsWithIgnoringCase.Prefix) { Comparison = StringAttributesTestData.StartsWithIgnoringCase.Comparison };
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.NotStartsWith.Cases), MemberType = typeof(StringAttributesTestData.NotStartsWith))]
+    public void NotStartsWith_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotStartsWithAttribute(StringAttributesTestData.NotStartsWith.Prefix);
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.NotStartsWithIgnoringCase.Cases), MemberType = typeof(StringAttributesTestData.NotStartsWithIgnoringCase))]
+    public void NotStartsWithIgnoringCase_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotStartsWithAttribute(StringAttributesTestData.NotStartsWithIgnoringCase.Prefix) { Comparison = StringAttributesTestData.NotStartsWithIgnoringCase.Comparison };
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.EndsWith.Cases), MemberType = typeof(StringAttributesTestData.EndsWith))]
+    public void EndsWith_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new EndsWithAttribute(StringAttributesTestData.EndsWith.Suffix);
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.EndsWithIgnoringCase.Cases), MemberType = typeof(StringAttributesTestData.EndsWithIgnoringCase))]
+    public void EndsWithIgnoringCase_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new EndsWithAttribute(StringAttributesTestData.EndsWithIgnoringCase.Suffix) { Comparison = StringAttributesTestData.EndsWithIgnoringCase.Comparison };
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.NotEndsWith.Cases), MemberType = typeof(StringAttributesTestData.NotEndsWith))]
+    public void NotEndsWith_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotEndsWithAttribute(StringAttributesTestData.NotEndsWith.Suffix);
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.NotEndsWithIgnoringCase.Cases), MemberType = typeof(StringAttributesTestData.NotEndsWithIgnoringCase))]
+    public void NotEndsWithIgnoringCase_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotEndsWithAttribute(StringAttributesTestData.NotEndsWithIgnoringCase.Suffix) { Comparison = StringAttributesTestData.NotEndsWithIgnoringCase.Comparison };
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
     }
 }
