@@ -59,9 +59,28 @@
 - Primary constructor for parameterized attributes: `sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.X.Y.Z)`; a parameterless attribute still needs the empty primary ctor `FooAttribute() : Base(code)` to pass the code up
 - Expose constructor params as `public` properties
 - Override `ValidateValue(object? value, ValidationContext validationContext)`
-- Type check: `if (value is not string strValue) return ValidationResult.Success;` (skip on wrong type)
+- **No defensive type guard.** Cast straight through: `var strValue = (string)value!;`. The base has
+  already returned `Success` for null and thrown `InvalidOperationException` on a type mismatch, so an
+  `is not T` check is an uncoverable dead branch that breaks the 100% gate (project.md §4). The two
+  exceptions are `typeof(object)` polymorphic families (switch with a throwing `default:`) and
+  `allowNull: false` attributes, which really do receive null.
 - Delegate: `var result = Must.Be.X(strValue, paramName: null); return FromMustResult(result, validationContext);`
 - Naming: String validators suffix `String`. Collision avoidance suffix Type/Domain
+
+### DataAnnotations: optional forwarded config (`init` property) and the netstandard2.1 trap
+- An optional knob the Must clause takes (`StringComparison comparison = Ordinal`) becomes a **named
+  attribute argument**, not a ctor parameter: `public StringComparison Comparison { get; init; } =
+  StringComparison.Ordinal`, read as `[EndsWith(".pdf", Comparison = StringComparison.OrdinalIgnoreCase)]`.
+  Required config stays a primary-ctor parameter exposed as `{ get; }`.
+- `init` on **any** member of a `netstandard2.1`-targeting project needs
+  `System.Runtime.CompilerServices.IsExternalInit`, which that TFM does not ship →
+  `error CS0518: Predefined type 'IsExternalInit' is not defined`. It compiles fine on net8.0/net10.0,
+  so the error only appears on a full multi-TFM build — never conclude from a net10.0-only build.
+- Core has the polyfill (`src/PineGuard.Core/Polyfills/IsExternalInit.cs`) but it is `internal` and
+  Core's `InternalsVisibleTo` covers only MustClauses and GuardClauses. `src/PineGuard.DataAnnotations/
+  Polyfills/IsExternalInit.cs` is now its own mirrored copy (same `#if !NET8_0_OR_GREATER` guard,
+  `internal` so it is not exported and cannot collide with the real BCL type). FluentValidation has no
+  copy yet — it will need one the first time it uses `init`.
 
 ### MustClause Parsed-Result Contract
 - When `MustResult<T>.Result` needs the parsed/normalized value, call `Utility.TryXxx(value, out var parsed)` — NOT `Rules.IsXxx()`
@@ -132,6 +151,29 @@ When implementing new validations, tests should follow the v2 architecture:
   has to be split off from the fixture side it is re-joined with a collection expression
   (`[.. a.ToGuardCases(...), .. b.Only(nameof(...)).ToGuardCases(...)]`), not a third dataset —
   unlike the Must layer, which does add `NullCases`
+
+### DA TestData: the attribute fixes its config, the fixture varies it
+- `DataAnnotationCase` carries only `(Name, object? Value, Expected)` — there is nowhere to put a
+  per-case needle/threshold, and the test method builds one attribute for the whole dataset. So a DA op
+  group **pins** its configuration in `public static readonly` fields and the test reads them
+  (`new ContainsAttribute(TestData.Contains.Substring)`), unlike Fluent/Must, which pull config out of
+  the scenario tuple per case.
+- When the fixture varies that config across scenarios, split into a default group plus a companion
+  group per variant (`Contains` + `ContainsIgnoringCase`), each selecting only the scenarios whose
+  tuple actually used that configuration, with every literal still sourced from a fixture field
+  (`F.Contains.PresentIgnoringCase.substring`). Do **not** reuse a scenario's value against a different
+  scenario's needle — the fixture's verdict does not survive the substitution.
+- The companion group is also what covers the `init` accessor: an attribute that is never constructed
+  with `Comparison = ...` leaves that accessor uncovered. The default group covers the ctor initializer.
+- Assert the code with the 3-arg overload `AssertResult(tc, result, attr.Code)`; `Code` is only checked
+  when `Expected.Code is not null`, so set it on invalid arms only.
+- DA null expectation is `true` (base skips null) — the same fixture's null scenario is a failure at
+  Must, a throw at Guard, and a pass at Fluent and DA.
+- Legacy DA files (`StringAttributesTestData`/`Tests`) still use `ValidCase`/`EdgeCases`/`InvalidCases`,
+  stacked `[MemberData]` and a private `Verify` helper — all explicitly **prohibited** by the addendum's
+  table. Append new op groups in the current shape and move the Tests class onto
+  `BaseDataAnnotationUnitTest(output)`; leave the legacy methods untouched (same treatment the Must
+  layer gave `MustStringClausesTests`).
 
 ## Topic Files
 - [MustCodes catalogue](must-codes-catalogue.md) — wiring codes into Must + Fluent + DataAnnotations: arg positions, one-clause-one-code and its bitwise exception, fixed-at-build ErrorCode
