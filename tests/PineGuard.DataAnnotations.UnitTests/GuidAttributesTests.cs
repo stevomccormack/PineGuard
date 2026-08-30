@@ -21,4 +21,20 @@ public sealed class GuidAttributesTests(ITestOutputHelper output)
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(GuidAttributesTestData.HasGuidVersion.Cases), MemberType = typeof(GuidAttributesTestData.HasGuidVersion))]
+    public void HasGuidVersion_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, version) = ((Guid? value, int version))tc.Value!;
+        var attr = new HasGuidVersionAttribute(version);
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

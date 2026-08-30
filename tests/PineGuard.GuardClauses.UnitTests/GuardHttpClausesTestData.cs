@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.HttpRulesFixtures;
@@ -123,6 +124,14 @@ public static class GuardHttpClausesTestData
             new(nameof(F.HasContentType.PlainTextHeaders), (F.HasContentType.PlainTextHeaders, ["application/json"]), new GuardExpected(false, typeof(ArgumentException), "headers")),
             new(nameof(F.HasContentType.NonContentTypeHeaders), (F.HasContentType.NonContentTypeHeaders, ["application/json"]), new GuardExpected(false, typeof(ArgumentException), "headers"))
         ];
+    }
+
+    // Guard.Against.NotMediaType — throws when value is NOT a valid media type (delegates to Must.Be.MediaType)
+    public static class NotMediaType
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.IsMediaType.ValidScenarios.ToGuardCases();
+
+        public static TheoryData<GuardCase<string?>> InvalidCases => F.IsMediaType.InvalidScenarios.ToGuardCases(s => new GuardExpected(false, s.IsNull ? typeof(ArgumentNullException) : typeof(ArgumentException), "value", Code: MustCodes.Http.MediaType.Invalid));
     }
 
     public static class NotHasHeaderValueOverload

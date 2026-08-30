@@ -18,4 +18,9 @@ public static class IdentifierRulesTestData
             new("Period rejected", "page.2", new RuleExpected(false))
         ];
     }
+
+    public static class IsUlid
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.IsUlid.AllScenarios.ToRuleCases();
+    }
 }

@@ -286,6 +286,46 @@ public static class MustNetworkClauses
     }
 
     /// <summary>
+    /// Validates that the specified value must be a valid MAC address.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
+    /// Delegates to <see cref="NetworkRules.IsMacAddress"/>, which accepts the colon-, hyphen- and
+    /// Cisco dot-separated notations in either case. The failure message follows the pattern
+    /// <c>"{paramName} must be a valid MAC address."</c>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = Must.Be.MacAddress(adapterAddress);
+    /// if (result.Failed)
+    ///     Console.WriteLine(result.Message);
+    /// </code>
+    /// </example>
+    /// <seealso cref="NetworkRules.IsMacAddress"/>
+    /// <seealso href="https://pineguard.ai/docs/must/network">Network Must Clauses documentation</seealso>
+    public static MustResult<string> MacAddress(this IMustClause _,
+        string? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Network.Mac.Invalid, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must be a valid MAC address.";
+
+        var ok = NetworkRules.IsMacAddress(value);
+        return MustResult<string>.FromBool(ok, MustCodes.Network.Mac.Invalid, messageTemplate, paramName, value, result: value);
+    }
+
+    /// <summary>
     /// Validates that the specified value must not be a valid IP address.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>

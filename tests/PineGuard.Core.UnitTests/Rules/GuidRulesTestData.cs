@@ -14,4 +14,9 @@ public static class GuidRulesTestData
     {
         public static TheoryData<RuleCase<Guid?>> Cases => F.IsNotEmpty.AllScenarios.ToRuleCases();
     }
+
+    public static class HasVersion
+    {
+        public static TheoryData<RuleCase<(Guid? value, int version)>> Cases => F.HasVersion.AllScenarios.ToRuleCases();
+    }
 }

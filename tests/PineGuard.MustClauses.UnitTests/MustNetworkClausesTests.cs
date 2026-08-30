@@ -87,6 +87,18 @@ public sealed class MustNetworkClausesTests(ITestOutputHelper output) : BaseMust
     }
 
     [Theory]
+    [MemberData(nameof(MustNetworkClausesTestData.MacAddress.ValidCases), MemberType = typeof(MustNetworkClausesTestData.MacAddress))]
+    [MemberData(nameof(MustNetworkClausesTestData.MacAddress.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.MacAddress))]
+    public void MacAddress_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Act
+        var result = Must.Be.MacAddress(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(MustNetworkClausesTestData.NotIpAddress.ValidCases), MemberType = typeof(MustNetworkClausesTestData.NotIpAddress))]
     [MemberData(nameof(MustNetworkClausesTestData.NotIpAddress.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.NotIpAddress))]
     public void NotIpAddress_BehavesAsExpected(MustCase<string?> tc)

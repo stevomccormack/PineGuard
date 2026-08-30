@@ -172,4 +172,17 @@ public sealed class StringUtilityTests : BaseUnitTest
         Assert.Equal(testCase.Expected, ok);
         Assert.Equal(testCase.ExpectedOutValue, range);
     }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityTestData.TryCreateRegex.ValidCases), MemberType = typeof(StringUtilityTestData.TryCreateRegex))]
+    [MemberData(nameof(StringUtilityTestData.TryCreateRegex.EdgeCases), MemberType = typeof(StringUtilityTestData.TryCreateRegex))]
+    public void TryCreateRegex_ReturnsExpected(StringUtilityTestData.TryCreateRegex.ValidCase testCase)
+    {
+        // Act
+        var ok = StringUtility.TryCreateRegex(testCase.Value, out var regex);
+
+        // Assert
+        Assert.Equal(testCase.Expected.ok, ok);
+        Assert.Equal(testCase.Expected.hasRegex, regex is not null);
+    }
 }

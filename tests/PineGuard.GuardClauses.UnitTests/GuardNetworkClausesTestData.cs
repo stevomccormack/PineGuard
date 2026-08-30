@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.NetworkRulesFixtures;
@@ -100,6 +101,14 @@ public static class GuardNetworkClausesTestData
             F.IsPortNumber.AllInvalid.Where(s => s.Inputs.HasValue)
             .Select(s => new RuleScenario<int>(s.Name, s.Inputs!.Value, s.IsValid)).ToArray()
             .ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+    }
+
+    // Guard.Against.NotMacAddress — throws when value is NOT a valid MAC address (delegates to Must.Be.MacAddress)
+    public static class NotMacAddress
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.IsMacAddress.AllValid.ToGuardCases();
+
+        public static TheoryData<GuardCase<string?>> InvalidCases => F.IsMacAddress.AllInvalid.ToGuardCases(s => new GuardExpected(false, s.IsNull ? typeof(ArgumentNullException) : typeof(ArgumentException), "value", Code: MustCodes.Network.Mac.Invalid));
     }
 
     // Guard.Against.IpAddress — throws when value IS a valid IP address

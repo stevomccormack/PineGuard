@@ -1,5 +1,7 @@
+using PineGuard.Codes;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.IdentifierRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -37,5 +39,15 @@ public static class IdentifierAttributesTestData
             new("start dash", "-slug", false),
             new("end dash", "slug-", false)
         ];
+    }
+
+    public static class Ulid
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsUlid.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.IsUlid.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a valid ULID.", Code: MustCodes.Identifier.Ulid.Invalid)
+        });
     }
 }
