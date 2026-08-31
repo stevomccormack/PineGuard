@@ -1061,4 +1061,39 @@ public static class MustDateTimeClauses
         var ok = !DateTimeRules.HasExplicitKind(value);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.NotUnspecified, messageTemplate, paramName, value, value);
     }
+
+    /// <summary>
+    /// Validates that the specified date of birth must meet the expected minimum age.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The date of birth to validate.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must meet the expected minimum age."</c>
+    /// A negative <paramref name="years"/> is a configuration error, reported against that parameter.
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-time">Date Time Must Clauses documentation</seealso>
+    public static MustResult<DateTime> MinimumAge(this IMustClause _,
+        DateTime value,
+        int years,
+        TimeProvider? timeProvider = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (years < 0)
+            return MustResult<DateTime>.Fail(MustCodes.Date.Age.BelowMinimum,
+                "{paramName} requires a non-negative number of years.", nameof(years), years);
+
+        const string messageTemplate = "{paramName} must meet the expected minimum age.";
+
+        var ok = DateTimeRules.HasMinimumAge(value, years, timeProvider);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Age.BelowMinimum, messageTemplate, paramName, value, value);
+    }
 }
