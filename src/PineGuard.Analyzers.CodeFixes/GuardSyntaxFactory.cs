@@ -17,34 +17,31 @@ internal static class GuardSyntaxFactory
     /// </summary>
     internal const string GuardClausesNamespace = "PineGuard.GuardClauses";
 
-    /// <summary>
-    /// The <c>Guard.Against.Null</c> clause name.
-    /// </summary>
-    internal const string NullClause = "Null";
-
     private const string GuardTypeName = "Guard";
     private const string AgainstPropertyName = "Against";
 
     /// <summary>
-    /// Rewrites <paramref name="node"/> — one of the three shapes PG1001 reports — as the
-    /// equivalent <c>Guard.Against.Null</c> call, preserving the original trivia.
+    /// Rewrites <paramref name="node"/> — one of the shapes a <c>PG1xxx</c> diagnostic reports — as
+    /// the equivalent <c>Guard.Against</c> call, preserving the original trivia.
     /// </summary>
-    /// <param name="node">The reported node: an <c>if</c> statement, a coalesce-throw expression, or a <c>ThrowIfNull</c> invocation.</param>
-    /// <param name="identifier">The name of the guarded identifier.</param>
+    /// <param name="node">The reported node: an <c>if</c> statement, a coalesce-throw expression, or a throw-helper invocation.</param>
+    /// <param name="diagnostic">The reported diagnostic, carrying the clause and its arguments.</param>
     /// <returns>The replacement node.</returns>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// Thrown when <paramref name="node"/> is not one of the three shapes PG1001 reports.
+    /// Thrown when <paramref name="node"/> is not one of the shapes a <c>PG1xxx</c> diagnostic reports.
     /// </exception>
-    internal static SyntaxNode CreateGuardAgainstNull(SyntaxNode node, string identifier)
+    internal static SyntaxNode CreateGuard(SyntaxNode node, Diagnostic diagnostic)
     {
-        var invocation = GuardInvocation(NullClause, IdentifierName(identifier));
+        var invocation = GuardInvocation(
+            diagnostic.Properties[DiagnosticProperties.Clause]!,
+            ArgumentsFor(diagnostic));
 
         return node switch
         {
             IfStatementSyntax ifStatement => ExpressionStatement(invocation).WithTriviaFrom(ifStatement),
-            InvocationExpressionSyntax throwIfNull => invocation.WithTriviaFrom(throwIfNull),
+            InvocationExpressionSyntax throwHelper => invocation.WithTriviaFrom(throwHelper),
             BinaryExpressionSyntax coalesce => invocation.WithTriviaFrom(coalesce),
-            _ => throw new ArgumentOutOfRangeException(nameof(node), node.Kind(), "PG1001 reports an if statement, a coalesce-throw expression or a ThrowIfNull invocation.")
+            _ => throw new ArgumentOutOfRangeException(nameof(node), node.Kind(), "A PG1xxx diagnostic reports an if statement, a coalesce-throw expression or a throw-helper invocation.")
         };
     }
 
@@ -67,6 +64,14 @@ internal static class GuardSyntaxFactory
 
         return root.AddUsings(guardClauses);
     }
+
+    /// <summary>
+    /// Reads the guard-clause arguments the analyzer recorded on <paramref name="diagnostic"/>.
+    /// </summary>
+    /// <param name="diagnostic">The reported diagnostic.</param>
+    /// <returns>The arguments to pass to the guard clause, in call order.</returns>
+    private static ExpressionSyntax[] ArgumentsFor(Diagnostic diagnostic) =>
+        [IdentifierName(diagnostic.Properties[DiagnosticProperties.Identifier]!)];
 
     /// <summary>
     /// Builds a <c>Guard.Against.{clause}({arguments})</c> invocation.

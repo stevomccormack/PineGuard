@@ -23,6 +23,7 @@ The analyzer assemblies target `netstandard2.0` and load into any Roslyn 4.14-or
 | Id | Title | Category | Severity |
 |---|---|---|---|
 | `PG1001` | Use `Guard.Against.Null` | Usage | Info |
+| `PG1002` | Use `Guard.Against.NullOrWhiteSpace` | Usage | Info |
 
 `PG1xxx` means *prefer a guard clause*; `PG2xxx` means *guard or validation misuse*. Every diagnostic ships with a code fix, and every fix supports fix-all across a document, project or solution.
 

@@ -22,12 +22,18 @@ internal sealed class PineGuardTypes
     /// </summary>
     internal const string ArgumentNullExceptionMetadataName = "System.ArgumentNullException";
 
+    /// <summary>
+    /// The metadata name of the exception the <c>PG1002</c> and <c>PG1003</c> shapes throw.
+    /// </summary>
+    internal const string ArgumentExceptionMetadataName = "System.ArgumentException";
+
     private const string PineGuardAssemblyNamePrefix = "PineGuard.";
 
-    private PineGuardTypes(INamedTypeSymbol? guard, INamedTypeSymbol? argumentNullException)
+    private PineGuardTypes(INamedTypeSymbol? guard, INamedTypeSymbol? argumentNullException, INamedTypeSymbol? argumentException)
     {
         Guard = guard;
         ArgumentNullException = argumentNullException;
+        ArgumentException = argumentException;
     }
 
     /// <summary>
@@ -42,6 +48,11 @@ internal sealed class PineGuardTypes
     internal INamedTypeSymbol? ArgumentNullException { get; }
 
     /// <summary>
+    /// Gets <see cref="System.ArgumentException"/> as the compilation sees it.
+    /// </summary>
+    internal INamedTypeSymbol? ArgumentException { get; }
+
+    /// <summary>
     /// Gets a value indicating whether guard-clause suggestions may be reported at all.
     /// </summary>
     internal bool CanSuggestGuardClauses => Guard is not null;
@@ -53,7 +64,8 @@ internal sealed class PineGuardTypes
     /// <returns>The resolved well-known types.</returns>
     internal static PineGuardTypes From(Compilation compilation) => new(
         compilation.GetTypeByMetadataName(GuardMetadataName),
-        compilation.GetTypeByMetadataName(ArgumentNullExceptionMetadataName));
+        compilation.GetTypeByMetadataName(ArgumentNullExceptionMetadataName),
+        compilation.GetTypeByMetadataName(ArgumentExceptionMetadataName));
 
     /// <summary>
     /// Determines whether <paramref name="compilation"/> is one of PineGuard's own assemblies.

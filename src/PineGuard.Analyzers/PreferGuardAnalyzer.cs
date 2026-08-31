@@ -18,10 +18,14 @@ namespace PineGuard.Analyzers;
 public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
 {
     private const string ThrowIfNullMethodName = "ThrowIfNull";
+    private const string ThrowIfNullOrWhiteSpaceMethodName = "ThrowIfNullOrWhiteSpace";
+    private const string IsNullOrWhiteSpaceMethodName = "IsNullOrWhiteSpace";
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(DiagnosticDescriptors.UseGuardAgainstNull);
+        ImmutableArray.Create(
+            DiagnosticDescriptors.UseGuardAgainstNull,
+            DiagnosticDescriptors.UseGuardAgainstNullOrWhiteSpace);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -46,7 +50,7 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
     }
 
     /// <summary>
-    /// Handles <c>if (x is null) throw new ArgumentNullException(nameof(x));</c>.
+    /// Handles the <c>if (check) throw new ArgumentXException(...);</c> shapes.
     /// </summary>
     private static void AnalyzeIfStatement(SyntaxNodeAnalysisContext context, PineGuardTypes types)
     {
@@ -54,18 +58,22 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
         if (ifStatement.Else is not null)
             return;
 
-        var identifier = GetIdentifierCheckedAgainstNull(ifStatement.Condition);
-        if (identifier is null)
-            return;
-
         var throwStatement = GetOnlyThrow(ifStatement.Statement);
         if (throwStatement is null)
             return;
 
-        if (!IsArgumentNullExceptionCreation(throwStatement.Expression, context, types))
+        var thrown = GetCreatedExceptionType(throwStatement.Expression, context);
+        if (thrown is null)
             return;
 
-        Report(context, ifStatement.GetLocation(), identifier);
+        if (SymbolEqualityComparer.Default.Equals(thrown, types.ArgumentNullException))
+        {
+            ReportNullCheck(context, ifStatement);
+            return;
+        }
+
+        if (SymbolEqualityComparer.Default.Equals(thrown, types.ArgumentException))
+            ReportEmptinessCheck(context, ifStatement);
     }
 
     /// <summary>
@@ -80,43 +88,108 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
         if (coalesce.Left is not IdentifierNameSyntax identifierName)
             return;
 
-        if (!IsArgumentNullExceptionCreation(throwExpression.Expression, context, types))
+        var thrown = GetCreatedExceptionType(throwExpression.Expression, context);
+        if (thrown is null)
             return;
 
-        Report(context, coalesce.GetLocation(), identifierName.Identifier.ValueText);
+        if (!SymbolEqualityComparer.Default.Equals(thrown, types.ArgumentNullException))
+            return;
+
+        Report(context, GuardSuggestion.Null, coalesce.GetLocation(), identifierName.Identifier.ValueText);
     }
 
     /// <summary>
-    /// Handles <c>ArgumentNullException.ThrowIfNull(x)</c>.
+    /// Handles the framework throw helpers — <c>ArgumentNullException.ThrowIfNull(x)</c> and
+    /// <c>ArgumentException.ThrowIfNullOrWhiteSpace(x)</c>.
     /// </summary>
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context, PineGuardTypes types)
     {
         var invocation = (InvocationExpressionSyntax)context.Node;
-        var arguments = invocation.ArgumentList.Arguments;
-        if (arguments.Count != 1)
-            return;
-
-        if (arguments[0].Expression is not IdentifierNameSyntax identifierName)
+        var identifier = GetSingleIdentifierArgument(invocation);
+        if (identifier is null)
             return;
 
         if (context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol is not IMethodSymbol method)
             return;
 
-        if (!string.Equals(method.Name, ThrowIfNullMethodName, StringComparison.Ordinal))
+        var suggestion = GetThrowHelperSuggestion(method, types);
+        if (suggestion is null)
             return;
 
-        if (!SymbolEqualityComparer.Default.Equals(method.ContainingType, types.ArgumentNullException))
-            return;
-
-        Report(context, invocation.GetLocation(), identifierName.Identifier.ValueText);
+        Report(context, suggestion, invocation.GetLocation(), identifier);
     }
 
-    private static void Report(SyntaxNodeAnalysisContext context, Location location, string identifier) =>
+    /// <summary>
+    /// Reports <c>if (x is null) throw new ArgumentNullException(nameof(x));</c>.
+    /// </summary>
+    private static void ReportNullCheck(SyntaxNodeAnalysisContext context, IfStatementSyntax ifStatement)
+    {
+        var identifier = GetIdentifierCheckedAgainstNull(ifStatement.Condition);
+        if (identifier is null)
+            return;
+
+        Report(context, GuardSuggestion.Null, ifStatement.GetLocation(), identifier);
+    }
+
+    /// <summary>
+    /// Reports <c>if (string.IsNullOrWhiteSpace(x)) throw new ArgumentException(...);</c>.
+    /// </summary>
+    private static void ReportEmptinessCheck(SyntaxNodeAnalysisContext context, IfStatementSyntax ifStatement)
+    {
+        if (ifStatement.Condition is not InvocationExpressionSyntax invocation)
+            return;
+
+        var identifier = GetSingleIdentifierArgument(invocation);
+        if (identifier is null)
+            return;
+
+        if (context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol
+            is not IMethodSymbol { ContainingType.SpecialType: SpecialType.System_String } predicate)
+            return;
+
+        var suggestion = GetEmptinessSuggestion(predicate.Name);
+        if (suggestion is null)
+            return;
+
+        Report(context, suggestion, ifStatement.GetLocation(), identifier);
+    }
+
+    private static void Report(SyntaxNodeAnalysisContext context, GuardSuggestion suggestion, Location location, string identifier) =>
         context.ReportDiagnostic(Diagnostic.Create(
-            DiagnosticDescriptors.UseGuardAgainstNull,
+            suggestion.Descriptor,
             location,
-            DiagnosticProperties.ForIdentifier(identifier),
+            DiagnosticProperties.ForGuard(suggestion.Clause, identifier),
             identifier));
+
+    /// <summary>
+    /// Maps a <see cref="string"/> predicate name onto the guard clause that replaces it.
+    /// </summary>
+    private static GuardSuggestion? GetEmptinessSuggestion(string methodName) =>
+        string.Equals(methodName, IsNullOrWhiteSpaceMethodName, StringComparison.Ordinal)
+            ? GuardSuggestion.NullOrWhiteSpace
+            : null;
+
+    /// <summary>
+    /// Maps a framework <c>ThrowIfX</c> helper onto the guard clause that replaces it.
+    /// </summary>
+    private static GuardSuggestion? GetThrowHelperSuggestion(IMethodSymbol method, PineGuardTypes types)
+    {
+        if (string.Equals(method.Name, ThrowIfNullMethodName, StringComparison.Ordinal))
+        {
+            return SymbolEqualityComparer.Default.Equals(method.ContainingType, types.ArgumentNullException)
+                ? GuardSuggestion.Null
+                : null;
+        }
+
+        if (string.Equals(method.Name, ThrowIfNullOrWhiteSpaceMethodName, StringComparison.Ordinal))
+        {
+            return SymbolEqualityComparer.Default.Equals(method.ContainingType, types.ArgumentException)
+                ? GuardSuggestion.NullOrWhiteSpace
+                : null;
+        }
+
+        return null;
+    }
 
     private static string? GetIdentifierCheckedAgainstNull(ExpressionSyntax condition) => condition switch
     {
@@ -148,6 +221,21 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
     private static bool IsNullLiteral(ExpressionSyntax expression) =>
         expression.IsKind(SyntaxKind.NullLiteralExpression);
 
+    /// <summary>
+    /// Returns the name of the only argument of <paramref name="invocation"/> when it is a plain
+    /// identifier, and <see langword="null"/> for every other argument list.
+    /// </summary>
+    private static string? GetSingleIdentifierArgument(InvocationExpressionSyntax invocation)
+    {
+        var arguments = invocation.ArgumentList.Arguments;
+        if (arguments.Count != 1)
+            return null;
+
+        return arguments[0].Expression is IdentifierNameSyntax identifierName
+            ? identifierName.Identifier.ValueText
+            : null;
+    }
+
     private static ThrowStatementSyntax? GetOnlyThrow(StatementSyntax statement)
     {
         if (statement is not BlockSyntax block)
@@ -158,12 +246,12 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
             : null;
     }
 
-    private static bool IsArgumentNullExceptionCreation(ExpressionSyntax? expression, SyntaxNodeAnalysisContext context, PineGuardTypes types)
-    {
-        if (expression is not ObjectCreationExpressionSyntax creation)
-            return false;
-
-        var type = context.SemanticModel.GetTypeInfo(creation, context.CancellationToken).Type;
-        return SymbolEqualityComparer.Default.Equals(type, types.ArgumentNullException);
-    }
+    /// <summary>
+    /// Returns the type of the exception <paramref name="expression"/> constructs, or
+    /// <see langword="null"/> when it does not construct one.
+    /// </summary>
+    private static ITypeSymbol? GetCreatedExceptionType(ExpressionSyntax? expression, SyntaxNodeAnalysisContext context) =>
+        expression is ObjectCreationExpressionSyntax creation
+            ? context.SemanticModel.GetTypeInfo(creation, context.CancellationToken).Type
+            : null;
 }
