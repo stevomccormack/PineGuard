@@ -581,4 +581,20 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime> NotExplicitKind<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotExplicitKind(val, paramName: null),
             message, MustCodes.Date.Kind.NotUnspecified);
+
+    /// <summary>Validates that the <see cref="DateTime"/> date of birth meets the expected minimum age.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>A negative <paramref name="years"/> is a configuration error, reported against that parameter.</remarks>
+    /// <example><code>RuleFor(x => x.DateOfBirth).MinimumAge(18);</code></example>
+    public static IRuleBuilderOptions<TModel, DateTime> MinimumAge<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
+        int years,
+        TimeProvider? timeProvider = null,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.MinimumAge(val, years, timeProvider, paramName: null),
+            message, MustCodes.Date.Age.BelowMinimum);
 }
