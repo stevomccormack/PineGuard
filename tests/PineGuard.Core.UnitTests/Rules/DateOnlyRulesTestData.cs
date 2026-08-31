@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.DateOnlyRulesFixtures;
 
@@ -6,40 +7,46 @@ namespace PineGuard.Core.UnitTests.Rules;
 
 public static class DateOnlyRulesTestData
 {
+    // Today as the pinned clock reports it, derived from FixedTimeProvider.Default rather than
+    // restated as a literal. Because that instant is in the real past, "Tomorrow" is a date the
+    // machine clock considers past — so a rule that ignored the supplied provider would fail here.
+    private static readonly DateOnly PinnedToday = DateOnly.FromDateTime(FixedTimeProvider.Default.GetUtcNow().UtcDateTime);
+
     public static class IsInPast
     {
-        public static TheoryData<RuleCase<DateOnly?>> Cases
-        {
-            get
-            {
-                var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                return
-                [
-                    new RuleCase<DateOnly?>("Past", today.AddDays(-2), new RuleExpected(true)),
-                    new RuleCase<DateOnly?>("Future", today.AddDays(2), new RuleExpected(false)),
-                    new RuleCase<DateOnly?>("Today", today, new RuleExpected(false)),
-                    new RuleCase<DateOnly?>("NullValue", null, new RuleExpected(false))
-                ];
-            }
-        }
+        public static TheoryData<RuleCase<DateOnly?>> Cases =>
+        [
+            new RuleCase<DateOnly?>("Yesterday", PinnedToday.AddDays(-1), new RuleExpected(true)),
+            new RuleCase<DateOnly?>("Tomorrow", PinnedToday.AddDays(1), new RuleExpected(false)),
+            new RuleCase<DateOnly?>("Today", PinnedToday, new RuleExpected(false)),
+            new RuleCase<DateOnly?>("NullValue", null, new RuleExpected(false))
+        ];
+    }
+
+    public static class IsInPastSystemClock
+    {
+        public static TheoryData<RuleCase<DateOnly?>> Cases => F.IsPast.AllScenarios.ToRuleCases();
     }
 
     public static class IsInFuture
     {
-        public static TheoryData<RuleCase<DateOnly?>> Cases
-        {
-            get
-            {
-                var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                return
-                [
-                    new RuleCase<DateOnly?>("Future", today.AddDays(2), new RuleExpected(true)),
-                    new RuleCase<DateOnly?>("Past", today.AddDays(-2), new RuleExpected(false)),
-                    new RuleCase<DateOnly?>("Today", today, new RuleExpected(false)),
-                    new RuleCase<DateOnly?>("NullValue", null, new RuleExpected(false))
-                ];
-            }
-        }
+        public static TheoryData<RuleCase<DateOnly?>> Cases =>
+        [
+            new RuleCase<DateOnly?>("Tomorrow", PinnedToday.AddDays(1), new RuleExpected(true)),
+            new RuleCase<DateOnly?>("Yesterday", PinnedToday.AddDays(-1), new RuleExpected(false)),
+            new RuleCase<DateOnly?>("Today", PinnedToday, new RuleExpected(false)),
+            new RuleCase<DateOnly?>("NullValue", null, new RuleExpected(false))
+        ];
+    }
+
+    public static class IsInFutureSystemClock
+    {
+        public static TheoryData<RuleCase<DateOnly?>> Cases =>
+        [
+            new RuleCase<DateOnly?>(nameof(F.IsPast.FutureDate), F.IsPast.FutureDate, new RuleExpected(true)),
+            new RuleCase<DateOnly?>(nameof(F.IsPast.PastDate), F.IsPast.PastDate, new RuleExpected(false)),
+            new RuleCase<DateOnly?>(nameof(F.IsPast.NullValue), F.IsPast.NullValue, new RuleExpected(false))
+        ];
     }
 
     public static class IsBetween

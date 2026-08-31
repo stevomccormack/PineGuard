@@ -1,5 +1,6 @@
 using PineGuard.Common;
 using PineGuard.Rules;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
 
@@ -12,6 +13,17 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     public void IsInPast_BehavesAsExpected(RuleCase<DateOnly?> tc)
     {
         // Act
+        var result = DateOnlyRules.IsInPast(tc.Value, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsInPastSystemClock.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInPastSystemClock))]
+    public void IsInPast_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<DateOnly?> tc)
+    {
+        // Act
         var result = DateOnlyRules.IsInPast(tc.Value);
 
         // Assert
@@ -21,6 +33,17 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     [Theory]
     [MemberData(nameof(DateOnlyRulesTestData.IsInFuture.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInFuture))]
     public void IsInFuture_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsInFuture(tc.Value, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsInFutureSystemClock.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInFutureSystemClock))]
+    public void IsInFuture_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<DateOnly?> tc)
     {
         // Act
         var result = DateOnlyRules.IsInFuture(tc.Value);
