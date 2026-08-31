@@ -1,6 +1,7 @@
 #if NET10_0_OR_GREATER
 #pragma warning disable ASP0029
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Validation;
 using PineGuard.AspNetCore.UnitTests.Samples;
 using PineGuard.Testing.Common;
@@ -96,6 +97,39 @@ public sealed class MustValidatableInfoResolverTests(ITestOutputHelper output)
         // Act & Assert
         var ex = await Assert.ThrowsAsync(tc.ExpectedException.Type, action);
         ThrowsCaseAssert.Expected(ex, tc);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatableInfoResolverTestData.EndToEnd.Cases), MemberType = typeof(MustValidatableInfoResolverTestData.EndToEnd))]
+    public async Task EndToEnd_BehavesAsExpected(MustValidatableInfoResolverTestData.EndToEnd.Case tc)
+    {
+        // Arrange
+        var (requestUri, json) = tc.Value;
+        await using var app = await SampleHost.StartAsync(SampleBuiltInValidationApi.ConfigureServices, SampleBuiltInValidationApi.Map);
+        using var client = app.GetTestClient();
+        using var request = SampleHost.Request(HttpMethod.Post, requestUri, json);
+
+        // Act
+        using var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(tc.Expected.IsValid, response.IsSuccessStatusCode);
+        Assert.Equal(tc.Expected.Status, (int)response.StatusCode);
+
+        var body = await SampleResponses.ReadJsonAsync(response);
+
+        if (tc.Expected.Echo is not null)
+            Assert.Equal(tc.Expected.Echo, body.GetString());
+
+        if (tc.Expected.Body is not { } problem)
+            return;
+
+        var errors = body.GetProperty("errors");
+
+        Assert.Equal(problem.Title, body.GetProperty("title").GetString());
+        Assert.Equal(problem.ErrorKeys, errors.EnumerateObject().Select(error => error.Name));
+        Assert.Equal(problem.Messages, errors.EnumerateObject().SelectMany(error => error.Value.EnumerateArray().Select(message => message.GetString())));
+        Assert.False(body.TryGetProperty(ProblemDetailsExtension.FailuresExtensionKey, out _));
     }
 }
 #pragma warning restore ASP0029
