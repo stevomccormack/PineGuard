@@ -647,4 +647,184 @@ public static class GuardDateTimeOffsetClauses
 
         return result.Result;
     }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the Weekend constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateTimeOffsetClauses.Weekday"/>
+    public static DateTimeOffset Weekend(this IGuardClause _,
+        DateTimeOffset value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Weekday(value, paramName);
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the Weekday constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateTimeOffsetClauses.Weekend"/>
+    public static DateTimeOffset Weekday(this IGuardClause _,
+        DateTimeOffset value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Weekend(value, paramName);
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the NotFirstDayOfMonth constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateTimeOffsetClauses.FirstDayOfMonth"/>
+    public static DateTimeOffset NotFirstDayOfMonth(this IGuardClause _,
+        DateTimeOffset value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.FirstDayOfMonth(value, paramName);
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the FirstDayOfMonth constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateTimeOffsetClauses.NotFirstDayOfMonth"/>
+    public static DateTimeOffset FirstDayOfMonth(this IGuardClause _,
+        DateTimeOffset value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotFirstDayOfMonth(value, paramName); // Guard.Against.FirstDayOfMonth => Must.Be.NotFirstDayOfMonth (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the NotLastDayOfMonth constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateTimeOffsetClauses.LastDayOfMonth"/>
+    public static DateTimeOffset NotLastDayOfMonth(this IGuardClause _,
+        DateTimeOffset value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.LastDayOfMonth(value, paramName);
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the LastDayOfMonth constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateTimeOffsetClauses.NotLastDayOfMonth"/>
+    public static DateTimeOffset LastDayOfMonth(this IGuardClause _,
+        DateTimeOffset value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotLastDayOfMonth(value, paramName); // Guard.Against.LastDayOfMonth => Must.Be.NotLastDayOfMonth (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
 }
