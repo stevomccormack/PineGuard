@@ -277,4 +277,31 @@ public static class FluentStringDateOnlyExtensionsTestData
                 _ => new FluentExpected(true)
             });
     }
+
+    public static class MinimumAge
+    {
+        public static TheoryData<FluentCase<(string? value, int years)>> Cases => F.DateOnlyHasMinimumAge.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.DateOnlyHasMinimumAge.NullValue) => new FluentExpected(true),
+            nameof(F.DateOnlyHasMinimumAge.NegativeYears) => new FluentExpected(false, "years requires a non-negative number of years.", Code: MustCodes.Date.Age.BelowMinimum),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)
+        });
+    }
+
+    // A 29-February birth date has no anniversary in a non-leap year, so each case pins its own clock:
+    // here the boundary moves and the birth date stays put, which the shared provider cannot express.
+    public static class MinimumAgeOnLeapDay
+    {
+        public static TheoryData<FluentCase<(string? value, int years, DateTimeOffset utcNow)>> Cases =>
+        [
+            new("TwentyEighthOfFebruaryInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 02, 28)), new FluentExpected(false, "Value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)),
+            new("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new FluentExpected(true)),
+            new("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new FluentExpected(true))
+        ];
+    }
+
+    private const string LeapDayBirth = "2008-02-29";
+
+    private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);
 }

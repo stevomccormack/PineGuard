@@ -1,5 +1,6 @@
 using FluentValidation;
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
 
@@ -147,6 +148,12 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
     {
         public NotOverlappingDateOnlyValidator(string end1, string start2, string end2, Inclusion inclusion) =>
             RuleFor(x => x.Value).NotOverlappingDateOnly(end1, start2, end2, inclusion);
+    }
+
+    private sealed class MinimumAgeValidator : AbstractValidator<Model>
+    {
+        public MinimumAgeValidator(int years, TimeProvider timeProvider) =>
+            RuleFor(x => x.Value).MinimumAge(years, timeProvider);
     }
 
     // FluentStringDateOnlyExtensions.PastDateOnly
@@ -382,6 +389,26 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
     {
         var result = new NotOverlappingDateOnlyValidator(tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, tc.Value.inclusion)
             .Validate(new Model { Value = tc.Value.start1 });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.MinimumAge
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.MinimumAge.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.MinimumAge))]
+    public void MinimumAge_BehavesAsExpected(FluentCase<(string? value, int years)> tc)
+    {
+        var result = new MinimumAgeValidator(tc.Value.years, FixedTimeProvider.Default)
+            .Validate(new Model { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.MinimumAge
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.MinimumAgeOnLeapDay))]
+    public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(FluentCase<(string? value, int years, DateTimeOffset utcNow)> tc)
+    {
+        var result = new MinimumAgeValidator(tc.Value.years, new FixedTimeProvider(tc.Value.utcNow))
+            .Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 }
