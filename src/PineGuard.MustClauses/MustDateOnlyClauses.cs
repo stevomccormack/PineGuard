@@ -592,6 +592,162 @@ public static class MustDateOnlyClauses
     }
 
     /// <summary>
+    /// Validates that the specified value must be a weekday.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must be a weekday."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
+    public static MustResult<DateOnly> Weekday(this IMustClause _,
+        DateOnly value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must be a weekday.";
+
+        var ok = DateOnlyRules.IsWeekday(value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Calendar.NotWeekday, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must be a weekend day.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must be a weekend day."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
+    public static MustResult<DateOnly> Weekend(this IMustClause _,
+        DateOnly value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must be a weekend day.";
+
+        var ok = DateOnlyRules.IsWeekend(value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Calendar.NotWeekend, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must be the first day of the month.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must be the first day of the month."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
+    public static MustResult<DateOnly> FirstDayOfMonth(this IMustClause _,
+        DateOnly value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must be the first day of the month.";
+
+        var ok = DateOnlyRules.IsFirstDayOfMonth(value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Calendar.NotFirstDayOfMonth, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must not be the first day of the month.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must not be the first day of the month."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
+    public static MustResult<DateOnly> NotFirstDayOfMonth(this IMustClause _,
+        DateOnly value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must not be the first day of the month.";
+
+        var ok = !DateOnlyRules.IsFirstDayOfMonth(value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Calendar.FirstDayOfMonth, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must be the last day of the month.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must be the last day of the month."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
+    public static MustResult<DateOnly> LastDayOfMonth(this IMustClause _,
+        DateOnly value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must be the last day of the month.";
+
+        var ok = DateOnlyRules.IsLastDayOfMonth(value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Calendar.NotLastDayOfMonth, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must not be the last day of the month.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must not be the last day of the month."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
+    public static MustResult<DateOnly> NotLastDayOfMonth(this IMustClause _,
+        DateOnly value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must not be the last day of the month.";
+
+        var ok = !DateOnlyRules.IsLastDayOfMonth(value);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Calendar.LastDayOfMonth, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
     /// Validates that the specified value must not be chronological.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
