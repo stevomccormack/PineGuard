@@ -789,4 +789,117 @@ public static class FluentDateTimeOffsetExtensions
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotWithinCalendarMonths(val.Value, reference, months, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
             message, MustCodes.Date.Proximity.WithinCalendarMonths);
 
+    /// <summary>Validates that the <see cref="DateTimeOffset"/> value falls on a weekday (Monday through Friday).</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset> Weekday<TModel>(this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.Weekday(val, paramName: null),
+            message, MustCodes.Date.Calendar.NotWeekday);
+
+    /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value falls on a weekday (Monday through Friday).</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset?> Weekday<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Weekday(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+            message, MustCodes.Date.Calendar.NotWeekday);
+
+    /// <summary>Validates that the <see cref="DateTimeOffset"/> value falls on a weekend (Saturday or Sunday).</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset> Weekend<TModel>(this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.Weekend(val, paramName: null),
+            message, MustCodes.Date.Calendar.NotWeekend);
+
+    /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value falls on a weekend (Saturday or Sunday).</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset?> Weekend<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Weekend(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+            message, MustCodes.Date.Calendar.NotWeekend);
+
+    /// <summary>Validates that the <see cref="DateTimeOffset"/> value is the first day of its month.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset> FirstDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.FirstDayOfMonth(val, paramName: null),
+            message, MustCodes.Date.Calendar.NotFirstDayOfMonth);
+
+    /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is the first day of its month.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset?> FirstDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FirstDayOfMonth(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+            message, MustCodes.Date.Calendar.NotFirstDayOfMonth);
+
+    /// <summary>Validates that the <see cref="DateTimeOffset"/> value is not the first day of its month.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset> NotFirstDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.NotFirstDayOfMonth(val, paramName: null),
+            message, MustCodes.Date.Calendar.FirstDayOfMonth);
+
+    /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is not the first day of its month.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset?> NotFirstDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotFirstDayOfMonth(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+            message, MustCodes.Date.Calendar.FirstDayOfMonth);
+
+    /// <summary>Validates that the <see cref="DateTimeOffset"/> value is the last day of its month.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset> LastDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.LastDayOfMonth(val, paramName: null),
+            message, MustCodes.Date.Calendar.NotLastDayOfMonth);
+
+    /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is the last day of its month.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset?> LastDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.LastDayOfMonth(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+            message, MustCodes.Date.Calendar.NotLastDayOfMonth);
+
+    /// <summary>Validates that the <see cref="DateTimeOffset"/> value is not the last day of its month.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset> NotLastDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.NotLastDayOfMonth(val, paramName: null),
+            message, MustCodes.Date.Calendar.LastDayOfMonth);
+
+    /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is not the last day of its month.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    public static IRuleBuilderOptions<TModel, DateTimeOffset?> NotLastDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotLastDayOfMonth(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+            message, MustCodes.Date.Calendar.LastDayOfMonth);
 }

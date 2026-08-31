@@ -289,6 +289,66 @@ public static class FluentDateOnlyExtensionsTestData
             });
     }
 
+    public static class Weekday
+    {
+        public static TheoryData<FluentCase<DateOnly?>> Cases => F.IsWeekday.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsWeekday.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be a weekday.", Code: MustCodes.Date.Calendar.NotWeekday)
+        });
+    }
+
+    public static class Weekend
+    {
+        public static TheoryData<FluentCase<DateOnly?>> Cases => F.IsWeekend.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsWeekend.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be a weekend day.", Code: MustCodes.Date.Calendar.NotWeekend)
+        });
+    }
+
+    public static class FirstDayOfMonth
+    {
+        public static TheoryData<FluentCase<DateOnly?>> Cases => F.IsFirstDayOfMonth.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsFirstDayOfMonth.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be the first day of the month.", Code: MustCodes.Date.Calendar.NotFirstDayOfMonth)
+        });
+    }
+
+    public static class NotFirstDayOfMonth
+    {
+        public static TheoryData<FluentCase<DateOnly?>> Cases => F.IsFirstDayOfMonth.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsFirstDayOfMonth.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(false, "Value must not be the first day of the month.", Code: MustCodes.Date.Calendar.FirstDayOfMonth),
+            _ => new FluentExpected(true)
+        });
+    }
+
+    public static class LastDayOfMonth
+    {
+        public static TheoryData<FluentCase<DateOnly?>> Cases => F.IsLastDayOfMonth.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsLastDayOfMonth.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be the last day of the month.", Code: MustCodes.Date.Calendar.NotLastDayOfMonth)
+        });
+    }
+
+    public static class NotLastDayOfMonth
+    {
+        public static TheoryData<FluentCase<DateOnly?>> Cases => F.IsLastDayOfMonth.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsLastDayOfMonth.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(false, "Value must not be the last day of the month.", Code: MustCodes.Date.Calendar.LastDayOfMonth),
+            _ => new FluentExpected(true)
+        });
+    }
+
     public static class MinimumAge
     {
         public static TheoryData<FluentCase<(DateOnly? value, int years)>> Cases => F.HasMinimumAge.AllScenarios.ToFluentCases(s => s.Name switch
@@ -606,6 +666,54 @@ public static class FluentDateOnlyExtensionsTestData
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must not be within the expected number of calendar months.")
         });
+    }
+
+    public static class WeekdayNonNullable
+    {
+        public static TheoryData<FluentCase<DateOnly>> Cases =>
+            F.IsWeekday.AllScenarios.Except(nameof(F.IsWeekday.NullValue)).Project(v => v!.Value).ToFluentCases(s => s.IsValid
+                ? new FluentExpected(true)
+                : new FluentExpected(false, "Value must be a weekday.", Code: MustCodes.Date.Calendar.NotWeekday));
+    }
+
+    public static class WeekendNonNullable
+    {
+        public static TheoryData<FluentCase<DateOnly>> Cases =>
+            F.IsWeekend.AllScenarios.Except(nameof(F.IsWeekend.NullValue)).Project(v => v!.Value).ToFluentCases(s => s.IsValid
+                ? new FluentExpected(true)
+                : new FluentExpected(false, "Value must be a weekend day.", Code: MustCodes.Date.Calendar.NotWeekend));
+    }
+
+    public static class FirstDayOfMonthNonNullable
+    {
+        public static TheoryData<FluentCase<DateOnly>> Cases =>
+            F.IsFirstDayOfMonth.AllScenarios.Except(nameof(F.IsFirstDayOfMonth.NullValue)).Project(v => v!.Value).ToFluentCases(s => s.IsValid
+                ? new FluentExpected(true)
+                : new FluentExpected(false, "Value must be the first day of the month.", Code: MustCodes.Date.Calendar.NotFirstDayOfMonth));
+    }
+
+    public static class NotFirstDayOfMonthNonNullable
+    {
+        public static TheoryData<FluentCase<DateOnly>> Cases =>
+            F.IsFirstDayOfMonth.AllScenarios.Except(nameof(F.IsFirstDayOfMonth.NullValue)).Project(v => v!.Value).ToFluentCases(s => s.IsValid
+                ? new FluentExpected(false, "Value must not be the first day of the month.", Code: MustCodes.Date.Calendar.FirstDayOfMonth)
+                : new FluentExpected(true));
+    }
+
+    public static class LastDayOfMonthNonNullable
+    {
+        public static TheoryData<FluentCase<DateOnly>> Cases =>
+            F.IsLastDayOfMonth.AllScenarios.Except(nameof(F.IsLastDayOfMonth.NullValue)).Project(v => v!.Value).ToFluentCases(s => s.IsValid
+                ? new FluentExpected(true)
+                : new FluentExpected(false, "Value must be the last day of the month.", Code: MustCodes.Date.Calendar.NotLastDayOfMonth));
+    }
+
+    public static class NotLastDayOfMonthNonNullable
+    {
+        public static TheoryData<FluentCase<DateOnly>> Cases =>
+            F.IsLastDayOfMonth.AllScenarios.Except(nameof(F.IsLastDayOfMonth.NullValue)).Project(v => v!.Value).ToFluentCases(s => s.IsValid
+                ? new FluentExpected(false, "Value must not be the last day of the month.", Code: MustCodes.Date.Calendar.LastDayOfMonth)
+                : new FluentExpected(true));
     }
 
     public static class MinimumAgeNonNullable
