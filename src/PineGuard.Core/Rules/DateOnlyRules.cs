@@ -15,18 +15,20 @@ public static class DateOnlyRules
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether today is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the past; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInPast(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive) =>
-        value is not null && IsBefore(value, DateOnly.FromDateTime(DateTime.UtcNow), inclusion);
+    public static bool IsInPast(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
+        value is not null && IsBefore(value, DateOnly.FromDateTime(DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime), inclusion);
 
     /// <summary>
     /// Determines whether the specified date is in the future relative to UTC now.
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether today is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the future; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInFuture(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive) =>
-        value is not null && IsAfter(value, DateOnly.FromDateTime(DateTime.UtcNow), inclusion);
+    public static bool IsInFuture(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
+        value is not null && IsAfter(value, DateOnly.FromDateTime(DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime), inclusion);
 
     /// <summary>
     /// Determines whether the specified date falls within [<paramref name="min"/>, <paramref name="max"/>].

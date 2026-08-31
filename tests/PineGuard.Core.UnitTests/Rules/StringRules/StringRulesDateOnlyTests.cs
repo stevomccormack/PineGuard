@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
 
@@ -19,11 +20,11 @@ public sealed class StringRulesDateOnlyTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesDateOnlyTestData.IsInPast.DynamicCases), MemberType = typeof(StringRulesDateOnlyTestData.IsInPast))]
-    public void IsInPast_Dynamic_BehavesAsExpected(RuleCase<string?> tc)
+    [MemberData(nameof(StringRulesDateOnlyTestData.IsInPast.PinnedClockCases), MemberType = typeof(StringRulesDateOnlyTestData.IsInPast))]
+    public void IsInPast_PinnedTimeProvider_BehavesAsExpected(RuleCase<string?> tc)
     {
         // Act
-        var result = PineGuard.Rules.StringRules.DateOnly.IsInPast(tc.Value);
+        var result = PineGuard.Rules.StringRules.DateOnly.IsInPast(tc.Value, timeProvider: FixedTimeProvider.Default);
 
         // Assert
         AssertResult(tc, result);
@@ -41,11 +42,11 @@ public sealed class StringRulesDateOnlyTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesDateOnlyTestData.IsInFuture.DynamicCases), MemberType = typeof(StringRulesDateOnlyTestData.IsInFuture))]
-    public void IsInFuture_Dynamic_BehavesAsExpected(RuleCase<string?> tc)
+    [MemberData(nameof(StringRulesDateOnlyTestData.IsInFuture.PinnedClockCases), MemberType = typeof(StringRulesDateOnlyTestData.IsInFuture))]
+    public void IsInFuture_PinnedTimeProvider_BehavesAsExpected(RuleCase<string?> tc)
     {
         // Act
-        var result = PineGuard.Rules.StringRules.DateOnly.IsInFuture(tc.Value);
+        var result = PineGuard.Rules.StringRules.DateOnly.IsInFuture(tc.Value, timeProvider: FixedTimeProvider.Default);
 
         // Assert
         AssertResult(tc, result);
