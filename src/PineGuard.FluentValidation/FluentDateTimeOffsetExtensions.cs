@@ -16,94 +16,110 @@ public static class FluentDateTimeOffsetExtensions
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is in the past.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <example><code>RuleFor(x => x.CreatedAt).Past();</code></example>
     public static IRuleBuilderOptions<TModel, DateTimeOffset> Past<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Past(val, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.Past(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is in the past.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> Past<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Past(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Past(val.Value, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
             message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is in the past or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, DateTimeOffset> PastOrPresent<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.PastOrPresent(val, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.PastOrPresent(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is in the past or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> PastOrPresent<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.PastOrPresent(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.PastOrPresent(val.Value, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
             message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is in the future.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, DateTimeOffset> Future<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Future(val, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.Future(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is in the future.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> Future<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Future(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Future(val.Value, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
             message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is in the future or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, DateTimeOffset> FutureOrPresent<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.FutureOrPresent(val, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.FutureOrPresent(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is in the future or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> FutureOrPresent<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FutureOrPresent(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FutureOrPresent(val.Value, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
             message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is between the specified bounds.</summary>
