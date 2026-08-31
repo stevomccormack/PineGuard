@@ -1,8 +1,9 @@
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
+using Xunit.Abstractions;
 
 namespace PineGuard.MustClauses.UnitTests;
 
-public class MustDateTimeOffsetClausesTests : BaseUnitTest
+public class MustDateTimeOffsetClausesTests(ITestOutputHelper output) : BaseMustUnitTest(output)
 {
     [Theory]
     [MemberData(nameof(MustDateTimeOffsetClausesTestData.Past.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.Past))]
@@ -175,5 +176,77 @@ public class MustDateTimeOffsetClausesTests : BaseUnitTest
         var (val, reference, months) = testCase.Value;
         var result = Must.Be.NotWithinCalendarMonths(val, reference, months);
         Assert.Equal(testCase.Expected, result.Success);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.Weekday.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.Weekday))]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.Weekday.InvalidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.Weekday))]
+    public void Weekday_BehavesAsExpected(MustCase<DateTimeOffset> tc)
+    {
+        // Act
+        var result = Must.Be.Weekday(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.Weekend.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.Weekend))]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.Weekend.InvalidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.Weekend))]
+    public void Weekend_BehavesAsExpected(MustCase<DateTimeOffset> tc)
+    {
+        // Act
+        var result = Must.Be.Weekend(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.FirstDayOfMonth.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.FirstDayOfMonth))]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.FirstDayOfMonth.InvalidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.FirstDayOfMonth))]
+    public void FirstDayOfMonth_BehavesAsExpected(MustCase<DateTimeOffset> tc)
+    {
+        // Act
+        var result = Must.Be.FirstDayOfMonth(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.NotFirstDayOfMonth.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.NotFirstDayOfMonth))]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.NotFirstDayOfMonth.InvalidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.NotFirstDayOfMonth))]
+    public void NotFirstDayOfMonth_BehavesAsExpected(MustCase<DateTimeOffset> tc)
+    {
+        // Act
+        var result = Must.Be.NotFirstDayOfMonth(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.LastDayOfMonth.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.LastDayOfMonth))]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.LastDayOfMonth.InvalidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.LastDayOfMonth))]
+    public void LastDayOfMonth_BehavesAsExpected(MustCase<DateTimeOffset> tc)
+    {
+        // Act
+        var result = Must.Be.LastDayOfMonth(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.NotLastDayOfMonth.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.NotLastDayOfMonth))]
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.NotLastDayOfMonth.InvalidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.NotLastDayOfMonth))]
+    public void NotLastDayOfMonth_BehavesAsExpected(MustCase<DateTimeOffset> tc)
+    {
+        // Act
+        var result = Must.Be.NotLastDayOfMonth(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
     }
 }
