@@ -215,4 +215,70 @@ public sealed class GuardDateTimeOffsetClausesTests(ITestOutputHelper output) : 
         AssertCustomMessage(tc, () => Guard.Against.WithinCalendarMonths(value, tc.Value.reference, tc.Value.months, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
+
+    [Theory]
+    [MemberData(nameof(TD.Weekend.ValidCases), MemberType = typeof(TD.Weekend))]
+    [MemberData(nameof(TD.Weekend.InvalidCases), MemberType = typeof(TD.Weekend))]
+    public void Weekend_BehavesAsExpected(GuardCase<DateTimeOffset> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.Weekend(value));
+        AssertCustomMessage(tc, () => Guard.Against.Weekend(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.Weekday.ValidCases), MemberType = typeof(TD.Weekday))]
+    [MemberData(nameof(TD.Weekday.InvalidCases), MemberType = typeof(TD.Weekday))]
+    public void Weekday_BehavesAsExpected(GuardCase<DateTimeOffset> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.Weekday(value));
+        AssertCustomMessage(tc, () => Guard.Against.Weekday(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.NotFirstDayOfMonth.ValidCases), MemberType = typeof(TD.NotFirstDayOfMonth))]
+    [MemberData(nameof(TD.NotFirstDayOfMonth.InvalidCases), MemberType = typeof(TD.NotFirstDayOfMonth))]
+    public void NotFirstDayOfMonth_BehavesAsExpected(GuardCase<DateTimeOffset> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.NotFirstDayOfMonth(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotFirstDayOfMonth(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.FirstDayOfMonth.ValidCases), MemberType = typeof(TD.FirstDayOfMonth))]
+    [MemberData(nameof(TD.FirstDayOfMonth.InvalidCases), MemberType = typeof(TD.FirstDayOfMonth))]
+    public void FirstDayOfMonth_BehavesAsExpected(GuardCase<DateTimeOffset> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.FirstDayOfMonth(value));
+        AssertCustomMessage(tc, () => Guard.Against.FirstDayOfMonth(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.NotLastDayOfMonth.ValidCases), MemberType = typeof(TD.NotLastDayOfMonth))]
+    [MemberData(nameof(TD.NotLastDayOfMonth.InvalidCases), MemberType = typeof(TD.NotLastDayOfMonth))]
+    public void NotLastDayOfMonth_BehavesAsExpected(GuardCase<DateTimeOffset> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.NotLastDayOfMonth(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotLastDayOfMonth(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.LastDayOfMonth.ValidCases), MemberType = typeof(TD.LastDayOfMonth))]
+    [MemberData(nameof(TD.LastDayOfMonth.InvalidCases), MemberType = typeof(TD.LastDayOfMonth))]
+    public void LastDayOfMonth_BehavesAsExpected(GuardCase<DateTimeOffset> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.LastDayOfMonth(value));
+        AssertCustomMessage(tc, () => Guard.Against.LastDayOfMonth(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
 }
