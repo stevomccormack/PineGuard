@@ -3,6 +3,7 @@
     <Project Path="src/PineGuard.ErrorOr/PineGuard.ErrorOr.csproj" />
     <Project Path="src/PineGuard.Extensions.DependencyInjection/PineGuard.Extensions.DependencyInjection.csproj" />
     <Project Path="src/PineGuard.FluentResults/PineGuard.FluentResults.csproj" />
+    <Project Path="src/PineGuard.MediatR/PineGuard.MediatR.csproj" />
     <Project Path="src/PineGuard.OneOf/PineGuard.OneOf.csproj" />
   </Folder>
   <Folder Name="/tests/">
@@ -14,6 +15,7 @@
     <Project Path="tests/PineGuard.FluentResults.UnitTests/PineGuard.FluentResults.UnitTests.csproj" />
     <Project Path="tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj" />
     <Project Path="tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj" />
+    <Project Path="tests/PineGuard.MediatR.UnitTests/PineGuard.MediatR.UnitTests.csproj" />
     <Project Path="tests/PineGuard.MustClauses.UnitTests/PineGuard.MustClauses.UnitTests.csproj" />
     <Project Path="tests/PineGuard.Testing/PineGuard.Testing.csproj" Id="25fce7fa-931f-473b-8f94-a50e5789298d" />
     <Project Path="tests/PineGuard.OneOf.UnitTests/PineGuard.OneOf.UnitTests.csproj" />

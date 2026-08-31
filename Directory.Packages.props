@@ -11,6 +11,10 @@
     <PackageVersion Include="ErrorOr" Version="2.1.1" />
     <PackageVersion Include="FluentResults" Version="3.16.0" />
     <PackageVersion Include="FluentValidation" Version="11.12.0" />
+    <!-- MediatR is pinned to the 12.5.x line: it is the last Apache-2.0 release, 13.x moved to a
+         commercial licence. The NuGet dependency range PineGuard publishes is >= 12.5.0, so a
+         consumer who has licensed 13.x may still use it — the 12-style next() call compiles on both -->
+    <PackageVersion Include="MediatR" Version="12.5.0" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.7.8" />
     <!-- Direct pins for audit-cli lifting vulnerable transitives (NU1903) -->
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="18.7.1" />
