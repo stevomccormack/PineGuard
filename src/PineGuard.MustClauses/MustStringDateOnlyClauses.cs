@@ -1036,5 +1036,49 @@ public static class MustStringDateOnlyClauses
             inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Overlap.Present, messageTemplate, paramName, start1, parsedStartValue);
     }
+
+    /// <summary>
+    /// Validates that the specified date of birth must meet the expected minimum age.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The date of birth to validate.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must meet the expected minimum age."</c>
+    /// A negative <paramref name="years"/> is a configuration error, reported against that parameter.
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
+    public static MustResult<DateOnly> MinimumAge(this IMustClause _,
+        string? value,
+        int years,
+        DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (years < 0)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Age.BelowMinimum,
+                "{paramName} requires a non-negative number of years.", nameof(years), years);
+
+        if (value is null)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Age.BelowMinimum, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must meet the expected minimum age.";
+
+        if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
+
+        var parsedValue = parsed.GetValueOrDefault();
+        var ok = DateOnlyRules.HasMinimumAge(parsedValue, years, timeProvider);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Age.BelowMinimum, messageTemplate, paramName, value, parsedValue);
+    }
 }
 #endif
