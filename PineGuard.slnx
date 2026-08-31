@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/PineGuard.Analyzers.CodeFixes/PineGuard.Analyzers.CodeFixes.csproj" />
+    <Project Path="src/PineGuard.Analyzers/PineGuard.Analyzers.csproj" />
     <Project Path="src/PineGuard.ErrorOr/PineGuard.ErrorOr.csproj" />
     <Project Path="src/PineGuard.Extensions.DependencyInjection/PineGuard.Extensions.DependencyInjection.csproj" />
     <Project Path="src/PineGuard.FluentResults/PineGuard.FluentResults.csproj" />
