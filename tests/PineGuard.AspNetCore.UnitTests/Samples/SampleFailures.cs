@@ -17,5 +17,7 @@ public static class SampleFailures
 
     public static MustFailure Root => new("", "value.state.invalid", "The order is not consistent.", null);
 
+    public static MustFailure Term => new("Term", "text.content.blank", "Term must not be null or whitespace.", null);
+
     public static MustFailure Password => new("Password", "text.content.blank", "Password must not be null or whitespace.", SecretValue);
 }
