@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
 
@@ -45,6 +46,7 @@ public sealed class FluentDateTimeExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class NotUnspecifiedValidator : AbstractValidator<Model> { public NotUnspecifiedValidator() => RuleFor(x => x.Value).NotUnspecified(); }
     private sealed class ExplicitKindValidator : AbstractValidator<Model> { public ExplicitKindValidator() => RuleFor(x => x.Value).ExplicitKind(); }
     private sealed class NotExplicitKindValidator : AbstractValidator<Model> { public NotExplicitKindValidator() => RuleFor(x => x.Value).NotExplicitKind(); }
+    private sealed class MinimumAgeValidator : AbstractValidator<Model> { public MinimumAgeValidator(int years, TimeProvider timeProvider) => RuleFor(x => x.Value).MinimumAge(years, timeProvider); }
 
     [Theory]
     [MemberData(nameof(FluentDateTimeExtensionsTestData.Past.Cases), MemberType = typeof(FluentDateTimeExtensionsTestData.Past))]
@@ -339,6 +341,22 @@ public sealed class FluentDateTimeExtensionsTests(ITestOutputHelper output) : Ba
     public void NotExplicitKind_BehavesAsExpected(FluentCase<DateTime> tc)
     {
         var result = new NotExplicitKindValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeExtensionsTestData.MinimumAge.Cases), MemberType = typeof(FluentDateTimeExtensionsTestData.MinimumAge))]
+    public void MinimumAge_BehavesAsExpected(FluentCase<(DateTime value, int years)> tc)
+    {
+        var result = new MinimumAgeValidator(tc.Value.years, FixedTimeProvider.Default).Validate(new Model { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeExtensionsTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(FluentDateTimeExtensionsTestData.MinimumAgeOnLeapDay))]
+    public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(FluentCase<(DateTime value, int years, DateTimeOffset utcNow)> tc)
+    {
+        var result = new MinimumAgeValidator(tc.Value.years, new FixedTimeProvider(tc.Value.utcNow)).Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 
