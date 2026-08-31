@@ -27,13 +27,23 @@ internal sealed class PineGuardTypes
     /// </summary>
     internal const string ArgumentExceptionMetadataName = "System.ArgumentException";
 
+    /// <summary>
+    /// The metadata name of the exception the <c>PG1004</c> shape throws.
+    /// </summary>
+    internal const string ArgumentOutOfRangeExceptionMetadataName = "System.ArgumentOutOfRangeException";
+
     private const string PineGuardAssemblyNamePrefix = "PineGuard.";
 
-    private PineGuardTypes(INamedTypeSymbol? guard, INamedTypeSymbol? argumentNullException, INamedTypeSymbol? argumentException)
+    private PineGuardTypes(
+        INamedTypeSymbol? guard,
+        INamedTypeSymbol? argumentNullException,
+        INamedTypeSymbol? argumentException,
+        INamedTypeSymbol? argumentOutOfRangeException)
     {
         Guard = guard;
         ArgumentNullException = argumentNullException;
         ArgumentException = argumentException;
+        ArgumentOutOfRangeException = argumentOutOfRangeException;
     }
 
     /// <summary>
@@ -53,6 +63,11 @@ internal sealed class PineGuardTypes
     internal INamedTypeSymbol? ArgumentException { get; }
 
     /// <summary>
+    /// Gets <see cref="System.ArgumentOutOfRangeException"/> as the compilation sees it.
+    /// </summary>
+    internal INamedTypeSymbol? ArgumentOutOfRangeException { get; }
+
+    /// <summary>
     /// Gets a value indicating whether guard-clause suggestions may be reported at all.
     /// </summary>
     internal bool CanSuggestGuardClauses => Guard is not null;
@@ -65,7 +80,8 @@ internal sealed class PineGuardTypes
     internal static PineGuardTypes From(Compilation compilation) => new(
         compilation.GetTypeByMetadataName(GuardMetadataName),
         compilation.GetTypeByMetadataName(ArgumentNullExceptionMetadataName),
-        compilation.GetTypeByMetadataName(ArgumentExceptionMetadataName));
+        compilation.GetTypeByMetadataName(ArgumentExceptionMetadataName),
+        compilation.GetTypeByMetadataName(ArgumentOutOfRangeExceptionMetadataName));
 
     /// <summary>
     /// Determines whether <paramref name="compilation"/> is one of PineGuard's own assemblies.

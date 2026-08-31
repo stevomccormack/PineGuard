@@ -69,9 +69,14 @@ internal static class GuardSyntaxFactory
     /// Reads the guard-clause arguments the analyzer recorded on <paramref name="diagnostic"/>.
     /// </summary>
     /// <param name="diagnostic">The reported diagnostic.</param>
-    /// <returns>The arguments to pass to the guard clause, in call order.</returns>
-    private static ExpressionSyntax[] ArgumentsFor(Diagnostic diagnostic) =>
-        [IdentifierName(diagnostic.Properties[DiagnosticProperties.Identifier]!)];
+    /// <returns>The argument list to pass to the guard clause.</returns>
+    /// <remarks>
+    /// The analyzer records the arguments as C# source, so parsing them back is what separates
+    /// <c>quantity, min, max</c> into three arguments — a bound may itself be a literal containing a
+    /// comma.
+    /// </remarks>
+    private static ArgumentListSyntax ArgumentsFor(Diagnostic diagnostic) =>
+        ParseArgumentList("(" + diagnostic.Properties[DiagnosticProperties.Arguments] + ")");
 
     /// <summary>
     /// Builds a <c>Guard.Against.{clause}({arguments})</c> invocation.
@@ -79,7 +84,7 @@ internal static class GuardSyntaxFactory
     /// <param name="clause">The guard clause name, such as <c>Null</c>.</param>
     /// <param name="arguments">The arguments to pass to the clause.</param>
     /// <returns>The invocation expression.</returns>
-    internal static InvocationExpressionSyntax GuardInvocation(string clause, params ExpressionSyntax[] arguments) =>
+    internal static InvocationExpressionSyntax GuardInvocation(string clause, ArgumentListSyntax arguments) =>
         InvocationExpression(
             MemberAccessExpression(
                 SyntaxKind.SimpleMemberAccessExpression,
@@ -88,5 +93,5 @@ internal static class GuardSyntaxFactory
                     IdentifierName(GuardTypeName),
                     IdentifierName(AgainstPropertyName)),
                 IdentifierName(clause)),
-            ArgumentList(SeparatedList(Array.ConvertAll(arguments, Argument))));
+            arguments);
 }

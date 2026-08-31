@@ -54,4 +54,17 @@ internal static class DiagnosticDescriptors
         isEnabledByDefault: true,
         description: "A hand-rolled string.IsNullOrEmpty check throws the ArgumentException that Guard.Against.NullOrEmpty already throws, and the guard captures the parameter name for you.",
         helpLinkUri: HelpLinkPrefix + DiagnosticIds.UseGuardAgainstNullOrEmpty);
+
+    /// <summary>
+    /// PG1004 — suggests <c>Guard.Against.OutOfRange</c> in place of a hand-rolled range check.
+    /// </summary>
+    internal static readonly DiagnosticDescriptor UseGuardAgainstOutOfRange = new(
+        DiagnosticIds.UseGuardAgainstOutOfRange,
+        "Use Guard.Against.OutOfRange",
+        "Replace this range check with Guard.Against.OutOfRange({0}, {1}, {2})",
+        UsageCategory,
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true,
+        description: "A hand-rolled lower-and-upper bound check states in two comparisons what Guard.Against.OutOfRange states once, and the guard captures the parameter name for you.",
+        helpLinkUri: HelpLinkPrefix + DiagnosticIds.UseGuardAgainstOutOfRange);
 }

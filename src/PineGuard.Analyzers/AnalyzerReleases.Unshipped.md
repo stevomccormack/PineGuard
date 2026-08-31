@@ -8,3 +8,4 @@ Rule ID | Category | Severity | Notes
 PG1001 | Usage | Info | PreferGuardAnalyzer, [Documentation](https://pineguard.ai/docs/analyzers/PG1001)
 PG1002 | Usage | Info | PreferGuardAnalyzer, [Documentation](https://pineguard.ai/docs/analyzers/PG1002)
 PG1003 | Usage | Info | PreferGuardAnalyzer, [Documentation](https://pineguard.ai/docs/analyzers/PG1003)
+PG1004 | Usage | Info | PreferGuardAnalyzer, [Documentation](https://pineguard.ai/docs/analyzers/PG1004)

@@ -27,6 +27,11 @@ internal sealed class GuardSuggestion
     /// </summary>
     internal static readonly GuardSuggestion NullOrEmpty = new(DiagnosticDescriptors.UseGuardAgainstNullOrEmpty, "NullOrEmpty");
 
+    /// <summary>
+    /// PG1004 — <c>Guard.Against.OutOfRange</c>.
+    /// </summary>
+    internal static readonly GuardSuggestion OutOfRange = new(DiagnosticDescriptors.UseGuardAgainstOutOfRange, "OutOfRange");
+
     private GuardSuggestion(DiagnosticDescriptor descriptor, string clause)
     {
         Descriptor = descriptor;
