@@ -13,4 +13,10 @@ internal static class DiagnosticIds
     /// PG1001 — a hand-rolled null check that <c>Guard.Against.Null</c> already expresses.
     /// </summary>
     internal const string UseGuardAgainstNull = "PG1001";
+
+    /// <summary>
+    /// PG1002 — a hand-rolled null-or-whitespace check that <c>Guard.Against.NullOrWhiteSpace</c>
+    /// already expresses.
+    /// </summary>
+    internal const string UseGuardAgainstNullOrWhiteSpace = "PG1002";
 }

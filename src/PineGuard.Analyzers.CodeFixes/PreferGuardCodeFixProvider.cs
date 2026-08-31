@@ -16,11 +16,13 @@ namespace PineGuard.Analyzers.CodeFixes;
 [Shared]
 public sealed class PreferGuardCodeFixProvider : CodeFixProvider
 {
-    private const string UseGuardAgainstNullTitle = "Use Guard.Against.Null";
+    private const string TitlePrefix = "Use Guard.Against.";
 
     /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-        ImmutableArray.Create(DiagnosticIds.UseGuardAgainstNull);
+        ImmutableArray.Create(
+            DiagnosticIds.UseGuardAgainstNull,
+            DiagnosticIds.UseGuardAgainstNullOrWhiteSpace);
 
     /// <inheritdoc />
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -32,22 +34,21 @@ public sealed class PreferGuardCodeFixProvider : CodeFixProvider
         {
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    UseGuardAgainstNullTitle,
-                    cancellationToken => UseGuardAgainstNullAsync(context.Document, diagnostic, cancellationToken),
-                    equivalenceKey: DiagnosticIds.UseGuardAgainstNull),
+                    TitlePrefix + diagnostic.Properties[DiagnosticProperties.Clause],
+                    cancellationToken => UseGuardAsync(context.Document, diagnostic, cancellationToken),
+                    equivalenceKey: diagnostic.Id),
                 diagnostic);
         }
 
         return Task.CompletedTask;
     }
 
-    private static async Task<Document> UseGuardAgainstNullAsync(Document document, Diagnostic diagnostic, CancellationToken cancellationToken)
+    private static async Task<Document> UseGuardAsync(Document document, Diagnostic diagnostic, CancellationToken cancellationToken)
     {
         var root = (CompilationUnitSyntax)(await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false))!;
         var reported = root.FindNode(diagnostic.Location.SourceSpan);
-        var identifier = diagnostic.Properties[DiagnosticProperties.Identifier]!;
 
-        var guarded = root.ReplaceNode(reported, GuardSyntaxFactory.CreateGuardAgainstNull(reported, identifier));
+        var guarded = root.ReplaceNode(reported, GuardSyntaxFactory.CreateGuard(reported, diagnostic));
 
         return document.WithSyntaxRoot(GuardSyntaxFactory.AddGuardClausesUsing(guarded));
     }
