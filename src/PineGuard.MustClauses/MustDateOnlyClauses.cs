@@ -612,5 +612,40 @@ public static class MustDateOnlyClauses
         var ok = !DateOnlyRules.IsChronological(start, end, inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.Chronological, messageTemplate, paramName, start, start);
     }
+
+    /// <summary>
+    /// Validates that the specified date of birth must meet the expected minimum age.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The date of birth to validate.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must meet the expected minimum age."</c>
+    /// A negative <paramref name="years"/> is a configuration error, reported against that parameter.
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
+    public static MustResult<DateOnly> MinimumAge(this IMustClause _,
+        DateOnly value,
+        int years,
+        TimeProvider? timeProvider = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (years < 0)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Age.BelowMinimum,
+                "{paramName} requires a non-negative number of years.", nameof(years), years);
+
+        const string messageTemplate = "{paramName} must meet the expected minimum age.";
+
+        var ok = DateOnlyRules.HasMinimumAge(value, years, timeProvider);
+        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Age.BelowMinimum, messageTemplate, paramName, value, value);
+    }
 }
 #endif

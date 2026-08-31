@@ -45,6 +45,16 @@ public static partial class MustCodes
             public const string Future = Prefix + ".future";
         }
 
+        /// <summary>Elapsed whole years between a date of birth and today.</summary>
+        public static class Age
+        {
+            /// <summary>The code prefix for this node (<c>"date.age"</c>).</summary>
+            public const string Prefix = Date.Prefix + ".age";
+
+            /// <summary><c>date.age.below-minimum</c></summary>
+            public const string BelowMinimum = Prefix + ".below-minimum";
+        }
+
         /// <summary>Chronological ordering against another date, or of a start and end pair.</summary>
         public static class Order
         {
