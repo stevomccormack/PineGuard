@@ -23,3 +23,4 @@
 - [Must complement test wiring](must-complement-test-wiring.md) — projecting one fixture group into a positive/`Not*` pair: the null-value case that can't be inverted, `Except`/`Only`, legacy `BaseUnitTest` migration
 - [Fluent adapter nuances](fluent-adapter-nuances.md) — the two null conventions in-repo and which is normative, config-param messages arriving pre-formatted, folding extra scenarios into the single `Cases`
 - [Result bridges are not Integrations](result-bridge-layer.md) — why "Must owns messages" doesn't bind on ErrorOr/FluentResults/OneOf, and what does
+- [Batch E TimeProvider gate](project_batch-e-timeprovider-gate.md) — the retrofit is fully specified; what blocks it is a Tier 1 package edit, not ambiguity
