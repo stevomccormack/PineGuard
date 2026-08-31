@@ -14,18 +14,20 @@ public static class DateTimeOffsetRules
     /// </summary>
     /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the past; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInPast(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive) =>
-        value is not null && IsBefore(value, DateTimeOffset.UtcNow, inclusion);
+    public static bool IsInPast(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
+        value is not null && IsBefore(value, DateTimeUtility.GetUtcNow(timeProvider), inclusion);
 
     /// <summary>
     /// Determines whether the specified date/time offset is in the future relative to UTC now.
     /// </summary>
     /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the future; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInFuture(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive) =>
-        value is not null && IsAfter(value, DateTimeOffset.UtcNow, inclusion);
+    public static bool IsInFuture(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
+        value is not null && IsAfter(value, DateTimeUtility.GetUtcNow(timeProvider), inclusion);
 
     /// <summary>
     /// Determines whether the specified date/time offset falls within [<paramref name="min"/>, <paramref name="max"/>].

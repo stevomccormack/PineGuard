@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
 
@@ -19,11 +20,33 @@ public sealed class StringRulesDateTimeOffsetTests(ITestOutputHelper output)
     }
 
     [Theory]
+    [MemberData(nameof(StringRulesDateTimeOffsetTestData.IsInPast.PinnedClockCases), MemberType = typeof(StringRulesDateTimeOffsetTestData.IsInPast))]
+    public void IsInPast_PinnedTimeProvider_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.DateTimeOffset.IsInPast(tc.Value, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(StringRulesDateTimeOffsetTestData.IsInFuture.Cases), MemberType = typeof(StringRulesDateTimeOffsetTestData.IsInFuture))]
     public void IsInFuture_BehavesAsExpected(RuleCase<string?> tc)
     {
         // Act
         var result = PineGuard.Rules.StringRules.DateTimeOffset.IsInFuture(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesDateTimeOffsetTestData.IsInFuture.PinnedClockCases), MemberType = typeof(StringRulesDateTimeOffsetTestData.IsInFuture))]
+    public void IsInFuture_PinnedTimeProvider_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.DateTimeOffset.IsInFuture(tc.Value, timeProvider: FixedTimeProvider.Default);
 
         // Assert
         AssertResult(tc, result);
