@@ -243,6 +243,21 @@ public static class PreferGuardAnalyzerTestData
         }
         """;
 
+    private const string EqualsAnotherIdentifier = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name, string fallback)
+            {
+                if (name == fallback)
+                    throw new ArgumentNullException(nameof(name));
+            }
+        }
+        """;
+
     private const string IsNotNullPattern = """
         using System;
 
@@ -437,6 +452,38 @@ public static class PreferGuardAnalyzerTestData
         public class Order
         {
             public void Ship(string name)
+            {
+                Guard.Against.Null(name);
+            }
+        }
+        """;
+
+    private const string UsingAliasToAnArray = """
+        using System;
+        using Sizes = int[];
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name, Sizes sizes)
+            {
+                if (name is null)
+                    throw new ArgumentNullException(nameof(name));
+            }
+        }
+        """;
+
+    private const string UsingAliasToAnArrayFixed = """
+        using System;
+        using Sizes = int[];
+        using PineGuard.GuardClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name, Sizes sizes)
             {
                 Guard.Against.Null(name);
             }
@@ -651,6 +698,21 @@ public static class PreferGuardAnalyzerTestData
             public void Ship(string name)
             {
                 if (Text.IsNullOrWhiteSpace(name))
+                    throw new ArgumentException("A name is required.", nameof(name));
+            }
+        }
+        """;
+
+    private const string LateBoundPredicateThrow = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name, dynamic isBlank)
+            {
+                if (isBlank(name))
                     throw new ArgumentException("A name is required.", nameof(name));
             }
         }
@@ -1216,6 +1278,7 @@ public static class PreferGuardAnalyzerTestData
             new("throwing-a-factory-made-exception-is-left-alone", ThrownExpressionIsNotCreation, new AnalyzerExpected(true)),
             new("a-length-check-is-not-a-null-check", NotANullCheck, new AnalyzerExpected(true)),
             new("an-inequality-check-is-not-a-null-check", NotEqualsNull, new AnalyzerExpected(true)),
+            new("comparing-one-identifier-to-another-is-not-a-null-check", EqualsAnotherIdentifier, new AnalyzerExpected(true)),
             new("an-is-not-null-pattern-is-not-a-null-check", IsNotNullPattern, new AnalyzerExpected(true)),
             new("a-constant-pattern-other-than-null-is-not-a-null-check", IsEmptyStringPattern, new AnalyzerExpected(true)),
             new("only-a-plain-identifier-is-guarded-not-a-member-access", MemberIsNullPattern, new AnalyzerExpected(true)),
@@ -1249,7 +1312,8 @@ public static class PreferGuardAnalyzerTestData
             new("a-coalesce-throw-becomes-a-guard-that-returns-the-value", CoalesceThrow, new AnalyzerExpected(false, NameMessage, UseGuardAgainstNull, 11, 17, CoalesceThrowFixed)),
             new("throw-if-null-becomes-guard-against-null", ThrowIfNull, new AnalyzerExpected(false, NameMessage, UseGuardAgainstNull, 9, 9, ThrowIfNullFixed)),
             new("an-existing-guard-clauses-using-is-not-duplicated", ExistingGuardClausesUsing, new AnalyzerExpected(false, NameMessage, UseGuardAgainstNull, 10, 9, ExistingGuardClausesUsingFixed)),
-            new("a-file-with-no-usings-gains-one", NoUsings, new AnalyzerExpected(false, NameMessage, UseGuardAgainstNull, 7, 9, NoUsingsFixed))
+            new("a-file-with-no-usings-gains-one", NoUsings, new AnalyzerExpected(false, NameMessage, UseGuardAgainstNull, 7, 9, NoUsingsFixed)),
+            new("a-using-alias-to-a-type-that-is-not-a-name-is-stepped-over", UsingAliasToAnArray, new AnalyzerExpected(false, NameMessage, UseGuardAgainstNull, 10, 9, UsingAliasToAnArrayFixed))
         ];
 
         public static TheoryData<AnalyzerCase> FixAllCases =>
@@ -1269,6 +1333,7 @@ public static class PreferGuardAnalyzerTestData
             new("checking-a-call-rather-than-an-identifier-is-left-alone", IsNullOrWhiteSpaceOfExpression, new AnalyzerExpected(true)),
             new("a-negated-check-asserts-the-opposite-and-is-left-alone", NegatedIsNullOrWhiteSpace, new AnalyzerExpected(true)),
             new("an-is-null-or-white-space-declared-somewhere-other-than-string-is-left-alone", CustomIsNullOrWhiteSpace, new AnalyzerExpected(true)),
+            new("a-late-bound-predicate-binds-to-no-method-and-is-left-alone", LateBoundPredicateThrow, new AnalyzerExpected(true)),
             new("another-string-predicate-is-not-an-emptiness-check", StringContainsThrow, new AnalyzerExpected(true)),
             new("a-condition-that-is-not-a-call-at-all-is-left-alone", LengthCheckArgumentException, new AnalyzerExpected(true)),
             new("a-throw-if-null-or-white-space-declared-somewhere-other-than-the-framework-is-left-alone", CustomThrowIfNullOrWhiteSpace, new AnalyzerExpected(true))
