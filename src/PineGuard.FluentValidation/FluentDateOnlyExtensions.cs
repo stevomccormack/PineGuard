@@ -17,97 +17,113 @@ public static class FluentDateOnlyExtensions
     /// <summary>Validates that the <see cref="DateOnly"/> value is in the past.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <example><code>RuleFor(x => x.BirthDate).Past();</code></example>
     public static IRuleBuilderOptions<TModel, DateOnly> Past<TModel>(
         this IRuleBuilder<TModel, DateOnly> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Past(val, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.Past(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value is in the past.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> Past<TModel>(
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Past(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Past(val.Value, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
             message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is in the past or is today.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <example><code>RuleFor(x => x.StartDate).PastOrPresent();</code></example>
     public static IRuleBuilderOptions<TModel, DateOnly> PastOrPresent<TModel>(
         this IRuleBuilder<TModel, DateOnly> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.PastOrPresent(val, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.PastOrPresent(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value is in the past or is today.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> PastOrPresent<TModel>(
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.PastOrPresent(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.PastOrPresent(val.Value, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
             message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is in the future.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <example><code>RuleFor(x => x.ExpiryDate).Future();</code></example>
     public static IRuleBuilderOptions<TModel, DateOnly> Future<TModel>(
         this IRuleBuilder<TModel, DateOnly> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Future(val, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.Future(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value is in the future.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> Future<TModel>(
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Future(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Future(val.Value, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
             message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is in the future or is today.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <example><code>RuleFor(x => x.ValidUntil).FutureOrPresent();</code></example>
     public static IRuleBuilderOptions<TModel, DateOnly> FutureOrPresent<TModel>(
         this IRuleBuilder<TModel, DateOnly> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.FutureOrPresent(val, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.FutureOrPresent(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value is in the future or is today.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> FutureOrPresent<TModel>(
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FutureOrPresent(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FutureOrPresent(val.Value, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
             message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value falls between the specified bounds.</summary>

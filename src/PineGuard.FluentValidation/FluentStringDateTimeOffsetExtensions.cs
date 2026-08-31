@@ -19,54 +19,62 @@ public static class FluentStringDateTimeOffsetExtensions
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> in the past.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     /// <example><code>RuleFor(x => x.CreatedAt).PastDateTimeOffset();</code></example>
     public static IRuleBuilderOptions<TModel, string?> PastDateTimeOffset<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.PastDateTimeOffset(val, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.PastDateTimeOffset(val, styles, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
             message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> in the past or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> PastOrPresentDateTimeOffset<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.PastOrPresentDateTimeOffset(val, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.PastOrPresentDateTimeOffset(val, styles, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
             message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> in the future.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> FutureDateTimeOffset<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.FutureDateTimeOffset(val, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.FutureDateTimeOffset(val, styles, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
             message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> in the future or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, string?> FutureOrPresentDateTimeOffset<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        TimeProvider? timeProvider = null,
         string? message = null,
         DateTimeStyles styles = DefaultStyles) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.FutureOrPresentDateTimeOffset(val, styles, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.FutureOrPresentDateTimeOffset(val, styles, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
             message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the string value represents a <see cref="DateTimeOffset"/> between the specified bounds.</summary>
