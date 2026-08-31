@@ -31,6 +31,74 @@ The analyzer assemblies target `netstandard2.0` and load into any Roslyn 4.14-or
 
 `PG1xxx` means *prefer a guard clause*; `PG2xxx` means *guard or validation misuse*. Every diagnostic ships with a code fix, and every fix supports fix-all across a document, project or solution.
 
+### PG1001 — Use `Guard.Against.Null`
+
+A hand-rolled null check throws the `ArgumentNullException` the guard already throws, and spells the parameter name out to do it. The guard captures that name itself, and the fix adds `using PineGuard.GuardClauses;` to the file when it is missing.
+
+```csharp
+// Before
+if (name is null)
+    throw new ArgumentNullException(nameof(name));
+
+// After
+Guard.Against.Null(name);
+```
+
+`name == null`, `null == name` and `ArgumentNullException.ThrowIfNull(name)` report the same way. The guard also hands the value back, so the expression form stays an expression:
+
+```csharp
+// Before
+_name = name ?? throw new ArgumentNullException(nameof(name));
+
+// After
+_name = Guard.Against.Null(name);
+```
+
+### PG1002 — Use `Guard.Against.NullOrWhiteSpace`
+
+`string.IsNullOrWhiteSpace` covers the three ways a required string arrives useless — null, empty, blank — and then needs a throw, a message and a parameter name wrapped around it. The guard is the same check with the ceremony already written.
+
+```csharp
+// Before
+if (string.IsNullOrWhiteSpace(name))
+    throw new ArgumentException("A name is required.", nameof(name));
+
+// After
+Guard.Against.NullOrWhiteSpace(name);
+```
+
+`ArgumentException.ThrowIfNullOrWhiteSpace(name)` reports the same way.
+
+### PG1003 — Use `Guard.Against.NullOrEmpty`
+
+The same shape for the check that lets whitespace through.
+
+```csharp
+// Before
+if (string.IsNullOrEmpty(name))
+    throw new ArgumentException("A name is required.", nameof(name));
+
+// After
+Guard.Against.NullOrEmpty(name);
+```
+
+`ArgumentException.ThrowIfNullOrEmpty(name)` reports the same way.
+
+### PG1004 — Use `Guard.Against.OutOfRange`
+
+Two comparisons joined by `||` state a range the guard states once, in the order a reader expects to find it: value, lower bound, upper bound.
+
+```csharp
+// Before
+if (quantity < 1 || quantity > 100)
+    throw new ArgumentOutOfRangeException(nameof(quantity));
+
+// After
+Guard.Against.OutOfRange(quantity, 1, 100);
+```
+
+Only the canonical shape reports — the same identifier below its lower bound or above its upper bound, each bound a plain identifier or literal, so `quantity < min || quantity > max` becomes `Guard.Against.OutOfRange(quantity, min, max)`. A computed bound is left alone rather than rewritten into something the fix cannot guarantee is equivalent.
+
 ### PG2001 — Must result is discarded
 
 A Must clause never throws on its own; it hands back a `MustResult<T>` to inspect. Calling one as a statement therefore checks nothing, and no compiler warning says so.
