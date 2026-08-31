@@ -19,13 +19,16 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
 {
     private const string ThrowIfNullMethodName = "ThrowIfNull";
     private const string ThrowIfNullOrWhiteSpaceMethodName = "ThrowIfNullOrWhiteSpace";
+    private const string ThrowIfNullOrEmptyMethodName = "ThrowIfNullOrEmpty";
     private const string IsNullOrWhiteSpaceMethodName = "IsNullOrWhiteSpace";
+    private const string IsNullOrEmptyMethodName = "IsNullOrEmpty";
 
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
             DiagnosticDescriptors.UseGuardAgainstNull,
-            DiagnosticDescriptors.UseGuardAgainstNullOrWhiteSpace);
+            DiagnosticDescriptors.UseGuardAgainstNullOrWhiteSpace,
+            DiagnosticDescriptors.UseGuardAgainstNullOrEmpty);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -164,10 +167,15 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
     /// <summary>
     /// Maps a <see cref="string"/> predicate name onto the guard clause that replaces it.
     /// </summary>
-    private static GuardSuggestion? GetEmptinessSuggestion(string methodName) =>
-        string.Equals(methodName, IsNullOrWhiteSpaceMethodName, StringComparison.Ordinal)
-            ? GuardSuggestion.NullOrWhiteSpace
+    private static GuardSuggestion? GetEmptinessSuggestion(string methodName)
+    {
+        if (string.Equals(methodName, IsNullOrWhiteSpaceMethodName, StringComparison.Ordinal))
+            return GuardSuggestion.NullOrWhiteSpace;
+
+        return string.Equals(methodName, IsNullOrEmptyMethodName, StringComparison.Ordinal)
+            ? GuardSuggestion.NullOrEmpty
             : null;
+    }
 
     /// <summary>
     /// Maps a framework <c>ThrowIfX</c> helper onto the guard clause that replaces it.
@@ -181,14 +189,27 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
                 : null;
         }
 
-        if (string.Equals(method.Name, ThrowIfNullOrWhiteSpaceMethodName, StringComparison.Ordinal))
-        {
-            return SymbolEqualityComparer.Default.Equals(method.ContainingType, types.ArgumentException)
-                ? GuardSuggestion.NullOrWhiteSpace
-                : null;
-        }
+        var suggestion = GetEmptinessThrowHelperSuggestion(method.Name);
+        if (suggestion is null)
+            return null;
 
-        return null;
+        return SymbolEqualityComparer.Default.Equals(method.ContainingType, types.ArgumentException)
+            ? suggestion
+            : null;
+    }
+
+    /// <summary>
+    /// Maps an <see cref="System.ArgumentException"/> emptiness helper name onto the guard clause
+    /// that replaces it.
+    /// </summary>
+    private static GuardSuggestion? GetEmptinessThrowHelperSuggestion(string methodName)
+    {
+        if (string.Equals(methodName, ThrowIfNullOrWhiteSpaceMethodName, StringComparison.Ordinal))
+            return GuardSuggestion.NullOrWhiteSpace;
+
+        return string.Equals(methodName, ThrowIfNullOrEmptyMethodName, StringComparison.Ordinal)
+            ? GuardSuggestion.NullOrEmpty
+            : null;
     }
 
     private static string? GetIdentifierCheckedAgainstNull(ExpressionSyntax condition) => condition switch
