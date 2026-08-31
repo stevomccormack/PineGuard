@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using Xunit.Abstractions;
 using TD = PineGuard.GuardClauses.UnitTests.GuardDateOnlyClausesTestData;
@@ -224,6 +225,27 @@ public sealed class GuardDateOnlyClausesTests(ITestOutputHelper output) : BaseGu
         var value = tc.Value.value;
         var result = AssertResult(tc, () => Guard.Against.WithinCalendarMonths(value, tc.Value.reference, tc.Value.months));
         AssertCustomMessage(tc, () => Guard.Against.WithinCalendarMonths(value, tc.Value.reference, tc.Value.months, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.BelowMinimumAge.ValidCases), MemberType = typeof(TD.BelowMinimumAge))]
+    [MemberData(nameof(TD.BelowMinimumAge.InvalidCases), MemberType = typeof(TD.BelowMinimumAge))]
+    public void BelowMinimumAge_BehavesAsExpected(GuardCase<(DateOnly value, int years)> tc)
+    {
+        var value = tc.Value.value;
+        var result = AssertResult(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, FixedTimeProvider.Default));
+        AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, FixedTimeProvider.Default, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TD.BelowMinimumAgeOnLeapDay.Cases), MemberType = typeof(TD.BelowMinimumAgeOnLeapDay))]
+    public void BelowMinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(GuardCase<(DateOnly value, int years, DateTimeOffset utcNow)> tc)
+    {
+        var value = tc.Value.value;
+        var result = AssertResult(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, new FixedTimeProvider(tc.Value.utcNow)));
+        AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, new FixedTimeProvider(tc.Value.utcNow), message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

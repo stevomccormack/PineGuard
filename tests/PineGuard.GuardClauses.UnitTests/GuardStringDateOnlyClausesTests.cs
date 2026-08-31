@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using Xunit.Abstractions;
 
@@ -200,5 +201,26 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
         var start1 = tc.Value.start1;
         AssertResult(tc, () => Guard.Against.NotOverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!));
         AssertCustomMessage(tc, () => Guard.Against.NotOverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, message: CustomMessage));
+    }
+
+    // GuardStringDateOnlyClauses.BelowMinimumAge
+    [Theory]
+    [MemberData(nameof(GuardStringDateOnlyClausesTestData.BelowMinimumAge.ValidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.BelowMinimumAge))]
+    [MemberData(nameof(GuardStringDateOnlyClausesTestData.BelowMinimumAge.InvalidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.BelowMinimumAge))]
+    public void BelowMinimumAge_BehavesAsExpected(GuardCase<(string? value, int years)> tc)
+    {
+        var value = tc.Value.value;
+        AssertResult(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, timeProvider: FixedTimeProvider.Default));
+        AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, timeProvider: FixedTimeProvider.Default, message: CustomMessage));
+    }
+
+    // GuardStringDateOnlyClauses.BelowMinimumAge — 29-February birth dates
+    [Theory]
+    [MemberData(nameof(GuardStringDateOnlyClausesTestData.BelowMinimumAgeOnLeapDay.Cases), MemberType = typeof(GuardStringDateOnlyClausesTestData.BelowMinimumAgeOnLeapDay))]
+    public void BelowMinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(GuardCase<(string? value, int years, DateTimeOffset utcNow)> tc)
+    {
+        var value = tc.Value.value;
+        AssertResult(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, timeProvider: new FixedTimeProvider(tc.Value.utcNow)));
+        AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, timeProvider: new FixedTimeProvider(tc.Value.utcNow), message: CustomMessage));
     }
 }
