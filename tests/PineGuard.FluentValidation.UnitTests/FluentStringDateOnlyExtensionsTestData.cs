@@ -1,4 +1,6 @@
+using System.Globalization;
 using PineGuard.Codes;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -6,6 +8,13 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public static class FluentStringDateOnlyExtensionsTestData
 {
+    // Today as the pinned clock reports it, rendered the way the fixtures render dates. That day is itself
+    // in the real past, so the day after it is future for the pinned clock and past for the machine's — an
+    // overload that dropped the supplied provider would fail these groups rather than pass by coincidence.
+    private static readonly DateOnly PinnedToday = DateOnly.FromDateTime(FixedTimeProvider.Default.GetUtcNow().UtcDateTime);
+
+    private static string Iso(DateOnly value) => value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
     public static class InPast
     {
         public static TheoryData<FluentCase<string?>> Cases => F.DateOnlyIsInPast.AllScenarios.ToFluentCases(s => s.Name switch
@@ -46,6 +55,50 @@ public static class FluentStringDateOnlyExtensionsTestData
             nameof(F.DateOnlyIsInPast.NotADate) => new FluentExpected(false, "Value must be a date in the future or present."),
             _ => new FluentExpected(true)
         });
+    }
+
+    public static class InPastPinnedClock
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("Yesterday", Iso(PinnedToday.AddDays(-1)), new FluentExpected(true)),
+            new("Null", null, new FluentExpected(true)),
+            new("Today", Iso(PinnedToday), new FluentExpected(false, "Value must be a date in the past.", Code: MustCodes.Date.Relative.NotPast)),
+            new("Tomorrow", Iso(PinnedToday.AddDays(1)), new FluentExpected(false, "Value must be a date in the past.", Code: MustCodes.Date.Relative.NotPast))
+        ];
+    }
+
+    public static class InPastOrPresentPinnedClock
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("Yesterday", Iso(PinnedToday.AddDays(-1)), new FluentExpected(true)),
+            new("Today", Iso(PinnedToday), new FluentExpected(true)),
+            new("Null", null, new FluentExpected(true)),
+            new("Tomorrow", Iso(PinnedToday.AddDays(1)), new FluentExpected(false, "Value must be a date in the past or present.", Code: MustCodes.Date.Relative.Future))
+        ];
+    }
+
+    public static class InFuturePinnedClock
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("Tomorrow", Iso(PinnedToday.AddDays(1)), new FluentExpected(true)),
+            new("Null", null, new FluentExpected(true)),
+            new("Today", Iso(PinnedToday), new FluentExpected(false, "Value must be a date in the future.", Code: MustCodes.Date.Relative.NotFuture)),
+            new("Yesterday", Iso(PinnedToday.AddDays(-1)), new FluentExpected(false, "Value must be a date in the future.", Code: MustCodes.Date.Relative.NotFuture))
+        ];
+    }
+
+    public static class InFutureOrPresentPinnedClock
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("Tomorrow", Iso(PinnedToday.AddDays(1)), new FluentExpected(true)),
+            new("Today", Iso(PinnedToday), new FluentExpected(true)),
+            new("Null", null, new FluentExpected(true)),
+            new("Yesterday", Iso(PinnedToday.AddDays(-1)), new FluentExpected(false, "Value must be a date in the future or present.", Code: MustCodes.Date.Relative.Past))
+        ];
     }
 
     public static class IsBetween

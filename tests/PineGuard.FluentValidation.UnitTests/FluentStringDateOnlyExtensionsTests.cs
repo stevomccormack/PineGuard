@@ -30,6 +30,26 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
         public FutureOrPresentDateOnlyValidator() => RuleFor(x => x.Value).FutureOrPresentDateOnly();
     }
 
+    private sealed class PastPinnedClockDateOnlyValidator : AbstractValidator<Model>
+    {
+        public PastPinnedClockDateOnlyValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).PastDateOnly(timeProvider);
+    }
+
+    private sealed class PastOrPresentPinnedClockDateOnlyValidator : AbstractValidator<Model>
+    {
+        public PastOrPresentPinnedClockDateOnlyValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).PastOrPresentDateOnly(timeProvider);
+    }
+
+    private sealed class FuturePinnedClockDateOnlyValidator : AbstractValidator<Model>
+    {
+        public FuturePinnedClockDateOnlyValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).FutureDateOnly(timeProvider);
+    }
+
+    private sealed class FutureOrPresentPinnedClockDateOnlyValidator : AbstractValidator<Model>
+    {
+        public FutureOrPresentPinnedClockDateOnlyValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).FutureOrPresentDateOnly(timeProvider);
+    }
+
     private sealed class BetweenDateOnlyValidator : AbstractValidator<Model>
     {
         public BetweenDateOnlyValidator(DateOnly min, DateOnly max, Inclusion inclusion) =>
@@ -189,6 +209,42 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
     public void InFutureOrPresent_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new FutureOrPresentDateOnlyValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.PastDateOnly
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.InPastPinnedClock.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.InPastPinnedClock))]
+    public void InPast_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        var result = new PastPinnedClockDateOnlyValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.PastOrPresentDateOnly
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.InPastOrPresentPinnedClock.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.InPastOrPresentPinnedClock))]
+    public void InPastOrPresent_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        var result = new PastOrPresentPinnedClockDateOnlyValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.FutureDateOnly
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.InFuturePinnedClock.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.InFuturePinnedClock))]
+    public void InFuture_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        var result = new FuturePinnedClockDateOnlyValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.FutureOrPresentDateOnly
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.InFutureOrPresentPinnedClock.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.InFutureOrPresentPinnedClock))]
+    public void InFutureOrPresent_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        var result = new FutureOrPresentPinnedClockDateOnlyValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
     }
 
