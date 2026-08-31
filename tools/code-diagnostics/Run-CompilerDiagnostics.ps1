@@ -25,7 +25,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateSet('All', 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing')]
+    [ValidateSet('All', 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing')]
     [string] $Scope = 'All',
 
     [string] $Filter,

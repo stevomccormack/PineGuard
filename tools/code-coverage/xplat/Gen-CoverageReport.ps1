@@ -36,7 +36,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release')] [string] $Configuration = 'Debug',
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'All', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'All', 'Testing')] [string] $Scope = 'Core',
     [switch] $Clean,
     [switch] $NoOpen,
     [switch] $SkipHtml,
@@ -82,7 +82,7 @@ function Test-CoverageLooksValid {
     }
 
     $repoRootForScopeCheck = Get-RepoRoot
-    $scopeRegistryEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing')) {
+    $scopeRegistryEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing')) {
         Get-PineGuardScope -Name $Scope
     }
     else {
@@ -151,7 +151,7 @@ if ($Clean) {
 Ensure-Directory -Path $generatedRoot
 Ensure-Directory -Path $resultsRoot
 
-$generateScopeEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing')) {
+$generateScopeEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing')) {
     Get-PineGuardScope -Name $Scope
 }
 else {

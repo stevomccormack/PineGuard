@@ -69,7 +69,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Generate', 'Analyze', 'GenerateAndAnalyze')] [string] $Mode = 'GenerateAndAnalyze',
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'All', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'All', 'Testing')] [string] $Scope = 'Core',
     [ValidateSet('Debug', 'Release')] [string] $Configuration = 'Debug',
     [switch] $Clean,
     [switch] $NoOpen,
@@ -90,7 +90,7 @@ param(
     [string] $Format
 )
 
-if ($Scope -in 'Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing') {
+if ($Scope -in 'Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing') {
     if (-not $Relaxed) {
         $Enforce100 = $true
     }

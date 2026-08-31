@@ -29,6 +29,9 @@
 .PARAMETER DependencyInjection
     See the param block for details.
 
+.PARAMETER AspNetCore
+    See the param block for details.
+
 .PARAMETER ErrorOr
     See the param block for details.
 
@@ -85,6 +88,7 @@ param(
     [switch]$DataAnnotations,
     [switch]$Options,
     [switch]$DependencyInjection,
+    [switch]$AspNetCore,
     [switch]$ErrorOr,
     [switch]$FluentResults,
     [switch]$OneOf,
@@ -123,6 +127,7 @@ if ($All.IsPresent) {
     $DataAnnotations = $true
     $Options = $true
     $DependencyInjection = $true
+    $AspNetCore = $true
     $ErrorOr = $true
     $FluentResults = $true
     $OneOf = $true
@@ -133,7 +138,7 @@ if ($All.IsPresent) {
     $IncludeTests = $true
 }
 
-$any = $Agent -or $Core -or $MustClauses -or $GuardClauses -or $FluentValidation -or $DataAnnotations -or $Options -or $DependencyInjection -or $ErrorOr -or $FluentResults -or $OneOf -or $Testing -or $Docs -or $Tools -or $Solution
+$any = $Agent -or $Core -or $MustClauses -or $GuardClauses -or $FluentValidation -or $DataAnnotations -or $Options -or $DependencyInjection -or $AspNetCore -or $ErrorOr -or $FluentResults -or $OneOf -or $Testing -or $Docs -or $Tools -or $Solution
 if (-not $any) {
     throw 'No scopes selected. Use -All or specify one or more scopes (e.g. -Core -Tools).'
 }
@@ -183,6 +188,7 @@ if ($FluentValidation) { Invoke-ScopedCommit -ScriptName 'Commit-FluentValidatio
 if ($DataAnnotations) { Invoke-ScopedCommit -ScriptName 'Commit-DataAnnotations.ps1' -IncludeTests:$IncludeTests.IsPresent }
 if ($Options) { Invoke-ScopedCommit -ScriptName 'Commit-Options.ps1' -IncludeTests:$IncludeTests.IsPresent }
 if ($DependencyInjection) { Invoke-ScopedCommit -ScriptName 'Commit-DependencyInjection.ps1' -IncludeTests:$IncludeTests.IsPresent }
+if ($AspNetCore) { Invoke-ScopedCommit -ScriptName 'Commit-AspNetCore.ps1' -IncludeTests:$IncludeTests.IsPresent }
 if ($ErrorOr) { Invoke-ScopedCommit -ScriptName 'Commit-ErrorOr.ps1' -IncludeTests:$IncludeTests.IsPresent }
 if ($FluentResults) { Invoke-ScopedCommit -ScriptName 'Commit-FluentResults.ps1' -IncludeTests:$IncludeTests.IsPresent }
 if ($OneOf) { Invoke-ScopedCommit -ScriptName 'Commit-OneOf.ps1' -IncludeTests:$IncludeTests.IsPresent }
