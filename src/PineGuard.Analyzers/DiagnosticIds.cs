@@ -25,4 +25,9 @@ internal static class DiagnosticIds
     /// expresses.
     /// </summary>
     internal const string UseGuardAgainstNullOrEmpty = "PG1003";
+
+    /// <summary>
+    /// PG1004 — a hand-rolled range check that <c>Guard.Against.OutOfRange</c> already expresses.
+    /// </summary>
+    internal const string UseGuardAgainstOutOfRange = "PG1004";
 }

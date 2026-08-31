@@ -8,6 +8,9 @@ public static class PreferGuardAnalyzerTestData
     private const string NameMessage = "Replace this null check with Guard.Against.Null(name)";
     private const string NameWhiteSpaceMessage = "Replace this null-or-whitespace check with Guard.Against.NullOrWhiteSpace(name)";
     private const string NameEmptyMessage = "Replace this null-or-empty check with Guard.Against.NullOrEmpty(name)";
+    private const string UseGuardAgainstOutOfRange = "PG1004";
+    private const string QuantityLiteralRangeMessage = "Replace this range check with Guard.Against.OutOfRange(quantity, 1, 100)";
+    private const string QuantityNamedRangeMessage = "Replace this range check with Guard.Against.OutOfRange(quantity, min, max)";
 
     private const string IsNullThrow = """
         using System;
@@ -944,6 +947,261 @@ public static class PreferGuardAnalyzerTestData
         }
         """;
 
+    private const string RangeCheckThrow = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity)
+            {
+                if (quantity < 1 || quantity > 100)
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+        }
+        """;
+
+    private const string RangeCheckThrowFixed = """
+        using System;
+        using PineGuard.GuardClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity)
+            {
+                Guard.Against.OutOfRange(quantity, 1, 100);
+            }
+        }
+        """;
+
+    private const string RangeCheckBlockThrow = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity)
+            {
+                if (quantity < 1 || quantity > 100)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+                }
+            }
+        }
+        """;
+
+    private const string RangeCheckNamedBounds = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity, int min, int max)
+            {
+                if (quantity < min || quantity > max)
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+        }
+        """;
+
+    private const string RangeCheckNamedBoundsFixed = """
+        using System;
+        using PineGuard.GuardClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity, int min, int max)
+            {
+                Guard.Against.OutOfRange(quantity, min, max);
+            }
+        }
+        """;
+
+    private const string RangeCheckOtherException = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity)
+            {
+                if (quantity < 1 || quantity > 100)
+                    throw new InvalidOperationException();
+            }
+        }
+        """;
+
+    private const string RangeCheckLogicalAnd = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity, int lowWater)
+            {
+                if (quantity < 1 && quantity > lowWater)
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+        }
+        """;
+
+    private const string RangeCheckIsACall = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity)
+            {
+                if (IsOutOfRange(quantity))
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+
+            private static bool IsOutOfRange(int value) => value < 1;
+        }
+        """;
+
+    private const string RangeCheckOfTwoIdentifiers = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity, int weight)
+            {
+                if (quantity < 1 || weight > 100)
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+        }
+        """;
+
+    private const string RangeCheckReversedComparisons = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity)
+            {
+                if (quantity > 100 || quantity < 1)
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+        }
+        """;
+
+    private const string RangeCheckOfMember = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            private int _quantity;
+
+            public void Ship()
+            {
+                if (this._quantity < 1 || this._quantity > 100)
+                    throw new ArgumentOutOfRangeException(nameof(_quantity));
+            }
+        }
+        """;
+
+    private const string RangeCheckComputedLowerBound = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity)
+            {
+                if (quantity < Minimum() || quantity > 100)
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+
+            private static int Minimum() => 1;
+        }
+        """;
+
+    private const string RangeCheckComputedUpperBound = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity)
+            {
+                if (quantity < 1 || quantity > Maximum())
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+
+            private static int Maximum() => 100;
+        }
+        """;
+
+    private const string RangeCheckUpperHalfIsACall = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity)
+            {
+                if (quantity < 1 || IsTooLarge(quantity))
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+            }
+
+            private static bool IsTooLarge(int value) => value > 100;
+        }
+        """;
+
+    private const string TwoRangeCheckedParameters = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity, int weight)
+            {
+                if (quantity < 1 || quantity > 100)
+                    throw new ArgumentOutOfRangeException(nameof(quantity));
+                if (weight < 1 || weight > 50)
+                    throw new ArgumentOutOfRangeException(nameof(weight));
+            }
+        }
+        """;
+
+    private const string TwoRangeCheckedParametersFixed = """
+        using System;
+        using PineGuard.GuardClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(int quantity, int weight)
+            {
+                Guard.Against.OutOfRange(quantity, 1, 100);
+                Guard.Against.OutOfRange(weight, 1, 50);
+            }
+        }
+        """;
+
     public static class PG1001
     {
         public static TheoryData<AnalyzerCase> Cases =>
@@ -1076,6 +1334,48 @@ public static class PreferGuardAnalyzerTestData
         public static TheoryData<AnalyzerCase> FixAllCases =>
         [
             new("two-checks-are-fixed-together-and-the-using-is-added-once", TwoEmptyCheckedParameters, new AnalyzerExpected(false, null, UseGuardAgainstNullOrEmpty, null, null, TwoEmptyCheckedParametersFixed))
+        ];
+    }
+
+    public static class PG1004
+    {
+        public static TheoryData<AnalyzerCase> Cases =>
+        [
+            new("below-or-above-a-literal-bound-then-throw-out-of-range-is-a-guard", RangeCheckThrow, new AnalyzerExpected(false, QuantityLiteralRangeMessage, UseGuardAgainstOutOfRange, 9, 9)),
+            new("a-braced-single-throw-is-the-same-check", RangeCheckBlockThrow, new AnalyzerExpected(false, QuantityLiteralRangeMessage, UseGuardAgainstOutOfRange, 9, 9)),
+            new("bounds-may-be-identifiers-rather-than-literals", RangeCheckNamedBounds, new AnalyzerExpected(false, QuantityNamedRangeMessage, UseGuardAgainstOutOfRange, 9, 9)),
+            new("throwing-another-exception-type-is-not-a-range-guard", RangeCheckOtherException, new AnalyzerExpected(true)),
+            new("conjoined-halves-do-not-describe-a-range-and-are-left-alone", RangeCheckLogicalAnd, new AnalyzerExpected(true)),
+            new("a-condition-that-is-not-a-comparison-at-all-is-left-alone", RangeCheckIsACall, new AnalyzerExpected(true)),
+            new("guarding-a-different-identifier-on-each-half-is-left-alone", RangeCheckOfTwoIdentifiers, new AnalyzerExpected(true)),
+            new("the-lower-bound-must-come-first-so-a-reversed-pair-is-left-alone", RangeCheckReversedComparisons, new AnalyzerExpected(true)),
+            new("only-a-plain-identifier-is-guarded-not-a-member-access", RangeCheckOfMember, new AnalyzerExpected(true)),
+            new("a-computed-lower-bound-is-left-alone", RangeCheckComputedLowerBound, new AnalyzerExpected(true)),
+            new("a-computed-upper-bound-is-left-alone", RangeCheckComputedUpperBound, new AnalyzerExpected(true)),
+            new("an-upper-half-that-is-not-a-comparison-is-left-alone", RangeCheckUpperHalfIsACall, new AnalyzerExpected(true))
+        ];
+
+        public static TheoryData<AnalyzerCase> WithoutPineGuardReferenceCases =>
+        [
+            new("no-pineguard-reference-means-no-suggestion", RangeCheckThrow, new AnalyzerExpected(true)),
+            new("no-pineguard-reference-silences-named-bounds-too", RangeCheckNamedBounds, new AnalyzerExpected(true))
+        ];
+
+        public static TheoryData<AnalyzerCase> InsidePineGuardCases =>
+        [
+            new("pineguard-never-reports-on-its-own-range-check", RangeCheckThrow, new AnalyzerExpected(true)),
+            new("pineguard-never-reports-on-its-own-named-bounds-check", RangeCheckNamedBounds, new AnalyzerExpected(true))
+        ];
+
+        public static TheoryData<AnalyzerCase> FixCases =>
+        [
+            new("a-literal-bounded-range-check-becomes-guard-against-out-of-range", RangeCheckThrow, new AnalyzerExpected(false, QuantityLiteralRangeMessage, UseGuardAgainstOutOfRange, 9, 9, RangeCheckThrowFixed)),
+            new("an-identifier-bounded-range-check-keeps-its-bounds", RangeCheckNamedBounds, new AnalyzerExpected(false, QuantityNamedRangeMessage, UseGuardAgainstOutOfRange, 9, 9, RangeCheckNamedBoundsFixed))
+        ];
+
+        public static TheoryData<AnalyzerCase> FixAllCases =>
+        [
+            new("two-checks-are-fixed-together-and-the-using-is-added-once", TwoRangeCheckedParameters, new AnalyzerExpected(false, null, UseGuardAgainstOutOfRange, null, null, TwoRangeCheckedParametersFixed))
         ];
     }
 }

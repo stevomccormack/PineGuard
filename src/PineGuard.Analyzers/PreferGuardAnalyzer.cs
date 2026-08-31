@@ -28,7 +28,8 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
         ImmutableArray.Create(
             DiagnosticDescriptors.UseGuardAgainstNull,
             DiagnosticDescriptors.UseGuardAgainstNullOrWhiteSpace,
-            DiagnosticDescriptors.UseGuardAgainstNullOrEmpty);
+            DiagnosticDescriptors.UseGuardAgainstNullOrEmpty,
+            DiagnosticDescriptors.UseGuardAgainstOutOfRange);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -72,6 +73,12 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
         if (SymbolEqualityComparer.Default.Equals(thrown, types.ArgumentNullException))
         {
             ReportNullCheck(context, ifStatement);
+            return;
+        }
+
+        if (SymbolEqualityComparer.Default.Equals(thrown, types.ArgumentOutOfRangeException))
+        {
+            ReportRangeCheck(context, ifStatement);
             return;
         }
 
@@ -157,12 +164,44 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
         Report(context, suggestion, ifStatement.GetLocation(), identifier);
     }
 
-    private static void Report(SyntaxNodeAnalysisContext context, GuardSuggestion suggestion, Location location, string identifier) =>
+    /// <summary>
+    /// Reports <c>if (x &lt; min || x &gt; max) throw new ArgumentOutOfRangeException(nameof(x));</c>.
+    /// </summary>
+    /// <remarks>
+    /// Only the canonical shape is reported: the same identifier below its lower bound or above its
+    /// upper bound, with both bounds simple enough to hand to the guard unchanged.
+    /// </remarks>
+    private static void ReportRangeCheck(SyntaxNodeAnalysisContext context, IfStatementSyntax ifStatement)
+    {
+        if (ifStatement.Condition is not BinaryExpressionSyntax condition || !condition.IsKind(SyntaxKind.LogicalOrExpression))
+            return;
+
+        var belowMinimum = GetBoundComparison(condition.Left, SyntaxKind.LessThanExpression);
+        if (belowMinimum is null)
+            return;
+
+        var aboveMaximum = GetBoundComparison(condition.Right, SyntaxKind.GreaterThanExpression);
+        if (aboveMaximum is null)
+            return;
+
+        if (!string.Equals(belowMinimum.Value.Identifier, aboveMaximum.Value.Identifier, StringComparison.Ordinal))
+            return;
+
+        Report(
+            context,
+            GuardSuggestion.OutOfRange,
+            ifStatement.GetLocation(),
+            belowMinimum.Value.Identifier,
+            belowMinimum.Value.Bound,
+            aboveMaximum.Value.Bound);
+    }
+
+    private static void Report(SyntaxNodeAnalysisContext context, GuardSuggestion suggestion, Location location, params string[] arguments) =>
         context.ReportDiagnostic(Diagnostic.Create(
             suggestion.Descriptor,
             location,
-            DiagnosticProperties.ForGuard(suggestion.Clause, identifier),
-            identifier));
+            DiagnosticProperties.ForGuard(suggestion.Clause, arguments),
+            arguments));
 
     /// <summary>
     /// Maps a <see cref="string"/> predicate name onto the guard clause that replaces it.
@@ -241,6 +280,39 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
 
     private static bool IsNullLiteral(ExpressionSyntax expression) =>
         expression.IsKind(SyntaxKind.NullLiteralExpression);
+
+    /// <summary>
+    /// Matches one half of a range check — <c>identifier &lt; bound</c> or
+    /// <c>identifier &gt; bound</c> — where the bound is simple enough to pass to a guard clause.
+    /// </summary>
+    /// <param name="expression">One operand of the <c>||</c> in the condition.</param>
+    /// <param name="comparison">The comparison this half must use.</param>
+    /// <returns>The guarded identifier and its bound, or <see langword="null"/> when the half is some other shape.</returns>
+    private static (string Identifier, string Bound)? GetBoundComparison(ExpressionSyntax expression, SyntaxKind comparison)
+    {
+        if (expression is not BinaryExpressionSyntax binary || !binary.IsKind(comparison))
+            return null;
+
+        if (binary.Left is not IdentifierNameSyntax identifierName)
+            return null;
+
+        var bound = GetBoundText(binary.Right);
+
+        return bound is null
+            ? null
+            : (identifierName.Identifier.ValueText, bound);
+    }
+
+    /// <summary>
+    /// Returns the source text of a range bound that can be handed to a guard clause unchanged — a
+    /// plain identifier or a literal — and <see langword="null"/> for anything computed.
+    /// </summary>
+    private static string? GetBoundText(ExpressionSyntax expression) => expression switch
+    {
+        IdentifierNameSyntax identifierName => identifierName.Identifier.ValueText,
+        LiteralExpressionSyntax literal => literal.Token.Text,
+        _ => null
+    };
 
     /// <summary>
     /// Returns the name of the only argument of <paramref name="invocation"/> when it is a plain

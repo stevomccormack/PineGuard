@@ -23,7 +23,8 @@ public sealed class PreferGuardCodeFixProvider : CodeFixProvider
         ImmutableArray.Create(
             DiagnosticIds.UseGuardAgainstNull,
             DiagnosticIds.UseGuardAgainstNullOrWhiteSpace,
-            DiagnosticIds.UseGuardAgainstNullOrEmpty);
+            DiagnosticIds.UseGuardAgainstNullOrEmpty,
+            DiagnosticIds.UseGuardAgainstOutOfRange);
 
     /// <inheritdoc />
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;

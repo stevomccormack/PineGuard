@@ -92,10 +92,10 @@ public static class AnalyzerVerifier
     /// <param name="descriptor">The descriptor the analyzer reports.</param>
     /// <param name="line">The one-based line of the report.</param>
     /// <param name="column">The one-based column of the report.</param>
-    /// <param name="identifier">The guarded identifier named in the message.</param>
+    /// <param name="arguments">The guard-clause arguments named in the message.</param>
     /// <returns>The expected diagnostic.</returns>
-    public static DiagnosticResult Diagnostic(DiagnosticDescriptor descriptor, int line, int column, string identifier) =>
-        new DiagnosticResult(descriptor).WithLocation(line, column).WithArguments(identifier);
+    public static DiagnosticResult Diagnostic(DiagnosticDescriptor descriptor, int line, int column, params string[] arguments) =>
+        new DiagnosticResult(descriptor).WithLocation(line, column).WithArguments(arguments);
 
     private static void Configure(AnalyzerTest<DefaultVerifier> test, SolutionState state, bool referencePineGuard, string? assemblyName)
     {
