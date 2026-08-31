@@ -69,7 +69,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Generate', 'Analyze', 'GenerateAndAnalyze')] [string] $Mode = 'GenerateAndAnalyze',
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'All', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Testing')] [string] $Scope = 'Core',
     [ValidateSet('Debug', 'Release')] [string] $Configuration = 'Debug',
     [switch] $Clean,
     [switch] $NoOpen,
@@ -90,12 +90,6 @@ param(
     [string] $Format
 )
 
-if ($Scope -in 'Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing') {
-    if (-not $Relaxed) {
-        $Enforce100 = $true
-    }
-}
-
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
@@ -105,6 +99,16 @@ if (-not (Test-Path $utilityPath)) {
 }
 
 . $utilityPath
+
+# Every real (non-aggregate) scope is held to 100% unless -Relaxed says otherwise. Derived from
+# the registry rather than a literal list so a newly registered scope cannot silently opt out.
+$registryScopeNames = @(Get-PineGuardScope -All | ForEach-Object Name)
+
+if ($Scope -in $registryScopeNames) {
+    if (-not $Relaxed) {
+        $Enforce100 = $true
+    }
+}
 
 $xplatGenerate = Join-Path $PSScriptRoot 'xplat\Gen-CoverageReport.ps1'
 $xplatAnalyze = Join-Path $PSScriptRoot 'xplat\Test-CoverageAnalysis.ps1'
