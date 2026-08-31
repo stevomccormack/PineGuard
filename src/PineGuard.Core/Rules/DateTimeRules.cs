@@ -14,18 +14,20 @@ public static class DateTimeRules
     /// </summary>
     /// <param name="value">The date/time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the past; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInPast(DateTime? value, Inclusion inclusion = Inclusion.Exclusive) =>
-        IsBefore(value, DateTime.UtcNow, inclusion);
+    public static bool IsInPast(DateTime? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
+        IsBefore(value, DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime, inclusion);
 
     /// <summary>
     /// Determines whether the specified date/time is in the future relative to UTC now.
     /// </summary>
     /// <param name="value">The date/time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the future; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInFuture(DateTime? value, Inclusion inclusion = Inclusion.Exclusive) =>
-        IsAfter(value, DateTime.UtcNow, inclusion);
+    public static bool IsInFuture(DateTime? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
+        IsAfter(value, DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime, inclusion);
 
     /// <summary>
     /// Determines whether the specified date/time falls within [<paramref name="min"/>, <paramref name="max"/>].
@@ -176,14 +178,15 @@ public static class DateTimeRules
     /// </summary>
     /// <param name="value">The date/time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="days">The maximum number of days allowed. If negative, returns <see langword="false"/>.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if the absolute day difference from UTC now is within the limit; otherwise, <see langword="false"/>.</returns>
-    public static bool IsWithinDaysFromNow(DateTime? value, int days)
+    public static bool IsWithinDaysFromNow(DateTime? value, int days, TimeProvider? timeProvider = null)
     {
         if (value is null || days < 0)
             return false;
 
         var valueUtc = DateTimeUtility.ToUtc(value)!.Value;
-        var diffDays = Math.Abs((valueUtc - DateTime.UtcNow).TotalDays);
+        var diffDays = Math.Abs((valueUtc - DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime).TotalDays);
         return diffDays <= days;
     }
 
@@ -336,4 +339,37 @@ public static class DateTimeRules
     /// <returns><see langword="true"/> if <paramref name="value"/> has an explicit kind; otherwise, <see langword="false"/>.</returns>
     public static bool HasExplicitKind(DateTime? value) =>
         value is not null && value.Value.Kind != DateTimeKind.Unspecified;
+
+    /// <summary>
+    /// Determines whether the specified date of birth is at least <paramref name="years"/> whole years ago.
+    /// </summary>
+    /// <param name="value">The date of birth to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="years">
+    /// The minimum age in whole years. Negative, or large enough to place the boundary before year one,
+    /// returns <see langword="false"/>.
+    /// </param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> meets the minimum age; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Age is measured against the boundary <c>today.AddYears(-years)</c>: a birth date on that boundary has
+    /// just reached the age, and any later one has not. A 29 February birth date therefore reaches its next
+    /// birthday on 1 March of a non-leap year, because shifting a 28 February back by whole years lands on a
+    /// 28th, which falls before the 29th the birth date carries.
+    /// Both sides are reduced to a UTC calendar date first — via the normalization
+    /// <see cref="DateTimeUtility.ToUtc(DateTime?)"/> applies throughout this class — so the time of day a
+    /// birth date happens to carry never decides the answer.
+    /// </remarks>
+    public static bool HasMinimumAge(DateTime? value, int years, TimeProvider? timeProvider = null)
+    {
+        if (value is null || years < 0)
+            return false;
+
+        var today = DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime.Date;
+
+        // Shifting today back that far would leave the boundary before year one, which no date can precede.
+        if (years >= today.Year)
+            return false;
+
+        return DateTimeUtility.ToUtc(value)!.Value.Date <= today.AddYears(-years);
+    }
 }
