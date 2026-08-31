@@ -15,6 +15,7 @@ public static class GuardDateTimeClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -29,11 +30,12 @@ public static class GuardDateTimeClauses
     /// <seealso cref="MustDateTimeClauses.Past"/>
     public static DateTime FutureOrPresent(this IGuardClause _,
         DateTime value,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Past(value, paramName: paramName);
+        var result = Must.Be.Past(value, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -45,6 +47,7 @@ public static class GuardDateTimeClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -59,11 +62,12 @@ public static class GuardDateTimeClauses
     /// <seealso cref="MustDateTimeClauses.PastOrPresent"/>
     public static DateTime Future(this IGuardClause _,
         DateTime value,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.PastOrPresent(value, paramName: paramName);
+        var result = Must.Be.PastOrPresent(value, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -75,6 +79,7 @@ public static class GuardDateTimeClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -89,11 +94,12 @@ public static class GuardDateTimeClauses
     /// <seealso cref="MustDateTimeClauses.Future"/>
     public static DateTime PastOrPresent(this IGuardClause _,
         DateTime value,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Future(value, paramName: paramName);
+        var result = Must.Be.Future(value, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -105,6 +111,7 @@ public static class GuardDateTimeClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -119,11 +126,12 @@ public static class GuardDateTimeClauses
     /// <seealso cref="MustDateTimeClauses.FutureOrPresent"/>
     public static DateTime Past(this IGuardClause _,
         DateTime value,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.FutureOrPresent(value, paramName: paramName);
+        var result = Must.Be.FutureOrPresent(value, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -510,6 +518,7 @@ public static class GuardDateTimeClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
     /// <param name="days">The number of days for the proximity window.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -525,11 +534,12 @@ public static class GuardDateTimeClauses
     public static DateTime NotWithinDaysFromNow(this IGuardClause _,
         DateTime value,
         int days,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.WithinDaysFromNow(value, days, paramName: paramName);
+        var result = Must.Be.WithinDaysFromNow(value, days, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -542,6 +552,7 @@ public static class GuardDateTimeClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
     /// <param name="days">The number of days for the proximity window.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -557,11 +568,12 @@ public static class GuardDateTimeClauses
     public static DateTime WithinDaysFromNow(this IGuardClause _,
         DateTime value,
         int days,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotWithinDaysFromNow(value, days, paramName: paramName); // Guard.Against.WithinDaysFromNow => Must.Be.NotWithinDaysFromNow (complement)
+        var result = Must.Be.NotWithinDaysFromNow(value, days, timeProvider, paramName: paramName); // Guard.Against.WithinDaysFromNow => Must.Be.NotWithinDaysFromNow (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
