@@ -85,4 +85,17 @@ internal static class DiagnosticDescriptors
         isEnabledByDefault: true,
         description: "A Must clause reports failure only through the MustResult it returns, so a call whose result is thrown away checks nothing. Call ThrowIfFailed() on it, or assign it and inspect it.",
         helpLinkUri: HelpLinkPrefix + DiagnosticIds.DiscardedMustResult);
+
+    /// <summary>
+    /// PG2002 — warns that a validator call throws its <c>MustValidationResult</c> away.
+    /// </summary>
+    internal static readonly DiagnosticDescriptor DiscardedMustValidationResult = new(
+        DiagnosticIds.DiscardedMustValidationResult,
+        "Must validation result is discarded",
+        "The MustValidationResult from '{0}' is discarded, so a failed validation passes unnoticed",
+        ReliabilityCategory,
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: "A validator reports every failure it found only through the MustValidationResult it returns, so a call whose result is thrown away validates nothing. Call ThrowIfFailed() on it, or assign it and inspect it.",
+        helpLinkUri: HelpLinkPrefix + DiagnosticIds.DiscardedMustValidationResult);
 }
