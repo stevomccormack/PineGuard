@@ -18,7 +18,7 @@ Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core), [Pin
 
 Targets `net8.0` and `net10.0`. ASP.NET Core has no `netstandard` asset, so this package does not carry the `netstandard2.1` target the rest of PineGuard does.
 
-`AddMustValidators()` — the `Microsoft.Extensions.Validation` integration — exists on `net10.0` only, because that is where the built-in validation pipeline ships.
+`AddMustValidatorResolver()` — the `Microsoft.Extensions.Validation` integration — exists on `net10.0` only, because that is where the built-in validation pipeline ships.
 
 ## What you get
 
@@ -120,10 +120,14 @@ Both filters call `ValidateAsync` with `HttpContext.RequestAborted`. A validator
 ### .NET 10 built-in validation
 
 ```csharp
-builder.Services.AddValidation(options => options.AddMustValidators());
+builder.Services.AddValidation(options => options.AddMustValidatorResolver());
 ```
 
-PineGuard validators join Microsoft's own validation pipeline, so `[ValidatableType]`, `DisableValidation()` and the source-generated resolvers keep working. Codes are **not** carried on this path — the built-in error shape is `Dictionary<string, string[]>` and has nowhere to put them. Use the filters when you need codes.
+PineGuard validators join Microsoft's own validation pipeline, so `[ValidatableType]`, `DisableValidation()` and the source-generated resolvers keep working: the resolver PineGuard adds runs your validators and then hands the value on to the rest of the chain, so it only ever *adds* validation. It is named for what it adds — one resolver — so it never reads as a second spelling of `AddMustValidatorsFromAssembly`, which adds validators.
+
+Codes are **not** carried on this path — the built-in error shape is `Dictionary<string, string[]>` and has nowhere to put them. Use the filters when you need codes.
+
+`Microsoft.Extensions.Validation`'s resolver seam is `[Experimental("ASP0029")]` in .NET 10. PineGuard absorbs that diagnostic internally, so `AddMustValidatorResolver()` compiles clean at your call site — but the underlying platform contract may still change in a future release.
 
 ### Localisation
 
