@@ -25,7 +25,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateSet('All', 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing')]
+    [ValidateSet('All', 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'Testing')]
     [string] $Scope = 'All',
 
     [string] $Filter,
@@ -48,14 +48,18 @@ $ProgressPreference = 'SilentlyContinue'
 . (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
-$buildTarget = if ($Scope -eq 'All') {
-    Join-Path $repoRoot 'PineGuard.slnx'
+# A scope can own more than one source project (Analyzers = analyzer + code fixes); each is
+# built in its own pass so warnings from every project in the scope land in the report.
+$buildTargets = if ($Scope -eq 'All') {
+    @(Join-Path $repoRoot 'PineGuard.slnx')
 }
 else {
-    Join-Path $repoRoot (Get-PineGuardScope -Name $Scope).SourceCsproj
+    @((Get-PineGuardScope -Name $Scope).SourceCsprojs | ForEach-Object { Join-Path $repoRoot $_ })
 }
-if (-not (Test-Path $buildTarget)) {
-    throw "Build target not found: $buildTarget"
+foreach ($buildTarget in $buildTargets) {
+    if (-not (Test-Path $buildTarget)) {
+        throw "Build target not found: $buildTarget"
+    }
 }
 
 # ── Output Directory ──────────────────────────────────────────────────────────
@@ -68,20 +72,24 @@ Ensure-Directory -Path $outputDir
 
 Write-Host "`n=== Roslyn Compiler Diagnostics ===" -ForegroundColor Cyan
 Write-Host "Scope         : $Scope"
-Write-Host "Build Target  : $buildTarget"
+Write-Host "Build Target  : $($buildTargets -join ', ')"
 Write-Host "Configuration : $Configuration"
 if ($Filter) { Write-Host "Filter        : $Filter" }
 Write-Host ""
 
-$buildArgs = @('build', $buildTarget, '--no-incremental', '-c', $Configuration)
+$buildOutput = @()
 
-if ($Clean) {
-    Write-Host "Cleaning first..." -ForegroundColor Yellow
-    & dotnet clean $buildTarget -c $Configuration 2>&1 | Out-Null
+foreach ($buildTarget in $buildTargets) {
+    $buildArgs = @('build', $buildTarget, '--no-incremental', '-c', $Configuration)
+
+    if ($Clean) {
+        Write-Host "Cleaning first..." -ForegroundColor Yellow
+        & dotnet clean $buildTarget -c $Configuration 2>&1 | Out-Null
+    }
+
+    Write-Host "Building $(Split-Path $buildTarget -Leaf)..." -ForegroundColor Yellow
+    $buildOutput += & dotnet @buildArgs 2>&1 | Out-String -Stream
 }
-
-Write-Host "Building..." -ForegroundColor Yellow
-$buildOutput = & dotnet @buildArgs 2>&1 | Out-String -Stream
 
 # ── Parse Warnings ────────────────────────────────────────────────────────────
 

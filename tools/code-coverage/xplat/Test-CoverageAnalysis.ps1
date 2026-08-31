@@ -48,7 +48,7 @@
 [CmdletBinding()]
 param(
     [ValidateRange(1, 500)] [int] $Top = 30,
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
     [string] $IncludeFileRegex,
     [string] $ExcludeFileRegex,
     [string] $IncludeClassNameRegex,
@@ -97,7 +97,7 @@ $defaultSourcePrefix = 'src\PineGuard.Core'
 switch ($Scope) {
     'All' {
         if (-not $IncludeFileRegex) {
-            # 'All' = the union of the seven per-scope path filters. Each PathIncludeRegex is
+            # 'All' = the union of every per-scope path filter. Each PathIncludeRegex is
             # self-anchored (^src... / ^tests...), so a plain '|' join is the exact aggregate —
             # and scopes whose folder is not 'PineGuard.<Name>' (Options ->
             # PineGuard.Extensions.Options) stay correct because the registry regex, not the
@@ -111,7 +111,7 @@ switch ($Scope) {
         # No defaults.
     }
     default {
-        # Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Testing
+        # Every real (non-aggregate) registry scope.
         $scopeEntry = Get-PineGuardScope -Name $Scope
         if (-not $IncludeFileRegex) { $IncludeFileRegex = $scopeEntry.PathIncludeRegex }
         if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }

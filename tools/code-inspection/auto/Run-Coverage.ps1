@@ -6,7 +6,7 @@
 	Part of the PineGuard PowerShell toolchain.
 
 .PARAMETER Scope
-	The coverage scope to run. Valid values: Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options, DependencyInjection, ErrorOr, FluentResults, OneOf, MediatR, All, Testing.
+	The coverage scope to run. Valid values: Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options, DependencyInjection, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, All, Testing.
 
 .PARAMETER Filter
 	See the param block for details.
@@ -16,7 +16,7 @@
 # It is intended to be whitelisted in agent settings via wildcard: tools/code-inspection/auto/*.ps1
 
 param(
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'All', 'Testing')]
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Testing')]
     [string] $Scope = 'All',
     [string] $Filter
 )

@@ -17,8 +17,10 @@
     Path to a specific solution file (.sln / .slnx).
 
 .PARAMETER Scope
-    Named scope that resolves to a source project. Valid values:
-    Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, ErrorOr, FluentResults, OneOf, MediatR, Testing, All.
+    Named scope that resolves to that scope's source project(s). Valid values:
+    Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All.
+    'Analyzers' targets two projects (the analyzer and its code fixes) — 'dotnet format' skips
+    referenced projects, so each is formatted in its own pass.
     'Testing' targets the PineGuard.Testing support library under tests/.
     'All' targets the full PineGuard.slnx solution (src + tests).
 
@@ -56,7 +58,7 @@ param(
     [string]$Project,
     [string]$Solution,
 
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing', 'All')]
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'Testing', 'All')]
     [string]$Scope,
 
     [switch]$VerifyNoChanges,
@@ -94,56 +96,66 @@ if ($targetCount -eq 0) {
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
 # --- Scope resolution ---
+# A scope can own more than one source project (Analyzers = analyzer + code fixes), and
+# 'dotnet format' formats only the project it is handed — it logs "Skipping referenced project"
+# for the rest — so every project in the scope gets its own pass.
 if ($Scope) {
-    $target = if ($Scope -eq 'All') {
-        Join-Path $repoRoot 'PineGuard.slnx'
+    $targets = if ($Scope -eq 'All') {
+        @(Join-Path $repoRoot 'PineGuard.slnx')
     }
     else {
-        Join-Path $repoRoot (Get-PineGuardScope -Name $Scope).SourceCsproj
+        @((Get-PineGuardScope -Name $Scope).SourceCsprojs | ForEach-Object { Join-Path $repoRoot $_ })
     }
-    if (-not (Test-Path $target)) {
-        throw "Resolved target not found: $target"
+    foreach ($target in $targets) {
+        if (-not (Test-Path $target)) {
+            throw "Resolved target not found: $target"
+        }
     }
 }
 elseif ($Solution) {
     if (-not (Test-Path $Solution)) { throw "Solution file not found: $Solution" }
-    $target = $Solution
+    $targets = @($Solution)
 }
 else {
     if (-not (Test-Path $Project)) { throw "Project file not found: $Project" }
-    $target = $Project
+    $targets = @($Project)
 }
 
 # --- Build command args ---
-$cmdArgs = @("format", $target)
+$commonArgs = @()
 
 if ($VerifyNoChanges) {
-    $cmdArgs += "--verify-no-changes"
+    $commonArgs += "--verify-no-changes"
 }
 
 if ($Severity) {
-    $cmdArgs += "--severity", $Severity
+    $commonArgs += "--severity", $Severity
 }
 
 if ($NoBuild) {
-    $cmdArgs += "--no-restore"
+    $commonArgs += "--no-restore"
 }
 
 if ($Verbosity) {
-    $cmdArgs += "--verbosity", $Verbosity
+    $commonArgs += "--verbosity", $Verbosity
 }
 
 # --- Execute ---
 $label = if ($Scope) { $Scope } elseif ($Solution) { Split-Path $Solution -Leaf } else { Split-Path $Project -Leaf }
 Write-Host "Formatting: $label" -ForegroundColor Cyan
-Write-Host "Target:     $target" -ForegroundColor DarkGray
-Write-Host "Command:    dotnet $($cmdArgs -join ' ')" -ForegroundColor DarkGray
 
-& dotnet $cmdArgs
+foreach ($target in $targets) {
+    $cmdArgs = @("format", $target) + $commonArgs
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "dotnet format exited with code $LASTEXITCODE" -ForegroundColor Red
-    exit $LASTEXITCODE
+    Write-Host "Target:     $target" -ForegroundColor DarkGray
+    Write-Host "Command:    dotnet $($cmdArgs -join ' ')" -ForegroundColor DarkGray
+
+    & dotnet $cmdArgs
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "dotnet format exited with code $LASTEXITCODE" -ForegroundColor Red
+        exit $LASTEXITCODE
+    }
 }
 
 Write-Host "Format complete." -ForegroundColor Green
