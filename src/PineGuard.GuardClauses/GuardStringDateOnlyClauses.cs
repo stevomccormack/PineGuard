@@ -20,6 +20,7 @@ public static class GuardStringDateOnlyClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -35,11 +36,12 @@ public static class GuardStringDateOnlyClauses
     public static DateOnly FutureOrPresentDateOnly(this IGuardClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.PastDateOnly(value, styles, paramName: paramName);
+        var result = Must.Be.PastDateOnly(value, styles, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -52,6 +54,7 @@ public static class GuardStringDateOnlyClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -67,11 +70,12 @@ public static class GuardStringDateOnlyClauses
     public static DateOnly FutureDateOnly(this IGuardClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.PastOrPresentDateOnly(value, styles, paramName: paramName);
+        var result = Must.Be.PastOrPresentDateOnly(value, styles, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -84,6 +88,7 @@ public static class GuardStringDateOnlyClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -99,11 +104,12 @@ public static class GuardStringDateOnlyClauses
     public static DateOnly PastOrPresentDateOnly(this IGuardClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.FutureDateOnly(value, styles, paramName: paramName);
+        var result = Must.Be.FutureDateOnly(value, styles, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -116,6 +122,7 @@ public static class GuardStringDateOnlyClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -131,11 +138,12 @@ public static class GuardStringDateOnlyClauses
     public static DateOnly PastDateOnly(this IGuardClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.FutureOrPresentDateOnly(value, styles, paramName: paramName);
+        var result = Must.Be.FutureOrPresentDateOnly(value, styles, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
