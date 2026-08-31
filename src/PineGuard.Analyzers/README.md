@@ -26,12 +26,23 @@ The analyzer assemblies target `netstandard2.0` and load into any Roslyn 4.14-or
 | `PG1002` | Use `Guard.Against.NullOrWhiteSpace` | Usage | Info |
 | `PG1003` | Use `Guard.Against.NullOrEmpty` | Usage | Info |
 | `PG1004` | Use `Guard.Against.OutOfRange` | Usage | Info |
+| `PG2001` | Must result is discarded | Reliability | Warning |
 
 `PG1xxx` means *prefer a guard clause*; `PG2xxx` means *guard or validation misuse*. Every diagnostic ships with a code fix, and every fix supports fix-all across a document, project or solution.
 
+### PG2001 — Must result is discarded
+
+A Must clause never throws on its own; it hands back a `MustResult<T>` to inspect. Calling one as a statement therefore checks nothing, and no compiler warning says so.
+
+```csharp
+Must.Be.NotNull(name);                       // checks nothing
+Must.Be.NotNull(name).ThrowIfFailed();       // fix: throw if failed
+var result = Must.Be.NotNull(name);          // fix: assign the result
+```
+
 ## Reporting rules
 
-- **Silent without PineGuard.** `PG1xxx` reports only when the compilation can resolve `PineGuard.GuardClauses.Guard`. A project that has not installed PineGuard sees nothing.
+- **Silent without PineGuard.** `PG1xxx` reports only when the compilation can resolve `PineGuard.GuardClauses.Guard`, and `PG2xxx` only when it can resolve PineGuard's result types. A project that has not installed PineGuard sees nothing.
 - **Never inside PineGuard.** Diagnostics are suppressed in assemblies whose name starts with `PineGuard.` — the library's own `ThrowHelper` is exactly the pattern `PG1001` targets, and it must stay.
 
 ## Links

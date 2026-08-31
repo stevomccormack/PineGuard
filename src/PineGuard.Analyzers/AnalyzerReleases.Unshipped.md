@@ -9,3 +9,4 @@ PG1001 | Usage | Info | PreferGuardAnalyzer, [Documentation](https://pineguard.a
 PG1002 | Usage | Info | PreferGuardAnalyzer, [Documentation](https://pineguard.ai/docs/analyzers/PG1002)
 PG1003 | Usage | Info | PreferGuardAnalyzer, [Documentation](https://pineguard.ai/docs/analyzers/PG1003)
 PG1004 | Usage | Info | PreferGuardAnalyzer, [Documentation](https://pineguard.ai/docs/analyzers/PG1004)
+PG2001 | Reliability | Warning | DiscardedMustResultAnalyzer, [Documentation](https://pineguard.ai/docs/analyzers/PG2001)

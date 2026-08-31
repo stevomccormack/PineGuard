@@ -8,7 +8,8 @@ namespace PineGuard.Analyzers;
 /// <remarks>
 /// Resolving through <see cref="Compilation.GetTypeByMetadataName(string)"/> is what keeps the
 /// package quiet: a project that has not referenced PineGuard cannot resolve
-/// <see cref="GuardMetadataName"/>, so no <c>PG1xxx</c> diagnostic is ever registered.
+/// <see cref="GuardMetadataName"/> or <see cref="MustResultMetadataName"/>, so no diagnostic is
+/// ever registered.
 /// </remarks>
 internal sealed class PineGuardTypes
 {
@@ -32,18 +33,25 @@ internal sealed class PineGuardTypes
     /// </summary>
     internal const string ArgumentOutOfRangeExceptionMetadataName = "System.ArgumentOutOfRangeException";
 
+    /// <summary>
+    /// The metadata name of the result every <c>Must.Be</c> clause returns.
+    /// </summary>
+    internal const string MustResultMetadataName = "PineGuard.MustClauses.MustResult`1";
+
     private const string PineGuardAssemblyNamePrefix = "PineGuard.";
 
     private PineGuardTypes(
         INamedTypeSymbol? guard,
         INamedTypeSymbol? argumentNullException,
         INamedTypeSymbol? argumentException,
-        INamedTypeSymbol? argumentOutOfRangeException)
+        INamedTypeSymbol? argumentOutOfRangeException,
+        INamedTypeSymbol? mustResult)
     {
         Guard = guard;
         ArgumentNullException = argumentNullException;
         ArgumentException = argumentException;
         ArgumentOutOfRangeException = argumentOutOfRangeException;
+        MustResult = mustResult;
     }
 
     /// <summary>
@@ -68,9 +76,20 @@ internal sealed class PineGuardTypes
     internal INamedTypeSymbol? ArgumentOutOfRangeException { get; }
 
     /// <summary>
+    /// Gets the unbound <c>PineGuard.MustClauses.MustResult&lt;T&gt;</c>, or <see langword="null"/>
+    /// when the compilation does not reference PineGuard's Must clauses.
+    /// </summary>
+    internal INamedTypeSymbol? MustResult { get; }
+
+    /// <summary>
     /// Gets a value indicating whether guard-clause suggestions may be reported at all.
     /// </summary>
     internal bool CanSuggestGuardClauses => Guard is not null;
+
+    /// <summary>
+    /// Gets a value indicating whether discarded-result warnings may be reported at all.
+    /// </summary>
+    internal bool CanReportDiscardedResults => MustResult is not null;
 
     /// <summary>
     /// Resolves the well-known types for <paramref name="compilation"/>.
@@ -81,7 +100,8 @@ internal sealed class PineGuardTypes
         compilation.GetTypeByMetadataName(GuardMetadataName),
         compilation.GetTypeByMetadataName(ArgumentNullExceptionMetadataName),
         compilation.GetTypeByMetadataName(ArgumentExceptionMetadataName),
-        compilation.GetTypeByMetadataName(ArgumentOutOfRangeExceptionMetadataName));
+        compilation.GetTypeByMetadataName(ArgumentOutOfRangeExceptionMetadataName),
+        compilation.GetTypeByMetadataName(MustResultMetadataName));
 
     /// <summary>
     /// Determines whether <paramref name="compilation"/> is one of PineGuard's own assemblies.
