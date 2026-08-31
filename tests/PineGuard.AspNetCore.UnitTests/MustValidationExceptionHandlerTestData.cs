@@ -79,4 +79,39 @@ public static class MustValidationExceptionHandlerTestData
         private sealed record FuncThrowsCase(string Name, Func<Task> Value, ExpectedException ExpectedException)
             : ThrowsCase<Func<Task>>(Name, Value, ExpectedException);
     }
+
+    /// <summary>
+    /// Plan 03's stories 5 and 6 thrown through <see cref="SampleBoundaryApi"/>, so the boundary policy is
+    /// read off the statuses a client receives rather than off a handler's return value.
+    /// </summary>
+    public static class EndToEnd
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("a-validation-exception-answers-the-story-five-body", ("/boundary/validation", Defaults), new ResponseExpected(true, StatusCodes.Status400BadRequest, StoryFiveBody)),
+            new("an-unrelated-exception-stays-a-server-error", ("/boundary/unrelated", Defaults), new ResponseExpected(false, StatusCodes.Status500InternalServerError)),
+            new("a-guard-exception-stays-a-server-error-by-default", ("/boundary/guard", Defaults), new ResponseExpected(false, StatusCodes.Status500InternalServerError)),
+            new("a-guard-exception-becomes-a-bad-request-when-handled", ("/boundary/guard", HandleGuards), new ResponseExpected(true, StatusCodes.Status400BadRequest, new ProblemDetailsExpected(false, 400, ["email"], [MustCodes.Value.Argument.Invalid]))),
+            new("an-unrelated-exception-stays-a-server-error-even-when-guards-are-handled", ("/boundary/unrelated", HandleGuards), new ResponseExpected(false, StatusCodes.Status500InternalServerError))
+        ];
+
+        /// <summary>
+        /// The body story 5 publishes — the same one the two filters publish, because all three build it
+        /// through <see cref="ProblemDetailsExtension"/>.
+        /// </summary>
+        private static ProblemDetailsExpected StoryFiveBody =>
+            new(false, 400, ["email", "lines[1].sku"], ["email.address.invalid", "text.content.blank"], ["email must be a valid email address.", "lines[1].sku must not be null or whitespace."], "One or more validation errors occurred.");
+
+        private static void Defaults(IServiceCollection services) => SampleBoundaryApi.ConfigureServices(services, handleGuardExceptions: false);
+
+        private static void HandleGuards(IServiceCollection services) => SampleBoundaryApi.ConfigureServices(services, handleGuardExceptions: true);
+
+        /// <param name="IsValid">Whether PineGuard answered the exception itself — visible on the wire as the <c>failures</c> extension only its body carries.</param>
+        /// <param name="Status">The status code the client read.</param>
+        /// <param name="Body">What the answer says, when PineGuard wrote it.</param>
+        public sealed record ResponseExpected(bool IsValid, int Status, ProblemDetailsExpected? Body = null) : ReturnExpected(IsValid);
+
+        public sealed record Case(string Name, (string requestUri, Action<IServiceCollection> configureServices) Value, ResponseExpected Expected)
+            : ReturnCase<(string requestUri, Action<IServiceCollection> configureServices), ResponseExpected>(Name, Value, Expected);
+    }
 }

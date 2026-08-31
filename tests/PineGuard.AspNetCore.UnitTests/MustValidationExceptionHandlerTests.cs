@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PineGuard.AspNetCore.UnitTests.Samples;
@@ -62,5 +63,31 @@ public sealed class MustValidationExceptionHandlerTests(ITestOutputHelper output
         // Act & Assert
         var ex = await Assert.ThrowsAsync(tc.ExpectedException.Type, action);
         ThrowsCaseAssert.Expected(ex, tc);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidationExceptionHandlerTestData.EndToEnd.Cases), MemberType = typeof(MustValidationExceptionHandlerTestData.EndToEnd))]
+    public async Task EndToEnd_BehavesAsExpected(MustValidationExceptionHandlerTestData.EndToEnd.Case tc)
+    {
+        // Arrange
+        var (requestUri, configureServices) = tc.Value;
+        await using var app = await SampleHost.StartAsync(configureServices, SampleBoundaryApi.Map);
+        using var client = app.GetTestClient();
+        using var request = SampleHost.Request(HttpMethod.Get, requestUri, json: null);
+
+        // Act
+        using var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(tc.Expected.Status, (int)response.StatusCode);
+
+        var body = await SampleResponses.ReadJsonAsync(response);
+
+        Assert.Equal(tc.Expected.IsValid, body.TryGetProperty(ProblemDetailsExtension.FailuresExtensionKey, out _));
+
+        if (tc.Expected.Body is null)
+            return;
+
+        ProblemDetailsAssert.Expected(tc.Expected.Body, body);
     }
 }
