@@ -429,5 +429,23 @@ public static class FluentStringDateOnlyExtensions
         DateTimeStyles styles = DefaultStyles) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotOverlappingDateOnly(val, end1, start2, end2, inclusion, styles, paramName: null) : MustResult<DateOnly>.Ok(default),
             message, MustCodes.Date.Overlap.Present);
+
+    /// <summary>Validates that the string value represents a <see cref="DateOnly"/> date of birth meeting the expected minimum age.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>If the value is <see langword="null"/>, validation passes. A negative <paramref name="years"/> is a configuration error, reported against that parameter.</remarks>
+    /// <example><code>RuleFor(x => x.DateOfBirth).MinimumAge(18);</code></example>
+    public static IRuleBuilderOptions<TModel, string?> MinimumAge<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+        int years,
+        TimeProvider? timeProvider = null,
+        string? message = null,
+        DateTimeStyles styles = DefaultStyles) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.MinimumAge(val, years, styles, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
+            message, MustCodes.Date.Age.BelowMinimum);
 }
 #endif
