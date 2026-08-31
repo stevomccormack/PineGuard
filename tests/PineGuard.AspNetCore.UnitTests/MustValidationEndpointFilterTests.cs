@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.TestHost;
 using PineGuard.AspNetCore.UnitTests.Samples;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
@@ -62,5 +63,28 @@ public sealed class MustValidationEndpointFilterTests(ITestOutputHelper output)
         // Act & Assert
         var ex = await Assert.ThrowsAsync(tc.ExpectedException.Type, action);
         ThrowsCaseAssert.Expected(ex, tc);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidationEndpointFilterTestData.EndToEnd.Cases), MemberType = typeof(MustValidationEndpointFilterTestData.EndToEnd))]
+    public async Task EndToEnd_BehavesAsExpected(MustValidationEndpointFilterTestData.EndToEnd.Case tc)
+    {
+        // Arrange
+        var (method, requestUri, json) = tc.Value;
+        await using var app = await SampleHost.StartAsync(SampleMinimalApi.ConfigureServices, SampleMinimalApi.Map);
+        using var client = app.GetTestClient();
+        using var request = SampleHost.Request(method, requestUri, json);
+
+        // Act
+        using var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(tc.Expected.IsValid, response.IsSuccessStatusCode);
+        Assert.Equal(tc.Expected.Status, (int)response.StatusCode);
+
+        if (tc.Expected.Body is null)
+            return;
+
+        ProblemDetailsAssert.Expected(tc.Expected.Body, await SampleResponses.ReadJsonAsync(response));
     }
 }

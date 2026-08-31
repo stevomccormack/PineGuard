@@ -76,4 +76,42 @@ public static class MustValidationEndpointFilterTestData
         private sealed record FuncThrowsCase(string Name, Func<Task> Value, ExpectedException ExpectedException)
             : ThrowsCase<Func<Task>>(Name, Value, ExpectedException);
     }
+
+    /// <summary>
+    /// Plan 03's story 2 (and story 8) sent as real requests through <see cref="SampleMinimalApi"/>, so the
+    /// published body is the one a client parses rather than the one the filter returned.
+    /// </summary>
+    public static class EndToEnd
+    {
+        private const string ValidOrderBody = """{"email":"buyer@example.test"}""";
+
+        private const string InvalidOrderBody = """{"email":"not-an-email"}""";
+
+        private const string CustomerBody = """{"name":"Ada"}""";
+
+        public static TheoryData<Case> Cases =>
+        [
+            new("a-valid-body-reaches-the-handler", (HttpMethod.Post, "/orders", ValidOrderBody), new ResponseExpected(true, StatusCodes.Status200OK)),
+            new("an-invalid-body-answers-the-story-two-body", (HttpMethod.Post, "/orders", InvalidOrderBody), new ResponseExpected(false, StatusCodes.Status400BadRequest, StoryTwoBody)),
+            new("an-endpoint-with-nothing-to-validate-is-left-alone", (HttpMethod.Post, "/customers", CustomerBody), new ResponseExpected(true, StatusCodes.Status200OK)),
+            new("a-valid-as-parameters-query-reaches-the-handler", (HttpMethod.Get, "/search?term=pine", null), new ResponseExpected(true, StatusCodes.Status200OK)),
+            new("an-invalid-as-parameters-query-is-validated-like-a-body", (HttpMethod.Get, "/search?term=%20%20", null), new ResponseExpected(false, StatusCodes.Status400BadRequest, new ProblemDetailsExpected(false, 400, ["term"], ["text.content.blank"], ["term must not be null or whitespace."]))),
+            new("a-group-wide-registration-validates-the-endpoints-in-it", (HttpMethod.Post, "/api/orders", InvalidOrderBody), new ResponseExpected(false, StatusCodes.Status400BadRequest, StoryTwoBody))
+        ];
+
+        /// <summary>
+        /// The body Plan 03's story 2 publishes verbatim — camel-cased keys, messages naming the field the
+        /// same way the keys do, and one <c>failures</c> entry per failure carrying its stable code.
+        /// </summary>
+        private static ProblemDetailsExpected StoryTwoBody =>
+            new(false, 400, ["email", "lines[1].sku"], ["email.address.invalid", "text.content.blank"], ["email must be a valid email address.", "lines[1].sku must not be null or whitespace."], "One or more validation errors occurred.");
+
+        /// <param name="IsValid">Whether the request reached its handler.</param>
+        /// <param name="Status">The status code the client read.</param>
+        /// <param name="Body">What the response says, when PineGuard answered it instead of the handler.</param>
+        public sealed record ResponseExpected(bool IsValid, int Status, ProblemDetailsExpected? Body = null) : ReturnExpected(IsValid);
+
+        public sealed record Case(string Name, (HttpMethod method, string requestUri, string? json) Value, ResponseExpected Expected)
+            : ReturnCase<(HttpMethod method, string requestUri, string? json), ResponseExpected>(Name, Value, Expected);
+    }
 }
