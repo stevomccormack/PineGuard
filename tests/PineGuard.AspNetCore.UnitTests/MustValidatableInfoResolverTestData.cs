@@ -1,6 +1,7 @@
 #if NET10_0_OR_GREATER
 #pragma warning disable ASP0029
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Validation;
 using PineGuard.AspNetCore.UnitTests.Samples;
@@ -137,6 +138,63 @@ public static class MustValidatableInfoResolverTestData
 
         private sealed record FuncThrowsCase(string Name, Func<Task> Value, ExpectedException ExpectedException)
             : ThrowsCase<Func<Task>>(Name, Value, ExpectedException);
+    }
+
+    /// <summary>
+    /// Plan 03's story 4 sent as real requests through <see cref="SampleBuiltInValidationApi"/>, so what the
+    /// built-in pipeline publishes is read off the wire rather than off a <see cref="ValidateContext"/> the
+    /// test filled in itself.
+    /// </summary>
+    /// <remarks>
+    /// This is the one path whose body PineGuard does not write, so it is the one body
+    /// <see cref="ProblemDetailsExpected"/> cannot describe: the built-in pipeline answers with a bare
+    /// <c>HttpValidationProblemDetails</c> — a title and a dictionary of messages, with no status, no type
+    /// and, above all, no <c>failures</c>, because a dictionary of messages has nowhere to put a code. Keys
+    /// are the declared property paths, not the application's JSON spelling, for the same reason: the naming
+    /// policy is the filters' doing and the filters are not in this pipeline.
+    /// </remarks>
+    /// <seealso cref="MustValidationEndpointFilterTestData.EndToEnd"/>
+    public static class EndToEnd
+    {
+        private const string ValidOrderBody = """{"email":"buyer@example.test"}""";
+
+        private const string InvalidOrderBody = """{"email":"not-an-email"}""";
+
+        private const string CustomerBody = """{"name":"Ada"}""";
+
+        /// <summary>
+        /// The name <c>/validated/customers</c> echoes back, proving the handler ran on the bound value and
+        /// that a claimed type with no validator registered for it cost the request nothing.
+        /// </summary>
+        private const string CustomerName = "Ada";
+
+        public static TheoryData<Case> Cases =>
+        [
+            new("a-valid-body-reaches-the-handler", ("/validated/orders", ValidOrderBody), new ResponseExpected(true, StatusCodes.Status200OK, CreateOrder.ValidEmail)),
+            new("an-invalid-body-answers-the-built-in-body", ("/validated/orders", InvalidOrderBody), new ResponseExpected(false, StatusCodes.Status400BadRequest, Body: StoryFourBody)),
+            new("a-type-no-validator-is-registered-for-is-a-pass-through", ("/validated/customers", CustomerBody), new ResponseExpected(true, StatusCodes.Status200OK, CustomerName))
+        ];
+
+        /// <summary>
+        /// The body story 4 publishes — the same two failures story 2 publishes, spelled the built-in way:
+        /// declared paths rather than <c>email</c> and <c>lines[1].sku</c>, and no codes behind them.
+        /// </summary>
+        private static BuiltInProblemExpected StoryFourBody =>
+            new("One or more validation errors occurred.", ["Email", "Lines[1].Sku"], ["Email must be a valid email address.", "Lines[1].Sku must not be null or whitespace."]);
+
+        /// <param name="Title">The title the built-in problem details name themselves with.</param>
+        /// <param name="ErrorKeys">The keys the messages are filed under, in order.</param>
+        /// <param name="Messages">Every message the body carries, read in key order.</param>
+        public sealed record BuiltInProblemExpected(string Title, string[] ErrorKeys, string[] Messages);
+
+        /// <param name="IsValid">Whether the request reached its handler.</param>
+        /// <param name="Status">The status code the client read.</param>
+        /// <param name="Echo">What the handler answered with, when it ran.</param>
+        /// <param name="Body">What the built-in pipeline said, when it answered instead of the handler.</param>
+        public sealed record ResponseExpected(bool IsValid, int Status, string? Echo = null, BuiltInProblemExpected? Body = null) : ReturnExpected(IsValid);
+
+        public sealed record Case(string Name, (string requestUri, string json) Value, ResponseExpected Expected)
+            : ReturnCase<(string requestUri, string json), ResponseExpected>(Name, Value, Expected);
     }
 }
 #pragma warning restore ASP0029
