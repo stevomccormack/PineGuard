@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.MustClauses;
 using Xunit.Abstractions;
 
@@ -215,6 +216,35 @@ public sealed class MustStringDateOnlyClausesTests(ITestOutputHelper output) : B
     {
         var start1 = tc.Value.start1;
         var result = Must.Be.NotOverlappingDateOnly(start1, tc.Value.end1, tc.Value.start2, tc.Value.end2);
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.MinimumAge.ValidCases), MemberType = typeof(MustStringDateOnlyClausesTestData.MinimumAge))]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.MinimumAge.InvalidCases), MemberType = typeof(MustStringDateOnlyClausesTestData.MinimumAge))]
+    public void MinimumAge_BehavesAsExpected(MustCase<(string? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = Must.Be.MinimumAge(value, years, timeProvider: FixedTimeProvider.Default, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.MinimumAgeOnLeapDay))]
+    public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(MustCase<(string? value, int years, DateTimeOffset utcNow)> tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = tc.Value;
+
+        // Act
+        var result = Must.Be.MinimumAge(value, years, timeProvider: new FixedTimeProvider(utcNow), paramName: "value");
+
+        // Assert
         AssertResult(tc, result);
     }
 }

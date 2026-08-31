@@ -8,6 +8,8 @@ namespace PineGuard.MustClauses.UnitTests;
 
 public static class MustStringDateOnlyClausesTestData
 {
+    private const string LeapDayBirth = "2008-02-29";
+
     private static readonly DateOnly Ref = new(2020, 6, 15);
     private static readonly DateOnly RefMin = new(2020, 1, 1);
     private static readonly DateOnly RefMax = new(2020, 12, 31);
@@ -309,4 +311,31 @@ public static class MustStringDateOnlyClausesTestData
             new("unparseable-end2", ("2020-01-01", "2020-06-30", "2020-03-01", "not-a-date"), new MustExpected(false, "end2 must not be overlapping.", "end2"))
         ];
     }
+
+    public static class MinimumAge
+    {
+        public static TheoryData<MustCase<(string? value, int years)>> ValidCases => F.DateOnlyHasMinimumAge.AllValid.ToMustCases();
+
+        public static TheoryData<MustCase<(string? value, int years)>> InvalidCases => F.DateOnlyHasMinimumAge.AllInvalid.ToMustCases(s => s.Name switch
+        {
+            nameof(F.DateOnlyHasMinimumAge.NullValue) => new MustExpected(false, "value must not be null.", "value", MustCodes.Date.Age.BelowMinimum),
+            nameof(F.DateOnlyHasMinimumAge.NotADate) => new MustExpected(false, "value must meet the expected minimum age.", "value", MustCodes.Date.Format.Invalid),
+            nameof(F.DateOnlyHasMinimumAge.NegativeYears) => new MustExpected(false, "years requires a non-negative number of years.", "years", MustCodes.Date.Age.BelowMinimum),
+            _ => new MustExpected(false, "value must meet the expected minimum age.", "value", MustCodes.Date.Age.BelowMinimum)
+        });
+    }
+
+    public static class MinimumAgeOnLeapDay
+    {
+        // A 29-February birth date has no anniversary in a non-leap year, so each case pins its own clock:
+        // here the boundary moves and the birth date stays put, which the shared provider cannot express.
+        public static TheoryData<MustCase<(string? value, int years, DateTimeOffset utcNow)>> Cases =>
+        [
+            new MustCase<(string? value, int years, DateTimeOffset utcNow)>("TwentyEighthOfFebruaryInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 02, 28)), new MustExpected(false, "value must meet the expected minimum age.", "value", MustCodes.Date.Age.BelowMinimum)),
+            new MustCase<(string? value, int years, DateTimeOffset utcNow)>("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new MustExpected(true)),
+            new MustCase<(string? value, int years, DateTimeOffset utcNow)>("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new MustExpected(true))
+        ];
+    }
+
+    private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);
 }
