@@ -106,6 +106,14 @@ public sealed class MustValidationExceptionHandler : IExceptionHandler
             exception.Message,
             Value: null);
 
-    private static string ResolvePropertyPath(ArgumentException exception) =>
-        exception.GetMustPropertyPath() is { Length: > 0 } propertyPath ? propertyPath : exception.ParamName ?? string.Empty;
+    /// <remarks>
+    /// <see cref="ExceptionExtension.GetMustPropertyPath"/> answers <see cref="string.Empty"/> rather than
+    /// <see langword="null"/> when nothing was stamped, so emptiness is the only question worth asking.
+    /// </remarks>
+    private static string ResolvePropertyPath(ArgumentException exception)
+    {
+        var propertyPath = exception.GetMustPropertyPath();
+
+        return propertyPath.Length > 0 ? propertyPath : exception.ParamName ?? string.Empty;
+    }
 }
