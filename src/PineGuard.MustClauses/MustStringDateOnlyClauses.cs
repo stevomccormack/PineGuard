@@ -26,6 +26,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="styles">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -40,6 +41,7 @@ public static class MustStringDateOnlyClauses
     public static MustResult<DateOnly> PastDateOnly(this IMustClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -51,7 +53,7 @@ public static class MustStringDateOnlyClauses
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateOnlyRules.IsInPast(parsedValue);
+        var ok = DateOnlyRules.IsInPast(parsedValue, timeProvider: timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -61,6 +63,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="styles">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -75,6 +78,7 @@ public static class MustStringDateOnlyClauses
     public static MustResult<DateOnly> PastOrPresentDateOnly(this IMustClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -86,7 +90,7 @@ public static class MustStringDateOnlyClauses
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateOnlyRules.IsInPast(parsedValue, Inclusion.Inclusive);
+        var ok = DateOnlyRules.IsInPast(parsedValue, Inclusion.Inclusive, timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -96,6 +100,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="styles">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -110,6 +115,7 @@ public static class MustStringDateOnlyClauses
     public static MustResult<DateOnly> FutureDateOnly(this IMustClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -121,7 +127,7 @@ public static class MustStringDateOnlyClauses
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateOnlyRules.IsInFuture(parsedValue);
+        var ok = DateOnlyRules.IsInFuture(parsedValue, timeProvider: timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -131,6 +137,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="styles">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -145,6 +152,7 @@ public static class MustStringDateOnlyClauses
     public static MustResult<DateOnly> FutureOrPresentDateOnly(this IMustClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -156,7 +164,7 @@ public static class MustStringDateOnlyClauses
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateOnlyRules.IsInFuture(parsedValue, Inclusion.Inclusive);
+        var ok = DateOnlyRules.IsInFuture(parsedValue, Inclusion.Inclusive, timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, parsedValue);
     }
 

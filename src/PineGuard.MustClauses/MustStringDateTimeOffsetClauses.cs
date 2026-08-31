@@ -24,6 +24,7 @@ public static class MustStringDateTimeOffsetClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="styles">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -38,6 +39,7 @@ public static class MustStringDateTimeOffsetClauses
     public static MustResult<DateTimeOffset> PastDateTimeOffset(this IMustClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -49,7 +51,7 @@ public static class MustStringDateTimeOffsetClauses
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateTimeOffsetRules.IsInPast(parsedValue);
+        var ok = DateTimeOffsetRules.IsInPast(parsedValue, timeProvider: timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -59,6 +61,7 @@ public static class MustStringDateTimeOffsetClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="styles">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -73,6 +76,7 @@ public static class MustStringDateTimeOffsetClauses
     public static MustResult<DateTimeOffset> PastOrPresentDateTimeOffset(this IMustClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -84,7 +88,7 @@ public static class MustStringDateTimeOffsetClauses
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateTimeOffsetRules.IsInPast(parsedValue, Inclusion.Inclusive);
+        var ok = DateTimeOffsetRules.IsInPast(parsedValue, Inclusion.Inclusive, timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -94,6 +98,7 @@ public static class MustStringDateTimeOffsetClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="styles">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -108,6 +113,7 @@ public static class MustStringDateTimeOffsetClauses
     public static MustResult<DateTimeOffset> FutureDateTimeOffset(this IMustClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -119,7 +125,7 @@ public static class MustStringDateTimeOffsetClauses
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateTimeOffsetRules.IsInFuture(parsedValue);
+        var ok = DateTimeOffsetRules.IsInFuture(parsedValue, timeProvider: timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -129,6 +135,7 @@ public static class MustStringDateTimeOffsetClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="styles">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -143,6 +150,7 @@ public static class MustStringDateTimeOffsetClauses
     public static MustResult<DateTimeOffset> FutureOrPresentDateTimeOffset(this IMustClause _,
         string? value,
         DateTimeStyles styles = DefaultStyles,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -154,7 +162,7 @@ public static class MustStringDateTimeOffsetClauses
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
         var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateTimeOffsetRules.IsInFuture(parsedValue, Inclusion.Inclusive);
+        var ok = DateTimeOffsetRules.IsInFuture(parsedValue, Inclusion.Inclusive, timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, parsedValue);
     }
 
