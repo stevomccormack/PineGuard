@@ -40,4 +40,18 @@ internal static class DiagnosticDescriptors
         isEnabledByDefault: true,
         description: "A hand-rolled string.IsNullOrWhiteSpace check throws the ArgumentException that Guard.Against.NullOrWhiteSpace already throws, and the guard captures the parameter name for you.",
         helpLinkUri: HelpLinkPrefix + DiagnosticIds.UseGuardAgainstNullOrWhiteSpace);
+
+    /// <summary>
+    /// PG1003 — suggests <c>Guard.Against.NullOrEmpty</c> in place of a hand-rolled null-or-empty
+    /// check.
+    /// </summary>
+    internal static readonly DiagnosticDescriptor UseGuardAgainstNullOrEmpty = new(
+        DiagnosticIds.UseGuardAgainstNullOrEmpty,
+        "Use Guard.Against.NullOrEmpty",
+        "Replace this null-or-empty check with Guard.Against.NullOrEmpty({0})",
+        UsageCategory,
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true,
+        description: "A hand-rolled string.IsNullOrEmpty check throws the ArgumentException that Guard.Against.NullOrEmpty already throws, and the guard captures the parameter name for you.",
+        helpLinkUri: HelpLinkPrefix + DiagnosticIds.UseGuardAgainstNullOrEmpty);
 }

@@ -22,6 +22,11 @@ internal sealed class GuardSuggestion
     /// </summary>
     internal static readonly GuardSuggestion NullOrWhiteSpace = new(DiagnosticDescriptors.UseGuardAgainstNullOrWhiteSpace, "NullOrWhiteSpace");
 
+    /// <summary>
+    /// PG1003 — <c>Guard.Against.NullOrEmpty</c>.
+    /// </summary>
+    internal static readonly GuardSuggestion NullOrEmpty = new(DiagnosticDescriptors.UseGuardAgainstNullOrEmpty, "NullOrEmpty");
+
     private GuardSuggestion(DiagnosticDescriptor descriptor, string clause)
     {
         Descriptor = descriptor;

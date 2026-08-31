@@ -773,8 +773,7 @@ public static class PreferGuardAnalyzerTestData
             new("a-throw-if-null-declared-somewhere-other-than-the-framework-is-left-alone", CustomThrowIfNull, new AnalyzerExpected(true)),
             new("a-throw-expression-outside-a-coalesce-is-left-alone", ThrowExpressionOutsideCoalesce, new AnalyzerExpected(true)),
             new("throw-if-null-with-an-explicit-param-name-is-left-alone", ThrowIfNullWithParamName, new AnalyzerExpected(true)),
-            new("throw-if-null-of-a-call-rather-than-an-identifier-is-left-alone", ThrowIfNullOfExpression, new AnalyzerExpected(true)),
-            new("a-different-throw-if-helper-is-left-alone", ThrowIfNullOrEmpty, new AnalyzerExpected(true))
+            new("throw-if-null-of-a-call-rather-than-an-identifier-is-left-alone", ThrowIfNullOfExpression, new AnalyzerExpected(true))
         ];
 
         public static TheoryData<AnalyzerCase> WithoutPineGuardReferenceCases =>
