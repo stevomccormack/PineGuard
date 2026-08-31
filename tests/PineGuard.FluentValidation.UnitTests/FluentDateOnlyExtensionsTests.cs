@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
 
@@ -29,6 +30,7 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class NotWithinDaysValidator : AbstractValidator<Model> { public NotWithinDaysValidator(DateOnly reference, int days) => RuleFor(x => x.Value).NotWithinDays(reference, days); }
     private sealed class WithinCalendarMonthsValidator : AbstractValidator<Model> { public WithinCalendarMonthsValidator(DateOnly reference, int months) => RuleFor(x => x.Value).WithinCalendarMonths(reference, months); }
     private sealed class NotWithinCalendarMonthsValidator : AbstractValidator<Model> { public NotWithinCalendarMonthsValidator(DateOnly reference, int months) => RuleFor(x => x.Value).NotWithinCalendarMonths(reference, months); }
+    private sealed class MinimumAgeValidator : AbstractValidator<Model> { public MinimumAgeValidator(int years, TimeProvider timeProvider) => RuleFor(x => x.Value).MinimumAge(years, timeProvider); }
 
     [Theory]
     [MemberData(nameof(FluentDateOnlyExtensionsTestData.Past.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.Past))]
@@ -190,6 +192,14 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
         AssertResult(tc, result);
     }
 
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.MinimumAge.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.MinimumAge))]
+    public void MinimumAge_BehavesAsExpected(FluentCase<(DateOnly? value, int years)> tc)
+    {
+        var result = new MinimumAgeValidator(tc.Value.years, FixedTimeProvider.Default).Validate(new Model { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
     // ── Non-nullable overloads ─────────────────────────────────────────────
 
     private sealed class PastNonNullableValidator : AbstractValidator<NonNullableModel> { public PastNonNullableValidator() => RuleFor(x => x.Value).Past(); }
@@ -212,6 +222,7 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class NotWithinDaysNonNullableValidator : AbstractValidator<NonNullableModel> { public NotWithinDaysNonNullableValidator(DateOnly reference, int days) => RuleFor(x => x.Value).NotWithinDays(reference, days); }
     private sealed class WithinCalendarMonthsNonNullableValidator : AbstractValidator<NonNullableModel> { public WithinCalendarMonthsNonNullableValidator(DateOnly reference, int months) => RuleFor(x => x.Value).WithinCalendarMonths(reference, months); }
     private sealed class NotWithinCalendarMonthsNonNullableValidator : AbstractValidator<NonNullableModel> { public NotWithinCalendarMonthsNonNullableValidator(DateOnly reference, int months) => RuleFor(x => x.Value).NotWithinCalendarMonths(reference, months); }
+    private sealed class MinimumAgeNonNullableValidator : AbstractValidator<NonNullableModel> { public MinimumAgeNonNullableValidator(int years, TimeProvider timeProvider) => RuleFor(x => x.Value).MinimumAge(years, timeProvider); }
 
     [Theory]
     [MemberData(nameof(FluentDateOnlyExtensionsTestData.PastNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.PastNonNullable))]
@@ -370,6 +381,22 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     public void NotWithinCalendarMonthsNonNullable_BehavesAsExpected(FluentCase<(DateOnly value, DateOnly reference, int months)> tc)
     {
         var result = new NotWithinCalendarMonthsNonNullableValidator(tc.Value.reference, tc.Value.months).Validate(new NonNullableModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.MinimumAgeNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.MinimumAgeNonNullable))]
+    public void MinimumAgeNonNullable_BehavesAsExpected(FluentCase<(DateOnly value, int years)> tc)
+    {
+        var result = new MinimumAgeNonNullableValidator(tc.Value.years, FixedTimeProvider.Default).Validate(new NonNullableModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.MinimumAgeOnLeapDay))]
+    public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(FluentCase<(DateOnly value, int years, DateTimeOffset utcNow)> tc)
+    {
+        var result = new MinimumAgeNonNullableValidator(tc.Value.years, new FixedTimeProvider(tc.Value.utcNow)).Validate(new NonNullableModel { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 
