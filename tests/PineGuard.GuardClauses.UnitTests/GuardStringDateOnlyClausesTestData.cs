@@ -1,3 +1,4 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -7,6 +8,7 @@ public static class GuardStringDateOnlyClausesTestData
 {
     private static readonly DateOnly D20200101 = new(2020, 1, 1);
     private static readonly DateOnly D20200115 = new(2020, 1, 15);
+    private const string LeapDayBirth = "2008-02-29";
 
     // Guard.Against.FutureOrPresent — valid when Must.Be.PastDateOnly succeeds (past date)
     public static class FutureOrPresent
@@ -241,4 +243,37 @@ public static class GuardStringDateOnlyClausesTestData
             new("null-start1", (null, "2020-01-20", "2020-01-10", "2020-01-31"), new GuardExpected(false, typeof(ArgumentNullException), "start1"))
         ];
     }
+
+    // Guard.Against.BelowMinimumAge — calls Must.Be.MinimumAge; throws when the birth date falls short
+    // ValidCases: the birth date meets the minimum age
+    // InvalidCases: falls short / unparseable / null / negative years
+    // ToGuardCases("value") cannot detect null inside tuple inputs; use explicit mapping so NullValue → ANE
+    public static class BelowMinimumAge
+    {
+        public static TheoryData<GuardCase<(string? value, int years)>> ValidCases =>
+            F.DateOnlyHasMinimumAge.AllValid.ToGuardCases(_ => new GuardExpected(true));
+
+        public static TheoryData<GuardCase<(string? value, int years)>> InvalidCases =>
+            F.DateOnlyHasMinimumAge.AllInvalid.ToGuardCases(s => s.Name switch
+            {
+                nameof(F.DateOnlyHasMinimumAge.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value", Code: MustCodes.Date.Age.BelowMinimum),
+                nameof(F.DateOnlyHasMinimumAge.NotADate) => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Format.Invalid),
+                nameof(F.DateOnlyHasMinimumAge.NegativeYears) => new GuardExpected(false, typeof(ArgumentException), "years", Code: MustCodes.Date.Age.BelowMinimum),
+                _ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Age.BelowMinimum)
+            });
+    }
+
+    // A 29-February birth date has no anniversary in a non-leap year, so each case pins its own clock:
+    // here the boundary moves and the birth date stays put, which the shared provider cannot express.
+    public static class BelowMinimumAgeOnLeapDay
+    {
+        public static TheoryData<GuardCase<(string? value, int years, DateTimeOffset utcNow)>> Cases =>
+        [
+            new("TwentyEighthOfFebruaryInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 02, 28)), new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Age.BelowMinimum)),
+            new("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new GuardExpected(true)),
+            new("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new GuardExpected(true))
+        ];
+    }
+
+    private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);
 }
