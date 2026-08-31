@@ -144,6 +144,17 @@ public static class MustHttpClausesTestData
         ];
     }
 
+    public static class MediaType
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.IsMediaType.ValidScenarios.ToMustCases();
+
+        public static TheoryData<MustCase<string?>> InvalidCases => F.IsMediaType.InvalidScenarios.ToMustCases(s => s.Name switch
+        {
+            nameof(F.IsMediaType.NullValue) => new MustExpected(false, "value must not be null.", "value", MustCodes.Http.MediaType.Invalid),
+            _ => new MustExpected(false, "value must be a valid media type.", Code: MustCodes.Http.MediaType.Invalid)
+        });
+    }
+
     public static class NotIsHeaderName
     {
         public static TheoryData<MustCase<string?>> ValidCases => F.IsHeaderName.InvalidScenarios.Except(nameof(F.IsHeaderName.Null)).ToMustCases(_ => new MustExpected(true));

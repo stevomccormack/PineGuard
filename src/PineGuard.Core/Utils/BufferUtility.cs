@@ -1,6 +1,7 @@
 #if !NET8_0_OR_GREATER
 using System.Buffers;
 #endif
+using System.Text;
 using PineGuard.Rules;
 
 namespace PineGuard.Utils;
@@ -66,4 +67,83 @@ public static class BufferUtility
         }
 #endif
     }
+
+    /// <summary>
+    /// Determines whether the specified string is a valid Base64Url-encoded string
+    /// (RFC 4648 §5, the URL- and filename-safe alphabet).
+    /// </summary>
+    /// <param name="value">The string to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if the value is valid Base64Url; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Trailing padding is optional, but a padded value must still be a whole number of quanta. Embedded
+    /// whitespace is rejected rather than ignored, unlike <see cref="IsBase64String(string?)"/>. Leading and
+    /// trailing whitespace is trimmed before validation.
+    /// </remarks>
+    public static bool IsBase64UrlString(string? value)
+    {
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            return false;
+
+        var padding = 0;
+        while (padding < trimmed.Length && trimmed[trimmed.Length - 1 - padding] == BufferRules.Base64PaddingChar)
+            padding++;
+
+        if (padding > BufferRules.MaxBase64PaddingChars)
+            return false;
+
+        var dataLength = trimmed.Length - padding;
+
+        if (dataLength == 0)
+            return false;
+
+        // Padding exists to complete a quantum, so a padded value that is not quantum-aligned is malformed.
+        if (padding > 0 && trimmed.Length % BufferRules.Base64CharsPerQuantum != 0)
+            return false;
+
+        // A lone trailing character encodes no whole byte, so that remainder can never occur.
+        if (dataLength % BufferRules.Base64CharsPerQuantum == 1)
+            return false;
+
+        for (var index = 0; index < dataLength; index++)
+        {
+            if (!IsBase64UrlChar(trimmed[index]))
+                return false;
+        }
+
+        return true;
+    }
+
+    private static bool IsBase64UrlChar(char value) =>
+        value is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z') or (>= '0' and <= '9') or '-' or '_';
+
+    /// <summary>
+    /// Attempts to decode the specified bytes as UTF-8 text, rejecting any byte sequence that is not
+    /// well-formed UTF-8 (overlong encodings, unpaired surrogates, truncated sequences, out-of-range code points).
+    /// </summary>
+    /// <param name="value">The bytes to decode. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
+    /// <param name="text">When this method returns, contains the decoded text if successful; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the bytes decoded as UTF-8; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// The decoder never substitutes U+FFFD for a malformed sequence, so a successful decode means the bytes
+    /// round-trip. A leading byte-order mark is retained in <paramref name="text"/> rather than stripped.
+    /// </remarks>
+    public static bool TryDecodeUtf8(byte[]? value, out string? text)
+    {
+        text = null;
+
+        if (value is null || value.Length == 0)
+            return false;
+
+        try
+        {
+            text = StrictUtf8.GetString(value);
+            return true;
+        }
+        catch (DecoderFallbackException)
+        {
+            return false;
+        }
+    }
+
+    private static readonly UTF8Encoding StrictUtf8 = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
 }

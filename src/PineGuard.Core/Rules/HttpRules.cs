@@ -179,6 +179,50 @@ public static partial class HttpRules
         return false;
     }
 
+    /// <summary>
+    /// Determines whether the specified value is a well-formed media type (RFC 6838 <c>type/subtype</c>).
+    /// </summary>
+    /// <param name="value">The media type to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> carries a <c>type/subtype</c> pair composed only of
+    /// RFC 7230 token characters; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// A structured-syntax suffix (<c>application/vnd.api+json</c>) and a vendor or personal tree prefix
+    /// (<c>vnd.</c>, <c>prs.</c>) need no special handling: <c>+</c> and <c>.</c> are token characters, so they are
+    /// admitted by the same check as the rest of the subtype. Anything from the first <c>;</c> onwards is a
+    /// parameter list, which is stripped before validation and not itself validated — the subject of this rule is
+    /// the media type, and <c>text/plain; charset=utf-8</c> names the same one as <c>text/plain</c>. Leading and
+    /// trailing whitespace is trimmed, but whitespace around the slash is not: <c>text / plain</c> is malformed.
+    /// Matching is case-preserving; media types are compared case-insensitively by
+    /// <see cref="HasContentType(IReadOnlyDictionary{string, IEnumerable{string}}?, string[])"/>, not here.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// bool valid = HttpRules.IsMediaType("application/vnd.api+json"); // true
+    /// bool invalid = HttpRules.IsMediaType("application");            // false (no subtype)
+    /// </code>
+    /// </example>
+    public static bool IsMediaType(string? value)
+    {
+        if (!HttpContentTypeUtility.TryGetMediaType(value, out var mediaType))
+            return false;
+
+        var slash = mediaType.IndexOf('/');
+
+        // The slash must separate a non-empty type from a non-empty subtype, and there can be only one.
+        if (slash <= 0 || slash == mediaType.Length - 1 || mediaType.IndexOf('/', slash + 1) >= 0)
+            return false;
+
+        for (var index = 0; index < mediaType.Length; index++)
+        {
+            if (index != slash && !IsTokenChar(mediaType[index]))
+                return false;
+        }
+
+        return true;
+    }
+
     private static bool IsTokenChar(char ch) =>
         ch switch
         {

@@ -326,6 +326,46 @@ public static class MustHttpClauses
     }
 
     /// <summary>
+    /// Validates that the specified value must be a valid media type.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
+    /// Delegates to <see cref="HttpRules.IsMediaType"/>, so any <c>; parameter=value</c> list is accepted
+    /// and ignored — the verdict is about the <c>type/subtype</c> the value leads with. The failure message
+    /// follows the pattern <c>"{paramName} must be a valid media type."</c>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var result = Must.Be.MediaType(requestedFormat);
+    /// if (result.Failed)
+    ///     Console.WriteLine(result.Message);
+    /// </code>
+    /// </example>
+    /// <seealso cref="HttpRules.IsMediaType"/>
+    /// <seealso href="https://pineguard.ai/docs/must/http">Http Must Clauses documentation</seealso>
+    public static MustResult<string> MediaType(this IMustClause _,
+        string? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Http.MediaType.Invalid, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must be a valid media type.";
+
+        var ok = HttpRules.IsMediaType(value);
+        return MustResult<string>.FromBool(ok, MustCodes.Http.MediaType.Invalid, messageTemplate, paramName, value, result: value);
+    }
+
+    /// <summary>
     /// Validates that the specified value must not be a valid HTTP header name.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>

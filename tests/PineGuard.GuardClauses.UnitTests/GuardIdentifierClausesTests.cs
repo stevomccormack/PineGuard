@@ -15,4 +15,19 @@ public sealed class GuardIdentifierClausesTests(ITestOutputHelper output) : Base
         AssertCustomMessage(tc, () => Guard.Against.NotSlug(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
+
+    // Guard.Against.NotUlid
+    [Theory]
+    [MemberData(nameof(GuardIdentifierClausesTestData.NotUlid.ValidCases), MemberType = typeof(GuardIdentifierClausesTestData.NotUlid))]
+    [MemberData(nameof(GuardIdentifierClausesTestData.NotUlid.InvalidCases), MemberType = typeof(GuardIdentifierClausesTestData.NotUlid))]
+    public void NotUlid_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        // Arrange
+        var value = tc.Value;
+
+        // Act + Assert
+        var result = AssertResult(tc, () => Guard.Against.NotUlid(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotUlid(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
 }

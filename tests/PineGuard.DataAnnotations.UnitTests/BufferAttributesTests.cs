@@ -66,4 +66,34 @@ public sealed class BufferAttributesTests(ITestOutputHelper output)
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(BufferAttributesTestData.Base64Url.Cases), MemberType = typeof(BufferAttributesTestData.Base64Url))]
+    public void Base64Url_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new Base64UrlAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(BufferAttributesTestData.Utf8.Cases), MemberType = typeof(BufferAttributesTestData.Utf8))]
+    public void Utf8_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new Utf8Attribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

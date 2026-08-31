@@ -288,4 +288,35 @@ public static class StringUtilityTestData
         public sealed record ValidCase(string Name, (string? Start, string? End) Value, bool Expected, DateTimeOffsetRange? ExpectedOutValue)
             : TryCase<(string? Start, string? End), DateTimeOffsetRange?>(Name, Value, Expected, ExpectedOutValue);
     }
+
+    public static class TryCreateRegex
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("literal", "abc", true, true),
+            new("anchored", "^abc$", true, true),
+            new("character class", "[a-z]+", true, true),
+            new("quantified", @"^\d{3}-\d{4}$", true, true),
+            new("named group", @"(?<year>\d{4})", true, true)
+        ];
+
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("space is a significant pattern", " ", true, true),
+            new("null", null, false, false),
+            new("empty", "", false, false),
+            new("unclosed character class", "[unclosed", false, false),
+            new("unclosed group", "(unclosed", false, false),
+            new("unbalanced close paren", "a)b", false, false),
+            new("dangling quantifier", "*", false, false),
+            new("reversed quantifier range", "a{3,1}", false, false),
+            new("unknown unicode category", @"\p{NotACategory}", false, false)
+        ];
+
+        public sealed record ValidCase : ReturnCase<string?, (bool ok, bool hasRegex)>
+        {
+            public ValidCase(string name, string? value, bool expectedOk, bool expectedHasRegex)
+                : base(name, value, (expectedOk, expectedHasRegex)) { }
+        }
+    }
 }
