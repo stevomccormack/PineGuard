@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <SonarQubeTestProject>true</SonarQubeTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" />
+    <!-- The two Testing packages above declare only a low-bound floor dependency on
+         Microsoft.CodeAnalysis.CSharp/.Workspaces; without an explicit direct reference here NuGet
+         restores that floor (1.0.1, a net45-era build) instead of this repo's pinned 4.14.0. -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Both analyzer assemblies are referenced normally so their DLLs and PDBs land in the test
+       output and Coverlet can measure them. PineGuard.Core / MustClauses / GuardClauses are the
+       assemblies each test compilation references, so a fix that emits a Guard name that does not
+       exist fails to compile the fixed source. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PineGuard.Analyzers\PineGuard.Analyzers.csproj" />
+    <ProjectReference Include="..\..\src\PineGuard.Analyzers.CodeFixes\PineGuard.Analyzers.CodeFixes.csproj" />
+    <ProjectReference Include="..\..\src\PineGuard.Core\PineGuard.Core.csproj" />
+    <ProjectReference Include="..\..\src\PineGuard.GuardClauses\PineGuard.GuardClauses.csproj" />
+    <ProjectReference Include="..\..\src\PineGuard.MustClauses\PineGuard.MustClauses.csproj" />
+    <ProjectReference Include="..\PineGuard.Testing\PineGuard.Testing.csproj" />
+  </ItemGroup>
+
+</Project>
