@@ -41,4 +41,15 @@ public static class StringRulesDateOnlyTestData
     {
         public static TheoryData<RuleCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)>> Cases => F.DateOnlyIsBetween.AllScenarios.ToRuleCases();
     }
+
+    public static class HasMinimumAge
+    {
+        public static TheoryData<RuleCase<(string? value, int years)>> Cases => F.DateOnlyHasMinimumAge.AllScenarios.ToRuleCases();
+
+        public static TheoryData<RuleCase<(string? value, int years)>> SystemClockCases =>
+        [
+            new RuleCase<(string? value, int years)>("BornLongAgo", ("1900-01-01", 18), new RuleExpected(true)),
+            new RuleCase<(string? value, int years)>("BornFarInTheFuture", ("2999-01-01", 18), new RuleExpected(false))
+        ];
+    }
 }
