@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PineGuard.Utils;
 
 /// <summary>
@@ -40,7 +42,7 @@ public static class HttpContentTypeUtility
 
         foreach (var raw in values)
         {
-            if (!TryGetMediaType(raw, out var mediaType) || mediaType is null)
+            if (!TryGetMediaType(raw, out var mediaType))
                 continue;
 
             list.Add(mediaType);
@@ -75,7 +77,7 @@ public static class HttpContentTypeUtility
     /// HttpContentTypeUtility.TryGetMediaType("application/json; charset=utf-8", out var mediaType); // "application/json"
     /// </code>
     /// </example>
-    public static bool TryGetMediaType(string? contentTypeHeaderValue, out string? mediaType)
+    public static bool TryGetMediaType(string? contentTypeHeaderValue, [NotNullWhen(true)] out string? mediaType)
     {
         mediaType = null;
 

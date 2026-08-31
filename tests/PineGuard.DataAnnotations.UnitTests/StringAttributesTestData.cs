@@ -386,6 +386,16 @@ public static class StringAttributesTestData
         ];
     }
 
+    public static class RegexPattern
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsRegexPattern.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        {
+            nameof(F.IsRegexPattern.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a valid regular expression pattern.", Code: MustCodes.Text.Pattern.Invalid)
+        });
+    }
+
     public static class HasByteOrderMark
     {
         public static TheoryData<DataAnnotationCase> Cases => F.HasByteOrderMark.AllScenarios.ToDataAnnotationCases(s => s.Name switch

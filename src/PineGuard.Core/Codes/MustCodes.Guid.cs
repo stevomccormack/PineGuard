@@ -28,5 +28,15 @@ public static partial class MustCodes
             /// <summary><c>guid.emptiness.empty</c></summary>
             public const string Empty = Prefix + ".empty";
         }
+
+        /// <summary>The UUID version the GUID declares: the layout its bits were generated under.</summary>
+        public static class Version
+        {
+            /// <summary>The code prefix for this node (<c>"guid.version"</c>).</summary>
+            public const string Prefix = Guid.Prefix + ".version";
+
+            /// <summary><c>guid.version.mismatch</c></summary>
+            public const string Mismatch = Prefix + ".mismatch";
+        }
     }
 }

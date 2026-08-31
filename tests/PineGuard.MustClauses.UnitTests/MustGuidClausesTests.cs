@@ -16,4 +16,16 @@ public sealed class MustGuidClausesTests(ITestOutputHelper output) : BaseMustUni
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(MustGuidClausesTestData.HasGuidVersion.ValidCases), MemberType = typeof(MustGuidClausesTestData.HasGuidVersion))]
+    [MemberData(nameof(MustGuidClausesTestData.HasGuidVersion.InvalidCases), MemberType = typeof(MustGuidClausesTestData.HasGuidVersion))]
+    public void HasGuidVersion_BehavesAsExpected(MustCase<(Guid value, int version)> tc)
+    {
+        // Act
+        var result = Must.Be.HasGuidVersion(tc.Value.value, tc.Value.version, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

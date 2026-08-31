@@ -92,4 +92,9 @@ public static class HttpRulesTestData
             new("missing header", (F.HasSingleHeaderValue.SingleValueHeaders, "Y"), new RuleExpected(false))
         ];
     }
+
+    public static class IsMediaType
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.IsMediaType.AllScenarios.ToRuleCases();
+    }
 }

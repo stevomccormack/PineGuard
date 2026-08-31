@@ -72,5 +72,15 @@ public static partial class MustCodes
             /// <summary><c>network.cidr.in-range</c></summary>
             public const string InRange = Prefix + ".in-range";
         }
+
+        /// <summary>The MAC (media access control) address the value carries.</summary>
+        public static class Mac
+        {
+            /// <summary>The code prefix for this node (<c>"network.mac"</c>).</summary>
+            public const string Prefix = Network.Prefix + ".mac";
+
+            /// <summary><c>network.mac.invalid</c></summary>
+            public const string Invalid = Prefix + ".invalid";
+        }
     }
 }

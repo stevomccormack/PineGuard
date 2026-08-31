@@ -13,11 +13,28 @@ public sealed class FluentIdentifierExtensionsTests(ITestOutputHelper output) : 
         public SlugValidator() => RuleFor(x => x.Value).Slug();
     }
 
+    private sealed class UlidValidator : AbstractValidator<Model>
+    {
+        public UlidValidator() => RuleFor(x => x.Value).Ulid();
+    }
+
     [Theory]
     [MemberData(nameof(FluentIdentifierExtensionsTestData.Slug.Cases), MemberType = typeof(FluentIdentifierExtensionsTestData.Slug))]
     public void Slug_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new SlugValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    // FluentIdentifierExtensions.Ulid
+    [Theory]
+    [MemberData(nameof(FluentIdentifierExtensionsTestData.Ulid.Cases), MemberType = typeof(FluentIdentifierExtensionsTestData.Ulid))]
+    public void Ulid_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new UlidValidator().Validate(new Model { Value = tc.Value });
+
+        // Assert
         AssertResult(tc, result);
     }
 }

@@ -1,3 +1,5 @@
+using PineGuard.Utils;
+
 namespace PineGuard.Rules;
 
 /// <summary>
@@ -6,6 +8,19 @@ namespace PineGuard.Rules;
 /// <seealso href="https://pineguard.ai/docs/rules/identifier">Identifier Rules documentation</seealso>
 public static class IdentifierRules
 {
+    /// <summary>
+    /// The number of characters in a ULID (26 Crockford base32 digits).
+    /// </summary>
+    public const int UlidLength = 26;
+
+    /// <summary>
+    /// The highest character a ULID can start with (<c>'7'</c>). The leading character carries the
+    /// top three bits of a 48-bit timestamp, so a canonical ULID never begins above this.
+    /// </summary>
+    public const char MaxUlidFirstChar = '7';
+
+    private const string UlidAlphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+
     /// <summary>
     /// Determines whether the specified value is a valid URL slug (kebab-case identifier).
     /// </summary>
@@ -46,6 +61,44 @@ public static class IdentifierRules
                 return false;
 
             previousWasHyphen = false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Determines whether the specified value is a canonical ULID (Universally Unique
+    /// Lexicographically Sortable Identifier).
+    /// </summary>
+    /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> is a canonical ULID; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// A canonical ULID is exactly <see cref="UlidLength"/> characters of Crockford base32 — the digits
+    /// <c>0-9</c> and the letters <c>A-Z</c> excluding <c>I</c>, <c>L</c>, <c>O</c> and <c>U</c> — written
+    /// in either case, and starting no higher than <see cref="MaxUlidFirstChar"/>. Leading and trailing
+    /// whitespace is trimmed before validation. This checks the textual form only; it does not interpret
+    /// the embedded timestamp.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// bool valid = IdentifierRules.IsUlid("01ARZ3NDEKTSV4RRFFQ69G5FAV"); // true
+    /// bool invalid = IdentifierRules.IsUlid("01ARZ3NDEKTSV4RRFFQ69G5FAI"); // false ('I' is not in the alphabet)
+    /// </code>
+    /// </example>
+    public static bool IsUlid(string? value)
+    {
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed) || trimmed.Length != UlidLength)
+            return false;
+
+        if (trimmed[0] is < '0' or > MaxUlidFirstChar)
+            return false;
+
+        foreach (var ch in trimmed)
+        {
+            if (!UlidAlphabet.Contains(char.ToUpperInvariant(ch), StringComparison.Ordinal))
+                return false;
         }
 
         return true;

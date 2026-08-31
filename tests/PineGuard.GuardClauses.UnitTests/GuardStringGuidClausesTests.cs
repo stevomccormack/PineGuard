@@ -24,4 +24,18 @@ public sealed class GuardStringGuidClausesTests(ITestOutputHelper output) : Base
         AssertResult(tc, () => Guard.Against.EmptyGuid(value));
         AssertCustomMessage(tc, () => Guard.Against.EmptyGuid(value, message: CustomMessage));
     }
+
+    // Guard.Against.NotHasGuidVersion
+    [Theory]
+    [MemberData(nameof(GuardStringGuidClausesTestData.NotHasGuidVersion.ValidCases), MemberType = typeof(GuardStringGuidClausesTestData.NotHasGuidVersion))]
+    [MemberData(nameof(GuardStringGuidClausesTestData.NotHasGuidVersion.InvalidCases), MemberType = typeof(GuardStringGuidClausesTestData.NotHasGuidVersion))]
+    public void NotHasGuidVersion_BehavesAsExpected(GuardCase<(string? value, int version)> tc)
+    {
+        // Arrange
+        var value = tc.Value.value;
+
+        // Act + Assert
+        AssertResult(tc, () => Guard.Against.NotHasGuidVersion(value, tc.Value.version));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasGuidVersion(value, tc.Value.version, message: CustomMessage));
+    }
 }

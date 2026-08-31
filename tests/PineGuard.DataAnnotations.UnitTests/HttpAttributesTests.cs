@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using PineGuard.Codes;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class HttpAttributesTests
+public sealed class HttpAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     private static void Verify<TAttribute>(TAttribute attribute, HttpAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
@@ -54,5 +56,20 @@ public sealed class HttpAttributesTests
         var attribute = new HttpStatusSuccessAttribute();
         Assert.Equal(MustCodes.Http.Status.NotSuccess, attribute.Code);
         Verify(attribute, testCase);
+    }
+
+    [Theory]
+    [MemberData(nameof(HttpAttributesTestData.MediaType.Cases), MemberType = typeof(HttpAttributesTestData.MediaType))]
+    public void MediaType_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new MediaTypeAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
     }
 }

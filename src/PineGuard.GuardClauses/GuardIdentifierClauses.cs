@@ -55,4 +55,53 @@ public static class GuardIdentifierClauses
 
         return result.Result!;
     }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> is not a canonical ULID (Universally Unique Lexicographically
+    /// Sortable Identifier).
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string to guard.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustIdentifierClauses.Ulid"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is not a canonical ULID and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// This guard is the complement of <see cref="MustIdentifierClauses.Ulid"/>:
+    /// <c>Guard.Against.NotUlid</c> passes when the value is 26 Crockford base32 characters whose
+    /// first character encodes a timestamp within range. It checks the textual form only and does
+    /// not interpret the embedded timestamp.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// Guard.Against.NotUlid(eventId);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustIdentifierClauses.Ulid"/>
+    public static string NotUlid(
+        this IGuardClause _,
+        string? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Ulid(value, paramName); // Guard.Against.NotUlid => Must.Be.Ulid (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
 }

@@ -149,4 +149,15 @@ public sealed class HttpRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(HttpRulesTestData.IsMediaType.Cases), MemberType = typeof(HttpRulesTestData.IsMediaType))]
+    public void IsMediaType_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = HttpRules.IsMediaType(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

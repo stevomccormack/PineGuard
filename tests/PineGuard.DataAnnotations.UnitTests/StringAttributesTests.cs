@@ -547,6 +547,21 @@ public sealed class StringAttributesTests(ITestOutputHelper output) : BaseDataAn
     }
 
     [Theory]
+    [MemberData(nameof(StringAttributesTestData.RegexPattern.Cases), MemberType = typeof(StringAttributesTestData.RegexPattern))]
+    public void RegexPattern_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new RegexPatternAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
     [MemberData(nameof(StringAttributesTestData.HasByteOrderMark.Cases), MemberType = typeof(StringAttributesTestData.HasByteOrderMark))]
     public void HasByteOrderMark_BehavesAsExpected(DataAnnotationCase tc)
     {

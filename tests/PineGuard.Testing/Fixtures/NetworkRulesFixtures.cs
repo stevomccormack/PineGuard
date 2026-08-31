@@ -184,4 +184,70 @@ public static class NetworkRulesFixtures
         public static RuleScenario<int?>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
         public static RuleScenario<int?>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
+
+    public static class IsMacAddress
+    {
+        public static readonly string? ColonUpper = "01:23:45:67:89:AB";
+        public static readonly string? ColonLower = "01:23:45:67:89:ab";
+        public static readonly string? HyphenUpper = "01-23-45-67-89-AB";
+        public static readonly string? HyphenLower = "01-23-45-67-89-ab";
+        public static readonly string? CiscoDotted = "0123.4567.89ab";
+        public static readonly string? CiscoDottedUpper = "0123.4567.89AB";
+        public static readonly string? Padded = "  01:23:45:67:89:AB  ";
+        public static readonly string? AllZeros = "00:00:00:00:00:00";
+        public static readonly string? Broadcast = "FF:FF:FF:FF:FF:FF";
+        public static readonly string? Null = null;
+        public static readonly string? EmptyString = "";
+        public static readonly string? WhiteSpace = "   ";
+        public static readonly string? NoSeparator = "0123456789AB";
+        public static readonly string? MixedSeparators = "01-23-45-67-89:AB";
+        public static readonly string? SpaceSeparated = "01 23 45 67 89 AB";
+        public static readonly string? NonHexOctet = "01:23:45:67:89:AG";
+        public static readonly string? CiscoNonHexGroup = "0123.4567.89zz";
+        public static readonly string? CiscoWrongSeparator = "0123-4567-89ab";
+        public static readonly string? TooFewOctets = "01:23:45:67:89";
+        public static readonly string? TooManyOctets = "01:23:45:67:89:AB:CD";
+        public static readonly string? SingleDigitOctet = "1:23:45:67:89:AB";
+
+        public static RuleScenario<string?>[] ValidScenarios =>
+        [
+            new(nameof(ColonUpper),       ColonUpper,       true),
+            new(nameof(ColonLower),       ColonLower,       true),
+            new(nameof(HyphenUpper),      HyphenUpper,      true),
+            new(nameof(HyphenLower),      HyphenLower,      true),
+            new(nameof(CiscoDotted),      CiscoDotted,      true),
+            new(nameof(CiscoDottedUpper), CiscoDottedUpper, true),
+            new(nameof(Padded),           Padded,           true)
+        ];
+
+        public static RuleScenario<string?>[] ValidEdgeScenarios =>
+        [
+            new(nameof(AllZeros),  AllZeros,  true),
+            new(nameof(Broadcast), Broadcast, true)
+        ];
+
+        public static RuleScenario<string?>[] InvalidScenarios =>
+        [
+            new(nameof(Null),                Null,                false),
+            new(nameof(EmptyString),         EmptyString,         false),
+            new(nameof(WhiteSpace),          WhiteSpace,          false),
+            new(nameof(NoSeparator),         NoSeparator,         false),
+            new(nameof(MixedSeparators),     MixedSeparators,     false),
+            new(nameof(SpaceSeparated),      SpaceSeparated,      false),
+            new(nameof(NonHexOctet),         NonHexOctet,         false),
+            new(nameof(CiscoNonHexGroup),    CiscoNonHexGroup,    false),
+            new(nameof(CiscoWrongSeparator), CiscoWrongSeparator, false)
+        ];
+
+        public static RuleScenario<string?>[] InvalidEdgeScenarios =>
+        [
+            new(nameof(TooFewOctets),     TooFewOctets,     false),
+            new(nameof(TooManyOctets),    TooManyOctets,    false),
+            new(nameof(SingleDigitOctet), SingleDigitOctet, false)
+        ];
+
+        public static RuleScenario<string?>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<string?>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<string?>[] AllScenarios => [.. AllValid, .. AllInvalid];
+    }
 }
