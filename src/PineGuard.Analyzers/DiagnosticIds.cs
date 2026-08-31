@@ -35,4 +35,10 @@ internal static class DiagnosticIds
     /// PG2001 — a <c>Must.Be</c> call whose <c>MustResult</c> is thrown away, so nothing checks it.
     /// </summary>
     internal const string DiscardedMustResult = "PG2001";
+
+    /// <summary>
+    /// PG2002 — a validator call whose <c>MustValidationResult</c> is thrown away, so nothing checks
+    /// it.
+    /// </summary>
+    internal const string DiscardedMustValidationResult = "PG2002";
 }

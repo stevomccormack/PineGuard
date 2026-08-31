@@ -8,8 +8,8 @@ namespace PineGuard.Analyzers;
 /// <remarks>
 /// Resolving through <see cref="Compilation.GetTypeByMetadataName(string)"/> is what keeps the
 /// package quiet: a project that has not referenced PineGuard cannot resolve
-/// <see cref="GuardMetadataName"/> or <see cref="MustResultMetadataName"/>, so no diagnostic is
-/// ever registered.
+/// <see cref="GuardMetadataName"/>, <see cref="MustResultMetadataName"/> or
+/// <see cref="MustValidationResultMetadataName"/>, so no diagnostic is ever registered.
 /// </remarks>
 internal sealed class PineGuardTypes
 {
@@ -38,6 +38,11 @@ internal sealed class PineGuardTypes
     /// </summary>
     internal const string MustResultMetadataName = "PineGuard.MustClauses.MustResult`1";
 
+    /// <summary>
+    /// The metadata name of the result every validator returns.
+    /// </summary>
+    internal const string MustValidationResultMetadataName = "PineGuard.MustClauses.MustValidationResult";
+
     private const string PineGuardAssemblyNamePrefix = "PineGuard.";
 
     private PineGuardTypes(
@@ -45,13 +50,15 @@ internal sealed class PineGuardTypes
         INamedTypeSymbol? argumentNullException,
         INamedTypeSymbol? argumentException,
         INamedTypeSymbol? argumentOutOfRangeException,
-        INamedTypeSymbol? mustResult)
+        INamedTypeSymbol? mustResult,
+        INamedTypeSymbol? mustValidationResult)
     {
         Guard = guard;
         ArgumentNullException = argumentNullException;
         ArgumentException = argumentException;
         ArgumentOutOfRangeException = argumentOutOfRangeException;
         MustResult = mustResult;
+        MustValidationResult = mustValidationResult;
     }
 
     /// <summary>
@@ -82,6 +89,12 @@ internal sealed class PineGuardTypes
     internal INamedTypeSymbol? MustResult { get; }
 
     /// <summary>
+    /// Gets <c>PineGuard.MustClauses.MustValidationResult</c>, or <see langword="null"/> when the
+    /// compilation does not reference PineGuard's Must clauses.
+    /// </summary>
+    internal INamedTypeSymbol? MustValidationResult { get; }
+
+    /// <summary>
     /// Gets a value indicating whether guard-clause suggestions may be reported at all.
     /// </summary>
     internal bool CanSuggestGuardClauses => Guard is not null;
@@ -89,7 +102,11 @@ internal sealed class PineGuardTypes
     /// <summary>
     /// Gets a value indicating whether discarded-result warnings may be reported at all.
     /// </summary>
-    internal bool CanReportDiscardedResults => MustResult is not null;
+    /// <remarks>
+    /// Either result type is enough to register the analysis; which of the two a given call returns
+    /// then decides which diagnostic it warrants.
+    /// </remarks>
+    internal bool CanReportDiscardedResults => MustResult is not null || MustValidationResult is not null;
 
     /// <summary>
     /// Resolves the well-known types for <paramref name="compilation"/>.
@@ -101,7 +118,8 @@ internal sealed class PineGuardTypes
         compilation.GetTypeByMetadataName(ArgumentNullExceptionMetadataName),
         compilation.GetTypeByMetadataName(ArgumentExceptionMetadataName),
         compilation.GetTypeByMetadataName(ArgumentOutOfRangeExceptionMetadataName),
-        compilation.GetTypeByMetadataName(MustResultMetadataName));
+        compilation.GetTypeByMetadataName(MustResultMetadataName),
+        compilation.GetTypeByMetadataName(MustValidationResultMetadataName));
 
     /// <summary>
     /// Determines whether <paramref name="compilation"/> is one of PineGuard's own assemblies.

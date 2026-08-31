@@ -27,6 +27,7 @@ The analyzer assemblies target `netstandard2.0` and load into any Roslyn 4.14-or
 | `PG1003` | Use `Guard.Against.NullOrEmpty` | Usage | Info |
 | `PG1004` | Use `Guard.Against.OutOfRange` | Usage | Info |
 | `PG2001` | Must result is discarded | Reliability | Warning |
+| `PG2002` | Must validation result is discarded | Reliability | Warning |
 
 `PG1xxx` means *prefer a guard clause*; `PG2xxx` means *guard or validation misuse*. Every diagnostic ships with a code fix, and every fix supports fix-all across a document, project or solution.
 
@@ -38,6 +39,16 @@ A Must clause never throws on its own; it hands back a `MustResult<T>` to inspec
 Must.Be.NotNull(name);                       // checks nothing
 Must.Be.NotNull(name).ThrowIfFailed();       // fix: throw if failed
 var result = Must.Be.NotNull(name);          // fix: assign the result
+```
+
+### PG2002 — Must validation result is discarded
+
+A validator reports every failure it found through the `MustValidationResult` it returns, and nothing else. Calling one as a statement therefore validates nothing.
+
+```csharp
+validator.Validate(order);                      // validates nothing
+validator.Validate(order).ThrowIfFailed();      // fix: throw if failed
+var result = validator.Validate(order);         // fix: assign the result
 ```
 
 ## Reporting rules

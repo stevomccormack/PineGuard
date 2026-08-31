@@ -9,10 +9,10 @@ namespace PineGuard.Analyzers;
 /// Reports a PineGuard validation call whose result is thrown away, which checks nothing.
 /// </summary>
 /// <remarks>
-/// A Must clause never throws on its own — it hands back a result to inspect. Calling one as a
-/// statement is therefore a silent no-op, and the compiler has nothing to say about it. The
-/// analyzer stays silent unless the compilation references PineGuard's Must clauses, and never
-/// reports inside PineGuard's own assemblies.
+/// Neither a Must clause nor a validator throws on its own — each hands back a result to inspect.
+/// Calling one as a statement is therefore a silent no-op, and the compiler has nothing to say about
+/// it. The analyzer stays silent unless the compilation references PineGuard's Must clauses, and
+/// never reports inside PineGuard's own assemblies.
 /// </remarks>
 /// <seealso href="https://pineguard.ai/docs/analyzers">PineGuard analyzers documentation</seealso>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -20,7 +20,7 @@ public sealed class DiscardedMustResultAnalyzer : DiagnosticAnalyzer
 {
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(DiagnosticDescriptors.DiscardedMustResult);
+        ImmutableArray.Create(DiagnosticDescriptors.DiscardedMustResult, DiagnosticDescriptors.DiscardedMustValidationResult);
 
     /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
@@ -69,8 +69,19 @@ public sealed class DiscardedMustResultAnalyzer : DiagnosticAnalyzer
     /// <param name="returnType">The original definition of the called method's return type.</param>
     /// <param name="types">The well-known types resolved for this compilation.</param>
     /// <returns>The descriptor to report, or <see langword="null"/> when the call returns something PineGuard does not own.</returns>
-    private static DiagnosticDescriptor? GetDiscardedResultDescriptor(ITypeSymbol returnType, PineGuardTypes types) =>
-        SymbolEqualityComparer.Default.Equals(returnType, types.MustResult)
-            ? DiagnosticDescriptors.DiscardedMustResult
-            : null;
+    /// <remarks>
+    /// A well-known type the compilation could not resolve is <see langword="null"/>, which no return
+    /// type equals — so a compilation that references only one of the two result types can only ever
+    /// be reported for that one.
+    /// </remarks>
+    private static DiagnosticDescriptor? GetDiscardedResultDescriptor(ITypeSymbol returnType, PineGuardTypes types)
+    {
+        if (SymbolEqualityComparer.Default.Equals(returnType, types.MustResult))
+            return DiagnosticDescriptors.DiscardedMustResult;
+
+        if (SymbolEqualityComparer.Default.Equals(returnType, types.MustValidationResult))
+            return DiagnosticDescriptors.DiscardedMustValidationResult;
+
+        return null;
+    }
 }

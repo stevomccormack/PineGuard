@@ -3,7 +3,9 @@ namespace PineGuard.Analyzers.UnitTests;
 public static class DiscardedMustResultAnalyzerTestData
 {
     private const string DiscardedMustResult = "PG2001";
+    private const string DiscardedMustValidationResult = "PG2002";
     private const string NotNullDiscardedMessage = "The MustResult from 'NotNull' is discarded, so a failed check passes unnoticed";
+    private const string ValidateDiscardedMessage = "The MustValidationResult from 'Validate' is discarded, so a failed validation passes unnoticed";
 
     private const string MustResultDiscarded = """
         using PineGuard.MustClauses;
@@ -227,6 +229,209 @@ public static class DiscardedMustResultAnalyzerTestData
         }
         """;
 
+    private const string MustValidationResultDiscarded = """
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public void Ship(IMustValidator<Order> validator, Order order)
+            {
+                validator.Validate(order);
+            }
+        }
+        """;
+
+    private const string MustValidationResultThrown = """
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public void Ship(IMustValidator<Order> validator, Order order)
+            {
+                validator.Validate(order).ThrowIfFailed();
+            }
+        }
+        """;
+
+    private const string MustValidationResultAssigned = """
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public void Ship(IMustValidator<Order> validator, Order order)
+            {
+                var result = validator.Validate(order);
+            }
+        }
+        """;
+
+    private const string MustValidationResultDiscardedIntoAWildcard = """
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public void Ship(IMustValidator<Order> validator, Order order)
+            {
+                _ = validator.Validate(order);
+            }
+        }
+        """;
+
+    private const string MustValidationResultReturned = """
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public MustValidationResult Check(IMustValidator<Order> validator, Order order)
+            {
+                return validator.Validate(order);
+            }
+        }
+        """;
+
+    private const string MustValidationResultAwaited = """
+        using System.Threading.Tasks;
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public async Task ShipAsync(IMustValidator<Order> validator, Order order)
+            {
+                await validator.ValidateAsync(order);
+            }
+        }
+        """;
+
+    // Named nothing from PineGuard, so the one snippet serves both the "referenced but irrelevant"
+    // and the "not referenced at all" groups.
+    private const string LookAlikeValidationResultDiscarded = """
+        namespace Sample;
+
+        public sealed class MustValidationResult
+        {
+        }
+
+        public class Shipment
+        {
+            public void Ship(string name)
+            {
+                Validate(name);
+            }
+
+            private static MustValidationResult Validate(string value) => new();
+        }
+        """;
+
+    private const string MustValidationResultThrownFixed = """
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public void Ship(IMustValidator<Order> validator, Order order)
+            {
+                validator.Validate(order).ThrowIfFailed();
+            }
+        }
+        """;
+
+    private const string MustValidationResultAssignedFixed = """
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public void Ship(IMustValidator<Order> validator, Order order)
+            {
+                var result = validator.Validate(order);
+            }
+        }
+        """;
+
+    private const string TwoDiscardedMustValidationResults = """
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public void Ship(IMustValidator<Order> validator, Order first, Order second)
+            {
+                validator.Validate(first);
+                validator.Validate(second);
+            }
+        }
+        """;
+
+    private const string TwoDiscardedMustValidationResultsFixed = """
+        using PineGuard.MustClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+        }
+
+        public class Shipment
+        {
+            public void Ship(IMustValidator<Order> validator, Order first, Order second)
+            {
+                validator.Validate(first).ThrowIfFailed();
+                validator.Validate(second).ThrowIfFailed();
+            }
+        }
+        """;
+
     public static class PG2001
     {
         public static TheoryData<AnalyzerCase> Cases =>
@@ -266,6 +471,45 @@ public static class DiscardedMustResultAnalyzerTestData
         public static TheoryData<AnalyzerCase> ThrowIfFailedFixAllCases =>
         [
             new("every-discarded-result-in-the-method-gains-throw-if-failed", TwoDiscardedMustResults, new AnalyzerExpected(false, null, DiscardedMustResult, null, null, TwoDiscardedMustResultsFixed))
+        ];
+    }
+
+    public static class PG2002
+    {
+        public static TheoryData<AnalyzerCase> Cases =>
+        [
+            new("a-validate-call-on-its-own-line-validates-nothing", MustValidationResultDiscarded, new AnalyzerExpected(false, ValidateDiscardedMessage, DiscardedMustValidationResult, 13, 9)),
+            new("chaining-throw-if-failed-uses-the-validation-result", MustValidationResultThrown, new AnalyzerExpected(true)),
+            new("assigning-the-validation-result-keeps-it-for-inspection", MustValidationResultAssigned, new AnalyzerExpected(true)),
+            new("discarding-into-a-wildcard-is-a-deliberate-act", MustValidationResultDiscardedIntoAWildcard, new AnalyzerExpected(true)),
+            new("returning-the-validation-result-hands-it-to-the-caller", MustValidationResultReturned, new AnalyzerExpected(true)),
+            new("an-awaited-validation-is-not-a-bare-call-and-is-left-alone", MustValidationResultAwaited, new AnalyzerExpected(true)),
+            new("a-validation-result-of-the-same-name-from-another-namespace-is-left-alone", LookAlikeValidationResultDiscarded, new AnalyzerExpected(true))
+        ];
+
+        public static TheoryData<AnalyzerCase> WithoutPineGuardReferenceCases =>
+        [
+            new("no-pineguard-reference-means-no-warning", LookAlikeValidationResultDiscarded, new AnalyzerExpected(true))
+        ];
+
+        public static TheoryData<AnalyzerCase> InsidePineGuardCases =>
+        [
+            new("pineguard-never-warns-about-its-own-validator-calls", MustValidationResultDiscarded, new AnalyzerExpected(true))
+        ];
+
+        public static TheoryData<AnalyzerCase> ThrowIfFailedFixCases =>
+        [
+            new("a-discarded-validation-result-gains-throw-if-failed", MustValidationResultDiscarded, new AnalyzerExpected(false, ValidateDiscardedMessage, DiscardedMustValidationResult, 13, 9, MustValidationResultThrownFixed))
+        ];
+
+        public static TheoryData<AnalyzerCase> AssignResultFixCases =>
+        [
+            new("a-discarded-validation-result-becomes-a-local", MustValidationResultDiscarded, new AnalyzerExpected(false, ValidateDiscardedMessage, DiscardedMustValidationResult, 13, 9, MustValidationResultAssignedFixed))
+        ];
+
+        public static TheoryData<AnalyzerCase> ThrowIfFailedFixAllCases =>
+        [
+            new("every-discarded-validation-in-the-method-gains-throw-if-failed", TwoDiscardedMustValidationResults, new AnalyzerExpected(false, null, DiscardedMustValidationResult, null, null, TwoDiscardedMustValidationResultsFixed))
         ];
     }
 }

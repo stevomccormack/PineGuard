@@ -31,7 +31,7 @@ public sealed class DiscardedMustResultCodeFixProvider : CodeFixProvider
 
     /// <inheritdoc />
     public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-        ImmutableArray.Create(DiagnosticIds.DiscardedMustResult);
+        ImmutableArray.Create(DiagnosticIds.DiscardedMustResult, DiagnosticIds.DiscardedMustValidationResult);
 
     /// <inheritdoc />
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
