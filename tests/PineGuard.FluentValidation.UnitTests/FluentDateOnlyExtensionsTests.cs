@@ -30,6 +30,12 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class NotWithinDaysValidator : AbstractValidator<Model> { public NotWithinDaysValidator(DateOnly reference, int days) => RuleFor(x => x.Value).NotWithinDays(reference, days); }
     private sealed class WithinCalendarMonthsValidator : AbstractValidator<Model> { public WithinCalendarMonthsValidator(DateOnly reference, int months) => RuleFor(x => x.Value).WithinCalendarMonths(reference, months); }
     private sealed class NotWithinCalendarMonthsValidator : AbstractValidator<Model> { public NotWithinCalendarMonthsValidator(DateOnly reference, int months) => RuleFor(x => x.Value).NotWithinCalendarMonths(reference, months); }
+    private sealed class WeekdayValidator : AbstractValidator<Model> { public WeekdayValidator() => RuleFor(x => x.Value).Weekday(); }
+    private sealed class WeekendValidator : AbstractValidator<Model> { public WeekendValidator() => RuleFor(x => x.Value).Weekend(); }
+    private sealed class FirstDayOfMonthValidator : AbstractValidator<Model> { public FirstDayOfMonthValidator() => RuleFor(x => x.Value).FirstDayOfMonth(); }
+    private sealed class NotFirstDayOfMonthValidator : AbstractValidator<Model> { public NotFirstDayOfMonthValidator() => RuleFor(x => x.Value).NotFirstDayOfMonth(); }
+    private sealed class LastDayOfMonthValidator : AbstractValidator<Model> { public LastDayOfMonthValidator() => RuleFor(x => x.Value).LastDayOfMonth(); }
+    private sealed class NotLastDayOfMonthValidator : AbstractValidator<Model> { public NotLastDayOfMonthValidator() => RuleFor(x => x.Value).NotLastDayOfMonth(); }
     private sealed class MinimumAgeValidator : AbstractValidator<Model> { public MinimumAgeValidator(int years, TimeProvider timeProvider) => RuleFor(x => x.Value).MinimumAge(years, timeProvider); }
 
     [Theory]
@@ -193,6 +199,54 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     }
 
     [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.Weekday.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.Weekday))]
+    public void Weekday_BehavesAsExpected(FluentCase<DateOnly?> tc)
+    {
+        var result = new WeekdayValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.Weekend.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.Weekend))]
+    public void Weekend_BehavesAsExpected(FluentCase<DateOnly?> tc)
+    {
+        var result = new WeekendValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.FirstDayOfMonth.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.FirstDayOfMonth))]
+    public void FirstDayOfMonth_BehavesAsExpected(FluentCase<DateOnly?> tc)
+    {
+        var result = new FirstDayOfMonthValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.NotFirstDayOfMonth.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.NotFirstDayOfMonth))]
+    public void NotFirstDayOfMonth_BehavesAsExpected(FluentCase<DateOnly?> tc)
+    {
+        var result = new NotFirstDayOfMonthValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.LastDayOfMonth.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.LastDayOfMonth))]
+    public void LastDayOfMonth_BehavesAsExpected(FluentCase<DateOnly?> tc)
+    {
+        var result = new LastDayOfMonthValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.NotLastDayOfMonth.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.NotLastDayOfMonth))]
+    public void NotLastDayOfMonth_BehavesAsExpected(FluentCase<DateOnly?> tc)
+    {
+        var result = new NotLastDayOfMonthValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(FluentDateOnlyExtensionsTestData.MinimumAge.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.MinimumAge))]
     public void MinimumAge_BehavesAsExpected(FluentCase<(DateOnly? value, int years)> tc)
     {
@@ -222,6 +276,12 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class NotWithinDaysNonNullableValidator : AbstractValidator<NonNullableModel> { public NotWithinDaysNonNullableValidator(DateOnly reference, int days) => RuleFor(x => x.Value).NotWithinDays(reference, days); }
     private sealed class WithinCalendarMonthsNonNullableValidator : AbstractValidator<NonNullableModel> { public WithinCalendarMonthsNonNullableValidator(DateOnly reference, int months) => RuleFor(x => x.Value).WithinCalendarMonths(reference, months); }
     private sealed class NotWithinCalendarMonthsNonNullableValidator : AbstractValidator<NonNullableModel> { public NotWithinCalendarMonthsNonNullableValidator(DateOnly reference, int months) => RuleFor(x => x.Value).NotWithinCalendarMonths(reference, months); }
+    private sealed class WeekdayNonNullableValidator : AbstractValidator<NonNullableModel> { public WeekdayNonNullableValidator() => RuleFor(x => x.Value).Weekday(); }
+    private sealed class WeekendNonNullableValidator : AbstractValidator<NonNullableModel> { public WeekendNonNullableValidator() => RuleFor(x => x.Value).Weekend(); }
+    private sealed class FirstDayOfMonthNonNullableValidator : AbstractValidator<NonNullableModel> { public FirstDayOfMonthNonNullableValidator() => RuleFor(x => x.Value).FirstDayOfMonth(); }
+    private sealed class NotFirstDayOfMonthNonNullableValidator : AbstractValidator<NonNullableModel> { public NotFirstDayOfMonthNonNullableValidator() => RuleFor(x => x.Value).NotFirstDayOfMonth(); }
+    private sealed class LastDayOfMonthNonNullableValidator : AbstractValidator<NonNullableModel> { public LastDayOfMonthNonNullableValidator() => RuleFor(x => x.Value).LastDayOfMonth(); }
+    private sealed class NotLastDayOfMonthNonNullableValidator : AbstractValidator<NonNullableModel> { public NotLastDayOfMonthNonNullableValidator() => RuleFor(x => x.Value).NotLastDayOfMonth(); }
     private sealed class MinimumAgeNonNullableValidator : AbstractValidator<NonNullableModel> { public MinimumAgeNonNullableValidator(int years, TimeProvider timeProvider) => RuleFor(x => x.Value).MinimumAge(years, timeProvider); }
 
     [Theory]
