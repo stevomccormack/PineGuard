@@ -65,4 +65,32 @@ public sealed class StringRulesDateOnlyTests(ITestOutputHelper output)
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(StringRulesDateOnlyTestData.HasMinimumAge.Cases), MemberType = typeof(StringRulesDateOnlyTestData.HasMinimumAge))]
+    public void HasMinimumAge_BehavesAsExpected(RuleCase<(string? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = PineGuard.Rules.StringRules.DateOnly.HasMinimumAge(value, years, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesDateOnlyTestData.HasMinimumAge.SystemClockCases), MemberType = typeof(StringRulesDateOnlyTestData.HasMinimumAge))]
+    public void HasMinimumAge_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<(string? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = PineGuard.Rules.StringRules.DateOnly.HasMinimumAge(value, years);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

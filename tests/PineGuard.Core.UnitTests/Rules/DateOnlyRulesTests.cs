@@ -205,4 +205,46 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.HasMinimumAge.Cases), MemberType = typeof(DateOnlyRulesTestData.HasMinimumAge))]
+    public void HasMinimumAge_BehavesAsExpected(RuleCase<(DateOnly? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.HasMinimumAge(value, years, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.HasMinimumAgeSystemClock.Cases), MemberType = typeof(DateOnlyRulesTestData.HasMinimumAgeSystemClock))]
+    public void HasMinimumAge_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<(DateOnly? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.HasMinimumAge(value, years);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.HasMinimumAgeOnLeapDay.Cases), MemberType = typeof(DateOnlyRulesTestData.HasMinimumAgeOnLeapDay))]
+    public void HasMinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(RuleCase<(DateOnly? value, int years, DateTimeOffset utcNow)> tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.HasMinimumAge(value, years, timeProvider: new FixedTimeProvider(utcNow));
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }
