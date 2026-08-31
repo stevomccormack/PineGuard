@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Roslyn code fixes load into the IDE's compiler host, which is netstandard2.0-only.
+         Overrides the netstandard2.1;net8.0;net10.0 set in Directory.Build.props. -->
+    <TargetFrameworks />
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <!-- This assembly is packed by PineGuard.Analyzers, not on its own -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.Analyzers.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Analyzers\PineGuard.Analyzers.csproj" />
+  </ItemGroup>
+
+</Project>
