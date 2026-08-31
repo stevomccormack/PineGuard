@@ -92,4 +92,44 @@ public static class MustValidationActionFilterTestData
         private sealed record FuncThrowsCase(string Name, Func<Task> Value, ExpectedException ExpectedException)
             : ThrowsCase<Func<Task>>(Name, Value, ExpectedException);
     }
+
+    /// <summary>
+    /// Plan 03's story 3 sent as real requests through <see cref="SampleMvcApi"/>, asserting the body MVC
+    /// actually serialised.
+    /// </summary>
+    /// <remarks>
+    /// The expected body is the same one
+    /// <see cref="MustValidationEndpointFilterTestData.EndToEnd"/> asserts for story 2, which is the promise
+    /// story 3 makes: an MVC action and a Minimal API endpoint answer the same bad request identically, with
+    /// neither application configuring a JSON naming policy for itself.
+    /// </remarks>
+    public static class EndToEnd
+    {
+        private const string ValidOrderBody = """{"email":"buyer@example.test"}""";
+
+        private const string InvalidOrderBody = """{"email":"not-an-email"}""";
+
+        private const string CustomerBody = """{"name":"Ada"}""";
+
+        public static TheoryData<Case> Cases =>
+        [
+            new("a-valid-body-runs-the-action", ("/mvc/orders", ValidOrderBody), new ResponseExpected(true, StatusCodes.Status200OK)),
+            new("an-invalid-body-answers-the-story-three-body", ("/mvc/orders", InvalidOrderBody), new ResponseExpected(false, StatusCodes.Status400BadRequest, StoryThreeBody)),
+            new("an-action-with-nothing-to-validate-is-left-alone", ("/mvc/customers", CustomerBody), new ResponseExpected(true, StatusCodes.Status200OK))
+        ];
+
+        /// <summary>
+        /// The body story 3 publishes — byte-for-byte the one story 2 publishes, modulo whitespace.
+        /// </summary>
+        private static ProblemDetailsExpected StoryThreeBody =>
+            new(false, 400, ["email", "lines[1].sku"], ["email.address.invalid", "text.content.blank"], ["email must be a valid email address.", "lines[1].sku must not be null or whitespace."], "One or more validation errors occurred.");
+
+        /// <param name="IsValid">Whether the request reached its action.</param>
+        /// <param name="Status">The status code the client read.</param>
+        /// <param name="Body">What the response says, when PineGuard answered it instead of the action.</param>
+        public sealed record ResponseExpected(bool IsValid, int Status, ProblemDetailsExpected? Body = null) : ReturnExpected(IsValid);
+
+        public sealed record Case(string Name, (string requestUri, string json) Value, ResponseExpected Expected)
+            : ReturnCase<(string requestUri, string json), ResponseExpected>(Name, Value, Expected);
+    }
 }

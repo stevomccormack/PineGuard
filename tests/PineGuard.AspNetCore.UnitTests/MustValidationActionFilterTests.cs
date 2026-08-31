@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PineGuard.AspNetCore.UnitTests.Samples;
@@ -76,6 +77,29 @@ public sealed class MustValidationActionFilterTests(ITestOutputHelper output)
         // Act & Assert
         var ex = await Assert.ThrowsAsync(tc.ExpectedException.Type, action);
         ThrowsCaseAssert.Expected(ex, tc);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidationActionFilterTestData.EndToEnd.Cases), MemberType = typeof(MustValidationActionFilterTestData.EndToEnd))]
+    public async Task EndToEnd_BehavesAsExpected(MustValidationActionFilterTestData.EndToEnd.Case tc)
+    {
+        // Arrange
+        var (requestUri, json) = tc.Value;
+        await using var app = await SampleHost.StartAsync(SampleMvcApi.ConfigureServices, SampleMvcApi.Map);
+        using var client = app.GetTestClient();
+        using var request = SampleHost.Request(HttpMethod.Post, requestUri, json);
+
+        // Act
+        using var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(tc.Expected.IsValid, response.IsSuccessStatusCode);
+        Assert.Equal(tc.Expected.Status, (int)response.StatusCode);
+
+        if (tc.Expected.Body is null)
+            return;
+
+        ProblemDetailsAssert.Expected(tc.Expected.Body, await SampleResponses.ReadJsonAsync(response));
     }
 
     /// <summary>
