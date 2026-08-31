@@ -12,7 +12,7 @@ Most apps don't install Core directly. They install a higher layer (Must, Guard,
 dotnet add package PineGuard.Core
 ```
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`. The only package references are the Microsoft first-party BCL packages `System.ComponentModel.Annotations` and `System.Text.Json`.
+Targets `net8.0`, `net10.0`, and `netstandard2.1`. The only package references are the Microsoft first-party BCL packages `System.ComponentModel.Annotations` and `System.Text.Json`, joined on `netstandard2.1` alone by `Microsoft.Bcl.TimeProvider`, which backfills the `TimeProvider` the temporal rules read the clock through.
 
 ## Examples
 
