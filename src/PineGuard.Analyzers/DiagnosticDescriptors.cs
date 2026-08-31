@@ -12,6 +12,11 @@ internal static class DiagnosticDescriptors
     /// </summary>
     internal const string UsageCategory = "Usage";
 
+    /// <summary>
+    /// The category reported for a <c>PG2xxx</c> "this call validates nothing" warning.
+    /// </summary>
+    internal const string ReliabilityCategory = "Reliability";
+
     private const string HelpLinkPrefix = "https://pineguard.ai/docs/analyzers/";
 
     /// <summary>
@@ -67,4 +72,17 @@ internal static class DiagnosticDescriptors
         isEnabledByDefault: true,
         description: "A hand-rolled lower-and-upper bound check states in two comparisons what Guard.Against.OutOfRange states once, and the guard captures the parameter name for you.",
         helpLinkUri: HelpLinkPrefix + DiagnosticIds.UseGuardAgainstOutOfRange);
+
+    /// <summary>
+    /// PG2001 — warns that a <c>Must.Be</c> call throws its <c>MustResult</c> away.
+    /// </summary>
+    internal static readonly DiagnosticDescriptor DiscardedMustResult = new(
+        DiagnosticIds.DiscardedMustResult,
+        "Must result is discarded",
+        "The MustResult from '{0}' is discarded, so a failed check passes unnoticed",
+        ReliabilityCategory,
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: "A Must clause reports failure only through the MustResult it returns, so a call whose result is thrown away checks nothing. Call ThrowIfFailed() on it, or assign it and inspect it.",
+        helpLinkUri: HelpLinkPrefix + DiagnosticIds.DiscardedMustResult);
 }

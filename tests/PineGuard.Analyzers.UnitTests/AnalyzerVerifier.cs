@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
@@ -52,7 +53,7 @@ public static class AnalyzerVerifier
         };
 
         Configure(test, test.TestState, referencePineGuard, assemblyName);
-        Expect(test.TestState.ExpectedDiagnostics, tc.Expected);
+        Expect(test.TestState.ExpectedDiagnostics, tc.Expected, new TAnalyzer().SupportedDiagnostics);
 
         await test.RunAsync();
     }
@@ -65,7 +66,21 @@ public static class AnalyzerVerifier
     /// <typeparam name="TCodeFix">The code-fix provider under test.</typeparam>
     /// <param name="tc">The case holding the source, the diagnostic and the fixed source.</param>
     /// <param name="expectedDiagnostics">Every diagnostic the source reports, when the case reports more than one.</param>
-    public static async Task FixAsync<TAnalyzer, TCodeFix>(AnalyzerCase tc, params DiagnosticResult[] expectedDiagnostics)
+    public static Task FixAsync<TAnalyzer, TCodeFix>(AnalyzerCase tc, params DiagnosticResult[] expectedDiagnostics)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+        where TCodeFix : CodeFixProvider, new() =>
+        FixAsync<TAnalyzer, TCodeFix>(tc, equivalenceKey: null, expectedDiagnostics);
+
+    /// <summary>
+    /// Runs the one fix <paramref name="equivalenceKey"/> names over <paramref name="tc"/> and
+    /// asserts the fixed source matches <see cref="AnalyzerExpected.FixedSource"/>.
+    /// </summary>
+    /// <typeparam name="TAnalyzer">The analyzer that reports the diagnostic.</typeparam>
+    /// <typeparam name="TCodeFix">The code-fix provider under test.</typeparam>
+    /// <param name="tc">The case holding the source, the diagnostic and the fixed source.</param>
+    /// <param name="equivalenceKey">The fix to apply when the provider offers more than one, or <see langword="null"/> for the first.</param>
+    /// <param name="expectedDiagnostics">Every diagnostic the source reports, when the case reports more than one.</param>
+    public static async Task FixAsync<TAnalyzer, TCodeFix>(AnalyzerCase tc, string? equivalenceKey, params DiagnosticResult[] expectedDiagnostics)
         where TAnalyzer : DiagnosticAnalyzer, new()
         where TCodeFix : CodeFixProvider, new()
     {
@@ -73,13 +88,14 @@ public static class AnalyzerVerifier
         {
             TestCode = Normalize(tc.Source),
             FixedCode = Normalize(tc.Expected.FixedSource!),
-            ReferenceAssemblies = TargetFrameworkReferences
+            ReferenceAssemblies = TargetFrameworkReferences,
+            CodeActionEquivalenceKey = equivalenceKey
         };
 
         Configure(test, test.TestState, referencePineGuard: true, assemblyName: null);
 
         if (expectedDiagnostics.Length == 0)
-            Expect(test.TestState.ExpectedDiagnostics, tc.Expected);
+            Expect(test.TestState.ExpectedDiagnostics, tc.Expected, new TAnalyzer().SupportedDiagnostics);
         else
             test.TestState.ExpectedDiagnostics.AddRange(expectedDiagnostics);
 
@@ -106,12 +122,16 @@ public static class AnalyzerVerifier
             test.SolutionTransforms.Add((solution, projectId) => solution.WithProjectAssemblyName(projectId, assemblyName));
     }
 
-    private static void Expect(List<DiagnosticResult> expected, AnalyzerExpected analyzerExpected)
+    // The severity comes from the analyzer's own descriptor rather than the case, so a test can
+    // never assert a severity the analyzer does not actually report.
+    private static void Expect(List<DiagnosticResult> expected, AnalyzerExpected analyzerExpected, ImmutableArray<DiagnosticDescriptor> supported)
     {
         if (analyzerExpected.IsValid)
             return;
 
-        var diagnostic = new DiagnosticResult(analyzerExpected.DiagnosticId!, DiagnosticSeverity.Info)
+        var descriptor = supported.Single(d => string.Equals(d.Id, analyzerExpected.DiagnosticId, StringComparison.Ordinal));
+
+        var diagnostic = new DiagnosticResult(descriptor)
             .WithLocation(analyzerExpected.Line!.Value, analyzerExpected.Column!.Value)
             .WithMessage(analyzerExpected.Message);
 
