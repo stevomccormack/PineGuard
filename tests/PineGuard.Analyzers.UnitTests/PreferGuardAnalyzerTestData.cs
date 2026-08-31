@@ -4,8 +4,10 @@ public static class PreferGuardAnalyzerTestData
 {
     private const string UseGuardAgainstNull = "PG1001";
     private const string UseGuardAgainstNullOrWhiteSpace = "PG1002";
+    private const string UseGuardAgainstNullOrEmpty = "PG1003";
     private const string NameMessage = "Replace this null check with Guard.Against.Null(name)";
     private const string NameWhiteSpaceMessage = "Replace this null-or-whitespace check with Guard.Against.NullOrWhiteSpace(name)";
+    private const string NameEmptyMessage = "Replace this null-or-empty check with Guard.Against.NullOrEmpty(name)";
 
     private const string IsNullThrow = """
         using System;
@@ -173,20 +175,6 @@ public static class PreferGuardAnalyzerTestData
             }
 
             private static string Normalize(string value) => value;
-        }
-        """;
-
-    private const string ThrowIfNullOrEmpty = """
-        using System;
-
-        namespace Sample;
-
-        public class Order
-        {
-            public void Ship(string name)
-            {
-                ArgumentException.ThrowIfNullOrEmpty(name);
-            }
         }
         """;
 
@@ -747,6 +735,215 @@ public static class PreferGuardAnalyzerTestData
         }
         """;
 
+    private const string IsNullOrEmptyThrow = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                if (string.IsNullOrEmpty(name))
+                    throw new ArgumentException("A name is required.", nameof(name));
+            }
+        }
+        """;
+
+    private const string IsNullOrEmptyThrowFixed = """
+        using System;
+        using PineGuard.GuardClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                Guard.Against.NullOrEmpty(name);
+            }
+        }
+        """;
+
+    private const string IsNullOrEmptyBlockThrow = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    throw new ArgumentException("A name is required.", nameof(name));
+                }
+            }
+        }
+        """;
+
+    private const string ThrowIfNullOrEmpty = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                ArgumentException.ThrowIfNullOrEmpty(name);
+            }
+        }
+        """;
+
+    private const string ThrowIfNullOrEmptyFixed = """
+        using System;
+        using PineGuard.GuardClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                Guard.Against.NullOrEmpty(name);
+            }
+        }
+        """;
+
+    private const string ThrowIfNullOrEmptyWithParamName = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
+            }
+        }
+        """;
+
+    private const string IsNullOrEmptyOtherException = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                if (string.IsNullOrEmpty(name))
+                    throw new InvalidOperationException();
+            }
+        }
+        """;
+
+    private const string IsNullOrEmptyOfExpression = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                if (string.IsNullOrEmpty(Normalize(name)))
+                    throw new ArgumentException("A name is required.", nameof(name));
+            }
+
+            private static string Normalize(string value) => value;
+        }
+        """;
+
+    private const string NegatedIsNullOrEmpty = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                if (!string.IsNullOrEmpty(name))
+                    throw new ArgumentException("A name is required.", nameof(name));
+            }
+        }
+        """;
+
+    private const string CustomIsNullOrEmpty = """
+        using System;
+
+        namespace Sample;
+
+        public static class Text
+        {
+            public static bool IsNullOrEmpty(string value) => value.Length == 0;
+        }
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                if (Text.IsNullOrEmpty(name))
+                    throw new ArgumentException("A name is required.", nameof(name));
+            }
+        }
+        """;
+
+    private const string CustomThrowIfNullOrEmpty = """
+        using System;
+
+        namespace Sample;
+
+        public static class Text
+        {
+            public static void ThrowIfNullOrEmpty(string value) => Console.WriteLine(value);
+        }
+
+        public class Order
+        {
+            public void Ship(string name)
+            {
+                Text.ThrowIfNullOrEmpty(name);
+            }
+        }
+        """;
+
+    private const string TwoEmptyCheckedParameters = """
+        using System;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name, string address)
+            {
+                if (string.IsNullOrEmpty(name))
+                    throw new ArgumentException("A name is required.", nameof(name));
+                if (string.IsNullOrEmpty(address))
+                    throw new ArgumentException("An address is required.", nameof(address));
+            }
+        }
+        """;
+
+    private const string TwoEmptyCheckedParametersFixed = """
+        using System;
+        using PineGuard.GuardClauses;
+
+        namespace Sample;
+
+        public class Order
+        {
+            public void Ship(string name, string address)
+            {
+                Guard.Against.NullOrEmpty(name);
+                Guard.Against.NullOrEmpty(address);
+            }
+        }
+        """;
+
     public static class PG1001
     {
         public static TheoryData<AnalyzerCase> Cases =>
@@ -840,6 +1037,45 @@ public static class PreferGuardAnalyzerTestData
         public static TheoryData<AnalyzerCase> FixAllCases =>
         [
             new("two-checks-are-fixed-together-and-the-using-is-added-once", TwoWhiteSpaceCheckedParameters, new AnalyzerExpected(false, null, UseGuardAgainstNullOrWhiteSpace, null, null, TwoWhiteSpaceCheckedParametersFixed))
+        ];
+    }
+
+    public static class PG1003
+    {
+        public static TheoryData<AnalyzerCase> Cases =>
+        [
+            new("is-null-or-empty-then-throw-argument-is-a-guard", IsNullOrEmptyThrow, new AnalyzerExpected(false, NameEmptyMessage, UseGuardAgainstNullOrEmpty, 9, 9)),
+            new("a-braced-single-throw-is-the-same-check", IsNullOrEmptyBlockThrow, new AnalyzerExpected(false, NameEmptyMessage, UseGuardAgainstNullOrEmpty, 9, 9)),
+            new("throw-if-null-or-empty-is-a-guard", ThrowIfNullOrEmpty, new AnalyzerExpected(false, NameEmptyMessage, UseGuardAgainstNullOrEmpty, 9, 9)),
+            new("throwing-another-exception-type-is-not-an-argument-guard", IsNullOrEmptyOtherException, new AnalyzerExpected(true)),
+            new("checking-a-call-rather-than-an-identifier-is-left-alone", IsNullOrEmptyOfExpression, new AnalyzerExpected(true)),
+            new("a-negated-check-asserts-the-opposite-and-is-left-alone", NegatedIsNullOrEmpty, new AnalyzerExpected(true)),
+            new("an-is-null-or-empty-declared-somewhere-other-than-string-is-left-alone", CustomIsNullOrEmpty, new AnalyzerExpected(true)),
+            new("a-throw-if-null-or-empty-declared-somewhere-other-than-the-framework-is-left-alone", CustomThrowIfNullOrEmpty, new AnalyzerExpected(true)),
+            new("throw-if-null-or-empty-with-an-explicit-param-name-is-left-alone", ThrowIfNullOrEmptyWithParamName, new AnalyzerExpected(true))
+        ];
+
+        public static TheoryData<AnalyzerCase> WithoutPineGuardReferenceCases =>
+        [
+            new("no-pineguard-reference-means-no-suggestion", IsNullOrEmptyThrow, new AnalyzerExpected(true)),
+            new("no-pineguard-reference-silences-throw-if-null-or-empty-too", ThrowIfNullOrEmpty, new AnalyzerExpected(true))
+        ];
+
+        public static TheoryData<AnalyzerCase> InsidePineGuardCases =>
+        [
+            new("pineguard-never-reports-on-its-own-emptiness-check", IsNullOrEmptyThrow, new AnalyzerExpected(true)),
+            new("pineguard-never-reports-on-its-own-throw-if-null-or-empty", ThrowIfNullOrEmpty, new AnalyzerExpected(true))
+        ];
+
+        public static TheoryData<AnalyzerCase> FixCases =>
+        [
+            new("is-null-or-empty-becomes-guard-against-null-or-empty", IsNullOrEmptyThrow, new AnalyzerExpected(false, NameEmptyMessage, UseGuardAgainstNullOrEmpty, 9, 9, IsNullOrEmptyThrowFixed)),
+            new("throw-if-null-or-empty-becomes-guard-against-null-or-empty", ThrowIfNullOrEmpty, new AnalyzerExpected(false, NameEmptyMessage, UseGuardAgainstNullOrEmpty, 9, 9, ThrowIfNullOrEmptyFixed))
+        ];
+
+        public static TheoryData<AnalyzerCase> FixAllCases =>
+        [
+            new("two-checks-are-fixed-together-and-the-using-is-added-once", TwoEmptyCheckedParameters, new AnalyzerExpected(false, null, UseGuardAgainstNullOrEmpty, null, null, TwoEmptyCheckedParametersFixed))
         ];
     }
 }
