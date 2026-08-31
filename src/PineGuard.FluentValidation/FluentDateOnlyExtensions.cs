@@ -776,5 +776,38 @@ public static class FluentDateOnlyExtensions
         string? message = null) =>
         ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotWithinCalendarMonths(val.Value, reference, months, paramName: null) : MustResult<DateOnly>.Ok(default),
             message, MustCodes.Date.Proximity.WithinCalendarMonths);
+
+    /// <summary>Validates that the <see cref="DateOnly"/> date of birth meets the expected minimum age.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>A negative <paramref name="years"/> is a configuration error, reported against that parameter.</remarks>
+    /// <example><code>RuleFor(x => x.DateOfBirth).MinimumAge(18);</code></example>
+    public static IRuleBuilderOptions<TModel, DateOnly> MinimumAge<TModel>(
+        this IRuleBuilder<TModel, DateOnly> ruleBuilder,
+        int years,
+        TimeProvider? timeProvider = null,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.MinimumAge(val, years, timeProvider, paramName: null),
+            message, MustCodes.Date.Age.BelowMinimum);
+
+    /// <summary>Validates that the nullable <see cref="DateOnly"/> date of birth meets the expected minimum age.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>If the value is <see langword="null"/>, validation passes. A negative <paramref name="years"/> is a configuration error, reported against that parameter.</remarks>
+    public static IRuleBuilderOptions<TModel, DateOnly?> MinimumAge<TModel>(
+        this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
+        int years,
+        TimeProvider? timeProvider = null,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.MinimumAge(val.Value, years, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
+            message, MustCodes.Date.Age.BelowMinimum);
 }
 #endif
