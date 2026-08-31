@@ -1,8 +1,10 @@
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests.MustClauses;
+using Xunit.Abstractions;
 
 namespace PineGuard.MustClauses.UnitTests;
 
-public class MustDateOnlyClausesTests : BaseUnitTest
+public class MustDateOnlyClausesTests(ITestOutputHelper output) : BaseMustUnitTest(output)
 {
     [Theory]
     [MemberData(nameof(MustDateOnlyClausesTestData.Past.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.Past))]
@@ -313,5 +315,34 @@ public class MustDateOnlyClausesTests : BaseUnitTest
     {
         var result = Must.Be.NotWithinCalendarMonths(testCase.Value.value, testCase.Value.target, testCase.Value.months);
         Assert.Equal(testCase.Expected, result.Success);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.MinimumAge.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.MinimumAge))]
+    [MemberData(nameof(MustDateOnlyClausesTestData.MinimumAge.InvalidCases), MemberType = typeof(MustDateOnlyClausesTestData.MinimumAge))]
+    public void MinimumAge_BehavesAsExpected(MustCase<(DateOnly value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = Must.Be.MinimumAge(value, years, FixedTimeProvider.Default, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(MustDateOnlyClausesTestData.MinimumAgeOnLeapDay))]
+    public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(MustCase<(DateOnly value, int years, DateTimeOffset utcNow)> tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = tc.Value;
+
+        // Act
+        var result = Must.Be.MinimumAge(value, years, new FixedTimeProvider(utcNow), paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
     }
 }
