@@ -39,7 +39,7 @@ public static class GuardStringDateOnlyClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.PastDateOnly(value, styles, paramName);
+        var result = Must.Be.PastDateOnly(value, styles, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -71,7 +71,7 @@ public static class GuardStringDateOnlyClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.PastOrPresentDateOnly(value, styles, paramName);
+        var result = Must.Be.PastOrPresentDateOnly(value, styles, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -103,7 +103,7 @@ public static class GuardStringDateOnlyClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.FutureDateOnly(value, styles, paramName);
+        var result = Must.Be.FutureDateOnly(value, styles, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -135,7 +135,7 @@ public static class GuardStringDateOnlyClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.FutureOrPresentDateOnly(value, styles, paramName);
+        var result = Must.Be.FutureOrPresentDateOnly(value, styles, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

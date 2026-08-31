@@ -19,6 +19,7 @@ public static class MustDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -32,11 +33,12 @@ public static class MustDateOnlyClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> Past(this IMustClause _,
         DateOnly value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the past.";
 
-        var ok = DateOnlyRules.IsInPast(value);
+        var ok = DateOnlyRules.IsInPast(value, timeProvider: timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, value);
     }
 
@@ -45,6 +47,7 @@ public static class MustDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -58,11 +61,12 @@ public static class MustDateOnlyClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> PastOrPresent(this IMustClause _,
         DateOnly value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the past or present.";
 
-        var ok = DateOnlyRules.IsInPast(value, Inclusion.Inclusive);
+        var ok = DateOnlyRules.IsInPast(value, Inclusion.Inclusive, timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, value);
     }
 
@@ -71,6 +75,7 @@ public static class MustDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -84,11 +89,12 @@ public static class MustDateOnlyClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> Future(this IMustClause _,
         DateOnly value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the future.";
 
-        var ok = DateOnlyRules.IsInFuture(value);
+        var ok = DateOnlyRules.IsInFuture(value, timeProvider: timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, value);
     }
 
@@ -97,6 +103,7 @@ public static class MustDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -110,11 +117,12 @@ public static class MustDateOnlyClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> FutureOrPresent(this IMustClause _,
         DateOnly value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the future or present.";
 
-        var ok = DateOnlyRules.IsInFuture(value, Inclusion.Inclusive);
+        var ok = DateOnlyRules.IsInFuture(value, Inclusion.Inclusive, timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, value);
     }
 
