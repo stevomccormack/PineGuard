@@ -9,6 +9,21 @@ namespace PineGuard.Utils;
 public static class DateTimeUtility
 {
     /// <summary>
+    /// Reads the current UTC instant from the supplied clock, falling back to the system clock.
+    /// </summary>
+    /// <param name="timeProvider">The clock to read. If <see langword="null"/>, <see cref="TimeProvider.System"/> is used.</param>
+    /// <returns>The current instant reported by <paramref name="timeProvider"/>.</returns>
+    /// <remarks>
+    /// Every rule that compares a value against "now" reads the clock through this method, so a
+    /// caller can pin the instant — in a test, or anywhere determinism matters — by supplying a
+    /// <see cref="TimeProvider"/> instead of depending on the machine clock.
+    /// <see cref="TimeProvider"/> ships in-box from .NET 8 onwards; on <c>netstandard2.1</c> it comes
+    /// from the <c>Microsoft.Bcl.TimeProvider</c> package this project references for that target.
+    /// </remarks>
+    public static DateTimeOffset GetUtcNow(TimeProvider? timeProvider) =>
+        (timeProvider ?? TimeProvider.System).GetUtcNow();
+
+    /// <summary>
     /// Attempts to convert the specified <see cref="DateTime"/> to UTC.
     /// </summary>
     /// <param name="value">The date/time to convert. If <see langword="null"/>, returns <see langword="null"/>.</param>

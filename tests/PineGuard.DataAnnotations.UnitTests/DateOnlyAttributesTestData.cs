@@ -1,4 +1,6 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.DateOnlyRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -170,4 +172,122 @@ public static class DateOnlyAttributesTestData
             new("overlap", new DateOnly(2020, 1, 10), false) // range1=Jan10..Jan30, range2=Jan10..Jan20 — overlap
         ];
     }
+
+    // The clock-injection rows pin their own instant rather than share one provider. The subject sits in
+    // 2100, so a clock in 2200 puts it in the past and a clock in 2000 puts it in the future — verdicts that
+    // hold whatever the machine's clock reads, which is what makes them evidence the attribute resolved the
+    // TimeProvider off the ValidationContext instead of falling through to the system clock.
+    private static readonly DateOnly ClockSubject = new(2100, 01, 01);
+    private static readonly DateTimeOffset ClockAfterSubject = new(2200, 01, 01, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset ClockBeforeSubject = new(2000, 01, 01, 12, 0, 0, TimeSpan.Zero);
+
+    public static class PastDateOnlyOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(true)),
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(false, "Value must be in the past.", Code: MustCodes.Date.Relative.NotPast))
+        ];
+    }
+
+    public static class FutureDateOnlyOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(true)),
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(false, "Value must be in the future.", Code: MustCodes.Date.Relative.NotFuture))
+        ];
+    }
+
+    public static class WeekdayDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsWeekday.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsWeekday.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a weekday.", Code: MustCodes.Date.Calendar.NotWeekday)
+        });
+    }
+
+    public static class WeekendDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsWeekend.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsWeekend.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a weekend day.", Code: MustCodes.Date.Calendar.NotWeekend)
+        });
+    }
+
+    public static class FirstDayOfMonthDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsFirstDayOfMonth.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsFirstDayOfMonth.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be the first day of the month.", Code: MustCodes.Date.Calendar.NotFirstDayOfMonth)
+        });
+    }
+
+    public static class NotFirstDayOfMonthDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsFirstDayOfMonth.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsFirstDayOfMonth.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be the first day of the month.", Code: MustCodes.Date.Calendar.FirstDayOfMonth),
+            _ => new DataAnnotationExpected(true)
+        });
+    }
+
+    public static class LastDayOfMonthDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsLastDayOfMonth.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsLastDayOfMonth.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be the last day of the month.", Code: MustCodes.Date.Calendar.NotLastDayOfMonth)
+        });
+    }
+
+    public static class NotLastDayOfMonthDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsLastDayOfMonth.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsLastDayOfMonth.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be the last day of the month.", Code: MustCodes.Date.Calendar.LastDayOfMonth),
+            _ => new DataAnnotationExpected(true)
+        });
+    }
+
+    // The whole fixture tuple travels in Value, because the minimum age varies per row and the attribute takes
+    // it as a constructor argument; the test destructures it. Every birth date sits around the instant
+    // FixedTimeProvider.Default reports, which is the clock the test registers on the validation context —
+    // NotYetBorn is the row that proves the resolution happened, being future for the pinned clock and past
+    // for the machine's.
+    public static class MinimumAge
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.HasMinimumAge.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.HasMinimumAge.NullValue) => new DataAnnotationExpected(true),
+            nameof(F.HasMinimumAge.NegativeYears) => new DataAnnotationExpected(false, "years requires a non-negative number of years.", Code: MustCodes.Date.Age.BelowMinimum),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)
+        });
+    }
+
+    // A 29-February birth date has no anniversary in a non-leap year, so each row pins its own clock: the
+    // boundary moves while the birth date stays put, which the shared provider cannot express.
+    private static readonly DateOnly LeapDayBirth = new(2008, 02, 29);
+
+    public static class MinimumAgeOnLeapDay
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("TwentyEighthOfFebruaryInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 02, 28)), new DataAnnotationExpected(false, "Value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)),
+            new("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new DataAnnotationExpected(true)),
+            new("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new DataAnnotationExpected(true))
+        ];
+    }
+
+    private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);
 }

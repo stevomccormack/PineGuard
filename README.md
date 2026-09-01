@@ -72,7 +72,8 @@ dotnet add package PineGuard.Testing
 
 `PineGuard.Core` takes no third-party dependencies — only the Microsoft first-party
 `System.Text.Json` and `System.ComponentModel.Annotations` packages, which the .NET runtime already
-ships on modern targets.
+ships on modern targets, plus `Microsoft.Bcl.TimeProvider` on `netstandard2.1` alone, where
+`TimeProvider` is not yet in-box.
 
 ### Must Clauses &mdash; result-based, explicit, composable
 

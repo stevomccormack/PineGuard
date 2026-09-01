@@ -1,4 +1,6 @@
+using System.Globalization;
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 
 namespace PineGuard.Testing.Fixtures;
@@ -29,6 +31,33 @@ public static partial class StringRulesFixtures
         public static RuleScenario<string?>[] ValidScenarios => [new(nameof(FutureDate), FutureDate, true)];
         public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(PastDate), PastDate, false), new(nameof(NotADate), NotADate, false), new(nameof(NullValue), NullValue, false)];
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class DateOnlyHasMinimumAge
+    {
+        // Birth dates are placed around the instant FixedTimeProvider.Default reports, because that is the
+        // clock the tests inject. NotYetBorn is the scenario that proves the string overload forwards it:
+        // it is in the future for the pinned clock and in the past for the machine's.
+        private static readonly DateOnly Today = DateOnly.FromDateTime(FixedTimeProvider.Default.GetUtcNow().UtcDateTime);
+
+        public static readonly (string? value, int years) WellOverAge = (Iso(Today.AddYears(-40)), 18);
+        public static readonly (string? value, int years) TurnsEighteenToday = (Iso(Today.AddYears(-18)), 18);
+        public static readonly (string? value, int years) WellUnderAge = (Iso(Today.AddYears(-10)), 18);
+        public static readonly (string? value, int years) NotADate = ("not-a-date", 18);
+        public static readonly (string? value, int years) NullValue = (null, 18);
+        public static readonly (string? value, int years) TurnsEighteenTomorrow = (Iso(Today.AddYears(-18).AddDays(1)), 18);
+        public static readonly (string? value, int years) NotYetBorn = (Iso(Today.AddDays(1)), 0);
+        public static readonly (string? value, int years) NegativeYears = (Iso(Today.AddYears(-40)), -1);
+
+        public static RuleScenario<(string? value, int years)>[] ValidScenarios => [new(nameof(WellOverAge), WellOverAge, true)];
+        public static RuleScenario<(string? value, int years)>[] ValidEdgeScenarios => [new(nameof(TurnsEighteenToday), TurnsEighteenToday, true)];
+        public static RuleScenario<(string? value, int years)>[] InvalidScenarios => [new(nameof(WellUnderAge), WellUnderAge, false), new(nameof(NotADate), NotADate, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<(string? value, int years)>[] InvalidEdgeScenarios => [new(nameof(TurnsEighteenTomorrow), TurnsEighteenTomorrow, false), new(nameof(NotYetBorn), NotYetBorn, false), new(nameof(NegativeYears), NegativeYears, false)];
+        public static RuleScenario<(string? value, int years)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<(string? value, int years)>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<(string? value, int years)>[] AllScenarios => [.. AllValid, .. AllInvalid];
+
+        private static string Iso(DateOnly value) => value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
 
     public static class DateOnlyIsBetween

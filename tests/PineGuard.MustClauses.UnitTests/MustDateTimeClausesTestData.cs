@@ -1,4 +1,7 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
+using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.DateTimeRulesFixtures;
 
 namespace PineGuard.MustClauses.UnitTests;
@@ -6,6 +9,7 @@ namespace PineGuard.MustClauses.UnitTests;
 public static class MustDateTimeClausesTestData
 {
     private static readonly DateTime Now = DateTime.UtcNow;
+    private static readonly DateTime LeapDayBirth = new(2008, 02, 29, 0, 0, 0, DateTimeKind.Utc);
     private static readonly DateTime PastDate = Now.AddDays(-1);
     private static readonly DateTime FutureDate = Now.AddDays(1);
 
@@ -639,4 +643,29 @@ public static class MustDateTimeClausesTestData
         public sealed record ValidCase(string Name, DateTime Value, bool Expected) : IsCase<DateTime>(Name, Value, Expected);
         public sealed record EdgeCase(string Name, DateTime Value, bool Expected) : IsCase<DateTime>(Name, Value, Expected);
     }
+
+    public static class MinimumAge
+    {
+        public static TheoryData<MustCase<(DateTime value, int years)>> ValidCases => F.HasMinimumAge.AllValid.Project(v => (v.value!.Value, v.years)).ToMustCases();
+
+        public static TheoryData<MustCase<(DateTime value, int years)>> InvalidCases => F.HasMinimumAge.AllInvalid.Except(nameof(F.HasMinimumAge.NullValue)).Project(v => (v.value!.Value, v.years)).ToMustCases(s => s.Name switch
+        {
+            nameof(F.HasMinimumAge.NegativeYears) => new MustExpected(false, "years requires a non-negative number of years.", "years", Code: MustCodes.Date.Age.BelowMinimum),
+            _ => new MustExpected(false, "value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)
+        });
+    }
+
+    public static class MinimumAgeOnLeapDay
+    {
+        // A 29-February birth date has no anniversary in a non-leap year, so each case pins its own clock:
+        // here the boundary moves and the birth date stays put, which the shared provider cannot express.
+        public static TheoryData<MustCase<(DateTime value, int years, DateTimeOffset utcNow)>> Cases =>
+        [
+            new MustCase<(DateTime value, int years, DateTimeOffset utcNow)>("TwentyEighthOfFebruaryInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 02, 28)), new MustExpected(false, "value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)),
+            new MustCase<(DateTime value, int years, DateTimeOffset utcNow)>("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new MustExpected(true)),
+            new MustCase<(DateTime value, int years, DateTimeOffset utcNow)>("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new MustExpected(true))
+        ];
+    }
+
+    private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);
 }

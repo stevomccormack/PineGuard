@@ -1,5 +1,6 @@
 using PineGuard.Common;
 using PineGuard.Rules;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
 
@@ -12,6 +13,17 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
     public void IsInPast_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
     {
         // Act
+        var result = DateTimeOffsetRules.IsInPast(tc.Value, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsInPastSystemClock.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsInPastSystemClock))]
+    public void IsInPast_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
         var result = DateTimeOffsetRules.IsInPast(tc.Value);
 
         // Assert
@@ -21,6 +33,17 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
     [Theory]
     [MemberData(nameof(DateTimeOffsetRulesTestData.IsInFuture.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsInFuture))]
     public void IsInFuture_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsInFuture(tc.Value, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsInFutureSystemClock.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsInFutureSystemClock))]
+    public void IsInFuture_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<DateTimeOffset?> tc)
     {
         // Act
         var result = DateTimeOffsetRules.IsInFuture(tc.Value);
@@ -134,6 +157,50 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
     {
         // Act
         var result = DateTimeOffsetRules.IsWithinCalendarMonths(tc.Value.value, tc.Value.reference, tc.Value.months);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsWeekday.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsWeekday))]
+    public void IsWeekday_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsWeekday(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsWeekend.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsWeekend))]
+    public void IsWeekend_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsWeekend(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsFirstDayOfMonth.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsFirstDayOfMonth))]
+    public void IsFirstDayOfMonth_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsFirstDayOfMonth(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsLastDayOfMonth.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsLastDayOfMonth))]
+    public void IsLastDayOfMonth_BehavesAsExpected(RuleCase<DateTimeOffset?> tc)
+    {
+        // Act
+        var result = DateTimeOffsetRules.IsLastDayOfMonth(tc.Value);
 
         // Assert
         AssertResult(tc, result);

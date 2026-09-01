@@ -1,5 +1,6 @@
 using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
+using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.DateTimeRulesFixtures;
 
 namespace PineGuard.FluentValidation.UnitTests;
@@ -347,6 +348,33 @@ public static class FluentDateTimeExtensionsTestData
             new("Utc", F.HasExplicitKind.Utc!.Value, new FluentExpected(false, "Value must not have an explicit kind."))
         ];
     }
+
+    public static class MinimumAge
+    {
+        public static TheoryData<FluentCase<(DateTime value, int years)>> Cases =>
+            F.HasMinimumAge.AllScenarios.Except(nameof(F.HasMinimumAge.NullValue)).Project(v => (v.value!.Value, v.years)).ToFluentCases(s => s.Name switch
+            {
+                nameof(F.HasMinimumAge.NegativeYears) => new FluentExpected(false, "years requires a non-negative number of years.", Code: MustCodes.Date.Age.BelowMinimum),
+                _ when s.IsValid => new FluentExpected(true),
+                _ => new FluentExpected(false, "Value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)
+            });
+    }
+
+    // A 29-February birth date has no anniversary in a non-leap year, so each case pins its own clock:
+    // here the boundary moves and the birth date stays put, which the shared provider cannot express.
+    public static class MinimumAgeOnLeapDay
+    {
+        public static TheoryData<FluentCase<(DateTime value, int years, DateTimeOffset utcNow)>> Cases =>
+        [
+            new("TwentyEighthOfFebruaryInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 02, 28)), new FluentExpected(false, "Value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)),
+            new("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new FluentExpected(true)),
+            new("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new FluentExpected(true))
+        ];
+    }
+
+    private static readonly DateTime LeapDayBirth = new(2008, 02, 29, 0, 0, 0, DateTimeKind.Utc);
+
+    private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);
 
     // ── Cross-property expression overloads ──────────────────────────
 

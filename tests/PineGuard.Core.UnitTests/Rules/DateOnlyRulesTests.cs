@@ -1,5 +1,6 @@
 using PineGuard.Common;
 using PineGuard.Rules;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
 
@@ -12,6 +13,17 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     public void IsInPast_BehavesAsExpected(RuleCase<DateOnly?> tc)
     {
         // Act
+        var result = DateOnlyRules.IsInPast(tc.Value, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsInPastSystemClock.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInPastSystemClock))]
+    public void IsInPast_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<DateOnly?> tc)
+    {
+        // Act
         var result = DateOnlyRules.IsInPast(tc.Value);
 
         // Assert
@@ -21,6 +33,17 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     [Theory]
     [MemberData(nameof(DateOnlyRulesTestData.IsInFuture.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInFuture))]
     public void IsInFuture_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsInFuture(tc.Value, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsInFutureSystemClock.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInFutureSystemClock))]
+    public void IsInFuture_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<DateOnly?> tc)
     {
         // Act
         var result = DateOnlyRules.IsInFuture(tc.Value);
@@ -134,6 +157,92 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     {
         // Act
         var result = DateOnlyRules.IsWithin(tc.Value.value, tc.Value.reference, tc.Value.days);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsWeekday.Cases), MemberType = typeof(DateOnlyRulesTestData.IsWeekday))]
+    public void IsWeekday_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsWeekday(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsWeekend.Cases), MemberType = typeof(DateOnlyRulesTestData.IsWeekend))]
+    public void IsWeekend_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsWeekend(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsFirstDayOfMonth.Cases), MemberType = typeof(DateOnlyRulesTestData.IsFirstDayOfMonth))]
+    public void IsFirstDayOfMonth_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsFirstDayOfMonth(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsLastDayOfMonth.Cases), MemberType = typeof(DateOnlyRulesTestData.IsLastDayOfMonth))]
+    public void IsLastDayOfMonth_BehavesAsExpected(RuleCase<DateOnly?> tc)
+    {
+        // Act
+        var result = DateOnlyRules.IsLastDayOfMonth(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.HasMinimumAge.Cases), MemberType = typeof(DateOnlyRulesTestData.HasMinimumAge))]
+    public void HasMinimumAge_BehavesAsExpected(RuleCase<(DateOnly? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.HasMinimumAge(value, years, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.HasMinimumAgeSystemClock.Cases), MemberType = typeof(DateOnlyRulesTestData.HasMinimumAgeSystemClock))]
+    public void HasMinimumAge_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<(DateOnly? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.HasMinimumAge(value, years);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.HasMinimumAgeOnLeapDay.Cases), MemberType = typeof(DateOnlyRulesTestData.HasMinimumAgeOnLeapDay))]
+    public void HasMinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(RuleCase<(DateOnly? value, int years, DateTimeOffset utcNow)> tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.HasMinimumAge(value, years, timeProvider: new FixedTimeProvider(utcNow));
 
         // Assert
         AssertResult(tc, result);

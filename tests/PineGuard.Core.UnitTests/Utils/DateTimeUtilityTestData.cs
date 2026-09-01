@@ -1,10 +1,28 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 
 namespace PineGuard.Core.UnitTests.Utils;
 
 public static class DateTimeUtilityTestData
 {
+    public static class GetUtcNow
+    {
+        public static TheoryData<ValidCase> ValidCases =>
+        [
+            new("Supplied clock", FixedTimeProvider.Default, FixedTimeProvider.Default.GetUtcNow())
+        ];
+
+        // A null Expected asks the test to assert against the system clock instead of a pinned instant.
+        public static TheoryData<ValidCase> EdgeCases =>
+        [
+            new("Null falls back to the system clock", null, null)
+        ];
+
+        public sealed record ValidCase(string Name, TimeProvider? Value, DateTimeOffset? Expected)
+            : ReturnCase<TimeProvider?, DateTimeOffset?>(Name, Value, Expected);
+    }
+
     public static class ToUtc
     {
         public static TheoryData<ValidCase> ValidCases =>

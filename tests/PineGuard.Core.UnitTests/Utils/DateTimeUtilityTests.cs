@@ -6,6 +6,27 @@ namespace PineGuard.Core.UnitTests.Utils;
 public sealed class DateTimeUtilityTests : BaseUnitTest
 {
     [Theory]
+    [MemberData(nameof(DateTimeUtilityTestData.GetUtcNow.ValidCases), MemberType = typeof(DateTimeUtilityTestData.GetUtcNow))]
+    [MemberData(nameof(DateTimeUtilityTestData.GetUtcNow.EdgeCases), MemberType = typeof(DateTimeUtilityTestData.GetUtcNow))]
+    public void GetUtcNow_ReturnsExpected(DateTimeUtilityTestData.GetUtcNow.ValidCase testCase)
+    {
+        // Arrange
+        var before = DateTimeOffset.UtcNow;
+
+        // Act
+        var result = DateTimeUtility.GetUtcNow(testCase.Value);
+
+        // Assert
+        if (testCase.Expected is { } expected)
+        {
+            Assert.Equal(expected, result);
+            return;
+        }
+
+        Assert.InRange(result, before.AddSeconds(-1), DateTimeOffset.UtcNow.AddSeconds(1));
+    }
+
+    [Theory]
     [MemberData(nameof(DateTimeUtilityTestData.ToUtc.ValidCases), MemberType = typeof(DateTimeUtilityTestData.ToUtc))]
     [MemberData(nameof(DateTimeUtilityTestData.ToUtc.EdgeCases), MemberType = typeof(DateTimeUtilityTestData.ToUtc))]
     public void ToUtc_ReturnsExpected(DateTimeUtilityTestData.ToUtc.ValidCase testCase)

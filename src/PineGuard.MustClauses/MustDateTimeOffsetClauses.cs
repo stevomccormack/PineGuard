@@ -18,6 +18,7 @@ public static class MustDateTimeOffsetClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -31,11 +32,12 @@ public static class MustDateTimeOffsetClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
     public static MustResult<DateTimeOffset> Past(this IMustClause _,
         DateTimeOffset value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the past.";
 
-        var ok = DateTimeOffsetRules.IsInPast(value);
+        var ok = DateTimeOffsetRules.IsInPast(value, timeProvider: timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, value);
     }
 
@@ -44,6 +46,7 @@ public static class MustDateTimeOffsetClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -57,11 +60,12 @@ public static class MustDateTimeOffsetClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
     public static MustResult<DateTimeOffset> PastOrPresent(this IMustClause _,
         DateTimeOffset value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the past or present.";
 
-        var ok = DateTimeOffsetRules.IsInPast(value, Inclusion.Inclusive);
+        var ok = DateTimeOffsetRules.IsInPast(value, Inclusion.Inclusive, timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, value);
     }
 
@@ -70,6 +74,7 @@ public static class MustDateTimeOffsetClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -83,11 +88,12 @@ public static class MustDateTimeOffsetClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
     public static MustResult<DateTimeOffset> Future(this IMustClause _,
         DateTimeOffset value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the future.";
 
-        var ok = DateTimeOffsetRules.IsInFuture(value);
+        var ok = DateTimeOffsetRules.IsInFuture(value, timeProvider: timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, value);
     }
 
@@ -96,6 +102,7 @@ public static class MustDateTimeOffsetClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -109,11 +116,12 @@ public static class MustDateTimeOffsetClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
     public static MustResult<DateTimeOffset> FutureOrPresent(this IMustClause _,
         DateTimeOffset value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the future or present.";
 
-        var ok = DateTimeOffsetRules.IsInFuture(value, Inclusion.Inclusive);
+        var ok = DateTimeOffsetRules.IsInFuture(value, Inclusion.Inclusive, timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, value);
     }
 
@@ -585,5 +593,161 @@ public static class MustDateTimeOffsetClauses
         var ok = !DateTimeOffsetRules.IsWithinCalendarMonths(value, reference, months);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Proximity.WithinCalendarMonths,
             messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must be a weekday.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must be a weekday."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
+    public static MustResult<DateTimeOffset> Weekday(this IMustClause _,
+        DateTimeOffset value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must be a weekday.";
+
+        var ok = DateTimeOffsetRules.IsWeekday(value);
+        return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Calendar.NotWeekday, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must be a weekend day.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must be a weekend day."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
+    public static MustResult<DateTimeOffset> Weekend(this IMustClause _,
+        DateTimeOffset value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must be a weekend day.";
+
+        var ok = DateTimeOffsetRules.IsWeekend(value);
+        return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Calendar.NotWeekend, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must be the first day of the month.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must be the first day of the month."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
+    public static MustResult<DateTimeOffset> FirstDayOfMonth(this IMustClause _,
+        DateTimeOffset value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must be the first day of the month.";
+
+        var ok = DateTimeOffsetRules.IsFirstDayOfMonth(value);
+        return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Calendar.NotFirstDayOfMonth, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must not be the first day of the month.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must not be the first day of the month."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
+    public static MustResult<DateTimeOffset> NotFirstDayOfMonth(this IMustClause _,
+        DateTimeOffset value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must not be the first day of the month.";
+
+        var ok = !DateTimeOffsetRules.IsFirstDayOfMonth(value);
+        return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Calendar.FirstDayOfMonth, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must be the last day of the month.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must be the last day of the month."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
+    public static MustResult<DateTimeOffset> LastDayOfMonth(this IMustClause _,
+        DateTimeOffset value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must be the last day of the month.";
+
+        var ok = DateTimeOffsetRules.IsLastDayOfMonth(value);
+        return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Calendar.NotLastDayOfMonth, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must not be the last day of the month.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must not be the last day of the month."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-time-offset">Date Time Offset Must Clauses documentation</seealso>
+    public static MustResult<DateTimeOffset> NotLastDayOfMonth(this IMustClause _,
+        DateTimeOffset value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        const string messageTemplate = "{paramName} must not be the last day of the month.";
+
+        var ok = !DateTimeOffsetRules.IsLastDayOfMonth(value);
+        return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Calendar.LastDayOfMonth, messageTemplate, paramName, value, value);
     }
 }

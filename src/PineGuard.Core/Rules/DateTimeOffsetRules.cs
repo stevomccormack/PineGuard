@@ -14,18 +14,20 @@ public static class DateTimeOffsetRules
     /// </summary>
     /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the past; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInPast(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive) =>
-        value is not null && IsBefore(value, DateTimeOffset.UtcNow, inclusion);
+    public static bool IsInPast(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
+        value is not null && IsBefore(value, DateTimeUtility.GetUtcNow(timeProvider), inclusion);
 
     /// <summary>
     /// Determines whether the specified date/time offset is in the future relative to UTC now.
     /// </summary>
     /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the future; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInFuture(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive) =>
-        value is not null && IsAfter(value, DateTimeOffset.UtcNow, inclusion);
+    public static bool IsInFuture(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
+        value is not null && IsAfter(value, DateTimeUtility.GetUtcNow(timeProvider), inclusion);
 
     /// <summary>
     /// Determines whether the specified date/time offset falls within [<paramref name="min"/>, <paramref name="max"/>].
@@ -188,5 +190,66 @@ public static class DateTimeOffsetRules
 
         var monthDiff = Math.Abs(valueMonthIndex - referenceMonthIndex);
         return monthDiff <= months;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date/time offset falls on a weekday (Monday through Friday).
+    /// </summary>
+    /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a weekday; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>The calendar day is read from the value's own offset (its wall-clock date), not from UTC.</remarks>
+    public static bool IsWeekday(DateTimeOffset? value)
+    {
+        // ReSharper disable once UseNullPropagation
+        if (value is null)
+            return false;
+
+        var dayOfWeek = value.Value.DayOfWeek;
+        return dayOfWeek is >= DayOfWeek.Monday and <= DayOfWeek.Friday;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date/time offset falls on a weekend (Saturday or Sunday).
+    /// </summary>
+    /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a weekend day; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>The calendar day is read from the value's own offset (its wall-clock date), not from UTC.</remarks>
+    public static bool IsWeekend(DateTimeOffset? value)
+    {
+        // ReSharper disable once UseNullPropagation
+        if (value is null)
+            return false;
+
+        var dayOfWeek = value.Value.DayOfWeek;
+        return dayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date/time offset falls on the first day of its month.
+    /// </summary>
+    /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is the first day of the month; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>The calendar day is read from the value's own offset (its wall-clock date), not from UTC.</remarks>
+    public static bool IsFirstDayOfMonth(DateTimeOffset? value)
+    {
+        if (value is null)
+            return false;
+
+        return value.Value.Day == 1;
+    }
+
+    /// <summary>
+    /// Determines whether the specified date/time offset falls on the last day of its month.
+    /// </summary>
+    /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is the last day of the month; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>The calendar day is read from the value's own offset (its wall-clock date), not from UTC.</remarks>
+    public static bool IsLastDayOfMonth(DateTimeOffset? value)
+    {
+        if (value is null)
+            return false;
+
+        var date = value.Value;
+        return date.Day == DateTime.DaysInMonth(date.Year, date.Month);
     }
 }

@@ -1,8 +1,10 @@
-using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests.MustClauses;
+using Xunit.Abstractions;
 
 namespace PineGuard.MustClauses.UnitTests;
 
-public class MustDateOnlyClausesTests : BaseUnitTest
+public class MustDateOnlyClausesTests(ITestOutputHelper output) : BaseMustUnitTest(output)
 {
     [Theory]
     [MemberData(nameof(MustDateOnlyClausesTestData.Past.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.Past))]
@@ -313,5 +315,106 @@ public class MustDateOnlyClausesTests : BaseUnitTest
     {
         var result = Must.Be.NotWithinCalendarMonths(testCase.Value.value, testCase.Value.target, testCase.Value.months);
         Assert.Equal(testCase.Expected, result.Success);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.Weekday.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.Weekday))]
+    [MemberData(nameof(MustDateOnlyClausesTestData.Weekday.InvalidCases), MemberType = typeof(MustDateOnlyClausesTestData.Weekday))]
+    public void Weekday_BehavesAsExpected(MustCase<DateOnly> tc)
+    {
+        // Act
+        var result = Must.Be.Weekday(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.Weekend.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.Weekend))]
+    [MemberData(nameof(MustDateOnlyClausesTestData.Weekend.InvalidCases), MemberType = typeof(MustDateOnlyClausesTestData.Weekend))]
+    public void Weekend_BehavesAsExpected(MustCase<DateOnly> tc)
+    {
+        // Act
+        var result = Must.Be.Weekend(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.FirstDayOfMonth.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.FirstDayOfMonth))]
+    [MemberData(nameof(MustDateOnlyClausesTestData.FirstDayOfMonth.InvalidCases), MemberType = typeof(MustDateOnlyClausesTestData.FirstDayOfMonth))]
+    public void FirstDayOfMonth_BehavesAsExpected(MustCase<DateOnly> tc)
+    {
+        // Act
+        var result = Must.Be.FirstDayOfMonth(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.NotFirstDayOfMonth.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.NotFirstDayOfMonth))]
+    [MemberData(nameof(MustDateOnlyClausesTestData.NotFirstDayOfMonth.InvalidCases), MemberType = typeof(MustDateOnlyClausesTestData.NotFirstDayOfMonth))]
+    public void NotFirstDayOfMonth_BehavesAsExpected(MustCase<DateOnly> tc)
+    {
+        // Act
+        var result = Must.Be.NotFirstDayOfMonth(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.LastDayOfMonth.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.LastDayOfMonth))]
+    [MemberData(nameof(MustDateOnlyClausesTestData.LastDayOfMonth.InvalidCases), MemberType = typeof(MustDateOnlyClausesTestData.LastDayOfMonth))]
+    public void LastDayOfMonth_BehavesAsExpected(MustCase<DateOnly> tc)
+    {
+        // Act
+        var result = Must.Be.LastDayOfMonth(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.NotLastDayOfMonth.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.NotLastDayOfMonth))]
+    [MemberData(nameof(MustDateOnlyClausesTestData.NotLastDayOfMonth.InvalidCases), MemberType = typeof(MustDateOnlyClausesTestData.NotLastDayOfMonth))]
+    public void NotLastDayOfMonth_BehavesAsExpected(MustCase<DateOnly> tc)
+    {
+        // Act
+        var result = Must.Be.NotLastDayOfMonth(tc.Value, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.MinimumAge.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.MinimumAge))]
+    [MemberData(nameof(MustDateOnlyClausesTestData.MinimumAge.InvalidCases), MemberType = typeof(MustDateOnlyClausesTestData.MinimumAge))]
+    public void MinimumAge_BehavesAsExpected(MustCase<(DateOnly value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = Must.Be.MinimumAge(value, years, FixedTimeProvider.Default, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateOnlyClausesTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(MustDateOnlyClausesTestData.MinimumAgeOnLeapDay))]
+    public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(MustCase<(DateOnly value, int years, DateTimeOffset utcNow)> tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = tc.Value;
+
+        // Act
+        var result = Must.Be.MinimumAge(value, years, new FixedTimeProvider(utcNow), paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
     }
 }

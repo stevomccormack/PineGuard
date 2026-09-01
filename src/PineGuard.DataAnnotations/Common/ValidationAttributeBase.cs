@@ -128,6 +128,31 @@ public abstract class ValidationAttributeBase(Type expectedType, string code, bo
         result.Success ? ValidationResult.Success : BuildFailureResult(result.Message, context);
 
     /// <summary>
+    /// Resolves the <see cref="TimeProvider"/> a clock-reading attribute should validate against from the
+    /// validation context's service provider.
+    /// </summary>
+    /// <param name="validationContext">The validation context for the current member.</param>
+    /// <returns>
+    /// The registered <see cref="TimeProvider"/>, or <see langword="null"/> when the context resolves no
+    /// service — which every clock-reading must-clause already reads as "use the system clock".
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// Every other PineGuard layer takes the clock as a <c>TimeProvider? timeProvider = null</c> parameter.
+    /// An attribute cannot: its arguments must be compile-time constants, and a <see cref="TimeProvider"/>
+    /// is not one. Service resolution is the substitute seam — a test (or a host) registers the provider on
+    /// the <see cref="ValidationContext"/>, and the attribute reads it at validation time.
+    /// </para>
+    /// <para>
+    /// <see cref="ValidationContext"/> implements <see cref="IServiceProvider"/> over the
+    /// <c>serviceProvider</c> passed to its constructor, so a <c>new ValidationContext(instance)</c> with no
+    /// provider simply yields <see langword="null"/> here and the system clock applies.
+    /// </para>
+    /// </remarks>
+    protected static TimeProvider? ResolveTimeProvider(ValidationContext validationContext) =>
+        validationContext.GetService(typeof(TimeProvider)) as TimeProvider;
+
+    /// <summary>
     /// Builds an argument array suitable for reflective invocation of a must-clause method, filling
     /// positional parameters and defaulting trailing optional parameters.
     /// </summary>
