@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class DateTimeOffsetAttributesTests
+public sealed class DateTimeOffsetAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     private static void Verify<TAttribute>(TAttribute attribute, DateTimeOffsetAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
@@ -38,4 +41,36 @@ public sealed class DateTimeOffsetAttributesTests
     [MemberData(nameof(DateTimeOffsetAttributesTestData.FutureOrPresentDateTimeOffset.InvalidCases), MemberType = typeof(DateTimeOffsetAttributesTestData.FutureOrPresentDateTimeOffset))]
     public void FutureOrPresentDateTimeOffset_ShouldReturnExpected(DateTimeOffsetAttributesTestData.ValidCase testCase)
         => Verify(new FutureOrPresentDateTimeOffsetAttribute(), testCase);
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetAttributesTestData.PastDateTimeOffsetOnAnInjectedClock.Cases), MemberType = typeof(DateTimeOffsetAttributesTestData.PastDateTimeOffsetOnAnInjectedClock))]
+    public void PastDateTimeOffset_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((DateTimeOffset value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new PastDateTimeOffsetAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetAttributesTestData.FutureDateTimeOffsetOnAnInjectedClock.Cases), MemberType = typeof(DateTimeOffsetAttributesTestData.FutureDateTimeOffsetOnAnInjectedClock))]
+    public void FutureDateTimeOffset_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((DateTimeOffset value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new FutureDateTimeOffsetAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

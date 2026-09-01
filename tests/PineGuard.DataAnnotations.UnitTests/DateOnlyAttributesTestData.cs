@@ -1,4 +1,6 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.DateOnlyRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -168,6 +170,32 @@ public static class DateOnlyAttributesTestData
         public static TheoryData<ValidCase> InvalidCases =>
         [
             new("overlap", new DateOnly(2020, 1, 10), false) // range1=Jan10..Jan30, range2=Jan10..Jan20 — overlap
+        ];
+    }
+
+    // The clock-injection rows pin their own instant rather than share one provider. The subject sits in
+    // 2100, so a clock in 2200 puts it in the past and a clock in 2000 puts it in the future — verdicts that
+    // hold whatever the machine's clock reads, which is what makes them evidence the attribute resolved the
+    // TimeProvider off the ValidationContext instead of falling through to the system clock.
+    private static readonly DateOnly ClockSubject = new(2100, 01, 01);
+    private static readonly DateTimeOffset ClockAfterSubject = new(2200, 01, 01, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset ClockBeforeSubject = new(2000, 01, 01, 12, 0, 0, TimeSpan.Zero);
+
+    public static class PastDateOnlyOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(true)),
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(false, "Value must be in the past.", Code: MustCodes.Date.Relative.NotPast))
+        ];
+    }
+
+    public static class FutureDateOnlyOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(true)),
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(false, "Value must be in the future.", Code: MustCodes.Date.Relative.NotFuture))
         ];
     }
 }

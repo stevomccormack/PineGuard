@@ -50,4 +50,27 @@ public static class StringDateTimeOffsetAttributesTestData
             new("explicit non-utc offset outside window", "2024-01-15T10:30:00+05:00", new DataAnnotationExpected(false, "Value must be a date/time within the expected range."))
         ];
     }
+
+    // See DateOnlyAttributesTestData for why each row carries its own instant.
+    private const string ClockSubject = "2100-01-01T12:00:00+00:00";
+    private static readonly DateTimeOffset ClockAfterSubject = new(2200, 01, 01, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset ClockBeforeSubject = new(2000, 01, 01, 12, 0, 0, TimeSpan.Zero);
+
+    public static class PastDateTimeOffsetStringOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(true)),
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(false, "Value must be a date/time in the past.", Code: MustCodes.Date.Relative.NotPast))
+        ];
+    }
+
+    public static class FutureDateTimeOffsetStringOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(true)),
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(false, "Value must be a date/time in the future.", Code: MustCodes.Date.Relative.NotFuture))
+        ];
+    }
 }
