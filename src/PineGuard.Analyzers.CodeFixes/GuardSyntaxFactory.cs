@@ -58,8 +58,10 @@ internal static class GuardSyntaxFactory
                 return root;
         }
 
+        // ElasticEndOfLine(Environment.NewLine), not the fixed ElasticCarriageReturnLineFeed: a hardcoded
+        // CRLF here always mismatched CodeFixTest's expected output on Linux, where Environment.NewLine is LF.
         var guardClauses = UsingDirective(ParseName(GuardClausesNamespace))
-            .WithTrailingTrivia(ElasticCarriageReturnLineFeed)
+            .WithTrailingTrivia(ElasticEndOfLine(System.Environment.NewLine))
             .WithAdditionalAnnotations(Formatter.Annotation);
 
         return root.AddUsings(guardClauses);
