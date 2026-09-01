@@ -41,3 +41,41 @@ public sealed class SlugAttribute() : ValidationAttributeBase(typeof(string), Mu
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is a canonical ULID
+/// (26 Crockford base32 characters).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustIdentifierClauses.Ulid"/>. Supported on properties, fields, and parameters
+/// of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// The textual form is checked only — the embedded timestamp is not interpreted. If the value is
+/// <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class EventModel
+/// {
+///     [Ulid]
+///     public string EventId { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="MustIdentifierClauses.Ulid"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/identifier">Identifier Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class UlidAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Identifier.Ulid.Invalid)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+
+        var result = Must.Be.Ulid(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}

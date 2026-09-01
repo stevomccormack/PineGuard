@@ -231,3 +231,40 @@ public sealed class PortNumberAttribute() : ValidationAttributeBase(typeof(int),
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field is a valid MAC address.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustNetworkClauses.MacAddress"/>. Supported on properties, fields, and parameters
+/// of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// The colon-separated, hyphen-separated and Cisco dotted forms are all accepted in either case, but the
+/// separators must be consistent — a value that mixes them fails, as does one that omits them entirely.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class NetworkModel
+/// {
+///     [MacAddress]
+///     public string HardwareAddress { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="MustNetworkClauses.MacAddress"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/network">Network Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class MacAddressAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Network.Mac.Invalid)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.MacAddress(strValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}

@@ -4,7 +4,7 @@ using PineGuard.MustClauses;
 namespace PineGuard.GuardClauses;
 
 /// <summary>
-/// Guard clauses for binary buffer encodings (hex, Base64).
+/// Guard clauses for binary buffer encodings (hex, Base64, base64url, UTF-8).
 /// </summary>
 /// <seealso href="https://pineguard.ai/docs/guard/buffer">Guard Buffer Clauses documentation</seealso>
 public static class GuardBufferClauses
@@ -183,6 +183,101 @@ public static class GuardBufferClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         var result = Must.Be.NotBase64(value, paramName); // Guard.Against.Base64 => Must.Be.NotBase64 (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> is not a valid base64url-encoded string.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The string to guard as base64url.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustBufferClauses.Base64Url"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is not valid base64url and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// This guard is the complement of <see cref="MustBufferClauses.Base64Url"/>:
+    /// <c>Guard.Against.NotBase64Url</c> passes for the URL-safe RFC 4648 §5 alphabet, where
+    /// <c>-</c> and <c>_</c> replace <c>+</c> and <c>/</c> and the trailing padding is optional.
+    /// A plain Base64 string carrying <c>+</c> or <c>/</c> therefore fails this guard.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// Guard.Against.NotBase64Url(jwtSegment);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustBufferClauses.Base64Url"/>
+    public static string NotBase64Url(this IGuardClause _,
+        string? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Base64Url(value, paramName); // Guard.Against.NotBase64Url => Must.Be.Base64Url (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> is not a well-formed UTF-8 byte sequence.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The bytes to guard as UTF-8.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustBufferClauses.Utf8"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> is not valid UTF-8 and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// This guard is the complement of <see cref="MustBufferClauses.Utf8"/>:
+    /// <c>Guard.Against.NotUtf8</c> passes only when the bytes decode as UTF-8 without substitution,
+    /// so overlong encodings, unpaired surrogates, truncated sequences and code points above U+10FFFF
+    /// all throw — as does an empty buffer, which carries no text. Reach for it at a boundary that
+    /// accepts raw bytes and is about to treat them as text.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// Guard.Against.NotUtf8(requestBody);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustBufferClauses.Utf8"/>
+    public static byte[] NotUtf8(this IGuardClause _,
+        byte[]? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Utf8(value, paramName); // Guard.Against.NotUtf8 => Must.Be.Utf8 (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

@@ -15,4 +15,14 @@ public static class FluentIdentifierExtensionsTestData
             _ => new FluentExpected(false, "Value must be a valid slug.", Code: MustCodes.Identifier.Slug.Invalid)
         });
     }
+
+    public static class Ulid
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.IsUlid.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsUlid.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be a valid ULID.", Code: MustCodes.Identifier.Ulid.Invalid)
+        });
+    }
 }

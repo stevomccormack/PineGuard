@@ -14,4 +14,14 @@ public static class BufferRulesTestData
     {
         public static TheoryData<RuleCase<string?>> Cases => F.IsBase64.AllScenarios.ToRuleCases();
     }
+
+    public static class IsBase64Url
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.IsBase64Url.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsUtf8
+    {
+        public static TheoryData<RuleCase<byte[]?>> Cases => F.IsUtf8.AllScenarios.ToRuleCases();
+    }
 }

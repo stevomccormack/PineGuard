@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>IPipelineBehavior that validates MediatR requests with PineGuard validators — throw MustValidationException or return your own failure response.</Description>
+    <PackageTags>$(PackageTags);mediatr;mediator;pipeline-behavior;cqrs;request-validation</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.MediatR.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
+    <ProjectReference Include="..\PineGuard.Extensions.DependencyInjection\PineGuard.Extensions.DependencyInjection.csproj" />
+  </ItemGroup>
+
+</Project>

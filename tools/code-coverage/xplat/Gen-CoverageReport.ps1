@@ -36,7 +36,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release')] [string] $Configuration = 'Debug',
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'All', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Testing')] [string] $Scope = 'Core',
     [switch] $Clean,
     [switch] $NoOpen,
     [switch] $SkipHtml,
@@ -82,7 +82,7 @@ function Test-CoverageLooksValid {
     }
 
     $repoRootForScopeCheck = Get-RepoRoot
-    $scopeRegistryEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing')) {
+    $scopeRegistryEntry = if ($Scope -in @(Get-PineGuardScope -All | ForEach-Object Name)) {
         Get-PineGuardScope -Name $Scope
     }
     else {
@@ -151,18 +151,20 @@ if ($Clean) {
 Ensure-Directory -Path $generatedRoot
 Ensure-Directory -Path $resultsRoot
 
-$generateScopeEntry = if ($Scope -in @('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing')) {
+$generateScopeEntry = if ($Scope -in @(Get-PineGuardScope -All | ForEach-Object Name)) {
     Get-PineGuardScope -Name $Scope
 }
 else {
     $null
 }
 
+# A scope contributes one pattern per assembly it ships (Analyzers ships two), and
+# Write-CoverletRunSettings joins them into the ';'-separated <Include> coverlet expects.
 $includePatterns = if ($null -ne $generateScopeEntry) {
-    @($generateScopeEntry.CoverageIncludePattern)
+    @($generateScopeEntry.CoverageIncludePatterns)
 }
 else {
-    @(Get-PineGuardScope -All | ForEach-Object CoverageIncludePattern)
+    @(Get-PineGuardScope -All | ForEach-Object CoverageIncludePatterns)
 }
 
 # For speed, default to the single most relevant test project for the selected scope.

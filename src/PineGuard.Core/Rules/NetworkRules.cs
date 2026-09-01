@@ -8,6 +8,14 @@ namespace PineGuard.Rules;
 /// <seealso href="https://pineguard.ai/docs/rules/network">Network Rules documentation</seealso>
 public static class NetworkRules
 {
+    private const int MacOctetCount = 6;
+    private const int MacOctetHexLength = 2;
+    private const int MacCiscoGroupCount = 3;
+    private const int MacCiscoGroupHexLength = 4;
+    private const char MacColonSeparator = ':';
+    private const char MacHyphenSeparator = '-';
+    private const char MacDotSeparator = '.';
+
     /// <summary>
     /// Determines whether the specified value is a valid IP address (IPv4 or IPv6).
     /// </summary>
@@ -113,4 +121,55 @@ public static class NetworkRules
     /// </example>
     public static bool IsPortNumber(int? value) =>
         value is >= 1 and <= 65535;
+
+    /// <summary>
+    /// Determines whether the specified value is a MAC (media access control) address.
+    /// </summary>
+    /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> is a MAC address in one of the three conventional
+    /// notations; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// Accepts the IEEE colon and hyphen notations (<c>xx:xx:xx:xx:xx:xx</c>, <c>xx-xx-xx-xx-xx-xx</c>) and the
+    /// Cisco dotted-triplet notation (<c>xxxx.xxxx.xxxx</c>), in either hex case. The separator must be used
+    /// consistently, so a mixture such as <c>01:23-45:67:89:AB</c> is rejected. Leading and trailing whitespace
+    /// is trimmed before validation.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// bool valid = NetworkRules.IsMacAddress("01:23:45:67:89:AB"); // true
+    /// bool valid = NetworkRules.IsMacAddress("0123.4567.89ab");    // true
+    /// bool invalid = NetworkRules.IsMacAddress("01:23:45:67:89");  // false
+    /// </code>
+    /// </example>
+    public static bool IsMacAddress(string? value)
+    {
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            return false;
+
+        return IsGroupedHex(trimmed, MacOctetCount, MacOctetHexLength, MacColonSeparator)
+            || IsGroupedHex(trimmed, MacOctetCount, MacOctetHexLength, MacHyphenSeparator)
+            || IsGroupedHex(trimmed, MacCiscoGroupCount, MacCiscoGroupHexLength, MacDotSeparator);
+    }
+
+    private static bool IsGroupedHex(string value, int groupCount, int groupLength, char separator)
+    {
+        if (value.Length != groupCount * groupLength + groupCount - 1)
+            return false;
+
+        for (var index = 0; index < value.Length; index++)
+        {
+            var isSeparatorPosition = (index + 1) % (groupLength + 1) == 0;
+
+            if (isSeparatorPosition
+                ? value[index] != separator
+                : !CharRules.IsHexDigit(value[index]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

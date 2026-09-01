@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../../../src/PineGuard.Analyzers/PineGuard.Analyzers.csproj" />
+  <Project Path="../../../src/PineGuard.Analyzers.CodeFixes/PineGuard.Analyzers.CodeFixes.csproj" />
+  <Project Path="../../../tests/PineGuard.Analyzers.UnitTests/PineGuard.Analyzers.UnitTests.csproj" />
+</Solution>

@@ -262,4 +262,14 @@ public static class FluentHttpExtensionsTestData
             new(nameof(F.HasContentType.JsonHeaders), (F.HasContentType.JsonHeaders, ["application/json"]), new FluentExpected(false, "Value must not contain an allowed Content-Type."))
         ];
     }
+
+    public static class MediaType
+    {
+        public static TheoryData<FluentCase<string?>> Cases => F.IsMediaType.AllScenarios.ToFluentCases(s => s.Name switch
+        {
+            nameof(F.IsMediaType.NullValue) => new FluentExpected(true),
+            _ when s.IsValid => new FluentExpected(true),
+            _ => new FluentExpected(false, "Value must be a valid media type.", Code: MustCodes.Http.MediaType.Invalid)
+        });
+    }
 }

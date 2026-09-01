@@ -16,4 +16,15 @@ public static class MustIdentifierClausesTestData
             _ => new MustExpected(false, "value must be a valid slug.", Code: MustCodes.Identifier.Slug.Invalid)
         });
     }
+
+    public static class Ulid
+    {
+        public static TheoryData<MustCase<string?>> ValidCases => F.IsUlid.AllValid.ToMustCases();
+
+        public static TheoryData<MustCase<string?>> InvalidCases => F.IsUlid.AllInvalid.ToMustCases(s => s.Name switch
+        {
+            nameof(F.IsUlid.NullValue) => new MustExpected(false, "value must not be null.", "value", MustCodes.Identifier.Ulid.Invalid),
+            _ => new MustExpected(false, "value must be a valid ULID.", Code: MustCodes.Identifier.Ulid.Invalid)
+        });
+    }
 }

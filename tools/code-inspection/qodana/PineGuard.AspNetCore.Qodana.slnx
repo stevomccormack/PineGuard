@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../../../src/PineGuard.AspNetCore/PineGuard.AspNetCore.csproj" />
+  <Project Path="../../../tests/PineGuard.AspNetCore.UnitTests/PineGuard.AspNetCore.UnitTests.csproj" />
+</Solution>

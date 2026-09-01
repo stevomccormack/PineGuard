@@ -193,6 +193,14 @@ public static partial class GuardStringClausesTestData
         ];
     }
 
+    // Guard.Against.NotRegexPattern — throws when value is NOT a valid regex pattern (delegates to Must.Be.RegexPattern)
+    public static class NotRegexPattern
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.IsRegexPattern.ValidScenarios.ToGuardCases();
+
+        public static TheoryData<GuardCase<string?>> InvalidCases => F.IsRegexPattern.InvalidScenarios.ToGuardCases(s => new GuardExpected(false, s.IsNull ? typeof(ArgumentNullException) : typeof(ArgumentException), "value", Code: MustCodes.Text.Pattern.Invalid));
+    }
+
     // Guard.Against.NotAlphabetic — throws when value is NOT alphabetic (calls Must.Be.Alphabetic)
     public static class NotAlphabetic
     {
