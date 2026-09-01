@@ -58,6 +58,7 @@ $paths = @(
     'src/PineGuard.DataAnnotations/AGENTS.md',
     'src/PineGuard.Extensions.Options/AGENTS.md',
     'src/PineGuard.Extensions.DependencyInjection/AGENTS.md',
+    'src/PineGuard.AspNetCore/AGENTS.md',
     'src/PineGuard.ErrorOr/AGENTS.md',
     'src/PineGuard.FluentResults/AGENTS.md',
     'src/PineGuard.OneOf/AGENTS.md',

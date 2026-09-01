@@ -48,7 +48,7 @@
 [CmdletBinding()]
 param(
     [ValidateRange(1, 500)] [int] $Top = 30,
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
     [string] $IncludeFileRegex,
     [string] $ExcludeFileRegex,
     [string] $IncludeClassNameRegex,

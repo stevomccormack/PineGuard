@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/PineGuard.Analyzers.CodeFixes/PineGuard.Analyzers.CodeFixes.csproj" />
     <Project Path="src/PineGuard.Analyzers/PineGuard.Analyzers.csproj" />
+    <Project Path="src/PineGuard.AspNetCore/PineGuard.AspNetCore.csproj" />
     <Project Path="src/PineGuard.ErrorOr/PineGuard.ErrorOr.csproj" />
     <Project Path="src/PineGuard.Extensions.DependencyInjection/PineGuard.Extensions.DependencyInjection.csproj" />
     <Project Path="src/PineGuard.FluentResults/PineGuard.FluentResults.csproj" />
@@ -10,6 +11,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PineGuard.Analyzers.UnitTests/PineGuard.Analyzers.UnitTests.csproj" />
+    <Project Path="tests/PineGuard.AspNetCore.UnitTests/PineGuard.AspNetCore.UnitTests.csproj" />
     <Project Path="tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj" />
     <Project Path="tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj" />
     <Project Path="tests/PineGuard.ErrorOr.UnitTests/PineGuard.ErrorOr.UnitTests.csproj" />

@@ -1,0 +1,11 @@
+version: "1.0"
+
+linter: qodana-dotnet
+
+profile:
+  name: qodana.recommended
+
+dotnet:
+  solution: tools/code-inspection/qodana/PineGuard.AspNetCore.Qodana.slnx
+
+bootstrap: dotnet build tools/code-inspection/qodana/PineGuard.AspNetCore.Qodana.slnx -c Release
