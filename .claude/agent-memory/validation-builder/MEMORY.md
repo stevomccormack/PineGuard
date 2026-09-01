@@ -24,3 +24,4 @@
 - [Fluent adapter nuances](fluent-adapter-nuances.md) — the two null conventions in-repo and which is normative, config-param messages arriving pre-formatted, folding extra scenarios into `Cases`, unconsumed validators hiding gaps
 - [Result bridges are not Integrations](result-bridge-layer.md) — why "Must owns messages" doesn't bind on ErrorOr/FluentResults/OneOf, and what does
 - [TestServer end-to-end cases](testserver-integration-tests.md) — capture a framework-written body before writing its expectations; where the `EndToEnd` group lives
+- [Analyzer package verification](analyzer-package-verification.md) — Info diagnostics never print in `dotnet build`; consumer smoke projects under `artifacts/` need local props stubs
