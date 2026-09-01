@@ -22,6 +22,16 @@ public static partial class MustCodes
             public const string WellFormed = Prefix + ".well-formed";
         }
 
+        /// <summary>The Base64Url form of the value: RFC 4648 §5's URL- and filename-safe alphabet.</summary>
+        public static class Base64url
+        {
+            /// <summary>The code prefix for this node (<c>"encoding.base64url"</c>).</summary>
+            public const string Prefix = Encoding.Prefix + ".base64url";
+
+            /// <summary><c>encoding.base64url.invalid</c></summary>
+            public const string Invalid = Prefix + ".invalid";
+        }
+
         /// <summary>The hexadecimal form of the value.</summary>
         public static class Hex
         {
@@ -33,6 +43,16 @@ public static partial class MustCodes
 
             /// <summary><c>encoding.hex.well-formed</c></summary>
             public const string WellFormed = Prefix + ".well-formed";
+        }
+
+        /// <summary>The UTF-8 form of the value: whether the bytes decode as well-formed UTF-8 text.</summary>
+        public static class Utf8
+        {
+            /// <summary>The code prefix for this node (<c>"encoding.utf8"</c>).</summary>
+            public const string Prefix = Encoding.Prefix + ".utf8";
+
+            /// <summary><c>encoding.utf8.invalid</c></summary>
+            public const string Invalid = Prefix + ".invalid";
         }
     }
 }

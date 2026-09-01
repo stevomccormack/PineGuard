@@ -1,6 +1,6 @@
 ---
 name: fluent-adapter-nuances
-description: Writing a new Fluent*Extensions file — which null convention to follow when the repo shows two, how a config-param failure message reaches the user, and how to add extra scenarios without a second dataset
+description: Writing a new Fluent*Extensions file — which null convention to follow when the repo shows two, how a config-param failure message reaches the user, how to add extra scenarios without a second dataset, and why an unconsumed validator class hides an uncovered extension
 metadata:
   type: feedback
 ---
@@ -58,3 +58,20 @@ expression — `TheoryData<T>` is spreadable into `TheoryData<T>`, which is also
 joins datasets. See [[MEMORY]] for the per-layer dataset rules and [[must-codes-catalogue]] for why
 those extra cases still assert the rule's build-time code rather than the code the clause actually
 returned.
+
+**A declared-but-unconsumed `XxxValidator` is a silently uncovered extension.**
+Adding a Fluent extension touches three places — the extension, a `Cases` group, a validator nested
+class — but the `[Theory]` that ties them together is a fourth, and nothing fails if you skip it.
+The validator is `private sealed`, so an unused one is not even a warning; the suite still goes green
+with a higher test count than before, because the *other* groups grew. Only a full-scope
+`-Enforce100` coverage run catches it, and if the batch runs that gate once at the end rather than
+per commit, the gap can sit through several commits. (It did: `Base64Url` shipped in `4979580` with a
+validator and a full `Cases` group and no test method.)
+
+**Why:** the per-commit signal (build clean, tests pass, count went up) is indistinguishable between
+"wired up" and "wired up except the theory". The coverage gate is the only real check.
+
+**How to apply:** after editing a Fluent Tests file, count `XxxValidator` declarations against
+`[Theory]` methods — they must be 1:1. Do this before committing rather than trusting the end-of-batch
+gate. Same audit applies to any layer whose test entry point is a separate declaration from the
+subject under test.

@@ -144,6 +144,21 @@ public sealed class GuardHttpClausesTests(ITestOutputHelper output) : BaseGuardU
         AssertCustomMessage(tc, () => Guard.Against.NotHasContentType(headers, tc.Value.allowed, message: CustomMessage));
     }
 
+    // Guard.Against.NotMediaType
+    [Theory]
+    [MemberData(nameof(TD.NotMediaType.ValidCases), MemberType = typeof(TD.NotMediaType))]
+    [MemberData(nameof(TD.NotMediaType.InvalidCases), MemberType = typeof(TD.NotMediaType))]
+    public void NotMediaType_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        // Arrange
+        var value = tc.Value;
+
+        // Act + Assert
+        var result = AssertResult(tc, () => Guard.Against.NotMediaType(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotMediaType(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
     [Theory]
     [MemberData(nameof(TD.NotHasHeaderValueOverload.ValidCases), MemberType = typeof(TD.NotHasHeaderValueOverload))]
     [MemberData(nameof(TD.NotHasHeaderValueOverload.InvalidCases), MemberType = typeof(TD.NotHasHeaderValueOverload))]

@@ -114,6 +114,21 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
+    // Guard.Against.NotMacAddress
+    [Theory]
+    [MemberData(nameof(TD.NotMacAddress.ValidCases), MemberType = typeof(TD.NotMacAddress))]
+    [MemberData(nameof(TD.NotMacAddress.InvalidCases), MemberType = typeof(TD.NotMacAddress))]
+    public void NotMacAddress_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        // Arrange
+        var value = tc.Value;
+
+        // Act + Assert
+        var result = AssertResult(tc, () => Guard.Against.NotMacAddress(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotMacAddress(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
     // Guard.Against.IpAddress
     [Theory]
     [MemberData(nameof(TD.IpAddress.ValidCases), MemberType = typeof(TD.IpAddress))]

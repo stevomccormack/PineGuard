@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Roslyn analyzers load into the compiler, which is netstandard2.0-only.
+         Overrides the netstandard2.1;net8.0;net10.0 set in Directory.Build.props. Clearing
+         TargetFrameworks (plural) makes this a single-TFM project, so $(OutputPath) carries the
+         netstandard2.0 segment during pack — a cross-targeting outer build would not. -->
+    <TargetFrameworks />
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Roslyn analyzers and code fixes that spot hand-rolled argument checks and offer the equivalent PineGuard guard clause.</Description>
+    <PackageTags>$(PackageTags);roslyn;analyzer;analyzers;code-fix;code-analysis;diagnostics</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <!-- The package ships analyzers/dotnet/cs only — never a lib/ folder -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <!-- Directory.Build.props turns symbol packages on for every packable project. With
+         IncludeBuildOutput=false there is no lib/ assembly for a .snupkg to describe, so NuGet
+         would fail the pack with NU5017 (package has no dependencies nor content). -->
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!-- Both assemblies ship in the one package, side by side under analyzers/dotnet/cs -->
+  <ItemGroup>
+    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="..\PineGuard.Analyzers.CodeFixes\$(OutputPath)PineGuard.Analyzers.CodeFixes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.Analyzers.CodeFixes" />
+    <InternalsVisibleTo Include="PineGuard.Analyzers.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- RS2008 (analyzer release tracking) reads these; they are not compiled -->
+  <ItemGroup>
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+  </ItemGroup>
+
+  <!-- PineGuard.Analyzers.CodeFixes references THIS project (it needs DiagnosticIds), so the
+       ProjectReference-with-ReferenceOutputAssembly=false trick used by the Roslyn SDK template's
+       separate .Package project would be a reference cycle here. Build the code-fix assembly
+       explicitly instead, so its DLL exists when the <None Include> above is evaluated at pack. -->
+  <Target Name="BuildCodeFixesBeforePack" BeforeTargets="GenerateNuspec">
+    <MSBuild Projects="..\PineGuard.Analyzers.CodeFixes\PineGuard.Analyzers.CodeFixes.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)" />
+  </Target>
+
+</Project>

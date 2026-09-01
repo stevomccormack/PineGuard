@@ -148,6 +148,21 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
+    // Guard.Against.NotRegexPattern
+    [Theory]
+    [MemberData(nameof(TD.NotRegexPattern.ValidCases), MemberType = typeof(TD.NotRegexPattern))]
+    [MemberData(nameof(TD.NotRegexPattern.InvalidCases), MemberType = typeof(TD.NotRegexPattern))]
+    public void NotRegexPattern_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        // Arrange
+        var value = tc.Value;
+
+        // Act + Assert
+        var result = AssertResult(tc, () => Guard.Against.NotRegexPattern(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotRegexPattern(value, message: CustomMessage));
+        if (tc.Expected.IsValid) Assert.Equal(value, result);
+    }
+
     [Theory]
     [MemberData(nameof(TD.NotAlphabetic.ValidCases), MemberType = typeof(TD.NotAlphabetic))]
     [MemberData(nameof(TD.NotAlphabetic.InvalidCases), MemberType = typeof(TD.NotAlphabetic))]

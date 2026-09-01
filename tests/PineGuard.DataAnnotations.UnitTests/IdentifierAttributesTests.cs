@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public class IdentifierAttributesTests
+public sealed class IdentifierAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     private static void Verify<TAttribute>(TAttribute attribute, IdentifierAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
@@ -25,4 +27,19 @@ public class IdentifierAttributesTests
     [MemberData(nameof(IdentifierAttributesTestData.Slug.InvalidCases), MemberType = typeof(IdentifierAttributesTestData.Slug))]
     public void Slug_ShouldReturnExpected(IdentifierAttributesTestData.ValidCase testCase)
         => Verify(new SlugAttribute(), testCase);
+
+    [Theory]
+    [MemberData(nameof(IdentifierAttributesTestData.Ulid.Cases), MemberType = typeof(IdentifierAttributesTestData.Ulid))]
+    public void Ulid_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new UlidAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

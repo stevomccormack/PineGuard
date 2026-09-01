@@ -105,6 +105,21 @@
                 "./tests/PineGuard.Extensions.DependencyInjection.UnitTests/PineGuard.Extensions.DependencyInjection.UnitTests.csproj"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Test: AspNetCore (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.AspNetCore.UnitTests/PineGuard.AspNetCore.UnitTests.csproj"
+            ],
+            "problemMatcher": []
         },        {
             "label": "Test: ErrorOr (fast)",
             "type": "shell",
@@ -176,6 +191,7 @@
                 "Test: DataAnnotations (fast)",
                 "Test: Options (fast)",
                 "Test: DependencyInjection (fast)",
+                "Test: AspNetCore (fast)",
                 "Test: ErrorOr (fast)",
                 "Test: FluentResults (fast)",
                 "Test: OneOf (fast)",
@@ -634,6 +650,13 @@
                 "Quality: Qodana: DependencyInjection"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Inspect: Qodana: AspNetCore",
+            "dependsOn": [
+                "Quality: Qodana: AspNetCore"
+            ],
+            "problemMatcher": []
         },        {
             "label": "Inspect: Qodana: ErrorOr",
             "dependsOn": [
@@ -673,6 +696,7 @@
                 "Inspect: Qodana: DataAnnotations",
                 "Inspect: Qodana: Options",
                 "Inspect: Qodana: DependencyInjection",
+                "Inspect: Qodana: AspNetCore",
                 "Inspect: Qodana: ErrorOr",
                 "Inspect: Qodana: FluentResults",
                 "Inspect: Qodana: OneOf",
@@ -1025,6 +1049,25 @@
                 "-SkipHtml"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Coverage: AspNetCore (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-coverage/Run-CodeCoverage.ps1",
+                "-Mode",
+                "GenerateAndAnalyze",
+                "-Scope",
+                "AspNetCore",
+                "-NoOpen",
+                "-SkipHtml"
+            ],
+            "problemMatcher": []
         },        {
             "label": "Coverage: ErrorOr (fast)",
             "type": "shell",
@@ -1112,6 +1155,7 @@
                 "Coverage: DataAnnotations (fast)",
                 "Coverage: Options (fast)",
                 "Coverage: DependencyInjection (fast)",
+                "Coverage: AspNetCore (fast)",
                 "Coverage: ErrorOr (fast)",
                 "Coverage: FluentResults (fast)",
                 "Coverage: OneOf (fast)",
@@ -1246,6 +1290,23 @@
                 "./tools/code-inspection/Run-Qodana.ps1",
                 "-Scope",
                 "DependencyInjection",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Quality: Qodana: AspNetCore",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-inspection/Run-Qodana.ps1",
+                "-Scope",
+                "AspNetCore",
                 "-Clean",
                 "-Native"
             ],
@@ -1519,6 +1580,20 @@
                 "-AutoMessage"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit AspNetCore (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Commit-AspNetCore.ps1",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
         },        {
             "label": "Git: Commit ErrorOr (auto message)",
             "type": "shell",
@@ -1711,6 +1786,21 @@
                 "DependencyInjection"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Format: AspNetCore",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-formatter/Run-Format.ps1",
+                "-Scope",
+                "AspNetCore"
+            ],
+            "problemMatcher": []
         },        {
             "label": "Format: ErrorOr",
             "type": "shell",
@@ -1797,6 +1887,7 @@
                 "Format: DataAnnotations",
                 "Format: Options",
                 "Format: DependencyInjection",
+                "Format: AspNetCore",
                 "Format: ErrorOr",
                 "Format: FluentResults",
                 "Format: OneOf",

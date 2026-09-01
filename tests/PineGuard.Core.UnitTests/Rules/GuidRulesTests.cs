@@ -27,4 +27,15 @@ public sealed class GuidRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(GuidRulesTestData.HasVersion.Cases), MemberType = typeof(GuidRulesTestData.HasVersion))]
+    public void HasVersion_BehavesAsExpected(RuleCase<(Guid? value, int version)> tc)
+    {
+        // Act
+        var result = GuidRules.HasVersion(tc.Value.value, tc.Value.version);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

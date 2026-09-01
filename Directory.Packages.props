@@ -13,10 +13,25 @@
     <PackageVersion Include="FluentValidation" Version="11.12.0" />
     <!-- TimeProvider is in-box from net8.0 onwards; Core references this polyfill on netstandard2.1 only -->
     <PackageVersion Include="Microsoft.Bcl.TimeProvider" Version="10.0.11" />
+    <!-- TestHost is version-locked to the shared framework it hosts, so PineGuard.AspNetCore.UnitTests
+         takes the matching line per TFM rather than one central version -->
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="8.0.21" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="10.0.11" Condition="'$(TargetFramework)' != 'net8.0'" />
+    <!-- MediatR is pinned to the 12.5.x line: it is the last Apache-2.0 release, 13.x moved to a
+         commercial licence. The NuGet dependency range PineGuard publishes is >= 12.5.0, so a
+         consumer who has licensed 13.x may still use it — the 12-style next() call compiles on both -->
+    <PackageVersion Include="MediatR" Version="12.5.0" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.7.8" />
     <!-- Direct pins for audit-cli lifting vulnerable transitives (NU1903) -->
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="18.7.1" />
     <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.11" />
+    <!-- Roslyn analyzer/code-fix authoring (PineGuard.Analyzers). Microsoft.CodeAnalysis.Analyzers
+         supplies the RS1xxx/RS2xxx authoring rules that EnforceExtendedAnalyzerRules turns on -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <!-- Roslyn analyzer/code-fix test harness (Microsoft.CodeAnalysis.Testing, DefaultVerifier line) -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.4" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.4" />
     <!-- 5.x Workspaces.MSBuild pulls a net-framework-only Contracts package (NU1701) — stay on the 4.x family -->
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.14.0" />

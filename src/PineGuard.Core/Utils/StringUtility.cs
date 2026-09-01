@@ -1,4 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using PineGuard.Rules;
 
 namespace PineGuard.Utils;
@@ -125,6 +127,49 @@ public static partial class StringUtility
     /// <returns><see langword="true"/> if the conversion would succeed; otherwise, <see langword="false"/>.</returns>
     public static bool TitleCase(string? value)
         => TitleCase(value, out _);
+
+    /// <summary>
+    /// The match timeout applied to every <see cref="Regex"/> this library constructs (250 milliseconds).
+    /// </summary>
+    public static readonly System.TimeSpan RegexMatchTimeout = System.TimeSpan.FromMilliseconds(250);
+
+    /// <summary>
+    /// Attempts to compile the specified string as a regular expression.
+    /// </summary>
+    /// <param name="value">The pattern to compile. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
+    /// <param name="regex">When this method returns, contains the compiled expression if successful; otherwise, <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is a syntactically valid pattern; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// <para>
+    /// The <c>try</c>/<c>catch</c> here is deliberate, and is the only one of its kind in this library: the BCL offers
+    /// no <c>Regex.TryParse</c>, so constructing the expression is the only way to learn whether a pattern parses.
+    /// Only <see cref="ArgumentException"/> is caught, which covers both the <c>RegexParseException</c> thrown by the
+    /// newer targets and the plain <see cref="ArgumentException"/> thrown by <c>netstandard2.1</c>.
+    /// </para>
+    /// <para>
+    /// <paramref name="value"/> is not trimmed, because whitespace is significant inside a pattern — <c>" "</c> is a
+    /// valid expression that matches a space. An empty pattern is rejected instead: it compiles, but it names no
+    /// expression a caller could have meant. The returned expression carries <see cref="RegexMatchTimeout"/> so that a
+    /// pattern accepted here cannot later run unbounded against adversarial input.
+    /// </para>
+    /// </remarks>
+    public static bool TryCreateRegex(string? value, [NotNullWhen(true)] out Regex? regex)
+    {
+        regex = null;
+
+        if (string.IsNullOrEmpty(value))
+            return false;
+
+        try
+        {
+            regex = new Regex(value, RegexOptions.None, RegexMatchTimeout);
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+    }
 
     private delegate bool TryParseDelegate<T>(string value, out T parsed);
 

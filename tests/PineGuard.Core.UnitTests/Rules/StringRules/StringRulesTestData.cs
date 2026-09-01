@@ -238,6 +238,11 @@ public static class StringRulesTestData
             : ThrowsCase<(string? Value, string Suffix)>(Name, Input, ExpectedException);
     }
 
+    public static class IsRegexPattern
+    {
+        public static TheoryData<RuleCase<string?>> Cases => F.IsRegexPattern.AllScenarios.ToRuleCases();
+    }
+
     public static class HasByteOrderMark
     {
         public static TheoryData<RuleCase<string?>> Cases => F.HasByteOrderMark.AllScenarios.ToRuleCases();

@@ -27,4 +27,26 @@ public sealed class BufferRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(BufferRulesTestData.IsBase64Url.Cases), MemberType = typeof(BufferRulesTestData.IsBase64Url))]
+    public void IsBase64Url_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = BufferRules.IsBase64Url(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(BufferRulesTestData.IsUtf8.Cases), MemberType = typeof(BufferRulesTestData.IsUtf8))]
+    public void IsUtf8_BehavesAsExpected(RuleCase<byte[]?> tc)
+    {
+        // Act
+        var result = BufferRules.IsUtf8(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

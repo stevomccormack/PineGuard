@@ -28,4 +28,29 @@ public sealed class BufferUtilityTests : BaseUnitTest
         // Assert
         Assert.Equal(testCase.Expected, result);
     }
+
+    [Theory]
+    [MemberData(nameof(BufferUtilityTestData.IsBase64UrlString.ValidCases), MemberType = typeof(BufferUtilityTestData.IsBase64UrlString))]
+    [MemberData(nameof(BufferUtilityTestData.IsBase64UrlString.EdgeCases), MemberType = typeof(BufferUtilityTestData.IsBase64UrlString))]
+    public void IsBase64UrlString_ReturnsExpected(BufferUtilityTestData.IsBase64UrlString.ValidCase testCase)
+    {
+        // Act
+        var result = BufferUtility.IsBase64UrlString(testCase.Value);
+
+        // Assert
+        Assert.Equal(testCase.Expected, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(BufferUtilityTestData.TryDecodeUtf8.ValidCases), MemberType = typeof(BufferUtilityTestData.TryDecodeUtf8))]
+    [MemberData(nameof(BufferUtilityTestData.TryDecodeUtf8.EdgeCases), MemberType = typeof(BufferUtilityTestData.TryDecodeUtf8))]
+    public void TryDecodeUtf8_ReturnsExpected(BufferUtilityTestData.TryDecodeUtf8.ValidCase testCase)
+    {
+        // Act
+        var result = BufferUtility.TryDecodeUtf8(testCase.Value, out var text);
+
+        // Assert
+        Assert.Equal(testCase.Expected, result);
+        Assert.Equal(testCase.ExpectedOutValue, text);
+    }
 }
