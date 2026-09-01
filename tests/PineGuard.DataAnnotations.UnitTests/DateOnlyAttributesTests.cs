@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using PineGuard.Codes;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class DateOnlyAttributesTests
+public sealed class DateOnlyAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     private static void Verify<TAttribute>(TAttribute attribute, DateOnlyAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
@@ -128,4 +131,158 @@ public sealed class DateOnlyAttributesTests
     [MemberData(nameof(DateOnlyAttributesTestData.NotOverlappingDateOnly.InvalidCases), MemberType = typeof(DateOnlyAttributesTestData.NotOverlappingDateOnly))]
     public void NotOverlappingDateOnly_ShouldReturnExpected(DateOnlyAttributesTestData.ValidCase testCase)
         => Verify(new NotOverlappingDateOnlyAttribute("2020-01-30", "2020-01-10", "2020-01-20"), testCase);
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.PastDateOnlyOnAnInjectedClock.Cases), MemberType = typeof(DateOnlyAttributesTestData.PastDateOnlyOnAnInjectedClock))]
+    public void PastDateOnly_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((DateOnly value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new PastDateOnlyAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.FutureDateOnlyOnAnInjectedClock.Cases), MemberType = typeof(DateOnlyAttributesTestData.FutureDateOnlyOnAnInjectedClock))]
+    public void FutureDateOnly_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((DateOnly value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new FutureDateOnlyAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.WeekdayDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.WeekdayDateOnly))]
+    public void WeekdayDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new WeekdayDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.WeekendDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.WeekendDateOnly))]
+    public void WeekendDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new WeekendDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.FirstDayOfMonthDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.FirstDayOfMonthDateOnly))]
+    public void FirstDayOfMonthDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new FirstDayOfMonthDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.NotFirstDayOfMonthDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.NotFirstDayOfMonthDateOnly))]
+    public void NotFirstDayOfMonthDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotFirstDayOfMonthDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.LastDayOfMonthDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.LastDayOfMonthDateOnly))]
+    public void LastDayOfMonthDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new LastDayOfMonthDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.NotLastDayOfMonthDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.NotLastDayOfMonthDateOnly))]
+    public void NotLastDayOfMonthDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotLastDayOfMonthDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.MinimumAge.Cases), MemberType = typeof(DateOnlyAttributesTestData.MinimumAge))]
+    public void MinimumAge_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years) = ((DateOnly? value, int years))tc.Value!;
+        var attr = new MinimumAgeAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(FixedTimeProvider.Default);
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(DateOnlyAttributesTestData.MinimumAgeOnLeapDay))]
+    public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = ((DateOnly value, int years, DateTimeOffset utcNow))tc.Value!;
+        var attr = new MinimumAgeAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

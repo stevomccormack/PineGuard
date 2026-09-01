@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 
 namespace PineGuard.Testing.Fixtures;
@@ -255,6 +256,121 @@ public static class DateOnlyRulesFixtures
         ];
 
         public static RuleScenario<(DateOnly? value, DateOnly? reference, int days)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsWeekday
+    {
+        public static readonly DateOnly? Monday = new DateOnly(2024, 01, 01);
+        public static readonly DateOnly? Friday = new DateOnly(2024, 01, 05);
+        public static readonly DateOnly? Saturday = new DateOnly(2024, 01, 06);
+        public static readonly DateOnly? Sunday = new DateOnly(2024, 01, 07);
+        public static readonly DateOnly? NullValue = null;
+
+        public static RuleScenario<DateOnly?>[] ValidScenarios =>
+        [
+            new(nameof(Monday), Monday, true),
+            new(nameof(Friday), Friday, true)
+        ];
+
+        public static RuleScenario<DateOnly?>[] InvalidScenarios =>
+        [
+            new(nameof(Saturday), Saturday, false),
+            new(nameof(Sunday), Sunday, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsWeekend
+    {
+        public static readonly DateOnly? Saturday = new DateOnly(2024, 01, 06);
+        public static readonly DateOnly? Sunday = new DateOnly(2024, 01, 07);
+        public static readonly DateOnly? Monday = new DateOnly(2024, 01, 01);
+        public static readonly DateOnly? NullValue = null;
+
+        public static RuleScenario<DateOnly?>[] ValidScenarios =>
+        [
+            new(nameof(Saturday), Saturday, true),
+            new(nameof(Sunday), Sunday, true)
+        ];
+
+        public static RuleScenario<DateOnly?>[] InvalidScenarios =>
+        [
+            new(nameof(Monday), Monday, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsFirstDayOfMonth
+    {
+        public static readonly DateOnly? FirstDay = new DateOnly(2024, 02, 01);
+        public static readonly DateOnly? NotFirst = new DateOnly(2024, 02, 02);
+        public static readonly DateOnly? NullValue = null;
+
+        public static RuleScenario<DateOnly?>[] ValidScenarios =>
+        [
+            new(nameof(FirstDay), FirstDay, true)
+        ];
+
+        public static RuleScenario<DateOnly?>[] InvalidScenarios =>
+        [
+            new(nameof(NotFirst), NotFirst, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsLastDayOfMonth
+    {
+        public static readonly DateOnly? LastDayOfLeapFebruary = new DateOnly(2024, 02, 29);
+        public static readonly DateOnly? LastDayOfNonLeapFebruary = new DateOnly(2023, 02, 28);
+        public static readonly DateOnly? NotLast = new DateOnly(2024, 02, 28);
+        public static readonly DateOnly? NullValue = null;
+
+        public static RuleScenario<DateOnly?>[] ValidScenarios =>
+        [
+            new(nameof(LastDayOfLeapFebruary), LastDayOfLeapFebruary, true),
+            new(nameof(LastDayOfNonLeapFebruary), LastDayOfNonLeapFebruary, true)
+        ];
+
+        public static RuleScenario<DateOnly?>[] InvalidScenarios =>
+        [
+            new(nameof(NotLast), NotLast, false),
+            new(nameof(NullValue), NullValue, false)
+        ];
+
+        public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class HasMinimumAge
+    {
+        // Birth dates are placed around the instant FixedTimeProvider.Default reports, because that is the
+        // clock the tests inject. NotYetBorn is the scenario that proves the injection: it is in the future
+        // for the pinned clock and in the past for the machine's, so ignoring the provider fails it.
+        private static readonly DateOnly Today = DateOnly.FromDateTime(FixedTimeProvider.Default.GetUtcNow().UtcDateTime);
+
+        public static readonly (DateOnly? value, int years) WellOverAge = (Today.AddYears(-40), 18);
+        public static readonly (DateOnly? value, int years) TurnedEighteenYesterday = (Today.AddYears(-18).AddDays(-1), 18);
+        public static readonly (DateOnly? value, int years) TurnsEighteenToday = (Today.AddYears(-18), 18);
+        public static readonly (DateOnly? value, int years) BornTodayNoMinimum = (Today, 0);
+        public static readonly (DateOnly? value, int years) WellUnderAge = (Today.AddYears(-10), 18);
+        public static readonly (DateOnly? value, int years) NullValue = (null, 18);
+        public static readonly (DateOnly? value, int years) TurnsEighteenTomorrow = (Today.AddYears(-18).AddDays(1), 18);
+        public static readonly (DateOnly? value, int years) NotYetBorn = (Today.AddDays(1), 0);
+        public static readonly (DateOnly? value, int years) NegativeYears = (Today.AddYears(-40), -1);
+        public static readonly (DateOnly? value, int years) YearsBeyondTheCalendar = (Today.AddYears(-40), Today.Year);
+
+        public static RuleScenario<(DateOnly? value, int years)>[] ValidScenarios => [new(nameof(WellOverAge), WellOverAge, true), new(nameof(TurnedEighteenYesterday), TurnedEighteenYesterday, true)];
+        public static RuleScenario<(DateOnly? value, int years)>[] ValidEdgeScenarios => [new(nameof(TurnsEighteenToday), TurnsEighteenToday, true), new(nameof(BornTodayNoMinimum), BornTodayNoMinimum, true)];
+        public static RuleScenario<(DateOnly? value, int years)>[] InvalidScenarios => [new(nameof(WellUnderAge), WellUnderAge, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<(DateOnly? value, int years)>[] InvalidEdgeScenarios => [new(nameof(TurnsEighteenTomorrow), TurnsEighteenTomorrow, false), new(nameof(NotYetBorn), NotYetBorn, false), new(nameof(NegativeYears), NegativeYears, false), new(nameof(YearsBeyondTheCalendar), YearsBeyondTheCalendar, false)];
+        public static RuleScenario<(DateOnly? value, int years)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<(DateOnly? value, int years)>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<(DateOnly? value, int years)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
     public static class IsPast

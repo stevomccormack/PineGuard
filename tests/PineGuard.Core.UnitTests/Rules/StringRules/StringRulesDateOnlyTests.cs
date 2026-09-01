@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
 
@@ -19,11 +20,11 @@ public sealed class StringRulesDateOnlyTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesDateOnlyTestData.IsInPast.DynamicCases), MemberType = typeof(StringRulesDateOnlyTestData.IsInPast))]
-    public void IsInPast_Dynamic_BehavesAsExpected(RuleCase<string?> tc)
+    [MemberData(nameof(StringRulesDateOnlyTestData.IsInPast.PinnedClockCases), MemberType = typeof(StringRulesDateOnlyTestData.IsInPast))]
+    public void IsInPast_PinnedTimeProvider_BehavesAsExpected(RuleCase<string?> tc)
     {
         // Act
-        var result = PineGuard.Rules.StringRules.DateOnly.IsInPast(tc.Value);
+        var result = PineGuard.Rules.StringRules.DateOnly.IsInPast(tc.Value, timeProvider: FixedTimeProvider.Default);
 
         // Assert
         AssertResult(tc, result);
@@ -41,11 +42,11 @@ public sealed class StringRulesDateOnlyTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesDateOnlyTestData.IsInFuture.DynamicCases), MemberType = typeof(StringRulesDateOnlyTestData.IsInFuture))]
-    public void IsInFuture_Dynamic_BehavesAsExpected(RuleCase<string?> tc)
+    [MemberData(nameof(StringRulesDateOnlyTestData.IsInFuture.PinnedClockCases), MemberType = typeof(StringRulesDateOnlyTestData.IsInFuture))]
+    public void IsInFuture_PinnedTimeProvider_BehavesAsExpected(RuleCase<string?> tc)
     {
         // Act
-        var result = PineGuard.Rules.StringRules.DateOnly.IsInFuture(tc.Value);
+        var result = PineGuard.Rules.StringRules.DateOnly.IsInFuture(tc.Value, timeProvider: FixedTimeProvider.Default);
 
         // Assert
         AssertResult(tc, result);
@@ -60,6 +61,34 @@ public sealed class StringRulesDateOnlyTests(ITestOutputHelper output)
 
         // Act
         var result = PineGuard.Rules.StringRules.DateOnly.IsBetween(value, min, max, inclusion);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesDateOnlyTestData.HasMinimumAge.Cases), MemberType = typeof(StringRulesDateOnlyTestData.HasMinimumAge))]
+    public void HasMinimumAge_BehavesAsExpected(RuleCase<(string? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = PineGuard.Rules.StringRules.DateOnly.HasMinimumAge(value, years, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesDateOnlyTestData.HasMinimumAge.SystemClockCases), MemberType = typeof(StringRulesDateOnlyTestData.HasMinimumAge))]
+    public void HasMinimumAge_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<(string? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = PineGuard.Rules.StringRules.DateOnly.HasMinimumAge(value, years);
 
         // Assert
         AssertResult(tc, result);

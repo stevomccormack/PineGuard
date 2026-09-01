@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using Xunit.Abstractions;
 
@@ -68,5 +69,37 @@ public sealed class StringDateTimeOffsetAttributesTests(ITestOutputHelper output
 
         // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringDateTimeOffsetAttributesTestData.PastDateTimeOffsetStringOnAnInjectedClock.Cases), MemberType = typeof(StringDateTimeOffsetAttributesTestData.PastDateTimeOffsetStringOnAnInjectedClock))]
+    public void PastDateTimeOffsetString_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((string value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new PastDateTimeOffsetStringAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringDateTimeOffsetAttributesTestData.FutureDateTimeOffsetStringOnAnInjectedClock.Cases), MemberType = typeof(StringDateTimeOffsetAttributesTestData.FutureDateTimeOffsetStringOnAnInjectedClock))]
+    public void FutureDateTimeOffsetString_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((string value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new FutureDateTimeOffsetStringAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
     }
 }

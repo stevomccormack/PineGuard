@@ -18,6 +18,7 @@ public static class MustDateTimeClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -31,11 +32,12 @@ public static class MustDateTimeClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-time">Date Time Must Clauses documentation</seealso>
     public static MustResult<DateTime> Past(this IMustClause _,
         DateTime value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the past.";
 
-        var ok = DateTimeRules.IsInPast(value);
+        var ok = DateTimeRules.IsInPast(value, timeProvider: timeProvider);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, value);
     }
 
@@ -44,6 +46,7 @@ public static class MustDateTimeClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -57,11 +60,12 @@ public static class MustDateTimeClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-time">Date Time Must Clauses documentation</seealso>
     public static MustResult<DateTime> PastOrPresent(this IMustClause _,
         DateTime value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the past or present.";
 
-        var ok = DateTimeRules.IsInPast(value, Inclusion.Inclusive);
+        var ok = DateTimeRules.IsInPast(value, Inclusion.Inclusive, timeProvider);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, value);
     }
 
@@ -70,6 +74,7 @@ public static class MustDateTimeClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -83,11 +88,12 @@ public static class MustDateTimeClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-time">Date Time Must Clauses documentation</seealso>
     public static MustResult<DateTime> Future(this IMustClause _,
         DateTime value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the future.";
 
-        var ok = DateTimeRules.IsInFuture(value);
+        var ok = DateTimeRules.IsInFuture(value, timeProvider: timeProvider);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, value);
     }
 
@@ -96,6 +102,7 @@ public static class MustDateTimeClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -109,11 +116,12 @@ public static class MustDateTimeClauses
     /// <seealso href="https://pineguard.ai/docs/must/date-time">Date Time Must Clauses documentation</seealso>
     public static MustResult<DateTime> FutureOrPresent(this IMustClause _,
         DateTime value,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be in the future or present.";
 
-        var ok = DateTimeRules.IsInFuture(value, Inclusion.Inclusive);
+        var ok = DateTimeRules.IsInFuture(value, Inclusion.Inclusive, timeProvider);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, value);
     }
 
@@ -471,6 +479,7 @@ public static class MustDateTimeClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="days">The number of days within which the value must fall.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -485,11 +494,12 @@ public static class MustDateTimeClauses
     public static MustResult<DateTime> WithinDaysFromNow(this IMustClause _,
         DateTime value,
         int days,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must be within the expected number of days from now.";
 
-        var ok = DateTimeRules.IsWithinDaysFromNow(value, days);
+        var ok = DateTimeRules.IsWithinDaysFromNow(value, days, timeProvider);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Proximity.NotWithin, messageTemplate, paramName, value, value);
     }
 
@@ -499,6 +509,7 @@ public static class MustDateTimeClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="days">The number of days within which the value must fall.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -513,11 +524,12 @@ public static class MustDateTimeClauses
     public static MustResult<DateTime> NotWithinDaysFromNow(this IMustClause _,
         DateTime value,
         int days,
+        TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         const string messageTemplate = "{paramName} must not be within the expected number of days from now.";
 
-        var ok = !DateTimeRules.IsWithinDaysFromNow(value, days);
+        var ok = !DateTimeRules.IsWithinDaysFromNow(value, days, timeProvider);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Proximity.Within, messageTemplate, paramName, value, value);
     }
 
@@ -1060,5 +1072,40 @@ public static class MustDateTimeClauses
 
         var ok = !DateTimeRules.HasExplicitKind(value);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Kind.NotUnspecified, messageTemplate, paramName, value, value);
+    }
+
+    /// <summary>
+    /// Validates that the specified date of birth must meet the expected minimum age.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The date of birth to validate.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must meet the expected minimum age."</c>
+    /// A negative <paramref name="years"/> is a configuration error, reported against that parameter.
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/date-time">Date Time Must Clauses documentation</seealso>
+    public static MustResult<DateTime> MinimumAge(this IMustClause _,
+        DateTime value,
+        int years,
+        TimeProvider? timeProvider = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (years < 0)
+            return MustResult<DateTime>.Fail(MustCodes.Date.Age.BelowMinimum,
+                "{paramName} requires a non-negative number of years.", nameof(years), years);
+
+        const string messageTemplate = "{paramName} must meet the expected minimum age.";
+
+        var ok = DateTimeRules.HasMinimumAge(value, years, timeProvider);
+        return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Age.BelowMinimum, messageTemplate, paramName, value, value);
     }
 }

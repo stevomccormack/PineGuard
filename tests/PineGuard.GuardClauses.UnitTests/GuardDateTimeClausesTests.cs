@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using Xunit.Abstractions;
 using TD = PineGuard.GuardClauses.UnitTests.GuardDateTimeClausesTestData;
@@ -228,4 +229,15 @@ public sealed class GuardDateTimeClausesTests(ITestOutputHelper output) : BaseGu
     [MemberData(nameof(TD.ExplicitKind.InvalidCases), MemberType = typeof(TD.ExplicitKind))]
     public void ExplicitKind_BehavesAsExpected(GuardCase<DateTime> tc)
     { var value = tc.Value; var result = AssertResult(tc, () => Guard.Against.ExplicitKind(value)); AssertCustomMessage(tc, () => Guard.Against.ExplicitKind(value, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
+
+    [Theory]
+    [MemberData(nameof(TD.BelowMinimumAge.ValidCases), MemberType = typeof(TD.BelowMinimumAge))]
+    [MemberData(nameof(TD.BelowMinimumAge.InvalidCases), MemberType = typeof(TD.BelowMinimumAge))]
+    public void BelowMinimumAge_BehavesAsExpected(GuardCase<(DateTime value, int years)> tc)
+    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, FixedTimeProvider.Default)); AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, FixedTimeProvider.Default, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
+
+    [Theory]
+    [MemberData(nameof(TD.BelowMinimumAgeOnLeapDay.Cases), MemberType = typeof(TD.BelowMinimumAgeOnLeapDay))]
+    public void BelowMinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(GuardCase<(DateTime value, int years, DateTimeOffset utcNow)> tc)
+    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, new FixedTimeProvider(tc.Value.utcNow))); AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, new FixedTimeProvider(tc.Value.utcNow), message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
 }

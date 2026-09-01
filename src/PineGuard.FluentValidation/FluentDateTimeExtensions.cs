@@ -16,38 +16,50 @@ public static class FluentDateTimeExtensions
     /// <summary>Validates that the <see cref="DateTime"/> value is in the past.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <example><code>RuleFor(x => x.CreatedAt).Past();</code></example>
-    public static IRuleBuilderOptions<TModel, DateTime> Past<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Past(val, paramName: null),
+    public static IRuleBuilderOptions<TModel, DateTime> Past<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
+        TimeProvider? timeProvider = null,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.Past(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the <see cref="DateTime"/> value is in the past or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    public static IRuleBuilderOptions<TModel, DateTime> PastOrPresent<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.PastOrPresent(val, paramName: null),
+    public static IRuleBuilderOptions<TModel, DateTime> PastOrPresent<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
+        TimeProvider? timeProvider = null,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.PastOrPresent(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the <see cref="DateTime"/> value is in the future.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    public static IRuleBuilderOptions<TModel, DateTime> Future<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Future(val, paramName: null),
+    public static IRuleBuilderOptions<TModel, DateTime> Future<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
+        TimeProvider? timeProvider = null,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.Future(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the <see cref="DateTime"/> value is in the future or present.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    public static IRuleBuilderOptions<TModel, DateTime> FutureOrPresent<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.FutureOrPresent(val, paramName: null),
+    public static IRuleBuilderOptions<TModel, DateTime> FutureOrPresent<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
+        TimeProvider? timeProvider = null,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.FutureOrPresent(val, timeProvider, paramName: null),
             message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the <see cref="DateTime"/> value is between the specified bounds.</summary>
@@ -340,24 +352,28 @@ public static class FluentDateTimeExtensions
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="days">The maximum number of days allowed.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, DateTime> WithinDaysFromNow<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
         int days,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.WithinDaysFromNow(val, days, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.WithinDaysFromNow(val, days, timeProvider, paramName: null),
             message, MustCodes.Date.Proximity.NotWithin);
 
     /// <summary>Validates that the <see cref="DateTime"/> value is not within the specified number of days from now.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="days">The day threshold.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, DateTime> NotWithinDaysFromNow<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
         int days,
+        TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotWithinDaysFromNow(val, days, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.NotWithinDaysFromNow(val, days, timeProvider, paramName: null),
             message, MustCodes.Date.Proximity.Within);
 
     /// <summary>Validates that the <see cref="DateTime"/> value is within the specified time window of a reference.</summary>
@@ -565,4 +581,20 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime> NotExplicitKind<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotExplicitKind(val, paramName: null),
             message, MustCodes.Date.Kind.NotUnspecified);
+
+    /// <summary>Validates that the <see cref="DateTime"/> date of birth meets the expected minimum age.</summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>A negative <paramref name="years"/> is a configuration error, reported against that parameter.</remarks>
+    /// <example><code>RuleFor(x => x.DateOfBirth).MinimumAge(18);</code></example>
+    public static IRuleBuilderOptions<TModel, DateTime> MinimumAge<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
+        int years,
+        TimeProvider? timeProvider = null,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => Must.Be.MinimumAge(val, years, timeProvider, paramName: null),
+            message, MustCodes.Date.Age.BelowMinimum);
 }

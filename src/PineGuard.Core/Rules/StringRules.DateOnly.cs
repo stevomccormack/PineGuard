@@ -26,9 +26,10 @@ public static partial class StringRules
         /// accepts the whitespace-handling flags (<see cref="DateTimeStyles.AllowWhiteSpaces"/> and its constituents);
         /// passing any other flag causes parsing to fail for every input.
         /// </param>
+        /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
         /// <returns><see langword="true"/> if the parsed date is in the past; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInPast(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles) =>
-            StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInPast(parsed, inclusion);
+        public static bool IsInPast(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null) =>
+            StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInPast(parsed, inclusion, timeProvider);
 
         /// <summary>
         /// Determines whether the specified string parses to a date in the future.
@@ -41,9 +42,10 @@ public static partial class StringRules
         /// accepts the whitespace-handling flags (<see cref="DateTimeStyles.AllowWhiteSpaces"/> and its constituents);
         /// passing any other flag causes parsing to fail for every input.
         /// </param>
+        /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
         /// <returns><see langword="true"/> if the parsed date is in the future; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInFuture(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles) =>
-            StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInFuture(parsed, inclusion);
+        public static bool IsInFuture(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null) =>
+            StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInFuture(parsed, inclusion, timeProvider);
 
         /// <summary>
         /// Determines whether the specified string parses to a date within [<paramref name="min"/>, <paramref name="max"/>].
@@ -61,6 +63,29 @@ public static partial class StringRules
         /// <returns><see langword="true"/> if the parsed date falls within the specified range; otherwise, <see langword="false"/>.</returns>
         public static bool IsBetween(string? value, System.DateOnly min, System.DateOnly max, Inclusion inclusion = Inclusion.Inclusive, DateTimeStyles styles = DefaultStyles) =>
             StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsBetween(parsed, min, max, inclusion);
+
+        /// <summary>
+        /// Determines whether the specified string parses to a date of birth at least <paramref name="years"/> whole years ago.
+        /// </summary>
+        /// <param name="value">The value to validate. If <see langword="null"/> or not a valid date string, returns <see langword="false"/>.</param>
+        /// <param name="years">
+        /// The minimum age in whole years. Negative, or large enough to place the boundary before year one,
+        /// returns <see langword="false"/>.
+        /// </param>
+        /// <param name="styles">
+        /// The <see cref="DateTimeStyles"/> to apply when parsing. Defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
+        /// <see cref="System.DateOnly.TryParse(string?, IFormatProvider?, DateTimeStyles, out System.DateOnly)"/> only
+        /// accepts the whitespace-handling flags (<see cref="DateTimeStyles.AllowWhiteSpaces"/> and its constituents);
+        /// passing any other flag causes parsing to fail for every input.
+        /// </param>
+        /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+        /// <returns><see langword="true"/> if the parsed date of birth meets the minimum age; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// The age boundary is the one <see cref="DateOnlyRules.HasMinimumAge"/> documents, including how a
+        /// 29 February birth date behaves in a non-leap year.
+        /// </remarks>
+        public static bool HasMinimumAge(string? value, int years, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null) =>
+            StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.HasMinimumAge(parsed, years, timeProvider);
     }
 }
 #endif

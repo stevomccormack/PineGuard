@@ -1,5 +1,7 @@
+using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.GuardClauses;
+using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.DateOnlyRulesFixtures;
 
 namespace PineGuard.GuardClauses.UnitTests;
@@ -9,6 +11,7 @@ public static class GuardDateOnlyClausesTestData
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.UtcNow);
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly Yesterday = Today.AddDays(-1);
+    private static readonly DateOnly LeapDayBirth = new(2008, 02, 29);
 
     // Guard.Against.FutureOrPresent — throws when value IS future or present (calls Must.Be.Past)
     // ValidCases: value IS past — Guard does not throw
@@ -331,4 +334,95 @@ public static class GuardDateOnlyClausesTestData
             new("within 1 month", (Today, Today.AddMonths(1), 1), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
+
+    // Guard.Against.Weekend — throws when weekend; passes when weekday
+    // Delegates to Must.Be.Weekday
+    public static class Weekend
+    {
+        public static TheoryData<GuardCase<DateOnly>> ValidCases =>
+            F.IsWeekday.ValidScenarios.Except(nameof(F.IsWeekday.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<DateOnly>> InvalidCases =>
+            F.IsWeekday.InvalidScenarios.Except(nameof(F.IsWeekday.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Calendar.NotWeekday));
+    }
+
+    // Guard.Against.Weekday — throws when weekday; passes when weekend
+    // Delegates to Must.Be.Weekend (complement)
+    public static class Weekday
+    {
+        public static TheoryData<GuardCase<DateOnly>> ValidCases =>
+            F.IsWeekend.ValidScenarios.Except(nameof(F.IsWeekend.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<DateOnly>> InvalidCases =>
+            F.IsWeekend.InvalidScenarios.Except(nameof(F.IsWeekend.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Calendar.NotWeekend));
+    }
+
+    // Guard.Against.NotFirstDayOfMonth — throws when NOT first day; passes when first day
+    // Delegates to Must.Be.FirstDayOfMonth
+    public static class NotFirstDayOfMonth
+    {
+        public static TheoryData<GuardCase<DateOnly>> ValidCases =>
+            F.IsFirstDayOfMonth.ValidScenarios.Except(nameof(F.IsFirstDayOfMonth.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<DateOnly>> InvalidCases =>
+            F.IsFirstDayOfMonth.InvalidScenarios.Except(nameof(F.IsFirstDayOfMonth.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Calendar.NotFirstDayOfMonth));
+    }
+
+    // Guard.Against.FirstDayOfMonth — throws when first day; passes when NOT first day
+    // Delegates to Must.Be.NotFirstDayOfMonth (complement)
+    public static class FirstDayOfMonth
+    {
+        public static TheoryData<GuardCase<DateOnly>> ValidCases =>
+            F.IsFirstDayOfMonth.InvalidScenarios.Except(nameof(F.IsFirstDayOfMonth.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<DateOnly>> InvalidCases =>
+            F.IsFirstDayOfMonth.ValidScenarios.Except(nameof(F.IsFirstDayOfMonth.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Calendar.FirstDayOfMonth));
+    }
+
+    // Guard.Against.NotLastDayOfMonth — throws when NOT last day; passes when last day
+    // Delegates to Must.Be.LastDayOfMonth
+    public static class NotLastDayOfMonth
+    {
+        public static TheoryData<GuardCase<DateOnly>> ValidCases =>
+            F.IsLastDayOfMonth.ValidScenarios.Except(nameof(F.IsLastDayOfMonth.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<DateOnly>> InvalidCases =>
+            F.IsLastDayOfMonth.InvalidScenarios.Except(nameof(F.IsLastDayOfMonth.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Calendar.NotLastDayOfMonth));
+    }
+
+    // Guard.Against.LastDayOfMonth — throws when last day; passes when NOT last day
+    // Delegates to Must.Be.NotLastDayOfMonth (complement)
+    public static class LastDayOfMonth
+    {
+        public static TheoryData<GuardCase<DateOnly>> ValidCases =>
+            F.IsLastDayOfMonth.InvalidScenarios.Except(nameof(F.IsLastDayOfMonth.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<DateOnly>> InvalidCases =>
+            F.IsLastDayOfMonth.ValidScenarios.Except(nameof(F.IsLastDayOfMonth.NullValue)).Project(t => t!.Value).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Calendar.LastDayOfMonth));
+    }
+
+    // Guard.Against.BelowMinimumAge — throws when the birth date does NOT meet the minimum age (calls Must.Be.MinimumAge)
+    // ValidCases: the birth date meets the minimum age — Guard does not throw
+    // InvalidCases: the birth date falls short, or years is negative — Guard throws
+    // The fixture's NullValue scenario is dropped: this overload takes a non-nullable DateOnly.
+    public static class BelowMinimumAge
+    {
+        public static TheoryData<GuardCase<(DateOnly value, int years)>> ValidCases =>
+            F.HasMinimumAge.AllValid.Project(v => (v.value!.Value, v.years)).ToGuardCases(_ => new GuardExpected(true));
+
+        public static TheoryData<GuardCase<(DateOnly value, int years)>> InvalidCases =>
+            F.HasMinimumAge.AllInvalid.Except(nameof(F.HasMinimumAge.NullValue)).Project(v => (v.value!.Value, v.years)).ToGuardCases(s => s.Name switch
+            {
+                nameof(F.HasMinimumAge.NegativeYears) => new GuardExpected(false, typeof(ArgumentException), "years", Code: MustCodes.Date.Age.BelowMinimum),
+                _ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Age.BelowMinimum)
+            });
+    }
+
+    // A 29-February birth date has no anniversary in a non-leap year, so each case pins its own clock:
+    // here the boundary moves and the birth date stays put, which the shared provider cannot express.
+    public static class BelowMinimumAgeOnLeapDay
+    {
+        public static TheoryData<GuardCase<(DateOnly value, int years, DateTimeOffset utcNow)>> Cases =>
+        [
+            new("TwentyEighthOfFebruaryInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 02, 28)), new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Date.Age.BelowMinimum)),
+            new("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new GuardExpected(true)),
+            new("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new GuardExpected(true))
+        ];
+    }
+
+    private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);
 }

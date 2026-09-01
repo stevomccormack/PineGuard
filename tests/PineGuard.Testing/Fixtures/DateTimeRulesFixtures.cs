@@ -1,4 +1,5 @@
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 
 namespace PineGuard.Testing.Fixtures;
@@ -478,5 +479,34 @@ public static class DateTimeRulesFixtures
             new(nameof(NullValue), NullValue, false)
         ];
         public static RuleScenario<DateTime?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class HasMinimumAge
+    {
+        // Birth dates are placed around the instant FixedTimeProvider.Default reports, because that is the
+        // clock the tests inject. NotYetBorn is the scenario that proves the injection: it is in the future
+        // for the pinned clock and in the past for the machine's, so ignoring the provider fails it.
+        private static readonly DateTime Today = FixedTimeProvider.Default.GetUtcNow().UtcDateTime.Date;
+
+        public static readonly (DateTime? value, int years) WellOverAge = (Today.AddYears(-40), 18);
+        public static readonly (DateTime? value, int years) TurnedEighteenYesterday = (Today.AddYears(-18).AddDays(-1), 18);
+        public static readonly (DateTime? value, int years) TurnsEighteenToday = (Today.AddYears(-18), 18);
+        public static readonly (DateTime? value, int years) TurnsEighteenTodayLateInTheDay = (Today.AddYears(-18).AddHours(23).AddMinutes(59), 18);
+        public static readonly (DateTime? value, int years) BornTodayNoMinimum = (Today, 0);
+        public static readonly (DateTime? value, int years) LocalKindWellOverAge = (Today.AddYears(-40).ToLocalTime(), 18);
+        public static readonly (DateTime? value, int years) WellUnderAge = (Today.AddYears(-10), 18);
+        public static readonly (DateTime? value, int years) NullValue = (null, 18);
+        public static readonly (DateTime? value, int years) TurnsEighteenTomorrow = (Today.AddYears(-18).AddDays(1), 18);
+        public static readonly (DateTime? value, int years) NotYetBorn = (Today.AddDays(1), 0);
+        public static readonly (DateTime? value, int years) NegativeYears = (Today.AddYears(-40), -1);
+        public static readonly (DateTime? value, int years) YearsBeyondTheCalendar = (Today.AddYears(-40), Today.Year);
+
+        public static RuleScenario<(DateTime? value, int years)>[] ValidScenarios => [new(nameof(WellOverAge), WellOverAge, true), new(nameof(TurnedEighteenYesterday), TurnedEighteenYesterday, true)];
+        public static RuleScenario<(DateTime? value, int years)>[] ValidEdgeScenarios => [new(nameof(TurnsEighteenToday), TurnsEighteenToday, true), new(nameof(TurnsEighteenTodayLateInTheDay), TurnsEighteenTodayLateInTheDay, true), new(nameof(BornTodayNoMinimum), BornTodayNoMinimum, true), new(nameof(LocalKindWellOverAge), LocalKindWellOverAge, true)];
+        public static RuleScenario<(DateTime? value, int years)>[] InvalidScenarios => [new(nameof(WellUnderAge), WellUnderAge, false), new(nameof(NullValue), NullValue, false)];
+        public static RuleScenario<(DateTime? value, int years)>[] InvalidEdgeScenarios => [new(nameof(TurnsEighteenTomorrow), TurnsEighteenTomorrow, false), new(nameof(NotYetBorn), NotYetBorn, false), new(nameof(NegativeYears), NegativeYears, false), new(nameof(YearsBeyondTheCalendar), YearsBeyondTheCalendar, false)];
+        public static RuleScenario<(DateTime? value, int years)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<(DateTime? value, int years)>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<(DateTime? value, int years)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 }

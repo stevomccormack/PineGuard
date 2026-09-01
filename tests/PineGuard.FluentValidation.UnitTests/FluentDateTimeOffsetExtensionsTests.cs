@@ -1,4 +1,5 @@
 using FluentValidation;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
 
@@ -16,6 +17,10 @@ public sealed class FluentDateTimeOffsetExtensionsTests(ITestOutputHelper output
     private sealed class FutureValidator : AbstractValidator<Model> { public FutureValidator() => RuleFor(x => x.Value).Future(); }
     private sealed class PastOrPresentValidator : AbstractValidator<Model> { public PastOrPresentValidator() => RuleFor(x => x.Value).PastOrPresent(); }
     private sealed class FutureOrPresentValidator : AbstractValidator<Model> { public FutureOrPresentValidator() => RuleFor(x => x.Value).FutureOrPresent(); }
+    private sealed class PastPinnedClockValidator : AbstractValidator<Model> { public PastPinnedClockValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).Past(timeProvider); }
+    private sealed class PastOrPresentPinnedClockValidator : AbstractValidator<Model> { public PastOrPresentPinnedClockValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).PastOrPresent(timeProvider); }
+    private sealed class FuturePinnedClockValidator : AbstractValidator<Model> { public FuturePinnedClockValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).Future(timeProvider); }
+    private sealed class FutureOrPresentPinnedClockValidator : AbstractValidator<Model> { public FutureOrPresentPinnedClockValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).FutureOrPresent(timeProvider); }
     private sealed class BetweenValidator : AbstractValidator<Model> { public BetweenValidator(DateTimeOffset min, DateTimeOffset max) => RuleFor(x => x.Value).Between(min, max); }
     private sealed class NotBetweenValidator : AbstractValidator<Model> { public NotBetweenValidator(DateTimeOffset min, DateTimeOffset max) => RuleFor(x => x.Value).NotBetween(min, max); }
     private sealed class BeforeValidator : AbstractValidator<Model> { public BeforeValidator(DateTimeOffset other) => RuleFor(x => x.Value).Before(other); }
@@ -31,6 +36,12 @@ public sealed class FluentDateTimeOffsetExtensionsTests(ITestOutputHelper output
     private sealed class NotWithinValidator : AbstractValidator<Model> { public NotWithinValidator(DateTimeOffset reference, TimeSpan window) => RuleFor(x => x.Value).NotWithin(reference, window); }
     private sealed class WithinCalendarMonthsValidator : AbstractValidator<Model> { public WithinCalendarMonthsValidator(DateTimeOffset reference, int months) => RuleFor(x => x.Value).WithinCalendarMonths(reference, months); }
     private sealed class NotWithinCalendarMonthsValidator : AbstractValidator<Model> { public NotWithinCalendarMonthsValidator(DateTimeOffset reference, int months) => RuleFor(x => x.Value).NotWithinCalendarMonths(reference, months); }
+    private sealed class WeekdayValidator : AbstractValidator<Model> { public WeekdayValidator() => RuleFor(x => x.Value).Weekday(); }
+    private sealed class WeekendValidator : AbstractValidator<Model> { public WeekendValidator() => RuleFor(x => x.Value).Weekend(); }
+    private sealed class FirstDayOfMonthValidator : AbstractValidator<Model> { public FirstDayOfMonthValidator() => RuleFor(x => x.Value).FirstDayOfMonth(); }
+    private sealed class NotFirstDayOfMonthValidator : AbstractValidator<Model> { public NotFirstDayOfMonthValidator() => RuleFor(x => x.Value).NotFirstDayOfMonth(); }
+    private sealed class LastDayOfMonthValidator : AbstractValidator<Model> { public LastDayOfMonthValidator() => RuleFor(x => x.Value).LastDayOfMonth(); }
+    private sealed class NotLastDayOfMonthValidator : AbstractValidator<Model> { public NotLastDayOfMonthValidator() => RuleFor(x => x.Value).NotLastDayOfMonth(); }
     private sealed class ChronologicalExpressionValidator : AbstractValidator<ExpressionModel> { public ChronologicalExpressionValidator() => RuleFor(x => x.Start).Chronological(m => m.End).WithName("Value"); }
     private sealed class OverlappingExpressionValidator : AbstractValidator<OverlapExpressionModel> { public OverlappingExpressionValidator() => RuleFor(x => x.Start1).Overlapping(m => m.End1, m => m.Start2, m => m.End2).WithName("Value"); }
     private sealed class NotOverlappingExpressionValidator : AbstractValidator<OverlapExpressionModel> { public NotOverlappingExpressionValidator() => RuleFor(x => x.Start1).NotOverlapping(m => m.End1, m => m.Start2, m => m.End2).WithName("Value"); }
@@ -64,6 +75,38 @@ public sealed class FluentDateTimeOffsetExtensionsTests(ITestOutputHelper output
     public void FutureOrPresent_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
     {
         var result = new FutureOrPresentValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.PastPinnedClock.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.PastPinnedClock))]
+    public void Past_WithPinnedClock_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new PastPinnedClockValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.PastOrPresentPinnedClock.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.PastOrPresentPinnedClock))]
+    public void PastOrPresent_WithPinnedClock_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new PastOrPresentPinnedClockValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.FuturePinnedClock.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.FuturePinnedClock))]
+    public void Future_WithPinnedClock_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new FuturePinnedClockValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.FutureOrPresentPinnedClock.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.FutureOrPresentPinnedClock))]
+    public void FutureOrPresent_WithPinnedClock_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new FutureOrPresentPinnedClockValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
     }
 
@@ -188,6 +231,54 @@ public sealed class FluentDateTimeOffsetExtensionsTests(ITestOutputHelper output
     }
 
     [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.Weekday.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.Weekday))]
+    public void Weekday_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new WeekdayValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.Weekend.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.Weekend))]
+    public void Weekend_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new WeekendValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.FirstDayOfMonth.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.FirstDayOfMonth))]
+    public void FirstDayOfMonth_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new FirstDayOfMonthValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.NotFirstDayOfMonth.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.NotFirstDayOfMonth))]
+    public void NotFirstDayOfMonth_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new NotFirstDayOfMonthValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.LastDayOfMonth.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.LastDayOfMonth))]
+    public void LastDayOfMonth_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new LastDayOfMonthValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.NotLastDayOfMonth.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.NotLastDayOfMonth))]
+    public void NotLastDayOfMonth_BehavesAsExpected(FluentCase<DateTimeOffset?> tc)
+    {
+        var result = new NotLastDayOfMonthValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.ChronologicalExpression.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.ChronologicalExpression))]
     public void ChronologicalExpression_BehavesAsExpected(FluentCase<(DateTimeOffset start, DateTimeOffset end)> tc)
     {
@@ -232,6 +323,16 @@ public sealed class FluentDateTimeOffsetExtensionsTests(ITestOutputHelper output
     private sealed class NotWithinNonNullableValidator : AbstractValidator<NonNullableModel> { public NotWithinNonNullableValidator(DateTimeOffset reference, TimeSpan window) => RuleFor(x => x.Value).NotWithin(reference, window); }
     private sealed class WithinCalendarMonthsNonNullableValidator : AbstractValidator<NonNullableModel> { public WithinCalendarMonthsNonNullableValidator(DateTimeOffset reference, int months) => RuleFor(x => x.Value).WithinCalendarMonths(reference, months); }
     private sealed class NotWithinCalendarMonthsNonNullableValidator : AbstractValidator<NonNullableModel> { public NotWithinCalendarMonthsNonNullableValidator(DateTimeOffset reference, int months) => RuleFor(x => x.Value).NotWithinCalendarMonths(reference, months); }
+    private sealed class PastPinnedClockNonNullableValidator : AbstractValidator<NonNullableModel> { public PastPinnedClockNonNullableValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).Past(timeProvider); }
+    private sealed class PastOrPresentPinnedClockNonNullableValidator : AbstractValidator<NonNullableModel> { public PastOrPresentPinnedClockNonNullableValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).PastOrPresent(timeProvider); }
+    private sealed class FuturePinnedClockNonNullableValidator : AbstractValidator<NonNullableModel> { public FuturePinnedClockNonNullableValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).Future(timeProvider); }
+    private sealed class FutureOrPresentPinnedClockNonNullableValidator : AbstractValidator<NonNullableModel> { public FutureOrPresentPinnedClockNonNullableValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).FutureOrPresent(timeProvider); }
+    private sealed class WeekdayNonNullableValidator : AbstractValidator<NonNullableModel> { public WeekdayNonNullableValidator() => RuleFor(x => x.Value).Weekday(); }
+    private sealed class WeekendNonNullableValidator : AbstractValidator<NonNullableModel> { public WeekendNonNullableValidator() => RuleFor(x => x.Value).Weekend(); }
+    private sealed class FirstDayOfMonthNonNullableValidator : AbstractValidator<NonNullableModel> { public FirstDayOfMonthNonNullableValidator() => RuleFor(x => x.Value).FirstDayOfMonth(); }
+    private sealed class NotFirstDayOfMonthNonNullableValidator : AbstractValidator<NonNullableModel> { public NotFirstDayOfMonthNonNullableValidator() => RuleFor(x => x.Value).NotFirstDayOfMonth(); }
+    private sealed class LastDayOfMonthNonNullableValidator : AbstractValidator<NonNullableModel> { public LastDayOfMonthNonNullableValidator() => RuleFor(x => x.Value).LastDayOfMonth(); }
+    private sealed class NotLastDayOfMonthNonNullableValidator : AbstractValidator<NonNullableModel> { public NotLastDayOfMonthNonNullableValidator() => RuleFor(x => x.Value).NotLastDayOfMonth(); }
 
     [Theory]
     [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.PastNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.PastNonNullable))]
@@ -382,6 +483,86 @@ public sealed class FluentDateTimeOffsetExtensionsTests(ITestOutputHelper output
     public void NotWithinCalendarMonthsNonNullable_BehavesAsExpected(FluentCase<(DateTimeOffset value, DateTimeOffset reference, int months)> tc)
     {
         var result = new NotWithinCalendarMonthsNonNullableValidator(tc.Value.reference, tc.Value.months).Validate(new NonNullableModel { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.PastPinnedClockNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.PastPinnedClockNonNullable))]
+    public void PastNonNullable_WithPinnedClock_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new PastPinnedClockNonNullableValidator(FixedTimeProvider.Default).Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.PastOrPresentPinnedClockNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.PastOrPresentPinnedClockNonNullable))]
+    public void PastOrPresentNonNullable_WithPinnedClock_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new PastOrPresentPinnedClockNonNullableValidator(FixedTimeProvider.Default).Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.FuturePinnedClockNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.FuturePinnedClockNonNullable))]
+    public void FutureNonNullable_WithPinnedClock_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new FuturePinnedClockNonNullableValidator(FixedTimeProvider.Default).Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.FutureOrPresentPinnedClockNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.FutureOrPresentPinnedClockNonNullable))]
+    public void FutureOrPresentNonNullable_WithPinnedClock_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new FutureOrPresentPinnedClockNonNullableValidator(FixedTimeProvider.Default).Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.WeekdayNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.WeekdayNonNullable))]
+    public void WeekdayNonNullable_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new WeekdayNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.WeekendNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.WeekendNonNullable))]
+    public void WeekendNonNullable_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new WeekendNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.FirstDayOfMonthNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.FirstDayOfMonthNonNullable))]
+    public void FirstDayOfMonthNonNullable_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new FirstDayOfMonthNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.NotFirstDayOfMonthNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.NotFirstDayOfMonthNonNullable))]
+    public void NotFirstDayOfMonthNonNullable_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new NotFirstDayOfMonthNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.LastDayOfMonthNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.LastDayOfMonthNonNullable))]
+    public void LastDayOfMonthNonNullable_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new LastDayOfMonthNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateTimeOffsetExtensionsTestData.NotLastDayOfMonthNonNullable.Cases), MemberType = typeof(FluentDateTimeOffsetExtensionsTestData.NotLastDayOfMonthNonNullable))]
+    public void NotLastDayOfMonthNonNullable_BehavesAsExpected(FluentCase<DateTimeOffset> tc)
+    {
+        var result = new NotLastDayOfMonthNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
         AssertResult(tc, result);
     }
 

@@ -16,6 +16,7 @@ public static class GuardDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -30,11 +31,12 @@ public static class GuardDateOnlyClauses
     /// <seealso cref="MustDateOnlyClauses.Past"/>
     public static DateOnly FutureOrPresent(this IGuardClause _,
         DateOnly value,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Past(value, paramName);
+        var result = Must.Be.Past(value, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -46,6 +48,7 @@ public static class GuardDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -60,11 +63,12 @@ public static class GuardDateOnlyClauses
     /// <seealso cref="MustDateOnlyClauses.PastOrPresent"/>
     public static DateOnly Future(this IGuardClause _,
         DateOnly value,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.PastOrPresent(value, paramName);
+        var result = Must.Be.PastOrPresent(value, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -76,6 +80,7 @@ public static class GuardDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -90,11 +95,12 @@ public static class GuardDateOnlyClauses
     /// <seealso cref="MustDateOnlyClauses.Future"/>
     public static DateOnly PastOrPresent(this IGuardClause _,
         DateOnly value,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Future(value, paramName);
+        var result = Must.Be.Future(value, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -106,6 +112,7 @@ public static class GuardDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -120,11 +127,12 @@ public static class GuardDateOnlyClauses
     /// <seealso cref="MustDateOnlyClauses.FutureOrPresent"/>
     public static DateOnly Past(this IGuardClause _,
         DateOnly value,
+        TimeProvider? timeProvider = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.FutureOrPresent(value, paramName);
+        var result = Must.Be.FutureOrPresent(value, timeProvider, paramName: paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -669,6 +677,220 @@ public static class GuardDateOnlyClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         var result = Must.Be.NotWithinCalendarMonths(value, reference, months, paramName); // Guard.Against.WithinCalendarMonths => Must.Be.NotWithinCalendarMonths (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the Weekend constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateOnlyClauses.Weekday"/>
+    public static DateOnly Weekend(this IGuardClause _,
+        DateOnly value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Weekday(value, paramName);
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the Weekday constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateOnlyClauses.Weekend"/>
+    public static DateOnly Weekday(this IGuardClause _,
+        DateOnly value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.Weekend(value, paramName);
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the NotFirstDayOfMonth constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateOnlyClauses.FirstDayOfMonth"/>
+    public static DateOnly NotFirstDayOfMonth(this IGuardClause _,
+        DateOnly value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.FirstDayOfMonth(value, paramName);
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the FirstDayOfMonth constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateOnlyClauses.NotFirstDayOfMonth"/>
+    public static DateOnly FirstDayOfMonth(this IGuardClause _,
+        DateOnly value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotFirstDayOfMonth(value, paramName); // Guard.Against.FirstDayOfMonth => Must.Be.NotFirstDayOfMonth (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the NotLastDayOfMonth constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateOnlyClauses.LastDayOfMonth"/>
+    public static DateOnly NotLastDayOfMonth(this IGuardClause _,
+        DateOnly value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.LastDayOfMonth(value, paramName);
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the LastDayOfMonth constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The value to guard.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateOnlyClauses.NotLastDayOfMonth"/>
+    public static DateOnly LastDayOfMonth(this IGuardClause _,
+        DateOnly value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.NotLastDayOfMonth(value, paramName); // Guard.Against.LastDayOfMonth => Must.Be.NotLastDayOfMonth (complement)
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result;
+    }
+
+    /// <summary>
+    /// Throws if <paramref name="value"/> violates the MinimumAge constraint.
+    /// </summary>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The date of birth to guard.</param>
+    /// <param name="years">The minimum age in whole years.</param>
+    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="message">An optional custom error message.</param>
+    /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>The validated value if the guard passes.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the guard condition is violated and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <seealso cref="MustDateOnlyClauses.MinimumAge"/>
+    public static DateOnly BelowMinimumAge(this IGuardClause _,
+        DateOnly value,
+        int years,
+        TimeProvider? timeProvider = null,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        var result = Must.Be.MinimumAge(value, years, timeProvider, paramName: paramName); // Guard.Against.BelowMinimumAge => Must.Be.MinimumAge (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

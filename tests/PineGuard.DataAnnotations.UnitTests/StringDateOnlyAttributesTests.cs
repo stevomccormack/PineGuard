@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using Xunit.Abstractions;
 
@@ -274,5 +275,69 @@ public sealed class StringDateOnlyAttributesTests(ITestOutputHelper output) : Ba
 
         // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.PastDateOnlyStringOnAnInjectedClock.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.PastDateOnlyStringOnAnInjectedClock))]
+    public void PastDateOnlyString_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((string value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new PastDateOnlyStringAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.FutureDateOnlyStringOnAnInjectedClock.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.FutureDateOnlyStringOnAnInjectedClock))]
+    public void FutureDateOnlyString_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((string value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new FutureDateOnlyStringAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.MinimumAgeString.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.MinimumAgeString))]
+    public void MinimumAgeString_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years) = ((string? value, int years))tc.Value!;
+        var attr = new MinimumAgeStringAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(FixedTimeProvider.Default);
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.MinimumAgeStringOnLeapDay.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.MinimumAgeStringOnLeapDay))]
+    public void MinimumAgeString_LeapDayBirthDate_MaturesOnTheFirstOfMarch(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = ((string value, int years, DateTimeOffset utcNow))tc.Value!;
+        var attr = new MinimumAgeStringAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
     }
 }

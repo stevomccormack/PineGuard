@@ -1,5 +1,6 @@
 using FluentValidation;
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
 
@@ -27,6 +28,26 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
     private sealed class FutureOrPresentDateOnlyValidator : AbstractValidator<Model>
     {
         public FutureOrPresentDateOnlyValidator() => RuleFor(x => x.Value).FutureOrPresentDateOnly();
+    }
+
+    private sealed class PastPinnedClockDateOnlyValidator : AbstractValidator<Model>
+    {
+        public PastPinnedClockDateOnlyValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).PastDateOnly(timeProvider);
+    }
+
+    private sealed class PastOrPresentPinnedClockDateOnlyValidator : AbstractValidator<Model>
+    {
+        public PastOrPresentPinnedClockDateOnlyValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).PastOrPresentDateOnly(timeProvider);
+    }
+
+    private sealed class FuturePinnedClockDateOnlyValidator : AbstractValidator<Model>
+    {
+        public FuturePinnedClockDateOnlyValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).FutureDateOnly(timeProvider);
+    }
+
+    private sealed class FutureOrPresentPinnedClockDateOnlyValidator : AbstractValidator<Model>
+    {
+        public FutureOrPresentPinnedClockDateOnlyValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).FutureOrPresentDateOnly(timeProvider);
     }
 
     private sealed class BetweenDateOnlyValidator : AbstractValidator<Model>
@@ -149,6 +170,12 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
             RuleFor(x => x.Value).NotOverlappingDateOnly(end1, start2, end2, inclusion);
     }
 
+    private sealed class MinimumAgeValidator : AbstractValidator<Model>
+    {
+        public MinimumAgeValidator(int years, TimeProvider timeProvider) =>
+            RuleFor(x => x.Value).MinimumAge(years, timeProvider);
+    }
+
     // FluentStringDateOnlyExtensions.PastDateOnly
     [Theory]
     [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.InPast.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.InPast))]
@@ -182,6 +209,42 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
     public void InFutureOrPresent_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new FutureOrPresentDateOnlyValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.PastDateOnly
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.InPastPinnedClock.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.InPastPinnedClock))]
+    public void InPast_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        var result = new PastPinnedClockDateOnlyValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.PastOrPresentDateOnly
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.InPastOrPresentPinnedClock.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.InPastOrPresentPinnedClock))]
+    public void InPastOrPresent_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        var result = new PastOrPresentPinnedClockDateOnlyValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.FutureDateOnly
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.InFuturePinnedClock.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.InFuturePinnedClock))]
+    public void InFuture_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        var result = new FuturePinnedClockDateOnlyValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.FutureOrPresentDateOnly
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.InFutureOrPresentPinnedClock.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.InFutureOrPresentPinnedClock))]
+    public void InFutureOrPresent_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        var result = new FutureOrPresentPinnedClockDateOnlyValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
     }
 
@@ -382,6 +445,26 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
     {
         var result = new NotOverlappingDateOnlyValidator(tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, tc.Value.inclusion)
             .Validate(new Model { Value = tc.Value.start1 });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.MinimumAge
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.MinimumAge.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.MinimumAge))]
+    public void MinimumAge_BehavesAsExpected(FluentCase<(string? value, int years)> tc)
+    {
+        var result = new MinimumAgeValidator(tc.Value.years, FixedTimeProvider.Default)
+            .Validate(new Model { Value = tc.Value.value });
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateOnlyExtensions.MinimumAge
+    [Theory]
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.MinimumAgeOnLeapDay))]
+    public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(FluentCase<(string? value, int years, DateTimeOffset utcNow)> tc)
+    {
+        var result = new MinimumAgeValidator(tc.Value.years, new FixedTimeProvider(tc.Value.utcNow))
+            .Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 }

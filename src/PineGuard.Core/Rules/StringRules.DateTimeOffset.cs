@@ -20,9 +20,10 @@ public static partial class StringRules
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid date-time-offset string, returns <see langword="false"/>.</param>
         /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
         /// <param name="styles">The <see cref="DateTimeStyles"/> to apply when parsing. Defaults to roundtrip kind with assume-universal and whitespace, so offset-less input is treated as UTC regardless of the host time zone.</param>
+        /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
         /// <returns><see langword="true"/> if the parsed date-time-offset is in the past; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInPast(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles) =>
-            StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles) && DateTimeOffsetRules.IsInPast(parsed, inclusion);
+        public static bool IsInPast(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null) =>
+            StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles) && DateTimeOffsetRules.IsInPast(parsed, inclusion, timeProvider);
 
         /// <summary>
         /// Determines whether the specified string parses to a date-time-offset in the future.
@@ -30,9 +31,10 @@ public static partial class StringRules
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid date-time-offset string, returns <see langword="false"/>.</param>
         /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
         /// <param name="styles">The <see cref="DateTimeStyles"/> to apply when parsing. Defaults to roundtrip kind with assume-universal and whitespace, so offset-less input is treated as UTC regardless of the host time zone.</param>
+        /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
         /// <returns><see langword="true"/> if the parsed date-time-offset is in the future; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInFuture(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles) =>
-            StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles) && DateTimeOffsetRules.IsInFuture(parsed, inclusion);
+        public static bool IsInFuture(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null) =>
+            StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles) && DateTimeOffsetRules.IsInFuture(parsed, inclusion, timeProvider);
 
         /// <summary>
         /// Determines whether the specified string parses to a date-time-offset within [<paramref name="min"/>, <paramref name="max"/>].

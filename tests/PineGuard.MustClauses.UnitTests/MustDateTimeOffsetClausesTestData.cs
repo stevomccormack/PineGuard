@@ -1,4 +1,7 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.MustClauses;
+using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.DateTimeOffsetRulesFixtures;
 
 namespace PineGuard.MustClauses.UnitTests;
@@ -249,5 +252,48 @@ public static class MustDateTimeOffsetClausesTestData
         ];
 
         public sealed record ValidCase(string Name, (DateTimeOffset Value, DateTimeOffset Ref, int Months) Value, bool Expected) : IsCase<(DateTimeOffset Value, DateTimeOffset Ref, int Months)>(Name, Value, Expected);
+    }
+
+    // The calendar clauses take a non-nullable DateTimeOffset, so each group drops the fixture's NullValue scenario.
+    public static class Weekday
+    {
+        public static TheoryData<MustCase<DateTimeOffset>> ValidCases => F.IsWeekday.ValidScenarios.Project(v => v!.Value).ToMustCases();
+
+        public static TheoryData<MustCase<DateTimeOffset>> InvalidCases => F.IsWeekday.InvalidScenarios.Except(nameof(F.IsWeekday.NullValue)).Project(v => v!.Value).ToMustCases(_ => new MustExpected(false, "value must be a weekday.", "value", MustCodes.Date.Calendar.NotWeekday));
+    }
+
+    public static class Weekend
+    {
+        public static TheoryData<MustCase<DateTimeOffset>> ValidCases => F.IsWeekend.ValidScenarios.Project(v => v!.Value).ToMustCases();
+
+        public static TheoryData<MustCase<DateTimeOffset>> InvalidCases => F.IsWeekend.InvalidScenarios.Except(nameof(F.IsWeekend.NullValue)).Project(v => v!.Value).ToMustCases(_ => new MustExpected(false, "value must be a weekend day.", "value", MustCodes.Date.Calendar.NotWeekend));
+    }
+
+    public static class FirstDayOfMonth
+    {
+        public static TheoryData<MustCase<DateTimeOffset>> ValidCases => F.IsFirstDayOfMonth.ValidScenarios.Project(v => v!.Value).ToMustCases();
+
+        public static TheoryData<MustCase<DateTimeOffset>> InvalidCases => F.IsFirstDayOfMonth.InvalidScenarios.Except(nameof(F.IsFirstDayOfMonth.NullValue)).Project(v => v!.Value).ToMustCases(_ => new MustExpected(false, "value must be the first day of the month.", "value", MustCodes.Date.Calendar.NotFirstDayOfMonth));
+    }
+
+    public static class NotFirstDayOfMonth
+    {
+        public static TheoryData<MustCase<DateTimeOffset>> ValidCases => F.IsFirstDayOfMonth.InvalidScenarios.Except(nameof(F.IsFirstDayOfMonth.NullValue)).Project(v => v!.Value).ToMustCases(_ => new MustExpected(true));
+
+        public static TheoryData<MustCase<DateTimeOffset>> InvalidCases => F.IsFirstDayOfMonth.ValidScenarios.Project(v => v!.Value).ToMustCases(_ => new MustExpected(false, "value must not be the first day of the month.", "value", MustCodes.Date.Calendar.FirstDayOfMonth));
+    }
+
+    public static class LastDayOfMonth
+    {
+        public static TheoryData<MustCase<DateTimeOffset>> ValidCases => F.IsLastDayOfMonth.ValidScenarios.Project(v => v!.Value).ToMustCases();
+
+        public static TheoryData<MustCase<DateTimeOffset>> InvalidCases => F.IsLastDayOfMonth.InvalidScenarios.Except(nameof(F.IsLastDayOfMonth.NullValue)).Project(v => v!.Value).ToMustCases(_ => new MustExpected(false, "value must be the last day of the month.", "value", MustCodes.Date.Calendar.NotLastDayOfMonth));
+    }
+
+    public static class NotLastDayOfMonth
+    {
+        public static TheoryData<MustCase<DateTimeOffset>> ValidCases => F.IsLastDayOfMonth.InvalidScenarios.Except(nameof(F.IsLastDayOfMonth.NullValue)).Project(v => v!.Value).ToMustCases(_ => new MustExpected(true));
+
+        public static TheoryData<MustCase<DateTimeOffset>> InvalidCases => F.IsLastDayOfMonth.ValidScenarios.Project(v => v!.Value).ToMustCases(_ => new MustExpected(false, "value must not be the last day of the month.", "value", MustCodes.Date.Calendar.LastDayOfMonth));
     }
 }

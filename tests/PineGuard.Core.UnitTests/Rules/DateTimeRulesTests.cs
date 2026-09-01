@@ -1,5 +1,6 @@
 using PineGuard.Common;
 using PineGuard.Rules;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.Rules;
 using Xunit.Abstractions;
 
@@ -13,6 +14,17 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
     public void IsInPast_BehavesAsExpected(RuleCase<DateTime?> tc)
     {
         // Act
+        var result = DateTimeRules.IsInPast(tc.Value, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeRulesTestData.IsInPastSystemClock.Cases), MemberType = typeof(DateTimeRulesTestData.IsInPastSystemClock))]
+    public void IsInPast_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<DateTime?> tc)
+    {
+        // Act
         var result = DateTimeRules.IsInPast(tc.Value);
 
         // Assert
@@ -24,6 +36,17 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
     public void IsInFuture_BehavesAsExpected(RuleCase<DateTime?> tc)
     {
         // Act
+        var result = DateTimeRules.IsInFuture(tc.Value, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeRulesTestData.IsInFutureSystemClock.Cases), MemberType = typeof(DateTimeRulesTestData.IsInFutureSystemClock))]
+    public void IsInFuture_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<DateTime?> tc)
+    {
+        // Act
         var result = DateTimeRules.IsInFuture(tc.Value);
 
         // Assert
@@ -33,6 +56,17 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
     [Theory]
     [MemberData(nameof(DateTimeRulesTestData.IsWithinDaysFromNow.Cases), MemberType = typeof(DateTimeRulesTestData.IsWithinDaysFromNow))]
     public void IsWithinDaysFromNow_BehavesAsExpected(RuleCase<(DateTime? value, int days)> tc)
+    {
+        // Act
+        var result = DateTimeRules.IsWithinDaysFromNow(tc.Value.value, tc.Value.days, FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeRulesTestData.IsWithinDaysFromNowSystemClock.Cases), MemberType = typeof(DateTimeRulesTestData.IsWithinDaysFromNowSystemClock))]
+    public void IsWithinDaysFromNow_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<(DateTime? value, int days)> tc)
     {
         // Act
         var result = DateTimeRules.IsWithinDaysFromNow(tc.Value.value, tc.Value.days);
@@ -250,4 +284,45 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
         AssertResult(tc, result);
     }
 
+    [Theory]
+    [MemberData(nameof(DateTimeRulesTestData.HasMinimumAge.Cases), MemberType = typeof(DateTimeRulesTestData.HasMinimumAge))]
+    public void HasMinimumAge_BehavesAsExpected(RuleCase<(DateTime? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = DateTimeRules.HasMinimumAge(value, years, timeProvider: FixedTimeProvider.Default);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeRulesTestData.HasMinimumAgeSystemClock.Cases), MemberType = typeof(DateTimeRulesTestData.HasMinimumAgeSystemClock))]
+    public void HasMinimumAge_DefaultTimeProvider_ReadsTheSystemClock(RuleCase<(DateTime? value, int years)> tc)
+    {
+        // Arrange
+        var (value, years) = tc.Value;
+
+        // Act
+        var result = DateTimeRules.HasMinimumAge(value, years);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeRulesTestData.HasMinimumAgeOnLeapDay.Cases), MemberType = typeof(DateTimeRulesTestData.HasMinimumAgeOnLeapDay))]
+    public void HasMinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(RuleCase<(DateTime? value, int years, DateTimeOffset utcNow)> tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = tc.Value;
+
+        // Act
+        var result = DateTimeRules.HasMinimumAge(value, years, timeProvider: new FixedTimeProvider(utcNow));
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

@@ -20,6 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- TimeProvider, the clock seam every "is it in the past" rule reads through, ships in-box from
+         net8.0 onwards. netstandard2.1 gets it from this Microsoft first-party polyfill instead. -->
+    <PackageReference Include="Microsoft.Bcl.TimeProvider" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
     <PackageReference Include="System.ComponentModel.Annotations" />
     <PackageReference Include="System.Text.Json" />
   </ItemGroup>
