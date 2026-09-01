@@ -47,7 +47,7 @@ public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(type
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.PastDateOnly(strValue, Styles, paramName: null);
+        var result = Must.Be.PastDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -91,7 +91,7 @@ public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(ty
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.FutureDateOnly(strValue, Styles, paramName: null);
+        var result = Must.Be.FutureDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -135,7 +135,7 @@ public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttribute
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.PastOrPresentDateOnly(strValue, Styles, paramName: null);
+        var result = Must.Be.PastOrPresentDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -179,7 +179,7 @@ public sealed class FutureOrPresentDateOnlyStringAttribute() : ValidationAttribu
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.FutureOrPresentDateOnly(strValue, Styles, paramName: null);
+        var result = Must.Be.FutureOrPresentDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }

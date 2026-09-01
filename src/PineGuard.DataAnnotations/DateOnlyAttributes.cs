@@ -37,7 +37,7 @@ public sealed class PastDateOnlyAttribute() : ValidationAttributeBase(typeof(Dat
     {
         var dateValue = (DateOnly)value!;
 
-        var result = Must.Be.Past(dateValue, paramName: null);
+        var result = Must.Be.Past(dateValue, ResolveTimeProvider(validationContext), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -72,7 +72,7 @@ public sealed class PastOrPresentDateOnlyAttribute() : ValidationAttributeBase(t
     {
         var dateValue = (DateOnly)value!;
 
-        var result = Must.Be.PastOrPresent(dateValue, paramName: null);
+        var result = Must.Be.PastOrPresent(dateValue, ResolveTimeProvider(validationContext), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -106,7 +106,7 @@ public sealed class FutureDateOnlyAttribute() : ValidationAttributeBase(typeof(D
     {
         var dateValue = (DateOnly)value!;
 
-        var result = Must.Be.Future(dateValue, paramName: null);
+        var result = Must.Be.Future(dateValue, ResolveTimeProvider(validationContext), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -141,7 +141,7 @@ public sealed class FutureOrPresentDateOnlyAttribute() : ValidationAttributeBase
     {
         var dateValue = (DateOnly)value!;
 
-        var result = Must.Be.FutureOrPresent(dateValue, paramName: null);
+        var result = Must.Be.FutureOrPresent(dateValue, ResolveTimeProvider(validationContext), paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
