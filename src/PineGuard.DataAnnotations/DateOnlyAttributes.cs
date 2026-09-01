@@ -683,4 +683,208 @@ public sealed class NotOverlappingDateOnlyAttribute(string end1, string start2, 
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="DateOnly"/> property or field falls on a weekday (Monday through Friday).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustDateOnlyClauses.Weekday"/>. Supported on properties, fields, and
+/// parameters of type <see cref="DateOnly"/>.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ScheduleModel
+/// {
+///     [WeekdayDateOnly]
+///     public DateOnly OccursOn { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="WeekendDateOnlyAttribute"/>
+/// <seealso cref="MustDateOnlyClauses.Weekday"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class WeekdayDateOnlyAttribute() : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Calendar.NotWeekday)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var dateValue = (DateOnly)value!;
+
+        var result = Must.Be.Weekday(dateValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="DateOnly"/> property or field falls on a weekend day (Saturday or Sunday).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustDateOnlyClauses.Weekend"/>. Supported on properties, fields, and
+/// parameters of type <see cref="DateOnly"/>.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ScheduleModel
+/// {
+///     [WeekendDateOnly]
+///     public DateOnly OccursOn { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="WeekdayDateOnlyAttribute"/>
+/// <seealso cref="MustDateOnlyClauses.Weekend"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class WeekendDateOnlyAttribute() : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Calendar.NotWeekend)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var dateValue = (DateOnly)value!;
+
+        var result = Must.Be.Weekend(dateValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="DateOnly"/> property or field is the first day of its month.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustDateOnlyClauses.FirstDayOfMonth"/>. Supported on properties, fields, and
+/// parameters of type <see cref="DateOnly"/>.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ScheduleModel
+/// {
+///     [FirstDayOfMonthDateOnly]
+///     public DateOnly OccursOn { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotFirstDayOfMonthDateOnlyAttribute"/>
+/// <seealso cref="MustDateOnlyClauses.FirstDayOfMonth"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class FirstDayOfMonthDateOnlyAttribute() : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Calendar.NotFirstDayOfMonth)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var dateValue = (DateOnly)value!;
+
+        var result = Must.Be.FirstDayOfMonth(dateValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="DateOnly"/> property or field is not the first day of its month.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustDateOnlyClauses.NotFirstDayOfMonth"/>. Supported on properties, fields, and
+/// parameters of type <see cref="DateOnly"/>.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ScheduleModel
+/// {
+///     [NotFirstDayOfMonthDateOnly]
+///     public DateOnly OccursOn { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="FirstDayOfMonthDateOnlyAttribute"/>
+/// <seealso cref="MustDateOnlyClauses.NotFirstDayOfMonth"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotFirstDayOfMonthDateOnlyAttribute() : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Calendar.FirstDayOfMonth)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var dateValue = (DateOnly)value!;
+
+        var result = Must.Be.NotFirstDayOfMonth(dateValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="DateOnly"/> property or field is the last day of its month.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustDateOnlyClauses.LastDayOfMonth"/>. Supported on properties, fields, and
+/// parameters of type <see cref="DateOnly"/>.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ScheduleModel
+/// {
+///     [LastDayOfMonthDateOnly]
+///     public DateOnly OccursOn { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="NotLastDayOfMonthDateOnlyAttribute"/>
+/// <seealso cref="MustDateOnlyClauses.LastDayOfMonth"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class LastDayOfMonthDateOnlyAttribute() : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Calendar.NotLastDayOfMonth)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var dateValue = (DateOnly)value!;
+
+        var result = Must.Be.LastDayOfMonth(dateValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>
+/// Validates that the annotated <see cref="DateOnly"/> property or field is not the last day of its month.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustDateOnlyClauses.NotLastDayOfMonth"/>. Supported on properties, fields, and
+/// parameters of type <see cref="DateOnly"/>.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class ScheduleModel
+/// {
+///     [NotLastDayOfMonthDateOnly]
+///     public DateOnly OccursOn { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="LastDayOfMonthDateOnlyAttribute"/>
+/// <seealso cref="MustDateOnlyClauses.NotLastDayOfMonth"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class NotLastDayOfMonthDateOnlyAttribute() : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Calendar.LastDayOfMonth)
+{
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var dateValue = (DateOnly)value!;
+
+        var result = Must.Be.NotLastDayOfMonth(dateValue, paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
 #endif
