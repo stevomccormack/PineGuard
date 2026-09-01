@@ -445,6 +445,54 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     }
 
     [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.WeekdayNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.WeekdayNonNullable))]
+    public void WeekdayNonNullable_BehavesAsExpected(FluentCase<DateOnly> tc)
+    {
+        var result = new WeekdayNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.WeekendNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.WeekendNonNullable))]
+    public void WeekendNonNullable_BehavesAsExpected(FluentCase<DateOnly> tc)
+    {
+        var result = new WeekendNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.FirstDayOfMonthNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.FirstDayOfMonthNonNullable))]
+    public void FirstDayOfMonthNonNullable_BehavesAsExpected(FluentCase<DateOnly> tc)
+    {
+        var result = new FirstDayOfMonthNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.NotFirstDayOfMonthNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.NotFirstDayOfMonthNonNullable))]
+    public void NotFirstDayOfMonthNonNullable_BehavesAsExpected(FluentCase<DateOnly> tc)
+    {
+        var result = new NotFirstDayOfMonthNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.LastDayOfMonthNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.LastDayOfMonthNonNullable))]
+    public void LastDayOfMonthNonNullable_BehavesAsExpected(FluentCase<DateOnly> tc)
+    {
+        var result = new LastDayOfMonthNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.NotLastDayOfMonthNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.NotLastDayOfMonthNonNullable))]
+    public void NotLastDayOfMonthNonNullable_BehavesAsExpected(FluentCase<DateOnly> tc)
+    {
+        var result = new NotLastDayOfMonthNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(FluentDateOnlyExtensionsTestData.MinimumAgeNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.MinimumAgeNonNullable))]
     public void MinimumAgeNonNullable_BehavesAsExpected(FluentCase<(DateOnly value, int years)> tc)
     {
