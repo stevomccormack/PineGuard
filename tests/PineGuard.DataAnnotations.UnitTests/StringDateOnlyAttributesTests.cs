@@ -308,4 +308,36 @@ public sealed class StringDateOnlyAttributesTests(ITestOutputHelper output) : Ba
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.MinimumAgeString.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.MinimumAgeString))]
+    public void MinimumAgeString_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years) = ((string? value, int years))tc.Value!;
+        var attr = new MinimumAgeStringAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(FixedTimeProvider.Default);
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.MinimumAgeStringOnLeapDay.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.MinimumAgeStringOnLeapDay))]
+    public void MinimumAgeString_LeapDayBirthDate_MaturesOnTheFirstOfMarch(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = ((string value, int years, DateTimeOffset utcNow))tc.Value!;
+        var attr = new MinimumAgeStringAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

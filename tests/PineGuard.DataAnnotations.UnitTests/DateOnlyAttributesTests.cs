@@ -253,4 +253,36 @@ public sealed class DateOnlyAttributesTests(ITestOutputHelper output) : BaseData
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.MinimumAge.Cases), MemberType = typeof(DateOnlyAttributesTestData.MinimumAge))]
+    public void MinimumAge_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years) = ((DateOnly? value, int years))tc.Value!;
+        var attr = new MinimumAgeAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(FixedTimeProvider.Default);
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(DateOnlyAttributesTestData.MinimumAgeOnLeapDay))]
+    public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = ((DateOnly value, int years, DateTimeOffset utcNow))tc.Value!;
+        var attr = new MinimumAgeAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }
