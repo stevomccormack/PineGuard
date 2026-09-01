@@ -1,4 +1,6 @@
+using PineGuard.Codes;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.DateTimeRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
@@ -88,6 +90,31 @@ public static class DateTimeAttributesTestData
         [
             new("utc", () => F.IsUnspecified.Utc!.Value, false),
             new("local", () => F.IsLocal.Local!.Value, false)
+        ];
+    }
+
+    // See DateOnlyAttributesTestData for why each row carries its own instant: a subject in 2100 read on a
+    // 2200 clock is unambiguously past and on a 2000 clock unambiguously future, so neither verdict can be
+    // reproduced by the system clock this decade.
+    private static readonly DateTime ClockSubject = new(2100, 01, 01, 12, 0, 0, DateTimeKind.Utc);
+    private static readonly DateTimeOffset ClockAfterSubject = new(2200, 01, 01, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset ClockBeforeSubject = new(2000, 01, 01, 12, 0, 0, TimeSpan.Zero);
+
+    public static class PastDateTimeOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(true)),
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(false, "Value must be in the past.", Code: MustCodes.Date.Relative.NotPast))
+        ];
+    }
+
+    public static class FutureDateTimeOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(true)),
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(false, "Value must be in the future.", Code: MustCodes.Date.Relative.NotFuture))
         ];
     }
 }

@@ -199,4 +199,27 @@ public static class StringDateOnlyAttributesTestData
             new("null", null, new DataAnnotationExpected(true))
         ];
     }
+
+    // See DateOnlyAttributesTestData for why each row carries its own instant.
+    private const string ClockSubject = "2100-01-01";
+    private static readonly DateTimeOffset ClockAfterSubject = new(2200, 01, 01, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset ClockBeforeSubject = new(2000, 01, 01, 12, 0, 0, TimeSpan.Zero);
+
+    public static class PastDateOnlyStringOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(true)),
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(false, "Value must be a date in the past.", Code: MustCodes.Date.Relative.NotPast))
+        ];
+    }
+
+    public static class FutureDateOnlyStringOnAnInjectedClock
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("ClockBeforeTheSubject", (ClockSubject, ClockBeforeSubject), new DataAnnotationExpected(true)),
+            new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(false, "Value must be a date in the future.", Code: MustCodes.Date.Relative.NotFuture))
+        ];
+    }
 }

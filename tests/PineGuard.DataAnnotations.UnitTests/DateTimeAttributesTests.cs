@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class DateTimeAttributesTests
+public sealed class DateTimeAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     private static void Verify<TAttribute>(TAttribute attribute, DateTimeAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
@@ -60,4 +63,36 @@ public sealed class DateTimeAttributesTests
     [MemberData(nameof(DateTimeAttributesTestData.UnspecifiedDateTime.InvalidCases), MemberType = typeof(DateTimeAttributesTestData.UnspecifiedDateTime))]
     public void UnspecifiedDateTime_ShouldReturnExpected(DateTimeAttributesTestData.ValidCase testCase)
         => Verify(new UnspecifiedDateTimeAttribute(), testCase);
+
+    [Theory]
+    [MemberData(nameof(DateTimeAttributesTestData.PastDateTimeOnAnInjectedClock.Cases), MemberType = typeof(DateTimeAttributesTestData.PastDateTimeOnAnInjectedClock))]
+    public void PastDateTime_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((DateTime value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new PastDateTimeAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeAttributesTestData.FutureDateTimeOnAnInjectedClock.Cases), MemberType = typeof(DateTimeAttributesTestData.FutureDateTimeOnAnInjectedClock))]
+    public void FutureDateTime_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((DateTime value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new FutureDateTimeAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

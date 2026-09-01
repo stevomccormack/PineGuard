@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using PineGuard.Codes;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class DateOnlyAttributesTests
+public sealed class DateOnlyAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     private static void Verify<TAttribute>(TAttribute attribute, DateOnlyAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
@@ -128,4 +131,36 @@ public sealed class DateOnlyAttributesTests
     [MemberData(nameof(DateOnlyAttributesTestData.NotOverlappingDateOnly.InvalidCases), MemberType = typeof(DateOnlyAttributesTestData.NotOverlappingDateOnly))]
     public void NotOverlappingDateOnly_ShouldReturnExpected(DateOnlyAttributesTestData.ValidCase testCase)
         => Verify(new NotOverlappingDateOnlyAttribute("2020-01-30", "2020-01-10", "2020-01-20"), testCase);
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.PastDateOnlyOnAnInjectedClock.Cases), MemberType = typeof(DateOnlyAttributesTestData.PastDateOnlyOnAnInjectedClock))]
+    public void PastDateOnly_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((DateOnly value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new PastDateOnlyAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.FutureDateOnlyOnAnInjectedClock.Cases), MemberType = typeof(DateOnlyAttributesTestData.FutureDateOnlyOnAnInjectedClock))]
+    public void FutureDateOnly_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((DateOnly value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new FutureDateOnlyAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

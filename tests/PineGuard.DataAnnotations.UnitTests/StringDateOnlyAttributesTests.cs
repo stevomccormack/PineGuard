@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using Xunit.Abstractions;
 
@@ -274,5 +275,37 @@ public sealed class StringDateOnlyAttributesTests(ITestOutputHelper output) : Ba
 
         // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.PastDateOnlyStringOnAnInjectedClock.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.PastDateOnlyStringOnAnInjectedClock))]
+    public void PastDateOnlyString_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((string value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new PastDateOnlyStringAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.FutureDateOnlyStringOnAnInjectedClock.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.FutureDateOnlyStringOnAnInjectedClock))]
+    public void FutureDateOnlyString_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((string value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new FutureDateOnlyStringAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
     }
 }

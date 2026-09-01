@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using Xunit.Abstractions;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
-public sealed class TimeAttributesTests
+public sealed class TimeAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     private static void Verify<TAttribute>(TAttribute attribute, TimeAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
@@ -77,5 +80,37 @@ public sealed class TimeAttributesTests
 
         // Assert
         Assert.Contains(testCase.ExpectedMessageContains, ex.Message);
+    }
+
+    [Theory]
+    [MemberData(nameof(TimeAttributesTestData.PastOnAnInjectedClock.Cases), MemberType = typeof(TimeAttributesTestData.PastOnAnInjectedClock))]
+    public void Past_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((object value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new PastAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(TimeAttributesTestData.FutureOnAnInjectedClock.Cases), MemberType = typeof(TimeAttributesTestData.FutureOnAnInjectedClock))]
+    public void Future_HonoursTheInjectedClock(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, utcNow) = ((object value, DateTimeOffset utcNow))tc.Value!;
+        var attr = new FutureAttribute();
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
     }
 }
