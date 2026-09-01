@@ -249,3 +249,47 @@ public sealed class UnspecifiedDateTimeAttribute() : ValidationAttributeBase(typ
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="DateTime"/> date of birth meets the expected minimum age.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustDateTimeClauses.MinimumAge"/>. Supported on properties, fields, and
+/// parameters of type <see cref="DateTime"/>.
+/// </para>
+/// <para>
+/// The clock supplying today's date is resolved from the validation context's service provider: an
+/// attribute argument must be a compile-time constant, which a <see cref="TimeProvider"/> is not. Register
+/// one to validate against a fixed instant; with no registration the system clock applies.
+/// </para>
+/// <para>
+/// A negative minimum age is a configuration error and fails validation.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class RegistrationModel
+/// {
+///     [MinimumAgeDateTime(18)]
+///     public DateTime DateOfBirth { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="MustDateTimeClauses.MinimumAge"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/datetime">DateTime Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class MinimumAgeDateTimeAttribute(int years) : ValidationAttributeBase(typeof(DateTime), MustCodes.Date.Age.BelowMinimum)
+{
+    /// <summary>Gets the minimum age, in whole years, the date of birth must satisfy.</summary>
+    public int Years { get; } = years;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var dateValue = (DateTime)value!;
+
+        var result = Must.Be.MinimumAge(dateValue, Years, ResolveTimeProvider(validationContext), paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}

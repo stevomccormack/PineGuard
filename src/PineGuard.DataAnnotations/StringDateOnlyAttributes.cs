@@ -861,4 +861,59 @@ public sealed class NotOverlappingDateOnlyStringAttribute(string end1, string st
         return FromMustResult(result, validationContext);
     }
 }
+
+/// <summary>
+/// Validates that the annotated <see cref="string"/> property or field represents a
+/// <see cref="DateOnly"/> date of birth that meets the expected minimum age.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Delegates to <see cref="MustStringDateOnlyClauses.MinimumAge"/>. Supported on properties, fields, and
+/// parameters of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// The <see cref="Styles"/> property controls parsing flags; defaults to
+/// <see cref="DateTimeStyles.AllowWhiteSpaces"/>. A value that does not parse fails validation.
+/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// <para>
+/// The clock supplying today's date is resolved from the validation context's service provider: an
+/// attribute argument must be a compile-time constant, which a <see cref="TimeProvider"/> is not. Register
+/// one to validate against a fixed instant; with no registration the system clock applies.
+/// </para>
+/// <para>
+/// A negative minimum age is a configuration error and fails validation.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class RegistrationModel
+/// {
+///     [MinimumAgeString(18)]
+///     public string DateOfBirth { get; set; }
+/// }
+/// </code>
+/// </example>
+/// <seealso cref="MinimumAgeAttribute"/>
+/// <seealso cref="MustStringDateOnlyClauses.MinimumAge"/>
+/// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class MinimumAgeStringAttribute(int years) : ValidationAttributeBase(typeof(string), MustCodes.Date.Age.BelowMinimum)
+{
+    private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
+
+    /// <summary>Gets the minimum age, in whole years, the date of birth must satisfy.</summary>
+    public int Years { get; } = years;
+
+    /// <summary>Gets or sets the <see cref="DateTimeStyles"/> used when parsing the string value.</summary>
+    public DateTimeStyles Styles { get; set; } = DefaultStyles;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var strValue = (string)value!;
+        var result = Must.Be.MinimumAge(strValue, Years, Styles, ResolveTimeProvider(validationContext), paramName: null);
+        return FromMustResult(result, validationContext);
+    }
+}
 #endif
