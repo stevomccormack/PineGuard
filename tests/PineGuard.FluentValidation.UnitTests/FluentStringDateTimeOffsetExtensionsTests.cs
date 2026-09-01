@@ -1,5 +1,6 @@
 using FluentValidation;
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
 
@@ -72,6 +73,74 @@ public sealed class FluentStringDateTimeOffsetExtensionsTests(ITestOutputHelper 
     {
         // Act
         var result = new InFutureOrPresentValidator().Validate(new Model { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateTimeOffsetExtensions.PastDateTimeOffset
+    private sealed class InPastPinnedClockValidator : AbstractValidator<Model>
+    {
+        public InPastPinnedClockValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).PastDateTimeOffset(timeProvider);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringDateTimeOffsetExtensionsTestData.InPastPinnedClock.Cases), MemberType = typeof(FluentStringDateTimeOffsetExtensionsTestData.InPastPinnedClock))]
+    public void InPast_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new InPastPinnedClockValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateTimeOffsetExtensions.PastOrPresentDateTimeOffset
+    private sealed class InPastOrPresentPinnedClockValidator : AbstractValidator<Model>
+    {
+        public InPastOrPresentPinnedClockValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).PastOrPresentDateTimeOffset(timeProvider);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringDateTimeOffsetExtensionsTestData.InPastOrPresentPinnedClock.Cases), MemberType = typeof(FluentStringDateTimeOffsetExtensionsTestData.InPastOrPresentPinnedClock))]
+    public void InPastOrPresent_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new InPastOrPresentPinnedClockValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateTimeOffsetExtensions.FutureDateTimeOffset
+    private sealed class InFuturePinnedClockValidator : AbstractValidator<Model>
+    {
+        public InFuturePinnedClockValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).FutureDateTimeOffset(timeProvider);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringDateTimeOffsetExtensionsTestData.InFuturePinnedClock.Cases), MemberType = typeof(FluentStringDateTimeOffsetExtensionsTestData.InFuturePinnedClock))]
+    public void InFuture_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new InFuturePinnedClockValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    // FluentStringDateTimeOffsetExtensions.FutureOrPresentDateTimeOffset
+    private sealed class InFutureOrPresentPinnedClockValidator : AbstractValidator<Model>
+    {
+        public InFutureOrPresentPinnedClockValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).FutureOrPresentDateTimeOffset(timeProvider);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentStringDateTimeOffsetExtensionsTestData.InFutureOrPresentPinnedClock.Cases), MemberType = typeof(FluentStringDateTimeOffsetExtensionsTestData.InFutureOrPresentPinnedClock))]
+    public void InFutureOrPresent_WithPinnedClock_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        // Act
+        var result = new InFutureOrPresentPinnedClockValidator(FixedTimeProvider.Default).Validate(new Model { Value = tc.Value });
 
         // Assert
         AssertResult(tc, result);
