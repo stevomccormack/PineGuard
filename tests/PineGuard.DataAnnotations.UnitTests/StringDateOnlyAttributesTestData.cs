@@ -222,4 +222,37 @@ public static class StringDateOnlyAttributesTestData
             new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(false, "Value must be a date in the future.", Code: MustCodes.Date.Relative.NotFuture))
         ];
     }
+
+    // The whole fixture tuple travels in Value, because the minimum age varies per row and the attribute takes
+    // it as a constructor argument; the test destructures it. Every birth date sits around the instant
+    // FixedTimeProvider.Default reports, which is the clock the test registers on the validation context —
+    // NotYetBorn is the row that proves the resolution happened, being future for the pinned clock and past
+    // for the machine's. NotADate fails on the same message as an under-age value, so it needs no arm of its
+    // own; NullValue never reaches the clause, the base class passing null through untouched.
+    public static class MinimumAgeString
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.DateOnlyHasMinimumAge.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.DateOnlyHasMinimumAge.NullValue) => new DataAnnotationExpected(true),
+            nameof(F.DateOnlyHasMinimumAge.NegativeYears) => new DataAnnotationExpected(false, "years requires a non-negative number of years.", Code: MustCodes.Date.Age.BelowMinimum),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)
+        });
+    }
+
+    // A 29-February birth date has no anniversary in a non-leap year, so each row pins its own clock: the
+    // boundary moves while the birth date stays put, which the shared provider cannot express.
+    private const string LeapDayBirth = "2008-02-29";
+
+    public static class MinimumAgeStringOnLeapDay
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("TwentyEighthOfFebruaryInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 02, 28)), new DataAnnotationExpected(false, "Value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)),
+            new("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new DataAnnotationExpected(true)),
+            new("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new DataAnnotationExpected(true))
+        ];
+    }
+
+    private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);
 }

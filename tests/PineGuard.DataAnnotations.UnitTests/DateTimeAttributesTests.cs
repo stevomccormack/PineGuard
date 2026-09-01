@@ -95,4 +95,36 @@ public sealed class DateTimeAttributesTests(ITestOutputHelper output) : BaseData
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(DateTimeAttributesTestData.MinimumAgeDateTime.Cases), MemberType = typeof(DateTimeAttributesTestData.MinimumAgeDateTime))]
+    public void MinimumAgeDateTime_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years) = ((DateTime? value, int years))tc.Value!;
+        var attr = new MinimumAgeDateTimeAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(FixedTimeProvider.Default);
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeAttributesTestData.MinimumAgeDateTimeOnLeapDay.Cases), MemberType = typeof(DateTimeAttributesTestData.MinimumAgeDateTimeOnLeapDay))]
+    public void MinimumAgeDateTime_LeapDayBirthDate_MaturesOnTheFirstOfMarch(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, years, utcNow) = ((DateTime value, int years, DateTimeOffset utcNow))tc.Value!;
+        var attr = new MinimumAgeDateTimeAttribute(years);
+        var ctx = ValidationContextFactory.WithTimeProvider(new FixedTimeProvider(utcNow));
+
+        // Act
+        var result = attr.GetValidationResult(value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }
