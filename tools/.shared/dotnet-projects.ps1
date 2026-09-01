@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Shared .NET project discovery helpers for the PineGuard PowerShell toolchain.
 
@@ -13,36 +13,51 @@ $ErrorActionPreference = 'Stop'
 function Get-PineGuardScope {
     <#
     .SYNOPSIS
-        Returns the per-scope path/identifier registry entry (or entries) for the thirteen named
+        Returns the per-scope path/identifier registry entry (or entries) for the fourteen named
         PineGuard scopes: Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation,
-        Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Testing.
+        Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR,
+        Analyzers, Testing.
 
     .DESCRIPTION
-        Centralises the per-scope source directory, project paths, coverage include pattern,
+        Centralises the per-scope source directory, project paths, coverage include patterns,
         path-include regex, default source prefix and Qodana config/slug that used to be
         repeated as switch/hashtable blocks across tools/code-coverage, tools/code-formatter,
         tools/code-diagnostics and tools/code-inspection scripts.
 
         'All' (the aggregate pseudo-scope) and 'Custom' (Test-CoverageAnalysis.ps1 only) are
         NOT registry entries — callers that need the aggregate keep handling those cases
-        specially, using -All to enumerate the thirteen real entries in a stable order
+        specially, using -All to enumerate the fourteen real entries in a stable order
         (Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options,
-        DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Testing).
+        DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers,
+        Testing).
 
         Adding a new scope means adding one entry here plus one ValidateSet token per consumer
         script — ValidateSet attributes must stay literal (PowerShell requires compile-time
-        constants), so the scope names are necessarily still spelled out there too.
+        constants), so the scope names are necessarily still spelled out there too. Membership
+        TESTS ('is this scope a real registry entry rather than an aggregate?') must NOT be
+        spelled out: derive them from (Get-PineGuardScope -All).Name so a new entry cannot be
+        half-wired — present in a ValidateSet but silently treated as an aggregate downstream.
+
+        A scope is a shipped unit, not a single project: SourceCsprojs and CoverageIncludePatterns
+        are arrays because PineGuard.Analyzers ships one NuGet package built from two projects
+        (the analyzer and its code fixes), measured as two assemblies. They are plural for every
+        entry so a consumer cannot accidentally act on only the first project — 'dotnet format'
+        skips referenced projects, so formatting the analyzer alone would silently miss the code
+        fixes. SourceDir and DefaultSourcePrefix stay singular: they are the scope's primary
+        project directory, used only for 'does this scope have any *.cs?' checks and as a
+        Cobertura path-resolution fallback prefix — never to enumerate what to build or measure.
+        Coverage breadth is expressed by CoverageIncludePatterns and PathIncludeRegex.
 
     .PARAMETER Name
-        One of the twelve scope names. Returns the single matching registry entry.
+        One of the fourteen scope names. Returns the single matching registry entry.
 
     .PARAMETER All
-        Returns all twelve registry entries, in the stable order used to build 'All' aggregates.
+        Returns all fourteen registry entries, in the stable order used to build 'All' aggregates.
     #>
     [CmdletBinding(DefaultParameterSetName = 'One')]
     param(
         [Parameter(Mandatory, ParameterSetName = 'One', Position = 0)]
-        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing')]
+        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'Testing')]
         [string] $Name,
 
         [Parameter(Mandatory, ParameterSetName = 'All')]
@@ -51,15 +66,16 @@ function Get-PineGuardScope {
 
     # Ordered so that -All enumerates scopes in the same order every consumer script already
     # used when building its own hardcoded 'All' aggregate (Core, MustClauses, GuardClauses,
-    # DataAnnotations, FluentValidation, Testing).
+    # DataAnnotations, FluentValidation, Testing). New src/ scopes append after the last
+    # integration and before Testing, which stays last because it is the tests/ support library.
     $registry = [ordered]@{
         Core              = [pscustomobject]@{
             Name                     = 'Core'
             SourceDir                = 'src\PineGuard.Core'
-            SourceCsproj             = 'src\PineGuard.Core\PineGuard.Core.csproj'
+            SourceCsprojs            = @('src\PineGuard.Core\PineGuard.Core.csproj')
             TestCsproj               = 'tests\PineGuard.Core.UnitTests\PineGuard.Core.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.Core.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.Core]*'
+            CoverageIncludePatterns  = @('[PineGuard.Core]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.Core[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.Core'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.core.yaml'
@@ -69,10 +85,10 @@ function Get-PineGuardScope {
         MustClauses       = [pscustomobject]@{
             Name                     = 'MustClauses'
             SourceDir                = 'src\PineGuard.MustClauses'
-            SourceCsproj             = 'src\PineGuard.MustClauses\PineGuard.MustClauses.csproj'
+            SourceCsprojs            = @('src\PineGuard.MustClauses\PineGuard.MustClauses.csproj')
             TestCsproj               = 'tests\PineGuard.MustClauses.UnitTests\PineGuard.MustClauses.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.MustClauses.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.MustClauses]*'
+            CoverageIncludePatterns  = @('[PineGuard.MustClauses]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.MustClauses[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.MustClauses'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.must-clauses.yaml'
@@ -82,10 +98,10 @@ function Get-PineGuardScope {
         GuardClauses      = [pscustomobject]@{
             Name                     = 'GuardClauses'
             SourceDir                = 'src\PineGuard.GuardClauses'
-            SourceCsproj             = 'src\PineGuard.GuardClauses\PineGuard.GuardClauses.csproj'
+            SourceCsprojs            = @('src\PineGuard.GuardClauses\PineGuard.GuardClauses.csproj')
             TestCsproj               = 'tests\PineGuard.GuardClauses.UnitTests\PineGuard.GuardClauses.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.GuardClauses.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.GuardClauses]*'
+            CoverageIncludePatterns  = @('[PineGuard.GuardClauses]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.GuardClauses[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.GuardClauses'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.guard-clauses.yaml'
@@ -95,10 +111,10 @@ function Get-PineGuardScope {
         DataAnnotations   = [pscustomobject]@{
             Name                     = 'DataAnnotations'
             SourceDir                = 'src\PineGuard.DataAnnotations'
-            SourceCsproj             = 'src\PineGuard.DataAnnotations\PineGuard.DataAnnotations.csproj'
+            SourceCsprojs            = @('src\PineGuard.DataAnnotations\PineGuard.DataAnnotations.csproj')
             TestCsproj               = 'tests\PineGuard.DataAnnotations.UnitTests\PineGuard.DataAnnotations.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.DataAnnotations.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.DataAnnotations]*'
+            CoverageIncludePatterns  = @('[PineGuard.DataAnnotations]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.DataAnnotations[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.DataAnnotations'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.data-annotations.yaml'
@@ -108,10 +124,10 @@ function Get-PineGuardScope {
         FluentValidation  = [pscustomobject]@{
             Name                     = 'FluentValidation'
             SourceDir                = 'src\PineGuard.FluentValidation'
-            SourceCsproj             = 'src\PineGuard.FluentValidation\PineGuard.FluentValidation.csproj'
+            SourceCsprojs            = @('src\PineGuard.FluentValidation\PineGuard.FluentValidation.csproj')
             TestCsproj               = 'tests\PineGuard.FluentValidation.UnitTests\PineGuard.FluentValidation.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.FluentValidation.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.FluentValidation]*'
+            CoverageIncludePatterns  = @('[PineGuard.FluentValidation]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.FluentValidation[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.FluentValidation'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.fluent-validation.yaml'
@@ -121,10 +137,10 @@ function Get-PineGuardScope {
         Options           = [pscustomobject]@{
             Name                     = 'Options'
             SourceDir                = 'src\PineGuard.Extensions.Options'
-            SourceCsproj             = 'src\PineGuard.Extensions.Options\PineGuard.Extensions.Options.csproj'
+            SourceCsprojs            = @('src\PineGuard.Extensions.Options\PineGuard.Extensions.Options.csproj')
             TestCsproj               = 'tests\PineGuard.Extensions.Options.UnitTests\PineGuard.Extensions.Options.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.Extensions.Options.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.Extensions.Options]*'
+            CoverageIncludePatterns  = @('[PineGuard.Extensions.Options]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.Extensions\.Options[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.Extensions.Options'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.options.yaml'
@@ -134,10 +150,10 @@ function Get-PineGuardScope {
         DependencyInjection = [pscustomobject]@{
             Name                     = 'DependencyInjection'
             SourceDir                = 'src\PineGuard.Extensions.DependencyInjection'
-            SourceCsproj             = 'src\PineGuard.Extensions.DependencyInjection\PineGuard.Extensions.DependencyInjection.csproj'
+            SourceCsprojs            = @('src\PineGuard.Extensions.DependencyInjection\PineGuard.Extensions.DependencyInjection.csproj')
             TestCsproj               = 'tests\PineGuard.Extensions.DependencyInjection.UnitTests\PineGuard.Extensions.DependencyInjection.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.Extensions.DependencyInjection.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.Extensions.DependencyInjection]*'
+            CoverageIncludePatterns  = @('[PineGuard.Extensions.DependencyInjection]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.Extensions\.DependencyInjection[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.Extensions.DependencyInjection'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.dependency-injection.yaml'
@@ -147,10 +163,10 @@ function Get-PineGuardScope {
         AspNetCore        = [pscustomobject]@{
             Name                     = 'AspNetCore'
             SourceDir                = 'src\PineGuard.AspNetCore'
-            SourceCsproj             = 'src\PineGuard.AspNetCore\PineGuard.AspNetCore.csproj'
+            SourceCsprojs            = @('src\PineGuard.AspNetCore\PineGuard.AspNetCore.csproj')
             TestCsproj               = 'tests\PineGuard.AspNetCore.UnitTests\PineGuard.AspNetCore.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.AspNetCore.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.AspNetCore]*'
+            CoverageIncludePatterns  = @('[PineGuard.AspNetCore]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.AspNetCore[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.AspNetCore'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.aspnetcore.yaml'
@@ -160,10 +176,10 @@ function Get-PineGuardScope {
         ErrorOr           = [pscustomobject]@{
             Name                     = 'ErrorOr'
             SourceDir                = 'src\PineGuard.ErrorOr'
-            SourceCsproj             = 'src\PineGuard.ErrorOr\PineGuard.ErrorOr.csproj'
+            SourceCsprojs            = @('src\PineGuard.ErrorOr\PineGuard.ErrorOr.csproj')
             TestCsproj               = 'tests\PineGuard.ErrorOr.UnitTests\PineGuard.ErrorOr.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.ErrorOr.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.ErrorOr]*'
+            CoverageIncludePatterns  = @('[PineGuard.ErrorOr]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.ErrorOr[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.ErrorOr'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.erroror.yaml'
@@ -173,10 +189,10 @@ function Get-PineGuardScope {
         FluentResults     = [pscustomobject]@{
             Name                     = 'FluentResults'
             SourceDir                = 'src\PineGuard.FluentResults'
-            SourceCsproj             = 'src\PineGuard.FluentResults\PineGuard.FluentResults.csproj'
+            SourceCsprojs            = @('src\PineGuard.FluentResults\PineGuard.FluentResults.csproj')
             TestCsproj               = 'tests\PineGuard.FluentResults.UnitTests\PineGuard.FluentResults.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.FluentResults.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.FluentResults]*'
+            CoverageIncludePatterns  = @('[PineGuard.FluentResults]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.FluentResults[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.FluentResults'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.fluentresults.yaml'
@@ -186,10 +202,10 @@ function Get-PineGuardScope {
         OneOf             = [pscustomobject]@{
             Name                     = 'OneOf'
             SourceDir                = 'src\PineGuard.OneOf'
-            SourceCsproj             = 'src\PineGuard.OneOf\PineGuard.OneOf.csproj'
+            SourceCsprojs            = @('src\PineGuard.OneOf\PineGuard.OneOf.csproj')
             TestCsproj               = 'tests\PineGuard.OneOf.UnitTests\PineGuard.OneOf.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.OneOf.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.OneOf]*'
+            CoverageIncludePatterns  = @('[PineGuard.OneOf]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.OneOf[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.OneOf'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.oneof.yaml'
@@ -199,26 +215,44 @@ function Get-PineGuardScope {
         MediatR           = [pscustomobject]@{
             Name                     = 'MediatR'
             SourceDir                = 'src\PineGuard.MediatR'
-            SourceCsproj             = 'src\PineGuard.MediatR\PineGuard.MediatR.csproj'
+            SourceCsprojs            = @('src\PineGuard.MediatR\PineGuard.MediatR.csproj')
             TestCsproj               = 'tests\PineGuard.MediatR.UnitTests\PineGuard.MediatR.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.MediatR.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.MediatR]*'
+            CoverageIncludePatterns  = @('[PineGuard.MediatR]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.MediatR[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.MediatR'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.mediatr.yaml'
             QodanaSlug               = 'mediatr'
             IncludeEmptyTestProjects = $false
         }
+        Analyzers         = [pscustomobject]@{
+            Name                     = 'Analyzers'
+            # One package, two projects: PineGuard.Analyzers.CodeFixes is IsPackable=false and
+            # ships inside the analyzer package, so it has no scope of its own — it is listed
+            # here as a second source project and a second coverage assembly instead.
+            SourceDir                = 'src\PineGuard.Analyzers'
+            SourceCsprojs            = @('src\PineGuard.Analyzers\PineGuard.Analyzers.csproj', 'src\PineGuard.Analyzers.CodeFixes\PineGuard.Analyzers.CodeFixes.csproj')
+            TestCsproj               = 'tests\PineGuard.Analyzers.UnitTests\PineGuard.Analyzers.UnitTests.csproj'
+            DefaultProjectFilter     = 'PineGuard.Analyzers.UnitTests.csproj'
+            # NOT '[PineGuard.Analyzers*]*': that wildcard would also swallow the
+            # PineGuard.Analyzers.UnitTests assembly and count test code as covered code.
+            CoverageIncludePatterns  = @('[PineGuard.Analyzers]*', '[PineGuard.Analyzers.CodeFixes]*')
+            PathIncludeRegex         = '^src[/\\]+PineGuard\.Analyzers(\.CodeFixes)?[/\\]+'
+            DefaultSourcePrefix      = 'src\PineGuard.Analyzers'
+            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.analyzers.yaml'
+            QodanaSlug               = 'analyzers'
+            IncludeEmptyTestProjects = $false
+        }
         Testing           = [pscustomobject]@{
             Name                     = 'Testing'
             SourceDir                = 'tests\PineGuard.Testing'
-            SourceCsproj             = 'tests\PineGuard.Testing\PineGuard.Testing.csproj'
+            SourceCsprojs            = @('tests\PineGuard.Testing\PineGuard.Testing.csproj')
             TestCsproj               = 'tests\PineGuard.Testing.UnitTests\PineGuard.Testing.UnitTests.csproj'
             # NOTE: unlike the other five scopes, Testing's own coverage scripts default the
             # test-project filter to the wildcard, not to its own test csproj filename — verified
             # against Run-CodeCoverage.ps1 and Gen-CoverageReport.ps1 before this refactor.
             DefaultProjectFilter     = '*.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.Testing]*'
+            CoverageIncludePatterns  = @('[PineGuard.Testing]*')
             PathIncludeRegex         = '^tests[/\\]+PineGuard\.Testing[/\\]+'
             DefaultSourcePrefix      = 'tests\PineGuard.Testing'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.testing.yaml'

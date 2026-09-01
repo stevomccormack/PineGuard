@@ -15,7 +15,7 @@
 
 .PARAMETER Scope
     The inspection scope. Determines the Qodana config and results directory.
-    Valid values: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Testing, All.
+    Valid values: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All.
     Default: Core.
 
 .PARAMETER RepoRoot
@@ -63,7 +63,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Testing', 'All')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'Testing', 'All')] [string] $Scope = 'Core',
     [ValidateNotNullOrEmpty()] [string] $RepoRoot = '',
     [string] $ResultsDir = '',
     [switch] $Clean,
