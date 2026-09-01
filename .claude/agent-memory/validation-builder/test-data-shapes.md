@@ -89,3 +89,10 @@ the legacy methods untouched, the same treatment the Must layer gave `MustString
 One fixture's null scenario is a failure at Must, a throw at Guard, and a pass at both Fluent and
 DataAnnotations (FluentValidation skips null per its project.md §5; the DA base returns `Success` for
 null). See [[fluent-adapter-nuances]].
+
+**Only null flips.** For a reference-typed fixture (`byte[]?`, `string?`), the *empty* row is a
+different row: `[]` and `""` are present rather than absent, so `ValidationAttributeBase.IsValid`
+never short-circuits and they reach the clause carrying the clause's verdict. When a fixture has both
+`Null` and `Empty` invalid rows, exactly one arm of the DA switch names `Null` — resist the pull to
+group them. Note also that the null row's fixture field is named `Null` in some families and
+`NullValue` in others, so read the fixture before writing `nameof(...)`.
