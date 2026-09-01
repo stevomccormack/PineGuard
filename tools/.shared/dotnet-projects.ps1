@@ -163,10 +163,10 @@ function Get-PineGuardScope {
         AspNetCore        = [pscustomobject]@{
             Name                     = 'AspNetCore'
             SourceDir                = 'src\PineGuard.AspNetCore'
-            SourceCsproj             = 'src\PineGuard.AspNetCore\PineGuard.AspNetCore.csproj'
+            SourceCsprojs            = @('src\PineGuard.AspNetCore\PineGuard.AspNetCore.csproj')
             TestCsproj               = 'tests\PineGuard.AspNetCore.UnitTests\PineGuard.AspNetCore.UnitTests.csproj'
             DefaultProjectFilter     = 'PineGuard.AspNetCore.UnitTests.csproj'
-            CoverageIncludePattern   = '[PineGuard.AspNetCore]*'
+            CoverageIncludePatterns  = @('[PineGuard.AspNetCore]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.AspNetCore[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.AspNetCore'
             QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.aspnetcore.yaml'
