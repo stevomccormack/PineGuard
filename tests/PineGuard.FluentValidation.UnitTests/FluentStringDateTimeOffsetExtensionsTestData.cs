@@ -1,4 +1,6 @@
+using System.Globalization;
 using PineGuard.Codes;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -6,6 +8,14 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public static class FluentStringDateTimeOffsetExtensionsTestData
 {
+    // Now as the pinned clock reports it, rendered the way the fixtures render timestamps. That instant is
+    // itself in the real past, so the hour after it is future for the pinned clock and past for the system
+    // clock — an overload that dropped the supplied provider would fail these groups rather than pass by
+    // coincidence.
+    private static readonly DateTimeOffset PinnedNow = FixedTimeProvider.Default.GetUtcNow();
+
+    private static string Iso(DateTimeOffset value) => value.ToString("O", CultureInfo.InvariantCulture);
+
     public static class InPast
     {
         public static TheoryData<FluentCase<string?>> Cases => F.DateTimeOffsetIsInPast.AllScenarios.ToFluentCases(s => s.Name switch
@@ -45,6 +55,50 @@ public static class FluentStringDateTimeOffsetExtensionsTestData
             nameof(F.DateTimeOffsetIsInPast.FutureDate) => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must be a date/time in the future or present.")
         });
+    }
+
+    public static class InPastPinnedClock
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("AnHourAgo", Iso(PinnedNow.AddHours(-1)), new FluentExpected(true)),
+            new("Null", null, new FluentExpected(true)),
+            new("ThisVeryInstant", Iso(PinnedNow), new FluentExpected(false, "Value must be a date/time in the past.", Code: MustCodes.Date.Relative.NotPast)),
+            new("AnHourFromNow", Iso(PinnedNow.AddHours(1)), new FluentExpected(false, "Value must be a date/time in the past.", Code: MustCodes.Date.Relative.NotPast))
+        ];
+    }
+
+    public static class InPastOrPresentPinnedClock
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("AnHourAgo", Iso(PinnedNow.AddHours(-1)), new FluentExpected(true)),
+            new("ThisVeryInstant", Iso(PinnedNow), new FluentExpected(true)),
+            new("Null", null, new FluentExpected(true)),
+            new("AnHourFromNow", Iso(PinnedNow.AddHours(1)), new FluentExpected(false, "Value must be a date/time in the past or present.", Code: MustCodes.Date.Relative.Future))
+        ];
+    }
+
+    public static class InFuturePinnedClock
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("AnHourFromNow", Iso(PinnedNow.AddHours(1)), new FluentExpected(true)),
+            new("Null", null, new FluentExpected(true)),
+            new("ThisVeryInstant", Iso(PinnedNow), new FluentExpected(false, "Value must be a date/time in the future.", Code: MustCodes.Date.Relative.NotFuture)),
+            new("AnHourAgo", Iso(PinnedNow.AddHours(-1)), new FluentExpected(false, "Value must be a date/time in the future.", Code: MustCodes.Date.Relative.NotFuture))
+        ];
+    }
+
+    public static class InFutureOrPresentPinnedClock
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("AnHourFromNow", Iso(PinnedNow.AddHours(1)), new FluentExpected(true)),
+            new("ThisVeryInstant", Iso(PinnedNow), new FluentExpected(true)),
+            new("Null", null, new FluentExpected(true)),
+            new("AnHourAgo", Iso(PinnedNow.AddHours(-1)), new FluentExpected(false, "Value must be a date/time in the future or present.", Code: MustCodes.Date.Relative.Past))
+        ];
     }
 
     public static class IsBetween
