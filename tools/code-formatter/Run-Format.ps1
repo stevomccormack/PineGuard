@@ -18,7 +18,7 @@
 
 .PARAMETER Scope
     Named scope that resolves to that scope's source project(s). Valid values:
-    Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All.
+    Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All.
     'Analyzers' targets two projects (the analyzer and its code fixes) — 'dotnet format' skips
     referenced projects, so each is formatted in its own pass.
     'Testing' targets the PineGuard.Testing support library under tests/.
@@ -58,7 +58,7 @@ param(
     [string]$Project,
     [string]$Solution,
 
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'Testing', 'All')]
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'Testing', 'All')]
     [string]$Scope,
 
     [switch]$VerifyNoChanges,
