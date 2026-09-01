@@ -163,4 +163,94 @@ public sealed class DateOnlyAttributesTests(ITestOutputHelper output) : BaseData
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.WeekdayDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.WeekdayDateOnly))]
+    public void WeekdayDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new WeekdayDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.WeekendDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.WeekendDateOnly))]
+    public void WeekendDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new WeekendDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.FirstDayOfMonthDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.FirstDayOfMonthDateOnly))]
+    public void FirstDayOfMonthDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new FirstDayOfMonthDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.NotFirstDayOfMonthDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.NotFirstDayOfMonthDateOnly))]
+    public void NotFirstDayOfMonthDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotFirstDayOfMonthDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.LastDayOfMonthDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.LastDayOfMonthDateOnly))]
+    public void LastDayOfMonthDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new LastDayOfMonthDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyAttributesTestData.NotLastDayOfMonthDateOnly.Cases), MemberType = typeof(DateOnlyAttributesTestData.NotLastDayOfMonthDateOnly))]
+    public void NotLastDayOfMonthDateOnly_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotLastDayOfMonthDateOnlyAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }

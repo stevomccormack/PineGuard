@@ -198,4 +198,64 @@ public static class DateOnlyAttributesTestData
             new("ClockAfterTheSubject", (ClockSubject, ClockAfterSubject), new DataAnnotationExpected(false, "Value must be in the future.", Code: MustCodes.Date.Relative.NotFuture))
         ];
     }
+
+    public static class WeekdayDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsWeekday.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsWeekday.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a weekday.", Code: MustCodes.Date.Calendar.NotWeekday)
+        });
+    }
+
+    public static class WeekendDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsWeekend.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsWeekend.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be a weekend day.", Code: MustCodes.Date.Calendar.NotWeekend)
+        });
+    }
+
+    public static class FirstDayOfMonthDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsFirstDayOfMonth.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsFirstDayOfMonth.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be the first day of the month.", Code: MustCodes.Date.Calendar.NotFirstDayOfMonth)
+        });
+    }
+
+    public static class NotFirstDayOfMonthDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsFirstDayOfMonth.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsFirstDayOfMonth.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be the first day of the month.", Code: MustCodes.Date.Calendar.FirstDayOfMonth),
+            _ => new DataAnnotationExpected(true)
+        });
+    }
+
+    public static class LastDayOfMonthDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsLastDayOfMonth.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsLastDayOfMonth.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(true),
+            _ => new DataAnnotationExpected(false, "Value must be the last day of the month.", Code: MustCodes.Date.Calendar.NotLastDayOfMonth)
+        });
+    }
+
+    public static class NotLastDayOfMonthDateOnly
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.IsLastDayOfMonth.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
+        {
+            nameof(F.IsLastDayOfMonth.NullValue) => new DataAnnotationExpected(true),
+            _ when s.IsValid => new DataAnnotationExpected(false, "Value must not be the last day of the month.", Code: MustCodes.Date.Calendar.LastDayOfMonth),
+            _ => new DataAnnotationExpected(true)
+        });
+    }
 }

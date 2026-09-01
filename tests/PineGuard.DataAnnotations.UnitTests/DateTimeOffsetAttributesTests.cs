@@ -73,4 +73,94 @@ public sealed class DateTimeOffsetAttributesTests(ITestOutputHelper output) : Ba
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetAttributesTestData.WeekdayDateTimeOffset.Cases), MemberType = typeof(DateTimeOffsetAttributesTestData.WeekdayDateTimeOffset))]
+    public void WeekdayDateTimeOffset_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new WeekdayDateTimeOffsetAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetAttributesTestData.WeekendDateTimeOffset.Cases), MemberType = typeof(DateTimeOffsetAttributesTestData.WeekendDateTimeOffset))]
+    public void WeekendDateTimeOffset_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new WeekendDateTimeOffsetAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetAttributesTestData.FirstDayOfMonthDateTimeOffset.Cases), MemberType = typeof(DateTimeOffsetAttributesTestData.FirstDayOfMonthDateTimeOffset))]
+    public void FirstDayOfMonthDateTimeOffset_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new FirstDayOfMonthDateTimeOffsetAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetAttributesTestData.NotFirstDayOfMonthDateTimeOffset.Cases), MemberType = typeof(DateTimeOffsetAttributesTestData.NotFirstDayOfMonthDateTimeOffset))]
+    public void NotFirstDayOfMonthDateTimeOffset_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotFirstDayOfMonthDateTimeOffsetAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetAttributesTestData.LastDayOfMonthDateTimeOffset.Cases), MemberType = typeof(DateTimeOffsetAttributesTestData.LastDayOfMonthDateTimeOffset))]
+    public void LastDayOfMonthDateTimeOffset_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new LastDayOfMonthDateTimeOffsetAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetAttributesTestData.NotLastDayOfMonthDateTimeOffset.Cases), MemberType = typeof(DateTimeOffsetAttributesTestData.NotLastDayOfMonthDateTimeOffset))]
+    public void NotLastDayOfMonthDateTimeOffset_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotLastDayOfMonthDateTimeOffsetAttribute();
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result, attr.Code);
+    }
 }
