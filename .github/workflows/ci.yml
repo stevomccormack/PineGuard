@@ -357,13 +357,19 @@ jobs:
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.4.*
 
+      # merge-multiple: false (the default) — downloading up to 15 parallel matrix jobs' artifacts
+      # into one flat directory with merge-multiple: true was occasionally colliding on an internal
+      # extraction path shared between two artifacts, corrupting one job's coverage.cobertura.xml
+      # (observed as "Data at the root level is invalid" / "multiple root elements" in Generate
+      # coverage report, costing exactly the branches that file uniquely covered). Each artifact
+      # now lands in its own test-results/<artifact-name>/ subdirectory instead; "Find coverage
+      # files" below already does a recursive find, so the extra nesting is transparent to it.
       - name: Download all test results
         id: download
         uses: actions/download-artifact@v8
         with:
           pattern: test-results-*
           path: ./test-results/
-          merge-multiple: true
         continue-on-error: true
 
       - name: Find coverage files
