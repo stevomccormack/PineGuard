@@ -153,8 +153,8 @@ public sealed class PreferGuardAnalyzer : DiagnosticAnalyzer
         if (identifier is null)
             return;
 
-        if (context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol
-            is not IMethodSymbol { ContainingType.SpecialType: SpecialType.System_String } predicate)
+        if (context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol is not IMethodSymbol predicate
+            || predicate.ContainingType.SpecialType != SpecialType.System_String)
             return;
 
         var suggestion = GetEmptinessSuggestion(predicate.Name);
