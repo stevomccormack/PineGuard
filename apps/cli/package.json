@@ -27,7 +27,8 @@
     "remark-parse": "11.0.0",
     "tree-sitter-c-sharp": "0.23.5",
     "unist-util-visit": "5.1.0",
-    "web-tree-sitter": "0.27.0"
+    "web-tree-sitter": "0.27.0",
+    "yaml": "2.9.0"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
