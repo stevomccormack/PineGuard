@@ -16,8 +16,14 @@ import pc from "picocolors";
  */
 export const BANNER_FONT = "ANSI Shadow";
 
-/** The font only has capitals, so this casing is for readers of the source. */
-const WORDMARK = "PineGuard";
+/**
+ * The wordmark is rendered as two figlet blocks — "Pine" and "Guard" — and
+ * zipped back together row by row, so each word can be painted on its own
+ * (pine green for "Pine", the terminal's default for "Guard") without having
+ * to locate a column offset inside one rendered block. The font only has
+ * capitals, so the casing here is for readers of the source.
+ */
+const WORDMARK = { pine: "Pine", guard: "Guard" } as const;
 
 /** Plain-text line under the wordmark. Stable, and never part of commander's own `--help` output. */
 export const BANNER_TAGLINE =
@@ -27,11 +33,20 @@ export const BANNER_TAGLINE =
 const MARGIN = "  ";
 
 type Palette = ReturnType<typeof pc.createColors>;
+type Paint = (text: string) => string;
 
 /** Options for {@link renderBanner}. */
 export interface BannerOptions {
     /** Emit ANSI colour. Defaults to {@link shouldUseColor}. */
     color?: boolean;
+}
+
+/** One row of the wordmark, split at the word boundary so each half can be painted independently. */
+export interface WordmarkRow {
+    /** The "Pine" half, padded to a uniform width so the "Guard" half lines up beneath itself on every row. */
+    pine: string;
+    /** The "Guard" half, right edge trimmed (it is the end of the line). */
+    guard: string;
 }
 
 /**
@@ -53,8 +68,8 @@ export function shouldUseColor(
 }
 
 /**
- * The wordmark as plain rows: figlet's output with trailing whitespace and
- * any blank leading/trailing rows removed.
+ * One word as figlet rows, every row padded to the block's widest row so a
+ * block rendered next to it stays column-aligned.
  *
  * figlet reads the `.flf` font from its own `fonts/` directory at run time.
  * That is fine here because tsup keeps `dependencies` external, so `figlet`
@@ -62,31 +77,62 @@ export function shouldUseColor(
  * dependencies, switch to importing `figlet/fonts/ANSI Shadow` and
  * registering it with `figlet.parseFont` instead.)
  */
+function renderBlock(text: string): string[] {
+    const rows = figlet.textSync(text, { font: BANNER_FONT }).split("\n");
+    const width = Math.max(...rows.map((row) => row.length));
+    return rows.map((row) => row.padEnd(width));
+}
+
+function isBlank(row: WordmarkRow | undefined): boolean {
+    return row === undefined || (row.pine + row.guard).trim() === "";
+}
+
+/**
+ * The wordmark as rows split at the "Pine" | "Guard" boundary, with figlet's
+ * trailing whitespace and any blank leading/trailing rows removed. Joining
+ * `pine + guard` on each row gives the plain wordmark (see
+ * {@link renderWordmark}).
+ */
+export function renderWordmarkRows(): WordmarkRow[] {
+    const pine = renderBlock(WORDMARK.pine);
+    const guard = renderBlock(WORDMARK.guard);
+    const rows: WordmarkRow[] = [];
+    for (let i = 0; i < Math.max(pine.length, guard.length); i += 1) {
+        const guardRow = (guard[i] ?? "").trimEnd();
+        const pineRow = pine[i] ?? "";
+        // The pine half keeps its padding so the guard half lines up — unless
+        // there is no guard half on this row, in which case the padding would
+        // just be trailing whitespace.
+        rows.push({
+            pine: guardRow === "" ? pineRow.trimEnd() : pineRow,
+            guard: guardRow,
+        });
+    }
+    let end = rows.length;
+    while (end > 0 && isBlank(rows[end - 1])) {
+        end -= 1;
+    }
+    let start = 0;
+    while (start < end && isBlank(rows[start])) {
+        start += 1;
+    }
+    return rows.slice(start, end);
+}
+
+/** The wordmark as plain rows: both halves joined, no colour. */
 export function renderWordmark(): string[] {
-    const rows = figlet
-        .textSync(WORDMARK, { font: BANNER_FONT })
-        .split("\n")
-        .map((row) => row.trimEnd());
-    while (rows.length > 0 && rows.at(-1) === "") {
-        rows.pop();
-    }
-    while (rows.length > 0 && rows[0] === "") {
-        rows.shift();
-    }
-    return rows;
+    return renderWordmarkRows().map((row) => row.pine + row.guard);
 }
 
 /**
  * ANSI Shadow draws each glyph as solid `█` blocks with a drop shadow of
- * box-drawing strokes (`╗ ═ ╝ …`). Painting the blocks green and the strokes
- * dim green makes the shadow read as a shadow rather than a second outline.
- * With colour disabled the palette functions are identities, so the row
- * comes back untouched.
+ * box-drawing strokes (`╗ ═ ╝ …`). The strokes are dimmed so the shadow
+ * reads as a shadow rather than a second outline, and `body` then paints the
+ * whole half (identity for the terminal-default "Guard"). With colour
+ * disabled every function here is an identity, so the row comes back as-is.
  */
-function paintRow(row: string, palette: Palette): string {
-    return palette.green(
-        row.replace(/[^█\s]+/g, (stroke) => palette.dim(stroke)),
-    );
+function paintHalf(half: string, body: Paint, palette: Palette): string {
+    return body(half.replace(/[^█\s]+/g, (stroke) => palette.dim(stroke)));
 }
 
 /** Resolves the package version straight from `apps/cli/package.json` so the banner can never drift from `pineguard --version`. */
@@ -116,8 +162,12 @@ export function readVersion(): string {
  */
 export function renderBanner(options: BannerOptions = {}): string {
     const palette = pc.createColors(options.color ?? shouldUseColor());
-    const wordmark = renderWordmark().map(
-        (row) => MARGIN + paintRow(row, palette),
+    const plain: Paint = (text) => text;
+    const wordmark = renderWordmarkRows().map(
+        (row) =>
+            MARGIN +
+            paintHalf(row.pine, palette.green, palette) +
+            paintHalf(row.guard, plain, palette),
     );
     const version = palette.dim(`v${readVersion()}`);
 

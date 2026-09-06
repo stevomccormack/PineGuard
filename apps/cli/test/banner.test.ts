@@ -12,6 +12,7 @@ import {
     BANNER_TAGLINE,
     renderBanner,
     renderWordmark,
+    renderWordmarkRows,
     shouldUseColor,
 } from "../src/banner.js";
 
@@ -35,6 +36,8 @@ const MAX_COLUMNS = 80;
 const ESC = String.fromCharCode(27);
 const ANSI_SGR = new RegExp(`${ESC}\\[[0-9;]*m`, "g");
 const stripAnsi = (text: string): string => text.replace(ANSI_SGR, "");
+const GREEN_OPEN = `${ESC}[32m`;
+const GREEN_CLOSE = `${ESC}[39m`;
 
 /** Terminal columns of a row: code points, since the font uses non-ASCII block glyphs. */
 const columns = (row: string): number => [...row].length;
@@ -69,7 +72,7 @@ function runCli(args: readonly string[]): {
 }
 
 describe("renderWordmark", () => {
-    it("is figlet's own rendering of the wordmark in BANNER_FONT, trimmed", () => {
+    it("is figlet's own single rendering of PineGuard in BANNER_FONT, trimmed — the Pine/Guard split leaves no seam", () => {
         const expected = figlet
             .textSync("PineGuard", { font: BANNER_FONT })
             .split("\n")
@@ -87,6 +90,25 @@ describe("renderWordmark", () => {
         for (const row of rows) {
             expect(columns(row)).toBeLessThanOrEqual(MAX_COLUMNS);
         }
+    });
+});
+
+describe("renderWordmarkRows", () => {
+    it("keeps the Pine half a uniform width so the Guard half stays column-aligned", () => {
+        const rows = renderWordmarkRows();
+        const [first] = rows;
+        expect(first).toBeDefined();
+        for (const row of rows) {
+            expect(columns(row.pine)).toBe(columns(first?.pine ?? ""));
+            expect(row.guard).not.toBe("");
+            expect(row.guard).toBe(row.guard.trimEnd());
+        }
+    });
+
+    it("joins back into the plain wordmark row for row", () => {
+        expect(renderWordmarkRows().map((row) => row.pine + row.guard)).toEqual(
+            renderWordmark(),
+        );
     });
 });
 
@@ -127,6 +149,23 @@ describe("renderBanner", () => {
         const coloured = renderBanner({ color: true });
         expect(coloured).toContain(ESC);
         expect(stripAnsi(coloured)).toBe(plain);
+    });
+
+    it("paints exactly the Pine half green and leaves the Guard half in the terminal's default colour", () => {
+        const rows = renderWordmarkRows();
+        const colouredLines = renderBanner({ color: true }).split("\n");
+        // Line 0 is the leading blank; the wordmark rows follow in order.
+        rows.forEach((row, i) => {
+            const line = colouredLines[i + 1] ?? "";
+            const closeAt = line.indexOf(GREEN_CLOSE);
+            expect(line.indexOf(GREEN_OPEN)).toBeGreaterThanOrEqual(0);
+            expect(closeAt).toBeGreaterThan(0);
+            const greenSpan = line.slice(0, closeAt + GREEN_CLOSE.length);
+            const rest = line.slice(closeAt + GREEN_CLOSE.length);
+            expect(stripAnsi(greenSpan).trimStart()).toBe(row.pine);
+            expect(stripAnsi(rest)).toBe(row.guard);
+            expect(rest).not.toContain(GREEN_OPEN);
+        });
     });
 });
 
