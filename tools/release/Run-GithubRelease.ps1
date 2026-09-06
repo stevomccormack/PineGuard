@@ -120,7 +120,7 @@ if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     Fail "gh CLI not found. Install from https://cli.github.com/"
 }
 
-$ghStatus = gh auth status 2>&1
+$null = gh auth status 2>&1
 if ($LASTEXITCODE -ne 0) {
     Fail "gh not authenticated. Run 'gh auth login' or set GH_TOKEN."
 }
@@ -163,8 +163,8 @@ if ($BypassPR) {
         Fail "Run-GithubRuleset.ps1 not found at $rulesetScript"
     }
 
-    $aheadCount = [int]((git rev-list --count '@{upstream}..HEAD' 2>$null) -as [string]).Trim()
-    if ($null -eq $aheadCount) { $aheadCount = 0 }
+    $aheadCountRaw = git rev-list --count '@{upstream}..HEAD' 2>$null
+    $aheadCount = if ([string]::IsNullOrWhiteSpace($aheadCountRaw)) { 0 } else { [int]$aheadCountRaw.Trim() }
 
     if ($aheadCount -eq 0) {
         Write-Info "No local commits ahead of upstream — skipping BypassPR cycle."

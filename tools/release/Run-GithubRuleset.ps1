@@ -64,7 +64,7 @@ $displayName = $rulesetKeyToName[$Name]
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     Fail "gh CLI not found on PATH. Install from https://cli.github.com/"
 }
-$ghStatus = gh auth status 2>&1
+$null = gh auth status 2>&1
 if ($LASTEXITCODE -ne 0) {
     Fail "gh CLI is not authenticated. Run 'gh auth login' first."
 }
