@@ -4,20 +4,19 @@
 
 .DESCRIPTION
     This script deletes files with specified extensions from the repository root.
-    Note: For safety, Recursive is disabled by default and requires explicit confirmation in logic if dealing with sensitive operations.
-    Given the request, recursive is supported but we must be careful with root.
+    This script ONLY ever touches the top-level of the repository root — it never
+    recurses into subdirectories. That is a deliberate, permanent constraint: recursing
+    from root with generic extensions (like txt/log) has no safe way to exclude
+    directories such as .git, so recursion is not offered as an option here.
 
 .PARAMETER Extensions
     A list of file extensions to delete. Default is 'txt', 'log'.
     Example: -Extensions 'tmp'
 
 .PARAMETER All
-    If specified, deletes *all* items matching extensions (reinforces intent).
-
-.PARAMETER Recursive
-    If specified, searches subdirectories of the root.
-    WARNING: Using -Recursive on Root with generic extensions (like txt) will delete files across the entire repo!
-    Use with extreme caution.
+    Kept as a documented no-op for CLI compatibility with Run-Clean.ps1 -All.
+    It has no effect on this script's behavior: -Extensions already controls
+    exactly which files are targeted.
 
 .EXAMPLE
     .\Cleanup-Root.ps1
@@ -26,57 +25,50 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [string[]]$Extensions = @('txt', 'log'),
-    [switch]$All,
-    [switch]$Recursive
+    [switch]$All
 )
 
 . (Join-Path $PSScriptRoot '..\.shared\path.ps1')
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
+# Names that must never be matched, even at the top level. Top-level-only
+# enumeration with -File already excludes directories like .git, but this list
+# is belt-and-suspenders in case that restriction is ever loosened later
+# without re-reading this comment.
+$excludedNames = @('.git', '.claude', 'node_modules', 'bin', 'obj', '.vs', '.idea', 'packages')
+
 if ($All) {
-    # If -All is passed, we stick to the provided extensions or default.
-    # We DO NOT default to '*' for Root because that would delete the repo.
-    # The requirement said "Cleanup-Root -Extensions -All -Recursive".
-    # We assume -All just means "All specified content types" here, usually redundant but kept for API consistency.
-    # If the user meant "Delete everything in root", that's too dangerous.
-    # We will trust the Extensions param.
+    # -All is accepted for CLI compatibility with Run-Clean.ps1 but is a no-op here:
+    # -Extensions already fully determines what gets targeted, and root cleanup
+    # never defaults to '*' regardless of this switch (see the guard below).
 }
 
 Write-Host "Cleaning root directory: $repoRoot" -ForegroundColor Cyan
-if ($Recursive) {
-    Write-Warning "Running RECURSIVE cleanup from ROOT. This scans the entire repository!"
-}
 
 foreach ($ext in $Extensions) {
     # Ensure extension has wildcard
     $filter = if ($ext -eq '*') { '*' } elseif ($ext -like '*.*') { $ext } else { "*.$ext" }
-    
-    # SAFETY: Do not allow * or *.* on root unless explicitly forced (which we are not implementing a force-override for here for safety).
-    if ($filter -eq '*' -and -not $Recursive) {
+
+    # SAFETY: Never allow a bare '*' filter on root, full stop.
+    if ($filter -eq '*') {
         Write-Warning "Deleting '*' from Root is dangerous. Skipping. Specify extensions explicitly if needed."
         continue
     }
-    
+
     $params = @{
         Path   = $repoRoot
         Filter = $filter
         File   = $true
         Force  = $true
     }
-    
-    if ($Recursive) {
-        $params['Recurse'] = $true
-        # Exclude .git and commonly ignored folders if possible? 
-        # For simple Get-ChildItem, excluding .git is good practice if recursive.
-        # However, user asked for simple cleanup. We will trust ShouldProcess.
-    }
-    
+
     $files = Get-ChildItem @params
-    
+
     foreach ($file in $files) {
-        # Skip this script and the maintenance folder itself if we are recursive?
-        # No, generally we just delete the target extensions.
-        
+        if ($excludedNames -contains $file.Name) {
+            continue
+        }
+
         if ($PSCmdlet.ShouldProcess($file.FullName, "Delete Root File")) {
             Remove-Item -LiteralPath $file.FullName -Force
             Write-Host "Deleted: $($file.Name)" -ForegroundColor Gray
