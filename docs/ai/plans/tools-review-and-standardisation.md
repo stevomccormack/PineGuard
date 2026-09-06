@@ -428,7 +428,7 @@ tasks sharing a group letter run concurrently; a group runs after the group it d
 
 | ID | Task | Agent / model | Status | Fan-out group | Depends on | Notes |
 |---|---|---|---|---|---|---|
-| D-1..9 | Decision session, append `## Decisions` | Owner + Sonnet 5 (no council) | Done | P0 | — | Signed off 2026-09-06. D-1c, D-1d, D-2 reverse defaults; D-9 adds a front door to §3.5; see `## Decisions` follow-up before dispatching. |
+| D-1..9 | Decision session, append `## Decisions` | Owner + Sonnet 5 (no council) | Done | P0 | — | Signed off 2026-09-06. D-1a replaces §3.1 with the owner's two-level rule; D-1c, D-1d, D-2 reverse defaults; D-9 adds a front door to §3.5; see `## Decisions` follow-up before dispatching. |
 | T1.01 | git.ps1 Tier 0 fix + `$args` rename | Sonnet | Pending | P1-B | — | Serialised on `git.ps1` |
 | T1.02 | Diagnostics: exit code, errors, dedupe | Sonnet | Pending | P1-A | — | |
 | T1.03 | Coverage analysis tab + temp cleanup | Sonnet | Pending | P1-A | — | |
@@ -489,14 +489,15 @@ tasks sharing a group letter run concurrently; a group runs after the group it d
 
 ## Decisions
 
-Session: 2026-09-06, owner (Steve McCormack) sign-off via interactive Q&A, Sonnet 5 session
-(no `/ask-council` pressure-test requested).
+Session: 2026-09-06, owner (Steve McCormack) sign-off via interactive Q&A, Sonnet 5 then
+Fable 5.1 (no `/ask-council` pressure-test requested). D-1 and D-9 were each revised by the
+owner within the session; the table records the final answer and lists the withdrawn one.
 
 | ID | Decision | Rejected alternatives | Notes |
 |---|---|---|---|
-| D-1a | Adopt §3.1 taxonomy (activity names for generic dotnet work, product names for third-party analysers) | All-activity; all-product; leave as-is | — |
+| D-1a | **Two-level rule.** Folders are the abstract activity, spelled as the bare activity noun (the owner's phrase: "plural in its singular form" — `code-format`, not `code-formatter`; `code-scan`, not `code-scanner`). Final root list, owner-signed 2026-09-06: `code-coverage/`, `code-diagnostics/`, `code-format/` (from `code-formatter/`), `code-scan/` (absorbs `code-inspection/` and `sonar-scanner/`), `clean/` (from `maintenance/`), `github/` (from `release/`), `nuget/` (new; takes `Run-NugetUnlist.ps1` from `release/`), `testing/`, `git/`, `docker/`, plus the dot-folders `.shared/` and `.tests/`; `audit-cli/` is being removed by another agent and is ignored here. Everything *inside* a folder — subfolders, scripts, and the slash-command families that drive them — is named for the concrete tool: `code-coverage/coverlet/` (from `xplat/`), `code-coverage/dotcover/`, `code-scan/qodana/` (from `code-inspection/`, with the inner `qodana/` level flattened away so config and `.slnx` sit directly under it), `code-scan/sonarqube/` (from `sonar-scanner/`), `Run-Qodana.ps1`, `Run-SonarScanner.ps1`, `/scan-roslyn-*`, `/scan-qodana-*`, `/scan-sonar`. | §3.1 as written ("one name per thing" across every level, with `code-inspection`→`qodana`, `sonar-scanner`→`sonarqube`, and abstract orchestrator names `Run-CodeDiagnostics`/`Run-CodeFormat`/`Run-SonarQube`); `code-scan/` as a rename of `sonar-scanner/` alone (owner's interim answer, withdrawn: `scan` is the shared verb of every `scan-*` skill and SonarScanner is a CLI, not an activity); nesting `sonarqube/` under `code-inspection/`; all-activity; all-product; leave as-is | Owner's own rule, replacing §3.1's. F-01 is resolved by declaring which level each name lives at, not by collapsing to one name. `code-scan/` is the home for every external scanning CLI, one subfolder per tool; the owner intends to add more (semgrep, snyk, others) later — YAGNI now, but the shape is chosen for them. Spelled `code-scan`, not `code-scanner`, to match the abstract name the Brain already uses: `docs/ai/specs/scan/`, `docs/ai/rules/scan.md`, `docs/ai/commands/scan.md`, and the `scan-*` skill prefix. Roslyn stays in `code-diagnostics/`: it is a build by-product, not a scanning CLI. `code-analyzer` was considered for the diagnostics domain and rejected: it collides with `src/PineGuard.Analyzers` and with the scanner vocabulary, and Roslyn's own term is `Diagnostic`. §3.1's `code-formatter/` → `code-format/` rename is kept (plain activity noun, matching `code-scan`); its other folder and orchestrator renames are withdrawn; `Run-CompilerDiagnostics.ps1` and `Run-Format.ps1` stay. The registry's `QodanaConfig` paths and `rules/scan.md` / `specs/scan/spec.md` `applies_to` follow the moves in T4.02. Artifacts folders follow the folder names (`artifacts/clean/`, `artifacts/github/`), and the `/clean-*` command family now matches its folder outright. `Run-NugetUnlist.ps1` moves to a new `nuget/` sibling (owner decision: nuget.org tooling never sits under `github/`), becoming `Unpublish-NugetPrerelease.ps1` per §3.2; `/nuget-unlist` and `docs/ai/agents/nuget-unlist.md` keep their names and follow the path in T4.02. `Test-StructuralIntegrity.ps1` stays in `clean/`. |
 | D-1b | Only `Run-` (+ plural `Run-Tests`/`Run-Commits`) are sanctioned verb outliers | Keep `Gen-`, `Clean-`, `Setup-` as extra outliers | `Gen-`, `Clean-`, `Setup-` get renamed to approved verbs (`New-`, `Clear-`, `Initialize-`) per §3.2 |
-| D-1c | **Folder follows commands**: `tools/code-diagnostics/` → `tools/roslyn/` (script and spec path move with it) | Commands/rules follow folder (`/scan-roslyn-*` → `/scan-diagnostics-*`); keep both, document mapping | CLI-facing names stay as-is: `/scan-roslyn-*`, `/fix-roslyn-all`, `docs/ai/rules/roslyn.md`, CLAUDE.md palette unchanged. **This reverses §3.1's table row and the D-1c default lean in §4 — §3.1 and Phase 4/5 task text need correcting to a folder-only rename, not a command rename.** |
+| D-1c | **No mismatch to fix.** Under D-1a a command family names the tool and its folder names the activity by design, so `/scan-roslyn-*` inside `code-diagnostics/` is the intended layering. Nothing renames on either side. | Folder → `tools/roslyn/` (owner's first answer, withdrawn once D-1a was stated); commands → `/scan-diagnostics-*`; keep both and document the mapping | `/scan-roslyn-*`, `/fix-roslyn-all`, `docs/ai/rules/roslyn.md`, the CLAUDE.md palette, `tools/code-diagnostics/` and `Run-CompilerDiagnostics.ps1` all stay exactly as they are. The same reasoning keeps `/scan-sonar` and `rules/scan.md` beside `code-scan/sonarqube/`, and `/scan-qodana-*` beside `code-scan/qodana/`. §3.1's table row and the D-1c row in §4 need replacing with this. |
 | D-1d | Support **both** `-WhatIf` (native `SupportsShouldProcess`) and `-DryRun` (alias) everywhere | `-WhatIf` only; `-DryRun` only | **Reverses §3.3's "-WhatIf … replaces -DryRun (rejected)" row** — `-DryRun` becomes a supported alias, not removed; §3.3 needs correcting |
 | D-2 | **Keep dot-sourcing**, add a Pester ordering test | Convert `.shared` to a `PineGuard.Tools` script module | **Reverses the plan's default and removes the basis for T3.01 as written** — T3.01 must be rewritten: no module conversion; instead consolidate duplicate functions (F-06, F-07, F-10) and remove the two aggregator shims within the existing dot-source pattern, plus the new ordering test |
 | D-3 | **Leave the Qodana Docker compose stack and the 14 hand-written `.slnx` files as-is** — no removal, no run-time generation | Remove compose stack; generate per-scope config from the registry | T1.05 (hand-add the missing MediatR/Analyzers `.slnx`/config so `Run-Qodana -Scope MediatR` stops throwing) still happens — that is a bug fix, not the D-3 restructuring. T3.04's compose-removal and config-generation scope is dropped. |
@@ -509,11 +510,20 @@ Session: 2026-09-06, owner (Steve McCormack) sign-off via interactive Q&A, Sonne
 
 ### Follow-up required before Phase 1 dispatch
 
-Three decisions (D-1c, D-1d, D-2) reverse a default recommendation the rest of the document was
-written around, and D-9 adds a front-door script to §3.5. Before dispatching Phase 1/2/3 tasks,
-§3.1, §3.3, §3.5, and the Phase 3/4/5 task tables (T3.01, T3.03, T3.11, T4.02, T5.01) need a text
-pass to match the decisions above — not a re-decision, just bringing the prose in line with what
-was actually chosen.
+D-1a replaces §3.1's vocabulary rule and table outright; D-1c, D-1d and D-2 reverse a default
+recommendation the rest of the document was written around; D-9 adds a front-door script to §3.5.
+Before dispatching Phase 1/2/3 tasks, §3.1 (rewrite to the two-level rule; the folder moves are
+`code-inspection/` → `code-scan/qodana/`, `sonar-scanner/` → `code-scan/sonarqube/`,
+`code-formatter/` → `code-format/`, `maintenance/` → `clean/`, `release/` → `github/` with
+`Run-NugetUnlist.ps1` out to a new `nuget/`, and `code-coverage/xplat/` → `code-coverage/coverlet/`),
+§3.2's orchestrator examples, §3.3, §3.5, and the Phase 3/4/5 task tables (T3.01, T3.03, T3.04,
+T3.05, T3.06, T3.07, T3.08, T3.11, T4.01, T4.02, T5.01) need a
+text pass to match the decisions above — not a re-decision, just bringing the prose in line with
+what was actually chosen. Phase 4's rename cascade is those six folder moves, the new `nuget/` folder, plus the
+script-level renames in §3.2 as decided in D-1b (`Gen-`→`New-`, `Clean-`→`Clear-`,
+`Setup-`→`Initialize-`, `Initialize-`→`Install-` where it installs, `*-up`/`*-down`→`Start-`/`Stop-`,
+`Test-CoverageAnalysis`→`Test-Coverage`, and the F-02 `Run-` singles); no slash command, skill, or
+rules file changes name.
 
 ## Baselines
 
