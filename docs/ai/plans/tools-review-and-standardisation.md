@@ -1,8 +1,8 @@
 <!-- metadata_header
 type: plan
 id: tools-review-and-standardisation
-version: 1.0
-status: planned
+version: 1.1
+status: decisions-signed-off
 last_updated: 2026-09-06
 scope: tools/** excluding tools/audit-cli/** (under separate review)
 -->
@@ -428,7 +428,7 @@ tasks sharing a group letter run concurrently; a group runs after the group it d
 
 | ID | Task | Agent / model | Status | Fan-out group | Depends on | Notes |
 |---|---|---|---|---|---|---|
-| D-1..8 | Decision session, append `## Decisions` | Fable (council optional) | Pending | P0 | — | Owner signs off. Present §3 with alternatives. |
+| D-1..9 | Decision session, append `## Decisions` | Owner + Sonnet 5 (no council) | Done | P0 | — | Signed off 2026-09-06. D-1c, D-1d, D-2, D-9 reverse defaults; see `## Decisions` follow-up before dispatching. |
 | T1.01 | git.ps1 Tier 0 fix + `$args` rename | Sonnet | Pending | P1-B | — | Serialised on `git.ps1` |
 | T1.02 | Diagnostics: exit code, errors, dedupe | Sonnet | Pending | P1-A | — | |
 | T1.03 | Coverage analysis tab + temp cleanup | Sonnet | Pending | P1-A | — | |
@@ -489,7 +489,30 @@ tasks sharing a group letter run concurrently; a group runs after the group it d
 
 ## Decisions
 
-*(appended by the Phase 0 session)*
+Session: 2026-09-06, owner (Steve McCormack) sign-off via interactive Q&A, Sonnet 5 session
+(no `/ask-council` pressure-test requested).
+
+| ID | Decision | Rejected alternatives | Notes |
+|---|---|---|---|
+| D-1a | Adopt §3.1 taxonomy (activity names for generic dotnet work, product names for third-party analysers) | All-activity; all-product; leave as-is | — |
+| D-1b | Only `Run-` (+ plural `Run-Tests`/`Run-Commits`) are sanctioned verb outliers | Keep `Gen-`, `Clean-`, `Setup-` as extra outliers | `Gen-`, `Clean-`, `Setup-` get renamed to approved verbs (`New-`, `Clear-`, `Initialize-`) per §3.2 |
+| D-1c | **Folder follows commands**: `tools/code-diagnostics/` → `tools/roslyn/` (script and spec path move with it) | Commands/rules follow folder (`/scan-roslyn-*` → `/scan-diagnostics-*`); keep both, document mapping | CLI-facing names stay as-is: `/scan-roslyn-*`, `/fix-roslyn-all`, `docs/ai/rules/roslyn.md`, CLAUDE.md palette unchanged. **This reverses §3.1's table row and the D-1c default lean in §4 — §3.1 and Phase 4/5 task text need correcting to a folder-only rename, not a command rename.** |
+| D-1d | Support **both** `-WhatIf` (native `SupportsShouldProcess`) and `-DryRun` (alias) everywhere | `-WhatIf` only; `-DryRun` only | **Reverses §3.3's "-WhatIf … replaces -DryRun (rejected)" row** — `-DryRun` becomes a supported alias, not removed; §3.3 needs correcting |
+| D-2 | **Keep dot-sourcing**, add a Pester ordering test | Convert `.shared` to a `PineGuard.Tools` script module | **Reverses the plan's default and removes the basis for T3.01 as written** — T3.01 must be rewritten: no module conversion; instead consolidate duplicate functions (F-06, F-07, F-10) and remove the two aggregator shims within the existing dot-source pattern, plus the new ordering test |
+| D-3 | **Leave the Qodana Docker compose stack and the 14 hand-written `.slnx` files as-is** — no removal, no run-time generation | Remove compose stack; generate per-scope config from the registry | T1.05 (hand-add the missing MediatR/Analyzers `.slnx`/config so `Run-Qodana -Scope MediatR` stops throwing) still happens — that is a bug fix, not the D-3 restructuring. T3.04's compose-removal and config-generation scope is dropped. |
+| D-4 | One `Get-ToolSecret` resolver + `.env` + SonarQube bound to loopback + generated admin password | Keep the persisted User-level environment variable | Adopted as recommended (§3.4) |
+| D-5 | **PowerShell only for now** — fix Windows-only path literals in place across `tools/**` (excluding `audit-cli`) | Proceed with a Bash rewrite now | Bash is a **future aspiration, not executed now**: `cross-platform-tools-migration.md` is marked **deferred**, not superseded/deleted. No CI job changes — the Windows-pinned `audit` job (`.github/workflows/ci.yml:701-704`) runs `tools/audit-cli/Run-All.ps1`, which is out of scope here and owned by the separate audit-cli review. |
+| D-6 | Table-driven `Run-Commits.ps1 -Scope <string[]>` replacing all 16 `Commit-*.ps1`, conventional-commit auto message | Keep 16 scripts, patch only | Adopted as recommended |
+| D-7 | Tool tests live under `tools/.tests/` | `tests/PineGuard.Tools.Tests/` | Adopted as recommended |
+| D-8 | **Defer Phase 5** — docs/spec rewrites do not proceed on this pass | Lift the freeze now (New Surfaces Program is complete, `d94b85b`) | Owner deferred despite the freeze's original justification no longer applying; Phase 5 stays blocked until the owner reopens it |
+| D-9 | **One `New-CoverageReport.ps1` with `-Engine Coverlet\|DotCover` branches**, not separate `coverlet/`/`dotcover/` scripts | Adopt §3.5 (two folders, same-named scripts); dotCover authoritative; flatten to Coverlet only | Coverlet stays the CI/100%-gate authority; dotCover is the local/Rider second opinion, reported not gated, per §3.5's other rules. **Reverses §3.5's rejection rationale ("share almost no code, would become one file full of `if ($Engine)`") — §3.5 and tasks T3.03/T3.11 need rewriting to a single branching script.** |
+
+### Follow-up required before Phase 1 dispatch
+
+Four decisions (D-1c, D-1d, D-2, D-9) reverse a default recommendation the rest of the document
+was written around. Before dispatching Phase 1/2/3 tasks, §3.1, §3.3, §3.5, and the Phase 3/4/5
+task tables (T3.01, T3.03, T3.11, T4.02, T5.01) need a text pass to match the decisions above —
+not a re-decision, just bringing the prose in line with what was actually chosen.
 
 ## Baselines
 
