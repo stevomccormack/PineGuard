@@ -1,7 +1,11 @@
 import type { Command } from "commander";
 
 import { getAllRules, isRuleScope, type RuleScope } from "../audit/catalog.js";
-import { runAudit, type AuditRunOptions } from "../audit/engine.js";
+import {
+    runAudit,
+    runUpdateBaseline,
+    type AuditRunOptions,
+} from "../audit/engine.js";
 import { buildJsonReport, writeJsonReport } from "../audit/reporters/json.js";
 import { renderPretty } from "../audit/reporters/pretty.js";
 import { findRepoRoot } from "../audit/repo.js";
@@ -24,9 +28,11 @@ interface AuditOptions {
     gate?: boolean;
     list?: boolean;
     format?: string;
+    /** `--changed`: plan P3.2, still a no-op today. */
     changed?: boolean;
+    /** `--update-baseline` (plan §4.4): handled entirely by {@link runUpdateBaselineCommand}. */
     updateBaseline?: boolean;
-    // commander maps `--no-baseline` to `baseline: false`; absent = true.
+    /** `--no-baseline` (plan §4.4). commander maps it to `baseline: false`; absent = `true` (apply the ratchet). */
     baseline?: boolean;
 }
 
@@ -64,11 +70,48 @@ function printCatalog(): void {
     }
 }
 
-/** P3-territory flags: accepted so scripts don't break, but currently a no-op beyond this one-line notice. */
+/** P3-territory flags not yet implemented: accepted so scripts don't break, but currently a no-op beyond this one-line notice. Only `--changed` (plan P3.2) is still in this state — `--update-baseline`/`--no-baseline` (plan P3.1) are implemented below. */
 function warnNotYetImplemented(flag: string): void {
     console.error(
         `pineguard audit: ${flag} is accepted but not implemented yet (plan P3) — continuing without it.`,
     );
+}
+
+/**
+ * `pineguard audit --update-baseline` (plan §4.4): a maintenance operation,
+ * not a pass/fail check. Snapshots every registered rule's current,
+ * unsuppressed findings into `apps/cli/config/baseline.json` via
+ * {@link runUpdateBaseline}, then exits `0` — regardless of how many
+ * findings were baselined — unless something actually went wrong building
+ * the context or running a rule, in which case it exits `2` like any other
+ * usage/config error.
+ */
+async function runUpdateBaselineCommand(): Promise<void> {
+    const result = await runUpdateBaseline();
+
+    if (!result.written) {
+        console.error(
+            `pineguard audit --update-baseline: ${result.error ?? "failed to write apps/cli/config/baseline.json"}`,
+        );
+        process.exitCode = 2;
+        return;
+    }
+
+    const slugs = Object.keys(result.baseline).sort((a, b) =>
+        a.localeCompare(b),
+    );
+    const totalFindings = slugs.reduce(
+        (sum, slug) => sum + (result.baseline[slug]?.length ?? 0),
+        0,
+    );
+    console.log(
+        `pineguard audit: wrote apps/cli/config/baseline.json — ` +
+            `${String(totalFindings)} finding(s) accepted as pre-existing debt across ${String(slugs.length)} rule(s).`,
+    );
+    for (const slug of slugs) {
+        console.log(`  ${slug}: ${String(result.baseline[slug]?.length ?? 0)}`);
+    }
+    process.exitCode = 0;
 }
 
 async function runAuditCommand(
@@ -77,6 +120,17 @@ async function runAuditCommand(
 ): Promise<void> {
     if (options.list) {
         printCatalog();
+        return;
+    }
+
+    if (options.updateBaseline) {
+        // A separate maintenance flow (plan §4.4) — always snapshots the
+        // whole catalog, so any rule-selection/--scope/--gate arguments also
+        // given alongside --update-baseline are deliberately ignored rather
+        // than narrowing what gets snapshotted (see runUpdateBaseline's doc
+        // comment in engine.ts for why: a partial snapshot would silently
+        // drift the ratchet floor out of sync for the rules not selected).
+        await runUpdateBaselineCommand();
         return;
     }
 
@@ -101,17 +155,14 @@ async function runAuditCommand(
     if (options.changed) {
         warnNotYetImplemented("--changed");
     }
-    if (options.updateBaseline) {
-        warnNotYetImplemented("--update-baseline");
-    }
-    if (options.baseline === false) {
-        warnNotYetImplemented("--no-baseline");
-    }
 
     const runOptions: AuditRunOptions = {
         rules,
         scope: options.scope as RuleScope | undefined,
         gate: options.gate,
+        // commander maps --no-baseline to `baseline: false`; absent (true)
+        // applies the ratchet as normal (plan §4.4).
+        baseline: options.baseline,
     };
 
     const result = await runAudit(runOptions);
@@ -155,11 +206,11 @@ export function registerAuditCommand(program: Command): void {
         )
         .option(
             "--update-baseline",
-            "accept current findings as the new ratchet floor (plan P3.1, not yet implemented)",
+            "accept current findings as the new ratchet floor (plan §4.4); a maintenance operation, always exits 0",
         )
         .option(
             "--no-baseline",
-            "show the full debt, ignoring the ratchet (plan P3.1, not yet implemented)",
+            "show the full debt, ignoring the ratchet (plan §4.4)",
         )
         .action(async (rules: string[], options: AuditOptions) => {
             await runAuditCommand(rules, options);

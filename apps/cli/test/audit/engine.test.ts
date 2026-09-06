@@ -253,13 +253,21 @@ describe("applyExceptions", () => {
 });
 
 describe("applyBaseline", () => {
-    it("is a no-op pass-through (the baseline ratchet is P3.1's job, not P1.5's)", () => {
+    // The full baseline ratchet (suppression, exact-key anti-regression
+    // matching, --update-baseline, --no-baseline, --gate composition) is
+    // P3.1's job and is covered in test/audit/baseline.test.ts. These two
+    // cases stay here because they pin down the specific 3rd-argument-omitted
+    // call shape: no `baseline` config given is, and must remain, a plain
+    // pass-through — this is what keeps P1.5's original no-op placeholder
+    // behaviour indistinguishable from P3.1's real implementation when no
+    // baseline is in play.
+    it("is a pass-through when called with no baseline config (2-argument call shape)", () => {
         const findings = [findingFor("r1", "Foo.cs", "bad thing")];
 
         expect(applyBaseline(findings, "r1")).toEqual(findings);
     });
 
-    it("does not drop or reorder findings regardless of slug", () => {
+    it("does not drop or reorder findings regardless of slug, with no baseline config given", () => {
         const findings = [
             findingFor("r1", "Foo.cs", "bad thing"),
             findingFor("r1", "Bar.cs", "another thing"),
@@ -270,7 +278,7 @@ describe("applyBaseline", () => {
 });
 
 describe("buildContext", () => {
-    it("builds a real context: rootDir, trackedFiles, parseFile, parsed vocabulary, and parsed exceptions", () => {
+    it("builds a real context: rootDir, trackedFiles, parseFile, parsed vocabulary, exceptions, and baseline", () => {
         const ctx = buildContext();
 
         expect(ctx.rootDir.length).toBeGreaterThan(0);
@@ -280,6 +288,9 @@ describe("buildContext", () => {
         expect(ctx.vocabulary?.version).toBe(1);
         // apps/cli/config/exceptions.json is still the P1.1 placeholder `{}`.
         expect(ctx.exceptions).toEqual({});
+        // apps/cli/config/baseline.json starts as the P3.1 placeholder `{}`
+        // — real content is only ever written by `--update-baseline`.
+        expect(ctx.baseline).toEqual({});
     });
 });
 

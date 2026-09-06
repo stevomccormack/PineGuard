@@ -38,8 +38,24 @@ export interface Finding {
     message: string;
     /**
      * Stable identity for this finding, used by the baseline ratchet (plan
-     * §4.4) to distinguish already-known debt from a new regression.
-     * Typically derived from rule + file + a normalised message.
+     * §4.4, `applyBaseline` in `engine.ts`) to distinguish already-known debt
+     * from a new regression. Typically derived from rule + file + a
+     * normalised message.
+     *
+     * **Convention** (until a rule needs something else — the engine treats
+     * `key` as an opaque string and never parses it, so a rule is free to
+     * deviate if it has a good reason to, as long as it stays *stable* across
+     * runs): `` `${rule}:${file}:${normalisedMessage}` ``, e.g.
+     * `"must-usage:src/PineGuard.MustClauses/MustStringClauses.cs:Must.Be.NullOrWhiteSpace has no Guard caller"`.
+     * This matches the pattern the P1.5 engine tests already use
+     * (`test/audit/engine.test.ts`'s `findingFor` helper) and satisfies plan
+     * §11's anti-regression requirement: two runs against unchanged input
+     * must produce byte-identical keys (no timestamps, no line-number
+     * churn if the rule can avoid it, no non-deterministic ordering baked
+     * into the message), and two *different* violations — even in the same
+     * file, even for the same rule — must produce different keys, so a new
+     * finding in an already-baselined file still surfaces instead of being
+     * masked by a coarser per-file suppression.
      */
     key: string;
 }
@@ -79,6 +95,24 @@ export interface VocabularyConfig {
 export type ExceptionsConfig = Readonly<Record<string, readonly string[]>>;
 
 /**
+ * Parsed shape of `apps/cli/config/baseline.json` (plan §4.4 "Baseline
+ * ratchet"). Keyed by rule slug; each value is the list of `Finding.key`s
+ * accepted as pre-existing debt for that rule. A rule with a clean baseline
+ * (zero accepted findings) has **no entry at all** rather than an empty
+ * array — `--update-baseline` (`engine.ts`'s `computeBaselineSnapshot`)
+ * omits empty entries, and once a rule's entry is gone it is a hard gate
+ * (plan §4.4: "when a rule's baseline entry count hits zero the entry is
+ * deleted and the rule is a hard gate").
+ *
+ * The engine (`applyBaseline` in `engine.ts`) never inspects a key's
+ * internal structure — matching is exact-string-equality only, on purpose:
+ * a coarser per-file suppression would defeat the anti-regression property
+ * plan §11 calls out ("a new finding in an already-failing file still
+ * fails"). See `Finding.key`'s doc comment above for the key convention.
+ */
+export type BaselineConfig = Readonly<Record<string, readonly string[]>>;
+
+/**
  * The context a rule runs against.
  *
  * The test harness (`test/support/runRule.ts`) only ever populates
@@ -111,6 +145,13 @@ export interface RuleContext {
     vocabulary?: VocabularyConfig;
     /** Parsed `apps/cli/config/exceptions.json`, keyed by rule slug. */
     exceptions?: ExceptionsConfig;
+    /**
+     * Parsed `apps/cli/config/baseline.json`, keyed by rule slug (plan §4.4).
+     * Rules do not need to apply this themselves — same as `exceptions`, the
+     * engine applies it (via `applyBaseline` in `engine.ts`) after `run()`
+     * returns, per rule slug.
+     */
+    baseline?: BaselineConfig;
 }
 
 /**
