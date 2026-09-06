@@ -62,7 +62,10 @@ $paths = @(
     'src/PineGuard.ErrorOr/AGENTS.md',
     'src/PineGuard.FluentResults/AGENTS.md',
     'src/PineGuard.OneOf/AGENTS.md',
+    'src/PineGuard.Analyzers/AGENTS.md',
+    'src/PineGuard.MediatR/AGENTS.md',
     'tests/AGENTS.md',
+    'tests/PineGuard.Testing/AGENTS.md',
     'tools/AGENTS.md',
     'tools/code-diagnostics/AGENTS.md',
     'tools/sonar-scanner/AGENTS.md'

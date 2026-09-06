@@ -8,7 +8,7 @@ PowerShell tooling for cutting GitHub Releases and managing the resulting nuget.
 |--------|---------|
 | [`Run-GithubRelease.ps1`](Run-GithubRelease.ps1) | Main orchestrator. Cuts a GitHub Release that triggers `publish.yml` → nuget.org. Switches compose in sub-operations (ruleset toggle, nuget unlist, watch the workflow). |
 | [`Run-GithubRuleset.ps1`](Run-GithubRuleset.ps1) | Standalone ruleset toggle. Flips enforcement between `active` and `disabled` on a named ruleset (default `main-branch`) without deleting the configuration. |
-| [`Run-NugetUnlist.ps1`](Run-NugetUnlist.ps1) | Standalone nuget.org unlist. Unlists older prereleases across all six PineGuard packages; keeps the latest prerelease listed by default. |
+| [`Run-NugetUnlist.ps1`](Run-NugetUnlist.ps1) | Standalone nuget.org unlist. Unlists older prereleases across all 14 PineGuard packages; keeps the latest prerelease listed by default. |
 
 All scripts run from the repository root.
 

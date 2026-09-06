@@ -53,7 +53,9 @@ param(
         'PineGuard.ErrorOr',
         'PineGuard.FluentResults',
         'PineGuard.OneOf',
-        'PineGuard.Testing'
+        'PineGuard.Testing',
+        'PineGuard.MediatR',
+        'PineGuard.Analyzers'
     ),
     [switch] $All,
     [switch] $DryRun,
