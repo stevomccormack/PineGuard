@@ -1,23 +1,23 @@
 import type { Command } from "commander";
 
-/**
- * Shape a real catalog entry will have once `src/audit/catalog.ts` lands
- * (plan P1.5). This stub only needs enough of the shape to render an
- * (empty) `--list` table — it intentionally does not import from
- * `src/audit/*` so the P1 foundation agents can land those files without
- * racing this one.
- */
-interface CatalogEntry {
-    slug: string;
-    legacyId: string;
-    scope: "library" | "testing" | "docs";
-    gate: boolean;
-    description: string;
-}
+import { getAllRules, isRuleScope, type RuleScope } from "../audit/catalog.js";
+import { runAudit, type AuditRunOptions } from "../audit/engine.js";
+import { buildJsonReport, writeJsonReport } from "../audit/reporters/json.js";
+import { renderPretty } from "../audit/reporters/pretty.js";
+import { findRepoRoot } from "../audit/repo.js";
+// Side-effect import: every rule module under src/audit/rules/*.ts registers
+// itself into the catalog (see src/audit/catalog.ts's header comment) by
+// calling registerRule() at import time, reached transitively through this
+// barrel. This is the one place that import chain runs for a real
+// `pineguard audit` invocation; empty until plan P2 lands the first rule.
+import "../audit/rules/index.js";
 
-// No rules ship in this phase (P1.1). P2 rule agents populate the real
-// catalog in src/audit/catalog.ts; this stays empty on purpose until then.
-const EMPTY_CATALOG: readonly CatalogEntry[] = [];
+const SUPPORTED_FORMATS = ["pretty", "json"] as const;
+type SupportedFormat = (typeof SUPPORTED_FORMATS)[number];
+
+function isSupportedFormat(value: string): value is SupportedFormat {
+    return (SUPPORTED_FORMATS as readonly string[]).includes(value);
+}
 
 interface AuditOptions {
     scope?: string;
@@ -30,50 +30,113 @@ interface AuditOptions {
     baseline?: boolean;
 }
 
-function printCatalog(catalog: readonly CatalogEntry[]): void {
-    console.log("slug\tlegacyId\tscope\tgate\tdescription");
-    if (catalog.length === 0) {
+/** `pineguard audit --list`: prints slug/legacyId/scope/gate/description for every registered rule, or a clear "nothing here yet" message. */
+function printCatalog(): void {
+    const rules = getAllRules();
+    if (rules.length === 0) {
         console.log(
-            "(no rules registered yet — scaffold only; see plan P1.5/P2)",
+            "No rules registered yet — the catalog is empty. Rules land in plan P2; " +
+                "see docs/ai/plans/audit-cli-rebuild.md §9.2.",
         );
         return;
     }
-    // TODO(P1.5): real column alignment / table rendering once rules exist.
-    for (const rule of catalog) {
-        console.log(
-            `${rule.slug}\t${rule.legacyId}\t${rule.scope}\t${rule.gate}\t${rule.description}`,
-        );
+
+    const header = ["slug", "legacyId", "scope", "gate", "description"];
+    const rows = rules.map((rule) => [
+        rule.slug,
+        rule.legacyId ?? "-",
+        rule.scope,
+        String(rule.gate),
+        rule.description,
+    ]);
+    const widths = header.map((title, index) =>
+        Math.max(title.length, ...rows.map((row) => row[index]?.length ?? 0)),
+    );
+    const renderRow = (cells: string[]): string =>
+        cells
+            .map((cell, index) => cell.padEnd(widths[index] ?? 0))
+            .join("  ")
+            .trimEnd();
+
+    console.log(renderRow(header));
+    for (const row of rows) {
+        console.log(renderRow(row));
     }
 }
 
-function runAudit(rules: readonly string[], options: AuditOptions): void {
+/** P3-territory flags: accepted so scripts don't break, but currently a no-op beyond this one-line notice. */
+function warnNotYetImplemented(flag: string): void {
+    console.error(
+        `pineguard audit: ${flag} is accepted but not implemented yet (plan P3) — continuing without it.`,
+    );
+}
+
+async function runAuditCommand(
+    rules: string[],
+    options: AuditOptions,
+): Promise<void> {
     if (options.list) {
-        printCatalog(EMPTY_CATALOG);
+        printCatalog();
         return;
     }
 
-    // TODO(P1.5): resolve selection (all / slugs / legacy ids / --scope / --gate),
-    // build the shared context (tracked files, C# parse cache, vocabulary,
-    // exceptions, baseline), run rules, apply exceptions + baseline, hand
-    // findings to a reporter, and return the real exit code (0/1/2).
-    // TODO(P3): --changed, --update-baseline, --no-baseline, github/sarif formats.
-    const requested = rules.length > 0 ? rules.join(", ") : "all";
-    console.log(
-        `pineguard audit: engine not implemented yet (scaffold only — see ` +
-            `docs/ai/plans/audit-cli-rebuild.md P1.5). Requested rules: ${requested}; ` +
-            `scope=${options.scope ?? "(none)"} gate=${Boolean(options.gate)} ` +
-            `format=${options.format ?? "pretty"} changed=${Boolean(options.changed)} ` +
-            `updateBaseline=${Boolean(options.updateBaseline)} ` +
-            `baseline=${options.baseline === false ? "disabled" : "enabled"}`,
-    );
+    const format = options.format ?? "pretty";
+    if (!isSupportedFormat(format)) {
+        console.error(
+            `pineguard audit: --format ${format} is not implemented yet (plan P3.2/P3.3) — ` +
+                `use --format pretty or --format json.`,
+        );
+        process.exitCode = 2;
+        return;
+    }
+
+    if (options.scope !== undefined && !isRuleScope(options.scope)) {
+        console.error(
+            `pineguard audit: unknown --scope "${options.scope}" (expected library|testing|docs).`,
+        );
+        process.exitCode = 2;
+        return;
+    }
+
+    if (options.changed) {
+        warnNotYetImplemented("--changed");
+    }
+    if (options.updateBaseline) {
+        warnNotYetImplemented("--update-baseline");
+    }
+    if (options.baseline === false) {
+        warnNotYetImplemented("--no-baseline");
+    }
+
+    const runOptions: AuditRunOptions = {
+        rules,
+        scope: options.scope as RuleScope | undefined,
+        gate: options.gate,
+    };
+
+    const result = await runAudit(runOptions);
+
+    if (result.exitCode === 2) {
+        console.error(`pineguard audit: ${result.error ?? "usage error"}`);
+        process.exitCode = 2;
+        return;
+    }
+
+    if (format === "json") {
+        const report = buildJsonReport(result);
+        writeJsonReport(report, findRepoRoot());
+        console.log(JSON.stringify(report, null, 2));
+    } else {
+        console.log(renderPretty(result));
+    }
+
+    process.exitCode = result.exitCode;
 }
 
 export function registerAuditCommand(program: Command): void {
     program
         .command("audit")
-        .description(
-            "Run PineGuard's cross-layer audit rules (scaffold — no rules registered yet)",
-        )
+        .description("Run PineGuard's cross-layer audit rules")
         .argument(
             "[rules...]",
             "rule slugs or legacy RuleNN ids to run (default: all)",
@@ -83,16 +146,22 @@ export function registerAuditCommand(program: Command): void {
         .option("--list", "print the rule catalog and exit")
         .option(
             "--format <format>",
-            "output format: pretty|json|github|sarif",
+            "output format: pretty|json (github/sarif land in plan P3)",
             "pretty",
         )
-        .option("--changed", "restrict to files changed vs main")
+        .option(
+            "--changed",
+            "restrict to files changed vs main (plan P3, not yet implemented)",
+        )
         .option(
             "--update-baseline",
-            "accept current findings as the new ratchet floor",
+            "accept current findings as the new ratchet floor (plan P3.1, not yet implemented)",
         )
-        .option("--no-baseline", "show the full debt, ignoring the ratchet")
-        .action((rules: string[], options: AuditOptions) => {
-            runAudit(rules, options);
+        .option(
+            "--no-baseline",
+            "show the full debt, ignoring the ratchet (plan P3.1, not yet implemented)",
+        )
+        .action(async (rules: string[], options: AuditOptions) => {
+            await runAuditCommand(rules, options);
         });
 }

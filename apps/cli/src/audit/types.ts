@@ -1,17 +1,25 @@
+import type { ParsedFile } from "./parsing/csharp.js";
+
 /**
  * Shared type shapes for PineGuard audit rules and their findings.
  *
  * This file is deliberately **type declarations only** — no logic, no
- * runtime code, no side-effecting imports. It exists so the test harness
+ * runtime code, no side-effecting imports (the `ParsedFile` import below is
+ * `import type`, so it is erased at compile time and never runs the
+ * `parsing/csharp.ts` module). It exists so the test harness
  * (`test/support/runRule.ts`, plan P1.4) and the rule engine (plan P1.5:
  * `src/audit/engine.ts` + `src/audit/catalog.ts`) agree on the same `Rule` /
  * `Finding` shape from day one, instead of P1.5 reconciling a shape invented
  * independently after 14 rule-fixture tests already exist against it.
  *
- * P1.5 is expected to *extend* this file (e.g. wrap `Rule` with catalog
- * metadata — slug/legacyId/scope/gate/description, per plan §4.1
- * `catalog.ts` — and add fields to `RuleContext`). Extensions should be
- * additive so rules written against today's shape keep working unchanged.
+ * P1.5 (landed) extends this file additively: `catalog.ts` wraps `Rule` with
+ * catalog metadata (`CatalogEntry`: slug/legacyId/scope/gate/description —
+ * see that file, not here, since the wrapping is a catalog concern), and
+ * `RuleContext` below gained optional `trackedFiles`/`parseFile`/
+ * `vocabulary`/`exceptions` fields. Every field P1.4 depended on
+ * (`rootDir`, plain `{ rootDir }` context construction) is untouched — the
+ * new fields are additive and optional, so `test/support/runRule.ts`'s
+ * `{ rootDir: fixtureDir }` literal still type-checks unchanged.
  *
  * See docs/ai/plans/audit-cli-rebuild.md §4.1, §4.2, §7.
  */
@@ -37,18 +45,72 @@ export interface Finding {
 }
 
 /**
+ * Parsed shape of `docs/ai/specs/language/vocabulary.json` (plan §4.1, §8).
+ * The engine (`src/audit/engine.ts`) loads and parses this file once per
+ * invocation and exposes it on `RuleContext.vocabulary`, so every rule reads
+ * the same parsed object instead of each re-reading/re-parsing the file.
+ * `concepts`/`opposites` are carried through unvalidated — D9 (plan §5) is
+ * still open on whether they get wired up or removed; loading them here does
+ * not decide that.
+ */
+export interface VocabularyConfig {
+    readonly version: number;
+    readonly stripPrefixes: readonly string[];
+    readonly ignoreMethods: readonly string[];
+    readonly aliases: Readonly<Record<string, string>>;
+    readonly concepts: readonly unknown[];
+    readonly opposites: readonly {
+        readonly a: string;
+        readonly b: string;
+        readonly omitNegationsInParity?: boolean;
+    }[];
+}
+
+/**
+ * Parsed shape of `apps/cli/config/exceptions.json` (plan §4.1, §7
+ * "Exceptions application"). Keyed by rule slug; each value is a list of
+ * substrings. A finding is suppressed by the engine when one of its rule's
+ * entries is a substring of either the finding's `file` or its `message`.
+ * Deliberately simple — this is the load-and-apply mechanism P1.5 owes P2/P5,
+ * not the final shape ported from `tools/audit-cli/test-audit-exceptions.json`
+ * (that port is P5's job; today's file is still the placeholder `{}` from
+ * P1.1).
+ */
+export type ExceptionsConfig = Readonly<Record<string, readonly string[]>>;
+
+/**
  * The context a rule runs against.
  *
  * The test harness (`test/support/runRule.ts`) only ever populates
- * `rootDir`, pointed at a fixture directory instead of the real repo root.
- * The real engine (plan P1.5) extends this with the shared, precomputed
- * context described in plan §7.2 — tracked file listings, the C# parse
- * cache, `vocabulary.json` data, `config/exceptions.json`, and the
- * baseline — as additional (optional, unless a rule opts in) fields.
+ * `rootDir`, pointed at a fixture directory instead of the real repo root —
+ * every field below is optional for exactly that reason: a rule that only
+ * reads `rootDir` (or walks it directly) keeps working against that harness
+ * unchanged. The real engine (`src/audit/engine.ts`'s `buildContext`)
+ * populates every field on a real `pineguard audit` run: tracked file
+ * listings (`trackedFiles`), a bound, already-cached C# parse function
+ * (`parseFile` — rules may also import `parsing/csharp.ts`'s `parseFile`
+ * directly if that's simpler; both resolve to the same cache),
+ * `vocabulary.json` (`vocabulary`), and `config/exceptions.json`
+ * (`exceptions`, though rules do not need to apply exceptions themselves —
+ * the engine does that after `run()` returns, per rule slug).
  */
 export interface RuleContext {
     /** Absolute path to the root of the tree this run should scan. */
     rootDir: string;
+    /**
+     * Every file `git` tracks under `rootDir`, forward-slash-normalised and
+     * relative to it (see `repo.ts`'s `listTrackedFiles`). Absent in the
+     * P1.4 fixture harness — a rule that needs this list against a fixture
+     * tree should walk `rootDir` directly instead (see the `_demo-harness`
+     * rule in `test/support/runRule.test.ts` for that pattern).
+     */
+    trackedFiles?: readonly string[];
+    /** Bound to `parsing/csharp.ts`'s `parseFile`; parses (and caches) one C# file. */
+    parseFile?: (filePath: string) => Promise<ParsedFile>;
+    /** Parsed `docs/ai/specs/language/vocabulary.json`. */
+    vocabulary?: VocabularyConfig;
+    /** Parsed `apps/cli/config/exceptions.json`, keyed by rule slug. */
+    exceptions?: ExceptionsConfig;
 }
 
 /**
