@@ -125,23 +125,29 @@ Write-Host "Scope: $Scope" -ForegroundColor DarkGray
 
 $coverageFiles = Get-LatestCoverageFiles -ResultsRoot $ResultsRoot
 
-if ($Isolated) {
-    Write-Host "Isolated mode: Copying coverage files to temp to avoid locking..." -ForegroundColor Cyan
-    $isoDir = Join-Path $env:TEMP "PineGuard-Coverage-Analyze-$([Guid]::NewGuid())"
-    Ensure-Directory $isoDir
-    
-    $isoFiles = @()
-    foreach ($file in $coverageFiles) {
-        $dest = Join-Path $isoDir (Split-Path $file -Leaf)
-        Copy-Item -LiteralPath $file -Destination $dest -Force
-        $isoFiles += $dest
+$isoDir = $null
+try {
+    if ($Isolated) {
+        Write-Host "Isolated mode: Copying coverage files to temp to avoid locking..." -ForegroundColor Cyan
+        $isoDir = Join-Path ([IO.Path]::GetTempPath()) "PineGuard-Coverage-Analyze-$([Guid]::NewGuid())"
+        Ensure-Directory $isoDir
+
+        $isoFiles = @()
+        foreach ($file in $coverageFiles) {
+            $dest = Join-Path $isoDir (Split-Path $file -Leaf)
+            Copy-Item -LiteralPath $file -Destination $dest -Force
+            $isoFiles += $dest
+        }
+        $coverageFiles = $isoFiles
     }
-    $coverageFiles = $isoFiles
+
+    $classes = Read-CoberturaCoverage -CoverageFiles $coverageFiles -RepoRoot $repoRoot -IncludeFileRegex $IncludeFileRegex -ExcludeFileRegex $ExcludeFileRegex -IncludeClassNameRegex $IncludeClassNameRegex -ExcludeClassNameRegex $ExcludeClassNameRegex -DefaultSourcePrefix $defaultSourcePrefix
 }
-
-
-
-$classes = Read-CoberturaCoverage -CoverageFiles $coverageFiles -RepoRoot $repoRoot -IncludeFileRegex $IncludeFileRegex -ExcludeFileRegex $ExcludeFileRegex -IncludeClassNameRegex $IncludeClassNameRegex -ExcludeClassNameRegex $ExcludeClassNameRegex -DefaultSourcePrefix $defaultSourcePrefix
+finally {
+    if ($isoDir -and (Test-Path -LiteralPath $isoDir)) {
+        Remove-Item -LiteralPath $isoDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
 
 
 
@@ -177,13 +183,13 @@ if ($AsTable) {
     Format-Table -AutoSize
 }
 else {
-    Write-Host 'Line%\tBranch%\tLines\tBranches\tClass\tFile'
+    Write-Host "Line%`tBranch%`tLines`tBranches`tClass`tFile"
     foreach ($row in $bottom) {
         $linePct = ("{0:P2}" -f $row.LineRate)
         $branchPct = ("{0:P2}" -f $row.BranchRate)
         $lines = ("{0}/{1}" -f $row.LinesCovered, $row.LinesTotal)
         $branches = ("{0}/{1}" -f $row.BranchesCovered, $row.BranchesTotal)
-        Write-Host ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}" -f $linePct, $branchPct, $lines, $branches, $row.Name, $row.File)
+        Write-Host ("{0}`t{1}`t{2}`t{3}`t{4}`t{5}" -f $linePct, $branchPct, $lines, $branches, $row.Name, $row.File)
     }
 }
 
