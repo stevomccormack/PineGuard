@@ -428,7 +428,7 @@ tasks sharing a group letter run concurrently; a group runs after the group it d
 
 | ID | Task | Agent / model | Status | Fan-out group | Depends on | Notes |
 |---|---|---|---|---|---|---|
-| D-1..9 | Decision session, append `## Decisions` | Owner + Sonnet 5 (no council) | Done | P0 | — | Signed off 2026-09-06. D-1c, D-1d, D-2, D-9 reverse defaults; see `## Decisions` follow-up before dispatching. |
+| D-1..9 | Decision session, append `## Decisions` | Owner + Sonnet 5 (no council) | Done | P0 | — | Signed off 2026-09-06. D-1c, D-1d, D-2 reverse defaults; D-9 adds a front door to §3.5; see `## Decisions` follow-up before dispatching. |
 | T1.01 | git.ps1 Tier 0 fix + `$args` rename | Sonnet | Pending | P1-B | — | Serialised on `git.ps1` |
 | T1.02 | Diagnostics: exit code, errors, dedupe | Sonnet | Pending | P1-A | — | |
 | T1.03 | Coverage analysis tab + temp cleanup | Sonnet | Pending | P1-A | — | |
@@ -505,14 +505,15 @@ Session: 2026-09-06, owner (Steve McCormack) sign-off via interactive Q&A, Sonne
 | D-6 | Table-driven `Run-Commits.ps1 -Scope <string[]>` replacing all 16 `Commit-*.ps1`, conventional-commit auto message | Keep 16 scripts, patch only | Adopted as recommended |
 | D-7 | Tool tests live under `tools/.tests/` | `tests/PineGuard.Tools.Tests/` | Adopted as recommended |
 | D-8 | **Defer Phase 5** — docs/spec rewrites do not proceed on this pass | Lift the freeze now (New Surfaces Program is complete, `d94b85b`) | Owner deferred despite the freeze's original justification no longer applying; Phase 5 stays blocked until the owner reopens it |
-| D-9 | **One `New-CoverageReport.ps1` with `-Engine Coverlet\|DotCover` branches**, not separate `coverlet/`/`dotcover/` scripts | Adopt §3.5 (two folders, same-named scripts); dotCover authoritative; flatten to Coverlet only | Coverlet stays the CI/100%-gate authority; dotCover is the local/Rider second opinion, reported not gated, per §3.5's other rules. **Reverses §3.5's rejection rationale ("share almost no code, would become one file full of `if ($Engine)`") — §3.5 and tasks T3.03/T3.11 need rewriting to a single branching script.** |
+| D-9 | **Two engine scripts behind a delegating front door.** `coverlet/New-CoverageReport.ps1` and `dotcover/New-CoverageReport.ps1` (the §3.5 pair, one parameter contract) sit behind a root `tools/code-coverage/New-CoverageReport.ps1 -Engine Coverlet\|DotCover` that validates and delegates only; `Run-CodeCoverage` calls the front door | One script with `if ($Engine)` branches (owner's first answer, revised in the same session); §3.5 as written (`Run-CodeCoverage` routes to the engine folders directly, no front door); dotCover authoritative; flatten to Coverlet only | Coverlet stays the CI/100%-gate authority; dotCover is the local/Rider second opinion, reported not gated. Engine scripts keep the same basename because the folder supplies the engine — the repo's own precedent (fixture inner classes drop the parent's infix, `IsIsoAlpha2Code` → `Countries.IsAlpha2Code`); engine-named files (`New-CoverletReport.ps1`) were considered and rejected as repeating the folder in the name. §3.5's routing sentence and T3.03/T3.11 need a one-line update: the routing point is the front door, not the orchestrator. |
 
 ### Follow-up required before Phase 1 dispatch
 
-Four decisions (D-1c, D-1d, D-2, D-9) reverse a default recommendation the rest of the document
-was written around. Before dispatching Phase 1/2/3 tasks, §3.1, §3.3, §3.5, and the Phase 3/4/5
-task tables (T3.01, T3.03, T3.11, T4.02, T5.01) need a text pass to match the decisions above —
-not a re-decision, just bringing the prose in line with what was actually chosen.
+Three decisions (D-1c, D-1d, D-2) reverse a default recommendation the rest of the document was
+written around, and D-9 adds a front-door script to §3.5. Before dispatching Phase 1/2/3 tasks,
+§3.1, §3.3, §3.5, and the Phase 3/4/5 task tables (T3.01, T3.03, T3.11, T4.02, T5.01) need a text
+pass to match the decisions above — not a re-decision, just bringing the prose in line with what
+was actually chosen.
 
 ## Baselines
 
