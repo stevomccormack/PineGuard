@@ -193,6 +193,7 @@ pineguard audit --format pretty|json|github|sarif
 pineguard audit --changed            # restrict to files changed vs main (pre-commit speed)
 pineguard audit --update-baseline    # accept current findings as the new ratchet floor
 pineguard audit --no-baseline        # show the full debt, ignoring the ratchet
+pineguard banner                     # print the ASCII banner
 ```
 
 Exit codes: 0 clean, 1 findings, 2 usage/config error. `--format github` emits
@@ -242,6 +243,48 @@ TestData file), and run the queries the rules need (method declarations with mod
 parameters, attributes, record declarations, tuple types, invocation expressions). Fallback if
 the wasm artefact is not published for the pinned version: the native `tree-sitter` binding with
 prebuilds. This is the only technical risk in the plan and it is retired first.
+
+### 4.6 Test fixture convention (VIBE) — owner directive, 2026-09-06
+
+The CLI's own test fixtures (every `test/fixtures/<slug>/…` under `apps/cli`, for every rule in
+P2 and the harness that runs them) MUST follow **VIBE — Valid / Invalid / Boundary-Edge** — the
+same three-way split already normative for the rest of the repo's C# tests
+(`docs/ai/specs/testing/unit-test.md` v11 §4.1, §4.4: `ValidCases` → `EdgeCases` → `InvalidCases`).
+This **replaces** the plain binary `pass`/`fail` split described earlier in this document
+(§4.1's `test/fixtures/<slug>/…` line and P1.4's original brief) — wherever an earlier section of
+this plan says `{pass,fail}`, read it as superseded by this section.
+
+**Directory shape**, per rule slug:
+
+```
+apps/cli/test/fixtures/<slug>/
+  valid/      — a minimal, realistic source tree the rule must NOT flag. Zero findings, always.
+  invalid/    — a minimal, realistic source tree the rule MUST flag. ≥1 finding, always — this is
+                the mandatory "can it fail" fixture (the exact gap that let the old tool's Rules
+                03/04/05/07 go silently vacuous for months).
+  boundary/   — edge-condition source trees that probe the rule's own decision boundary (an empty
+                collection vs. one item, exactly the threshold value, the last item in an ordered
+                list, a partial-class split, a moved/renamed type). Boundary fixtures do NOT carry
+                a blanket valid/invalid expectation — each one is asserted individually in the
+                rule's test file for whatever that specific boundary should produce (mirroring the
+                C# spec's own `ValidEdgeScenarios`/`InvalidEdgeScenarios` split: a boundary case can
+                legitimately be either still-valid or still-invalid).
+```
+
+**Harness API** (in `apps/cli/test/support/runRule.ts`, built by P1.4): expose three helpers over
+the shape above —
+- `expectValid(rule, slug)` — runs against `valid/`, asserts `[]`.
+- `expectInvalid(rule, slug)` — runs against `invalid/`, asserts `≥1` finding with the same
+  descriptive failure message P1.4 already wrote for the vacuous-rule case (naming Rules
+  03/04/05/07 as the historical precedent) if it comes back empty. This is the renamed/refocused
+  form of P1.4's original `expectRuleCanFail`.
+- `runBoundary(rule, slug)` — runs against `boundary/` and returns the raw `Finding[]` for the
+  calling test to assert against explicitly, case by case; no built-in pass/fail assumption.
+
+Every rule in P2 MUST populate `valid/` and `invalid/` (non-negotiable, mirrors §10.3's "no empty
+dataset" policy — don't scaffold an empty `boundary/` either; only add it when the rule actually
+has a meaningful boundary to probe). Per §10.3 of the C# spec, omit `boundary/` entirely for a rule
+with no meaningful edge condition rather than leaving an empty placeholder directory.
 
 ## 5. Decision gates (owner sign-off before P1 starts)
 
@@ -367,7 +410,7 @@ with every other row in the same group; "→" = depends on the row(s) named.
 | P1.3 | Repo + markdown infra: `repo.ts` (`git ls-files`, root discovery), `parsing/markdown.ts` (remark links, YAML front-matter), tests | Sonnet | ∥ | done | `repo.ts`: `findRepoRoot(startPath?)` walks up looking for a `.git` entry (file or dir, so worktree checkouts resolve correctly); `listTrackedFiles(patterns?, startPath?)` spawns plain `git ls-files` (newline-split, not `-z`) and normalises to forward slashes; `readRepoFile(relativePath, startPath?)` reads by repo-relative path. Regression test proves the worktree-immunity claim: running from inside `.claude/worktrees/audit-cli-rebuild` itself, `listTrackedFiles()` includes this plan file and contains no `.claude/worktrees/` path. `parsing/markdown.ts`: `extractPathReferences` walks the mdast tree (`remark` + `remark-frontmatter` so the front-matter block parses as one opaque node) for `link` and `inlineCode` nodes, tagging `+ ` prefixed code spans `{planned: true}` per the plan's own convention; `extractFrontMatter` deliberately parses the leading `---` block with a plain regex (not the mdast tree) and hands the captured YAML to the new `yaml` npm package (`2.9.0`, added as a direct dependency — not in P1.1's installed set; `remark-frontmatter` alone only exposes the raw block text, not a parsed object) — this sidesteps needing `@types/mdast`/`@types/unist`, which are only *transitive* deps and are not resolvable through this workspace's isolated pnpm `node_modules` (confirmed empirically: `tsc --noEmit` needs no `mdast`/`unist` type import anywhere in either file). |
 | P1.4 | Fixture convention + test harness: `test/fixtures/<slug>/{pass,fail}/…`, `runRule(slug, fixtureDir)` helper, the mandatory "fail fixture yields ≥1 finding" assertion template | Sonnet | ∥ | done | Harness API for every P2 agent: `apps/cli/test/support/runRule.ts` exports `runRuleOnFixture(rule: Rule, fixtureDir: string): Promise<Finding[]>` and `expectRuleCanFail(rule: Rule, fixtureDir: string): Promise<Finding[]>` (mandatory for every fail-fixture assertion; throws a descriptive error — naming Rules 03/04/05/07 — if findings come back empty, and a separate clear error if `fixtureDir` doesn't exist). `Rule`/`Finding`/`RuleContext` land in `apps/cli/src/audit/types.ts` (types-only, additive — P1.5 wraps/extends, does not replace). Convention (`test/fixtures/<slug>/{pass,fail}/…`, pair with `test/rules/<slug>.test.ts`) documented in `apps/cli/test/README.md`. Self-test `apps/cli/test/support/runRule.test.ts` + demo fixtures `test/fixtures/_demo-harness/{pass,fail}/Greeter.cs` (inline demo rule flags literal `BADWORD`) prove: pass fixture → `[]`, fail fixture → ≥1 finding, `expectRuleCanFail` passes on the real fail fixture and throws when pointed at `pass/`. |
 | P1.5 | Engine core: catalog, types, engine (selection, context, exceptions), `pretty` + `json` reporters, exit codes, `audit` command | Sonnet | → P1.1 | todo | Baseline + `github`/`sarif`/`--changed` are P3 |
-| P1.6 | ASCII TUI banner (`pineguard` bare invocation + a `pineguard banner` command) and a polished `pineguard --help` root output | Sonnet | ∥ | todo | Owner request 2026-09-06 mid-flight (not in the original Fable review); touches `src/index.ts` only, no dependency on P1.2–P1.4 |
+| P1.6 | ASCII TUI banner (`pineguard` bare invocation + a `pineguard banner` command) and a polished `pineguard --help` root output | Sonnet | ∥ | done | `src/banner.ts` (pure `renderBanner()`, reads version from `package.json`) + `src/commands/banner.ts`; bare invocation prints the banner then commander's own help listing (its default "no command" behaviour, exit 1, like bare `git`); `--help` stays banner-free (exit 0); tests in `test/banner.test.ts` |
 | **P2 — Rules** (each row ∥; fan out after P1) | | | | | |
 | P2.1 | `rules-usage` | Sonnet | → P1.2, P1.4, P1.5 | todo | Port of Rule02, source-only |
 | P2.2 | `must-usage` (guard/fluent/annotations) | Sonnet | → P1 | todo | Replaces Rule03/04/05; must-fail fixture mandatory |
