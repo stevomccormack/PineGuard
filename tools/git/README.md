@@ -86,6 +86,6 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -All -
 
 ## Notes
 
-- Scripts refuse to run if you already have staged changes (prevents mixing commits).
+- Scripts throw an error and stop if the git index already has staged changes, instead of unstaging them for you (prevents mixing commits, and avoids ever running `git restore --staged .`, a Tier 0 destructive command — see `docs/ai/specs/safety.md` §2.1). Commit or unstage the pre-existing changes yourself, then re-run.
 - If a scope has no changes, its commit is skipped.
 - `-AutoRebase` uses `git pull --rebase --autostash` and stops on conflicts; resolve conflicts then run `git rebase --continue`.

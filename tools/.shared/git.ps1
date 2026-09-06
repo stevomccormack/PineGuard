@@ -46,11 +46,11 @@ function Invoke-Git {
     #>
     param(
         [Parameter(Mandatory = $true)][string]$RepoRoot,
-        [Parameter(Mandatory = $true)][string[]]$Args
+        [Parameter(Mandatory = $true)][string[]]$GitArgs
     )
 
     Assert-GitAvailable
-    $output = & git -C $RepoRoot @Args
+    $output = & git -C $RepoRoot @GitArgs
     $exitCode = $LASTEXITCODE
     return [pscustomobject]@{
         Output = $output
@@ -65,7 +65,7 @@ function Get-StagedFiles {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('diff', '--cached', '--name-only')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('diff', '--cached', '--name-only')
     if ($r.ExitCode -ne 0) {
         throw 'Failed to check staged changes.'
     }
@@ -85,23 +85,16 @@ function Get-StagedFiles {
     Write-Output -NoEnumerate ([string[]]$lines)
 }
 
-function Unstage-AllChanges {
+function Assert-IndexClean {
     <#
     .SYNOPSIS
-        Runs git restore --staged . to unstage all changes.
-    #>
-    param([Parameter(Mandatory = $true)][string]$RepoRoot)
+        Throws if the git index already has staged changes.
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('restore', '--staged', '.')
-    if ($r.ExitCode -ne 0) {
-        throw 'Failed to unstage changes.'
-    }
-}
-
-function Ensure-IndexClean {
-    <#
-    .SYNOPSIS
-        Unstages any existing staged changes before committing.
+    .DESCRIPTION
+        `git restore --staged .` is a Tier 0 NEVER command (docs/ai/specs/safety.md §2.1) because
+        it can silently discard the user's own staged work. This function never unstages
+        anything; it only reports the problem and stops, so the caller (a human, or an agent
+        acting on human instruction) can decide what to do with the pre-existing staged changes.
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
@@ -110,8 +103,8 @@ function Ensure-IndexClean {
         return
     }
 
-    Write-Host "Detected existing staged changes; unstaging them to avoid mixing commits." -ForegroundColor Yellow
-    Unstage-AllChanges -RepoRoot $RepoRoot
+    throw ("The git index already has {0} staged file(s): {1}. Commit or unstage them yourself " +
+        "before running this script; it will not unstage changes for you." -f $staged.Count, ($staged -join ', '))
 }
 
 function Get-StatusPorcelain {
@@ -124,13 +117,13 @@ function Get-StatusPorcelain {
         [Parameter(Mandatory = $false)][string[]]$Paths
     )
 
-    $args = @('status', '--porcelain=v1')
+    $statusArgs = @('status', '--porcelain=v1')
     if ($Paths -and $Paths.Count -gt 0) {
-        $args += '--'
-        $args += $Paths
+        $statusArgs += '--'
+        $statusArgs += $Paths
     }
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args $args
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs $statusArgs
     if ($r.ExitCode -ne 0) {
         throw 'Failed to read git status.'
     }
@@ -160,8 +153,8 @@ function Add-Paths {
         [Parameter(Mandatory = $true)][string[]]$Paths
     )
 
-    $args = @('add', '--') + $Paths
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args $args
+    $addArgs = @('add', '--') + $Paths
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs $addArgs
     if ($r.ExitCode -ne 0) {
         throw 'git add failed.'
     }
@@ -174,7 +167,7 @@ function Get-StagedNameStatus {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('diff', '--cached', '--name-status')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('diff', '--cached', '--name-status')
     if ($r.ExitCode -ne 0) {
         throw 'Failed to compute staged diff.'
     }
@@ -201,7 +194,7 @@ function Get-StagedNumStat {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('diff', '--cached', '--numstat')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('diff', '--cached', '--numstat')
     if ($r.ExitCode -ne 0) {
         throw 'Failed to compute staged numstat.'
     }
@@ -393,7 +386,7 @@ function Invoke-Commit {
     )
 
     if (-not $WhatIf.IsPresent) {
-        Ensure-IndexClean -RepoRoot $RepoRoot
+        Assert-IndexClean -RepoRoot $RepoRoot
     }
 
     $statusBefore = Get-StatusPorcelain -RepoRoot $RepoRoot -Paths $StagePaths
@@ -406,7 +399,7 @@ function Invoke-Commit {
         $staged = @()
         try { $staged = Get-StagedFiles -RepoRoot $RepoRoot } catch { $staged = @() }
         if ($staged.Count -gt 0) {
-            Write-Host "[WhatIf] Note: staged changes already exist; real commits would unstage them first." -ForegroundColor Yellow
+            Write-Host "[WhatIf] Note: staged changes already exist; a real commit would fail here (commit or unstage them first)." -ForegroundColor Yellow
         }
         Write-Host ("[WhatIf] Would stage: {0}" -f ($StagePaths -join ', ')) -ForegroundColor Yellow
         Write-Host ("[WhatIf] Would commit: {0}" -f $Title) -ForegroundColor Yellow
@@ -432,12 +425,12 @@ function Invoke-Commit {
                 Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
         )
 
-        $args = @('commit')
+        $commitArgs = @('commit')
         foreach ($p in $paragraphs) {
-            $args += @('-m', $p)
+            $commitArgs += @('-m', $p)
         }
 
-        $r = Invoke-Git -RepoRoot $RepoRoot -Args $args
+        $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs $commitArgs
         if ($r.ExitCode -ne 0) {
             throw 'git commit failed.'
         }
@@ -446,7 +439,7 @@ function Invoke-Commit {
     }
 
     $templateFile = New-CommitTemplateFile -RepoRoot $RepoRoot -Title $Title -StagePaths $StagePaths -ExtraNotes $ExtraNotes
-    $r2 = Invoke-Git -RepoRoot $RepoRoot -Args @('commit', '--template', $templateFile)
+    $r2 = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('commit', '--template', $templateFile)
     if ($r2.ExitCode -ne 0) {
         throw 'git commit failed.'
     }
@@ -459,7 +452,7 @@ function Get-CurrentBranch {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('rev-parse', '--abbrev-ref', 'HEAD')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('rev-parse', '--abbrev-ref', 'HEAD')
     if ($r.ExitCode -ne 0) {
         throw 'Failed to get current branch.'
     }
@@ -474,7 +467,7 @@ function Get-UpstreamRef {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}')
     if ($r.ExitCode -ne 0) {
         return $null
     }
@@ -494,7 +487,7 @@ function Get-AheadBehind {
         [Parameter(Mandatory = $true)][string]$Upstream
     )
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('rev-list', '--left-right', '--count', ("HEAD...{0}" -f $Upstream))
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('rev-list', '--left-right', '--count', ("HEAD...{0}" -f $Upstream))
     if ($r.ExitCode -ne 0) {
         throw 'Failed to compute ahead/behind.'
     }
@@ -521,7 +514,7 @@ function Invoke-AutoRebaseIfNeeded {
         [string]$Remote = 'origin'
     )
 
-    $fetch = Invoke-Git -RepoRoot $RepoRoot -Args @('fetch', $Remote)
+    $fetch = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('fetch', $Remote)
     if ($fetch.ExitCode -ne 0) {
         throw 'git fetch failed.'
     }
@@ -540,7 +533,7 @@ function Invoke-AutoRebaseIfNeeded {
 
     Write-Host ("Remote is ahead by {0} commit(s); rebasing..." -f $ab.Behind) -ForegroundColor Cyan
 
-    $pull = Invoke-Git -RepoRoot $RepoRoot -Args @('pull', '--rebase', '--autostash')
+    $pull = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('pull', '--rebase', '--autostash')
     if ($pull.ExitCode -ne 0) {
         Write-Host ''
         Write-Host 'Auto rebase failed (likely conflicts).' -ForegroundColor Red
@@ -562,7 +555,7 @@ function Invoke-Push {
         [string]$Remote = 'origin'
     )
 
-    $fetch = Invoke-Git -RepoRoot $RepoRoot -Args @('fetch', $Remote)
+    $fetch = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('fetch', $Remote)
     if ($fetch.ExitCode -ne 0) {
         throw 'git fetch failed.'
     }
@@ -571,7 +564,7 @@ function Invoke-Push {
     $upstream = Get-UpstreamRef -RepoRoot $RepoRoot
 
     if ($null -eq $upstream) {
-        $r = Invoke-Git -RepoRoot $RepoRoot -Args @('push', '-u', $Remote, $branch)
+        $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('push', '-u', $Remote, $branch)
         if ($r.ExitCode -ne 0) {
             throw 'git push failed.'
         }
@@ -588,7 +581,7 @@ function Invoke-Push {
         return
     }
 
-    $r2 = Invoke-Git -RepoRoot $RepoRoot -Args @('push', $Remote, $branch)
+    $r2 = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('push', $Remote, $branch)
     if ($r2.ExitCode -ne 0) {
         throw 'git push failed.'
     }
