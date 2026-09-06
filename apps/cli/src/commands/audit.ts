@@ -8,6 +8,7 @@ import {
 } from "../audit/engine.js";
 import { buildJsonReport, writeJsonReport } from "../audit/reporters/json.js";
 import { renderPretty } from "../audit/reporters/pretty.js";
+import { renderSarif } from "../audit/reporters/sarif.js";
 import { findRepoRoot } from "../audit/repo.js";
 // Side-effect import: every rule module under src/audit/rules/*.ts registers
 // itself into the catalog (see src/audit/catalog.ts's header comment) by
@@ -16,7 +17,7 @@ import { findRepoRoot } from "../audit/repo.js";
 // `pineguard audit` invocation; empty until plan P2 lands the first rule.
 import "../audit/rules/index.js";
 
-const SUPPORTED_FORMATS = ["pretty", "json"] as const;
+const SUPPORTED_FORMATS = ["pretty", "json", "sarif"] as const;
 type SupportedFormat = (typeof SUPPORTED_FORMATS)[number];
 
 function isSupportedFormat(value: string): value is SupportedFormat {
@@ -137,8 +138,8 @@ async function runAuditCommand(
     const format = options.format ?? "pretty";
     if (!isSupportedFormat(format)) {
         console.error(
-            `pineguard audit: --format ${format} is not implemented yet (plan P3.2/P3.3) — ` +
-                `use --format pretty or --format json.`,
+            `pineguard audit: --format ${format} is not implemented yet (plan P3.2) — ` +
+                `use --format pretty, --format json, or --format sarif.`,
         );
         process.exitCode = 2;
         return;
@@ -177,6 +178,8 @@ async function runAuditCommand(
         const report = buildJsonReport(result);
         writeJsonReport(report, findRepoRoot());
         console.log(JSON.stringify(report, null, 2));
+    } else if (format === "sarif") {
+        console.log(renderSarif(result));
     } else {
         console.log(renderPretty(result));
     }
@@ -197,7 +200,7 @@ export function registerAuditCommand(program: Command): void {
         .option("--list", "print the rule catalog and exit")
         .option(
             "--format <format>",
-            "output format: pretty|json (github/sarif land in plan P3)",
+            "output format: pretty|json|sarif (github lands in plan P3.2)",
             "pretty",
         )
         .option(
