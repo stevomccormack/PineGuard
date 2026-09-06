@@ -12,10 +12,13 @@ name: pineguard
 
 services:
   sonarqube:
-    image: sonarqube:community
+    # Pinned to the 2025.1 LTA (Long-Term Active) Community Edition release, not the
+    # floating :community tag — see F-51 in docs/ai/plans/tools-review-and-standardisation.md.
+    image: sonarqube:2025.1-community
     container_name: pineguard-sonarqube
     ports:
-      - "9001:9000"
+      # Loopback-only — the admin UI must not be reachable from the LAN (F-23).
+      - "127.0.0.1:9001:9000"
     environment:
       # Disables Elasticsearch bootstrap checks — required for local dev on Windows/Mac.
       SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
@@ -26,6 +29,14 @@ services:
     networks:
       - pineguard
     stop_grace_period: 60s
+    healthcheck:
+      # /api/system/status only reports "UP" once SonarQube has finished starting
+      # (first boot can take 1-2 minutes) — not just that the process launched.
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/api/system/status | grep -q '\"status\":\"UP\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
 
 volumes:
   pineguard-sonarqube-data:
