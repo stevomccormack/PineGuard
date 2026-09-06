@@ -251,7 +251,7 @@ if ($Scope -in 'All', 'Namespaces') {
 if ($Scope -in 'All', 'Sonar') {
     Write-Check 'Sonar path validation'
 
-    $sonarFile = Join-Path $repoRoot 'sonar-project.properties'
+    $sonarFile = Join-Path $repoRoot 'tools/sonar-scanner/sonar-project.properties'
     if (Test-Path $sonarFile) {
         $sonarContent = Get-Content $sonarFile -Raw
         $hardcodedPaths = [regex]::Matches($sonarContent, 'resourceKey=(src/[^\s,]+\.cs)')

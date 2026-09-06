@@ -108,7 +108,7 @@ if (-not (Test-SonarQubeUp -SonarUrl $SonarUrl)) {
 
 # --- Load sonar-project.properties ---
 
-$propsFile = Join-Path $repoRootResolved 'sonar-project.properties'
+$propsFile = Join-Path $PSScriptRoot 'sonar-project.properties'
 Write-Host "Loading SonarQube properties from $propsFile..." -ForegroundColor Cyan
 $sonarProps = Import-SonarProperties -Path $propsFile
 
@@ -126,15 +126,10 @@ foreach ($key in $sonarProps.Keys) {
 
 Push-Location $repoRootResolved
 
-# The dotnet-sonarscanner does not support sonar-project.properties files and fails if
-# one is found in the repo root. We already parsed the file and pass properties via /d:
-# arguments, so temporarily hide it during the scanner session.
-$propsBackup = "$propsFile.bak"
-$propsHidden = $false
-if (Test-Path -LiteralPath $propsFile) {
-    Rename-Item -LiteralPath $propsFile -NewName (Split-Path $propsBackup -Leaf)
-    $propsHidden = $true
-}
+# The properties file lives under tools/sonar-scanner/ (not the repo root) because
+# dotnet-sonarscanner refuses to run if it finds a sonar-project.properties file in its
+# working directory. The scanner runs from $repoRootResolved, where no such file exists,
+# so no hide/restore step is needed.
 
 try {
     # Step 1: Begin
@@ -169,10 +164,6 @@ try {
     dotnet sonarscanner end /d:sonar.token="$tokenValue"
 }
 finally {
-    # Restore the properties file regardless of success or failure.
-    if ($propsHidden -and (Test-Path -LiteralPath $propsBackup)) {
-        Rename-Item -LiteralPath $propsBackup -NewName (Split-Path $propsFile -Leaf)
-    }
     Pop-Location
 }
 
