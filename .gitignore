@@ -12,6 +12,10 @@ docs/ai/chat-*.md
 logs/
 logs_*.txt
 
+# Node / pnpm (apps/cli TypeScript CLI — node_modules/ already covered above)
+apps/cli/dist/
+.pnpm-store/
+
 # SonarQube
 .sonarlint/
 .sonarqube/
