@@ -123,7 +123,17 @@ Write-Host "Repo root: $repoRoot" -ForegroundColor DarkGray
 Write-Host "Coverage results: $ResultsRoot" -ForegroundColor DarkGray
 Write-Host "Scope: $Scope" -ForegroundColor DarkGray
 
-$coverageFiles = Get-LatestCoverageFiles -ResultsRoot $ResultsRoot
+# Read only this scope's own results, never "whatever happens to be on disk" (F-19): a stale
+# leftover from a previous run of a different scope must not leak into this scope's numbers.
+# 'Custom' has no registry entry to resolve against, so it keeps the original unrestricted
+# ResultsRoot scan -- that is its documented purpose as a power-user escape hatch.
+if ($Scope -eq 'Custom') {
+    $coverageFiles = Get-LatestCoverageFiles -ResultsRoot $ResultsRoot
+}
+else {
+    $scopeResultsPaths = @(Get-ScopeTestResultsPaths -RepoRoot $repoRoot -ResultsRoot $ResultsRoot -Scope $Scope)
+    $coverageFiles = Get-LatestCoverageFiles -ProjectResultsPaths $scopeResultsPaths
+}
 
 $isoDir = $null
 try {

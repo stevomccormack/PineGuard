@@ -103,35 +103,6 @@ function Test-CoverageLooksValid {
         return $false
     }
 
-    $expected = if ($null -ne $scopeRegistryEntry) {
-        $scopePrefixFolder = ($scopeRegistryEntry.SourceDir -split '\\')[0]
-        $scopeLeaf = Split-Path $scopeRegistryEntry.SourceDir -Leaf
-        "(?i)(^|[\\/])($scopePrefixFolder[\\/]+)?$([regex]::Escape($scopeLeaf))[\\/]"
-    }
-    else {
-        # Aggregate scopes: same derivation as the per-scope branch above — the real folder
-        # leaf from SourceDir (Name is not always the folder suffix: Options ->
-        # PineGuard.Extensions.Options). PathIncludeRegex is not reusable here: it is
-        # ^-anchored for repo-relative paths, and this pattern runs against raw report
-        # content where paths appear mid-string.
-        $allFolderLeaves = (Get-PineGuardScope -All | ForEach-Object { [regex]::Escape((Split-Path $_.SourceDir -Leaf)) }) -join '|'
-        "(?i)(^|[\\/])((src|tests)[\\/]+)?($allFolderLeaves)[\\/]"
-    }
-
-    if ($false) {
-        if ($scopeHasAnySourceFiles) {
-            $debugLog = Join-Path $ProjectResults "debug_failure.txt"
-            "Scope: $Scope" | Out-File $debugLog
-            "Expected Regex: $expected" | Out-File $debugLog -Append
-            "Raw Content Length: $($raw.Length)" | Out-File $debugLog -Append
-            "First 1000 chars: " | Out-File $debugLog -Append
-            $raw.Substring(0, [Math]::Min($raw.Length, 1000)) | Out-File $debugLog -Append
-            
-            Write-Warning "Coverage validation failed: Content does not match regex '$expected'. See $debugLog"
-            return $false
-        }
-    }
-
     return $true
 }
 
@@ -140,8 +111,20 @@ $generatedRoot = Get-XplatArtifactsRoot -RepoRoot $repoRoot
 $resultsRoot = Join-Path $generatedRoot 'testresults'
 
 if ($Clean) {
-    if (Test-Path $generatedRoot) {
-        Remove-Item -Path $generatedRoot -Recurse -Force
+    # Delete only this scope's own previous output: its testresults/<project> folder(s) and
+    # its html-<scope> report. Every other scope's testresults/** and html-<otherscope> must
+    # survive untouched — wiping $generatedRoot wholesale here used to destroy every scope's
+    # already-collected results at once (F-19, the "stale data problem").
+    $scopeResultsPaths = @(Get-ScopeTestResultsPaths -RepoRoot $repoRoot -ResultsRoot $resultsRoot -Scope $Scope)
+    foreach ($scopeResultsPath in $scopeResultsPaths) {
+        if (Test-Path -LiteralPath $scopeResultsPath) {
+            Remove-Item -LiteralPath $scopeResultsPath -Recurse -Force
+        }
+    }
+
+    $scopeHtmlDir = Join-Path $generatedRoot "html-$($Scope.ToLower())"
+    if (Test-Path -LiteralPath $scopeHtmlDir) {
+        Remove-Item -LiteralPath $scopeHtmlDir -Recurse -Force
     }
 
     $redirectPath = Join-Path (Get-CodeCoverageArtifactsRoot -RepoRoot $repoRoot) "xplat-$($Scope.ToLower())-report.html"

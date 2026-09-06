@@ -49,6 +49,78 @@ function Get-XplatArtifactsRoot {
 }
 
 # -------------------------------------------------------------------------------------------------
+# Scope-to-TestProjects resolution
+# -------------------------------------------------------------------------------------------------
+
+function Get-ScopeTestProjectPaths {
+    <#
+    .SYNOPSIS
+        Resolves the test-project paths that a coverage scope's own generate run collects.
+
+    .DESCRIPTION
+        Mirrors the resolution Gen-CoverageReport.ps1 performs when the caller does not
+        override -ProjectFilter: a registry scope's own DefaultProjectFilter and
+        IncludeEmptyTestProjects, or '*.UnitTests.csproj' with empty projects excluded for
+        the 'All' aggregate (which is not a registry entry). This is the single place that
+        answers "which test projects does this scope canonically own", so Gen-CoverageReport
+        (-Clean) and Test-CoverageAnalysis (aggregation) cannot drift apart and re-open the
+        stale-data problem (F-19): a run for one scope must never touch or read another
+        scope's results.
+
+        An explicit -ProjectFilter override passed to Gen-CoverageReport for a one-off run is
+        intentionally NOT reflected here — this answers what the scope owns by default, which
+        is what -Clean and analysis need for isolation, not what a particular ad hoc run chose.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepoRoot,
+
+        [Parameter(Mandatory)]
+        [string] $Scope
+    )
+
+    $registryScopeNames = @(Get-PineGuardScope -All | ForEach-Object Name)
+    $scopeEntry = if ($Scope -in $registryScopeNames) { Get-PineGuardScope -Name $Scope } else { $null }
+
+    $projectFilter = if ($null -ne $scopeEntry) { $scopeEntry.DefaultProjectFilter } else { '*.UnitTests.csproj' }
+    $includeEmpty = if ($null -ne $scopeEntry) { [bool]$scopeEntry.IncludeEmptyTestProjects } else { $false }
+
+    return @(Get-TestProjects -RepoRoot $RepoRoot -ProjectFilter $projectFilter -IncludeEmpty:$includeEmpty)
+}
+
+function Get-ScopeTestResultsPaths {
+    <#
+    .SYNOPSIS
+        Resolves the testresults/<ProjectName> folders that belong to a coverage scope.
+
+    .DESCRIPTION
+        Used by Gen-CoverageReport.ps1 (-Clean) to delete only this scope's own previous
+        output, and by Test-CoverageAnalysis.ps1 to aggregate only this scope's own results —
+        never another scope's leftovers on disk (F-19).
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepoRoot,
+
+        [Parameter(Mandatory)]
+        [string] $ResultsRoot,
+
+        [Parameter(Mandatory)]
+        [string] $Scope
+    )
+
+    $projectPaths = @(Get-ScopeTestProjectPaths -RepoRoot $RepoRoot -Scope $Scope)
+
+    return @(
+        $projectPaths |
+        ForEach-Object { Join-Path $ResultsRoot ([IO.Path]::GetFileNameWithoutExtension($_)) } |
+        Sort-Object -Unique
+    )
+}
+
+# -------------------------------------------------------------------------------------------------
 # Coverlet RunSettings
 # -------------------------------------------------------------------------------------------------
 
@@ -105,18 +177,45 @@ function Get-LatestCoverageFiles {
     <#
     .SYNOPSIS
         Returns the newest coverage.cobertura.xml file per test-project folder.
+
+    .DESCRIPTION
+        -ProjectResultsPaths restricts the search to the given testresults/<ProjectName>
+        folders — a coverage scope's own output, from Get-ScopeTestResultsPaths — so a run
+        never aggregates another scope's leftovers (F-19). -ResultsRoot keeps the original
+        unrestricted recursive scan for callers with no scope to resolve against ('Custom').
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'ResultsRoot')]
     param(
-        [Parameter(Mandatory)]
-        [string] $ResultsRoot
+        [Parameter(Mandatory, ParameterSetName = 'ResultsRoot')]
+        [string] $ResultsRoot,
+
+        [Parameter(Mandatory, ParameterSetName = 'ProjectPaths')]
+        [string[]] $ProjectResultsPaths
     )
 
+    # The @() must wrap the whole if/else, not each branch: assigning an if/else expression's
+    # output to a variable re-collapses a single-item array back to a scalar unless the entire
+    # construct is wrapped, which silently broke the .Count check below for single-project scopes.
+    $searchPaths = @(
+        if ($PSCmdlet.ParameterSetName -eq 'ProjectPaths') {
+            $ProjectResultsPaths | Where-Object { Test-Path -LiteralPath $_ }
+        }
+        else {
+            $ResultsRoot
+        }
+    )
+
+    if (-not $searchPaths -or $searchPaths.Count -eq 0) {
+        throw "No coverage results folders found for the requested scope."
+    }
+
     $files = @(
-        Get-ChildItem -LiteralPath $ResultsRoot -Recurse -File -Filter 'coverage.cobertura.xml' -ErrorAction Stop
+        foreach ($searchPath in $searchPaths) {
+            Get-ChildItem -LiteralPath $searchPath -Recurse -File -Filter 'coverage.cobertura.xml' -ErrorAction SilentlyContinue
+        }
     )
     if (-not $files -or $files.Count -eq 0) {
-        throw "No 'coverage.cobertura.xml' files found under: $ResultsRoot"
+        throw "No 'coverage.cobertura.xml' files found under: $($searchPaths -join ', ')"
     }
 
     return @(
