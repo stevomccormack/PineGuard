@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../../../src/PineGuard.MediatR/PineGuard.MediatR.csproj" />
+  <Project Path="../../../tests/PineGuard.MediatR.UnitTests/PineGuard.MediatR.UnitTests.csproj" />
+</Solution>
