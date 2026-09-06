@@ -338,6 +338,73 @@ export function findRecordDeclarations(root: Node): RecordDeclarationInfo[] {
 }
 
 // ---------------------------------------------------------------------------
+// Type declarations — class/struct/interface/record, uniformly by name.
+// ---------------------------------------------------------------------------
+
+const TYPE_DECLARATION_NODE_TYPES = [
+    "class_declaration",
+    "struct_declaration",
+    "interface_declaration",
+    "record_declaration",
+] as const;
+
+/** One of the four C# named-type declaration forms. */
+export type TypeDeclarationKind = "class" | "struct" | "interface" | "record";
+
+function typeDeclarationKindOf(
+    nodeType: (typeof TYPE_DECLARATION_NODE_TYPES)[number],
+): TypeDeclarationKind {
+    switch (nodeType) {
+        case "class_declaration":
+            return "class";
+        case "struct_declaration":
+            return "struct";
+        case "interface_declaration":
+            return "interface";
+        case "record_declaration":
+            return "record";
+    }
+}
+
+export interface TypeDeclarationInfo {
+    readonly node: Node;
+    readonly kind: TypeDeclarationKind;
+    readonly name: string;
+    readonly modifiers: readonly string[];
+}
+
+/**
+ * Finds every `class`/`struct`/`interface`/`record` declaration under
+ * `root` — the general form {@link findRecordDeclarations} does not provide
+ * on its own. Needed by rules that must resolve a *named type* regardless of
+ * which of the four declaration keywords it uses (plan §8 `test-orphans`:
+ * "find a `class|record|struct|interface Foo` declaration"), including a
+ * type declared across multiple files via `partial`: each partial file's own
+ * declaration is its own node here, so a caller matching by `name` finds a
+ * hit in whichever file actually carries the keyword, without needing to
+ * merge the parts itself.
+ *
+ * Deliberately returns only `kind`/`name`/`modifiers`, not each form's extra
+ * shape (e.g. a record's or a class's own primary-constructor parameters) —
+ * use {@link findRecordDeclarations} directly when that extra shape matters;
+ * use this one when only "is a type named X declared here, and what kind is
+ * it" matters.
+ */
+export function findTypeDeclarations(root: Node): TypeDeclarationInfo[] {
+    return TYPE_DECLARATION_NODE_TYPES.flatMap((nodeType) =>
+        root.descendantsOfType(nodeType).map((node) => {
+            const nameNode = node.childForFieldName("name");
+            return {
+                node,
+                kind: typeDeclarationKindOf(nodeType),
+                name: nameNode?.text ?? "",
+                modifiers: getModifiers(node),
+            };
+        }),
+    );
+}
+
+// ---------------------------------------------------------------------------
 // Tuple types — to distinguish `(string Value, int Length)` from a record's
 // own primary-constructor parameter list, which uses the unrelated `parameter`
 // node shape even though both look similar in source.
