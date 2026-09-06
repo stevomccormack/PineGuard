@@ -10,8 +10,20 @@
  * Add one `import "./<slug>.js";` line per rule as plan P2 lands it. A rule
  * file that exists on disk but is missing its line here never registers —
  * `pineguard audit --list` simply won't show it.
- *
- * Empty on purpose until plan P2 lands the first rule
- * (docs/ai/plans/audit-cli-rebuild.md §9.2, P2.1-P2.14).
  */
-export {};
+
+/* Side-effect imports: each rule registers itself into the catalog at module load. */
+import "./doc-links.js";
+import "./layer-parity.js";
+import "./must-codes.js";
+import "./must-collisions.js";
+import "./must-usage.js";
+import "./nullability.js";
+import "./ordering.js";
+import "./rules-usage.js";
+import "./surface-parity.js";
+import "./test-files.js";
+import "./test-orphans.js";
+import "./test-records.js";
+import "./test-structure.js";
+import "./test-tuples.js";
