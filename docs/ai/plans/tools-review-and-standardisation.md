@@ -132,29 +132,52 @@ Every name below is a **recommendation with alternatives**, per the owner's nami
 (on-the-tin, unambiguous, precedent-checked, rejected alternatives shown, owner signs off).
 Nothing in §3 is applied until D-1 is signed.
 
-### 3.1 Vocabulary rule
+### 3.1 Vocabulary rule (owner's two-level rule, D-1a — replaces the "one name per thing" rule this section originally proposed)
 
-**One name per thing, used identically in the folder, the orchestrator noun, the slash-command
-family, the rules file, the spec folder, and the artifacts folder.**
+A `tools/` root folder that hosts, or is planned to host, more than one CLI/tool takes the bare
+abstract activity noun — spelled as the activity itself, not an agent noun (`code-format`, not
+`code-formatter`; `code-scan`, not `code-scanner`) — with the CLI-specific names living in nested
+subfolders. A root folder with a single purpose is named for its CLI directly (`git/`, `docker/`,
+`github/`, `nuget/`). Where the single tool is a dotnet SDK subcommand with no CLI name of its own
+(`dotnet build`, `dotnet format`, `dotnet test`), or there is no tool at all, the activity name
+applies anyway.
 
-| Domain (what it drives) | Folder | Orchestrator | Command family | Rules file | Artifacts |
-|---|---|---|---|---|---|
-| dotnet test | `testing/` | `Run-Tests.ps1` (sanctioned plural outlier) | `/test-*` | `testing.md` | `artifacts/testing/` |
-| Coverlet and dotCover, reported by ReportGenerator | `code-coverage/` with engine subfolders `coverlet/` and `dotcover/` | `Run-CodeCoverage.ps1 -Engine Coverlet\|DotCover` | `/coverage-*` | `tools.md` | `artifacts/code-coverage/<engine>/<scope>/` |
-| Roslyn compiler diagnostics | `code-diagnostics/` | `Run-CodeDiagnostics.ps1` | `/scan-roslyn-*` → **`/diagnostics-*`** (or keep and rename folder `roslyn/`; see D-1c) | `roslyn.md` → `code-diagnostics.md` | `artifacts/code-diagnostics/` |
-| dotnet format | `code-format/` (from `code-formatter`) | `Run-CodeFormat.ps1` (from `Run-Format`) | `/format-*` | `tools.md` | none |
-| JetBrains Qodana | `qodana/` (from `code-inspection`) | `Run-Qodana.ps1` | `/scan-qodana-*` | `qodana.md` | `artifacts/qodana/` |
-| SonarQube | `sonarqube/` (from `sonar-scanner`) | `Run-SonarQube.ps1` (from `Run-SonarScanner`) | `/scan-sonar-*` → `/scan-sonarqube-*` | `scan.md` → `sonarqube.md` | `artifacts/sonarqube/` |
-| git | `git/` | `Run-Commits.ps1` (sanctioned plural outlier) | `/commit-*` | `tools.md` | `artifacts/git/` |
-| GitHub + nuget.org release | `release/` | `Run-Release.ps1` (from `Run-GithubRelease`) | `/github-release-*`, `/nuget-*` | `tools.md` | `artifacts/release/` |
-| housekeeping | `maintenance/` | `Run-Clean.ps1` | `/clean-*` | `tools.md` | `artifacts/maintenance/` |
-| Docker | *removed* (see D-3) | | | | |
+Final signed-off root folder list:
 
-**Principle:** activities that are generic dotnet workflows get activity names (`code-*`,
-`testing`); third-party analysers get the product name because the activity ("static analysis")
-does not distinguish Qodana from SonarQube. Rejected: all-product naming (`coverlet/`,
-`roslyn/`) hides what the tool is *for*; all-activity naming (`code-inspection/`, `code-scan/`)
-made two folders that mean the same thing.
+| Root folder | Status | Nested (tool-named) subfolders |
+|---|---|---|
+| `code-coverage/` | unchanged (multi-tool: Coverlet + dotCover) | `coverlet/` (from `xplat/`), `dotcover/` (new) |
+| `code-diagnostics/` | unchanged — multi-tool in its own right (see note) | none checked in yet (Roslyn only today) |
+| `code-format/` | renamed from `code-formatter/` | — (`dotnet format` has no CLI name of its own) |
+| `code-scan/` | new; absorbs `code-inspection/` and `sonar-scanner/` | `qodana/` (from `code-inspection/`), `sonarqube/` (from `sonar-scanner/`); room for future scanners (semgrep, snyk, …) as siblings — YAGNI now |
+| `clean/` | renamed from `maintenance/` | — (no tool; activity name applies) |
+| `github/` | renamed from `release/` | — (single-purpose: GitHub CLI/API) |
+| `nuget/` | new — takes `Run-NugetUnlist.ps1` out of `release/` | — (single-purpose: nuget.org) |
+| `testing/` | unchanged | — (`dotnet test`) |
+| `git/` | unchanged | — (single-purpose: git) |
+| `docker/` | unchanged (D-3 keeps the compose stack as-is) | — (single-purpose: Docker) |
+| `.shared/` | unchanged — stays dot-sourced (D-2) | |
+| `.tests/` | new (D-7) | |
+
+Artifacts and log folders follow the same names one level down (`artifacts/clean/`,
+`artifacts/github/`, `logs/clean/`, and so on, D-1a).
+
+`code-diagnostics/` qualifies as multi-tool in its own right even with one subfolder checked in
+today: Roslyn/CS diagnostics, NuGet audit (`NU19xx`, emitted by `dotnet restore`), ApiCompat
+(`CP0xxx`), and the IL trimmer/AOT analyzer (`IL2xxx`/`IL3xxx`) all emit diagnostics through the
+same `dotnet build` pipeline, so parsing must not assume a `CS` prefix only (T1.02).
+
+**No downstream rename.** Slash commands, skill files, and `docs/ai/rules/*.md` files do not
+follow these folder moves: `roslyn.md`, `scan.md`, and every `/scan-*` / `/fix-*` command stay
+exactly as they are (D-1c). Only the `tools/` folders and the scripts inside them move;
+`audit-cli/` is out of scope for this plan and untouched by any of the above.
+
+Rejected: §3.1's original "one name per thing" table (folding `code-inspection` → `qodana`,
+`sonar-scanner` → `sonarqube`, and abstract orchestrator renames `Run-CodeDiagnostics` /
+`Run-CodeFormat` / `Run-SonarQube` all the way down to the command and rules-file level); a bare
+`code-scan/` rename of `sonar-scanner/` alone (the owner's first answer, withdrawn once `scan` was
+shown to be the shared verb of every `/scan-*` skill and rules file already in the Brain); nesting
+`sonarqube/` under `code-inspection/`; all-activity naming; all-product naming.
 
 ### 3.2 Verb rule (approved PowerShell verbs, with two sanctioned outliers)
 
@@ -171,7 +194,7 @@ made two folders that mean the same thing.
 | `Initialize-` | First-run configuration of a running service (`Initialize-SonarQube`). Replaces `Setup-`. | — |
 | `Start-` / `Stop-` | Container lifecycle (`Start-SonarQube`, `Stop-SonarQube`). Replaces `*-up`/`*-down`. | — |
 | `Clear-` | Delete regenerable content (`Clear-Artifacts`). Replaces `Clean-`. Alt: keep `Clean-` as a third outlier; rejected because `Clear-` is approved and reads the same. | — |
-| `Import-` | Loaders (only the module manifest remains). `Load-` removed from spec. | — |
+| `Import-` | Loaders — `Import-DotEnv` (secrets, D-4). No module manifest: D-2 kept dot-sourcing, so the two aggregator shims (`Import-CodeCoverageUtility`, `Import-GitHelpers`) are removed outright, not replaced by an `Import-Module` call. `Load-` removed from spec. | — |
 
 Shared-function renames: `Ensure-Directory` → inline `New-Item -Force`; `Ensure-DockerNetwork` →
 `Initialize-DockerNetwork`; `Ensure-IndexClean` → `Assert-IndexClean` (throws, never unstages);
@@ -189,7 +212,7 @@ deleted; `Ensure-ReportGenerator` → deleted (tool manifest).
 | `-Engine` | `Coverlet` \| `DotCover`, default `Coverlet` | new; coverage only |
 | `-Configuration` | `Debug` \| `Release` | — |
 | `-Clean` | Delete this scope's previous output first | — |
-| `-WhatIf` | Preview via `SupportsShouldProcess` everywhere | `-DryRun` (rejected: non-native; two spellings of one idea) |
+| `-WhatIf` | Preview via `SupportsShouldProcess` everywhere; `-DryRun` is a supported alias of the same native switch everywhere too (D-1d), not a separate parameter | — (D-1d reverses the original "replaces `-DryRun`" call: both spellings resolve to one implementation, neither is retired) |
 | `-Open` | Open the result in the browser; default off (CI-safe) | `-NoOpen`, `-OpenReport`, `-OpenHtml`, `-ShowReport` |
 | `-OutputPath` | Override the artifacts folder | `-Output`, `-ResultsDir`, `-ResultsRoot` |
 | `-Token` | Explicit secret; resolution order param → `$env:` → `.etc/powershell/.env` | `-ProjectToken` |
@@ -251,10 +274,18 @@ Rules:
   2025.3.3 (session memory) and 2024.3.9 cannot read 2025.3.3 snapshots, so `report` is never
   called. Whether `cover` with `--xml-report-output` avoids the hang is **unverified** and is the
   first question of spike T3.10.
+- **Delegating front door (D-9).** `code-coverage/New-CoverageReport.ps1 -Engine
+  Coverlet|DotCover` is the single entry point for report generation: it validates `-Engine` and
+  dispatches to `coverlet/New-CoverageReport.ps1` or `dotcover/New-CoverageReport.ps1`. It holds
+  no collection logic of its own — collection, the ReportGenerator call, and gating stay in the
+  two engine-named scripts. `Run-CodeCoverage.ps1` calls this front door; it never calls an engine
+  script directly. Rejected in the same session: one script with `if ($Engine)` branches
+  throughout (the owner's first answer, revised once the two collection paths were shown to share
+  almost no code).
 - **Same script name in both engine folders.** `coverlet/New-CoverageReport.ps1` and
-  `dotcover/New-CoverageReport.ps1` share one parameter contract; the orchestrator routes on
-  `-Engine`. Alternative rejected: one script with `-Engine` branches, because the two collection
-  paths share almost no code and would become one file full of `if ($Engine)`.
+  `dotcover/New-CoverageReport.ps1` share one parameter contract; the front door above is what
+  routes between them on `-Engine`, not the orchestrator and not either engine folder inspecting
+  the other.
 - **Exclusions are declared once** in the registry (`CoverageExcludeAttributes`,
   `CoverageExcludeAssemblies`) and rendered into coverlet runsettings and dotCover arguments.
 
@@ -325,31 +356,31 @@ Verification (Opus, T1.V): re-run the §1 inventory; every touched script execut
 
 | Task | Scope | Fixes |
 |---|---|---|
-| T3.01 | **`.shared` → `PineGuard.Tools` module** (D-2). Functions split into `functions/<area>.ps1`: `path`, `registry` (with `IValidateSetValuesGenerator` class `PineGuardScope`), `console` (`Write-Step`, `Write-Success`, `Write-Warn`, `Write-Fail`, `Write-Detail`), `command` (`Assert-Command`, `Test-Command`), `secret` (`Get-ToolSecret`, `Import-DotEnv`), `git`, `coverage`, `sonarqube`, `docker` (or none, per D-3). Approved verbs per §3.2. Remove `Import-CodeCoverageUtility.ps1`, `Import-GitHelpers.ps1`, `env.ps1`, `html.ps1`, `dotnet-tools-reportgenerator.ps1`, `commands.ps1`. Remove the two audit-cli dot-sources. Transcript helper `Start-ToolTranscript -Domain X`. | F-06, F-07, F-10, F-25, F-37, F-39, F-40, F-41, F-43 |
+| T3.01 | **`.shared` consolidation, no module (D-2 kept dot-sourcing).** Within the existing dot-source pattern — no `.psd1`/`.psm1`, no `Import-Module` — rename the unapproved-verb functions per §3.2: `Ensure-Directory` → inline `New-Item -Force`, `Ensure-DockerNetwork` → `Initialize-DockerNetwork`, `Ensure-IndexClean` → `Assert-IndexClean` (throws, never unstages — T1.01 already lands this), `Unstage-AllChanges` → deleted, `Try-ParseConditionCoverage` → `ConvertFrom-ConditionCoverage`, `Normalize-CoberturaFilename` → `Resolve-CoberturaFilename` (F-06); collapse `Get-RepoRoot` / `Resolve-RepoRoot` / `Resolve-PineGuardRepoRoot` and the inline copy in `Test-StructuralIntegrity.ps1` into one `Get-RepoRoot` in `.shared/path.ps1` (F-07); delete the two aggregator shims `Import-CodeCoverageUtility.ps1` and `Import-GitHelpers.ps1`, pointing every caller at the `.shared/*.ps1` files it actually needs (F-10). Consolidate the three redefinitions of console helpers into one `.shared/console.ps1` (`Write-Step`, `Write-Success`, `Write-Warn`, `Write-Fail`, `Write-Detail`, F-37); add `Get-ToolSecret`/`Import-DotEnv` (D-4) and a transcript helper `Start-ToolTranscript -Domain X` (F-43). Remove `env.ps1` (`Sync-Env`/`Sync-Path`/`Get-JavaVersion`, superseded by `Get-ToolSecret`), `html.ps1` (F-39), `dotnet-tools-reportgenerator.ps1` (superseded by the Phase 2 tool manifest), and the two audit-cli dot-sources. Add the Pester ordering test that is D-2's condition for keeping dot-sourcing: every `.shared/*.ps1` file loads standalone in filename order, with no unenforced "must load X first" comment left in a header. | F-06, F-07, F-10, F-25, F-37, F-39, F-40, F-41, F-43 |
 | T3.02 | **git**: scope table derived from the registry plus meta-scopes (`Agent`, `Docs`, `Tools`, `Solution`, `Ci`); one `Run-Commits.ps1 -Scope <string[]> [-All] [-IncludeTests] [-Message] [-AutoMessage] [-Push] [-Rebase] [-WhatIf]` calling `Invoke-ScopedCommit` in-process; delete 16 `Commit-*.ps1`; `README.md` owned by one scope; `.github/workflows` moves to `Ci`; auto message = conventional-commit subject + prose body per owner convention; `Assert-IndexClean`. Slash commands `/commit-*` call `Run-Commits -Scope X`. | F-21, F-33, F-34 |
-| T3.03 | **code-coverage (Coverlet)**: rename `xplat/` to `coverlet/`; `coverlet/New-CoverageReport.ps1`; engine-agnostic `Test-Coverage.ps1 -Engine` at the domain root; single coverlet source (generator reads `coverlet.runsettings` and patches `<Include>`; CI keeps using the static file); ReportGenerator emits `Html;HtmlSummary;Cobertura` into `artifacts/code-coverage/coverlet/<scope>/report/`; open `index.html` directly; per-scope clean and analysis from T1.04 retained; `-Engine`, `-Open`, `-OutputPath`, `-Framework`, `-Format` validated in the orchestrator. | F-03, F-11, F-14, F-35, F-39 |
-| T3.04 | **qodana**: folder rename; remove `auto/`; generate `artifacts/qodana/<slug>/qodana.yaml` from the registry at run time; either generate `.slnx` per scope or use `dotnet.project:` (spike first, 1 task); `exclude:` `.etc`, `artifacts`, `.git`; `Install-Qodana.ps1`; slugs normalised (D-1). `qodana.all.yaml` stays checked in for CI but is itself generated by `Sync-QodanaConfig.ps1` (spec §1.1 `Sync-` verb) with a parity test that it is current. | F-12, F-13, F-20, F-36, F-51 |
-| T3.05 | **sonarqube**: folder rename; `Install-SonarQube.ps1` (prereqs + start), `Initialize-SonarQube.ps1` (commission; password generated with `[System.Security.Cryptography.RandomNumberGenerator]`, stored to `.env` as `SONARQUBE_ADMIN_PASSWORD`, token stored to `.env`, never to User env), `Start-SonarQube.ps1`/`Stop-SonarQube.ps1` (absorb `sonarqube-up/down`, `docker-network`), `Run-SonarQube.ps1` (token via `SONAR_TOKEN` env; `-Framework` parameter with the net8.0 reason documented; properties from `tools/sonarqube/sonar-project.properties`), `Get-SonarQubeIssues.ps1`. Delete `tools/docker/` and `docker.ps1` per D-3. | F-04, F-05, F-22, F-23, F-24, F-25, F-26 |
-| T3.06 | **testing / code-format / code-diagnostics**: `Run-Tests -Scope` from the registry (All = `PineGuard.slnx`), `-Framework`, `-NoRestore`, `-OutputPath`, trx named per project; `Run-CodeFormat` with `-NoRestore`; `Run-CodeDiagnostics` with `-Code` filter, cross-platform output path, transcript; all three emit the §3.4 exit codes. Regenerate `.vscode/tasks.json` test entries from the registry (small `Sync-VsCodeTasks.ps1`, optional). | F-08, F-17, F-30, F-42, F-44 |
-| T3.07 | **maintenance**: `Clear-Artifacts.ps1`, `Clear-Logs.ps1`, `Clear-Root.ps1` sharing one `Clear-ToolDirectory` function; `Run-Clean -Target Artifacts,Logs,Root`; `Test-StructuralIntegrity` reads the registry for the namespace check, single-pass file reads, `artifacts/maintenance/`. | F-27, F-31, F-38 |
-| T3.08 | **release**: `Run-Release.ps1`, `Set-GithubRuleset.ps1`, `Unpublish-NugetPrerelease.ps1`; console helpers from the module; package list from the registry (`SourceCsprojs` where the csproj is packable); backup path via `Get-RepoRoot`; `-WhatIf`. | F-02, F-21, F-29, F-37 |
+| T3.03 | **code-coverage (Coverlet)**: rename `xplat/` to `coverlet/`; `coverlet/New-CoverageReport.ps1` implements collection under the same parameter contract as `dotcover/New-CoverageReport.ps1` (§3.5, T3.11); the new `code-coverage/New-CoverageReport.ps1 -Engine Coverlet\|DotCover` front door (D-9) validates `-Engine` and delegates here — it holds no collection logic of its own; engine-agnostic `Test-Coverage.ps1 -Engine` at the domain root; single coverlet source (generator reads `coverlet.runsettings` and patches `<Include>`; CI keeps using the static file); ReportGenerator emits `Html;HtmlSummary;Cobertura` into `artifacts/code-coverage/coverlet/<scope>/report/`; open `index.html` directly; per-scope clean and analysis from T1.04 retained; `-Open`, `-OutputPath`, `-Framework`, `-Format` validated in this script. `Run-CodeCoverage.ps1` calls the D-9 front door, never this script directly. | F-03, F-11, F-14, F-35, F-39 |
+| T3.04 | **code-scan/qodana**: folder move `code-inspection/` → `code-scan/qodana/` (D-1a; the inner `qodana/` level flattens away so config and `.slnx` sit directly under the new folder); remove `auto/` (F-12); normalise the Qodana slugs (D-1a, F-13); `Install-Qodana.ps1` (verb per §3.2); hand-add `exclude: .etc, artifacts, .git` to every checked-in Qodana YAML (F-51 — a manual edit to the existing files, not generation). **D-3 dropped this task's generation scope**: the owner chose to leave the Docker compose stack and all fourteen hand-written `.slnx` files as-is, so there is no per-scope `qodana.yaml` generated from the registry at run time, no `dotnet.project:` spike, and no `Sync-QodanaConfig.ps1`. F-20 (missing MediatR config/`.slnx`) is fixed by T1.05's hand-added files, not regenerated here; F-36 (duplication across the 14 YAML/`.slnx` files) is accepted as a known limitation of D-3, not resolved by this task. | F-12, F-13, F-51 (F-20 via T1.05; F-36 unresolved, D-3) |
+| T3.05 | **code-scan/sonarqube**: folder move `sonar-scanner/` → `code-scan/sonarqube/` (D-1a); `Install-SonarQube.ps1` (prereqs + start), `Initialize-SonarQube.ps1` (commission; password generated with `[System.Security.Cryptography.RandomNumberGenerator]`, stored to `.env` as `SONARQUBE_ADMIN_PASSWORD`, token stored to `.env`, never to User env — D-4), `Start-SonarQube.ps1`/`Stop-SonarQube.ps1` (absorb `sonarqube-up/down`, `docker-network`), `Run-SonarScanner.ps1` (name unchanged — D-1a keeps it, since it wraps the SonarScanner CLI, not the SonarQube server; token via `SONAR_TOKEN` env; `-Framework` parameter with the net8.0 reason documented; properties from `tools/code-scan/sonarqube/sonar-project.properties`), `Get-SonarQubeIssues.ps1`. `tools/docker/` and `docker.ps1` are **kept, not deleted** — D-3 reversed the removal, so the compose stack stays as-is. | F-04, F-05, F-23, F-24, F-25, F-26 (F-22 unresolved — D-3 keeps the compose stack) |
+| T3.06 | **testing / code-format / code-diagnostics**: `Run-Tests -Scope` from the registry (All = `PineGuard.slnx`), `-Framework`, `-NoRestore`, `-OutputPath`, trx named per project; `Run-Format.ps1` (name unchanged, D-1a — folder becomes `code-format/`, from `code-formatter/`) with `-NoRestore`; `Run-CompilerDiagnostics.ps1` (name unchanged, D-1a — stays in `code-diagnostics/`) with a `-Code` filter matching any `<PREFIX><digits>`, not only `CS` (D-1a: NuGet audit `NU19xx`, ApiCompat `CP0xxx`, IL trimmer `IL2xxx`/`IL3xxx` also emit build diagnostics), cross-platform output path, transcript; all three emit the §3.4 exit codes. Regenerate `.vscode/tasks.json` test entries from the registry (small `Sync-VsCodeTasks.ps1`, optional). | F-08, F-17, F-30, F-42, F-44 |
+| T3.07 | **clean**: folder move `maintenance/` → `clean/` (D-1a); `Clear-Artifacts.ps1`, `Clear-Logs.ps1`, `Clear-Root.ps1` sharing one `Clear-ToolDirectory` function; `Run-Clean -Target Artifacts,Logs,Root`; `Test-StructuralIntegrity.ps1` stays in `clean/` (D-1a), reads the registry for the namespace check, single-pass file reads, writes to `artifacts/clean/`. | F-27, F-31, F-38 |
+| T3.08 | **github**: folder move `release/` → `github/` (D-1a); `Run-Release.ps1`, `Set-GithubRuleset.ps1`; console helpers from `.shared` (T3.01; no module, D-2); package list from the registry (`SourceCsprojs` where the csproj is packable); backup path via `Get-RepoRoot`; `-WhatIf`. `Unpublish-NugetPrerelease.ps1` (from `Run-NugetUnlist.ps1`) moves out to the new **`nuget/`** root folder (D-1a) instead of staying under `github/` — nuget.org tooling is never nested under `github/`. | F-02, F-21, F-29, F-37 |
 | T3.09 | **Windows-ism sweep**: apply the T2.03 grep test across all of `tools/` (excluding audit-cli) and fix every hit; move the CI `audit` job to `ubuntu-latest` if audit-cli's owner confirms it is clean, else leave a TODO in the workflow. | F-30 |
 | T3.10 | **dotCover spike** (time-boxed, blocks T3.11). With `jetbrains.dotcover.commandlinetools` 2025.3.3 establish: (a) `dotCover cover --xml-report-output … -- test <Core csproj> -c Release -f net10.0` and `-f net8.0` complete without the `report` hang; (b) ReportGenerator accepts the XML as `DotCover` input and its Cobertura output matches Coverlet's Core line and branch totals within a documented tolerance; (c) which `--exclude-attributes` values reproduce coverlet's `ExcludeByAttribute` set, including the `GeneratedRegex` output; (d) whether per-TFM runs need `dotCover merge` or ReportGenerator merging. Record every answer in `## Baselines`. Delete `.dotnet/dotcover/2024.3.9`. Add the tool to `.config/dotnet-tools.json` if it installs as a local tool. | F-11 |
-| T3.11 | **code-coverage (dotCover)**: `dotcover/New-CoverageReport.ps1` with the same parameter contract as the Coverlet script; snapshots and XML under `artifacts/code-coverage/dotcover/<scope>/`; ReportGenerator `Html;HtmlSummary;Cobertura`; `Run-CodeCoverage -Engine DotCover` routes to it; `Test-Coverage -Engine DotCover` gates on the emitted Cobertura; README engine table replaces the "deliberately no dotcover folder" note; Pester test that both engines produce the same class list for Core. If T3.10 (a) fails, ship snapshot-only collection for Rider and record the JetBrains issue. | F-11 |
+| T3.11 | **code-coverage (dotCover)**: `dotcover/New-CoverageReport.ps1` with the same parameter contract as `coverlet/New-CoverageReport.ps1` (T3.03); snapshots and XML under `artifacts/code-coverage/dotcover/<scope>/`; ReportGenerator `Html;HtmlSummary;Cobertura`. `Run-CodeCoverage -Engine DotCover` calls the `code-coverage/New-CoverageReport.ps1` front door (D-9), which validates `-Engine` and delegates here — it does not route to this script directly; `Test-Coverage -Engine DotCover` gates on the emitted Cobertura; README engine table replaces the "deliberately no dotcover folder" note; Pester test that both engines produce the same class list for Core. If T3.10 (a) fails, ship snapshot-only collection for Rider and record the JetBrains issue. | F-11 |
 
 ### Phase 4 — Rename cascade (blocked on Phase 3 completion)
 
 | Task | Deliverable |
 |---|---|
-| T4.01 | `git mv` every folder and script per D-1 in one commit; update intra-`tools/` references |
-| T4.02 | Haiku fan-out, one agent per surface: `docs/ai/agents`, `docs/ai/commands`, `docs/ai/skills`, `docs/ai/specs`, `docs/ai/rules`, `docs/ai/workflows`, `docs/ai/README.md`, `.claude/`, `.agent/`, `.pi/`, `.github/` (prompts, instructions, skills, agents, workflows), `.clinerules/`, `.cursor/rules/`, `.windsurf/rules/`, `.amazonq/rules/`, `.junie/`, `.vscode/tasks.json`, `CLAUDE.md`/`AGENTS.md`/`GEMINI.md`. Each agent receives the exact old→new path table and replaces only those strings. |
+| T4.01 | `git mv` the six D-1a folder moves plus the new `nuget/` split, in one commit: `code-inspection/` → `code-scan/qodana/`; `sonar-scanner/` → `code-scan/sonarqube/`; `code-formatter/` → `code-format/`; `maintenance/` → `clean/`; `release/` → `github/` (with `Run-NugetUnlist.ps1`/`Unpublish-NugetPrerelease.ps1` and its README slice going to a new `nuget/` folder instead); `code-coverage/xplat/` → `code-coverage/coverlet/`. Plus the script-level verb renames from D-1b/§3.2. **`code-diagnostics/` does not move or become `roslyn/`** (D-1c withdrew that); **no slash command, skill file, or `docs/ai/rules/*.md` file is renamed** in this task. Update intra-`tools/` references. |
+| T4.02 | Haiku fan-out, one agent per surface: `docs/ai/agents`, `docs/ai/commands`, `docs/ai/skills`, `docs/ai/specs`, `docs/ai/rules`, `docs/ai/workflows`, `docs/ai/README.md`, `.claude/`, `.agent/`, `.pi/`, `.github/` (prompts, instructions, skills, agents, workflows), `.clinerules/`, `.cursor/rules/`, `.windsurf/rules/`, `.amazonq/rules/`, `.junie/`, `.vscode/tasks.json`, `CLAUDE.md`/`AGENTS.md`/`GEMINI.md`. Each agent receives the exact old→new **folder-path** table from T4.01 (the six folder moves plus the `nuget/` split) and replaces only those path strings — the table carries no command name, skill name, or rules-file name, because none of those rename (D-1c). |
 | T4.03 | Gate: `Test-StructuralIntegrity -Scope Paths -StalePaths <every old path>` returns zero; a Haiku sweep confirms every `tools/**/*.ps1` path mentioned anywhere in the repo exists on disk. |
 
 ### Phase 5 — Documentation and spec (blocked on D-8)
 
 | Task | Deliverable |
 |---|---|
-| T5.01 | `docs/ai/specs/tools/spec.md` v2: §1 verb table with the outlier register; §3.3 parameter table; exit codes; secrets rule; encoding rule; help rule; cross-platform rule; lint/test requirement; domain index with `spec.md` naming for every domain (rename `qodana.md` → `code-inspection/spec.md` or to the new folder name) |
+| T5.01 | `docs/ai/specs/tools/spec.md` v2: §1 verb table with the outlier register; §3.3 parameter table; exit codes; secrets rule; encoding rule; help rule; cross-platform rule; lint/test requirement; domain index matching the final D-1a folder list (`code-coverage/` with `coverlet/` + `dotcover/`, `code-diagnostics/`, `code-format/`, `code-scan/` with `qodana/` + `sonarqube/`, `clean/`, `github/`, `nuget/`, `testing/`, `git/`, `docker/`) — the Qodana spec's path follows the `code-scan/qodana/` move, not the `code-inspection/spec.md` naming ambiguity the original F-15 fix described |
 | T5.02 | `docs/ai/specs/scan/spec.md` §4 corrected (no `Sync-Env`), §6 script table; `docs/ai/specs/tools/code-diagnostics/spec.md` §4 scope table replaced by "see registry" |
 | T5.03 | Every `tools/**/README.md` regenerated: no hand-enumerated scope lists (one canonical table in `tools/README.md` produced by `Get-PineGuardScope -All`), correct output paths, correct parameter tables, the safety tier of every script |
 | T5.04 | `docs/ai/plans/cross-platform-tools-migration.md` marked superseded per D-5 with a pointer here |
