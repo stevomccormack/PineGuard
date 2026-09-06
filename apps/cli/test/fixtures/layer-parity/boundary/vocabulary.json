@@ -1,0 +1,6 @@
+{
+  "aliases": {
+    "NotBlank": "NullOrEmpty"
+  },
+  "stripPrefixes": ["Not"]
+}
