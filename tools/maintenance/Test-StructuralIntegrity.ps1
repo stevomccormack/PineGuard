@@ -9,7 +9,7 @@
     - Stale path references in .md files
     - Stale path references in .ps1 files
     - Stale namespace references in .cs files
-    - Sonar path validation (hardcoded paths exist on disk)
+    - Sonar path validation (sonar.*.exclusions entries resolve to real paths on disk)
     - Namespace/folder alignment (namespace matches folder path)
 
 .PARAMETER Scope
@@ -55,7 +55,7 @@ if (-not $repoRoot) {
     $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 }
 
-$artifactDir = Join-Path $repoRoot 'artifacts/audit'
+$artifactDir = Join-Path $repoRoot 'artifacts/maintenance'
 if (-not (Test-Path $artifactDir)) { New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null }
 
 $reportPath = Join-Path $artifactDir 'structural-integrity.txt'
@@ -246,31 +246,86 @@ if ($Scope -in 'All', 'Namespaces') {
 }
 
 # ─────────────────────────────────────────────
-# CHECK 6: Sonar hardcoded paths exist on disk
+# CHECK 6: Sonar exclusion paths exist on disk
 # ─────────────────────────────────────────────
+function Get-SonarExclusionEntry {
+    <#
+    .SYNOPSIS
+        Extracts the comma-separated, backslash-continued entries of one
+        sonar.*.exclusions property from a sonar-project.properties file.
+    .DESCRIPTION
+        tools/.shared/sonarqube.ps1's Import-SonarProperties treats blank
+        lines and comments as line terminators even mid-continuation, which
+        corrupts multi-line values that are followed by a blank line or a
+        comment (as sonar.exclusions is in this file) — the next property's
+        key=value line gets appended as if it were part of the previous
+        value, and the following key is lost entirely. This local parser
+        keeps consuming raw lines while the previous one ends in '\',
+        regardless of blank/comment content, matching standard .properties
+        continuation semantics.
+    #>
+    param(
+        # Not [Parameter(Mandatory)]: PowerShell's mandatory-parameter check rejects an
+        # entire array argument if any element is an empty string, and this file's blank
+        # lines (used as visual separators between properties) make that guaranteed.
+        [string[]] $Lines,
+        [Parameter(Mandatory)][string] $Key
+    )
+
+    $prefix = "$Key="
+    for ($i = 0; $i -lt $Lines.Count; $i++) {
+        $trimmed = $Lines[$i].TrimStart()
+        if (-not $trimmed.StartsWith($prefix)) { continue }
+
+        $value = $trimmed.Substring($prefix.Length)
+        while ($value.TrimEnd().EndsWith('\')) {
+            $value = $value.TrimEnd()
+            $value = $value.Substring(0, $value.Length - 1).TrimEnd()
+            $i++
+            if ($i -ge $Lines.Count) { break }
+            $value += $Lines[$i].Trim()
+        }
+
+        return @($value -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
+    }
+
+    return @()
+}
+
 if ($Scope -in 'All', 'Sonar') {
     Write-Check 'Sonar path validation'
 
     $sonarFile = Join-Path $repoRoot 'tools/sonar-scanner/sonar-project.properties'
     if (Test-Path $sonarFile) {
-        $sonarContent = Get-Content $sonarFile -Raw
-        $hardcodedPaths = [regex]::Matches($sonarContent, 'resourceKey=(src/[^\s,]+\.cs)')
+        $sonarLines = [System.IO.File]::ReadAllLines((Resolve-Path $sonarFile).Path)
+
+        $exclusionKeys = 'sonar.exclusions', 'sonar.coverage.exclusions', 'sonar.cpd.exclusions'
+        $entries = @(foreach ($key in $exclusionKeys) { Get-SonarExclusionEntry -Lines $sonarLines -Key $key })
 
         $missing = 0
-        foreach ($match in $hardcodedPaths) {
-            $filePath = $match.Groups[1].Value
-            $fullPath = Join-Path $repoRoot $filePath
+        $checkedCount = 0
+        foreach ($entry in $entries) {
+            $checkedCount++
+            $starIndex = $entry.IndexOf('*')
+            if ($starIndex -ge 0) {
+                $basePath = $entry.Substring(0, $starIndex).TrimEnd('/')
+            }
+            else {
+                $basePath = $entry
+            }
+
+            $fullPath = Join-Path $repoRoot $basePath
             if (-not (Test-Path $fullPath)) {
-                Write-Fail "Sonar references missing file: $filePath"
+                Write-Fail "Sonar exclusion references missing path: $entry (resolved base: $basePath)"
                 $missing++
             }
         }
 
-        if ($missing -eq 0 -and $hardcodedPaths.Count -gt 0) {
-            Write-Pass "All $($hardcodedPaths.Count) sonar hardcoded paths exist on disk"
+        if ($checkedCount -eq 0) {
+            Write-Info 'No sonar exclusion entries found to check'
         }
-        elseif ($hardcodedPaths.Count -eq 0) {
-            Write-Info 'No hardcoded sonar paths found to check'
+        elseif ($missing -eq 0) {
+            Write-Pass "All $checkedCount sonar exclusion paths resolve to real locations on disk"
         }
     }
     else {
@@ -306,4 +361,4 @@ $results.Add($divider)
 $results | Out-File -FilePath $reportPath -Encoding utf8
 Write-Host "`nReport written to: $reportPath" -ForegroundColor Gray
 
-exit $totalIssues
+if ($totalIssues -eq 0) { exit 0 } else { exit 1 }
