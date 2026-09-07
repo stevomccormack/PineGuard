@@ -683,43 +683,56 @@ jobs:
         run: exit 1
 
   # ---------------------------------------------------------------------------
-  # 7. Audit — machine-checked test-file conventions (tools/audit-cli, Rule50)
-  #    Windows runner: repo tooling is PowerShell and the cross-platform tools
-  #    migration (docs/ai/plans/cross-platform-tools-migration.md) is still open.
+  # 7. Audit — machine-checked repo conventions (apps/cli `pineguard audit`)
+  #    Rebuilt in TypeScript (docs/ai/plans/audit-cli-rebuild.md): real
+  #    tree-sitter/remark parsing instead of regex-over-C#, no .NET build
+  #    dependency, runs on ubuntu-latest in seconds instead of the old ~77s
+  #    Windows job. `--gate` runs only the hard-blocking rules (today:
+  #    doc-links, surface-parity, test-files); every other rule still runs
+  #    on demand (`pineguard audit`) and is tracked via the baseline ratchet
+  #    in apps/cli/config/baseline.json, so the gate set widens by a rule's
+  #    baseline shrinking to zero, not by editing this job. This replaces
+  #    the former "Rule50 only, widen later" comment with that mechanism
+  #    (plan §4.4).
   #
-  #    Scoped to Rule50 only. Rule01 needs a naming-spec.json bootstrap file
-  #    that isn't part of the repo or Run-All.ps1's default flow — it fails on
-  #    every fresh checkout. Rule51-54 (excluding 50) currently fail with
-  #    3000+ pre-existing findings across the test suite (nested-group
-  #    structure, tuple-naming, orphan heuristics) — real debt, but a
-  #    separate, large remediation effort, not something to gate merges on
-  #    yet. Rule50 (Theory-only + Tests/TestData pairing) was verified clean
-  #    after allowlisting the two legitimate pre-existing exceptions in
-  #    tools/audit-cli/test-audit-exceptions.json. Widen RuleId here once
-  #    Rule51-54 are remediated.
+  #    NOTE (P5.2, 2026-09-07): apps/cli/config/baseline.json has not been
+  #    committed yet — that snapshot is P6.1's job. Until it lands, this job
+  #    is EXPECTED to fail (166 pre-existing findings across the 3 gate
+  #    rules as of this writing: doc-links 164, surface-parity 0,
+  #    test-files 2). That is by design, not a regression.
   # ---------------------------------------------------------------------------
   audit:
     needs: changes
     if: needs.changes.outputs.any-src == 'true' || github.ref == 'refs/heads/main'
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
     steps:
       - uses: actions/checkout@v7
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
         with:
-          dotnet-version: "10.0.x"
+          node-version-file: ".node-version"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build audit CLI
+        run: pnpm -C apps/cli build
 
       - name: Run audit rules
         id: audit
         continue-on-error: true
-        shell: pwsh
+        shell: bash
         run: |
-          ./tools/audit-cli/Run-All.ps1 -Configuration Release -RuleId Rule50 2>&1 | Tee-Object ./audit-output.txt
-          exit $LASTEXITCODE
+          node apps/cli/dist/index.js audit --gate --format github 2>&1 | tee ./audit-output.txt
+          exit ${PIPESTATUS[0]}
 
       - name: Prepare audit failure report
         if: steps.audit.outcome == 'failure' && github.event_name == 'pull_request'
@@ -728,7 +741,7 @@ jobs:
           {
             echo "## Audit rule violations"
             echo ""
-            echo "Run \`./tools/audit-cli/Run-All.ps1\` locally to reproduce."
+            echo "Run \`pnpm -C apps/cli exec tsx src/index.ts audit --gate\` locally to reproduce."
             echo ""
             echo "<details><summary>Details</summary>"
             echo ""
