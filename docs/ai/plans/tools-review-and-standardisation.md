@@ -481,17 +481,17 @@ tasks sharing a group letter run concurrently; a group runs after the group it d
 | T2.05 | CI `tools-lint` job (soft, then hard) | Sonnet | Pending | P2-B | T2.04 | Ubuntu runner |
 | T2.06 | `.editorconfig` + BOM/whitespace strip | Haiku | Pending | P2-A | — | Mechanical |
 | T2.07 | `.config/dotnet-tools.json`; remove bespoke installers | Sonnet | Pending | P2-A | — | CI switches to `dotnet tool restore` |
-| T3.01 | `.shared` → `PineGuard.Tools` module | Sonnet | Blocked (D-2) | P3-A | P1, P2, D-1, D-2 | Everything in P3-B depends on this |
-| T3.02 | git consolidation | Sonnet | Blocked (D-6) | P3-B | T3.01, D-6 | Deletes 16 files |
-| T3.03 | code-coverage flatten + single runsettings source | Sonnet | Blocked (D-1) | P3-B | T3.01 | |
-| T3.04 | qodana: generated config, remove `auto/`, spike `dotnet.project:` | Sonnet | Blocked (D-3) | P3-B | T3.01, D-3 | Opus confirms compose unused first |
-| T3.05 | sonarqube: Install/Initialize/Start/Stop/Run/Get; secrets; delete `docker/` | Sonnet | Blocked (D-3, D-4) | P3-B | T3.01, D-3, D-4 | |
-| T3.06 | testing / code-format / code-diagnostics parity | Sonnet | Blocked (D-1) | P3-B | T3.01 | |
-| T3.07 | maintenance consolidation | Sonnet | Blocked (D-1) | P3-B | T3.01 | |
-| T3.08 | release renames + registry package list | Sonnet | Blocked (D-1) | P3-B | T3.01 | |
-| T3.09 | Windows-ism sweep; CI audit job to Ubuntu | Sonnet | Blocked (D-5) | P3-C | P3-B | Coordinate with audit-cli owner for the CI job |
-| T3.10 | dotCover CLI spike | Sonnet | Blocked (D-9) | P3-B | T3.01, D-9 | Time-boxed; findings to `## Baselines` |
-| T3.11 | dotCover engine wrapper | Sonnet | Blocked (D-9) | P3-C | T3.03, T3.10 | Same contract as the Coverlet script |
+| T3.01 | `.shared` consolidation, no module (D-2 kept dot-sourcing) | Sonnet | Pending | P3-A | P1, P2, D-1, D-2 | Everything in P3-B depends on this |
+| T3.02 | git consolidation: 16 scripts → `Run-Commits -Scope` | Sonnet | Pending | P3-B | T3.01, D-6 | Deletes 16 files |
+| T3.03 | code-coverage: `xplat/`→`coverlet/`, D-9 front door | Sonnet | Pending | P3-B | T3.01 | |
+| T3.04 | `code-scan/qodana/` folder move; D-3 keeps compose + hand-written `.slnx` | Sonnet | Pending | P3-B | T3.01 | No generation, no compose removal — see D-3 |
+| T3.05 | `code-scan/sonarqube/` folder move; secrets (D-4); `docker/` kept (D-3) | Sonnet | Pending | P3-B | T3.01, D-4 | |
+| T3.06 | testing / code-format / code-diagnostics parity | Sonnet | Pending | P3-B | T3.01 | Script names unchanged per D-1a |
+| T3.07 | `clean/` folder move + consolidation | Sonnet | Pending | P3-B | T3.01 | |
+| T3.08 | `github/` folder move + new `nuget/` split; registry package list | Sonnet | Pending | P3-B | T3.01 | |
+| T3.09 | Windows-ism sweep; CI audit job untouched (audit-cli out of scope) | Sonnet | Pending | P3-C | P3-B | No CI job change — belongs to audit-cli |
+| T3.10 | dotCover CLI spike | Sonnet | Pending | P3-B | T3.01 | Time-boxed; findings to `## Baselines` |
+| T3.11 | dotCover engine wrapper, called by the D-9 front door | Sonnet | Pending | P3-C | T3.03, T3.10 | Same contract as the Coverlet script |
 | T3.V | Verify Phase 3 per domain (build, test, coverage, lint, Pester) | Opus | Pending | P3-V | P3-C | |
 | T4.01 | `git mv` cascade inside `tools/` | Sonnet | Blocked (D-1) | P4-A | P3-V | One commit |
 | T4.02 | Reference rewrite, one agent per surface (≈18) | Haiku ×18 | Blocked (D-1) | P4-B | T4.01 | Exact old→new table supplied |
