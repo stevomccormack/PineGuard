@@ -1,10 +1,10 @@
 <!-- metadata_header
 type: agent
 id: agent-audit-cli
-version: 1.0
+version: 2.0
 -->
 
-# Agent: Run Audit CLI (Library / Testing / All)
+# Agent: Run Audit CLI (Library / Testing / Docs / All)
 
 > [!IMPORTANT]
 > business unit: engineering ([../business-units/engineering.md](../business-units/engineering.md))
@@ -12,54 +12,95 @@ version: 1.0
 
 ## Steps
 
-1. Read the master workflow at `docs/ai/workflows/audit.md`.
+1. Read the master workflow at `docs/ai/workflows/audit.md` and the specification at
+   `docs/ai/specs/tools/audit-cli/spec.md` (v2).
 
-2. Choose the scope and execute the matching wrapper (recommended defaults):
-   - **Reproduce the CI gate (Rule50 only)** — start here; this is the only invocation that blocks a merge (see [CI parity](#ci-parity)).
+2. Choose the scope and run the matching `pineguard audit` invocation (recommended defaults):
+   - **Reproduce the CI gate (`test-files`, `doc-links`, `surface-parity`)** — start here; this
+     is the only invocation that blocks a merge (see [CI parity](#ci-parity)).
 
-     ```powershell
-     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RepoRoot "." -RuleId Rule50
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit --gate
      ```
 
-   - **Audit libraries (Rule01..Rule10, Rule13)** — Rule01 fails on a fresh checkout (it needs a `naming-spec.json` bootstrap that the repo does not ship); treat its output as noise, not a regression.
+   - **Audit the library layer** (`rules-usage`, `must-usage`, `layer-parity`, `nullability`,
+     `must-collisions`, `ordering`, `must-codes`):
 
-     ```powershell
-     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-AuditLibraryRules.ps1" -Configuration Release -RepoRoot "."
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit --scope library
      ```
 
-   - **Audit testing (Rule50..Rule54)** — Rule51-54 currently report 3000+ pre-existing findings (nested-group structure, tuple naming, orphan heuristics). That is known debt, not something this run introduced.
+   - **Audit testing conventions** (`test-files`, `test-structure`, `test-records`,
+     `test-orphans`, `test-tuples`) — `test-structure`/`test-records`/`test-orphans`/`test-tuples`
+     carry real pre-existing debt tracked by the baseline ratchet (spec §4); treat a baselined
+     finding as known debt, not something this run introduced.
 
-     ```powershell
-     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-AuditTestingRules.ps1" -Configuration Release -RepoRoot "."
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit --scope testing
      ```
 
-   - **Audit all (full suite)** — inherits both caveats above; useful for a debt survey, not for deciding whether a change is mergeable.
+   - **Audit docs/adapter parity** (`doc-links`, `surface-parity`) — both are hard gates (spec
+     §8):
 
-     ```powershell
-     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RepoRoot "."
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit --scope docs
+     ```
+
+   - **Audit all (full suite)** — useful for a debt survey, not for deciding whether a change is
+     mergeable on its own (use `--gate` for that):
+
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit
      ```
 
 3. Optional iteration flags (useful while tightening policy or diagnosing failures):
-   - **Show failures + keep going**:
+   - **Show the full debt, ignoring the baseline ratchet**:
 
-     ```powershell
-     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RepoRoot "." -ContinueOnError -ShowFailures
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit --no-baseline
      ```
 
-   - **Emit JSON summary**:
+   - **Restrict to files changed vs `main`** (fast pre-commit feedback):
 
-     ```powershell
-     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RepoRoot "." -JsonSummary "artifacts/audit/audit-summary.json"
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit --changed
+     ```
+
+   - **Emit a JSON summary** (writes `artifacts/audit/<slug>.json` + `artifacts/audit/summary.json`):
+
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit --format json
+     ```
+
+   - **Run one rule by slug or legacy id** (both resolve to the same rule — spec §7):
+
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit ordering
+     pnpm -C apps/cli exec tsx src/index.ts audit Rule08   # legacy alias for `ordering`
+     ```
+
+   - **List the full catalog** (slug, legacy id, scope, gate, description):
+
+     ```sh
+     pnpm -C apps/cli exec tsx src/index.ts audit --list
      ```
 
 ## CI parity
 
-Pull requests are gated on **Rule50 only** (Theory-only tests + `Tests`/`TestData` pairing), with the two legitimate pre-existing exceptions allowlisted in [`tools/audit-cli/test-audit-exceptions.json`](../../../tools/audit-cli/test-audit-exceptions.json). Everything else in the suite runs locally but does not block a merge:
+Pull requests are gated on **`test-files`, `doc-links`, and `surface-parity`** only (spec §8),
+via `pineguard audit --gate --format github`. Permanent exemptions live in
+[`apps/cli/config/exceptions.json`](../../../apps/cli/config/exceptions.json); bulk
+pre-existing debt is absorbed by the baseline ratchet in
+[`apps/cli/config/baseline.json`](../../../apps/cli/config/baseline.json) (spec §4). Everything
+else in the catalog runs on demand and reports but does not block a merge:
 
 | Rules | Merge-blocking | Why |
 |-------|----------------|-----|
-| Rule50 | ✓ | Verified clean; this is the CI gate. |
-| Rule01 | | Requires a `naming-spec.json` bootstrap that is not in the repo and not in `Run-All.ps1`'s default flow, so it fails on every fresh checkout. |
-| Rule51–Rule54 | | Carry 3000+ pre-existing findings — real debt, tracked as a separate remediation effort. |
+| `test-files` (Rule50) | Yes | Carried over from the legacy tool with confirmed real-tool parity (`docs/ai/plans/audit-cli-rebuild.md` §9.2 P4.1). |
+| `doc-links` (Rule11) | Yes | Promoted to a hard gate in the rebuild. |
+| `surface-parity` (Rule12) | Yes | Promoted to a hard gate in the rebuild. |
+| The other 11 `library`/`testing` rules | No | Real, tracked pre-existing debt absorbed by the baseline ratchet; the gate widens as each rule's baseline entry shrinks to zero (spec §4), not by editing the CI job. |
 
-So do not report Rule01 or Rule51–54 output as a regression introduced by the change under audit. The gate widens once that debt is remediated; the CI job is section 7 of [`.github/workflows/ci.yml`](../../../.github/workflows/ci.yml).
+So do not report a baselined finding in a non-gate rule as a regression introduced by the change
+under audit — only an un-baselined finding, or a failure in one of the three gate rules, blocks.
+The CI job is section 7 of [`.github/workflows/ci.yml`](../../../.github/workflows/ci.yml).

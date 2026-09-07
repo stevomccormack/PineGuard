@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: command
 id: cmd-audit
-version: 1.1
+version: 2.0
 -->
 
 # Command: Audit
@@ -12,7 +12,7 @@ Structural checks over the repository — convention compliance, cross-layer map
 
 | Command | Intent | Agent |
 |---------|--------|-------|
-| `/audit-cli` | Run the audit-cli rule set (including the Rule50 CI gate) | `docs/ai/agents/audit-cli.md` |
+| `/audit-cli` | Run `pineguard audit` (the TypeScript CLI in `apps/cli`), including the `test-files`/`doc-links`/`surface-parity` CI gate | `docs/ai/agents/audit-cli.md` |
 | `/audit-gap` | Analyse coverage gaps and propose the missing cases | `docs/ai/agents/audit-gap.md` |
 
 **Shared orchestration**: `docs/ai/workflows/audit.md` (used by `/audit-cli`; `/audit-gap` runs its
