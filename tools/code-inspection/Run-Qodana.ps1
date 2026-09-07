@@ -288,16 +288,6 @@ if ($TimeoutMinutes -gt 0) {
 $scanArgs += '--within-docker'
 $scanArgs += 'true'
 
-if (-not [string]::IsNullOrWhiteSpace($env:QODANA_TOKEN)) {
-    $scanArgs += '-e'
-    $scanArgs += ("QODANA_TOKEN=$($env:QODANA_TOKEN)")
-}
-
-if (-not [string]::IsNullOrWhiteSpace($env:QODANA_ENDPOINT)) {
-    $scanArgs += '-e'
-    $scanArgs += ("QODANA_ENDPOINT=$($env:QODANA_ENDPOINT)")
-}
-
 if ($ShowReport) {
     $scanArgs += '--show-report'
 }
