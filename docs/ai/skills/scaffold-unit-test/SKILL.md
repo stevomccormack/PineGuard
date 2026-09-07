@@ -67,7 +67,7 @@ Add **xUnit** tests for rules, must clauses, guard clauses, or utilities.
 - [ ] Tests pass (`dotnet test`).
 - [ ] 100% line and branch coverage reached for the target.
 - [ ] Code conforms identically to `docs/ai/specs/testing/unit-test.md` patterns.
-- [ ] `pwsh ./tools/audit-cli/Run-All.ps1 -RuleId `test-files`` passes (Theory-only + Tests/TestData pairing — this is a CI PR gate).
+- [ ] `pnpm -C apps/cli exec tsx src/index.ts audit test-files` passes (Theory-only + Tests/TestData pairing — this is a CI PR gate).
 
 ## 7. Success Criteria
 

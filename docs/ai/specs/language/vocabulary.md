@@ -9,7 +9,7 @@ spec:
     - ../dependencies.md
 applies_to:
   - "docs/ai/specs/**"
-  - "tools/audit-cli/**"
+  - "apps/cli/**"
 ---
 
 # PineGuard Vocabulary Map (Opposites + Alternatives)

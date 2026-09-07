@@ -506,7 +506,8 @@ Rules:
 ### 6.0 Nullability
 
 GuardClauses follow the `nullability` hybrid nullability strategy (canonical statement:
-`../must-clauses/project.md` §Nullability; enforced by `tools/audit-cli/rules/Test-`nullability`-Nullability.ps1`):
+`../must-clauses/project.md` §Nullability; enforced by the `nullability` audit rule,
+`apps/cli/src/audit/rules/nullability.ts`):
 use nullable reference inputs for ergonomic call sites and correct exception typing, but treat null
 as invalid unless the method name explicitly encodes null as acceptable.
 

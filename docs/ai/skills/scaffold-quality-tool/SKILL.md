@@ -159,7 +159,7 @@ Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if
 4. **Slash commands**: Verify all `/scan-{tool}-*` and `/fix-{tool}-*` commands trigger correctly
 5. **Build**: `dotnet build PineGuard.slnx` — solution still builds cleanly
 6. **Cross-reference**: Verify `CLAUDE.md`, `AGENTS.md`, `.pi/AGENTS.md`, `docs/ai/README.md`, `docs/ai/skills/INDEX.md` and every adapter command directory are consistent
-7. **Parity**: `pwsh ./tools/audit-cli/Run-All.ps1` — the adapter-parity rule is clean
+7. **Parity**: `pnpm -C apps/cli exec tsx src/index.ts audit surface-parity` is clean
 
 ## 5. Definition of Done
 

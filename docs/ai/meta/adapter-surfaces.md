@@ -10,7 +10,7 @@ last_verified: 2026-08-20
 > [!IMPORTANT]
 > This file is the **single inventory** of every AI-tool surface in this repository.
 > `docs/ai/README.md`, `docs/ai/specs/protocol.md`, `docs/ai/skills/scaffold-workflow/SKILL.md`
-> and the adapter-parity rule in `tools/audit-cli/` all reference this file rather than
+> and the `surface-parity` audit rule in `apps/cli/` all reference this file rather than
 > maintaining their own lists. When a surface is added, removed, or retiered, change it **here**
 > and let the references follow.
 

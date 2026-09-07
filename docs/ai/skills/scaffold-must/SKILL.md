@@ -89,7 +89,7 @@ Implement a new **MustClause** fluent validation method. A MustClause validates 
 - [ ] No `[GeneratedRegex]` or raw logic in Must class.
 - [ ] Returns `MustResult.Fail` for null input (unless `NullOr...`).
 - [ ] Every `Fail`/`FromBool` call passes exactly one `MustCodes` constant.
-- [ ] `pwsh tools/audit-cli/Run-All.ps1 -RuleId `must-codes`` is clean.
+- [ ] `pnpm -C apps/cli exec tsx src/index.ts audit must-codes` is clean.
 
 ## 6. Success Criteria
 
@@ -100,7 +100,7 @@ Implement a new **MustClause** fluent validation method. A MustClause validates 
 | 3 | Message includes paramName | Every failure message interpolates `{paramName}` |
 | 4 | Delegates to Core | No regex, parsing, or raw validation logic in MustClause bodies |
 | 5 | Facade flattens API (complex domain) | Public facade exposes flat API, not nested namespaces |
-| 6 | Carries an error code | `Fail`/`FromBool` passes exactly one `MustCodes` constant; `Run-All.ps1 -RuleId `must-codes`` clean |
+| 6 | Carries an error code | `Fail`/`FromBool` passes exactly one `MustCodes` constant; `pineguard audit must-codes` clean |
 
 ## 7. Examples
 
