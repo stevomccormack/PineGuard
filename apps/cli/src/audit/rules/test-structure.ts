@@ -82,6 +82,27 @@ import type { Finding, Rule, RuleContext } from "../types.js";
  *    `ShouldThrowExpected`, `ReturnsExpected`, or any other naming pattern"
  *    requires.
  *
+ * ## `NullCases` / `AdHocCases` — conditionally recognised dataset names (P4.3 finding #5)
+ *
+ * `unit-test.md` §4.1 states dataset names are `ValidCases`/`EdgeCases`/
+ * `InvalidCases` "never any other names", but `fixture.md` — which its own
+ * header says wins where the two differ — uses two more itself:
+ * `NullCases` (§12.2: an inverted-guard nullable variant splits its null
+ * scenario into its own dataset because it needs a distinct
+ * `ArgumentNullException` expectation, and only ever appears *alongside* an
+ * explicit `ValidCases`/`InvalidCases` pair — never on its own) and
+ * `AdHocCases` (§11.6: "layer-specific cases not derivable from
+ * RuleScenarios", which by definition *supplements* cases that already are
+ * RuleScenario-derived, i.e. a `Cases`/`ValidCases`/`InvalidCases` property
+ * in the same group). Check 4's dataset-name recognition (below) now accepts
+ * both names, but only under the co-occurrence condition each spec section
+ * actually shows — never unconditionally, and never as a replacement for the
+ * mandatory split. A `NullCases`/`AdHocCases` property that appears without
+ * its required companion is simply ignored, exactly as any other
+ * unrecognised name is today (no "unknown dataset name" check exists to flag
+ * it) — this closes the *false-negative* gap (an empty `NullCases => [];`
+ * silently passing check 4) without introducing a new false-positive.
+ *
  * See `apps/cli/test/fixtures/test-structure/` for VIBE fixtures (plan
  * §4.6) and `apps/cli/test/rules/test-structure.test.ts` for the assertions.
  */
@@ -90,6 +111,41 @@ const SLUG = "test-structure";
 const BEHAVES_SUFFIX = "_BehavesAsExpected";
 const DATASET_ORDER = ["ValidCases", "EdgeCases", "InvalidCases"] as const;
 const RECOGNISED_DATASET_NAMES = new Set<string>(["Cases", ...DATASET_ORDER]);
+
+/**
+ * `fixture.md`-sanctioned supplemental dataset names — see this module's
+ * header note "`NullCases` / `AdHocCases` — conditionally recognised dataset
+ * names". Each is recognised only under the condition named there, never
+ * unconditionally.
+ */
+function isRecognisedDataset(
+    name: string,
+    groupPropertyNames: ReadonlySet<string>,
+): boolean {
+    if (RECOGNISED_DATASET_NAMES.has(name)) return true;
+
+    if (name === "NullCases") {
+        // fixture.md §12.2: only ever appears alongside an explicit
+        // ValidCases/InvalidCases pair (the inverted-guard nullable-variant
+        // shape), never replacing it.
+        return (
+            groupPropertyNames.has("ValidCases") &&
+            groupPropertyNames.has("InvalidCases")
+        );
+    }
+
+    if (name === "AdHocCases") {
+        // fixture.md §11.6: supplements cases that ARE RuleScenario-derived
+        // — i.e. it never appears in a group with no derived dataset at all.
+        return (
+            groupPropertyNames.has("Cases") ||
+            groupPropertyNames.has("ValidCases") ||
+            groupPropertyNames.has("InvalidCases")
+        );
+    }
+
+    return false;
+}
 
 /** The spec-sanctioned throws-companion suffix (`_ThrowsAsExpected` per §8.3, `_ThrowsExpected` per the DataAnnotations addendum's Pattern E). */
 const THROWS_SUFFIX = /Throws(As)?Expected$/;
@@ -359,9 +415,16 @@ function analyzePair(
     // ---- 4. Dataset ordering + emptiness, per Operation Group ----
     for (const group of groupNodes) {
         const groupName = nameOf(group);
-        const properties = directChildrenOfType(group, "property_declaration")
-            .map((node) => ({ node, name: nameOf(node) }))
-            .filter((p) => RECOGNISED_DATASET_NAMES.has(p.name));
+        const allGroupProperties = directChildrenOfType(
+            group,
+            "property_declaration",
+        ).map((node) => ({ node, name: nameOf(node) }));
+        const groupPropertyNames = new Set(
+            allGroupProperties.map((p) => p.name),
+        );
+        const properties = allGroupProperties.filter((p) =>
+            isRecognisedDataset(p.name, groupPropertyNames),
+        );
 
         for (const p of properties) {
             if (isEmptyDataset(p.node)) {

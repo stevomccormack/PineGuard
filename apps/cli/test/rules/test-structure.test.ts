@@ -64,7 +64,18 @@ describe("test-structure", () => {
         ).toBe(true);
     });
 
-    it("boundary: a single-Cases-rollup Operation Group, a fully-split Valid/Edge/Invalid group, an underscore-variant method name (EvenNonNullable <-> Even_NonNullable_BehavesAsExpected, per the FluentValidation addendum) and a throws-only group (Parse_ThrowsAsExpected, per §8.3 / the DataAnnotations addendum's Pattern E) are all valid — none is falsely flagged", async () => {
+    it("flags an empty `NullCases => [];` once ValidCases AND InvalidCases both co-occur (P4.3 finding #5 — fixture.md §12.2's co-occurrence condition is met, so the emptiness check must now catch it)", async () => {
+        const findings = await expectInvalid(testStructureRule, SLUG);
+        expect(
+            findings.some((f) =>
+                /declares an empty dataset 'NullCases => \[\];'/.test(
+                    f.message,
+                ),
+            ),
+        ).toBe(true);
+    });
+
+    it("boundary: a single-Cases-rollup Operation Group, a fully-split Valid/Edge/Invalid group, an underscore-variant method name (EvenNonNullable <-> Even_NonNullable_BehavesAsExpected, per the FluentValidation addendum), a throws-only group (Parse_ThrowsAsExpected, per §8.3 / the DataAnnotations addendum's Pattern E), and an empty `NullCases => [];` with NO co-occurring ValidCases/InvalidCases (P4.3 finding #5 — the condition is unmet, so it must stay unrecognised and unflagged, proving the recognition is genuinely conditional) are all valid — none is falsely flagged", async () => {
         const findings = await runBoundary(testStructureRule, SLUG);
         expect(findings).toEqual([]);
     });

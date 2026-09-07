@@ -109,6 +109,23 @@ import type { Finding, Rule, RuleContext } from "../types.js";
  * This rule therefore always checks all three layers unconditionally; a
  * real `--layer` flag is left as a follow-up once the engine grows
  * per-rule option support.
+ *
+ * ## Diagnostic finding when zero Must methods are found (P4.1 remediation)
+ *
+ * `collectMustMethods` returning an empty array should never happen against
+ * the real repo — 607 methods match today (see above) — but if it ever did
+ * (a tree-sitter grammar change, a moved `MustClauses` directory, a future
+ * refactor of `isMustExtensionMethod`'s shape check), the previous code
+ * returned `[]` immediately, silently reporting a clean audit. That is
+ * structurally the *exact same failure shape* as the legacy Rule03/04/05 bug
+ * this module exists to not repeat (see the module header above): "I found
+ * zero Must clauses, therefore zero are unused, PASS" — even though the
+ * *cause* would be different (a real detection failure, not a regex
+ * quoting bug). P4.1's parity diff flagged this at what was then
+ * `must-usage.ts:249` (`docs/ai/plans/audit-cli-rebuild.md` §9.2 row P4.1,
+ * §3.1 item 2). A rule that cannot find its own subject population must emit
+ * a diagnostic finding instead of returning clean — see `run()` below and
+ * `test/fixtures/must-usage/no-subjects-found/` for the regression fixture.
  */
 
 const MUST_CLAUSES_DIR = "src/PineGuard.MustClauses";
@@ -244,10 +261,27 @@ async function collectCalledNames(
     return called;
 }
 
+/**
+ * Emitted instead of an empty array when {@link collectMustMethods} finds no
+ * subjects at all — see this module's "Diagnostic finding when zero Must
+ * methods are found" header note. A rule that cannot find its own subject
+ * population must say so loudly, not report a vacuous PASS.
+ */
+function noSubjectsFoundFinding(): Finding {
+    return {
+        rule: "must-usage",
+        file: MUST_CLAUSES_DIR,
+        message:
+            "must-usage found zero Must extension methods to check — this likely means the rule's " +
+            "detection logic is broken, not that there is nothing to audit.",
+        key: "must-usage:no-subjects-found",
+    };
+}
+
 async function run(ctx: RuleContext): Promise<Finding[]> {
     const mustMethods = await collectMustMethods(ctx);
     if (mustMethods.length === 0) {
-        return [];
+        return [noSubjectsFoundFinding()];
     }
 
     const findings: Finding[] = [];

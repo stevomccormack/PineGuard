@@ -107,15 +107,9 @@ describe("test-records", () => {
         );
     });
 
-    it("boundary: a Core case record with a base clause that is the raw BaseCase infrastructure type is still flagged, as a different failure mode than a missing base", async () => {
+    it("boundary: a Core case record with a base clause that is the raw BaseCase infrastructure type is NOT flagged (P4.3 finding #4 — the ban had no spec basis and was removed)", async () => {
         const findings = await runBoundary(rule, "test-records");
 
-        expect(findings).toHaveLength(1);
-        const [finding] = findings;
-        expect(finding?.message).toContain("BaseCase");
-        expect(finding?.message).not.toContain("no base clause at all");
-        expect(finding?.key).toBe(
-            "test-records:wrong-base:tests/PineGuard.Core.UnitTests/BoundaryRulesTestData.cs:Case",
-        );
+        expect(findings).toEqual([]);
     });
 });

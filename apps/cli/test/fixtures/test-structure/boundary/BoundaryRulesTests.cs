@@ -29,4 +29,16 @@ public sealed class BoundaryRulesTests(ITestOutputHelper output) : BaseRuleUnitT
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(BoundaryRulesTestData.IsNullOnly.Cases), MemberType = typeof(BoundaryRulesTestData.IsNullOnly))]
+    [MemberData(nameof(BoundaryRulesTestData.IsNullOnly.NullCases), MemberType = typeof(BoundaryRulesTestData.IsNullOnly))]
+    public void IsNullOnly_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = BoundaryRules.IsNullOnly(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

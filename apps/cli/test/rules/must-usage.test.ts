@@ -1,7 +1,15 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { describe, expect, it } from "vitest";
 
 import { mustUsageRule } from "../../src/audit/rules/must-usage.js";
-import { expectInvalid, expectValid, runBoundary } from "../support/runRule.js";
+import {
+    expectInvalid,
+    expectValid,
+    runBoundary,
+    runRuleOnFixture,
+} from "../support/runRule.js";
 
 /**
  * Tests for the `must-usage` rule (plan P2.2, `docs/ai/plans/audit-cli-rebuild.md`
@@ -58,6 +66,35 @@ describe("must-usage", () => {
             "must-usage:annotations:Qux",
             "must-usage:fluent:Qux",
             "must-usage:guard:Qux",
+        ]);
+    });
+
+    it("emits a diagnostic finding instead of a silent PASS when zero Must extension methods are found at all (P4.1 remediation)", async () => {
+        // Not a VIBE valid/invalid/boundary case — this is the harness's
+        // lower-level runRuleOnFixture against a dedicated fixture tree,
+        // since expectValid/expectInvalid/runBoundary all assume the rule's
+        // ordinary three-way split. See src/audit/rules/must-usage.ts's
+        // "Diagnostic finding when zero Must methods are found" header note.
+        const here = path.dirname(fileURLToPath(import.meta.url));
+        const fixtureDir = path.join(
+            here,
+            "..",
+            "fixtures",
+            "must-usage",
+            "no-subjects-found",
+        );
+
+        const findings = await runRuleOnFixture(mustUsageRule, fixtureDir);
+
+        expect(findings).toEqual([
+            {
+                rule: "must-usage",
+                file: "src/PineGuard.MustClauses",
+                message:
+                    "must-usage found zero Must extension methods to check — this likely means the rule's " +
+                    "detection logic is broken, not that there is nothing to audit.",
+                key: "must-usage:no-subjects-found",
+            },
         ]);
     });
 });

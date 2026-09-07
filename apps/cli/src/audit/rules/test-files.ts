@@ -34,16 +34,30 @@ import type { Finding, RuleContext } from "../types.js";
  *    `<rootDir>/tests` with `node:fs` directly rather than consulting
  *    `ctx.trackedFiles`.
  * 2. **Theory-only** — a `*Tests.cs` file containing `[Fact]` or
- *    `[Fact(...)]` is flagged (`[FactNotAllowed]`). The match is the legacy
- *    regex verbatim, `/\[\s*Fact(\s*\(|\s*\])/` (PowerShell's `(?s)` modifier
- *    on the original only affects `.`, which the pattern never uses, and
- *    JavaScript's `\s` already matches newlines, so no flags are needed for
- *    parity) — this is a **known, intentionally-preserved** blind spot: it
- *    does not catch the verbose `[FactAttribute]` alias, and does not catch
- *    `[Fact, Trait(...)]` multi-attribute-in-one-bracket forms. Both are
- *    ported as-is (see `test/fixtures/test-files/boundary/`), not "fixed" —
- *    per this task's brief, an unexplained behaviour delta here is a bigger
- *    problem than a faithfully-reproduced legacy gap.
+ *    `[Fact(...)]` is flagged (`[FactNotAllowed]`). The core match starts
+ *    from the legacy regex verbatim, `/\[\s*Fact(\s*\(|\s*\])/` (PowerShell's
+ *    `(?s)` modifier on the original only affects `.`, which the pattern
+ *    never uses, and JavaScript's `\s` already matches newlines, so no flags
+ *    are needed for parity), then **widened** (P4.3 finding #1 / plan §9.2
+ *    row P4.3, §7.1; decision recorded in `docs/ai/plans/audit-cli-rebuild.md`)
+ *    to also catch two shapes the legacy tool's exact-parity port missed:
+ *    - the verbose `[FactAttribute]` / `[FactAttribute(...)]` alias — the
+ *      same attribute, spelled out in full;
+ *    - `[Fact, Trait(...)]` / `[Trait(...), Fact]` multi-attribute-in-one-
+ *      bracket forms, in either order.
+ *    `FACT_ATTRIBUTE_PATTERN` anchors `Fact`/`FactAttribute` to the *start*
+ *    of an attribute-list item — immediately after `[` or a `,` separator,
+ *    ignoring whitespace — rather than matching the bare word anywhere in
+ *    the file, so a string literal that merely *mentions* "Fact" inside an
+ *    unrelated attribute's argument (e.g. `[Description("uses Fact here")]`)
+ *    is not a false positive. This was a safe, zero-new-debt widening at the
+ *    time it was made: zero occurrences of either gap shape existed on
+ *    `main`, so gating did not change on real content — see
+ *    `test/fixtures/test-files/boundary/` for both new shapes asserted
+ *    against directly. `[InlineData]` (root spec §1) is a separate, **not**
+ *    widened, gap — see `docs/ai/plans/audit-cli-rebuild.md`'s InlineData
+ *    spec-gap note for why (§11's Enforcement section scopes the gated check
+ *    to `[Theory]`-only/no-`[Fact]`, omitting `[InlineData]`).
  *
  * **Exceptions**: the legacy tool reads three per-key allowlists from
  * `tools/audit-cli/test-audit-exceptions.json` (`Rule50.AllowMissingTestData`,
@@ -61,7 +75,14 @@ import type { Finding, RuleContext } from "../types.js";
  * `applyExceptions` directly, without duplicating per-key parsing here.
  */
 
-const FACT_ATTRIBUTE_PATTERN = /\[\s*Fact(\s*\(|\s*\])/;
+/**
+ * Matches `Fact`/`FactAttribute` anchored to the start of an attribute-list
+ * item (immediately after `[` or a `,` separator, ignoring whitespace),
+ * followed by `(`, `]`, or `,` — see this module's header comment ("Theory-
+ * only") for why the widening is anchored this way rather than matching the
+ * bare word anywhere in the file.
+ */
+const FACT_ATTRIBUTE_PATTERN = /[[,]\s*Fact(?:Attribute)?\s*[(\],]/;
 const BIN_OR_OBJ_SEGMENT = /(^|\/)(bin|obj)(\/|$)/i;
 
 function toForwardSlash(path: string): string {

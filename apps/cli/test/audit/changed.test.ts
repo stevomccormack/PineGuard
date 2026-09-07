@@ -157,9 +157,22 @@ describe("listChangedFiles", () => {
 });
 
 describe("buildContext's --changed propagation (BuildContextOptions.changedFiles)", () => {
-    it("leaves trackedFiles as the full git ls-files listing when changedFiles is omitted", () => {
+    // apps/cli/** is excluded from ctx.trackedFiles by buildContext itself
+    // (P4.1 remediation, plan §9.2 row P4.1, §3.2 "fixture-scope leakage" —
+    // apps/cli is the audit tool's own tree, never a subject) — see
+    // engine.test.ts's dedicated test for that exclusion. These tests filter
+    // it out of the raw listTrackedFiles() baseline too, so they keep
+    // proving --changed's own intersection semantics rather than
+    // re-asserting the exclusion.
+    function excludingAuditToolOwnPath(files: readonly string[]): string[] {
+        return files.filter((file) => !file.startsWith("apps/cli/"));
+    }
+
+    it("leaves trackedFiles as the full git ls-files listing (minus apps/cli/**) when changedFiles is omitted", () => {
         const root = findRepoRoot();
-        const allTracked = listTrackedFiles(undefined, root);
+        const allTracked = excludingAuditToolOwnPath(
+            listTrackedFiles(undefined, root),
+        );
 
         const ctx = buildContext(root);
 
@@ -168,7 +181,9 @@ describe("buildContext's --changed propagation (BuildContextOptions.changedFiles
 
     it("narrows trackedFiles to the intersection of git ls-files and the given changedFiles list", () => {
         const root = findRepoRoot();
-        const allTracked = listTrackedFiles(undefined, root);
+        const allTracked = excludingAuditToolOwnPath(
+            listTrackedFiles(undefined, root),
+        );
         const realFile = allTracked[0];
         expect(realFile).toBeDefined();
 

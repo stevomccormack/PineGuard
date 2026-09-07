@@ -292,6 +292,25 @@ describe("buildContext", () => {
         // — real content is only ever written by `--update-baseline`.
         expect(ctx.baseline).toEqual({});
     });
+
+    // P4.1 remediation (plan §9.2 row P4.1, §3.2 "rules audit the CLI's own
+    // test fixtures, and one is a CI gate"): apps/cli is the audit tool
+    // itself — its own source and its deliberately-invalid VIBE fixtures —
+    // never PineGuard library/test/docs content, so it must never appear in
+    // the shared trackedFiles scope every rule reads from.
+    it("excludes apps/cli/** from trackedFiles — the audit tool's own tree is never a subject", () => {
+        const ctx = buildContext();
+
+        const auditToolPaths = (ctx.trackedFiles ?? []).filter((file) =>
+            file.startsWith("apps/cli/"),
+        );
+        expect(auditToolPaths).toEqual([]);
+
+        // Sanity check the filter is actually doing something on this real
+        // repo, not vacuously passing because nothing under apps/cli is
+        // tracked at all.
+        expect(ctx.trackedFiles?.length ?? 0).toBeGreaterThan(0);
+    });
 });
 
 describe("runAudit", () => {

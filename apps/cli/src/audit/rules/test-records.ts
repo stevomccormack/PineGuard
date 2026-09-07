@@ -115,10 +115,29 @@ import type { Finding, RuleContext } from "../types.js";
  *   §2.1 — a package outside the five layers, e.g. `PineGuard.AspNetCore`):
  *   a `*Case`-suffixed record is legitimate (Core's "Value/Result Tests
  *   (e.g. Converters, Parsers)" per §4.2, and the "(Other)" convention's own
- *   project-local `XxxCase : ReturnCase<,>`), but it must actually inherit
- *   `ReturnCase<,>`/`ThrowsCase<>`/one of the shared layer case types — never
- *   bare, and never `BaseCase`/`ValueCase<>` directly (those skip the
- *   `Expected`-carrying shape the assertion helpers rely on).
+ *   project-local `XxxCase : ReturnCase<,>`), but it must actually have a
+ *   base clause — never bare (§4.2 "Standard Definitions" shows every
+ *   canonical example with a real base).
+ *
+ * ## Removed: the `ValueCase<>`/`BaseCase` direct-inheritance ban (P4.3 finding #4)
+ *
+ * An earlier version of this rule additionally flagged a Core/"(Other)" case
+ * record that inherited `ValueCase<T>` or `BaseCase` **directly**, on the
+ * theory that doing so "skips the `Expected`-carrying shape the assertion
+ * helpers rely on". P4.3's spec-conformance review
+ * (`docs/ai/plans/audit-cli-rebuild.md` §9.2 row P4.3, §7.4) found **no spec
+ * text supports this**: `unit-test.md` §2.2 lists `BaseCase` ("Root abstract
+ * record; provides `Name` and `ToString()`") and `ValueCase<TValue>` ("Case
+ * with a single `Value` input") as current, first-class members of the
+ * shared case hierarchy — not superseded, unlike `IsCase<T>`/`HasCase<T>`,
+ * which §2.2 and `fixture.md` §3 explicitly do mark superseded. The check's
+ * own justification was engineering reasoning inherited uncritically from
+ * the legacy `Rule52`, not spec text, and it is not even always true (a
+ * void/throwing member's case has no `Expected` to carry in the first
+ * place). The orchestrator's remediation decision was to cut the check
+ * outright rather than invent spec support for it after the fact — see this
+ * module's `git log` history / the plan's P4.4 remediation report for the
+ * before/after finding counts.
  */
 
 type Layer =
@@ -193,12 +212,6 @@ const LAYER_INFO: Readonly<Record<Layer, LayerInfo>> = {
 
 /** The hand-built throws-row shape the root spec keeps in every layer (§4.2 "Standard Definitions" 2 & 3; §8.2; the DataAnnotations addendum's "Pattern E"). */
 const THROWS_CASE_BASE = "ThrowsCase";
-
-/** Bases that bypass the `Expected`-carrying shape entirely — never a valid direct base for a case record. */
-const RAW_INFRASTRUCTURE_BASES: ReadonlySet<string> = new Set([
-    "BaseCase",
-    "ValueCase",
-]);
 
 function detectLayer(relativePath: string): Layer | null {
     const projectSegment = relativePath
@@ -333,18 +346,12 @@ registerRule({
                             `(unit-test.md §4.2 "Standard Definitions"; ${info.addendum}).`,
                         key: `test-records:missing-base:${file.relativePath}:${record.name}`,
                     });
-                } else if (RAW_INFRASTRUCTURE_BASES.has(baseTypeName)) {
-                    findings.push({
-                        rule: "test-records",
-                        file: file.relativePath,
-                        line,
-                        message:
-                            `"${record.name}" in ${info.label} TestData inherits ${baseTypeName} directly — ` +
-                            `case records must inherit ReturnCase<,>/ThrowsCase<>/the shared layer case type ` +
-                            `instead of the raw ${baseTypeName} infrastructure type (unit-test.md §4.2; fixture.md §3).`,
-                        key: `test-records:wrong-base:${file.relativePath}:${record.name}`,
-                    });
                 }
+                // A direct `BaseCase`/`ValueCase<T>` base is deliberately NOT
+                // flagged here — see this module's "Removed: the
+                // ValueCase<>/BaseCase direct-inheritance ban" header note
+                // (P4.3 finding #4): unit-test.md §2.2 lists both as current,
+                // first-class case types, not superseded.
             }
         }
 

@@ -73,19 +73,28 @@ describe("test-files (Rule50)", () => {
             ).toBe(false);
         });
 
-        it("does NOT flag the verbose [FactAttribute] alias (known, faithfully-ported legacy blind spot)", async () => {
+        it("flags the verbose [FactAttribute] alias (P4.3 finding #1 — widened, no longer a blind spot)", async () => {
             const findings = await runBoundary(testFilesRule, "test-files");
-            expect(
-                findings.some((f) =>
-                    f.file.endsWith("VerboseFactAliasTests.cs"),
-                ),
-            ).toBe(false);
+            const flagged = findings.filter((f) =>
+                f.file.endsWith("VerboseFactAliasTests.cs"),
+            );
+            expect(flagged).toHaveLength(1);
+            expect(flagged[0]?.message).toContain("[FactNotAllowed]");
         });
 
         it('still flags the parenthesized [Fact(DisplayName = "...")] form', async () => {
             const findings = await runBoundary(testFilesRule, "test-files");
             const flagged = findings.filter((f) =>
                 f.file.endsWith("ParameterizedFactTests.cs"),
+            );
+            expect(flagged).toHaveLength(1);
+            expect(flagged[0]?.message).toContain("[FactNotAllowed]");
+        });
+
+        it("flags [Fact, Trait(...)] in both attribute orderings (P4.3 finding #1 — widened, no longer a blind spot)", async () => {
+            const findings = await runBoundary(testFilesRule, "test-files");
+            const flagged = findings.filter((f) =>
+                f.file.endsWith("MultiAttributeFactTests.cs"),
             );
             expect(flagged).toHaveLength(1);
             expect(flagged[0]?.message).toContain("[FactNotAllowed]");

@@ -34,4 +34,20 @@ public static class BoundaryRulesTestData
             new("bad", null, new RuleExpected(false)),
         ];
     }
+
+    // P4.3 finding #5 (plan decision 5): NullCases WITHOUT its required
+    // ValidCases/InvalidCases co-occurrence (fixture.md §12.2) is simply an
+    // unrecognised dataset name, exactly like any other unknown name today
+    // (no "unknown dataset name" check exists) — even though it is `=> [];`
+    // empty, this must NOT be flagged. Proves the recognition is genuinely
+    // conditional, not a blanket allowlist.
+    public static class IsNullOnly
+    {
+        public static TheoryData<RuleCase<string?>> Cases =>
+        [
+            new("only", "ok", new RuleExpected(true)),
+        ];
+
+        public static TheoryData<RuleCase<string?>> NullCases => [];
+    }
 }

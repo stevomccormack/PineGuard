@@ -35,4 +35,17 @@ public sealed class FooRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(o
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(FooRulesTestData.IsQux.ValidCases), MemberType = typeof(FooRulesTestData.IsQux))]
+    [MemberData(nameof(FooRulesTestData.IsQux.InvalidCases), MemberType = typeof(FooRulesTestData.IsQux))]
+    [MemberData(nameof(FooRulesTestData.IsQux.NullCases), MemberType = typeof(FooRulesTestData.IsQux))]
+    public void IsQux_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = FooRules.IsQux(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

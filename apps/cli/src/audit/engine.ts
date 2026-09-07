@@ -40,6 +40,38 @@ const VOCABULARY_PATH = "docs/ai/specs/language/vocabulary.json";
 const EXCEPTIONS_PATH = "apps/cli/config/exceptions.json";
 const BASELINE_PATH = "apps/cli/config/baseline.json";
 
+/**
+ * `apps/cli` is the audit tool itself — its own TypeScript source, and the
+ * VIBE fixture trees (`apps/cli/test/fixtures/**`) that exist *specifically*
+ * to be invalid so the tool's own rule tests can assert on them. It is never
+ * PineGuard library/test/docs content that a `pineguard audit` run should
+ * treat as a subject. Before this exclusion existed, several rules that scope
+ * themselves via `ctx.trackedFiles` (`doc-links`, `test-orphans`,
+ * `test-structure`) walked straight into `apps/cli/test/fixtures/**` as if it
+ * were real repo content, producing real-looking findings against
+ * deliberately-broken test data — including against `doc-links`, a hard CI
+ * gate (`gate: true`). P4.1's parity diff caught this
+ * (`docs/ai/plans/audit-cli-rebuild.md` §9.2 row P4.1, §3.2: "rules audit the
+ * CLI's own test fixtures, and one is a CI gate").
+ *
+ * Fixed centrally, once, here — rather than in each affected rule — because
+ * `ctx.trackedFiles` (populated below) is the single shared file-scanning
+ * scope 12 of the 14 P2 rules read from (see {@link BuildContextOptions}'s
+ * doc comment); excluding `apps/cli/**` at its source reaches every current
+ * and future rule that scopes itself this way without editing rule files
+ * individually. `test-files` is the one rule that deliberately does **not**
+ * read `ctx.trackedFiles` (it walks the physical `<rootDir>/tests` tree for
+ * exact legacy parity — see that rule's header comment) but is unaffected
+ * anyway: `apps/cli`'s own fixtures live under `apps/cli/test/` (singular),
+ * never under the repo-root `tests/` tree `test-files` walks.
+ */
+const AUDIT_TOOL_SCOPE_PREFIX = "apps/cli/";
+
+/** `true` for a repo-relative path rooted under the audit tool's own tree (see {@link AUDIT_TOOL_SCOPE_PREFIX}). */
+function isAuditToolOwnPath(file: string): boolean {
+    return file.startsWith(AUDIT_TOOL_SCOPE_PREFIX);
+}
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -103,7 +135,9 @@ export function buildContext(
     rootDir: string = findRepoRoot(),
     options: BuildContextOptions = {},
 ): RuleContext {
-    const allTrackedFiles = listTrackedFiles(undefined, rootDir);
+    const allTrackedFiles = listTrackedFiles(undefined, rootDir).filter(
+        (file) => !isAuditToolOwnPath(file),
+    );
     let trackedFiles = allTrackedFiles;
     if (options.changedFiles !== undefined) {
         const changedSet = new Set(options.changedFiles);
