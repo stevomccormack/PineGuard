@@ -775,3 +775,56 @@ jobs:
         with:
           args: --config, tools/code-inspection/qodana/config/qodana.all.yaml
           upload-result: true
+
+  # ---------------------------------------------------------------------------
+  # 9. Tools lint — PSScriptAnalyzer + Pester over tools/** (T2.04/T2.05,
+  #    docs/ai/plans/tools-review-and-standardisation.md, Phase 2)
+  #
+  #    No needs:/if: — tools/** is not one of the "changes" job's path filters
+  #    (those only cover src/**, tests/**, and a handful of root files), so
+  #    this is the only check watching tools/** and it runs on every trigger
+  #    regardless of whether application code or tooling scripts changed.
+  #    Needs no .NET setup or build artifacts: Test-Tools.ps1 only runs
+  #    PSScriptAnalyzer and Pester against files on disk, never `dotnet`.
+  #
+  #    SOFT GATE (continue-on-error: true on the run step, matching this
+  #    file's existing soft-check convention — see format/roslyn/audit).
+  #    Test-Tools.ps1 is EXPECTED to exit 3 today: the Phase 2 baseline
+  #    (T2.02) recorded 296 PSScriptAnalyzer findings (291 cosmetic
+  #    whitespace/indentation, 5 real unapproved-verb hits) and the Pester
+  #    suite carries ~21-23 intentionally red tests (Help-Placeholder,
+  #    Windows-Isms, Bom-Absence — see tools/.tests/README.md) that encode
+  #    target-state invariants Phase 3 through 5 clear, not current bugs.
+  #
+  #    TODO(tools-review-and-standardisation, Phase 3): once the lint/test
+  #    baseline above is clean, make this a hard gate — set
+  #    continue-on-error: false on the run step below, or remove the line
+  #    entirely, so a red Test-Tools.ps1 blocks merges like every other
+  #    check in this file.
+  # ---------------------------------------------------------------------------
+  tools-lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install PSScriptAnalyzer and Pester
+        shell: pwsh
+        run: |
+          Install-Module -Name PSScriptAnalyzer -MinimumVersion 1.24.0 -Force -Scope CurrentUser -SkipPublisherCheck
+          Install-Module -Name Pester -MinimumVersion 5.7.1 -Force -Scope CurrentUser -SkipPublisherCheck
+
+      - name: Run tools lint and test gate
+        id: tools-lint
+        continue-on-error: true
+        shell: pwsh
+        run: ./tools/testing/Test-Tools.ps1
+
+      - name: Upload tools-lint summary
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tools-lint-summary
+          path: ./artifacts/tools-lint/
+          retention-days: 7
