@@ -369,4 +369,36 @@ describe("runAudit", () => {
         expect(result.exitCode).toBe(1);
         expect(result.outcomes[0]?.findings).toHaveLength(1);
     });
+
+    // `--changed` (plan §4.2, P3.2) end to end through the real engine, run
+    // against this actual repo checkout (a `main` ref always exists here —
+    // see `test/audit/changed.test.ts` for `listChangedFiles`'s own
+    // ref-resolution/fallback/merge-base unit tests in isolation). A rule
+    // that reads `ctx.trackedFiles` is exactly the propagation path P3.2
+    // relies on — see `engine.ts`'s `BuildContextOptions.changedFiles` doc
+    // comment for which of the 14 real P2 rules do and don't read it.
+    it("narrows a trackedFiles-reading rule's findings under --changed, with no warning, in this real repo", async () => {
+        registerRule(
+            fakeEntry({
+                slug: "reads-tracked-files",
+                run: (ctx) =>
+                    (ctx.trackedFiles ?? []).map((file) =>
+                        findingFor("reads-tracked-files", file, "seen"),
+                    ),
+            }),
+        );
+
+        const unfiltered = await runAudit({
+            rules: ["reads-tracked-files"],
+        });
+        const changed = await runAudit({
+            rules: ["reads-tracked-files"],
+            changed: true,
+        });
+
+        expect(changed.warnings).toBeUndefined();
+        expect(changed.outcomes[0]?.findings.length).toBeLessThanOrEqual(
+            unfiltered.outcomes[0]?.findings.length ?? 0,
+        );
+    });
 });

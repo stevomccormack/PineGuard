@@ -6,6 +6,7 @@ import {
     runUpdateBaseline,
     type AuditRunOptions,
 } from "../audit/engine.js";
+import { renderGithub } from "../audit/reporters/github.js";
 import { buildJsonReport, writeJsonReport } from "../audit/reporters/json.js";
 import { renderPretty } from "../audit/reporters/pretty.js";
 import { renderSarif } from "../audit/reporters/sarif.js";
@@ -17,7 +18,7 @@ import { findRepoRoot } from "../audit/repo.js";
 // `pineguard audit` invocation; empty until plan P2 lands the first rule.
 import "../audit/rules/index.js";
 
-const SUPPORTED_FORMATS = ["pretty", "json", "sarif"] as const;
+const SUPPORTED_FORMATS = ["pretty", "json", "github", "sarif"] as const;
 type SupportedFormat = (typeof SUPPORTED_FORMATS)[number];
 
 function isSupportedFormat(value: string): value is SupportedFormat {
@@ -29,7 +30,7 @@ interface AuditOptions {
     gate?: boolean;
     list?: boolean;
     format?: string;
-    /** `--changed`: plan P3.2, still a no-op today. */
+    /** `--changed` (plan P3.2): restrict `ctx.trackedFiles` to files that differ from `main`/`origin/main`. See `engine.ts`'s `AuditRunOptions.changed` doc comment for exactly which rules this reaches. */
     changed?: boolean;
     /** `--update-baseline` (plan §4.4): handled entirely by {@link runUpdateBaselineCommand}. */
     updateBaseline?: boolean;
@@ -69,13 +70,6 @@ function printCatalog(): void {
     for (const row of rows) {
         console.log(renderRow(row));
     }
-}
-
-/** P3-territory flags not yet implemented: accepted so scripts don't break, but currently a no-op beyond this one-line notice. Only `--changed` (plan P3.2) is still in this state — `--update-baseline`/`--no-baseline` (plan P3.1) are implemented below. */
-function warnNotYetImplemented(flag: string): void {
-    console.error(
-        `pineguard audit: ${flag} is accepted but not implemented yet (plan P3) — continuing without it.`,
-    );
 }
 
 /**
@@ -138,8 +132,8 @@ async function runAuditCommand(
     const format = options.format ?? "pretty";
     if (!isSupportedFormat(format)) {
         console.error(
-            `pineguard audit: --format ${format} is not implemented yet (plan P3.2) — ` +
-                `use --format pretty, --format json, or --format sarif.`,
+            `pineguard audit: --format ${format} is not supported — ` +
+                `use --format pretty, --format json, --format github, or --format sarif.`,
         );
         process.exitCode = 2;
         return;
@@ -153,10 +147,6 @@ async function runAuditCommand(
         return;
     }
 
-    if (options.changed) {
-        warnNotYetImplemented("--changed");
-    }
-
     const runOptions: AuditRunOptions = {
         rules,
         scope: options.scope as RuleScope | undefined,
@@ -164,6 +154,7 @@ async function runAuditCommand(
         // commander maps --no-baseline to `baseline: false`; absent (true)
         // applies the ratchet as normal (plan §4.4).
         baseline: options.baseline,
+        changed: options.changed,
     };
 
     const result = await runAudit(runOptions);
@@ -174,10 +165,18 @@ async function runAuditCommand(
         return;
     }
 
+    if (result.warnings) {
+        for (const warning of result.warnings) {
+            console.error(warning);
+        }
+    }
+
     if (format === "json") {
         const report = buildJsonReport(result);
         writeJsonReport(report, findRepoRoot());
         console.log(JSON.stringify(report, null, 2));
+    } else if (format === "github") {
+        console.log(renderGithub(result));
     } else if (format === "sarif") {
         console.log(renderSarif(result));
     } else {
@@ -200,12 +199,12 @@ export function registerAuditCommand(program: Command): void {
         .option("--list", "print the rule catalog and exit")
         .option(
             "--format <format>",
-            "output format: pretty|json|sarif (github lands in plan P3.2)",
+            "output format: pretty|json|github|sarif",
             "pretty",
         )
         .option(
             "--changed",
-            "restrict to files changed vs main (plan P3, not yet implemented)",
+            "restrict to files changed vs main/origin-main (fast pre-commit feedback)",
         )
         .option(
             "--update-baseline",

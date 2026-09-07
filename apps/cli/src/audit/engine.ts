@@ -2,7 +2,12 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { parseFile } from "./parsing/csharp.js";
-import { findRepoRoot, listTrackedFiles, readRepoFile } from "./repo.js";
+import {
+    findRepoRoot,
+    listChangedFiles,
+    listTrackedFiles,
+    readRepoFile,
+} from "./repo.js";
 import {
     type CatalogEntry,
     type RuleScope,
@@ -63,18 +68,47 @@ function parseBaseline(raw: string): BaselineConfig {
     return parsed as BaselineConfig;
 }
 
+/** Options for {@link buildContext}. */
+export interface BuildContextOptions {
+    /**
+     * When given, `ctx.trackedFiles` is narrowed to the intersection of the
+     * real `git ls-files` listing and this list (plan §4.2 `--changed`,
+     * P3.2) — i.e. every file `--changed`'s diff reported, minus anything
+     * that isn't (or is no longer) tracked, such as a deleted file the diff
+     * still names. Omit (or pass `undefined`) for the normal, unfiltered
+     * `trackedFiles`.
+     *
+     * `ctx.trackedFiles` is the single authoritative file list every rule
+     * that scopes itself to "files this run cares about" reads (12 of the 14
+     * P2 rules do; see `--changed`'s propagation note in
+     * `docs/ai/plans/audit-cli-rebuild.md` §9.2 P3.2 for exactly which two do
+     * not and why) — so narrowing it here, once, reaches every one of those
+     * rules without editing any rule file.
+     */
+    changedFiles?: readonly string[];
+}
+
 /**
  * Builds the shared {@link RuleContext} for one real `pineguard audit`
- * invocation: every tracked file, the cached C# parser, and the parsed
- * vocabulary + exceptions + baseline config. Built once per invocation and
- * handed to every selected rule unchanged.
+ * invocation: every tracked file (optionally narrowed to `--changed`'s diff,
+ * via {@link BuildContextOptions.changedFiles}), the cached C# parser, and
+ * the parsed vocabulary + exceptions + baseline config. Built once per
+ * invocation and handed to every selected rule unchanged.
  *
  * @param rootDir repo root to scan; defaults to {@link findRepoRoot}. Rule
  *   *tests* never call this directly — they build a minimal `{ rootDir }`
  *   pointed at a fixture directory via `test/support/runRule.ts` instead.
  */
-export function buildContext(rootDir: string = findRepoRoot()): RuleContext {
-    const trackedFiles = listTrackedFiles(undefined, rootDir);
+export function buildContext(
+    rootDir: string = findRepoRoot(),
+    options: BuildContextOptions = {},
+): RuleContext {
+    const allTrackedFiles = listTrackedFiles(undefined, rootDir);
+    let trackedFiles = allTrackedFiles;
+    if (options.changedFiles !== undefined) {
+        const changedSet = new Set(options.changedFiles);
+        trackedFiles = allTrackedFiles.filter((file) => changedSet.has(file));
+    }
     const vocabulary = parseVocabulary(readRepoFile(VOCABULARY_PATH, rootDir));
     const exceptions = parseExceptions(readRepoFile(EXCEPTIONS_PATH, rootDir));
     const baseline = parseBaseline(readRepoFile(BASELINE_PATH, rootDir));
@@ -381,6 +415,14 @@ export interface AuditRunResult {
     exitCode: AuditExitCode;
     /** Set when `exitCode === 2`: what went wrong (an unknown rule, or an unexpected error building the context / running a rule). */
     error?: string;
+    /**
+     * Non-fatal diagnostics the run wants surfaced (plan §4.2 `--changed`,
+     * P3.2) — e.g. `--changed` was given but neither `main` nor
+     * `origin/main` could be resolved, so the run went ahead unfiltered.
+     * Absent (not just empty) when there is nothing to say, so callers can
+     * `if (result.warnings)` rather than always checking `.length`.
+     */
+    warnings?: readonly string[];
     /** Empty when `exitCode === 2`. Otherwise one entry per selected rule, in stable slug order. */
     outcomes: RuleRunOutcome[];
 }
@@ -402,6 +444,17 @@ export interface AuditRunOptions {
      * stages of the same pipeline.
      */
     baseline?: boolean;
+    /**
+     * `--changed` (plan §4.2, P3.2): narrow `ctx.trackedFiles` to files that
+     * differ from `main`/`origin/main` (see {@link listChangedFiles} in
+     * `repo.ts` for exactly which comparison this is and why), for fast
+     * pre-commit feedback. Reaches every rule that reads `ctx.trackedFiles`
+     * (12 of 14 — see `BuildContextOptions.changedFiles`'s doc comment and
+     * the plan's P3.2 row for the two that do not and why); never a hard
+     * failure — if no base ref can be resolved, the run proceeds unfiltered
+     * and says so via {@link AuditRunResult.warnings}.
+     */
+    changed?: boolean;
     /** Repo root override, for tests. Defaults to {@link findRepoRoot}. */
     rootDir?: string;
 }
@@ -432,7 +485,22 @@ export async function runAudit(
     }
 
     try {
-        const ctx = buildContext(options.rootDir);
+        const rootDir = options.rootDir ?? findRepoRoot();
+        const warnings: string[] = [];
+        let changedFiles: readonly string[] | undefined;
+        if (options.changed) {
+            const changed = listChangedFiles(rootDir);
+            if (changed.baseRef === undefined) {
+                warnings.push(
+                    changed.warning ??
+                        "pineguard audit --changed: could not resolve a base ref; running unfiltered.",
+                );
+            } else {
+                changedFiles = changed.files;
+            }
+        }
+
+        const ctx = buildContext(rootDir, { changedFiles });
         const outcomes = await runSelectedRules(
             ctx,
             selection.entries,
@@ -442,7 +510,11 @@ export async function runAudit(
         const hasFindings = outcomes.some(
             (outcome) => outcome.findings.length > 0,
         );
-        return { exitCode: hasFindings ? 1 : 0, outcomes };
+        return {
+            exitCode: hasFindings ? 1 : 0,
+            outcomes,
+            warnings: warnings.length > 0 ? warnings : undefined,
+        };
     } catch (error) {
         return {
             exitCode: 2,
