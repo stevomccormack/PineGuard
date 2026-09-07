@@ -12,15 +12,15 @@
 
     The private build this script runs to collect diagnostics passes
     -p:TreatWarningsAsErrors=false, overriding the repo-wide Directory.Build.props setting, so
-    genuine warnings surface as "warning" lines instead of "error" lines. Its *output* binaries
-    are isolated under artifacts/code-diagnostics/build/ (via -o) so they never overwrite the
-    bin/ that the real build, tests, or coverage tooling read. The intermediate obj/ folder is
-    intentionally NOT isolated: pointing -p:BaseIntermediateOutputPath outside the project
-    breaks the .NET SDK's default Compile-item exclude for the project's real obj/ folder, so
-    stale generated files left there by prior ordinary builds (e.g. AssemblyInfo.cs) get
-    included a second time and reported as spurious CS0579 duplicate-attribute errors —
-    verified empirically while fixing this script. --no-incremental forces a full recompile of
-    obj/ every run instead, so stale intermediate state cannot mask a real diagnostic.
+    genuine warnings surface as "warning" lines instead of "error" lines. It builds into the
+    project's/solution's normal bin/obj output — --no-incremental already forces a full
+    recompile every run, so staleness is not a concern, and a per-project -o override cannot be
+    used safely here because -Scope All builds the whole solution in one dotnet invocation: -o
+    on a solution build forces every project x every TFM into a single shared output directory,
+    which causes real cross-project binding errors (e.g. a project's internal polyfill type
+    shadowing the framework-provided one for a different project). Isolating output would
+    require building each project in the scope individually even under -Scope All, which is a
+    larger change than this script's diagnostic-reporting mandate warrants.
 
     If a build target fails to compile outright (a genuine compile failure, not "compiled with
     warnings"), that is reported explicitly and distinctly — it is never reported as
@@ -42,8 +42,7 @@
     Build configuration. Defaults to Debug.
 
 .PARAMETER Clean
-    If set, deletes this script's own isolated build output for the target scope before
-    building (never the project's real bin/obj — see .DESCRIPTION).
+    If set, runs a clean build first.
 
 .NOTES
     Exit codes: 0 = build succeeded, no diagnostics matched; 1 = build succeeded, warnings
@@ -89,16 +88,11 @@ foreach ($buildTarget in $buildTargets) {
     }
 }
 
-# ── Output Directories ─────────────────────────────────────────────────────────
+# ── Output Directory ──────────────────────────────────────────────────────────
 
 $scopeSlug = $Scope.ToLowerInvariant()
 $outputDir = Join-Path $repoRoot "artifacts\code-diagnostics\$scopeSlug"
 Ensure-Directory -Path $outputDir
-
-# Isolated build output for this script's own private build. Never the same tree as the real
-# bin/obj — see .DESCRIPTION for why only -o (not BaseIntermediateOutputPath) is overridden.
-$buildOutputRoot = Join-Path $repoRoot "artifacts\code-diagnostics\build\$scopeSlug"
-Ensure-Directory -Path $buildOutputRoot
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 
@@ -106,7 +100,6 @@ Write-Host "`n=== Compiler Diagnostics ===" -ForegroundColor Cyan
 Write-Host "Scope         : $Scope"
 Write-Host "Build Target  : $($buildTargets -join ', ')"
 Write-Host "Configuration : $Configuration"
-Write-Host "Build Output  : $buildOutputRoot (isolated; real bin/obj untouched)"
 if ($Filter) { Write-Host "Filter        : $Filter" }
 Write-Host ""
 
@@ -114,19 +107,15 @@ $buildOutput = @()
 $failedBuildTargets = @()
 
 foreach ($buildTarget in $buildTargets) {
-    $targetName = [IO.Path]::GetFileNameWithoutExtension($buildTarget)
-    $targetOutputDir = Join-Path $buildOutputRoot $targetName
-
-    if ($Clean -and (Test-Path $targetOutputDir)) {
-        Write-Host "Cleaning previous isolated output for $targetName..." -ForegroundColor Yellow
-        Remove-Item -Path $targetOutputDir -Recurse -Force
+    if ($Clean) {
+        Write-Host "Cleaning $(Split-Path $buildTarget -Leaf) first..." -ForegroundColor Yellow
+        & dotnet clean $buildTarget -c $Configuration 2>&1 | Out-Null
     }
 
     $buildArgs = @(
         'build', $buildTarget,
         '--no-incremental',
         '-c', $Configuration,
-        '-o', $targetOutputDir,
         '-p:TreatWarningsAsErrors=false'
     )
 
