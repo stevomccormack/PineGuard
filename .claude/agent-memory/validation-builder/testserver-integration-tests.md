@@ -29,7 +29,7 @@ match, which is the exact thing the case exists to disprove.
 
 ## Where the group goes
 
-Rule53 maps a test file to a source class by name, so there is no `EndToEndTests` file. An
+The `test-orphans` audit maps a test file to a source class by name, so there is no `EndToEndTests` file. An
 end-to-end group is a nested `EndToEnd` class inside the test data of the component that *does the
 work* end to end, plus one `EndToEnd_BehavesAsExpected` method on the matching test class:
 the endpoint filter, the action filter, the exception handler, and the resolver — not the

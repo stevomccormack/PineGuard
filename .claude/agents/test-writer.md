@@ -33,7 +33,7 @@ You write xUnit tests that achieve 100% line and branch coverage. You follow the
 
 ## Critical Test Rules (NEVER violate these)
 - DO NOT use ad-hoc patterns. Follow the spec EXACTLY.
-- NEVER use `[Fact]` or `[InlineData]` — `[Theory]` + `TheoryData` + `[MemberData]` only. Every `XxxTests.cs` must have a paired `XxxTestData.cs`. CI gates both via audit-cli Rule50.
+- NEVER use `[Fact]` or `[InlineData]` — `[Theory]` + `TheoryData` + `[MemberData]` only. Every `XxxTests.cs` must have a paired `XxxTestData.cs`. CI gates both via audit-cli's `test-files` rule.
 - Mirror source layout: `src/PineGuard.X/` -> `tests/PineGuard.X.UnitTests/`
 - Place `XxxTests.cs` and `XxxTestData.cs` side-by-side in mirrored folder.
 - TestData files use nested Operation Groups; Tests files are flat `sealed class` with `MethodName_BehavesAsExpected` per op (`docs/ai/rules/fixture-conventions.md` §4).
