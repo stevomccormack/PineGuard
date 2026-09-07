@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Unlist prerelease versions of PineGuard packages on nuget.org.
 

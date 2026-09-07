@@ -49,20 +49,20 @@ Write-Host "Cleaning logs in: $logsDir" -ForegroundColor Cyan
 foreach ($ext in $Extensions) {
     # Ensure extension has wildcard if not present (unless it is exactly '*')
     $filter = if ($ext -eq '*') { '*' } elseif ($ext -like '*.*') { $ext } else { "*.$ext" }
-    
+
     $params = @{
         Path   = $logsDir
         Filter = $filter
         File   = $true
         Force  = $true
     }
-    
+
     if ($Recursive) {
         $params['Recurse'] = $true
     }
-    
+
     $files = Get-ChildItem @params
-    
+
     foreach ($file in $files) {
         if ($PSCmdlet.ShouldProcess($file.FullName, "Delete Log File")) {
             Remove-Item -LiteralPath $file.FullName -Force

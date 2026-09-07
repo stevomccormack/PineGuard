@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Cut a GitHub Release that triggers publish.yml, optionally bypassing
     branch protection to push local commits first and unlisting older

@@ -36,6 +36,6 @@ $repoRoot = Resolve-RepoRoot
 $paths = @('tests/PineGuard.Testing')
 if ($IncludeTests.IsPresent) {
     $paths += 'tests/PineGuard.Testing.UnitTests'
-} 
+}
 
 Invoke-Commit -RepoRoot $repoRoot -Title 'Testing: updates' -StagePaths $paths -WhatIf:$DryRun -AutoMessage:$AutoMessage -Message $Message

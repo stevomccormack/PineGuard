@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Test Coverage Analysis
 

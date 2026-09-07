@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Run Code Formatter wrapper for dotnet format.
 

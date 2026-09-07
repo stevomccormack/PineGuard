@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Run Compiler Diagnostics
 

@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Run a Qodana code inspection locally using Docker.
 

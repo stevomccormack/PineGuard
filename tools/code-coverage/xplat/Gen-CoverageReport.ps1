@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Gen Coverage Report
 
@@ -177,7 +177,7 @@ try {
         Ensure-Directory -Path $projectResults
 
         Write-Host "Running tests + collecting coverage: $name" -ForegroundColor Cyan
-        
+
         $settingsArg = @('--settings', $runSettingsPath)
 
         if (-not [string]::IsNullOrWhiteSpace($Framework)) {
@@ -187,7 +187,7 @@ try {
         if (-not [string]::IsNullOrWhiteSpace($Filter)) {
             $settingsArg += @('--filter', $Filter)
         }
-        
+
         # Isolation logic
         $targetToTest = $project
         $cleanupTempDir = $null
@@ -198,20 +198,20 @@ try {
             $tempDir = Join-Path $generatedRoot $tempDirName
             Ensure-Directory -Path $tempDir
             $cleanupTempDir = $tempDir
-             
+
             try {
                 Write-Host "  Isolating: Publishing to $tempDir ..." -ForegroundColor Gray
                 & dotnet publish $project -c $Configuration -o $tempDir | Out-Null
                 if ($LASTEXITCODE -ne 0) {
                     throw "dotnet publish failed for project: $project"
                 }
-                 
+
                 # Locate the published dll
                 $publishedDll = Join-Path $tempDir "$name.dll"
                 if (-not (Test-Path $publishedDll)) {
                     throw "Could not locate published dll at $publishedDll"
                 }
-                 
+
                 $targetToTest = $publishedDll
                 Write-Host "  Testing isolated dll: $publishedDll" -ForegroundColor Gray
             }
@@ -224,7 +224,7 @@ try {
         $attempt = 0
         while ($true) {
             $attempt++
-            
+
             & dotnet test $targetToTest -c $Configuration --collect:"XPlat Code Coverage" --results-directory $projectResults @settingsArg
             if ($LASTEXITCODE -ne 0) {
                 if ($Isolated) { Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue }
@@ -244,7 +244,7 @@ try {
             Remove-Item -LiteralPath $projectResults -Recurse -Force -ErrorAction SilentlyContinue
             Ensure-Directory -Path $projectResults
         }
-        
+
         if ($Isolated) {
             Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue
         }
@@ -269,7 +269,7 @@ Write-Host "Collected coverage files: $($coverageFiles.Count)" -ForegroundColor 
 $coverageFiles | ForEach-Object { Write-Host " - $_" -ForegroundColor Cyan }
 
 if ($SkipHtml) {
-    Write-Host "" 
+    Write-Host ""
     Write-Host "Coverage collection complete (HTML skipped)." -ForegroundColor Green
     Write-Host "Coverage XML files ($Format):" -ForegroundColor Green
     foreach ($f in $coverageFiles) {
@@ -294,7 +294,7 @@ if ($LASTEXITCODE -ne 0) {
 
 $indexPath = [IO.Path]::Combine($reportDir, 'index.html')
 
-Write-Host "" 
+Write-Host ""
 Write-Host "Coverage report generated:" -ForegroundColor Green
 Write-Host "  $reportDir" -ForegroundColor Green
 Write-Host "Open: $indexPath" -ForegroundColor Green
