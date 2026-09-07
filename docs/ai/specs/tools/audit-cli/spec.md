@@ -191,7 +191,7 @@ on/off switch:
 ["<file-or-message-substring>", ...] }`, a substring match against `finding.file` or
 `finding.message`, applied by the engine before the baseline. Use it for a small number of
 permanent, reviewed exemptions (the two live legacy `Rule50` allowlist entries carried forward
-from `tools/audit-cli/test-audit-exceptions.json` are the working example); use the baseline for
+from the legacy `tools/audit-cli` tool's `test-audit-exceptions.json` are the working example); use the baseline for
 bulk pre-existing debt you intend to burn down over time.
 
 ## 5. Parser approach
