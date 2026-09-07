@@ -78,7 +78,6 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-network.ps1 
 | `sonarqube-up.ps1` | `-NetworkName` | `pineguard` | Docker network name |
 | `sonarqube-up.ps1` | `-Port` | `9001` | Host port mapped to the container's `9000` |
 | `sonarqube-up.ps1` | `-HealthTimeoutSeconds` | `120` | How long to wait for the server to report UP (10–600) |
-| `sonarqube-up.ps1` | `-InstallScanner` | `$false` | Install `dotnet-sonarscanner` if it is missing |
 | `sonarqube-up.ps1` | `-Open` | `$false` | Open the SonarQube UI once it is healthy |
 | `docker-network.ps1` | `-Name` | `pineguard` | Network name |
 | `docker-network.ps1` | `-Driver` | `bridge` | Network driver (`bridge`, `host`, `overlay`) |
@@ -101,3 +100,6 @@ and `QODANA_CONFIG_PATH` (which defaults to `tools/code-inspection/qodana/config
   ensure the network exists first.
 - `-RemoveVolumes` on SonarQube discards the project, users, and analysis history; the setup steps in
   [tools/sonar-scanner/README.md](../sonar-scanner/README.md) then have to be repeated.
+- `dotnet-sonarscanner` is not installed by these scripts. It comes from the repo-root local tool
+  manifest (`.config/dotnet-tools.json`); run `dotnet tool restore` (or just run
+  `tools/sonar-scanner/Run-SonarScanner.ps1`, which restores it automatically) to make it available.

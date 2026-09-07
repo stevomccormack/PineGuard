@@ -4,8 +4,10 @@
 
 .DESCRIPTION
     Part of the PineGuard PowerShell toolchain.
-    Installs Java (OpenJDK 21) and dotnet-sonarscanner if not already present,
-    then starts the SonarQube Community Edition server via Docker Compose.
+    Installs Java (OpenJDK 21) if not already present, then starts the SonarQube Community
+    Edition server via Docker Compose. dotnet-sonarscanner comes from the repo-root local
+    tool manifest (.config/dotnet-tools.json) - Run-SonarScanner.ps1 restores it via
+    `dotnet tool restore` before use.
 
     For CI/CD, use the SonarQube GitHub Action with SONARQUBE_TOKEN stored as a
     repository secret - do not use this script in pipelines.
@@ -76,12 +78,11 @@ else {
     Write-Host "Java found: $(Get-JavaVersion)" -ForegroundColor DarkGray
 }
 
-# --- SonarQube server + dotnet-sonarscanner ---
+# --- SonarQube server ---
 
 $upArgs = @{
     Port                 = $Port
     HealthTimeoutSeconds = $HealthTimeoutSeconds
-    InstallScanner       = $true
 }
 if ($Open) { $upArgs['Open'] = $true }
 

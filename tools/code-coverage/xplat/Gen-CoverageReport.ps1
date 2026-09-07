@@ -279,17 +279,32 @@ if ($SkipHtml) {
     return
 }
 
-$reportGen = Ensure-ReportGenerator -RepoRoot $repoRoot
 $reportDir = Join-Path $generatedRoot "html-$($Scope.ToLower())"
 Ensure-Directory -Path $reportDir
 
 # reportgenerator accepts semicolon-separated patterns/paths
 $reportsArg = ($coverageFiles -join ';')
 
-Write-Host "Generating HTML coverage report..." -ForegroundColor Cyan
-& $reportGen "-reports:$reportsArg" "-targetdir:$reportDir" "-reporttypes:Html;HtmlSummary" "-filefilters:-obj\\*;-*\\obj\\*;-obj/*;-*/obj/*;-bin\\*;-*\\bin\\*;-bin/*;-*/bin/*" "-verbosity:Error"
-if ($LASTEXITCODE -ne 0) {
-    throw "reportgenerator failed with exit code: $LASTEXITCODE"
+# reportgenerator is a local dotnet tool (.config/dotnet-tools.json), invoked via
+# `dotnet reportgenerator`. `dotnet tool restore` must run from the repo root (or a
+# subdirectory of it) so it finds the manifest; it is fast and idempotent, so it is safe
+# to call unconditionally rather than trying to detect whether a restore already happened.
+Push-Location $repoRoot
+try {
+    Write-Host "Restoring local dotnet tools..." -ForegroundColor DarkGray
+    dotnet tool restore | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet tool restore failed with exit code: $LASTEXITCODE"
+    }
+
+    Write-Host "Generating HTML coverage report..." -ForegroundColor Cyan
+    & dotnet reportgenerator "-reports:$reportsArg" "-targetdir:$reportDir" "-reporttypes:Html;HtmlSummary" "-filefilters:-obj\\*;-*\\obj\\*;-obj/*;-*/obj/*;-bin\\*;-*\\bin\\*;-bin/*;-*/bin/*" "-verbosity:Error"
+    if ($LASTEXITCODE -ne 0) {
+        throw "reportgenerator failed with exit code: $LASTEXITCODE"
+    }
+}
+finally {
+    Pop-Location
 }
 
 $indexPath = [IO.Path]::Combine($reportDir, 'index.html')

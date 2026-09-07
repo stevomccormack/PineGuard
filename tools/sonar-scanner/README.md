@@ -24,7 +24,9 @@ per-stack up/down scripts (`sonarqube-up.ps1` starts SonarQube alone).
 
 ### 2. Initialize (first run only)
 
-Installs Java (OpenJDK 21) and `dotnet-sonarscanner` if not present, then waits for SonarQube to be healthy.
+Installs Java (OpenJDK 21) if not present, then waits for SonarQube to be healthy. `dotnet-sonarscanner`
+comes from the repo-root local tool manifest (`.config/dotnet-tools.json`) and is restored automatically
+by `Run-SonarScanner.ps1` (or run `dotnet tool restore` yourself).
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Initialize-SonarQube.ps1 -Open

@@ -22,9 +22,6 @@
 .PARAMETER HealthTimeoutSeconds
     Maximum seconds to wait for SonarQube to report UP. Default: 120.
 
-.PARAMETER InstallScanner
-    Install the dotnet-sonarscanner global tool if not already present.
-
 .PARAMETER Open
     Open the SonarQube dashboard in the default browser once the server is healthy.
 
@@ -33,8 +30,8 @@
     Starts the SonarQube server and waits for it to be healthy.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/sonarqube-up.ps1 -InstallScanner -Open
-    Starts the server, installs dotnet-sonarscanner if missing, and opens the dashboard.
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/sonarqube-up.ps1 -Open
+    Starts the server and opens the dashboard.
 #>
 
 [CmdletBinding()]
@@ -42,7 +39,6 @@ param(
     [string] $NetworkName = 'pineguard',
     [ValidateRange(1, 65535)] [int] $Port = 9001,
     [ValidateRange(10, 600)] [int] $HealthTimeoutSeconds = 120,
-    [switch] $InstallScanner,
     [switch] $Open
 )
 
@@ -96,21 +92,6 @@ if (-not $isHealthy) {
 
 Write-Host "SonarQube is UP: $sonarUrl" -ForegroundColor Green
 Write-Host 'Default credentials (first run): admin / admin' -ForegroundColor DarkGray
-
-# --- Install dotnet-sonarscanner ---
-
-if ($InstallScanner) {
-    Write-Host 'Checking dotnet-sonarscanner...' -ForegroundColor Cyan
-    $toolList = dotnet tool list -g 2>&1
-    if ($toolList -notmatch 'dotnet-sonarscanner') {
-        Write-Host 'Installing dotnet-sonarscanner...' -ForegroundColor Cyan
-        dotnet tool install --global dotnet-sonarscanner
-        Write-Host 'dotnet-sonarscanner installed.' -ForegroundColor Green
-    }
-    else {
-        Write-Host 'dotnet-sonarscanner already installed.' -ForegroundColor DarkGray
-    }
-}
 
 # --- Open dashboard ---
 

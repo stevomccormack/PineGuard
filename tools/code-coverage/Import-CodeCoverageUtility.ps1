@@ -17,5 +17,4 @@ $script:SharedDir = Join-Path $PSScriptRoot '..\.shared'
 . (Join-Path $script:SharedDir 'path.ps1')
 . (Join-Path $script:SharedDir 'html.ps1')
 . (Join-Path $script:SharedDir 'dotnet-projects.ps1')
-. (Join-Path $script:SharedDir 'dotnet-tools-reportgenerator.ps1')
 . (Join-Path $script:SharedDir 'coverage.ps1')

@@ -11,8 +11,9 @@
       4. Collects code coverage via the existing coverage script.
       5. Submits findings to the local SonarQube instance.
 
-    Requires dotnet-sonarscanner to be installed. Run Initialize-SonarQube.ps1 -InstallScanner
-    to install it, or run: dotnet tool install --global dotnet-sonarscanner
+    Requires dotnet-sonarscanner, restored from the repo-root local tool manifest
+    (.config/dotnet-tools.json). This script runs `dotnet tool restore` itself before invoking
+    the scanner; run it manually first only if you want to pre-warm the tool cache.
 
 .PARAMETER ProjectToken
     SonarQube project authentication token. Falls back to SONARQUBE_TOKEN environment variable.
@@ -93,9 +94,23 @@ if (-not (Test-CommandExists -Name 'java')) {
     exit 1
 }
 
-if (-not (Test-CommandExists -Name 'dotnet-sonarscanner')) {
-    Write-Host 'dotnet-sonarscanner not found. Run Initialize-SonarQube.ps1 to install it.' -ForegroundColor Red
-    exit 1
+# --- Restore local dotnet tools (dotnet-sonarscanner) ---
+#
+# dotnet-sonarscanner comes from the repo-root local tool manifest, not a global install.
+# `dotnet tool restore` must run from the repo root (or a subdirectory of it) so it finds
+# .config/dotnet-tools.json; it is fast and idempotent, so it is safe to call unconditionally
+# here rather than trying to detect whether the tool is already available.
+Write-Host 'Restoring local dotnet tools...' -ForegroundColor Cyan
+Push-Location $repoRootResolved
+try {
+    dotnet tool restore | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "dotnet tool restore failed with exit code $LASTEXITCODE." -ForegroundColor Red
+        exit $LASTEXITCODE
+    }
+}
+finally {
+    Pop-Location
 }
 
 # --- Verify SonarQube is UP ---

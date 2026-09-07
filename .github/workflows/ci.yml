@@ -354,8 +354,8 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.4.*
+      - name: Restore dotnet tools
+        run: dotnet tool restore
 
       # merge-multiple: false (the default) — downloading up to 15 parallel matrix jobs' artifacts
       # into one flat directory with merge-multiple: true was occasionally colliding on an internal
@@ -502,7 +502,7 @@ jobs:
       - name: Generate coverage report
         if: steps.find-coverage.outputs.found == 'true'
         run: >
-          reportgenerator
+          dotnet reportgenerator
           -reports:"${{ steps.find-coverage.outputs.files }}"
           -targetdir:./coverage-report
           -reporttypes:"Cobertura;TextSummary;MarkdownSummaryGithub"
