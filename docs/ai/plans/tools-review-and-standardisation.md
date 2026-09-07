@@ -558,4 +558,22 @@ rules file changes name.
 
 ## Baselines
 
-*(appended by T2.02)*
+**Phase 2 PSScriptAnalyzer baseline** (T2.02, executed 2026-09-07):
+
+- **Total findings:** 296 across 59 `.ps1` files under `tools/` (excluding `tools/audit-cli/`)
+- **Settings file:** `PSScriptAnalyzerSettings.psd1` (repo root, commit `b4e58d8`)
+- **Findings by rule:**
+  - `PSUseConsistentWhitespace`: 265 (cosmetic — whitespace style, low priority for Phase 3)
+  - `PSUseConsistentIndentation`: 26 (cosmetic — indentation style, low priority for Phase 3)
+  - `PSUseApprovedVerbs`: 5 (real — verb issues, addressed by D-1b/§3.2 renames in Phase 4)
+
+- **Top files by finding count:**
+  - `tools\.shared\dotnet-projects.ps1`: 158 (whitespace)
+  - `tools\code-diagnostics\Run-CompilerDiagnostics.ps1`: 35 (whitespace + indentation)
+  - `tools\sonar-scanner\Setup-SonarQube.ps1`: 13 (whitespace)
+  - `tools\sonar-scanner\Get-SonarIssues.ps1`: 12 (whitespace)
+  - `.shared\coverage.ps1`: 18 (whitespace)
+
+- **Assessment:** Cosmetic findings (whitespace/indentation, 291/296) do not block Phase 3 work. The 5 unapproved-verb findings are expected and will be resolved by the D-1b verb renames during Phase 4's cascade (§3.2). A Pester test (T2.03) will enforce no new unapproved-verb introductions during Phase 3. The full per-file breakdown is recorded in `artifacts/tools-lint/baseline.json` (gitignored; future readers should regenerate by re-running this same invocation rather than expect the file to be checked in).
+
+**dotCover spike status** (T3.10): pending Phase 3 start. Will be recorded in a follow-up `## dotCover spike results` section.
