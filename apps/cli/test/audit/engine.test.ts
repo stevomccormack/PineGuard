@@ -286,11 +286,13 @@ describe("buildContext", () => {
         expect(typeof ctx.parseFile).toBe("function");
         // docs/ai/specs/language/vocabulary.json's top-level "version" is 1.
         expect(ctx.vocabulary?.version).toBe(1);
-        // apps/cli/config/exceptions.json is still the P1.1 placeholder `{}`.
-        expect(ctx.exceptions).toEqual({});
-        // apps/cli/config/baseline.json starts as the P3.1 placeholder `{}`
-        // — real content is only ever written by `--update-baseline`.
-        expect(ctx.baseline).toEqual({});
+        // apps/cli/config/exceptions.json was populated at P6.2 (cutover cleanup)
+        // with entries ported from legacy tools/audit-cli/test-audit-exceptions.json.
+        expect(ctx.exceptions?.["test-files"]).toBeDefined();
+        // apps/cli/config/baseline.json was populated at P6.1 with a snapshot of
+        // pre-existing debt (real content is only ever written by `--update-baseline`).
+        expect(ctx.baseline).toBeDefined();
+        expect(Object.keys(ctx.baseline ?? {}).length).toBeGreaterThan(0);
     });
 
     // P4.1 remediation (plan §9.2 row P4.1, §3.2 "rules audit the CLI's own
