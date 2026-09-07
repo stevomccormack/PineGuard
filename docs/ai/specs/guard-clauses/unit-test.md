@@ -98,7 +98,7 @@ public sealed record GuardExpected(bool IsValid, Type? ExceptionType = null, str
 - `new GuardExpected(false, typeof(ArgumentNullException), "value")` — throws `ArgumentNullException` with ParamName "value"
 - `new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Email.Address.Invalid)` — also
   asserts the thrown exception's `Data[GuardFailure.CodeDataKey]`/`Data[GuardFailure.PropertyPathDataKey]`; a
-  spot check on one representative group per guard file (~50 total, Rule13 is the exhaustive check), not
+  spot check on one representative group per guard file (~50 total, `must-codes` is the exhaustive check), not
   every case
 
 ### Required Imports

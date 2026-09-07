@@ -206,7 +206,7 @@ Record the actual list of files touched in the PR body; Phase 3 copies it.
 
 ## 4. Testing plan
 
-Project `+ tests/PineGuard.Extensions.Options.UnitTests/` (Plan 00 §4.5 skeleton) with additional test-only packages `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Configuration`, `Microsoft.Extensions.Options.ConfigurationExtensions`, `Microsoft.Extensions.Hosting` (all need `PackageVersion` entries). Every `XxxTests.cs` ships with `XxxTestData.cs` (Rule50 — the CI-enforced audit rule); single-scenario groups use a `TheoryData` of one named case so the README's `BindConfiguration` path is exercised end-to-end from an in-memory configuration.
+Project `+ tests/PineGuard.Extensions.Options.UnitTests/` (Plan 00 §4.5 skeleton) with additional test-only packages `Microsoft.Extensions.DependencyInjection`, `Microsoft.Extensions.Configuration`, `Microsoft.Extensions.Options.ConfigurationExtensions`, `Microsoft.Extensions.Hosting` (all need `PackageVersion` entries). Every `XxxTests.cs` ships with `XxxTestData.cs` (`test-files` — the CI-enforced audit rule); single-scenario groups use a `TheoryData` of one named case so the README's `BindConfiguration` path is exercised end-to-end from an in-memory configuration.
 
 Base class: `BaseUnitTest` (there is no layer base for `ValidateOptionsResult`); project-local expectation types (precedent: `tests/PineGuard.DataAnnotations.UnitTests/ThrowsCase.cs`):
 
@@ -254,18 +254,18 @@ The `Get-PineGuardScope` registry is **Track 0** in Plan 00 §10 (merged 2026-08
 3. Commit `test(options): cover MustRulesValidateOptions and the builder extensions`.
 
 ### W5 — Brain and adapters
-1. Plan 00 §8.4 for `options`. `Run-All.ps1 -RuleId Rule11,Rule12` clean.
+1. Plan 00 §8.4 for `options`. `Run-All.ps1 -RuleId `doc-links`,`surface-parity`` clean.
 2. Commit `docs(brain): onboard the options scope (specs, rules, agents, commands)`.
 
 ### W6 — Gates, PR, merge
-1. Plan 00 §7; `dotnet format` then `--verify-no-changes`; `Run-All.ps1 -RuleId Rule50`.
+1. Plan 00 §7; `dotnet format` then `--verify-no-changes`; `Run-All.ps1 -RuleId `test-files``.
 2. Plan 00 §6 steps 6–9. PR body includes the §3.4 onboarding log.
 
 ## 6. Definition of Done
 
 Plan 00 §7, plus:
 
-- [ ] `Options` is a first-class scope in every script `ValidateSet`, `ci.yml`, `.editorconfig`, VS Code tasks, commit tooling, release tooling, Qodana, the Brain and every full adapter (Rule12 clean).
+- [ ] `Options` is a first-class scope in every script `ValidateSet`, `ci.yml`, `.editorconfig`, VS Code tasks, commit tooling, release tooling, Qodana, the Brain and every full adapter (`surface-parity` clean).
 - [ ] The onboarding log in the PR body corrects Plan 00 §8 where it was wrong, and Plan 00 §8 itself is amended in the same PR.
 - [ ] README examples compile as the test samples.
 

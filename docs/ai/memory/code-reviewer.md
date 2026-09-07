@@ -22,11 +22,11 @@ with dated, per-file review logs; durable criteria belong here.
 - Nullable value type (`int?`) where Rules expect the non-nullable form.
 - Test files that break the expected PineGuard test structure or fixture usage.
 - A `Fail(...)`/`FromBool(...)` call missing its `MustCodes` constant, passing more than one, or passing a
-  hardcoded string literal instead — Rule13 check (a)/(c) should already catch this, but treat a finding as
+  hardcoded string literal instead — the `must-codes` audit rule check (a)/(c) should already catch this, but treat a finding as
   a real defect, not a false positive.
 - An adapter's declared code (Guard's stamped `Exception.Data`, a DataAnnotations attribute's `Code`
   constructor argument, a FluentValidation extension's `MustBe` trailing argument) not matching the code the
-  underlying Must clause itself uses — Rule13 checks (d)/(e) cover DataAnnotations and Guard; FluentValidation
+  underlying Must clause itself uses — the `must-codes` audit rule checks (d)/(e) cover DataAnnotations and Guard; FluentValidation
   has no automated check for this yet, so review it by hand against the invoked clause's source.
 
 ## Parsed-Result Drift Signals
@@ -55,7 +55,7 @@ actually caught, in observed frequency order:
 - Case property named `ExpectedReturn`/`ExpectedSuccess` instead of `Expected`.
 - New tests using the soft-deprecated `IsCase<T>`/`HasCase<T>` instead of `RuleCase<T>`.
 - Edge-case boundary values hardcoded when a Rule/Utils constant exists (`fixture.md` §9).
-- `[Fact]` sneaking in — fails CI Rule50; every test is `[Theory]` + `TheoryData`/`[MemberData]`.
+- `[Fact]` sneaking in — fails the CI `test-files` gate; every test is `[Theory]` + `TheoryData`/`[MemberData]`.
 - Nested Operation Group classes reappearing in Tests files (only TestData keeps them).
 - Explanatory comments, multi-line scenario entries, or PascalCase tuple elements
   (`fixture.md` §11).

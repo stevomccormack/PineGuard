@@ -117,7 +117,7 @@ Two production failure modes matter as much as the integration itself: error key
 
 - [ ] All types in §4 exist with the listed signatures; 100 %/100 % on `DependencyInjection` and `AspNetCore` scopes.
 - [ ] End-to-end tests (`TestServer`) prove stories 2, 3, 5 and 6 with the exact JSON shape above.
-- [ ] Rule14 (Core stays sync) exists and is clean; Rule13 clean for the new async clauses.
+- [ ] Rule14 (Core stays sync) exists and is clean; `must-codes` clean for the new async clauses.
 - [ ] `docs/ai/specs/testing/unit-test.md` §5.1 records the async-test exception (`public async Task <Member>_BehavesAsExpected`).
 - [ ] Plan 00 §7 in full; both scopes onboarded per Plan 02 §3.4.
 
@@ -168,9 +168,9 @@ public static ValueTask<MustResult<T>> NotSatisfiesAsync<T>(/* same shape */);
 ```
 
 - Null `predicate` → failure attributed to `nameof(predicate)` (fail-soft, like `Satisfies`). Null `value` → failure with the clause's code (no predicate call), matching `PredicateRules.Satisfies`.
-- Codes: the async pair shares the sync pair's constants — `MustCodes.Predicate.Result.False` / `…Result.True` — because it is the same rule evaluated asynchronously (Plan 00 §5.4 rule 5). Rule13 (a) already matches `ValueTask<MustResult<…>>` signatures (Plan 01 §4.1); verify by deleting the constant from `SatisfiesAsync` and confirming Rule13 fails.
+- Codes: the async pair shares the sync pair's constants — `MustCodes.Predicate.Result.False` / `…Result.True` — because it is the same rule evaluated asynchronously (Plan 00 §5.4 rule 5). `must-codes` (a) already matches `ValueTask<MustResult<…>>` signatures (Plan 01 §4.1); verify by deleting the constant from `SatisfiesAsync` and confirming `must-codes` fails.
 - Parity: add both names to `ignoreMethods` in `docs/ai/specs/language/vocabulary.json` with the comment *Guard is synchronous by design; DataAnnotations has no async contract*. FluentValidation **does** get them (§3.4).
-- Method ordering: after `NotSatisfies`, positive before negative (Rule08).
+- Method ordering: after `NotSatisfies`, positive before negative (`ordering`).
 
 ### 3.4 FluentValidation async adapter (`src/PineGuard.FluentValidation/`)
 
@@ -183,7 +183,7 @@ public static ValueTask<MustResult<T>> NotSatisfiesAsync<T>(/* same shape */);
 
 ### 3.6 Test-spec addendum
 
-`docs/ai/specs/testing/unit-test.md` §5.1 gains: *"Async members are tested with `public async Task <Member>_BehavesAsExpected(…)` — the only permitted return type other than `void`."* The §5.2 and §8.3 examples in the same spec are annotated "sync form shown; async members use `public async Task`" so the three places agree. Rule50 does not inspect return types; verify by running it.
+`docs/ai/specs/testing/unit-test.md` §5.1 gains: *"Async members are tested with `public async Task <Member>_BehavesAsExpected(…)` — the only permitted return type other than `void`."* The §5.2 and §8.3 examples in the same spec are annotated "sync form shown; async members use `public async Task`" so the three places agree. `test-files` does not inspect return types; verify by running it.
 
 ## 4. Technical plan — `PineGuard.Extensions.DependencyInjection` and `PineGuard.AspNetCore`
 
@@ -272,7 +272,7 @@ Base `BaseUnitTest`; samples in `Samples/` (a validator for two types, an abstra
 
 ### 5.3 `+ tests/PineGuard.AspNetCore.UnitTests/`
 
-`<FrameworkReference Include="Microsoft.AspNetCore.App" />` in the test csproj; test-only packages `Microsoft.AspNetCore.TestHost`, `Microsoft.Extensions.DependencyInjection`. Every `XxxTests.cs` ships with `XxxTestData.cs` (Rule50, CI-enforced); single-scenario groups (`MustValidationOptionsTests` defaults) use a `TheoryData` of one named case. Rule53 is a local convention check, not a CI gate — never add allowlist entries to `tools/audit-cli/test-audit-exceptions.json` for new code. Base `BaseMustValidationUnitTest` where a result is asserted, `BaseUnitTest` elsewhere; project-local `ProblemDetailsExpected(bool IsValid, int? Status = null, string[]? ErrorKeys = null, string[]? Codes = null)` for HTTP-shaped assertions.
+`<FrameworkReference Include="Microsoft.AspNetCore.App" />` in the test csproj; test-only packages `Microsoft.AspNetCore.TestHost`, `Microsoft.Extensions.DependencyInjection`. Every `XxxTests.cs` ships with `XxxTestData.cs` (`test-files`, CI-enforced); single-scenario groups (`MustValidationOptionsTests` defaults) use a `TheoryData` of one named case. `test-orphans` is a local convention check, not a CI gate — never add allowlist entries to `tools/audit-cli/test-audit-exceptions.json` for new code. Base `BaseMustValidationUnitTest` where a result is asserted, `BaseUnitTest` elsewhere; project-local `ProblemDetailsExpected(bool IsValid, int? Status = null, string[]? ErrorKeys = null, string[]? Codes = null)` for HTTP-shaped assertions.
 
 | Tests | Groups |
 |---|---|
@@ -286,7 +286,7 @@ Base `BaseUnitTest`; samples in `Samples/` (a validator for two types, an abstra
 | `ServiceCollectionExtensionTests` | registrations, scanning delegated, options configured, handler registered |
 | `MustValidatableInfoResolverTests` (`#if NET10_0_OR_GREATER`) | `TryGetValidatableTypeInfo` true/false; `ValidateAsync` writes `ValidationErrors` with combined path; parameter info → false |
 
-End-to-end coverage (`TestServer` via `WebApplication.CreateBuilder` + `builder.WebHost.UseTestServer()`) lives as `EndToEnd` operation groups inside `MustValidationEndpointFilterTests` (story 2 JSON verbatim, camelCase policy), `MustValidationActionFilterTests` (story 3, identical body) and `MustValidationExceptionHandlerTests` (story 5; story 6 both settings) — Rule53 maps a test file to a source class by name, so there is no `EndToEndTests` file. Async test methods use the §3.6 form.
+End-to-end coverage (`TestServer` via `WebApplication.CreateBuilder` + `builder.WebHost.UseTestServer()`) lives as `EndToEnd` operation groups inside `MustValidationEndpointFilterTests` (story 2 JSON verbatim, camelCase policy), `MustValidationActionFilterTests` (story 3, identical body) and `MustValidationExceptionHandlerTests` (story 5; story 6 both settings) — `test-orphans` maps a test file to a source class by name, so there is no `EndToEndTests` file. Async test methods use the §3.6 form.
 
 ## 6. Playbook
 
@@ -296,9 +296,9 @@ End-to-end coverage (`TestServer` via `WebApplication.CreateBuilder` + `builder.
 
 **W1** Async rules + `MustValidationMode` in Core (§3.1–3.2); tests; `-Scope Core` 100/100; Rule14 script + catalogue + tasks + docs; `Run-All.ps1 -RuleId Rule14` clean. Commit `feat(core): add async validator rules and StopOnFirstFailure mode` and `feat(tools): add audit Rule14 keeping Core synchronous`.
 
-**W2** `SatisfiesAsync`/`NotSatisfiesAsync` (+ `MustCodes`, Rule13), `vocabulary.json` ignores, `MustBeAsync` + Fluent extensions, the unit-test spec addendum; tests; `-Scope MustClauses` and `-Scope FluentValidation` 100/100; `Run-All.ps1 -RuleId Rule06,Rule08,Rule13,Rule50` clean. Commit `feat(must): add the async predicate seam` and `feat(fluent): adapt async Must predicates`.
+**W2** `SatisfiesAsync`/`NotSatisfiesAsync` (+ `MustCodes`, `must-codes`), `vocabulary.json` ignores, `MustBeAsync` + Fluent extensions, the unit-test spec addendum; tests; `-Scope MustClauses` and `-Scope FluentValidation` 100/100; `Run-All.ps1 -RuleId `layer-parity`,`ordering`,`must-codes`,`test-files`` clean. Commit `feat(must): add the async predicate seam` and `feat(fluent): adapt async Must predicates`.
 
-**W3** Onboard `DependencyInjection` (Plan 02 §3.4 log) → package → tests → `-Scope DependencyInjection` 100/100 → Brain/agents (Rule11/12) → Plan 00 §7 → PR → merge. Commits: `build(di): …`, `feat(di): …`, `test(di): …`, `docs(brain): …`.
+**W3** Onboard `DependencyInjection` (Plan 02 §3.4 log) → package → tests → `-Scope DependencyInjection` 100/100 → Brain/agents (`doc-links`/12) → Plan 00 §7 → PR → merge. Commits: `build(di): …`, `feat(di): …`, `test(di): …`, `docs(brain): …`.
 
 ### PR 2 — `feature/aspnetcore`
 
@@ -310,7 +310,7 @@ End-to-end coverage (`TestServer` via `WebApplication.CreateBuilder` + `builder.
 
 **W7** `#if NET10_0_OR_GREATER` resolver + `AddMustValidators`; net10-gated tests; commit `feat(aspnetcore): integrate with Microsoft.Extensions.Validation on .NET 10`.
 
-**W8** `-Scope AspNetCore` 100/100, `-Scope All` 100/100; Brain/agents/README (Rule11/12); Plan 00 §7; PR; merge; worktree cleanup.
+**W8** `-Scope AspNetCore` 100/100, `-Scope All` 100/100; Brain/agents/README (`doc-links`/12); Plan 00 §7; PR; merge; worktree cleanup.
 
 **W9 — removed.** Guard code stamping moved to Phase 1d (Plan 01 §4.14, W6b) so that every layer carries codes before any adapter ships; W6 here only reads `Exception.Data["pineguard.code"]` / `["pineguard.property-path"]` when `HandleGuardExceptions` is on.
 

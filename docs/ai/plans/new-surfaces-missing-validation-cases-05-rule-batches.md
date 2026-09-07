@@ -13,7 +13,7 @@ parent: new-surfaces-program
 > [Parent](new-surfaces-missing-validation-cases.md) · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · **05 Rule batches** · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
 <!-- /plan-nav -->
 
-> **Status**: Planned | **Depends on**: Phase 1 (error codes — every new clause needs its `MustCodes` constant; Rule13 gates it) | **Runs in parallel with**: Phases 2–4 (independent code paths; expect merge conflicts only in a shared `MustCodes.<Domain>.cs`, `vocabulary.json` and `gold-standard.md`)
+> **Status**: Planned | **Depends on**: Phase 1 (error codes — every new clause needs its `MustCodes` constant; `must-codes` gates it) | **Runs in parallel with**: Phases 2–4 (independent code paths; expect merge conflicts only in a shared `MustCodes.<Domain>.cs`, `vocabulary.json` and `gold-standard.md`)
 >
 > **Worktrees**: one per batch — `rules-string-content`, `rules-identifiers`, `rules-unicode`, `rules-numeric`, `rules-temporal`, `rules-file-signature` — each its own PR. Batches are independent; run them in the listed order unless the operator pulls Batch E (clock injection, the differentiator) forward.
 >
@@ -29,18 +29,18 @@ Batch E carries one genuine differentiator: **clock injection** via `TimeProvide
 
 ### 1.2 Value and metrics
 
-- +≈45 Core rules across six batches, each with Must/Guard/Fluent/DataAnnotations parity (Rule06) and codes (Rule13); all scopes stay 100 %/100 %.
+- +≈45 Core rules across six batches, each with Must/Guard/Fluent/DataAnnotations parity (`layer-parity`) and codes (`must-codes`); all scopes stay 100 %/100 %.
 - The README's rule count and catalogue are updated per batch; `gold-standard.md` re-verified per batch.
 - Clock injection lands across four temporal families with a shared `FixedTimeProvider` test double.
 
 ## 2. Functional plan — conventions every batch follows
 
 - **Vocabulary** (`docs/ai/specs/language/vocabulary.md`): Core `IsX`/`HasX`/`ContainsX`; Must positive name, `NotX` only for strict complements; Guard forbidden-state name (`NotX`, or a curated semantic opposite registered as an alias in `vocabulary.json`); Fluent = Must name unless it collides with a FluentValidation built-in (`naming-collisions.md`); DataAnnotations = `<MustName>Attribute` with a type suffix only where a family already uses one (`…DateOnlyAttribute`, `…NumberAttribute`, `…StringAttribute`).
-- **Codes**: `MustCodes.<Domain>.<Aspect>.<Condition>` = `<domain>.<aspect>.<condition>` per the Plan 00 §5.4 grammar, domain map and condition vocabulary; the batch table proposes each code and the batch PR review is its curation checkpoint; a new domain (`token`, `version`, `cron`, `checksum`) is a new `MustCodes.<Domain>.cs` partial file in `src/PineGuard.Core/Codes/` with the Plan 01 §4.1 header comment; **any condition not already in Plan 00 §5.4's controlled vocabulary is added to that list in the same PR, before the code is written** (`MustCodesTests` asserts membership); Rule13 and `MustCodesTests` must be clean before the PR.
-- **Nullability** (Rule07): reference values nullable, struct values non-nullable at Must/Guard; configuration parameters non-nullable unless the Core rule accepts null.
+- **Codes**: `MustCodes.<Domain>.<Aspect>.<Condition>` = `<domain>.<aspect>.<condition>` per the Plan 00 §5.4 grammar, domain map and condition vocabulary; the batch table proposes each code and the batch PR review is its curation checkpoint; a new domain (`token`, `version`, `cron`, `checksum`) is a new `MustCodes.<Domain>.cs` partial file in `src/PineGuard.Core/Codes/` with the Plan 01 §4.1 header comment; **any condition not already in Plan 00 §5.4's controlled vocabulary is added to that list in the same PR, before the code is written** (`MustCodesTests` asserts membership); `must-codes` and `MustCodesTests` must be clean before the PR.
+- **Nullability** (`nullability`): reference values nullable, struct values non-nullable at Must/Guard; configuration parameters non-nullable unless the Core rule accepts null.
 - **Fixtures** (`docs/ai/specs/testing/fixture.md`): one `XxxRulesFixtures` group per new Core method; boundary shape (four arrays) when the rule has numeric parameters or constants, format shape (two arrays) otherwise; edge constants reference the source `const`s; partials mirror source partials.
 - **TFMs**: a rule that needs an API missing on `netstandard2.1` is gated exactly as `MustNumberClauses` is; the batch table says which.
-- **Ordering** (Rule08): positive before `Not*` in Must/Fluent/DataAnnotations; Guard ordered by the Must clause it calls.
+- **Ordering** (`ordering`): positive before `Not*` in Must/Fluent/DataAnnotations; Guard ordered by the Must clause it calls.
 - **No renames** of existing members even where a batch sits beside an open item in `core-common-api-decisions.md` (e.g. `IsValidHostname` stays).
 - **One deliberate signature change** (Batch E, pre-release so permitted by Plan 00 §4.6): inserting `TimeProvider? timeProvider = null` before `paramName`/`message` on every clock-reading member is source-compatible only for callers that never pass those positionally, and binary-breaking for all of them. Plan 00 §3.3's "additive only" claim carries this exception.
 
@@ -107,9 +107,9 @@ Codes: `number.scale.exceeded`, `number.precision.exceeded`, `number.precision.o
 - `src/PineGuard.Core/PineGuard.Core.csproj`: `<PackageReference Include="Microsoft.Bcl.TimeProvider" Condition="'$(TargetFramework)' == 'netstandard2.1'" />` (+ `PackageVersion`). It is a Microsoft first-party BCL package, consistent with Core's "first-party BCL packages only" policy; the Core README's dependency sentence and the root README's dependency note are updated. `TimeProvider` is in-box on net8+.
 - `Utils/DateTimeUtility.cs`: `GetUtcNow(TimeProvider? timeProvider)` → `(timeProvider ?? TimeProvider.System).GetUtcNow()`; every `DateTime.UtcNow` / `DateTimeOffset.UtcNow` in `Rules/` and `Utils/` is replaced by it (`grep -rn "UtcNow" src/PineGuard.Core` is the work list — today `DateTimeRules` ×3, `DateOnlyRules` ×2, `DateTimeOffsetRules` ×2, plus any string variants).
 - Every rule that reads the clock gains a trailing `TimeProvider? timeProvider = null` parameter: `IsInPast`, `IsInFuture`, `IsWithinDaysFromNow` on `DateTimeRules`, `DateTimeOffsetRules`, `DateOnlyRules`, and the `StringRules.DateOnly` / `StringRules.DateTimeOffset` counterparts.
-- Every Must clause that reads the clock (`Past`, `PastOrPresent`, `Future`, `FutureOrPresent`, `WithinDaysFromNow`, `NotWithinDaysFromNow` across the typed and `String*` families) gains `TimeProvider? timeProvider = null` **immediately before `paramName`**; Guard gains it before `message`; Fluent gains it before `message`; DataAnnotations attributes cannot take it in a constructor and instead resolve `validationContext.GetService(typeof(TimeProvider)) as TimeProvider` (null → system). Message templates are unchanged. **This is scripted, like Plan 01 W6b**: enumerate the affected members (`grep -rn "UtcNow\|timeProvider" src`) and every call site that passes `paramName`/`message` positionally (`tests/**` included), insert the parameter, rewrite positional callers to named arguments, and state the member and test-file counts in the PR body; Rule07/Rule08 re-run afterwards, and a Rule08 assertion that `paramName` stays the last parameter is added.
+- Every Must clause that reads the clock (`Past`, `PastOrPresent`, `Future`, `FutureOrPresent`, `WithinDaysFromNow`, `NotWithinDaysFromNow` across the typed and `String*` families) gains `TimeProvider? timeProvider = null` **immediately before `paramName`**; Guard gains it before `message`; Fluent gains it before `message`; DataAnnotations attributes cannot take it in a constructor and instead resolve `validationContext.GetService(typeof(TimeProvider)) as TimeProvider` (null → system). Message templates are unchanged. **This is scripted, like Plan 01 W6b**: enumerate the affected members (`grep -rn "UtcNow\|timeProvider" src`) and every call site that passes `paramName`/`message` positionally (`tests/**` included), insert the parameter, rewrite positional callers to named arguments, and state the member and test-file counts in the PR body; `nullability`/`ordering` re-run afterwards, and a `ordering` assertion that `paramName` stays the last parameter is added.
 - Test double: `+ tests/PineGuard.Testing/Common/FixedTimeProvider.cs` (ships in the **published** `PineGuard.Testing` package: it gets its own `+ tests/PineGuard.Testing.UnitTests/Common/FixedTimeProviderTests.cs` + `…TestData.cs` — ctor, `GetUtcNow`, `Default` — a README line, and a Plan 00 §5.3 canon row) — `public sealed class FixedTimeProvider(DateTimeOffset utcNow) : TimeProvider` overriding `GetUtcNow()`, plus `public static readonly FixedTimeProvider Default = new(new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero))`. Shared by all five layer test projects (the ≥2-projects rule). Existing far-past/far-future scenarios stay; each temporal group gains deterministic scenarios that pass `FixedTimeProvider.Default`, and the DataAnnotations tests build a `ValidationContext` whose service provider returns it.
-- Rule07: `TimeProvider?` is a nullable secondary parameter, permitted because the Core rule accepts null. Rule01 naming: the parameter is `timeProvider` everywhere.
+- `nullability`: `TimeProvider?` is a nullable secondary parameter, permitted because the Core rule accepts null. `must-collisions` or `nullability` naming: the parameter is `timeProvider` everywhere.
 
 | Concept | Core | Must / Guard / Fluent / DA | Notes |
 |---|---|---|---|
@@ -135,7 +135,7 @@ Codes: `date.calendar.not-weekday`, `…calendar.not-weekend`, `…calendar.not-
 
 - Fixtures first, then Core, Must, Guard, Fluent, DataAnnotations TestData/Tests — each layer's addendum (`docs/ai/specs/<layer>/unit-test.md`) governs dataset shape; Must groups assert `Code` in at least one `InvalidCases` factory.
 - Coverage: `-Scope Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations` each 100/100 on both `-Framework`s; then `-Scope All` 100/100 (for Batch E, `-Scope All` also covers `FixedTimeProvider` — `-Scope Testing` runs every test project too, so run one of them, not both).
-- Audit: `Run-All.ps1 -RuleId Rule06,Rule07,Rule08,Rule13,Rule50` clean; `vocabulary.json` aliases added where the batch table says so.
+- Audit: `Run-All.ps1 -RuleId `layer-parity`,`nullability`,`ordering`,`must-codes`,`test-files`` clean; `vocabulary.json` aliases added where the batch table says so.
 - Determinism (`unit-test.md` §7): Batch E tests never read the real clock except in the pre-existing far-past/far-future scenarios; Batch C grapheme scenarios are chosen to segment identically on net8.0 and net10.0 (both ICU-backed) — if a case differs between TFMs, replace the case rather than gate the test.
 - `docs/ai/specs/testing/gold-standard.md` counts and the dated verification section are refreshed in every batch PR.
 
@@ -145,7 +145,7 @@ Codes: `date.calendar.not-weekday`, `…calendar.not-weekend`, `…calendar.not-
 
 **W1** Utils + Rules + fixtures for every concept in the batch table; Core tests; `-Scope Core` 100/100. Commit `feat(core): add <batch> rules`.
 
-**W2** Must clauses (+ `MustCodes` constants, Rule13); Must tests; `-Scope MustClauses`. Commit `feat(must): add <batch> clauses`.
+**W2** Must clauses (+ `MustCodes` constants, `must-codes`); Must tests; `-Scope MustClauses`. Commit `feat(must): add <batch> clauses`.
 
 **W3** Guard clauses (+ `vocabulary.json` aliases); Guard tests; `-Scope GuardClauses`. Commit `feat(guard): …`.
 
@@ -155,13 +155,13 @@ Codes: `date.calendar.not-weekday`, `…calendar.not-weekend`, `…calendar.not-
 
 **W6** Batch E only — and it runs **first**, as W0.5, not after W1–W5: the `Microsoft.Bcl.TimeProvider` reference (Tier 1 edit of `Directory.Packages.props` and Core csproj — state the lines first), `FixedTimeProvider` + its tests, `DateTimeUtility.GetUtcNow` and the `UtcNow` sweep, then the parameter additions happen inside each layer's own W1–W5 so no temporal member is written twice.
 
-**W7** README rule catalogue/counts, per-layer package READMEs where a family is new (`Cron`, `Token`, `Version`, `Checksum`, `Decimal`, `FileSignature`), `gold-standard.md`; `Run-All.ps1 -RuleId Rule06,Rule07,Rule08,Rule11,Rule13,Rule50`. Commit `docs(brain): record <batch> in the rule catalogue and gold standard`.
+**W7** README rule catalogue/counts, per-layer package READMEs where a family is new (`Cron`, `Token`, `Version`, `Checksum`, `Decimal`, `FileSignature`), `gold-standard.md`; `Run-All.ps1 -RuleId `layer-parity`,`nullability`,`ordering`,`doc-links`,`must-codes`,`test-files``. Commit `docs(brain): record <batch> in the rule catalogue and gold standard`.
 
 **W8** Plan 00 §7; `git merge origin/main` (expect `MustCodes.<Domain>.cs`/`vocabulary.json`/`gold-standard.md` conflicts from sibling batches — resolve by union); PR; merge; cleanup.
 
 ## 6. Definition of Done (per batch)
 
-Plan 00 §7, plus: every concept row in the batch's table exists in all five layers with tests; Rule06/07/08/13 clean; codes registered; README counts updated; Batch C's at-risk row either delivered or explicitly dropped with the CI evidence in the PR body; Batch E's `FixedTimeProvider` is used by at least Core, Must and DataAnnotations tests and has its own tests in `PineGuard.Testing.UnitTests`; every new condition is in Plan 00 §5.4's vocabulary in the same PR.
+Plan 00 §7, plus: every concept row in the batch's table exists in all five layers with tests; `layer-parity`/07/08/13 clean; codes registered; README counts updated; Batch C's at-risk row either delivered or explicitly dropped with the CI evidence in the PR body; Batch E's `FixedTimeProvider` is used by at least Core, Must and DataAnnotations tests and has its own tests in `PineGuard.Testing.UnitTests`; every new condition is in Plan 00 §5.4's vocabulary in the same PR.
 
 ## 7. Risks
 

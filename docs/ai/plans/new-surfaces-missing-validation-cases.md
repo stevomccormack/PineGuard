@@ -160,7 +160,7 @@ Existing coverage is broad (see competitive-analysis §2 — base64, hex, IP/CID
 
 | Risk | Mitigation |
 |---|---|
-| New packages dilute the 100%-coverage / audit-rule discipline | Every new package adopts the same CI gates (`ci.yml` paths-filter entries, coverage, Rule50) before first commit |
+| New packages dilute the 100%-coverage / audit-rule discipline | Every new package adopts the same CI gates (`ci.yml` paths-filter entries, coverage, `test-files`) before first commit |
 | ASP.NET integration couples releases to framework versions | Multi-target (net8.0;net10.0) as the existing packages do; .NET 10 source-gen pieces behind TFM conditionals |
 | `MustAsync` leaks async into Core | Hard rule: async exists only in the Must layer and above; Core signatures stay sync — enforce via audit-cli rule |
 | Blanket Guard→400 mapping masks server bugs | Boundary-marker design in 1.2 is mandatory, not optional |

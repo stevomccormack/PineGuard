@@ -107,7 +107,7 @@ But keep the canonical “what to do” in Brain docs; tools are just execution 
 Use automated gates that fit enterprise expectations:
 
 - Tests: `dotnet test` (targeted projects first)
-- Test shape: `tools/audit-cli/Run-All.ps1 -RuleId Rule50` gates every PR — `[Theory]` + `TheoryData`
+- Test shape: the `test-files` audit rule gates every PR — `[Theory]` + `TheoryData`
   only, and every `*Tests.cs` file must have a paired `*TestData.cs` file. See
   `docs/ai/specs/tools/audit-cli/spec.md` and `docs/ai/specs/testing/unit-test.md` §1.
 - Coverage: Cobertura output via the cross-platform collector (`xplat`) — the engine every repo

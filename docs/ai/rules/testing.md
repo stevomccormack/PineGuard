@@ -17,6 +17,6 @@ When implementing, follow:
 
 - Every test is `[Theory]` + `TheoryData`/`[MemberData]`. `[Fact]` is prohibited.
 - Every `XxxTests.cs` has a paired `XxxTestData.cs`.
-- CI enforces both: `tools/audit-cli/Run-All.ps1 -RuleId Rule50`.
+- CI enforces both through the `test-files` audit rule.
 
 Follow the spec EXACTLY. Do not improvise patterns.
