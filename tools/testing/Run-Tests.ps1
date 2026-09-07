@@ -15,13 +15,17 @@
     Filter expression for running selective tests (e.g. "FullyQualifiedName~Tests").
 
 .PARAMETER Output
-    Path to directory for test results. If specified, adds trx logger.
+    Path to directory for test results. If specified, adds trx logger. A relative path is
+    resolved against the repository root (found via PineGuard.slnx), not the caller's current
+    working directory. An absolute path is used as-is.
 
 .PARAMETER NoBuild
     Skip build phase.
 
 .PARAMETER Async
-    If set, runs the test command in a separate process (Start-Process) to avoid blocking the current shell.
+    If set, runs the test command in a separate process (Start-Process) to avoid blocking the
+    current shell. The spawned process object is returned so its exit code can be recovered
+    later (e.g. `$proc.WaitForExit(); $proc.ExitCode`); its PID is also printed to the console.
 
 .PARAMETER Configuration
     Build configuration (Debug/Release).
@@ -40,6 +44,9 @@ param(
     [switch]$Async,
     [ValidateSet('Debug', 'Release')] [string]$Configuration = 'Debug'
 )
+
+. (Join-Path $PSScriptRoot '..\.shared\path.ps1')
+$repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
 $cmdArgs = @("test")
 
@@ -71,6 +78,13 @@ if ($NoBuild) {
 }
 
 if ($Output) {
+    # Resolve a relative path against the repo root, not the caller's current working
+    # directory, so results land in a predictable place regardless of where this script was
+    # invoked from. An absolute path the caller passed explicitly is used as-is.
+    if (-not [IO.Path]::IsPathRooted($Output)) {
+        $Output = Join-Path $repoRoot $Output
+    }
+
     # Ensure output directory exists
     if (-not (Test-Path $Output)) {
         New-Item -ItemType Directory -Path $Output -Force | Out-Null
@@ -83,8 +97,9 @@ $cmdStr = "dotnet " + ($cmdArgs -join " ")
 
 if ($PSCmdlet.ShouldProcess($cmdStr, "Execute Tests")) {
     if ($Async) {
-        Write-Host "Starting tests asynchronously..." -ForegroundColor Cyan
-        Start-Process dotnet -ArgumentList $cmdArgs -NoNewWindow
+        $proc = Start-Process dotnet -ArgumentList $cmdArgs -NoNewWindow -PassThru
+        Write-Host "Started async test run (PID $($proc.Id)). Check `$proc.ExitCode` after it exits (`$proc.WaitForExit()`), or inspect the results at -Output if provided." -ForegroundColor Cyan
+        return $proc
     }
     else {
         & dotnet $cmdArgs
