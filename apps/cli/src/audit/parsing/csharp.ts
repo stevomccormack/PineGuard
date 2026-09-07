@@ -346,10 +346,21 @@ const TYPE_DECLARATION_NODE_TYPES = [
     "struct_declaration",
     "interface_declaration",
     "record_declaration",
+    "enum_declaration",
 ] as const;
 
-/** One of the four C# named-type declaration forms. */
-export type TypeDeclarationKind = "class" | "struct" | "interface" | "record";
+/**
+ * One of the five C# named-type declaration forms.
+ *
+ * `enum` is included because an enum is a first-class named type a test class
+ * can legitimately be written against — `tests/PineGuard.Core.UnitTests/Common/InclusionTests.cs`
+ * targets `src/PineGuard.Core/Common/Inclusion.cs`, a plain `public enum`
+ * (`docs/ai/specs/testing/fixture.md` §9 lists `Inclusion` among the repo's own
+ * constant-bearing types). Omitting it made `test-orphans` report that file as
+ * an orphan.
+ */
+export type TypeDeclarationKind =
+    "class" | "struct" | "interface" | "record" | "enum";
 
 function typeDeclarationKindOf(
     nodeType: (typeof TYPE_DECLARATION_NODE_TYPES)[number],
@@ -363,6 +374,8 @@ function typeDeclarationKindOf(
             return "interface";
         case "record_declaration":
             return "record";
+        case "enum_declaration":
+            return "enum";
     }
 }
 
@@ -374,7 +387,7 @@ export interface TypeDeclarationInfo {
 }
 
 /**
- * Finds every `class`/`struct`/`interface`/`record` declaration under
+ * Finds every `class`/`struct`/`interface`/`record`/`enum` declaration under
  * `root` — the general form {@link findRecordDeclarations} does not provide
  * on its own. Needed by rules that must resolve a *named type* regardless of
  * which of the four declaration keywords it uses (plan §8 `test-orphans`:
@@ -420,9 +433,9 @@ export interface TupleTypeInfo {
     readonly elements: readonly TupleElementInfo[];
 }
 
-/** Finds every `tuple_type` node under `root`, e.g. `(string? Value, int Length)`. */
-export function findTupleTypes(root: Node): TupleTypeInfo[] {
-    return root.descendantsOfType("tuple_type").map((node) => ({
+/** Reads one `tuple_type` node's elements. */
+export function toTupleTypeInfo(node: Node): TupleTypeInfo {
+    return {
         node,
         elements: node.namedChildren
             .filter((child) => child.type === "tuple_element")
@@ -430,7 +443,12 @@ export function findTupleTypes(root: Node): TupleTypeInfo[] {
                 name: element.childForFieldName("name")?.text ?? null,
                 typeText: element.childForFieldName("type")?.text ?? "",
             })),
-    }));
+    };
+}
+
+/** Finds every `tuple_type` node under `root`, e.g. `(string? Value, int Length)`. */
+export function findTupleTypes(root: Node): TupleTypeInfo[] {
+    return root.descendantsOfType("tuple_type").map(toTupleTypeInfo);
 }
 
 // ---------------------------------------------------------------------------

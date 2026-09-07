@@ -92,10 +92,25 @@ import type { Finding, RuleContext } from "../types.js";
  * - **Must / Guard / Fluent / DataAnnotations**: any `*Case`-suffixed record
  *   locally declared in that layer's TestData is a finding — the addendum
  *   requires the shared per-layer case type used directly, full stop. The
- *   one documented exception is DataAnnotations' `ActionThrowsCase` (its
- *   addendum's "Pattern E — TypeMismatch Throws"), which is explicitly
- *   sanctioned as a `private sealed record ... : ThrowsCase<Action>(...)`
- *   declared inside a `*TypeMismatch` Op Group.
+ *   one exception is a **`ThrowsCase<>`-derived** record (P4.3). Each of the
+ *   four addenda bans *replacements for the layer's own case type*, and each
+ *   layer case type is `ReturnCase<,>`-derived and carries a layer `Expected`
+ *   (`fixture.md` §3); FluentValidation's addendum states the scope
+ *   explicitly — "Never define `ValidCase`, `NullCase`, `Args`, or any other
+ *   local record extending **`ReturnCase<T, bool>`**". A `ThrowsCase<>`-derived
+ *   record carries an `ExpectedException` instead and has no shared layer
+ *   equivalent to replace: it is the one hand-built shape the *root* spec
+ *   keeps for throwing members (§4.2 "Standard Definitions" patterns 2 and 3,
+ *   §8.2's `FooRulesTestData.Parse`, §8.3's `Parse_ThrowsAsExpected`), and the
+ *   DataAnnotations addendum sanctions it by name for its "Pattern E —
+ *   TypeMismatch Throws" (`private sealed record ActionThrowsCase ... :
+ *   ThrowsCase<Action>(...)`). Exempting the *shape* rather than one
+ *   hardcoded DataAnnotations record name is what keeps the four
+ *   FluentValidation adapter-infrastructure TestData files
+ *   (`FluentMustValidatorTestData`, `MustChildValidatorTestData`,
+ *   `RuleBuilderExtensionTestData`, `ValidationResultExtensionTestData`),
+ *   which declare exactly that record for the same reason, from being
+ *   reported as drift they are not.
  * - **Core** and **"(Other)" packages** (`docs/ai/specs/testing/unit-test.md`
  *   §2.1 — a package outside the five layers, e.g. `PineGuard.AspNetCore`):
  *   a `*Case`-suffixed record is legitimate (Core's "Value/Result Tests
@@ -176,9 +191,8 @@ const LAYER_INFO: Readonly<Record<Layer, LayerInfo>> = {
     },
 };
 
-/** DataAnnotations' one documented exception (its addendum's "Pattern E — TypeMismatch Throws"). */
-const DA_TYPE_MISMATCH_EXCEPTION_NAME = "ActionThrowsCase";
-const DA_TYPE_MISMATCH_EXCEPTION_BASE = "ThrowsCase<Action>";
+/** The hand-built throws-row shape the root spec keeps in every layer (§4.2 "Standard Definitions" 2 & 3; §8.2; the DataAnnotations addendum's "Pattern E"). */
+const THROWS_CASE_BASE = "ThrowsCase";
 
 /** Bases that bypass the `Expected`-carrying shape entirely — never a valid direct base for a case record. */
 const RAW_INFRASTRUCTURE_BASES: ReadonlySet<string> = new Set([
@@ -206,16 +220,9 @@ function extractBaseTypeName(baseListText: string | null): string | null {
     return match?.[1] ?? null;
 }
 
-function isDocumentedException(
-    layer: Layer,
-    record: RecordDeclarationInfo,
-): boolean {
-    return (
-        layer === "data-annotations" &&
-        record.name === DA_TYPE_MISMATCH_EXCEPTION_NAME &&
-        (record.baseListText?.includes(DA_TYPE_MISMATCH_EXCEPTION_BASE) ??
-            false)
-    );
+/** `true` for a `ThrowsCase<>`-derived record — the throws-row shape every layer keeps (see this module's "Per-layer policy" note). */
+function isThrowsCaseRecord(record: RecordDeclarationInfo): boolean {
+    return extractBaseTypeName(record.baseListText) === THROWS_CASE_BASE;
 }
 
 interface CandidateFile {
@@ -294,7 +301,7 @@ registerRule({
                 if (!record.name.endsWith("Case")) {
                     continue;
                 }
-                if (isDocumentedException(layer, record)) {
+                if (isThrowsCaseRecord(record)) {
                     continue;
                 }
 

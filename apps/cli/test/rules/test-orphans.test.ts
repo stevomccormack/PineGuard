@@ -24,7 +24,7 @@ if (!rule) {
 }
 
 describe("test-orphans", () => {
-    it("does not flag any *Tests.cs whose subject is resolvable (same project, cross-project via ProjectReference, or partial-class split)", async () => {
+    it("does not flag any *Tests.cs whose subject is resolvable (same project, cross-project via ProjectReference, partial-class split, a family-per-file source name, a dotted partial file name, or an enum)", async () => {
         await expectValid(rule, "test-orphans");
     });
 
@@ -43,6 +43,16 @@ describe("test-orphans", () => {
         expect(findings).toHaveLength(1);
         expect(findings[0]?.file).toBe("tests/Widget.UnitTests/WidgetTests.cs");
         expect(findings[0]?.message).toContain("'Widget'");
+    });
+
+    it("resolves a family-per-file source name (GroupedAttributesTests.cs -> GroupedAttributes.cs, the DataAnnotations addendum's own canonical pairing), a dotted partial file (SplitBoolTests.cs -> Split.Bool.cs) and an enum (ModeTests.cs -> enum Mode in Shapes.cs)", async () => {
+        const here = dirname(fileURLToPath(import.meta.url));
+        const ctx: RuleContext = {
+            rootDir: join(here, "..", "fixtures", "test-orphans", "valid"),
+        };
+        const findings = await rule.run(ctx);
+
+        expect(findings.map((f) => f.file)).toEqual([]);
     });
 
     it("suppresses a real orphan finding when ctx.exceptions carries a matching test-orphans entry (path-based exception, plan §8)", async () => {

@@ -7,6 +7,12 @@ public static class FakeClausesTestData
     // — the clean case this rule must accept.
     public static class IsBetween
     {
+        // The dominant shape in the repo (~1,533 sites) and the one every
+        // §4.3 example is written in: the tuple is the first type argument of
+        // a *Case generic, with no case record anywhere. Also camelCase and
+        // parameter-name-exact, so it must produce zero findings.
+        public static TheoryData<RuleCase<(int value, int min, int max)>> Cases => [];
+
         public sealed record ValidCase(string Name, (int value, int min, int max) Value, bool Expected);
     }
 

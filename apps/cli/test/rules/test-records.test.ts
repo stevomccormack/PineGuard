@@ -44,6 +44,19 @@ describe("test-records", () => {
         await expectValid(rule, "test-records");
     });
 
+    it("does not flag a ThrowsCase<>-derived record in a layer that forbids custom case records (root §4.2/§8.2 throws shape; the Fluent prohibition is scoped to ReturnCase<T, bool> replacements)", async () => {
+        const fluentValidDir = join(
+            FIXTURES_ROOT,
+            "valid",
+            "tests",
+            "PineGuard.FluentValidation.UnitTests",
+        );
+
+        await expect(runRuleOnFixture(rule, fluentValidDir)).resolves.toEqual(
+            [],
+        );
+    });
+
     it("proves the old blanket-scoping bug is fixed: a bare value-object record in a layer that forbids custom CASE records is not itself flagged", async () => {
         // Widget (no base at all) lives in the Guard fixture below — Guard is
         // one of the layers that forbids locally-declared *Case* records

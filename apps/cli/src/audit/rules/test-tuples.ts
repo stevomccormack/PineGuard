@@ -5,8 +5,8 @@ import { registerRule } from "../catalog.js";
 import {
     findMethodDeclarations,
     findRecordDeclarations,
-    findTupleTypes,
     parseFile as parseCsharpFile,
+    toTupleTypeInfo,
 } from "../parsing/csharp.js";
 import type {
     MethodDeclarationInfo,
@@ -41,11 +41,46 @@ import type { Finding, RuleContext } from "../types.js";
  * correlates each one to the specific record parameter it types, rather than
  * pattern-matching parentheses.
  *
- * ## The check (plan §4.3 of `docs/ai/specs/testing/unit-test.md`)
+ * ## The check (§4.3 of `docs/ai/specs/testing/unit-test.md`)
  *
- * For every `*TestData.cs` file, for every `*Case`-suffixed record with a
- * primary-constructor parameter literally named `Value` (PascalCase — the
- * spec's required property name) whose declared type is a `tuple_type`:
+ * ### Which tuples are in scope (widened in P4.3)
+ *
+ * §4.3's rule is about the tuple that carries a multi-parameter method's
+ * *inputs*. That tuple appears in the repo in two shapes, and the rule
+ * originally saw only the first:
+ *
+ * 1. The declared type of a `*Case`-suffixed record's primary-constructor
+ *    parameter literally named `Value` (PascalCase — the property name §4.3
+ *    mandates). ~239 sites, mostly in the "(Other)" adapter packages that
+ *    still hand-roll their own case records.
+ * 2. The **first type argument of a `*Case`/`*Scenario` generic** —
+ *    `TheoryData<RuleCase<(int value, int min, int max)>>`,
+ *    `RuleScenario<(string? value, int threshold)>`,
+ *    `ReturnCase<(DateTimeOffset start, DateTimeOffset end), TimeSpan>`. This
+ *    is the shape the scenario architecture actually uses, and it is what
+ *    every §4.3 example is written in (`unit-test.md` §4.3's two canonical
+ *    examples, §8.1's `IsBaz`, `fixture.md` §11.4). ~1,533 sites in
+ *    `*TestData.cs` plus ~685 in the fixtures — all of them invisible to the
+ *    rule before P4.3, so a PR introducing
+ *    `RuleCase<(string? val, int len)>` was never flagged.
+ *
+ * Only tuples in a *declaration's* type position count — a record's
+ * `base_list`, a property body, an object-creation's type arguments and every
+ * other expression position is skipped. See
+ * {@link EXPRESSION_POSITION_ANCESTORS} for why each one is excluded.
+ *
+ * ### Which files are in scope (widened in P4.3)
+ *
+ * Every `*TestData.cs` under `tests/`, **plus** every `.cs` file under
+ * `tests/PineGuard.Testing/Fixtures/`. §9.3 of the root spec states the
+ * fixture field convention in the same terms and points back at §4.3 for it
+ * ("Tuple element names: **camelCase**, **exact parameter names** from the
+ * method under test (per §4.3)"), and `fixture.md` §11.4 repeats it verbatim.
+ * Fixtures are where the tuple is *defined* — a wrong element name there
+ * propagates into every layer's TestData — so leaving them unchecked was the
+ * larger half of the gap.
+ *
+ * ### What is checked
  *
  * 1. **Every named tuple element must be camelCase.** An element with no
  *    name at all (a positional-only tuple element) is also flagged — the
@@ -55,12 +90,14 @@ import type { Finding, RuleContext } from "../types.js";
  *    must exactly match its real parameter names**, in order — no rename, no
  *    abbreviation, no shorthand. Resolution is deliberately best-effort and
  *    self-contained (it does not depend on `test-orphans`' own resolution
- *    logic, per this rule's brief, though the shape rhymes): the record's
+ *    logic, per this rule's brief, though the shape rhymes): the tuple's
  *    innermost enclosing `class_declaration` name is read as the "operation
- *    group" (the repo's nested-per-method TestData convention, e.g.
- *    `public static class ExactLength { … }`), the outermost enclosing
- *    class's name has its trailing `TestData` stripped to get a candidate
- *    source file basename (`MustStringClausesTestData` -> `MustStringClauses`),
+ *    group" (the repo's nested-per-method TestData/fixture convention, e.g.
+ *    `public static class ExactLength { … }`; `fixture.md` §9.2: "Inner class
+ *    | Matches the Core Rules method name"), the outermost enclosing class's
+ *    name has its trailing `TestData`/`Fixtures` stripped to get a candidate
+ *    source file basename (`MustStringClausesTestData` -> `MustStringClauses`;
+ *    `StringRulesFixtures` -> `StringRules`),
  *    and — if exactly one `.cs` file under `src/` has that basename, and
  *    exactly one of its methods is named after the operation group with a
  *    caller-supplied value-parameter count matching the tuple's arity — that
@@ -81,6 +118,13 @@ const CAMEL_CASE = /^[a-z][a-zA-Z0-9]*$/;
 const CALLER_ATTRIBUTE_PREFIX = "Caller";
 const TEST_DATA_SUFFIX = "TestData";
 const TEST_DATA_FILE_SUFFIX = `${TEST_DATA_SUFFIX}.cs`;
+const FIXTURES_SUFFIX = "Fixtures";
+/** `fixture.md` §10 / root spec §9.2: the one folder fixtures live in. */
+const FIXTURES_DIR = "tests/PineGuard.Testing/Fixtures/";
+/** Outer-class suffixes that name a source class once stripped (see check 2 in the header). */
+const OUTER_CLASS_SUFFIXES = [TEST_DATA_SUFFIX, FIXTURES_SUFFIX] as const;
+/** Generic type names whose FIRST type argument is the input tuple: `RuleCase<>`, `MustCase<>`, `ReturnCase<,>`, `ThrowsCase<>`, `RuleScenario<>`, … */
+const TUPLE_BEARING_GENERIC = /(?:Case|Scenario)$/;
 
 function toForwardSlash(path: string): string {
     return path.replaceAll("\\", "/");
@@ -122,26 +166,37 @@ interface CandidateFile {
  * never populates `trackedFiles` — mirrors `test-records`' own
  * `collectTestDataFiles`, this rule's closest sibling).
  */
+function isInScopeFile(relativePath: string): boolean {
+    return (
+        (relativePath.startsWith("tests/") &&
+            relativePath.endsWith(TEST_DATA_FILE_SUFFIX)) ||
+        (relativePath.startsWith(FIXTURES_DIR) &&
+            relativePath.endsWith(".cs")) ||
+        // Fixture-tree fallback: a VIBE fixture root is not the repo root, so
+        // its paths carry neither the `tests/` nor the `PineGuard.Testing`
+        // prefix. Match the folder name alone there.
+        relativePath.includes("/Fixtures/")
+    );
+}
+
 function collectTestDataFiles(ctx: RuleContext): CandidateFile[] {
     if (ctx.trackedFiles) {
-        return ctx.trackedFiles
-            .filter(
-                (file) =>
-                    file.startsWith("tests/") &&
-                    file.endsWith(TEST_DATA_FILE_SUFFIX),
-            )
-            .map((file) => ({
-                absolutePath: join(ctx.rootDir, file),
-                relativePath: file,
-            }));
+        return ctx.trackedFiles.filter(isInScopeFile).map((file) => ({
+            absolutePath: join(ctx.rootDir, file),
+            relativePath: file,
+        }));
     }
 
     return [...walkCsFiles(ctx.rootDir)]
-        .filter((absolutePath) => absolutePath.endsWith(TEST_DATA_FILE_SUFFIX))
         .map((absolutePath) => ({
             absolutePath,
             relativePath: toForwardSlash(relative(ctx.rootDir, absolutePath)),
-        }));
+        }))
+        .filter(
+            (file) =>
+                file.relativePath.endsWith(TEST_DATA_FILE_SUFFIX) ||
+                file.relativePath.includes("/Fixtures/"),
+        );
 }
 
 /**
@@ -226,6 +281,142 @@ function enclosingClassChain(node: RecordDeclarationInfo["node"]): string[] {
     return chain;
 }
 
+/**
+ * Ancestors that put a node in *expression* position rather than in a
+ * declaration's type position:
+ *
+ * - `base_list` — a two-line record restates its `Value` parameter's type in
+ *   its `: Base(...)` clause; reporting both doubles every finding.
+ * - the rest — the body of a property/method, an object-creation's type
+ *   arguments, an argument list, an initializer. A tuple there is an
+ *   intermediate in a projection, not a declared dataset shape. The repo has
+ *   70 such sites (`.Select(s => new RuleScenario<(TimeSpan, TimeSpan,
+ *   Inclusion)>(…))` in `FluentTimeSpanExtensionsTestData` and
+ *   `GuardTimeSpanClausesTestData`), whose *declared* dataset type on the
+ *   very next line up is correctly named — §4.3 governs the declaration, so
+ *   flagging the projection intermediate would be a false positive.
+ */
+const EXPRESSION_POSITION_ANCESTORS = new Set([
+    "base_list",
+    "arrow_expression_clause",
+    "block",
+    "argument_list",
+    "object_creation_expression",
+    "equals_value_clause",
+    "initializer_expression",
+    "collection_expression",
+]);
+
+function isInExpressionPosition(node: RecordDeclarationInfo["node"]): boolean {
+    let current = node.parent;
+    while (current) {
+        if (EXPRESSION_POSITION_ANCESTORS.has(current.type)) return true;
+        current = current.parent;
+    }
+    return false;
+}
+
+/** One tuple this rule checks, plus the label its findings are reported under. */
+interface TupleSite {
+    readonly tuple: TupleTypeInfo;
+    /** The declaration the tuple belongs to, for the finding message (`"IsBetween.Cases"`, `"ValidCase"`, …). */
+    readonly owner: string;
+    /** Any node inside the declaration — used to walk up to the enclosing Operation Group / outer class. */
+    readonly anchor: RecordDeclarationInfo["node"];
+}
+
+/** The nearest enclosing property/field/record declaration's name, for a finding's `owner` label. */
+function ownerLabelOf(node: RecordDeclarationInfo["node"]): string {
+    let current = node.parent;
+    while (current) {
+        if (
+            current.type === "property_declaration" ||
+            current.type === "record_declaration"
+        ) {
+            const name = current.childForFieldName("name")?.text;
+            if (name) return name;
+        }
+        if (current.type === "field_declaration") {
+            const declarator = current
+                .descendantsOfType("variable_declarator")
+                .at(0);
+            const name = declarator?.childForFieldName("name")?.text;
+            if (name) return name;
+        }
+        current = current.parent;
+    }
+    return "tuple";
+}
+
+/**
+ * Every §4.3 input tuple in `root`: the first type argument of any
+ * `*Case`/`*Scenario` generic, plus any `*Case` record's `Value` parameter
+ * whose type is a tuple (which the generic form usually also covers via the
+ * record's base clause — deliberately skipped there to avoid double
+ * reporting). See this module's header, "Which tuples are in scope".
+ */
+function collectTupleSites(
+    root: RecordDeclarationInfo["node"],
+    records: readonly RecordDeclarationInfo[],
+): TupleSite[] {
+    const sites = new Map<string, TupleSite>();
+
+    // `generic_name` has no named fields in this grammar: its children are
+    // exactly `identifier` then `type_argument_list` (verified against
+    // tree-sitter-c-sharp 0.23.5).
+    for (const generic of root.descendantsOfType("generic_name")) {
+        const identifier = generic.children.find(
+            (child) => child.type === "identifier",
+        );
+        if (!identifier || !TUPLE_BEARING_GENERIC.test(identifier.text)) {
+            continue;
+        }
+        const argumentList = generic.children.find(
+            (child) => child.type === "type_argument_list",
+        );
+        const first = argumentList?.namedChild(0);
+        if (!first || first.type !== "tuple_type") continue;
+        if (isInExpressionPosition(first)) continue;
+
+        sites.set(tupleTypeKey(first), {
+            tuple: toTupleTypeInfo(first),
+            owner: `${identifier.text} in '${ownerLabelOf(generic)}'`,
+            anchor: generic,
+        });
+    }
+
+    // Fixture tuple *fields* — `public static readonly (string? value, int
+    // length) Matching = …` (root spec §9.3, `fixture.md` §11.4). Their
+    // `tuple_type` sits under `variable_declaration`, not under any generic.
+    for (const tuple of root.descendantsOfType("tuple_type")) {
+        if (tuple.parent?.type !== "variable_declaration") continue;
+        if (sites.has(tupleTypeKey(tuple))) continue;
+
+        sites.set(tupleTypeKey(tuple), {
+            tuple: toTupleTypeInfo(tuple),
+            owner: `field '${ownerLabelOf(tuple)}'`,
+            anchor: tuple,
+        });
+    }
+
+    for (const record of records) {
+        if (!record.parameters || !record.name.endsWith("Case")) continue;
+        const valueParameter = record.parameters.find(
+            (p) => p.name === "Value",
+        );
+        const typeNode = valueParameter?.node.childForFieldName("type");
+        if (!typeNode || typeNode.type !== "tuple_type") continue;
+
+        sites.set(tupleTypeKey(typeNode), {
+            tuple: toTupleTypeInfo(typeNode),
+            owner: `${record.name}.Value`,
+            anchor: record.node,
+        });
+    }
+
+    return [...sites.values()];
+}
+
 interface ResolvedSourceMethod {
     readonly className: string;
     readonly methodName: string;
@@ -239,27 +430,30 @@ interface ResolvedSourceMethod {
  * than guessing.
  */
 async function resolveSourceMethod(
-    record: RecordDeclarationInfo,
+    site: TupleSite,
     tupleArity: number,
     sourceIndex: ReadonlyMap<string, CandidateFile[]>,
     parse: (filePath: string) => Promise<ParsedFile>,
 ): Promise<ResolvedSourceMethod | null> {
-    const chain = enclosingClassChain(record.node);
+    const chain = enclosingClassChain(site.anchor);
     if (chain.length < 2) {
         return null; // No distinct operation-group nesting to name a method after.
     }
 
     const operationGroupName = chain[0];
     const outerClassName = chain[chain.length - 1];
-    if (
-        operationGroupName === undefined ||
-        outerClassName === undefined ||
-        !outerClassName.endsWith(TEST_DATA_SUFFIX)
-    ) {
+    if (operationGroupName === undefined || outerClassName === undefined) {
         return null;
     }
 
-    const sourceBaseName = outerClassName.slice(0, -TEST_DATA_SUFFIX.length);
+    const suffix = OUTER_CLASS_SUFFIXES.find((candidate) =>
+        outerClassName.endsWith(candidate),
+    );
+    if (suffix === undefined) {
+        return null;
+    }
+
+    const sourceBaseName = outerClassName.slice(0, -suffix.length);
     if (sourceBaseName.length === 0) {
         return null;
     }
@@ -303,33 +497,14 @@ function tupleTypeKey(node: { startIndex: number; endIndex: number }): string {
     return `${String(node.startIndex)}:${String(node.endIndex)}`;
 }
 
-async function checkRecord(
-    record: RecordDeclarationInfo,
-    tupleByKey: ReadonlyMap<string, TupleTypeInfo>,
+async function checkTupleSite(
+    site: TupleSite,
     sourceIndex: ReadonlyMap<string, CandidateFile[]>,
     parse: (filePath: string) => Promise<ParsedFile>,
     relFile: string,
 ): Promise<Finding[]> {
-    if (!record.parameters || !record.name.endsWith("Case")) {
-        return [];
-    }
-
-    const valueParameter = record.parameters.find((p) => p.name === "Value");
-    if (!valueParameter) {
-        return [];
-    }
-
-    const typeNode = valueParameter.node.childForFieldName("type");
-    if (!typeNode || typeNode.type !== "tuple_type") {
-        return []; // Single-input Value (or unresolvable type) — not this rule's concern.
-    }
-
-    const tuple = tupleByKey.get(tupleTypeKey(typeNode));
-    if (!tuple) {
-        return []; // Should not happen — every tuple_type under root was indexed.
-    }
-
-    const line = typeNode.startPosition.row + 1;
+    const { tuple, owner } = site;
+    const line = tuple.node.startPosition.row + 1;
     const findings: Finding[] = [];
 
     tuple.elements.forEach((element, index) => {
@@ -339,7 +514,7 @@ async function checkRecord(
                 file: relFile,
                 line,
                 message:
-                    `${record.name}: tuple element #${String(index + 1)} in Value has no name — every ` +
+                    `${owner}: tuple element #${String(index + 1)} has no name — every ` +
                     `element must be a camelCase name matching the source method's exact parameter name.`,
                 key: `test-tuples:unnamed:${relFile}:${String(line)}:${String(index)}`,
             });
@@ -348,14 +523,14 @@ async function checkRecord(
                 rule: "test-tuples",
                 file: relFile,
                 line,
-                message: `${record.name}: tuple element '${element.name}' in Value must be camelCase (unit-test.md §4.3).`,
+                message: `${owner}: tuple element '${element.name}' must be camelCase (unit-test.md §4.3).`,
                 key: `test-tuples:camel-case:${relFile}:${String(line)}:${element.name}`,
             });
         }
     });
 
     const resolved = await resolveSourceMethod(
-        record,
+        site,
         tuple.elements.length,
         sourceIndex,
         parse,
@@ -372,7 +547,7 @@ async function checkRecord(
                     file: relFile,
                     line,
                     message:
-                        `${record.name}: tuple element '${element.name}' in Value does not match the exact ` +
+                        `${owner}: tuple element '${element.name}' does not match the exact ` +
                         `source parameter name '${expected}' of ${resolved.className}.${resolved.methodName} ` +
                         `(unit-test.md §4.3 — no shorthand, no renaming, no abbreviation).`,
                     key: `test-tuples:exact-name:${relFile}:${String(line)}:${element.name}`,
@@ -390,7 +565,7 @@ registerRule({
     scope: "testing",
     gate: false,
     description:
-        "Every named tuple element in a *TestData.cs case record's Value property is camelCase and, where the paired source method is resolvable, matches its exact parameter names.",
+        "Every input tuple in a *TestData.cs or fixture file — a *Case/*Scenario generic's first type argument, a case record's Value property, or a fixture tuple field — has camelCase element names that, where the paired source method is resolvable, match its exact parameter names.",
     async run(ctx: RuleContext): Promise<Finding[]> {
         const parse = ctx.parseFile ?? parseCsharpFile;
         const testDataFiles = collectTestDataFiles(ctx);
@@ -399,18 +574,12 @@ registerRule({
         const findings: Finding[] = [];
         for (const file of testDataFiles) {
             const { root } = await parse(file.absolutePath);
-            const tupleByKey = new Map(
-                findTupleTypes(root).map((tuple) => [
-                    tupleTypeKey(tuple.node),
-                    tuple,
-                ]),
-            );
+            const sites = collectTupleSites(root, findRecordDeclarations(root));
 
-            for (const record of findRecordDeclarations(root)) {
+            for (const site of sites) {
                 findings.push(
-                    ...(await checkRecord(
-                        record,
-                        tupleByKey,
+                    ...(await checkTupleSite(
+                        site,
                         sourceIndex,
                         parse,
                         file.relativePath,

@@ -26,24 +26,45 @@ describe("test-tuples", () => {
         expect(rule.gate).toBe(false);
     });
 
-    it("passes on a Value tuple whose camelCase elements match the real source parameter names, and never misidentifies an ordinary record's parameter list as a tuple", async () => {
+    it("passes on a conforming tree covering all three in-scope tuple shapes — a case record's Value, a *Case generic's first type argument, and a fixture tuple field/RuleScenario — and never misidentifies an ordinary record's parameter list as a tuple", async () => {
         await expectValid(rule, "test-tuples");
     });
 
     it("fails on a Value tuple whose elements are PascalCase (the mandatory 'can it fail' fixture)", async () => {
         const findings = await expectInvalid(rule, "test-tuples");
+        const forRecord = findings.filter((f) =>
+            f.message.startsWith("ValidCase.Value:"),
+        );
 
         // Three PascalCase elements (Value, Min, Max); no paired src/ tree in
         // this fixture, so only the camelCase check can fire — one finding
         // per element, none from the (unresolvable) exact-name check.
-        expect(findings).toHaveLength(3);
-        expect(findings.every((f) => f.rule === "test-tuples")).toBe(true);
-        expect(findings.every((f) => f.message.includes("camelCase"))).toBe(
+        expect(forRecord).toHaveLength(3);
+        expect(forRecord.every((f) => f.rule === "test-tuples")).toBe(true);
+        expect(forRecord.every((f) => f.message.includes("camelCase"))).toBe(
             true,
         );
-        expect(findings.some((f) => f.message.includes("'Value'"))).toBe(true);
-        expect(findings.some((f) => f.message.includes("'Min'"))).toBe(true);
-        expect(findings.some((f) => f.message.includes("'Max'"))).toBe(true);
+        expect(forRecord.some((f) => f.message.includes("'Value'"))).toBe(true);
+        expect(forRecord.some((f) => f.message.includes("'Min'"))).toBe(true);
+        expect(forRecord.some((f) => f.message.includes("'Max'"))).toBe(true);
+    });
+
+    it("fails on PascalCase elements in a *Case generic's first type argument — the record-less shape §4.3's own examples use, invisible to the rule before P4.3", async () => {
+        const findings = await expectInvalid(rule, "test-tuples");
+        const forGeneric = findings.filter((f) =>
+            f.message.startsWith("RuleCase in 'Cases'"),
+        );
+
+        expect(forGeneric).toHaveLength(2);
+        expect(forGeneric.every((f) => f.message.includes("camelCase"))).toBe(
+            true,
+        );
+        expect(forGeneric.some((f) => f.message.includes("'Value'"))).toBe(
+            true,
+        );
+        expect(forGeneric.some((f) => f.message.includes("'Length'"))).toBe(
+            true,
+        );
     });
 
     it("boundary: a camelCase-but-renamed/abbreviated element against a resolvable source method fails ONLY the exact-name check, not camelCase too", async () => {
@@ -67,8 +88,20 @@ describe("test-tuples", () => {
         expect(forNoSuchMethod).toHaveLength(1);
     });
 
-    it("boundary fixtures produce exactly the one expected finding overall", async () => {
+    it("boundary: a renamed element in a FIXTURE file is caught too, resolving through the Fixtures suffix (root spec §9.3, fixture.md §11.4)", async () => {
         const findings = await runBoundary(rule, "test-tuples");
-        expect(findings).toHaveLength(1);
+        const inFixtures = findings.filter((f) =>
+            f.file.includes("/Fixtures/"),
+        );
+
+        expect(inFixtures).toHaveLength(1);
+        expect(inFixtures[0]?.message).toContain("'lower'");
+        expect(inFixtures[0]?.message).toContain("does not match the exact");
+        expect(inFixtures[0]?.message).toContain("'min'");
+    });
+
+    it("boundary fixtures produce exactly the two expected findings overall", async () => {
+        const findings = await runBoundary(rule, "test-tuples");
+        expect(findings).toHaveLength(2);
     });
 });

@@ -47,11 +47,40 @@ import type { Finding, Rule, RuleContext } from "../types.js";
  *    §4.1): `ValidCases` → `EdgeCases` → `InvalidCases` when more than one
  *    is present in a group; no `=> [];` empty scaffolding for any
  *    recognised dataset (`Cases`, `ValidCases`, `EdgeCases`, `InvalidCases`).
+ * 5. **Sealed Tests class** (§5.1): "Test class `XxxTests` must be `sealed`".
+ * 6. **Instance test methods** (§5.1): "Test methods must be **instance**
+ *    methods declared `public void`" — a `static` test method is a finding.
+ *    Every one of the five layer addenda repeats this
+ *    ("Instance methods — `public void` (not `public static void`)").
  *
  * A single-dataset rollup (`Cases`, per the Core/Fluent/DataAnnotations
  * layer addenda in §4.1's table) has nothing to order against itself, so it
  * is exempt from check 4's ordering half — but still subject to the
  * emptiness half.
+ *
+ * ## Two spec-sanctioned shapes checks 2 and 3 must not flag (P4.3)
+ *
+ * 1. **Underscores inside the member half of a method name.** The
+ *    FluentValidation addendum's "Nullable vs Non-Nullable Variants" section
+ *    pairs Operation Group `EvenNonNullable` with test method
+ *    `Even_NonNullable_BehavesAsExpected`
+ *    (`docs/ai/specs/fluent-validation/unit-test.md`) — the group name and the
+ *    method's member half are the same identifier, differing only in
+ *    underscores. The repo follows it in 35 places
+ *    (`IsDefault_Int32_BehavesAsExpected` <-> `IsDefaultInt32`, …). Group and
+ *    method are therefore matched with `_` removed from both sides.
+ * 2. **A throws-only Operation Group.** §5.1 says "Throwing behaviour is
+ *    **not** a separate method" *for the layer bases*, but §8.3's own
+ *    canonical example splits `Parse` into a
+ *    `_BehavesAsExpected` / `_ThrowsAsExpected` pair, and the DataAnnotations
+ *    addendum's "Pattern E — TypeMismatch Throws" defines a group whose only
+ *    method is `<Attr>_TypeMismatch_ThrowsExpected`. A group is therefore
+ *    satisfied by a `<Group>…Throws[As]Expected` method as well as by
+ *    `<Group>_BehavesAsExpected`. Nothing else satisfies it: a group whose
+ *    only method is `<Group>_ShouldReturnExpected` is still a finding, which
+ *    is exactly what §5.1's "Do **NOT** use `ShouldReturnExpected`,
+ *    `ShouldThrowExpected`, `ReturnsExpected`, or any other naming pattern"
+ *    requires.
  *
  * See `apps/cli/test/fixtures/test-structure/` for VIBE fixtures (plan
  * §4.6) and `apps/cli/test/rules/test-structure.test.ts` for the assertions.
@@ -61,6 +90,14 @@ const SLUG = "test-structure";
 const BEHAVES_SUFFIX = "_BehavesAsExpected";
 const DATASET_ORDER = ["ValidCases", "EdgeCases", "InvalidCases"] as const;
 const RECOGNISED_DATASET_NAMES = new Set<string>(["Cases", ...DATASET_ORDER]);
+
+/** The spec-sanctioned throws-companion suffix (`_ThrowsAsExpected` per §8.3, `_ThrowsExpected` per the DataAnnotations addendum's Pattern E). */
+const THROWS_SUFFIX = /Throws(As)?Expected$/;
+
+/** Compares group names to method names ignoring `_` — see this module's header, note 1 (the FluentValidation addendum's `EvenNonNullable` <-> `Even_NonNullable_BehavesAsExpected` pairing). */
+function squash(name: string): string {
+    return name.replaceAll("_", "");
+}
 
 /** Rank of a dataset name in the §4.4 canonical order, or `-1` if it isn't one of the three ordered names (e.g. the single-rollup `Cases`). */
 function datasetRank(name: string): number {
@@ -206,41 +243,86 @@ function analyzePair(
         });
     }
 
+    // ---- 5. The Tests class must be `sealed` (§5.1) ----
+    if (!getModifiers(testsClass).includes("sealed")) {
+        findings.push({
+            rule: SLUG,
+            file: pair.testsRel,
+            line: lineOf(testsClass),
+            message: `Test class '${nameOf(testsClass)}' is not sealed — v11 §5.1 requires 'XxxTests' to be sealed.`,
+            key: `${SLUG}:not-sealed:${pair.testsRel}`,
+        });
+    }
+
     // ---- Operation Groups (TestData) vs. `_BehavesAsExpected` methods (Tests) ----
     const groupNodes = directChildrenOfType(testDataClass, "class_declaration");
     const groupNames = groupNodes.map(nameOf);
-    const groupNameSet = new Set(groupNames);
+    const squashedGroupNames = new Set(groupNames.map(squash));
 
     const methodNodes = directChildrenOfType(testsClass, "method_declaration");
-    const behavesMethods = methodNodes
-        .map((node) => ({ node, name: nameOf(node) }))
-        .filter((m) => m.name.endsWith(BEHAVES_SUFFIX));
+    const allMethods = methodNodes.map((node) => ({
+        node,
+        name: nameOf(node),
+    }));
+    const behavesMethods = allMethods.filter((m) =>
+        m.name.endsWith(BEHAVES_SUFFIX),
+    );
+
+    // ---- 6. Test methods must be instance methods, never `static` (§5.1) ----
+    for (const m of allMethods) {
+        if (
+            m.name.includes("_") &&
+            getModifiers(m.node).includes("static") &&
+            getModifiers(m.node).includes("public")
+        ) {
+            findings.push({
+                rule: SLUG,
+                file: pair.testsRel,
+                line: lineOf(m.node),
+                message: `Test method '${m.name}' is 'public static' — v11 §5.1 requires instance 'public void' methods so the layer base's AssertResult is in scope.`,
+                key: `${SLUG}:static-method:${pair.testsRel}:${m.name}`,
+            });
+        }
+    }
 
     const indexByBase = new Map<string, number>();
     behavesMethods.forEach((m, i) => {
-        const base = m.name.slice(0, -BEHAVES_SUFFIX.length);
+        const base = squash(m.name.slice(0, -BEHAVES_SUFFIX.length));
         if (!indexByBase.has(base)) {
             indexByBase.set(base, i);
         }
     });
 
+    /** Names of the throws-companion methods that satisfy `group` (header note 2). */
+    function throwsCompanionsFor(group: string): string[] {
+        const prefix = squash(group);
+        return allMethods
+            .filter(
+                (m) =>
+                    THROWS_SUFFIX.test(m.name) &&
+                    squash(m.name).startsWith(prefix),
+            )
+            .map((m) => m.name);
+    }
+
     // ---- 2. Missing test methods ----
     for (const group of groupNames) {
-        if (!indexByBase.has(group)) {
-            findings.push({
-                rule: SLUG,
-                file: pair.testsRel,
-                line: lineOf(testsClass),
-                message: `TestData Operation Group '${group}' has no corresponding '${group}${BEHAVES_SUFFIX}' method in '${nameOf(testsClass)}' (v11 §4.5).`,
-                key: `${SLUG}:missing:${pair.testsRel}:${group}`,
-            });
-        }
+        if (indexByBase.has(squash(group))) continue;
+        if (throwsCompanionsFor(group).length > 0) continue;
+
+        findings.push({
+            rule: SLUG,
+            file: pair.testsRel,
+            line: lineOf(testsClass),
+            message: `TestData Operation Group '${group}' has no corresponding '${group}${BEHAVES_SUFFIX}' method in '${nameOf(testsClass)}' (v11 §4.5).`,
+            key: `${SLUG}:missing:${pair.testsRel}:${group}`,
+        });
     }
 
     // ---- 3. Orphan test methods ----
     for (const m of behavesMethods) {
         const base = m.name.slice(0, -BEHAVES_SUFFIX.length);
-        if (!groupNameSet.has(base)) {
+        if (!squashedGroupNames.has(squash(base))) {
             findings.push({
                 rule: SLUG,
                 file: pair.testsRel,
@@ -254,7 +336,7 @@ function analyzePair(
     // ---- 2b. Ordering: matched methods must appear in the same order as their Operation Groups ----
     const presentPairs: { group: string; index: number }[] = [];
     for (const group of groupNames) {
-        const index = indexByBase.get(group);
+        const index = indexByBase.get(squash(group));
         if (index !== undefined) {
             presentPairs.push({ group, index });
         }
@@ -340,5 +422,5 @@ registerRule({
     scope: "testing",
     gate: false,
     description:
-        "TestData/Tests structural conformance to v11 §4-5: flat Tests class, one <Group>_BehavesAsExpected per Operation Group in order, no orphans, ValidCases→EdgeCases→InvalidCases dataset ordering with no empty scaffolding.",
+        "TestData/Tests structural conformance to v11 §4-5: sealed, flat Tests class with instance test methods, one <Group>_BehavesAsExpected per Operation Group in order, no orphans, ValidCases→EdgeCases→InvalidCases dataset ordering with no empty scaffolding.",
 });

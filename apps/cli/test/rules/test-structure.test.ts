@@ -44,7 +44,27 @@ describe("test-structure", () => {
         ).toBe(true);
     });
 
-    it("boundary: a single-Cases-rollup Operation Group and a fully-split Valid/Edge/Invalid group are both valid — neither is falsely flagged (v11 §4.1)", async () => {
+    it("flags a Tests class that is not sealed (v11 §5.1)", async () => {
+        const findings = await expectInvalid(testStructureRule, SLUG);
+        expect(
+            findings.some((f) =>
+                /Test class 'BarRulesTests' is not sealed/.test(f.message),
+            ),
+        ).toBe(true);
+    });
+
+    it("flags a `public static void` test method (v11 §5.1 — instance methods only)", async () => {
+        const findings = await expectInvalid(testStructureRule, SLUG);
+        expect(
+            findings.some((f) =>
+                /Test method 'IsBar_BehavesAsExpected' is 'public static'/.test(
+                    f.message,
+                ),
+            ),
+        ).toBe(true);
+    });
+
+    it("boundary: a single-Cases-rollup Operation Group, a fully-split Valid/Edge/Invalid group, an underscore-variant method name (EvenNonNullable <-> Even_NonNullable_BehavesAsExpected, per the FluentValidation addendum) and a throws-only group (Parse_ThrowsAsExpected, per §8.3 / the DataAnnotations addendum's Pattern E) are all valid — none is falsely flagged", async () => {
         const findings = await runBoundary(testStructureRule, SLUG);
         expect(findings).toEqual([]);
     });

@@ -38,16 +38,50 @@ import type { Finding, RuleContext } from "../types.js";
  *    `FluentDateExtensionsTests` whose subject moved to
  *    `FluentSqlDateTimeExtensions.cs` without a rename anywhere.
  *
- * The fix (plan §8) is to stop pattern-matching *filenames* altogether and
- * instead parse every `.cs` file in the *candidate project set* — `src/<Pkg>`
- * plus every project resolved from `<ProjectReference>` — for its actual
- * `class`/`record`/`struct`/`interface` declarations (`findTypeDeclarations`,
- * added to `parsing/csharp.ts` for this rule; it generalises the
- * record-only `findRecordDeclarations` the same module already had), and
- * check whether `Foo` is declared *anywhere* in that set. A type declared
- * across multiple partial files is a hit the moment any one of those files'
- * declarations matches by name — no merging of the parts is needed, and no
- * assumption is made about which file (if any) is named after the type.
+ * The fix (plan §8) is to parse every `.cs` file in the *candidate project
+ * set* — `src/<Pkg>` plus every project resolved from `<ProjectReference>` —
+ * for its actual `class`/`record`/`struct`/`interface`/`enum` declarations
+ * (`findTypeDeclarations`, added to `parsing/csharp.ts` for this rule; it
+ * generalises the record-only `findRecordDeclarations` the same module
+ * already had), and check whether `Foo` is declared *anywhere* in that set. A
+ * type declared across multiple partial files is a hit the moment any one of
+ * those files' declarations matches by name — no merging of the parts is
+ * needed, and no assumption is made about which file (if any) is named after
+ * the type.
+ *
+ * ## Why a source *file name* still counts as a resolution (P4.3)
+ *
+ * Type-declaration lookup alone is necessary but not sufficient: the repo has
+ * a second, spec-sanctioned convention where a `*Tests.cs` file is named after
+ * the **source file** it covers rather than after a single type, because that
+ * source file declares a *family* of types:
+ *
+ * - `docs/ai/specs/data-annotations/unit-test.md`'s own canonical example is
+ *   `tests/PineGuard.DataAnnotations.UnitTests/StringBoolAttributesTests.cs`
+ *   covering `src/PineGuard.DataAnnotations/StringBoolAttributes.cs`, which
+ *   declares `TrueStringAttribute`, `FalseStringAttribute`, … but no type
+ *   called `StringBoolAttributes`. Fifty-five DataAnnotations test files
+ *   follow it.
+ * - `docs/ai/specs/testing/unit-test.md` §2.3 pairs source *files* with test
+ *   *files*, and `fixture.md` §10 makes the partial split explicit
+ *   (`StringRules.Bool.cs`); the repo's paired test file is
+ *   `StringRulesBoolTests.cs`, whose subject type is the whole `StringRules`
+ *   partial, not a type literally named `StringRulesBool`.
+ *
+ * So after the type lookup fails, the rule falls back to the candidate
+ * projects' source *file* basenames — matched exactly, and with `.`
+ * separators removed so a partial file (`StringRules.Bool.cs` ->
+ * `StringRulesBool`) resolves. This is the one piece of the old rule's
+ * filename heuristic worth keeping, and keeping it *as a fallback* cannot
+ * reintroduce the old rule's false positives: those were cases where the
+ * filename match *failed* (`Baz.Core.cs` for `class Baz`), which the AST
+ * lookup now answers first. It is also strictly narrower than "any file in
+ * the repo" — only files inside the resolved project set count. The real
+ * drift the plan requires this rule to keep catching survives it untouched:
+ * `MustStringNumberClausesTests.cs` still finds neither a type nor a file
+ * called `MustStringNumberClauses` (the source is the plural
+ * `MustStringNumbersClauses.cs`), and `FluentDateExtensionsTests.cs` still
+ * finds neither (its subject moved to `FluentSqlDateTimeExtensions.cs`).
  *
  * ## Exceptions
  *
@@ -199,16 +233,8 @@ async function collectDeclaredTypeNames(
     sourceDirs: readonly string[],
     rootDir: string,
 ): Promise<Set<string>> {
-    const prefixes = sourceDirs.map((dir) => `${dir}/`);
-    const candidateFiles = files.filter(
-        (file) =>
-            file.endsWith(".cs") &&
-            !isBuildOutput(file) &&
-            prefixes.some((prefix) => file.startsWith(prefix)),
-    );
-
     const names = new Set<string>();
-    for (const relativePath of candidateFiles) {
+    for (const relativePath of sourceFilesIn(files, sourceDirs)) {
         const parsed = await parseFile(join(rootDir, relativePath));
         for (const declaration of findTypeDeclarations(parsed.root)) {
             if (declaration.name.length > 0) {
@@ -219,13 +245,49 @@ async function collectDeclaredTypeNames(
     return names;
 }
 
+/** Every `.cs` file (excluding build output) under any of `sourceDirs`. */
+function sourceFilesIn(
+    files: readonly string[],
+    sourceDirs: readonly string[],
+): string[] {
+    const prefixes = sourceDirs.map((dir) => `${dir}/`);
+    return files.filter(
+        (file) =>
+            file.endsWith(".cs") &&
+            !isBuildOutput(file) &&
+            prefixes.some((prefix) => file.startsWith(prefix)),
+    );
+}
+
+/**
+ * The source *file* names in the candidate project set, as the two forms a
+ * `*Tests.cs` file may legitimately be named after (see this module's header
+ * comment): the `.cs`-stripped basename verbatim (`StringBoolAttributes.cs` ->
+ * `StringBoolAttributes`) and the same with `.` separators removed, so a
+ * partial-file split resolves (`StringRules.Bool.cs` -> `StringRulesBool`).
+ */
+function collectSourceFileNames(
+    files: readonly string[],
+    sourceDirs: readonly string[],
+): Set<string> {
+    const names = new Set<string>();
+    for (const relativePath of sourceFilesIn(files, sourceDirs)) {
+        const base = relativePath
+            .slice(relativePath.lastIndexOf("/") + 1)
+            .slice(0, -".cs".length);
+        names.add(base);
+        names.add(base.replaceAll(".", ""));
+    }
+    return names;
+}
+
 registerRule({
     slug: SLUG,
     legacyId: "Rule53",
     scope: "testing",
     gate: false,
     description:
-        "Every *Tests.cs file's subject type is declared as a class/record/struct/interface in its package's source project or a project it references.",
+        "Every *Tests.cs file's subject resolves to a class/record/struct/interface/enum declaration — or to a source file of that name — in its package's source project or a project it references.",
     async run(ctx: RuleContext): Promise<Finding[]> {
         const files = listAllFiles(ctx);
         const projects = discoverTestProjects(files);
@@ -259,6 +321,9 @@ registerRule({
                 [...sourceDirs],
                 ctx.rootDir,
             );
+            const sourceFileNames = collectSourceFileNames(files, [
+                ...sourceDirs,
+            ]);
 
             for (const testFile of project.testFiles) {
                 const fileName = testFile.slice(testFile.lastIndexOf("/") + 1);
@@ -269,6 +334,7 @@ registerRule({
                 const targetType = baseName.slice(0, -"Tests".length);
                 if (targetType.length === 0) continue;
                 if (declaredNames.has(targetType)) continue;
+                if (sourceFileNames.has(targetType)) continue;
                 if (
                     exceptionPatterns.some((pattern) =>
                         testFile.includes(pattern),
@@ -281,9 +347,10 @@ registerRule({
                     rule: SLUG,
                     file: testFile,
                     message:
-                        `'${testFile}' refers to type '${targetType}', which is not declared ` +
-                        `as a class/record/struct/interface in '${project.pkg}' (src/${project.pkg}) ` +
-                        `or any project '${project.pkg}.UnitTests' references`,
+                        `'${testFile}' refers to '${targetType}', which is neither declared ` +
+                        `as a class/record/struct/interface/enum nor the name of a source file in ` +
+                        `'${project.pkg}' (src/${project.pkg}) or any project ` +
+                        `'${project.pkg}.UnitTests' references`,
                     key: `${SLUG}:${testFile}:${targetType}`,
                 });
             }
