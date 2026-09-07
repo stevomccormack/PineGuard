@@ -306,18 +306,50 @@ if ($Scope -in 'All', 'Sonar') {
         $checkedCount = 0
         foreach ($entry in $entries) {
             $checkedCount++
-            $starIndex = $entry.IndexOf('*')
-            if ($starIndex -ge 0) {
-                $basePath = $entry.Substring(0, $starIndex).TrimEnd('/')
+
+            # Base path = the leading run of whole path segments that contain no wildcard.
+            # Splitting on segments rather than at the first '*' character is what keeps a
+            # filename-level glob such as 'src/PineGuard.MustClauses/MustString*.cs' resolving
+            # to its real containing directory instead of the truncated, never-existent
+            # 'src/PineGuard.MustClauses/MustString'.
+            $segments = @($entry -split '/')
+            $baseSegments = @()
+            foreach ($segment in $segments) {
+                if ($segment -match '[*?]') { break }
+                $baseSegments += $segment
             }
-            else {
-                $basePath = $entry
-            }
+            $basePath = ($baseSegments -join '/').TrimEnd('/')
+            if (-not $basePath) { continue }
+
+            # Only exclusions pointing into the analysed source tree are load-bearing: this
+            # file sets sonar.sources to src/, so an exclusion outside it is a defensive no-op
+            # that may legitimately name a directory absent from a clean checkout (.vs/,
+            # coverage-results/, and the gitignored artifacts/). Failing on those made the
+            # check's result depend on whether a build had been run.
+            $isAnalysedTree = ($basePath -eq 'src') -or ($basePath -like 'src/*')
 
             $fullPath = Join-Path $repoRoot $basePath
             if (-not (Test-Path $fullPath)) {
-                Write-Fail "Sonar exclusion references missing path: $entry (resolved base: $basePath)"
-                $missing++
+                if ($isAnalysedTree) {
+                    Write-Fail "Sonar exclusion references missing path: $entry (resolved base: $basePath)"
+                    $missing++
+                }
+                else {
+                    Write-Info "Sonar exclusion base absent from this checkout, outside sonar.sources: $entry"
+                }
+                continue
+            }
+
+            # The base directory exists; if the entry ends in a filename-level glob, confirm it
+            # still matches at least one file, so a renamed-away exclusion is caught rather than
+            # silently passing on the strength of its parent folder.
+            $leaf = $segments[-1]
+            if ($isAnalysedTree -and $leaf -match '[*?]' -and $leaf -ne '*' -and $leaf -ne '**' -and
+                $baseSegments.Count -eq ($segments.Count - 1)) {
+                if (-not (Test-Path -Path (Join-Path $fullPath $leaf))) {
+                    Write-Fail "Sonar exclusion matches no file: $entry (searched: $basePath)"
+                    $missing++
+                }
             }
         }
 
