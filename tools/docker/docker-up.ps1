@@ -9,7 +9,7 @@
 
     To run the analysis processes after bringing containers up:
         tools/sonar-scanner/Run-SonarScanner.ps1  (SonarQube analysis)
-        tools/code-inspection/Run-Qodana.ps1      (Qodana inspection)
+        tools/code-scan/qodana/Run-Qodana.ps1     (Qodana inspection)
 
 .PARAMETER NetworkName
     Docker network name. Default: pineguard.

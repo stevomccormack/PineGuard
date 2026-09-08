@@ -8,7 +8,7 @@
     docker-compose.qodana.yml.
 
     To run a Qodana inspection:
-        tools/code-inspection/Run-Qodana.ps1
+        tools/code-scan/qodana/Run-Qodana.ps1
 
 .PARAMETER NetworkName
     Docker network name. Default: pineguard.

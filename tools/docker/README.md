@@ -1,10 +1,10 @@
 # Docker
 
-Docker Compose stacks backing the two containerised analysis tools: [Qodana](../code-inspection/README.md)
+Docker Compose stacks backing the two containerised analysis tools: [Qodana](../code-scan/qodana/README.md)
 and [SonarQube](../sonar-scanner/README.md).
 
 These scripts only start and stop containers. The analysis itself is run by
-`tools/code-inspection/Run-Qodana.ps1` and `tools/sonar-scanner/Run-SonarScanner.ps1`.
+`tools/code-scan/qodana/Run-Qodana.ps1` and `tools/sonar-scanner/Run-SonarScanner.ps1`.
 
 ## Prerequisites
 
@@ -92,7 +92,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-network.ps1 
 | Qodana | `pineguard-qodana` | none — writes to `artifacts/qodana/` | `pineguard-qodana-cache` |
 
 Qodana's host paths are overridable through the environment: `QODANA_PROJECT_DIR`, `QODANA_RESULTS_DIR`,
-and `QODANA_CONFIG_PATH` (which defaults to `tools/code-inspection/qodana/config/qodana.all.yaml`).
+and `QODANA_CONFIG_PATH` (which defaults to `tools/code-scan/qodana/config/qodana.all.yaml`).
 
 ## Notes
 
