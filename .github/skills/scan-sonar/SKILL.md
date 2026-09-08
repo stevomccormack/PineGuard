@@ -7,14 +7,14 @@ description: Run SonarQube analysis for PineGuard by following the canonical Bra
 ## Load First
 
 Read these files before running analysis:
-1. [scan/spec.md](../../../docs/ai/specs/scan/spec.md)
+1. [scan spec](../../../docs/ai/specs/scan/spec.md)
 2. [scan.md](../../../docs/ai/rules/scan.md)
-3. [scan-sonar/SKILL.md](../../../docs/ai/skills/scan-sonar/SKILL.md)
+3. [scan-sonar SKILL.md](../../../docs/ai/skills/scan-sonar/SKILL.md)
 4. [code-reviewer memory](../../../docs/ai/memory/code-reviewer.md)
 
 ## Execute
 
-Follow the canonical recipe in [docs/ai/skills/scan-sonar/SKILL.md](../../../docs/ai/skills/scan-sonar/SKILL.md) exactly.
+Follow the canonical recipe in [scan-sonar SKILL.md](../../../docs/ai/skills/scan-sonar/SKILL.md) exactly.
 
 ## Verify
 

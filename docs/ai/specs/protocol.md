@@ -14,6 +14,7 @@ applies_to:
   - ".claude/**"
   - ".agent/**"
   - ".github/**"
+  - ".opencode/**"
   - ".agents/**"
   - ".codex/**"
   - ".cursor/**"
@@ -54,7 +55,7 @@ This spec defines the **tiers** that inventory assigns:
 
 | Tier                  | Shape                                                                       | Obligations                                                                                                                                             |
 | :-------------------- | :-------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Root boot file**    | A single file loaded at session start (`CLAUDE.md`, `AGENTS.md`)              | Role adoption, the command palette, and a link into `docs/ai/README.md`. Nothing else.                                                                    |
+| **Root boot file**    | A single file loaded at session start (`CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`) | Role adoption, the command palette, and a link into `docs/ai/README.md`. Nothing else.                                                                    |
 | **Full adapter**      | A per-command file format (a command/prompt/workflow directory)              | MAY carry one pointer file per agent. Each pointer file names exactly one `docs/ai/agents/*.md` playbook. Command parity applies (see the inventory §4).   |
 | **Rules-only adapter** | A rules file or rules directory, with no per-command format                  | MUST carry path-scoped pointers ONLY. MUST NOT carry an intent-routing table mapping user phrasing to agent files — that is what `docs/ai/commands/` is for. Command parity does NOT apply, and a missing command directory is not parity debt. |
 
@@ -76,7 +77,7 @@ Workflows in `docs/ai` should be generic and accept parameters (Scope, Project, 
 
 ### Rule #2.1: Commands are interfaces
 
-Command documents in `docs/ai/commands/*.md` may list example triggers (e.g., “slash commands”), but they are treated as
+Command documents in `docs/ai/commands/*.md` may list example triggers (e.g., "slash commands"), but they are treated as
 **portable interface tokens**, not model-specific prompt syntax.
 
 Adapters may expose commands through:

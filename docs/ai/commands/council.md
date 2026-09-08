@@ -37,6 +37,7 @@ Do **not** trigger on factual lookups, creation tasks, or low-stakes "should I" 
 - **Claude**: not auto-approved. Slash command `/ask-council` is explicit; the command adapter at `.claude/commands/ask-council.md` delegates to the brain agent.
 - **Copilot**: `.github/prompts/ask-council.prompt.md` requires explicit invocation.
 - **Antigravity**: `.agent/workflows/ask-council.md` **omits** `// turbo-all` — the user must confirm.
+- **OpenCode**: `.opencode/commands/ask-council.md` requires explicit invocation.
 
 ## When Is This the Right Command?
 

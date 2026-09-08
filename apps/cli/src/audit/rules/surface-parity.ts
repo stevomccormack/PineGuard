@@ -23,16 +23,16 @@ import type { Finding, RuleContext } from "../types.js";
  *
  * - **§2 "Full adapters"** — the table of surfaces checked for command
  *   parity (`Surface | Tool | Command dir | Skills | Other`). The real doc
- *   lists four (`.claude/`, `.agent/`, `.pi/`, `.github/`) — matching the
- *   legacy rule's "84 agents x 4 surfaces" scale — but the count is read
+ *   lists four (`.claude/`, `.agent/`, `.github/`, `.opencode/`) — matching
+ *   the legacy rule's "84 agents x 4 surfaces" scale — but the count is read
  *   from the table, never hardcoded as "4".
  * - **§1 "Root boot files"** plus each surface's own "Other" column — used to
  *   *derive* which surfaces additionally carry a "palette" file (a file
  *   whose prose must list every non-exempt agent by path, e.g. `CLAUDE.md`'s
  *   command palette). A surface gets a derived palette when either (a) its
  *   Tool name matches a §1 boot-file row's Tool (`.claude` / "Claude Code" ->
- *   `CLAUDE.md`), or (b) its "Other" column names an `AGENTS.md`-shaped file
- *   (`.pi`'s Other column lists `AGENTS.md` -> `.pi/AGENTS.md`). This
+ *   `CLAUDE.md`, or `.github` / "GitHub Copilot" -> `.github/copilot-instructions.md`),
+ *   or (b) its "Other" column names an `AGENTS.md`-shaped file. This
  *   reproduces the legacy rule's hardcoded two-entry `$palettes` array
  *   without hardcoding it here.
  * - **§4 "Parity policy"** — the declared-exceptions table. Every agent must
@@ -383,7 +383,7 @@ function parseParityPolicy(
         findings.push(
             findingFor(
                 ADAPTER_SURFACES_DOC,
-                "Parity-policy section is present but its exceptions table has no data rows (or the table is malformed and unparsable) — expected at least the declared Release-family and Copilot-subset exceptions this rule enforces.",
+                "Parity-policy section is present but its exceptions table has no data rows (or the table is malformed and unparsable) — expected at least the declared Release-family exception this rule enforces.",
                 "surface-parity:exceptions-table-empty",
             ),
         );

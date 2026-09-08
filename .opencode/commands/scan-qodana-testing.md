@@ -1,0 +1,4 @@
+---
+description: "Run JetBrains Qodana for Testing"
+---
+Act as **Code Reviewer**. Read and execute `docs/ai/agents/scan-qodana-testing.md`.

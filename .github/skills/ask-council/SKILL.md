@@ -9,12 +9,12 @@ description: Pressure-test a decision through a council of five independent advi
 Read these files before convening:
 1. [spec.md](../../../docs/ai/specs/spec.md)
 2. [council.md](../../../docs/ai/specs/council.md)
-3. [roles/council.md](../../../docs/ai/roles/council.md)
-4. [ask-council/SKILL.md](../../../docs/ai/skills/ask-council/SKILL.md)
+3. [council.md (role)](../../../docs/ai/roles/council.md)
+4. [ask-council SKILL.md](../../../docs/ai/skills/ask-council/SKILL.md)
 
 ## Execute
 
-Follow the canonical recipe in [docs/ai/skills/ask-council/SKILL.md](../../../docs/ai/skills/ask-council/SKILL.md) exactly.
+Follow the canonical recipe in [ask-council SKILL.md](../../../docs/ai/skills/ask-council/SKILL.md) exactly.
 
 Key invariants (from `docs/ai/specs/council.md`):
 - Advisors and reviewers are each spawned as a single parallel batch.

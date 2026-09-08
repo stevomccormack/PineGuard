@@ -1,0 +1,16 @@
+---
+name: commit-agent
+description: "Commit Agent"
+agent: shipper
+argument-hint: Optional dry-run or commit focus.
+---
+Read and execute [commit-agent.md](../../docs/ai/agents/commit-agent.md).
+
+Adopt the role it declares: [shipper.md](../../docs/ai/roles/shipper.md).
+
+Start with:
+- [safety.md](../../docs/ai/specs/safety.md)
+- [tools.md](../../docs/ai/rules/tools.md)
+- [commit.md](../../docs/ai/workflows/commit.md)
+
+Keep the Brain as the source of truth.
