@@ -10,7 +10,7 @@
 #
 # After pulling this change into a checkout that still has CRLF files,
 # refresh the working tree once (clean tree required):
-#     git checkout-index --force --all
+#     git rm -rq --cached . && git reset -q --hard
 # ===================================================================
 
 * text=auto eol=lf

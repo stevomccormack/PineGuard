@@ -19,10 +19,11 @@ format pass never rewrites a line ending and git never reports hundreds of phant
 afterwards. CMD batch files are the one exception and are CRLF in both places.
 
 A checkout made before this change still holds CRLF files. Refresh it once, with a clean working
-tree:
+tree. `git checkout-index --force` is not enough, because it skips every file whose stat still
+matches the index:
 
 ```
-git checkout-index --force --all
+git rm -rq --cached . && git reset -q --hard
 ```
 
 `git ls-files --eol` shows the state per file: `i/` is the index, `w/` is the working tree, and
