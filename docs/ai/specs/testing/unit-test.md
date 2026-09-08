@@ -813,10 +813,10 @@ Two of this spec's rules are machine-checked, not merely conventions:
 - §1 — `[Theory]`-only parameterization (no `[Fact]` in `*Tests.cs`)
 - §3 — the `*Tests.cs` ↔ `*TestData.cs` pairing (no orphans on either side)
 
-Both are enforced by **audit-cli Rule50** (`Unit Test File Normalization`), which runs in CI and **gates pull requests**. A violation fails the build, so fix it rather than working around it. Legitimate pre-existing exceptions are allowlisted in `tools/audit-cli/test-audit-exceptions.json`.
+Both are enforced by **audit-cli `test-files`** (`Unit Test File Normalization`), which runs in CI and **gates pull requests**. A violation fails the build, so fix it rather than working around it. Legitimate pre-existing exceptions are allowlisted in `apps/cli/config/exceptions.json` under `test-files`.
 
 - Tool spec: `docs/ai/specs/tools/audit-cli/spec.md`
 - Agent: `docs/ai/agents/audit-cli.md` (exposed as `/audit-cli`)
-- Reproduce locally: `./tools/audit-cli/Run-All.ps1 -RuleId Rule50`
+- Reproduce locally: `pnpm -C apps/cli exec tsx src/index.ts audit test-files`
 
 The remaining unit-test rules in this spec (§4, §5, §9) are reviewed by agents and humans, not gated.

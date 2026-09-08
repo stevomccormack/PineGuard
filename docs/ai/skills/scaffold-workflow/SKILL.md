@@ -85,7 +85,7 @@ maintain its own list — read that file, then work its §5 cascade checklist ro
     - Verify adapter YAML frontmatter is valid.
     - Verify no adapter contains embedded scripts, steps, or logic — only a pointer.
     - Verify the role named in each adapter resolves to the role the playbook declares.
-    - Run `pwsh ./tools/audit-cli/Run-All.ps1` and confirm the adapter-parity rule is clean.
+    - Run `pnpm -C apps/cli exec tsx src/index.ts audit surface-parity` and confirm it is clean.
 
 ## 5. Definition of Done
 
@@ -103,7 +103,7 @@ One checkbox per cascade row. Tick **Done** or **N/A (policy)** — never leave 
 - [ ] Rules-only adapters reviewed (or N/A — no layer-mapping change)
 - [ ] `.vscode/tasks.json` updated (or N/A — no task-runner equivalent)
 - [ ] Every adapter is a pointer only, and names the playbook's role
-- [ ] `tools/audit-cli` adapter-parity rule passes
+- [ ] The `surface-parity` audit rule passes
 
 ## 6. Reference Material (Deep Dive)
 

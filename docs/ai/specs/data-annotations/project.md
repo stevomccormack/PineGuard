@@ -71,7 +71,7 @@ Required pattern:
   - Example: `public sealed class TrueAttribute() : ValidationAttributeBase(typeof(bool), MustCodes.Boolean.Value.False)`
 - **Error code**: `ValidationAttributeBase`'s second constructor parameter is `code` — the `MustCodes` catalogue
   constant identifying the clause the attribute adapts, exposed as the public `Code` property. It must be the
-  same constant the invoked Must clause itself passes to `Fail`/`FromBool`; Rule13 check (d) audits this. Every
+  same constant the invoked Must clause itself passes to `Fail`/`FromBool`; `must-codes` check (d) audits this. Every
   intermediate base (`NumberAttributeBase`, `CollectionAttributeBase`, `ObjectAttributeBase`,
   `GenericDictionaryAttributeBase`, `ComparePropertyAttributeBase`) accepts and forwards `code` the same way.
   See `../must-clauses/project.md` ("Error codes") for the format.
@@ -130,7 +130,7 @@ DataAnnotations follows the standard "skip on null" behavior:
 
 This is intentionally different from Must/Guard behavior:
 
-- MustClauses follow the Rule07 hybrid nullability strategy — **null is invalid by default** unless the method name encodes it (e.g., `NullOrXxx`). Canonical statement: `../must-clauses/project.md` §Nullability.
+- MustClauses follow the `nullability` hybrid nullability strategy — **null is invalid by default** unless the method name encodes it (e.g., `NullOrXxx`). Canonical statement: `../must-clauses/project.md` §Nullability.
 - The adapter layer is responsible for DataAnnotations UX: null handling is controlled by `[Required]` / `allowNull`, not by failing on null inside PineGuard validation attributes.
 
 Implementation rule:

@@ -73,7 +73,7 @@ added to reach these numbers.
 
 **Update (2026-08-28)**: the Phase 1 structural-validation merge (commit `357ab00`) — error
 codes across every layer, the `MustValidator<T>` keystone, the `GuardExceptionPolicy` redesign,
-ten new cross-property DataAnnotations attributes, and Rule13 — reconfirmed `-Scope All` at
+ten new cross-property DataAnnotations attributes, and `must-codes` — reconfirmed `-Scope All` at
 100.00% line / 100.00% branch coverage on both net8.0 and net10.0, with all 6 test projects
 passing on both TFMs. The per-scope test/line/branch counts in the table above predate this
 merge and have not been re-verified at the granular level; re-run the coverage script (see

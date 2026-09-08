@@ -154,7 +154,7 @@ MustClauses is the vocabulary owner, so the canonical ordering rule lives here a
 
 - Within each domain file, a positive method appears immediately **before** its `Not*` complement (e.g. `Contains` then `NotContains`, `SubsetOf` then `NotSubsetOf`).
 - Methods with no complement keep their domain-grouped position.
-- Enforced by `tools/audit-cli/rules/Test-Rule08-Ordering.ps1`.
+- Enforced by the `ordering` audit rule, `apps/cli/src/audit/rules/ordering.ts`.
 
 Adapter layers inherit this rule:
 
@@ -185,7 +185,7 @@ Rules:
 
 ### Nullability
 
-MustClauses use a **hybrid nullability strategy** (Rule07 — see `docs/ai/specs/tools/audit-cli/spec.md` and `tools/audit-cli/rules/Test-Rule07-Nullability.ps1`):
+MustClauses use a **hybrid nullability strategy** (`nullability` — see `docs/ai/specs/tools/audit-cli/spec.md` and `apps/cli/src/audit/rules/nullability.ts`):
 
 - **Primary validated value (reference types)**: use nullable inputs.
   - Example: `string? value`, `object? value`.
@@ -290,9 +290,9 @@ own code. Type-variant clauses of the same rule (e.g. `MustGuidClauses.NotEmpty(
 `MustStringGuidClauses.NotEmptyGuid(string)`) share one code — the rule is the same regardless of input
 type.
 
-### Rule13
+### `must-codes`
 
-`tools/audit-cli/rules/Test-Rule13-MustCodes.ps1` audits the catalogue and its call sites via source
+The `must-codes` audit rule (`apps/cli/src/audit/rules/must-codes.ts`) audits the catalogue and its call sites via source
 scan (no build required): every public clause passes exactly one code; every declared constant is
 referenced somewhere; no hardcoded code string literal duplicates a catalogue domain outside
 `Codes/`; every DataAnnotations attribute's declared code matches a code the clause it invokes can
@@ -300,7 +300,7 @@ actually produce; every `Guard.Against.*` clause passes its `IMustResult` (never
 `GuardFailure.Throw`, so the guarded exception's code is always the Must layer's own; every clause
 file only references its own mapped domain's constants; and the catalogue itself stays a
 dependency-free leaf (no `using PineGuard...` under `Codes/`). Run it via
-`pwsh tools/audit-cli/Run-All.ps1 -RuleId Rule13`.
+`pnpm -C apps/cli exec tsx src/index.ts audit must-codes`.
 
 ---
 

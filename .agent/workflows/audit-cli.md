@@ -1,5 +1,5 @@
 ---
-description: Run Audit CLI (Library / Testing / All)
+description: Run Audit CLI (Library / Testing / Docs / All)
 ---
 
 // turbo-all

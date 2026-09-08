@@ -1,0 +1,16 @@
+{
+  "name": "pineguard",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PineGuard workspace root (pnpm). Package code lives under apps/*; see docs/ai/plans/audit-cli-rebuild.md.",
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@12.3.4",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "pnpm -r run lint"
+  }
+}

@@ -213,7 +213,7 @@ public static class OneOfExtension
 
 ## 4. Testing plan
 
-Four test projects (Plan 00 §4.5). Base classes: `BaseMustValidationUnitTest` for result inputs where useful, otherwise `BaseUnitTest` with project-local `ReturnExpected`/`ReturnCase`-derived records. Every `XxxTests.cs` ships with `XxxTestData.cs` (Rule50).
+Four test projects (Plan 00 §4.5). Base classes: `BaseMustValidationUnitTest` for result inputs where useful, otherwise `BaseUnitTest` with project-local `ReturnExpected`/`ReturnCase`-derived records. Every `XxxTests.cs` ships with `XxxTestData.cs` (`test-files`).
 
 | Project | Tests | Groups |
 |---|---|---|
@@ -239,7 +239,7 @@ Samples for MediatR (`Samples/`): `CreateOrder : IRequest<Guid>`, its handler, a
 
 **W5** `PineGuard.OneOf` + tests → 100/100 → commit `feat(oneof): bridge MustResult and MustValidationResult to OneOf`.
 
-**W6** Brain/agents for the PR's scopes (Rule11/12), READMEs, root README *Mediator and result bridges* subsection (each PR adds its rows); commit `docs(brain): onboard the erroror, fluentresults and oneof scopes` / `docs(brain): onboard the mediatr scope`.
+**W6** Brain/agents for the PR's scopes (`doc-links`/12), READMEs, root README *Mediator and result bridges* subsection (each PR adds its rows); commit `docs(brain): onboard the erroror, fluentresults and oneof scopes` / `docs(brain): onboard the mediatr scope`.
 
 **W7** Plan 00 §7 (`-Scope All` 100/100); PR; merge; cleanup.
 

@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-`tools/audit-cli/Run-All.ps1 -RuleId Rule06` (and Rule08, which shares the helper) fails with
-`NETSDK1129: The 'Publish' target is not supported without specifying a target framework` from
-`tools/audit-cli/helpers/Test-ParityAgainstMust.ps1`, which calls `dotnet publish` on
+The legacy `tools/audit-cli` tool's `Run-All.ps1 -RuleId Rule06` (and Rule08, which shares the
+helper) failed with `NETSDK1129: The 'Publish' target is not supported without specifying a
+target framework` from its `Test-ParityAgainstMust.ps1` helper, which called `dotnet publish` on
 `PineGuard.MustClauses.csproj` without `-f`. That project targets netstandard2.1 / net8.0 / net10.0.
 Rule08 produces no report file at all as a result. Rule07, Rule13 and Rule50 run fine.
 

@@ -6,7 +6,7 @@
 
 The layer architecture — Core Utils -> Core Rules -> MustClauses -> GuardClauses -> Integrations,
 Must owns user-facing messages, Guard/FluentValidation/DataAnnotations reuse them, Core stays pure,
-and every clause passes its `MustCodes` constant on every `Fail(...)`/`FromBool(...)` call (Rule13) —
+and every clause passes its `MustCodes` constant on every `Fail(...)`/`FromBool(...)` call (verified by the `must-codes` audit rule) —
 is fully specified in `../rules/global.md`, `../rules/must.md`, `../rules/guard.md`, and
 `../specs/must-clauses/project.md` ("Error codes"). Read those; this file records observations, not rules.
 
