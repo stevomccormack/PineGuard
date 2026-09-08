@@ -198,18 +198,26 @@ function Get-StagedNumStat {
 function Get-CommitTitleSuggestion {
     <#
     .SYNOPSIS
-        Suggests commit title based on scope (tools/, src/, tests/, etc.).
+        Refines a scope's generic "updates" suffix into a more specific phrase, using
+        path-fragment heuristics over the staged files.
+
+    .DESCRIPTION
+        Returns a short phrase (e.g. "rules updates", "git automation scripts") describing what
+        changed, for use as the summary half of the conventional-commit subject line that
+        New-AutoCommitMessage builds. Falls back to the scope's own suffix (usually "updates")
+        when nothing more specific matches.
+
+        Pre-T3.02 this function returned a full "Prefix: Suffix" title string; it now returns
+        only the suffix phrase, because the subject line's "<type>(<scope>):" prefix is built
+        separately (F-33).
     #>
     param(
         [Parameter(Mandatory = $true)][string]$DefaultTitle,
         [Parameter(Mandatory = $true)][string[]]$NameStatusLines
     )
 
-    $prefix = $DefaultTitle
     $suffix = 'updates'
-
     if ($DefaultTitle -match '^([^:]+):\s*(.+)$') {
-        $prefix = $Matches[1].Trim()
         $suffix = $Matches[2].Trim()
     }
 
@@ -224,21 +232,82 @@ function Get-CommitTitleSuggestion {
         return (@($paths | Where-Object { $_ -like "*$fragment*" })).Count -gt 0
     }
 
-    if (& $has 'tools/git/') { return "${prefix}: git automation scripts" }
-    if (& $has 'tools/audit-cli/') { return "${prefix}: audit-cli orchestration" }
-    if (& $has 'tools/code-coverage/') { return "${prefix}: coverage tooling updates" }
-    if (& $has 'docs/') { return "${prefix}: documentation updates" }
-    if (& $has 'src/PineGuard.Core/Rules/') { return "${prefix}: rules updates" }
-    if (& $has 'src/PineGuard.Core/Utils/') { return "${prefix}: utils updates" }
-    if (& $has 'tests/') { return "${prefix}: tests updates" }
+    if (& $has 'tools/git/') { return 'git automation scripts' }
+    if (& $has 'tools/audit-cli/') { return 'audit-cli orchestration' }
+    if (& $has 'tools/code-coverage/') { return 'coverage tooling updates' }
+    if (& $has 'docs/') { return 'documentation updates' }
+    if (& $has 'src/PineGuard.Core/Rules/') { return 'rules updates' }
+    if (& $has 'src/PineGuard.Core/Utils/') { return 'utils updates' }
+    if (& $has 'tests/') { return 'tests updates' }
 
-    return "${prefix}: $suffix"
+    return $suffix
+}
+
+function Get-CommitTypeSuggestion {
+    <#
+    .SYNOPSIS
+        Infers a conventional-commits type (docs/test/chore) from the staged file paths.
+
+    .DESCRIPTION
+        A mechanical generator cannot know true intent (a behaviour change vs. a fix vs. a
+        refactor), so this only distinguishes what it CAN tell from paths alone: 'docs' when
+        every changed path is doc-like (under docs/, or any *.md file), 'test' when every changed
+        path is under tests/, and 'chore' as the safe default for everything else (including any
+        mix of the two, and all src/ or tools/ changes).
+    #>
+    param([Parameter(Mandatory = $true)][string[]]$Paths)
+
+    if ($Paths.Count -eq 0) {
+        return 'chore'
+    }
+
+    $nonDoc = @($Paths | Where-Object { $_ -notmatch '(^|/)docs/' -and $_ -notmatch '\.md$' })
+    if ($nonDoc.Count -eq 0) {
+        return 'docs'
+    }
+
+    $nonTest = @($Paths | Where-Object { $_ -notmatch '^tests/' })
+    if ($nonTest.Count -eq 0) {
+        return 'test'
+    }
+
+    return 'chore'
+}
+
+function ConvertTo-KebabCase {
+    <#
+    .SYNOPSIS
+        Converts a PascalCase scope name (e.g. "MustClauses") to kebab-case ("must-clauses").
+
+    .DESCRIPTION
+        A plain word-boundary conversion: a hyphen is inserted wherever a lowercase letter or
+        digit is followed by an uppercase letter, then the whole string is lowercased. This is
+        mechanical, not a lookup against the hand-curated Qodana slug table (F-13), so a name
+        with a trailing single capital that isn't a true word boundary (e.g. "MediatR") splits
+        as "mediat-r" — an accepted quirk of a generic heuristic, not a bug to chase here.
+    #>
+    param([Parameter(Mandatory = $true)][string]$Value)
+
+    $withHyphens = [regex]::Replace($Value, '(?<=[a-z0-9])(?=[A-Z])', '-')
+    return $withHyphens.ToLowerInvariant()
 }
 
 function New-AutoCommitMessage {
     <#
     .SYNOPSIS
-        Generates a multi-line commit message with stats and file list.
+        Generates a conventional-commits-style message: a "<type>(<scope>): <summary>" subject
+        line, a blank line, then one flowing prose paragraph describing what changed (F-33).
+
+    .DESCRIPTION
+        This is a BEST-EFFORT MECHANICAL summary standing in for a human-written -Message. It can
+        describe *what* changed — which files, how many, how many lines — because that is all
+        `git diff --cached` can tell it. It has no notion of *why* the change was made. The
+        owner's standing convention (a conventional-commits subject followed by a flowing prose
+        body; see project memory feedback_commit-messages.md) is achievable here only for the
+        "what" half of that convention. Prefer -Message over -AutoMessage whenever the change is
+        meaningful enough to be worth explaining — this generator exists for the mechanical,
+        low-stakes commits where writing a message by hand would not teach a reader anything a
+        stat line can't already show.
     #>
     param(
         [Parameter(Mandatory = $true)][string]$RepoRoot,
@@ -269,37 +338,29 @@ function New-AutoCommitMessage {
         if ($parts[1] -match '^\d+$') { $del += [int]$parts[1] }
     }
 
-    $isSmall = ($fileCount -le 2) -and (($ins + $del) -le 40)
-    $title = Get-CommitTitleSuggestion -DefaultTitle $DefaultTitle -NameStatusLines $nameStatus
+    $changedPaths = @(
+        $nameStatus |
+            ForEach-Object { ($_ -split "\t")[-1].Trim() } |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+    )
 
+    $scopeName = $DefaultTitle
+    if ($DefaultTitle -match '^([^:]+):') {
+        $scopeName = $Matches[1].Trim()
+    }
+
+    $type = Get-CommitTypeSuggestion -Paths $changedPaths
+    $scopeSlug = ConvertTo-KebabCase -Value $scopeName
+    $summary = Get-CommitTitleSuggestion -DefaultTitle $DefaultTitle -NameStatusLines $nameStatus
+
+    $subject = '{0}({1}): {2}' -f $type, $scopeSlug, $summary
+
+    $fileWord = if ($fileCount -eq 1) { 'file' } else { 'files' }
     $scopeText = ($StagePaths -join ', ')
-    $statsLine = "Files: $fileCount (M:$modified A:$added D:$deleted); Diff: +$ins/-$del"
+    $body = 'Updates {0} {1} under {2} ({3} modified, {4} added, {5} deleted; +{6}/-{7} lines).' -f `
+        $fileCount, $fileWord, $scopeText, $modified, $added, $deleted, $ins, $del
 
-    $lines = @()
-    $lines += $title
-    $lines += ''
-
-    if ($isSmall) {
-        $lines += "Summary: Small scoped update ($statsLine)."
-        $lines += "Scope: $scopeText"
-    }
-    else {
-        $lines += "Summary: Scoped update for $($DefaultTitle.Split(':')[0].Trim())."
-        $lines += $statsLine
-        $lines += "Scope: $scopeText"
-        $lines += ''
-
-        $lines += 'Changes:'
-        $max = [Math]::Min(12, $nameStatus.Count)
-        for ($i = 0; $i -lt $max; $i++) {
-            $lines += "- $($nameStatus[$i])"
-        }
-        if ($nameStatus.Count -gt $max) {
-            $lines += "- ...and $($nameStatus.Count - $max) more"
-        }
-    }
-
-    return ($lines -join [Environment]::NewLine)
+    return ($subject, '', $body) -join [Environment]::NewLine
 }
 
 function New-CommitTemplateFile {
