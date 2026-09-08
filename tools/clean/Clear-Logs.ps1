@@ -3,8 +3,9 @@
     Cleans up log files from the logs directory.
 
 .DESCRIPTION
-    This script deletes files with specified extensions from the 'logs' directory.
-    It supports recursive deletion and a safety switch to target all files.
+    Deletes files with specified extensions from the 'logs' directory via the shared
+    Clear-ToolDirectory helper (tools/.shared/clean.ps1, F-38). Supports recursive deletion and a
+    safety switch to target all files.
 
 .PARAMETER Extensions
     A list of file extensions to delete. Default is 'txt', 'log'.
@@ -17,11 +18,11 @@
     If specified, searches subdirectories of the logs directory.
 
 .EXAMPLE
-    .\Cleanup-Logs.ps1
+    .\Clear-Logs.ps1
     Deletes *.txt and *.log files in the logs directory.
 
 .EXAMPLE
-    .\Cleanup-Logs.ps1 -Recursive -All
+    .\Clear-Logs.ps1 -Recursive -All
     Deletes everything in logs and its subdirectories.
 #>
 [CmdletBinding(SupportsShouldProcess)]
@@ -32,6 +33,8 @@ param(
 )
 
 . (Join-Path $PSScriptRoot '..\.shared\path.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\clean.ps1')
+
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 $logsDir = Join-Path $repoRoot 'logs'
 
@@ -46,29 +49,6 @@ if ($All) {
 
 Write-Host "Cleaning logs in: $logsDir" -ForegroundColor Cyan
 
-foreach ($ext in $Extensions) {
-    # Ensure extension has wildcard if not present (unless it is exactly '*')
-    $filter = if ($ext -eq '*') { '*' } elseif ($ext -like '*.*') { $ext } else { "*.$ext" }
-
-    $params = @{
-        Path   = $logsDir
-        Filter = $filter
-        File   = $true
-        Force  = $true
-    }
-
-    if ($Recursive) {
-        $params['Recurse'] = $true
-    }
-
-    $files = Get-ChildItem @params
-
-    foreach ($file in $files) {
-        if ($PSCmdlet.ShouldProcess($file.FullName, "Delete Log File")) {
-            Remove-Item -LiteralPath $file.FullName -Force
-            Write-Host "Deleted: $($file.Name)" -ForegroundColor Gray
-        }
-    }
-}
+Clear-ToolDirectory -Path $logsDir -Extensions $Extensions -ItemLabel 'Log File' -AllowRecurse:$Recursive
 
 Write-Host "Cleanup Logs Complete." -ForegroundColor Green

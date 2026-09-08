@@ -9,8 +9,8 @@
     - Stale path references in .md files
     - Stale path references in .ps1 files
     - Stale namespace references in .cs files
+    - Namespace/folder alignment (namespace matches folder path), registry-driven
     - Sonar path validation (sonar.*.exclusions entries resolve to real paths on disk)
-    - Namespace/folder alignment (namespace matches folder path)
 
 .PARAMETER Scope
     Which checks to run: All, Build, Test, Paths, Namespaces, Sonar.
@@ -50,11 +50,12 @@ param(
 )
 
 . (Join-Path $PSScriptRoot '..\.shared\path.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
 
 $ErrorActionPreference = 'Continue'
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
-$artifactDir = Join-Path $repoRoot 'artifacts/maintenance'
+$artifactDir = Join-Path $repoRoot 'artifacts/clean'
 if (-not (Test-Path $artifactDir)) { New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null }
 
 $reportPath = Join-Path $artifactDir 'structural-integrity.txt'
@@ -177,59 +178,108 @@ if ($Scope -in 'All', 'Paths' -and $StalePaths.Count -gt 0) {
 }
 
 # ─────────────────────────────────────────────
-# CHECK 4: Stale namespace references in .cs
+# CHECK 4 + 5: Stale namespace references, and namespace/folder alignment
 # ─────────────────────────────────────────────
-if ($Scope -in 'All', 'Namespaces' -and $StaleNamespaces.Count -gt 0) {
-    Write-Check 'Stale namespace references (.cs)'
+# These two checks used to each run their own separate Get-ChildItem + Get-Content sweep over
+# an overlapping set of .cs files: CHECK 5's src/-scoped file set is always a subset of CHECK 4's
+# repo-wide file set. They now share a single enumeration and a single Get-Content -Raw read per
+# file. CHECK 5 always runs when Namespaces is in scope; CHECK 4 only runs when the caller passed
+# -StaleNamespaces. To avoid forcing a full-repo walk on the common invocation (no -StaleNamespaces,
+# CHECK 4 inactive), the scan root narrows to src/ in that case — the full repo-wide walk only
+# happens when CHECK 4 is actually going to use it.
+if ($Scope -in 'All', 'Namespaces') {
+    $runStaleNamespaceCheck = $StaleNamespaces.Count -gt 0
+    $scanRoot = if ($runStaleNamespaceCheck) { $repoRoot } else { Join-Path $repoRoot 'src' }
 
-    $csFiles = Get-ChildItem -Path $repoRoot -Recurse -Include '*.cs' -File |
-        Where-Object { $_.FullName -notmatch '[\\/](bin|obj|\.git)[\\/]' }
-
-    $staleFound = 0
-    foreach ($ns in $StaleNamespaces) {
-        foreach ($file in $csFiles) {
-            $content = Get-Content $file.FullName -Raw -ErrorAction SilentlyContinue
-            if (-not $content) { continue }
-
-            # Match as namespace declaration or using statement
-            if ($content -match "(?m)^(namespace|using)\s+$([regex]::Escape($ns))\b") {
-                $relFile = [System.IO.Path]::GetRelativePath($repoRoot, $file.FullName)
-                Write-Fail "Stale namespace '$ns' in: $relFile"
-                $staleFound++
+    $csFileEntries = @(
+        Get-ChildItem -Path $scanRoot -Recurse -Include '*.cs' -File |
+            Where-Object { $_.FullName -notmatch '[\\/](bin|obj|\.git)[\\/]' } |
+            ForEach-Object {
+                $content = Get-Content $_.FullName -Raw -ErrorAction SilentlyContinue
+                if ($null -ne $content) {
+                    [pscustomobject]@{ File = $_; Content = $content }
+                }
             }
+    )
+
+    # ─── CHECK 4: Stale namespace references in .cs ───
+    if ($runStaleNamespaceCheck) {
+        Write-Check 'Stale namespace references (.cs)'
+
+        $staleFound = 0
+        foreach ($ns in $StaleNamespaces) {
+            foreach ($entry in $csFileEntries) {
+                # Match as namespace declaration or using statement
+                if ($entry.Content -match "(?m)^(namespace|using)\s+$([regex]::Escape($ns))\b") {
+                    $relFile = [System.IO.Path]::GetRelativePath($repoRoot, $entry.File.FullName)
+                    Write-Fail "Stale namespace '$ns' in: $relFile"
+                    $staleFound++
+                }
+            }
+        }
+
+        if ($staleFound -eq 0) {
+            Write-Pass "No stale namespace references found ($($StaleNamespaces.Count) patterns checked)"
         }
     }
 
-    if ($staleFound -eq 0) {
-        Write-Pass "No stale namespace references found ($($StaleNamespaces.Count) patterns checked)"
-    }
-}
-
-# ─────────────────────────────────────────────
-# CHECK 5: Namespace/folder alignment
-# ─────────────────────────────────────────────
-if ($Scope -in 'All', 'Namespaces') {
+    # ─── CHECK 5: Namespace/folder alignment (registry-driven, src/ scopes only) ───
     Write-Check 'Namespace/folder alignment (src/ only)'
 
     $srcDir = Join-Path $repoRoot 'src'
-    $csFiles = Get-ChildItem -Path $srcDir -Recurse -Include '*.cs' -File |
-        Where-Object { $_.FullName -notmatch '[\\/](bin|obj|Common|Polyfills)[\\/]' -and $_.Name -ne 'GlobalUsings.cs' }
+
+    # Registry-driven (F-31 follow-up): the authoritative set of real scope-root folders under
+    # src/ comes from the registry (Get-PineGuardScope -All), not a hand-maintained folder-name
+    # exclude list — a new scope is picked up automatically the moment it is registered, with
+    # nothing here to remember to update.
+    #
+    # Polyfills/ subfolders are still excluded deliberately, not via the registry: every Polyfills
+    # file found in this repo declares a real BCL namespace (System.Runtime.CompilerServices,
+    # System.Diagnostics.CodeAnalysis, …) by design — a polyfill shim only works if it uses the
+    # exact namespace the compiler expects, so it can never "align" with its folder, and that is
+    # a permanent property of what a polyfill is, not something the registry could express.
+    #
+    # 'Common' is deliberately NOT excluded here, unlike the prior hand-maintained list: checking
+    # this repo's actual Common/ folders shows most of them already align with their folder path
+    # (src/PineGuard.DataAnnotations/Common -> PineGuard.DataAnnotations.Common,
+    # src/PineGuard.FluentValidation/Common -> PineGuard.FluentValidation.Common) and would have
+    # passed without an exclude. The one real exception, src/PineGuard.Core/Common (declared as
+    # the shared PineGuard.Common namespace, not PineGuard.Core.Common), is a genuine divergence
+    # worth surfacing — CHECK 5 only ever reports misalignment as an informational note (it does
+    # not fail the run), so letting it show up here is strictly more accurate than hiding it.
+    $srcScopeDirs = @(
+        Get-PineGuardScope -All |
+            Where-Object { $_.SourceDir -match '^src[\\/]' } |
+            ForEach-Object { (Join-Path $repoRoot $_.SourceDir) }
+    )
+
+    $scopedEntries = @(
+        $csFileEntries | Where-Object {
+            $dir = $_.File.DirectoryName
+            $underScope = $false
+            foreach ($scopeDir in $srcScopeDirs) {
+                if ($dir.Equals($scopeDir, [System.StringComparison]::OrdinalIgnoreCase) -or
+                    $dir.StartsWith("$scopeDir$([System.IO.Path]::DirectorySeparatorChar)", [System.StringComparison]::OrdinalIgnoreCase)) {
+                    $underScope = $true
+                    break
+                }
+            }
+            $underScope -and $_.File.FullName -notmatch '[\\/]Polyfills[\\/]' -and $_.File.Name -ne 'GlobalUsings.cs'
+        }
+    )
 
     $misaligned = 0
-    foreach ($file in $csFiles) {
-        $content = Get-Content $file.FullName -Raw -ErrorAction SilentlyContinue
-        if (-not $content) { continue }
-
-        if ($content -match '(?m)^namespace\s+([A-Za-z0-9_.]+)\s*;') {
+    foreach ($entry in $scopedEntries) {
+        if ($entry.Content -match '(?m)^namespace\s+([A-Za-z0-9_.]+)\s*;') {
             $declaredNs = $Matches[1]
 
             # Derive expected namespace from folder path
-            $relPath = [System.IO.Path]::GetRelativePath($srcDir, $file.DirectoryName)
+            $relPath = [System.IO.Path]::GetRelativePath($srcDir, $entry.File.DirectoryName)
             # e.g. PineGuard.MustClauses\Rules → PineGuard.MustClauses.Rules
             $expectedNs = $relPath.Replace('\', '.').Replace('/', '.')
 
             if ($declaredNs -ne $expectedNs) {
-                $relFile = [System.IO.Path]::GetRelativePath($repoRoot, $file.FullName)
+                $relFile = [System.IO.Path]::GetRelativePath($repoRoot, $entry.File.FullName)
                 Write-Info "Misalignment: $relFile — declared '$declaredNs', folder suggests '$expectedNs'"
                 $misaligned++
             }

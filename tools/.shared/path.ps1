@@ -18,7 +18,7 @@ function Get-RepoRoot {
         The single repo-root resolver for the whole tools/ tree (F-07). It replaces four prior
         implementations: this file's own former PineGuard.slnx-only walk, tools/.shared/git.ps1's
         git-only Resolve-RepoRoot, tools/audit-cli/helpers/Load-AuditHelpers.ps1's
-        Resolve-PineGuardRepoRoot, and an inline copy in tools/maintenance/Test-StructuralIntegrity.ps1.
+        Resolve-PineGuardRepoRoot, and an inline copy in tools/clean/Test-StructuralIntegrity.ps1.
 
         Resolution order:
           1. `git -C StartDirectory rev-parse --show-toplevel` — fast and authoritative whenever

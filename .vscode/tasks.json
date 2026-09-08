@@ -730,8 +730,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Clean-Artifacts.ps1",
-                "-Recursive",
+                "./tools/clean/Clear-Artifacts.ps1",
                 "-All"
             ],
             "problemMatcher": []
@@ -846,7 +845,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Clean-Logs.ps1",
+                "./tools/clean/Clear-Logs.ps1",
                 "-Recursive",
                 "-All"
             ],
@@ -861,12 +860,12 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Clean-Root.ps1"
+                "./tools/clean/Clear-Root.ps1"
             ],
             "problemMatcher": []
         },
         {
-            "label": "Clean: Root (recursive, WhatIf)",
+            "label": "Clean: Root (WhatIf)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -874,10 +873,8 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Clean-Root.ps1",
-                "-WhatIf",
-                "-Recursive",
-                "-All"
+                "./tools/clean/Clear-Root.ps1",
+                "-WhatIf"
             ],
             "problemMatcher": []
         },
@@ -890,9 +887,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Run-Clean.ps1",
-                "-Logs",
-                "-Artifacts",
+                "./tools/clean/Run-Clean.ps1",
+                "-Target",
+                "Logs,Artifacts",
                 "-Recursive",
                 "-All"
             ],
@@ -907,13 +904,10 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Run-Clean.ps1",
+                "./tools/clean/Run-Clean.ps1",
                 "-WhatIf",
-                "-Logs",
-                "-Artifacts",
-                "-Root",
-                "-Recursive",
-                "-All"
+                "-All",
+                "-Recursive"
             ],
             "problemMatcher": []
         },

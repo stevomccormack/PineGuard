@@ -54,7 +54,7 @@ The `tools/` directory contains 90 PowerShell scripts that only run natively on 
 ### Phase 3: Dev Workflow
 - Convert `tools/testing/Run-Tests.ps1`
 - Convert `tools/code-formatter/Run-Format.ps1`
-- Convert `tools/maintenance/*.ps1` (5 scripts)
+- Convert `tools/clean/*.ps1` (5 scripts)
 
 ### Phase 4: Git Automation
 - Convert `tools/git/*.ps1` (12 scripts)

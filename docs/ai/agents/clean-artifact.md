@@ -13,9 +13,9 @@ version: 1.0
 
 ## Steps
 
-1. **Clean Artifacts (Recursive + All)**
-   - Run: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/maintenance/Clean-Artifacts.ps1" -Recursive -All`
-   - This executes the maintenance scripts which wipe out test coverage results, generated outputs, and analysis data under the `artifacts/` folder.
+1. **Clean Artifacts (All)**
+   - Run: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/clean/Clear-Artifacts.ps1" -All`
+   - This executes the clean scripts which wipe out test coverage results, generated outputs, and analysis data under the `artifacts/` folder. Artifact cleanup is always recursive, unconditionally — `Clear-Artifacts.ps1` has no `-Recursive` switch to pass.
 
 ## Related
 
