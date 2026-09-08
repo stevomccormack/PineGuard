@@ -4,8 +4,7 @@
 #          Suggests structured subdirectory paths based on file type:
 #            logs/YYYY-MM-DD/        — log/txt files
 #            artifacts/tmp/          — temp scripts/helpers
-#            artifacts/<tool>/html/  — HTML reports
-#            artifacts/<tool>/report/— SARIF/JSON reports
+#            artifacts/<tool>/report/— HTML/SARIF/JSON reports
 #            artifacts/test-results/YYYY-MM-DD/ — .trx test results
 #            artifacts/code-coverage/ — coverage XML
 #
@@ -68,10 +67,10 @@ case "$FILENAME" in
     echo "  Move to: artifacts/test-results/$TODAY/$FILENAME" >&2
     ;;
   *.cobertura.xml|*.coverage|*.coveragexml)
-    echo "  Move to: artifacts/code-coverage/xplat/testresults/<Project>/$FILENAME" >&2
+    echo "  Move to: artifacts/code-coverage/coverlet/<scope>/testresults/<Project>/$FILENAME" >&2
     ;;
   *.html)
-    echo "  Move to: artifacts/<tool>/html/$FILENAME" >&2
+    echo "  Move to: artifacts/<tool>/report/$FILENAME" >&2
     ;;
   *.sarif)
     echo "  Move to: artifacts/<tool>/report/$FILENAME" >&2
