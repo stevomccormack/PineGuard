@@ -1,17 +1,22 @@
 <#
 .SYNOPSIS
-    Auto-commission a fresh SonarQube instance (password, project, token).
+    Commission a running local SonarQube instance (password, project, token).
 
 .DESCRIPTION
     Part of the PineGuard PowerShell toolchain.
-    Automates the first-run setup of a local SonarQube Community Edition server:
-      1. Changes the default admin:admin password.
+    Automates the first-run commissioning of a local SonarQube Community Edition server that is
+    already running:
+      1. Changes the default admin:admin password to a generated (or supplied) strong password.
       2. Creates the PineGuard project.
       3. Generates a user token.
-      4. Persists the token as a User environment variable (SONARQUBE_TOKEN).
+      4. Persists both the admin password and the token to .etc/powershell/.env
+         (SONARQUBE_ADMIN_PASSWORD, SONARQUBE_TOKEN) - never to the User/Machine environment
+         (D-4/F-23/F-24/F-25).
 
-    Idempotent — safe to re-run. Detects existing configuration and skips
-    completed steps.
+    Idempotent — safe to re-run. Detects existing configuration and skips completed steps; a
+    re-run with no -NewPassword reuses the password persisted by the previous run instead of
+    generating a new one (which would otherwise lock the operator out of the account it already
+    changed).
 
     Prerequisites: SonarQube must be running. Start it with Install-SonarQube.ps1 (installs Java
     and starts the container) or Start-SonarQube.ps1 (container only).
@@ -20,8 +25,10 @@
     Base URL of the local SonarQube instance. Default: http://localhost:9001.
 
 .PARAMETER NewPassword
-    Password to set for the admin account (replaces the default admin:admin).
-    Default: Scanner-1234.
+    Password to set for the admin account (replaces the default admin:admin). Default:
+    resolved from a previously-persisted SONARQUBE_ADMIN_PASSWORD (.etc/powershell/.env) if one
+    exists, otherwise a fresh cryptographically random 32-byte value, base64-encoded — never a
+    fixed, documented string (F-23). Pass this explicitly to choose your own.
 
 .PARAMETER ProjectKey
     SonarQube project key. Default: PineGuard.
@@ -34,17 +41,17 @@
 
 .EXAMPLE
     pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Initialize-SonarQube.ps1
-    Commissions SonarQube with default settings.
+    Commissions SonarQube with a generated (or previously-persisted) admin password.
 
 .EXAMPLE
     pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Initialize-SonarQube.ps1 -NewPassword "MyPassword123"
-    Commissions SonarQube with a custom admin password.
+    Commissions SonarQube with a caller-supplied admin password.
 #>
 
 [CmdletBinding()]
 param(
     [string] $SonarUrl     = $null,
-    [string] $NewPassword  = 'Scanner-1234',
+    [string] $NewPassword  = '',
     [string] $ProjectKey   = $null,
     [string] $ProjectName  = $null,
     [string] $TokenName    = 'LocalDev'
@@ -55,6 +62,7 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference    = 'SilentlyContinue'
 
 . (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/secret.ps1')
 . (Join-Path $PSScriptRoot '../../.shared/sonarqube.ps1')
 
 # Apply defaults from shared constants.
@@ -62,10 +70,32 @@ if ([string]::IsNullOrWhiteSpace($SonarUrl))     { $SonarUrl     = $SonarQubeDef
 if ([string]::IsNullOrWhiteSpace($ProjectKey))   { $ProjectKey   = $SonarQubeDefaultProjectKey }
 if ([string]::IsNullOrWhiteSpace($ProjectName)) { $ProjectName = $SonarQubeDefaultProjectName }
 
+$repoRoot    = Get-RepoRoot -StartDirectory $PSScriptRoot
+$envFilePath = Join-Path $repoRoot '.etc/powershell/.env'
+
+# --- Resolve the effective admin password (F-23/D-4) ---
+#
+# Resolution order: explicit -NewPassword -> a previously-persisted SONARQUBE_ADMIN_PASSWORD (so
+# re-running this script is idempotent and reuses the same password instead of locking the
+# operator out) -> a freshly generated cryptographically random value. Never a fixed, documented
+# default like the removed 'Scanner-1234'.
+
+if ([string]::IsNullOrWhiteSpace($NewPassword)) {
+    $persistedPassword = Get-ToolSecret -Name 'SONARQUBE_ADMIN_PASSWORD' -EnvFilePath $envFilePath
+    if (-not [string]::IsNullOrWhiteSpace($persistedPassword)) {
+        $NewPassword = $persistedPassword
+    }
+    else {
+        $passwordBytes = [byte[]]::new(32)
+        [System.Security.Cryptography.RandomNumberGenerator]::Fill($passwordBytes)
+        $NewPassword = [Convert]::ToBase64String($passwordBytes)
+    }
+}
+
 # --- Banner ---
 
 Write-Host ''
-Write-Host '=== SonarQube Setup ===' -ForegroundColor Cyan
+Write-Host '=== SonarQube Commissioning ===' -ForegroundColor Cyan
 Write-Host "Server        : $SonarUrl"
 Write-Host "Project       : $ProjectName ($ProjectKey)"
 Write-Host "Token Name    : $TokenName"
@@ -133,6 +163,13 @@ if ($isFreshInstall) {
     }
 }
 
+# $NewPassword is now confirmed to be the server's active admin password (either just changed
+# above, or already-configured and validated against $newHeaders in step 2) - persist it
+# unconditionally so .etc/powershell/.env always reflects reality.
+Write-Host 'Persisting SONARQUBE_ADMIN_PASSWORD... ' -NoNewline
+Set-DotEnvVariable -Path $envFilePath -Name 'SONARQUBE_ADMIN_PASSWORD' -Value $NewPassword
+Write-Host 'Done (written to .etc/powershell/.env, not echoed)' -ForegroundColor Green
+
 # --- 4. Create project ---
 
 Write-Host 'Creating project...           ' -NoNewline
@@ -160,7 +197,7 @@ catch {
 
 Write-Host 'Checking existing token...    ' -NoNewline
 
-$existingToken = $env:SONARQUBE_TOKEN
+$existingToken = Get-ToolSecret -Name 'SONARQUBE_TOKEN' -EnvFilePath $envFilePath
 $tokenValue = $null
 
 if (-not [string]::IsNullOrWhiteSpace($existingToken)) {
@@ -217,16 +254,18 @@ if ($null -eq $tokenValue) {
 
 # --- 6. Persist token ---
 
-Write-Host 'Persisting SONARQUBE_TOKEN... ' -NoNewline
+Write-Host 'Persisting SONARQUBE_TOKEN...  ' -NoNewline
 
-[Environment]::SetEnvironmentVariable('SONARQUBE_TOKEN', $tokenValue, 'User')
+Set-DotEnvVariable -Path $envFilePath -Name 'SONARQUBE_TOKEN' -Value $tokenValue
 $env:SONARQUBE_TOKEN = $tokenValue
 
-Write-Host 'Done (User environment variable)' -ForegroundColor Green
+Write-Host 'Done (written to .etc/powershell/.env, not echoed)' -ForegroundColor Green
 
 # --- 7. Summary ---
 
 Write-Host ''
-Write-Host 'Setup complete. You can now run:' -ForegroundColor Green
+Write-Host 'Commissioning complete.' -ForegroundColor Green
+Write-Host 'SONARQUBE_ADMIN_PASSWORD and SONARQUBE_TOKEN were written to .etc/powershell/.env (values not printed above).' -ForegroundColor Green
+Write-Host 'You can now run:' -ForegroundColor Green
 Write-Host '  pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Run-SonarScanner.ps1' -ForegroundColor White
 Write-Host ''

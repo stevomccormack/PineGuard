@@ -45,13 +45,17 @@ As of the run when this suite was added (Pester 5.7.1, 261 tests, 223 passed / 3
   text (F-46, exact match); Phase 5 replaces it with real documentation.
 - **`Windows-Isms.Tests.ps1`** — 3 of 5 tests red at the time this suite was added. Category A
   (hardcoded backslash path separators, including `tools/.shared/dotnet-projects.ps1`'s own
-  registry fields — SourceDir, SourceCsprojs, TestCsproj, DefaultSourcePrefix) has 81 hits across
+  registry fields — SourceDir, SourceCsprojs, TestCsproj, DefaultSourcePrefix) has 84 hits across
   14 files; T3.09 (D-5 sweep) fixes it. Category B (hardcoded `.exe`) originally had 2 hits, both
   in `dotnet-tools-reportgenerator.ps1` — that file was deleted by T2.07 (the local dotnet tool
   manifest work), which incidentally turned this category green ahead of Phase 3. Category C
   (`$env:TEMP`) already passes with zero hits — T1.03 fixed the one usage that used to exist.
-  Category D (`SetEnvironmentVariable(...,'User')`) has one hit
-  (`sonar-scanner/Setup-SonarQube.ps1`); D-4 fixes it. Current state: 2 of 5 tests red (A and D).
+  Category D (`SetEnvironmentVariable(...,'User')`) had one hit
+  (`sonar-scanner/Setup-SonarQube.ps1`) — T3.05 fixed it: the renamed
+  `code-scan/sonarqube/Initialize-SonarQube.ps1` now writes the admin password and token to
+  `.etc/powershell/.env` via the new `Set-DotEnvVariable` (`tools/.shared/dotenv.ps1`) instead of
+  the User environment variable. Category D is green. Current state: 1 of 5 tests red (A only;
+  T3.09).
 - **`Bom-Absence.Tests.ps1`** — 14 of 68 tests red (14 files carry a BOM, matching F-47 for this
   scope). Red until T2.06 lands (BOM/whitespace strip); green after.
 
