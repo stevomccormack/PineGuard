@@ -37,7 +37,7 @@ We use a strict **Verb-Noun** standard, with specific semantic meanings for verb
 - **`Test-`**: Audit and Verification scripts.
   - Performs checks, scans, or assertions.
   - **Output**: JSON/Text reports in `artifacts/audit/` or console pass/fail.
-  - **Example**: `Test-SpecNaming.ps1`, `tools/code-coverage/xplat/Test-CoverageAnalysis.ps1`.
+  - **Example**: `Test-SpecNaming.ps1`, `tools/code-coverage/Test-Coverage.ps1` (was `tools/code-coverage/xplat/Test-CoverageAnalysis.ps1`).
 
 - **`Gen-`**: Generator scripts.
   - Generates reports or output based on templates or data.
@@ -147,14 +147,14 @@ Most tool domains are governed by this spec alone. A domain gets its own spec on
 |--------|------|
 | `tools/audit-cli/` | `docs/ai/specs/tools/audit-cli/spec.md` |
 | `tools/code-diagnostics/` | `docs/ai/specs/tools/code-diagnostics/spec.md` |
-| `tools/code-inspection/` | `docs/ai/specs/tools/code-inspection/qodana.md` |
-| `tools/sonar-scanner/` | `docs/ai/specs/scan/spec.md` |
+| `tools/code-scan/qodana/` | `docs/ai/specs/tools/code-scan/qodana/qodana.md` |
+| `tools/code-scan/sonarqube/` | `docs/ai/specs/scan/spec.md` |
 | `tools/code-coverage/` | This spec only |
-| `tools/code-formatter/` | This spec only |
-| `tools/docker/` | This spec only |
+| `tools/code-format/` | This spec only |
+| `tools/clean/` | This spec only |
 | `tools/git/` | This spec only |
-| `tools/maintenance/` | This spec only |
-| `tools/release/` | This spec only |
+| `tools/github/` | This spec only |
+| `tools/nuget/` | This spec only |
 | `tools/testing/` | This spec only |
 
 Per-domain operational documentation (usage, parameters) lives in each `tools/<domain>/README.md`, not in a spec.

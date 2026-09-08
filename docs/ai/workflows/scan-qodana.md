@@ -7,13 +7,13 @@ version: 1.0
 # Workflow: Scan Qodana
 
 > [!NOTE]
-> Runs JetBrains Qodana locally via the repo wrapper under `tools/code-inspection/qodana/`.
+> Runs JetBrains Qodana locally via the repo wrapper under `tools/code-scan/qodana/`.
 
 ## Context
 
 - **Role**: [Code Reviewer](../roles/reviewer.md)
-- **Reference**: `tools/code-inspection/Run-Qodana.ps1`
-- **Docs**: `docs/ai/specs/tools/code-inspection/qodana.md`
+- **Reference**: `tools/code-scan/qodana/Run-Qodana.ps1`
+- **Docs**: `docs/ai/specs/tools/code-scan/qodana/qodana.md`
 
 ## Parameters
 
@@ -36,7 +36,7 @@ See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface invento
    **Command Template**:
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-inspection/Run-Qodana.ps1" -Scope [SCOPE] -Clean
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/qodana/Run-Qodana.ps1" -Scope [SCOPE] -Clean
    ```
 
    Notes:
@@ -47,7 +47,7 @@ See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface invento
    Optional: open the generated HTML report automatically:
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-inspection/Run-Qodana.ps1" -Scope [SCOPE] -Clean -OpenReport
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/qodana/Run-Qodana.ps1" -Scope [SCOPE] -Clean -OpenReport
    ```
 
 2. **Inspect outputs**

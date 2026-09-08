@@ -22,7 +22,7 @@ Run `dotnet format` to enforce `.editorconfig` rules across PineGuard source and
 ## 4. Execution Steps
 
 1.  **Run Format Command**
-    - Run the script: `tools/code-formatter/Run-Format.ps1 -Scope [ScopeName]`
+    - Run the script: `tools/code-format/Run-Format.ps1 -Scope [ScopeName]`
     - _Or_ use dotnet directly: `dotnet format [path-to-project-or-solution]`
 
 2.  **Verify Results**

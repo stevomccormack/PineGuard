@@ -13,7 +13,7 @@ version: 1.1
 
 - **Role**: [Senior Engineer](../roles/owner.md)
 - **Skill**: [Fix Sonar Issues](../skills/fix-sonar/SKILL.md) — the canonical procedure
-- **Reference**: `tools/sonar-scanner/Get-SonarIssues.ps1`
+- **Reference**: `tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1`
 - **Spec**: `docs/ai/specs/scan/spec.md`
 
 ## Parameters

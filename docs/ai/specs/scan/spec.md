@@ -8,7 +8,7 @@ spec:
   dependencies:
     - ../dependencies.md
 applies_to:
-  - "tools/sonar-scanner/**"
+  - "tools/code-scan/sonarqube/**"
 ---
 
 # Scan Specification (SonarQube)
@@ -75,11 +75,11 @@ Priority order:
 
 | Script | Purpose |
 |--------|---------|
-| `tools/sonar-scanner/Initialize-SonarQube.ps1` | Install Java, scanner, start Docker |
-| `tools/sonar-scanner/Run-SonarScanner.ps1` | Full analysis pipeline |
-| `tools/sonar-scanner/Get-SonarIssues.ps1` | Fetch issues by severity (JSON output) |
-| `tools/docker/docker-compose.sonarqube.yml` | Docker Compose definition |
-| `tools/docker/sonarqube-up.ps1` | Start SonarQube container |
+| `tools/code-scan/sonarqube/Install-SonarQube.ps1` | Install Java, scanner, start Docker |
+| `tools/code-scan/sonarqube/Run-SonarScanner.ps1` | Full analysis pipeline |
+| `tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1` | Fetch issues by severity (JSON output) |
+| `tools/code-scan/sonarqube/docker-compose.yml` | Docker Compose definition |
+| `tools/code-scan/sonarqube/Start-SonarQube.ps1` | Start SonarQube container |
 
 ## 7. Fix Workflow Rules
 
@@ -92,6 +92,6 @@ Priority order:
 
 ## 8. References
 
-- Tool README: `tools/sonar-scanner/README.md`
+- Tool README: `tools/code-scan/sonarqube/README.md`
 - Coding standards: `docs/ai/specs/coding-standard.md`
 - Safety spec: `docs/ai/specs/safety.md`

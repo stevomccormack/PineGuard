@@ -15,12 +15,12 @@ PowerShell scripts for building, testing, auditing, formatting, generating, and 
 | [code-coverage](code-coverage/README.md) | Cobertura coverage collection and analysis | `Run-CodeCoverage.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, Testing, All, Custom |
 | [code-diagnostics](code-diagnostics/README.md) | Roslyn compiler warning capture and reporting | `Run-CompilerDiagnostics.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, Testing, All |
 | [code-format](code-format/README.md) | `dotnet format` wrapper with scope support | `Run-Format.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, Testing, All |
-| [code-inspection](code-inspection/README.md) | JetBrains Qodana static inspection | `Run-Qodana.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, Testing, All |
-| [docker](docker/README.md) | Docker Compose stacks for Qodana and SonarQube | `docker-up.ps1` | Qodana, SonarQube |
+| [code-scan/qodana](code-scan/qodana/README.md) | JetBrains Qodana static inspection | `Run-Qodana.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, Testing, All |
+| [code-scan/sonarqube](code-scan/sonarqube/README.md) | SonarQube static analysis scanning | `Run-SonarScanner.ps1` | Project-level scanning |
 | [git](git/README.md) | Scoped commit orchestration | `Run-Commits.ps1` | Agent, Core, DataAnnotations, Docs, FluentValidation, GuardClauses, MustClauses, Options, Testing, Tools, Solution |
-| [maintenance](maintenance/README.md) | Cleanup of artifacts, logs, and root build files; structural-integrity checks after folder/namespace moves | `Run-Clean.ps1`, `Test-StructuralIntegrity.ps1` | `-Logs`, `-Artifacts`, `-Root`; Build, Test, Paths, Namespaces, Sonar, All |
-| [release](release/README.md) | GitHub Release publishing, ruleset toggles, nuget.org unlist | `Run-GithubRelease.ps1` | `-BypassPR`, `-Unlist`, `-Draft`, `-Force`, `-Watch` |
-| [sonar-scanner](sonar-scanner/README.md) | SonarQube static analysis scanning | `Run-SonarScanner.ps1` | Project-level scanning |
+| [clean](clean/README.md) | Cleanup of artifacts, logs, and root build files; structural-integrity checks after folder/namespace moves | `Run-Clean.ps1`, `Test-StructuralIntegrity.ps1` | `-Target Logs`, `-Target Artifacts`, `-Target Root`; Build, Test, Paths, Namespaces, Sonar, All |
+| [github](github/README.md) | GitHub Release publishing and ruleset toggles | `Run-Release.ps1`, `Set-GithubRuleset.ps1` | `-BypassPR`, `-Draft`, `-Force`, `-Watch` |
+| [nuget](nuget/README.md) | NuGet package management | `Unpublish-NugetPrerelease.ps1` | `-All`, `-Watch` |
 | [testing](testing/README.md) | `dotnet test` wrapper with async support | `Run-Tests.ps1` | Project or Solution targeting |
 
 ### Internal Directories

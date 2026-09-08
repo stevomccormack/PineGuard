@@ -1938,6 +1938,45 @@
                 "Format: Testing"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Release: GitHub Release Publish",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/github/Run-Release.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: GitHub Ruleset",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/github/Set-GithubRuleset.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: NuGet Unpublish Prerelease",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/nuget/Unpublish-NugetPrerelease.ps1"
+            ],
+            "problemMatcher": []
         }
     ]
 }

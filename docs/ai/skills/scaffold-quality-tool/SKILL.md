@@ -186,8 +186,8 @@ Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if
 
 | Tool | Tools Dir | Spec | Rules | Skills | Workflows | Agents | Commands |
 |------|-----------|------|-------|--------|-----------|--------|----------|
-| SonarQube | `tools/sonar-scanner/` | `specs/scan/spec.md` | `rules/scan.md` | `skills/scan-sonar/`, `skills/fix-sonar/` | `workflows/scan-sonar.md`, `workflows/fix-sonar.md` | `agents/scan-sonar.md`, `agents/fix-sonar-*.md` | `commands/scan.md` |
-| Qodana | `tools/code-inspection/` | `specs/tools/code-inspection/qodana.md` | — | — | `workflows/scan-qodana.md` | `agents/scan-qodana-*.md` | `commands/scan.md` |
+| SonarQube | `tools/code-scan/sonarqube/` | `specs/scan/spec.md` | `rules/scan.md` | `skills/scan-sonar/`, `skills/fix-sonar/` | `workflows/scan-sonar.md`, `workflows/fix-sonar.md` | `agents/scan-sonar.md`, `agents/fix-sonar-*.md` | `commands/scan.md` |
+| Qodana | `tools/code-scan/qodana/` | `specs/tools/code-scan/qodana/qodana.md` | — | — | `workflows/scan-qodana.md` | `agents/scan-qodana-*.md` | `commands/scan.md` |
 | Roslyn | `tools/code-diagnostics/` | `specs/tools/code-diagnostics/spec.md` | `rules/roslyn.md` | `skills/scan-roslyn/`, `skills/fix-roslyn/` | `workflows/scan-roslyn.md`, `workflows/fix-roslyn.md` | `agents/scan-roslyn-*.md`, `agents/fix-roslyn-*.md` | `commands/scan.md` |
 | Coverage | `tools/code-coverage/` | `specs/testing/coverage.md` | `rules/testing.md` | `skills/improve-coverage/` | `workflows/coverage.md` | `agents/coverage-*.md` | `commands/coverage.md` |
 

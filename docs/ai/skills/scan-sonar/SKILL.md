@@ -22,7 +22,7 @@ Run a full SonarQube static analysis against the PineGuard codebase and direct t
    Always verify the container is running first (idempotent):
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/sonar-scanner/Initialize-SonarQube.ps1"
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/sonarqube/Install-SonarQube.ps1"
    ```
 
 2. **Run the Analysis**
@@ -30,7 +30,7 @@ Run a full SonarQube static analysis against the PineGuard codebase and direct t
    Execute the main build wrapper:
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/sonar-scanner/Run-SonarScanner.ps1"
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/sonarqube/Run-SonarScanner.ps1"
    ```
 
 3. **Interpret Results**
@@ -63,4 +63,4 @@ Run a full SonarQube static analysis against the PineGuard codebase and direct t
 
 ## 8. Reference Material (Deep Dive)
 - `docs/ai/specs/scan/spec.md` (severity model, API, fix rules)
-- `tools/sonar-scanner/README.md` (usage, parameters, first-run setup)
+- `tools/code-scan/sonarqube/README.md` (usage, parameters, first-run setup)

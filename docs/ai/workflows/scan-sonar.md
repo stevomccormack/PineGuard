@@ -7,12 +7,12 @@ version: 1.0
 # Workflow: Scan Sonar
 
 > [!NOTE]
-> Runs SonarQube analysis locally via the repo wrapper under `tools/sonar-scanner/`.
+> Runs SonarQube analysis locally via the repo wrapper under `tools/code-scan/sonarqube/`.
 
 ## Context
 
 - **Role**: [Code Reviewer](../roles/reviewer.md)
-- **Reference**: `tools/sonar-scanner/Run-SonarScanner.ps1`
+- **Reference**: `tools/code-scan/sonarqube/Run-SonarScanner.ps1`
 - **Docs**: `docs/ai/specs/scan/spec.md`
 
 ## Parameters
@@ -36,18 +36,18 @@ See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface invento
 2. **Initialize SonarQube** (idempotent — safe to re-run):
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/sonar-scanner/Initialize-SonarQube.ps1"
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/sonarqube/Install-SonarQube.ps1"
    ```
 
 3. **Run the analysis pipeline**:
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/sonar-scanner/Run-SonarScanner.ps1"
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/sonarqube/Run-SonarScanner.ps1"
    ```
 
    Notes:
    - If the script prompts for a token, the user must generate one at `http://localhost:9001`.
-   - See `tools/sonar-scanner/README.md` § "3. Commission the server (first run only)" for first-run setup.
+   - See `tools/code-scan/sonarqube/README.md` § "3. Commission the server (first run only)" for first-run setup.
 
 4. **Review findings**
 

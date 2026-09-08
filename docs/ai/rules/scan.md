@@ -4,7 +4,7 @@
 
 Before doing any scan-related work, also read:
 - `docs/ai/specs/scan/spec.md` (normative specification: severity model, API endpoints, fix rules)
-- `tools/sonar-scanner/README.md` (operational docs: usage, parameters, examples)
+- `tools/code-scan/sonarqube/README.md` (operational docs: usage, parameters, examples)
 
 ## Key Rules
 

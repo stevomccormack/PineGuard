@@ -1,16 +1,16 @@
 ---
 spec:
-  id: pineguard.ai.tools.code-inspection.qodana
+  id: pineguard.ai.tools.code-scan.qodana
   title: "Qodana (Code Quality)"
   version: 1
   template:
-    - ../../../meta/template-project.md
+    - ../../../../meta/template-project.md
   parent:
     - ../spec.md
   dependencies:
-    - ../../dependencies.md
+    - ../../../dependencies.md
 applies_to:
-  - "tools/code-inspection/**"
+  - "tools/code-scan/qodana/**"
 ---
 
 # Qodana (Code Quality)
@@ -19,7 +19,7 @@ This repo can be analyzed with JetBrains Qodana locally and in GitHub Actions.
 
 For full usage examples, parameters, and directory structure, see:
 
-- `tools/code-inspection/README.md` (source of truth for operational documentation)
+- `tools/code-scan/qodana/README.md` (source of truth for operational documentation)
 
 ## GitHub Actions Setup
 
@@ -30,14 +30,14 @@ For full usage examples, parameters, and directory structure, see:
 Notes:
 
 - The job uses `JetBrains/qodana-action@v2026.2` with `upload-result: true` — results are attached as a workflow artifact and sent to Qodana Cloud. There is no SARIF upload to GitHub Code Scanning.
-- The analysis uses `tools/code-inspection/qodana/config/qodana.all.yaml` and builds `tools/code-inspection/qodana/PineGuard.All.Qodana.slnx`.
+- The analysis uses `tools/code-scan/qodana/config/qodana.all.yaml` and builds `tools/code-scan/qodana/PineGuard.All.Qodana.slnx`.
 
 ## Local Installation
 
 ### Windows
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-inspection/Initialize-Qodana.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Install-Qodana.ps1
 ```
 
 Installs the Qodana CLI via Winget if missing, then starts the Qodana Docker Compose stack (requires Docker Desktop running). Do not use it in CI.
@@ -58,7 +58,7 @@ qodana scan
 
 ## Key Design Decisions
 
-- Each scope uses a dedicated `.slnx` solution file under `tools/code-inspection/qodana/` (keeps analysis focused).
+- Each scope uses a dedicated `.slnx` solution file under `tools/code-scan/qodana/` (keeps analysis focused).
 - The wrapper forces non-interactive mode by default (CI-safe).
 - Docker is the default runtime.
 - Hard timeout (`-TimeoutMinutes 30`) prevents hung Qodana processes.

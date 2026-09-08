@@ -24,12 +24,12 @@ Query the SonarQube API for issues filtered by severity, then fix them in-place 
    pwsh -NoProfile -ExecutionPolicy Bypass -Command "Invoke-RestMethod -Uri 'http://localhost:9001/api/system/status'"
    ```
 
-   If not UP, instruct user to run `Initialize-SonarQube.ps1`.
+   If not UP, instruct user to run `tools/code-scan/sonarqube/Install-SonarQube.ps1`.
 
 2. **Fetch Issues**
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/sonar-scanner/Get-SonarIssues.ps1" -Severity [SEVERITY]
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1" -Severity [SEVERITY]
    ```
 
    Parse the JSON output. Each entry: `{ file, line, rule, severity, message, component }`.
@@ -58,4 +58,4 @@ Query the SonarQube API for issues filtered by severity, then fix them in-place 
 ## 6. Reference Material (Deep Dive)
 - `docs/ai/specs/scan/spec.md` (severity model, API, fix rules)
 - `docs/ai/specs/coding-standard.md` (formatting, naming)
-- `tools/sonar-scanner/README.md` (tool usage)
+- `tools/code-scan/sonarqube/README.md` (tool usage)
