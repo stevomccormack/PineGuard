@@ -1977,6 +1977,19 @@
                 "./tools/nuget/Unpublish-NugetPrerelease.ps1"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Tools: Lint (PSScriptAnalyzer + Pester)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Test-Tools.ps1"
+            ],
+            "problemMatcher": []
         }
     ]
 }

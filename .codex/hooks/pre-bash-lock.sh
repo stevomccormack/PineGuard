@@ -6,7 +6,7 @@
 #
 # Matched commands (case-insensitive):
 #   dotnet test | dotnet build | dotnet publish
-#   Run-CodeCoverage.ps1
+#   Run-CodeCoverage.ps1 / New-CoverageReport.ps1 / Test-Coverage.ps1
 #   Run-SonarScanner.ps1
 #   sonar-scanner / sonarscanner
 #
@@ -22,7 +22,7 @@ COMMAND=$(echo "$INPUT" | sed -n 's/.*"command" *: *"\([^"]*\)".*/\1/p' | head -
 
 # Only gate on heavy / potentially conflicting commands
 if ! echo "$COMMAND" | grep -qiE \
-    '(dotnet[[:space:]]+(test|build|publish)|Run-CodeCoverage|Run-SonarScanner|sonar-scanner|sonarscanner)'; then
+    '(dotnet[[:space:]]+(test|build|publish)|Run-CodeCoverage|New-CoverageReport|Test-Coverage|Run-SonarScanner|sonar-scanner|sonarscanner)'; then
   exit 0
 fi
 
