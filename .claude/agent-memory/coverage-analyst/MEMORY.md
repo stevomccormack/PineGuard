@@ -9,11 +9,11 @@
 ### Coverage Tool Usage
 - Default engine: xplat (cross-platform Coverlet)
 - Command: `pwsh -NoProfile -ExecutionPolicy Bypass -Command "cd '...'; ./tools/code-coverage/Run-CodeCoverage.ps1 -Mode GenerateAndAnalyze -Scope [ProjectName] -Top 30 -SkipHtml -Format cobertura"`
-- Note: `-Format cobertura` MUST be supplied explicitly — omitting it causes `Gen-CoverageReport.ps1` ValidateSet failure (empty string fails validation).
+- Note: `-Format cobertura` MUST be supplied explicitly — omitting it causes `New-CoverageReport.ps1` ValidateSet failure (empty string fails validation).
 - Note: `-Engine` parameter does NOT exist on `Run-CodeCoverage.ps1` — remove it from any stored commands.
 - dotCover: blocker resolved (Mar 2026) by adding Webroot AV exclusions — 2025.3.3 verified on net8.0 and net10.0, as is xplat. The driver script has not been re-added to `tools/code-coverage/`, so use xplat until it is.
 - Valid scopes: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All
-- Reports land in: `artifacts/code-coverage/xplat/`
+- Reports land in: `artifacts/code-coverage/coverlet/`
 
 ### Common Gap Patterns
 - **Null check branches**: Method accepts `string?` but tests only pass non-null

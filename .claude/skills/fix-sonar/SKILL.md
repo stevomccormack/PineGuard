@@ -22,7 +22,7 @@ Execute `docs/ai/skills/fix-sonar/SKILL.md` exactly as written.
 Do NOT suppress warnings. Fix the root cause.
 
 ## Step 2: Iterative Loop
-1. Fetch issues: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/sonar-scanner/Get-SonarIssues.ps1" -Severity [SEVERITY]`
+1. Fetch issues: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1" -Severity [SEVERITY]`
 2. Fix one file at a time
 3. Build: `dotnet build PineGuard.slnx --no-incremental`
 4. Repeat until all fixable issues resolved

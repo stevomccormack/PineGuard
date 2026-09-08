@@ -67,7 +67,7 @@ after (a) `StringUtility.TryParseDigits` has already guaranteed every character 
 impose no such pre-filtering on `DecimalUtility.TryGetPrecisionAndScale` (every branch — null check,
 fractional-loop entered/not-entered, significant-digit-loop entered/not-entered — is reachable through
 some already-required Rule-level boundary fixture case), so it reached 100%/100% with zero direct
-`DecimalUtilityTests.cs`, confirmed empirically via `Test-CoverageAnalysis.ps1 -IncludeClassNameRegex`
+`DecimalUtilityTests.cs`, confirmed empirically via `Test-Coverage.ps1 -IncludeClassNameRegex`
 scoped to just the four target classes rather than guessing. Always verify this way instead of
 reflexively writing a full Utils test file for every Utils class a task's coverage target line names.
 

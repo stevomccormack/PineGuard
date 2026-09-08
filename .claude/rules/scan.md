@@ -1,6 +1,6 @@
 ---
 paths:
-  - "tools/sonar-scanner/**"
+  - "tools/code-scan/sonarqube/**"
 ---
 
 # Scan (SonarQube)

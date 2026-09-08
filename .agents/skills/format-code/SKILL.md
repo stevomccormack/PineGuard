@@ -20,7 +20,7 @@ Read these files:
 Execute `docs/ai/skills/format-code/SKILL.md` exactly as written.
 
 ## Step 2: Format
-- Scope-specific: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope [ScopeName]`
+- Scope-specific: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps1" -Scope [ScopeName]`
 - Or direct: `dotnet format [path-to-project-or-solution]`
 
 ## Step 3: Verify
