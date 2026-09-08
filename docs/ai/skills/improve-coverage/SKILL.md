@@ -26,15 +26,15 @@ Run code coverage analysis and improve unit tests to reach 100% line and branch 
       (`-Mode Generate|Analyze|GenerateAndAnalyze`; scopes: `Core`, `MustClauses`, `GuardClauses`,
       `DataAnnotations`, `FluentValidation`, `Testing`, `All`).
     - Or drive the two stages directly, which is the loop the coverage spec defines:
-      - `tools/code-coverage/xplat/Gen-CoverageReport.ps1 -Scope [Scope]`
-      - `tools/code-coverage/xplat/Test-CoverageAnalysis.ps1 -Scope [Scope] -Top 30`
+      - `tools/code-coverage/New-CoverageReport.ps1 -Scope [Scope]`
+      - `tools/code-coverage/Test-Coverage.ps1 -Scope [Scope] -Top 30`
 
 2.  **Analyze Report**
     - HTML: `artifacts/code-coverage/xplat/html/index.html`
       (stable redirect: `artifacts/code-coverage/xplat-report.html`).
     - Identify red lines (uncovered) and yellow diamonds (partial branches).
     - For a fast console-only pass, add `-SkipHtml` and read the ranked gap table from
-      `Test-CoverageAnalysis.ps1` instead of opening the report.
+      `tools/code-coverage/Test-Coverage.ps1` instead of opening the report.
 
 3.  **Fill Gaps**
     - **Null Checks**: Did you test passing `null`?
@@ -47,7 +47,7 @@ Run code coverage analysis and improve unit tests to reach 100% line and branch 
 ## 5. Definition of Done
 
 - [ ] Report shows 100% coverage for the target class/project.
-- [ ] `Run-CodeCoverage.ps1 -Scope [Scope] -Enforce100` (or `Test-CoverageAnalysis.ps1 -Enforce100`) exits 0.
+- [ ] `Run-CodeCoverage.ps1 -Scope [Scope] -Enforce100` (or `tools/code-coverage/Test-Coverage.ps1 -Enforce100`) exits 0.
 
 ## 6. Troubleshooting
 

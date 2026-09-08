@@ -53,8 +53,8 @@ A test operation group reaches **GOLD** when:
 
 ## Coverage Verification (2026-08-21)
 
-`Test-CoverageAnalysis.ps1 -Enforce100` exits 0 for `All` and for every individual
-scope, against a full `Gen-CoverageReport.ps1 -Scope All` run covering net8.0 and
+`tools/code-coverage/Test-Coverage.ps1 -Enforce100` exits 0 for `All` and for every individual
+scope, against a full `tools/code-coverage/New-CoverageReport.ps1 -Scope All` run covering net8.0 and
 net10.0 (13,698 tests per target framework, 0 failures):
 
 | Scope | Line | Branch |

@@ -7,8 +7,8 @@
     Write-Detail into the calling script's scope.
 
     Consolidates the console-helper functions that used to be redefined separately (with
-    differing names and colours) in tools/release/Run-GithubRelease.ps1, Run-GithubRuleset.ps1,
-    Run-NugetUnlist.ps1, and tools/clean/Test-StructuralIntegrity.ps1 (F-37). Write-Fail only
+    differing names and colours) in tools/github/Run-Release.ps1, Set-GithubRuleset.ps1,
+    tools/nuget/Unpublish-NugetPrerelease.ps1, and tools/clean/Test-StructuralIntegrity.ps1 (F-37). Write-Fail only
     writes; it does not exit — callers that want "log and stop" compose it themselves (e.g. a local
     `Fail` wrapper that calls Write-Fail then `exit 1`), because how "stop" should look (immediate
     exit vs. accumulating an issue count) is a caller decision, not a console-output one.

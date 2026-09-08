@@ -93,13 +93,13 @@ Only use these if you need custom arguments not covered by the agents.
 
 ```powershell
 # Generate (Cobertura XML + HTML)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Scope Core
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/New-CoverageReport.ps1" -Scope Core
 
 # Analyze (pick targets)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Core -Top 30
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope Core -Top 30
 
 # Enforce 100%
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Core -Enforce100
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope Core -Enforce100
 ```
 
 Speed rules:
@@ -163,7 +163,7 @@ Supported presets:
 
 ### PineGuard.Testing scope
 
-`Testing` is a first-class preset in the `ValidateSet` of `Run-CodeCoverage.ps1`, `Gen-CoverageReport.ps1` and `Test-CoverageAnalysis.ps1`. Run it like any other scope:
+`Testing` is a first-class preset in the `ValidateSet` of `Run-CodeCoverage.ps1`, `New-CoverageReport.ps1` and `Test-Coverage.ps1`. Run it like any other scope:
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope Testing
@@ -206,6 +206,6 @@ Notes:
 
 - [tools/code-coverage/README.md](../../../../tools/code-coverage/README.md)
 - [tools/code-coverage/Run-CodeCoverage.ps1](../../../../tools/code-coverage/Run-CodeCoverage.ps1)
-- [tools/code-coverage/xplat/Gen-CoverageReport.ps1](../../../../tools/code-coverage/xplat/Gen-CoverageReport.ps1)
-- [tools/code-coverage/xplat/Test-CoverageAnalysis.ps1](../../../../tools/code-coverage/xplat/Test-CoverageAnalysis.ps1)
+- [tools/code-coverage/New-CoverageReport.ps1](../../../../tools/code-coverage/New-CoverageReport.ps1)
+- [tools/code-coverage/Test-Coverage.ps1](../../../../tools/code-coverage/Test-Coverage.ps1)
 - `tools/code-coverage/coverlet.runsettings`

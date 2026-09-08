@@ -225,7 +225,7 @@ Write-Host "Config   : $configPath" -ForegroundColor DarkGray
 Write-Host "Results  : $resultsDirResolved" -ForegroundColor DarkGray
 
 if (-not (Test-CommandExists -Name 'qodana')) {
-    throw "Qodana CLI ('qodana') was not found on PATH. See docs/ai/specs/tools/code-inspection/qodana.md for install steps."
+    throw "Qodana CLI ('qodana') was not found on PATH. See docs/ai/specs/tools/code-scan/qodana.md for install steps."
 }
 
 if (-not (Test-CommandExists -Name 'docker')) {

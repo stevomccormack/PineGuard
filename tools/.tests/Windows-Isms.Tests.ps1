@@ -22,7 +22,7 @@
          touches the current process and is not Windows-specific.
 
     T3.09 (D-5 sweep) is the task that actually fixes these; T1.03 already fixed the one
-    `$env:TEMP` usage that used to exist (Test-CoverageAnalysis.ps1's isolated-copy path), which
+    `$env:TEMP` usage that used to exist (tools/code-coverage/Test-Coverage.ps1's isolated-copy path), which
     is why category C is expected to already pass.
 
     SCOPE NOTE: unlike the other hygiene tests in this suite, this one excludes tools/.tests/**

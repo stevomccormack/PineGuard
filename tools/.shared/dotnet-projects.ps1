@@ -250,7 +250,7 @@ function Get-PineGuardScope {
             TestCsproj               = 'tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj'
             # NOTE: unlike the other five scopes, Testing's own coverage scripts default the
             # test-project filter to the wildcard, not to its own test csproj filename — verified
-            # against Run-CodeCoverage.ps1 and Gen-CoverageReport.ps1 before this refactor.
+            # against Run-CodeCoverage.ps1 and tools/code-coverage/New-CoverageReport.ps1 before this refactor.
             DefaultProjectFilter     = '*.UnitTests.csproj'
             CoverageIncludePatterns  = @('[PineGuard.Testing]*')
             PathIncludeRegex         = '^tests[/\\]+PineGuard\.Testing[/\\]+'
@@ -275,8 +275,8 @@ function Get-PineGuardPackableProjects {
 
     .DESCRIPTION
         Replaces the hand-maintained package-name lists that used to be duplicated, independently
-        typed, and drift-prone in tools/release/Run-GithubRelease.ps1 (a URL-printing loop) and
-        tools/release/Run-NugetUnlist.ps1 (a -Package default array) — T1.06 patched both by hand
+        typed, and drift-prone in tools/github/Run-Release.ps1 (a URL-printing loop) and
+        tools/nuget/Unpublish-NugetPrerelease.ps1 (a -Package default array) — T1.06 patched both by hand
         to add MediatR and Analyzers; this is the F-21 root-cause fix so no future scope addition
         needs a second manual edit here (T3.08).
 

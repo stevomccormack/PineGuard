@@ -36,7 +36,7 @@ Pick the layer the user named. If none was named, default to `MustClauses`.
      pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/helpers/Test-CoverageLatest.ps1" -TargetFilter '*PineGuard.MustClauses.UnitTests*' -OutputPath 'artifacts/audit/util/audit-gap-latest-coverage.txt'
      ```
 
-   - For a richer per-class table instead of a flat report, use `tools/code-coverage/xplat/Test-CoverageAnalysis.ps1 -Scope <Layer> -AsTable`.
+   - For a richer per-class table instead of a flat report, use `tools/code-coverage/Test-Coverage.ps1 -Scope <Layer> -AsTable`.
    - If no report is found, generate one first via the matching `/coverage-<layer>` agent.
 
 3. **Transition: remediate**

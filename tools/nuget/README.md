@@ -2,7 +2,7 @@
 
 PowerShell tooling for managing PineGuard packages on nuget.org.
 
-This folder was split out of `tools/release/` (T3.08, D-1a): nuget.org tooling is never nested
+This folder was split out during Phase 3 (T3.08, D-1a): nuget.org tooling is never nested
 under `github/`, since it wraps a different product with its own auth and API. The GitHub-side
 release orchestrator that can trigger an unlist as its last step now lives in
 [`tools/github/`](../github/README.md).

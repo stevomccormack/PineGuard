@@ -51,7 +51,7 @@ As of the run when this suite was added (Pester 5.7.1, 261 tests, 223 passed / 3
   manifest work), which incidentally turned this category green ahead of Phase 3. Category C
   (`$env:TEMP`) already passes with zero hits — T1.03 fixed the one usage that used to exist.
   Category D (`SetEnvironmentVariable(...,'User')`) had one hit
-  (`sonar-scanner/Setup-SonarQube.ps1`) — T3.05 fixed it: the renamed
+  (old SonarQube setup script) — T3.05 fixed it: the renamed
   `code-scan/sonarqube/Initialize-SonarQube.ps1` now writes the admin password and token to
   `.etc/powershell/.env` via the new `Set-DotEnvVariable` (`tools/.shared/dotenv.ps1`) instead of
   the User environment variable. Category D is green. Current state: 1 of 5 tests red (A only;

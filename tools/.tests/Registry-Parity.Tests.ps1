@@ -12,10 +12,10 @@
     hand-maintained lists) shows up here instead of silently shipping.
 
     The packable-project list used to be one more hand-maintained list here (T3.08 packable
-    context, before the fix): tools/release/Run-NugetUnlist.ps1's -Package default array. F-21's
+    context, before the fix): tools/nuget/Unpublish-NugetPrerelease.ps1's -Package default array. F-21's
     root cause is now fixed — tools/.shared/dotnet-projects.ps1's own Get-PineGuardPackableProjects
     computes that list from the registry plus each csproj's IsPackable flag, and
-    tools/nuget/Unpublish-NugetPrerelease.ps1 (renamed from Run-NugetUnlist.ps1, T3.08) calls it
+    tools/nuget/Unpublish-NugetPrerelease.ps1 (renamed in T3.08) calls it
     directly — there is no separate hand-maintained list left to parity-check here. The 'Packable
     list' Context below now asserts against Get-PineGuardPackableProjects's own output instead of
     regex-scraping a literal array out of the script file.

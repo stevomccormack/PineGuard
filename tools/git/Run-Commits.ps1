@@ -18,8 +18,8 @@
     fifteenth project) becomes a valid -Scope value automatically, with no literal list here to
     edit.
 
-    README.md is staged by exactly one scope going forward: Docs (F-34). It used to be staged by
-    both Commit-Docs.ps1 and Commit-Solution.ps1, so whichever ran first "won" it; Solution's
+    README.md is staged by exactly one scope going forward: Docs (F-34). Previously it was staged by
+    both the old Commit-Docs and Commit-Solution scripts, so whichever ran first "won" it; Solution's
     path list no longer includes it. .github/workflows moves out of the Agent meta-scope into the
     new Ci meta-scope, since it is CI configuration, not an assistant-adapter surface.
 
