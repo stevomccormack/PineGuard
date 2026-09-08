@@ -66,7 +66,8 @@ version: 2.0
      pnpm -C apps/cli exec tsx src/index.ts audit --changed
      ```
 
-   - **Emit a JSON summary** (writes `artifacts/audit/<slug>.json` + `artifacts/audit/summary.json`):
+   - **Emit a JSON summary** (writes `+ artifacts/audit/<slug>.json` + `+ artifacts/audit/summary.json`
+     — runtime output under the gitignored `artifacts/` directory, never a tracked file):
 
      ```sh
      pnpm -C apps/cli exec tsx src/index.ts audit --format json

@@ -104,7 +104,8 @@ See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface invento
 
 3. **Inspect outputs**
    - Pretty output prints directly to the terminal. `--format json` also writes
-     `artifacts/audit/<slug>.json` per rule plus `artifacts/audit/summary.json`.
+     `+ artifacts/audit/<slug>.json` per rule plus `+ artifacts/audit/summary.json` — runtime
+     output under the gitignored `artifacts/` directory, never a tracked file.
    - Treat any un-baselined finding as blocking; a baselined finding is pre-existing debt (spec
      §4) — a *new* finding in an already-baselined file still surfaces and still blocks, so
      baselined debt never grants a file blanket immunity.
