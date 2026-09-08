@@ -8,7 +8,7 @@ Small PowerShell helpers for creating clean, scoped commits.
 tools/git/
 ├── Run-Commits.ps1              # Master orchestrator (preferred entrypoint)
 ├── Import-GitHelpers.ps1        # Aggregator that dot-sources shared helpers
-├── Commit-Agent.ps1             # Scoped commit: every assistant adapter surface (.agent, .claude, .pi, .github/*, .clinerules, .cursor, .windsurf, .junie, .amazonq, .vscode) + root AGENTS.md/CLAUDE.md/GEMINI.md + per-project AGENTS.md
+├── Commit-Agent.ps1             # Scoped commit: every assistant adapter surface (.agent, .claude, .github/*, .cursor, .vscode) + root AGENTS.md/CLAUDE.md + per-project AGENTS.md
 ├── Commit-Core.ps1              # Scoped commit: PineGuard.Core
 ├── Commit-DataAnnotations.ps1   # Scoped commit: PineGuard.DataAnnotations
 ├── Commit-Docs.ps1              # Scoped commit: docs/

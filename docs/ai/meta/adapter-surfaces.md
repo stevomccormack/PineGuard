@@ -2,7 +2,7 @@
 title: Adapter Surfaces
 type: meta
 status: normative
-last_verified: 2026-08-20
+last_verified: 2026-09-08
 ---
 
 # Adapter Surfaces
@@ -18,8 +18,8 @@ The Brain lives in `docs/ai/`. Everything listed below is an **adapter**: a thin
 that routes a tool's native entry points into the Brain. Adapters carry no logic of their own
 (`docs/ai/specs/protocol.md` Rule #1).
 
-There are **eleven** adapter surfaces (four full, two skill/hook-only, five rules-only — plus two
-legacy single-file variants) and three root boot files. Tiering matters: what counts as parity
+There are **six** adapter surfaces (three full, two skill/hook-only, one rules-only) and two root
+boot files. Tiering matters: what counts as parity
 debt differs per tier, and treating a rules-only surface as though it were missing dozens of
 command files generates directories no tool reads.
 
@@ -32,7 +32,6 @@ entry point only: role adoption, the command palette, and a link into the Brain 
 |------|------|-------|
 | `CLAUDE.md` | Claude Code | Carries the canonical slash-command palette. |
 | `AGENTS.md` | Generic / OpenAI-style agents | Tool-neutral phrasing of the same contract. |
-| `GEMINI.md` | Gemini | Adds the `.agent/workflows/` pointer. |
 
 ## 2. Full adapters
 
@@ -43,13 +42,12 @@ Surfaces with a **per-command file format**. These are checked for command parit
 |---------|------|-------------|--------|-------|
 | `.claude/` | Claude Code | `commands/` | `skills/` | `rules/`, `agents/`, `agent-memory/`, `hooks/` |
 | `.agent/` | Antigravity | `workflows/` | — | — |
-| `.pi/` | Pi | `prompts/` | `skills/` | `AGENTS.md`, `extensions/` |
 | `.github/` | GitHub Copilot | `prompts/` | `skills/` | `copilot-instructions.md`, `instructions/`, `agents/` |
 
 > [!WARNING]
 > `.agent/` (singular, Antigravity workflows) and `.agents/` (plural, skills — see §2.1) are
-> **different surfaces**. Neither is the Gemini adapter; that is the root `GEMINI.md`. Conflating
-> `.agent/` with Gemini is a long-standing documentation error — do not reintroduce it.
+> **different surfaces**. Neither is a Gemini adapter: Gemini is not a supported surface, and its
+> root boot file was retired in September 2026 (see §3.1).
 
 ### 2.1 Skill- and hook-only adapters
 
@@ -72,26 +70,24 @@ must not report one.
 
 | Surface | Tool | Shape |
 |---------|------|-------|
-| `.clinerules/` | Cline | Numbered rule files (`01-global.md`, …) |
 | `.cursor/rules/` | Cursor | `*.mdc` with frontmatter globs — current Cursor format |
-| `.windsurf/rules/` | Windsurf | `global.md`, `layers.md` — current Windsurf format |
-| `.amazonq/rules/` | Amazon Q | Plain rule files |
-| `.junie/guidelines.md` | JetBrains Junie | Single guidelines file |
 
 Rules-only adapters carry **path-scoped pointers only**. They MUST NOT carry an intent-routing
 table mapping user phrasing to agent files — that is what `docs/ai/commands/` is for, and a
 duplicated routing table is exactly what rots when agents are renamed.
 
-### 3.1 Legacy single-file variants
+### 3.1 Retired surfaces
 
-`.cursorrules` and `.windsurfrules` are the pre-directory formats for Cursor and Windsurf. They are
-retained **only** for older editor builds and are reduced to pointer stubs. Never grow them back:
-the directory formats above are authoritative, and maintaining two files per tool is what let both
-legacy files drift a full rename cycle behind the Brain.
+Retired on 2026-09-08 and deliberately not recreated: the Pi adapter, the Cline, Windsurf, Amazon Q
+and JetBrains Junie rules surfaces, the legacy single-file Cursor and Windsurf stubs, and the Gemini
+root boot file. Every one of those tools reads the root `AGENTS.md` natively (Cline only when it
+finds no rules directory of its own), so removing them lost no support. Amazon Q itself reached
+end-of-support in 2026. Supported tools are Claude Code, GitHub Copilot, OpenAI Codex, and the
+surfaces in §2–§3 above.
 
 ## 4. Parity policy
 
-Command parity is expected across the four **full adapters** in §2, with these declared exceptions.
+Command parity is expected across the three **full adapters** in §2, with these declared exceptions.
 Anything not listed here is parity debt and the audit-cli adapter-parity rule will fail on it.
 
 | Exception | Surfaces | Rationale |
@@ -113,8 +109,6 @@ omitted three surfaces and thereby produced the drift this file exists to preven
 - [ ] `.claude/commands/<name>.md`
 - [ ] `CLAUDE.md` — palette row
 - [ ] `.agent/workflows/<name>.md`
-- [ ] `.pi/prompts/<name>.md`
-- [ ] `.pi/AGENTS.md` — palette row
 - [ ] `.github/prompts/<name>.prompt.md` — only if the agent is in the declared Copilot subset (§4)
 - [ ] `.agents/skills/<name>/SKILL.md` and `.codex/agents/<name>.toml` (§2.1) — only when the change adds or renames a **skill or subagent**, not for ordinary agent changes
 - [ ] Rules-only adapters (§3) — only if the change alters a **layer mapping**, not for ordinary agent changes

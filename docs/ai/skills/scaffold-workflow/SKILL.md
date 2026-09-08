@@ -71,14 +71,12 @@ maintain its own list — read that file, then work its §5 cascade checklist ro
     | 3 | `.claude/commands/<name>.md` | `Act as **<Role>**. Read and execute docs/ai/agents/<name>.md.` | never |
     | 4 | `CLAUDE.md` | Palette row under the matching `###` section | never |
     | 5 | `.agent/workflows/<name>.md` | YAML frontmatter (`description`) + `1. Read and execute docs/ai/agents/<name>.md.` | release family (§4) |
-    | 6 | `.pi/prompts/<name>.md` | Pi prompt pointing at the playbook | release family (§4) |
-    | 7 | `.pi/AGENTS.md` | Palette row | release family (§4) |
-    | 8 | `.github/prompts/<name>.prompt.md` | Copilot prompt pointing at the playbook | agent is outside the declared Copilot subset (§4) |
-    | 9 | `.agents/skills/<name>/SKILL.md`, `.codex/agents/<name>.toml` (§2.1) | One `SKILL.md` per Brain skill; TOML per Codex agent | ordinary agent changes; only touch these if the change adds or renames a **skill or subagent** |
-    | 10 | Rules-only adapters (§3) | — | ordinary agent changes; only touch these if the change alters a **layer mapping** |
-    | 11 | `.vscode/tasks.json` | Task entry | the agent has no task-runner equivalent |
+    | 6 | `.github/prompts/<name>.prompt.md` | Copilot prompt pointing at the playbook | agent is outside the declared Copilot subset (§4) |
+    | 7 | `.agents/skills/<name>/SKILL.md`, `.codex/agents/<name>.toml` (§2.1) | One `SKILL.md` per Brain skill; TOML per Codex agent | ordinary agent changes; only touch these if the change adds or renames a **skill or subagent** |
+    | 8 | Rules-only adapters (§3) | — | ordinary agent changes; only touch these if the change alters a **layer mapping** |
+    | 9 | `.vscode/tasks.json` | Task entry | the agent has no task-runner equivalent |
 
-    Rows 5–7 take `// turbo-all` only under the Turbo Safety rule above.
+    Row 5 takes `// turbo-all` only under the Turbo Safety rule above.
 
 4.  **Validation**
     - Verify every generated file exists at the path written and ends in `.md`.
@@ -96,8 +94,6 @@ One checkbox per cascade row. Tick **Done** or **N/A (policy)** — never leave 
 - [ ] `.claude/commands/<name>.md` created
 - [ ] `CLAUDE.md` palette row added
 - [ ] `.agent/workflows/<name>.md` created (or N/A — release family)
-- [ ] `.pi/prompts/<name>.md` created (or N/A — release family)
-- [ ] `.pi/AGENTS.md` palette row added (or N/A — release family)
 - [ ] `.github/prompts/<name>.prompt.md` created (or N/A — outside the Copilot subset)
 - [ ] `.agents/skills/<name>/SKILL.md` and `.codex/agents/<name>.toml` created (or N/A — no skill/subagent change)
 - [ ] Rules-only adapters reviewed (or N/A — no layer-mapping change)

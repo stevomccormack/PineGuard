@@ -11,18 +11,12 @@ applies_to:
   - "docs/ai/**"
   - "CLAUDE.md"
   - "AGENTS.md"
-  - "GEMINI.md"
   - ".claude/**"
   - ".agent/**"
-  - ".pi/**"
   - ".github/**"
   - ".agents/**"
   - ".codex/**"
-  - ".clinerules/**"
   - ".cursor/**"
-  - ".windsurf/**"
-  - ".amazonq/**"
-  - ".junie/**"
 ---
 
 # Universal Agent Protocol
@@ -60,7 +54,7 @@ This spec defines the **tiers** that inventory assigns:
 
 | Tier                  | Shape                                                                       | Obligations                                                                                                                                             |
 | :-------------------- | :-------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Root boot file**    | A single file loaded at session start (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) | Role adoption, the command palette, and a link into `docs/ai/README.md`. Nothing else.                                                                    |
+| **Root boot file**    | A single file loaded at session start (`CLAUDE.md`, `AGENTS.md`)              | Role adoption, the command palette, and a link into `docs/ai/README.md`. Nothing else.                                                                    |
 | **Full adapter**      | A per-command file format (a command/prompt/workflow directory)              | MAY carry one pointer file per agent. Each pointer file names exactly one `docs/ai/agents/*.md` playbook. Command parity applies (see the inventory §4).   |
 | **Rules-only adapter** | A rules file or rules directory, with no per-command format                  | MUST carry path-scoped pointers ONLY. MUST NOT carry an intent-routing table mapping user phrasing to agent files — that is what `docs/ai/commands/` is for. Command parity does NOT apply, and a missing command directory is not parity debt. |
 
