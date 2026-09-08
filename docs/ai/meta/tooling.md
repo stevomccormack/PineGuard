@@ -79,11 +79,12 @@ Shows the full adapter fan-out from one Brain capability:
 | Brain roles | `docs/ai/roles/council.md` |
 | Brain workflow | `docs/ai/workflows/plan-with-council.md` |
 | Claude | `.claude/skills/ask-council/SKILL.md`, `.claude/commands/ask-council.md`, `.claude/commands/plan-with-council.md` |
-| Copilot | `.github/skills/ask-council/SKILL.md`, `.github/prompts/ask-council.prompt.md` |
+| Copilot | `.github/skills/ask-council/SKILL.md`, `.github/prompts/ask-council.prompt.md`, `.github/prompts/plan-with-council.prompt.md` |
 | Antigravity | `.agent/workflows/ask-council.md` |
 | Pi | `.pi/skills/ask-council/SKILL.md` |
+| OpenCode | `.opencode/commands/ask-council.md`, `.opencode/commands/plan-with-council.md` |
 
-Only the four **full adapters** appear here. The rules-only surfaces (Cline, Cursor, Windsurf,
+Only the five **full adapters** appear here. The rules-only surfaces (Cline, Cursor, Windsurf,
 Junie, Amazon Q) carry no per-capability files, so a capability never fans out to them — see
 `docs/ai/meta/adapter-surfaces.md` §3.
 

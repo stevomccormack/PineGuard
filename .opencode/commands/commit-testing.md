@@ -1,0 +1,4 @@
+---
+description: "Commit Testing"
+---
+Act as **DevOps Engineer**. Read and execute `docs/ai/agents/commit-testing.md`.

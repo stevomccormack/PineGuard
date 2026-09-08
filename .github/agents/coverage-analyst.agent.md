@@ -19,6 +19,6 @@ Before analyzing coverage, read:
 - [unit-test.md](../../docs/ai/specs/testing/unit-test.md)
 - durable patterns in [coverage-analyst memory](../../docs/ai/memory/coverage-analyst.md)
 
-Use the canonical recipe in [improve-coverage/SKILL.md](../../docs/ai/skills/improve-coverage/SKILL.md).
+Use the canonical recipe in [improve-coverage SKILL.md](../../docs/ai/skills/improve-coverage/SKILL.md).
 
 Keep the Brain as the source of truth.

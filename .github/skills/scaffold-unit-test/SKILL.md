@@ -11,14 +11,14 @@ Read these files before writing tests:
 2. [unit-test.md](../../../docs/ai/specs/testing/unit-test.md)
 3. [template-unit-test.md](../../../docs/ai/meta/template-unit-test.md)
 4. [coverage.md](../../../docs/ai/specs/testing/coverage.md)
-5. [scaffold-unit-test/SKILL.md](../../../docs/ai/skills/scaffold-unit-test/SKILL.md)
+5. [scaffold-unit-test SKILL.md](../../../docs/ai/skills/scaffold-unit-test/SKILL.md)
 6. [test-writer memory](../../../docs/ai/memory/test-writer.md)
 
 Also read the project-specific unit test spec for the target layer.
 
 ## Execute
 
-Follow the canonical recipe in [docs/ai/skills/scaffold-unit-test/SKILL.md](../../../docs/ai/skills/scaffold-unit-test/SKILL.md) exactly.
+Follow the canonical recipe in [scaffold-unit-test SKILL.md](../../../docs/ai/skills/scaffold-unit-test/SKILL.md) exactly.
 
 ## Verify
 

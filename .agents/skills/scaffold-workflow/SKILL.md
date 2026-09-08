@@ -1,6 +1,6 @@
 ---
 name: scaffold-workflow
-description: Author a new agent playbook in docs/ai/agents/ and cascade it to every adapter surface. Use whenever the user says "add a new agent", "create a workflow", "add a slash command", "scaffold an agent", or wants a new command wired across Codex, Antigravity, Pi and Copilot.
+description: Author a new agent playbook in docs/ai/agents/ and cascade it to every adapter surface. Use whenever the user says "add a new agent", "create a workflow", "add a slash command", "scaffold an agent", or wants a new command wired across Claude, Antigravity, Pi, Copilot and OpenCode.
 argument-hint: "[AgentName]"
 context: fork
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash

@@ -1,0 +1,4 @@
+---
+description: "Run Code Coverage for All Projects"
+---
+Act as **Test Engineer**. Read and execute `docs/ai/agents/coverage-all.md`.

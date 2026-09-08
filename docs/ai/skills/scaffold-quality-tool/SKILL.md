@@ -131,11 +131,12 @@ permanently behind the Brain.
 | `.claude/commands/fix-{tool}-all.md` | Fix command (if HasFixWorkflow) |
 | `.github/skills/scan-{tool}/SKILL.md` | Copilot wrapper. See `.github/skills/scan-roslyn/SKILL.md` |
 | `.github/skills/fix-{tool}/SKILL.md` | Copilot wrapper (if HasFixWorkflow). See `.github/skills/fix-roslyn/SKILL.md` |
-| `.github/prompts/*.prompt.md` | Only if the command is in the declared Copilot subset (adapter-surfaces §4) |
+| `.github/prompts/*.prompt.md` | One per command, `.github/prompts/scan-{tool}-{scope}.prompt.md` and `.github/prompts/fix-{tool}-all.prompt.md` |
 | `.pi/skills/scan-{tool}/SKILL.md` | Pi wrapper. See `.pi/skills/scan-roslyn/SKILL.md` |
 | `.pi/skills/fix-{tool}/SKILL.md` | Pi wrapper (if HasFixWorkflow). See `.pi/skills/fix-roslyn/SKILL.md` |
 | `.pi/prompts/scan-{tool}-{scope}.md`, `.pi/prompts/fix-{tool}-all.md` | One per command |
 | `.agent/workflows/scan-{tool}-{scope}.md`, `.agent/workflows/fix-{tool}-all.md` | One per command |
+| `.opencode/commands/scan-{tool}-{scope}.md`, `.opencode/commands/fix-{tool}-all.md` | One per command |
 
 Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if the new tool changes a
 **layer mapping** — a new quality tool normally does not.
@@ -147,6 +148,7 @@ Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if
 | `CLAUDE.md` | New `### {ToolName}` section in the Command Palette |
 | `AGENTS.md` | Same palette rows, tool-neutral phrasing |
 | `.pi/AGENTS.md` | Same palette rows for the Pi surface |
+| `.github/copilot-instructions.md` | Same palette rows for the Copilot surface |
 | `docs/ai/README.md` | Rule in Rules Hierarchy tree, skills in Skills Inventory table |
 | `docs/ai/skills/INDEX.md` | Brain rows, plus one row per adapter table the tool lands in |
 | `.claude/settings.json` | Verify tool commands are whitelisted (e.g., `Bash(pwsh:*)`) |
@@ -174,8 +176,8 @@ Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if
 - [ ] Adapter skills: `context: fork` wrappers created in `.claude/skills/`
 - [ ] Adapter skills: wrappers created in `.github/skills/` and `.pi/skills/`
 - [ ] Adapter commands: created in `.claude/commands/`, `.pi/prompts/` and `.agent/workflows/`
-- [ ] Adapter commands: `.github/prompts/` — created, or N/A under the declared Copilot subset
-- [ ] Registration: `CLAUDE.md`, `AGENTS.md` and `.pi/AGENTS.md` palettes updated
+- [ ] Adapter commands: created in `.github/prompts/` and `.opencode/commands/`
+- [ ] Registration: `CLAUDE.md`, `AGENTS.md`, `.pi/AGENTS.md` and `.github/copilot-instructions.md` palettes updated
 - [ ] Registration: `docs/ai/README.md` Rules Hierarchy + Skills Inventory updated
 - [ ] Registration: `docs/ai/skills/INDEX.md` updated in the Brain table and every adapter table
 - [ ] Verification: Script runs, commands trigger, cross-references consistent

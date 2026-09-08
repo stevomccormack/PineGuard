@@ -1,0 +1,4 @@
+---
+description: "Run JetBrains Qodana for DataAnnotations"
+---
+Act as **Code Reviewer**. Read and execute `docs/ai/agents/scan-qodana-annotation.md`.

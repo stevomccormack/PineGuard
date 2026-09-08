@@ -1,9 +1,10 @@
 ---
 name: audit-cli
-description: Run the canonical audit workflow for PineGuard.
+description: "Run Audit CLI (Library / Testing / Docs / All)"
+agent: shipper
 argument-hint: Optional scope or rule focus.
 ---
-Read and execute [docs/ai/agents/audit-cli.md](../../docs/ai/agents/audit-cli.md).
+Read and execute [audit-cli.md](../../docs/ai/agents/audit-cli.md).
 
 Adopt the role it declares: [shipper.md](../../docs/ai/roles/shipper.md).
 

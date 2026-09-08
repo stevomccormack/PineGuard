@@ -1,8 +1,10 @@
 # PineGuard Skills Catalog
 
 > Quick-reference index of all skills across the Brain and its four skill-hosting adapter
-> surfaces (`.claude/`, `.github/`, `.pi/`, `.agents/`). Each entry links to its canonical SKILL.md.
-> The full surface inventory lives in [`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md).
+> surfaces (`.claude/`, `.github/`, `.pi/`, `.agents/`). OpenCode hosts no skills of its own: it
+> loads `.claude/skills/` and `.agents/skills/` natively. Each entry links to its canonical
+> SKILL.md. The full surface inventory lives in
+> [`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md).
 
 ## Brain Skills (`docs/ai/skills/`)
 
@@ -108,16 +110,26 @@ Thin wrappers for the Pi adapter. Same delegation contract as the Claude Code se
 
 ## GitHub Adapter Skills (`.github/skills/`)
 
-Copilot-compatible adapters for GitHub-hosted workflows.
+Copilot-compatible wrappers - one per Brain skill.
 
 | Skill | Brain Delegate | Description |
 |-------|---------------|-------------|
+| [scaffold-rule](../../../.github/skills/scaffold-rule/SKILL.md) | `scaffold-rule` | Core Rule/Util implementation |
+| [scaffold-must](../../../.github/skills/scaffold-must/SKILL.md) | `scaffold-must` | MustClause implementation |
+| [scaffold-guard](../../../.github/skills/scaffold-guard/SKILL.md) | `scaffold-guard` | GuardClause implementation |
+| [scaffold-fluent](../../../.github/skills/scaffold-fluent/SKILL.md) | `scaffold-fluent` | FluentValidation extension |
+| [scaffold-annotation](../../../.github/skills/scaffold-annotation/SKILL.md) | `scaffold-annotation` | DataAnnotations attribute |
 | [scaffold-unit-test](../../../.github/skills/scaffold-unit-test/SKILL.md) | `scaffold-unit-test` | xUnit test implementation |
+| [new-validation](../../../.github/skills/new-validation/SKILL.md) | `new-validation` | Simple in-memory predicate vertical slice |
 | [improve-coverage](../../../.github/skills/improve-coverage/SKILL.md) | `improve-coverage` | Coverage gap analysis |
+| [format-code](../../../.github/skills/format-code/SKILL.md) | `format-code` | Code formatting |
 | [scan-roslyn](../../../.github/skills/scan-roslyn/SKILL.md) | `scan-roslyn` | Roslyn diagnostics |
 | [fix-roslyn](../../../.github/skills/fix-roslyn/SKILL.md) | `fix-roslyn` | Roslyn warning fixes |
 | [scan-sonar](../../../.github/skills/scan-sonar/SKILL.md) | `scan-sonar` | SonarQube analysis |
 | [fix-sonar](../../../.github/skills/fix-sonar/SKILL.md) | `fix-sonar` | SonarQube issue fixes |
+| [document](../../../.github/skills/document/SKILL.md) | `document` | XML documentation generation |
+| [scaffold-workflow](../../../.github/skills/scaffold-workflow/SKILL.md) | `scaffold-workflow` | New agent playbook + adapter cascade |
+| [scaffold-quality-tool](../../../.github/skills/scaffold-quality-tool/SKILL.md) | `scaffold-quality-tool` | New quality/inspection tool scaffold |
 | [ask-council](../../../.github/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
 
 ---
