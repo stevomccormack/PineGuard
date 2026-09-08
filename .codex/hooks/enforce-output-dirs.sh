@@ -37,7 +37,7 @@ DIR_PART=$(dirname "$REL_PATH")
 
 # Allow files in known source directories
 case "$REL_PATH" in
-  src/*|tests/*|docs/*|tools/*|.claude/*|.agent/*|.github/*|.vscode/*|artifacts/*|logs/*|diagnostics/*)
+  src/*|tests/*|docs/*|tools/*|apps/*|.claude/*|.agent/*|.agents/*|.codex/*|.cursor/*|.github/*|.opencode/*|.vscode/*|artifacts/*|logs/*|diagnostics/*)
     exit 0
     ;;
 esac
@@ -48,7 +48,7 @@ case "$FILENAME" in
     exit 0
     ;;
   # Allow specific known root files
-  CLAUDE.md|AGENTS.md|LICENSE|LICENSE.md|README.md|Directory.Build.props|Directory.Packages.props|nuget.config|global.json|.cursorrules)
+  CLAUDE.md|AGENTS.md|LICENSE|LICENSE.md|README.md|Directory.Build.props|Directory.Packages.props|nuget.config|global.json)
     exit 0
     ;;
 esac

@@ -81,11 +81,9 @@ Shows the full adapter fan-out from one Brain capability:
 | Claude | `.claude/skills/ask-council/SKILL.md`, `.claude/commands/ask-council.md`, `.claude/commands/plan-with-council.md` |
 | Copilot | `.github/skills/ask-council/SKILL.md`, `.github/prompts/ask-council.prompt.md` |
 | Antigravity | `.agent/workflows/ask-council.md` |
-| Pi | `.pi/skills/ask-council/SKILL.md` |
 
-Only the four **full adapters** appear here. The rules-only surfaces (Cline, Cursor, Windsurf,
-Junie, Amazon Q) carry no per-capability files, so a capability never fans out to them — see
-`docs/ai/meta/adapter-surfaces.md` §3.
+Only the **full adapters** appear here. The rules-only surface (Cursor) carries no per-capability
+files, so a capability never fans out to it — see `docs/ai/meta/adapter-surfaces.md` §3.
 
 Best practice for portability (Claude Code / other tools):
 
@@ -138,5 +136,5 @@ Use this order so the system stays DRY and portable:
 - Root Spec precedence: `docs/ai/specs/spec.md`
 
 <!-- footer
-last_verified: 2026-08-20
+last_verified: 2026-09-08
 -->

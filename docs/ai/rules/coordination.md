@@ -3,7 +3,7 @@
 > Inherits from: `docs/ai/rules/global.md` (read first)
 
 These rules prevent collisions when multiple agent sessions run simultaneously
-(Claude Desktop, VS, JetBrains, Terminal, Antigravity, Copilot, Pi, Cline, or parallel subagents).
+(Claude Desktop, VS, JetBrains, Terminal, Antigravity, Copilot, Codex, or parallel subagents).
 
 ## Universal Contract
 
