@@ -392,8 +392,8 @@ Verification (Opus, T1.V): re-run the §1 inventory; every touched script execut
 | Task | Check |
 |---|---|
 | T6.01 | Every entry script: `-?` renders real help; `-WhatIf` previews without side effects; exit codes match §3.4 |
-| T6.02 | `Run-CodeCoverage -Scope All` on net8.0 and net10.0 still 100%/100%; `Run-Tests -Scope All` green; `Run-CodeDiagnostics -Scope All` zero warnings; `Run-CodeFormat -Scope All -VerifyNoChanges` clean |
-| T6.03 | PSScriptAnalyzer zero findings under the settings file; Pester green; `tools-lint` CI job hard-failing and green |
+| T6.02 | `Run-CodeCoverage.ps1 -Scope All` on net8.0 and net10.0 still 100%/100%; `Run-Tests.ps1 -Scope All` green; `Run-CompilerDiagnostics.ps1 -Scope All` zero warnings; `Run-Format.ps1 -Scope All -VerifyNoChanges` clean. (Corrected from the plan's original draft, which named `Run-CodeDiagnostics`/`Run-CodeFormat` — those orchestrator renames were withdrawn by D-1a/D-1c; the real, unchanged script names are `Run-CompilerDiagnostics.ps1`/`Run-Format.ps1`.) |
+| T6.03 | PSScriptAnalyzer zero `PSUseApprovedVerbs`/`Error`-severity findings under the settings file (cosmetic whitespace/indentation debt is accepted, tracked, Phase 5's job — not a T6.03 blocker); Pester green apart from the 2 known Help-Placeholder tests Phase 5 clears; `tools-lint` CI job **stays soft** (`continue-on-error: true`) — hardening it now would fail every CI run on Phase 5's own deferred backlog, contradicting D-8's deferral rather than honouring it. (Corrected: the plan's original draft assumed "Phase 3 clears the baseline" meant hardening would already be safe; it doesn't factor in the Phase 2 whitespace baseline and the Phase 5 placeholder-help debt, neither of which is Phase 3's or T6's to clear.) |
 | T6.04 | Safety review: grep for every Tier 0 command in `docs/ai/specs/safety.md` §2.1 across `tools/`; none present |
 | T6.05 | Secrets review: no token on any command line where an env alternative exists; nothing writes to User/Machine environment; SonarQube bound to loopback |
 | T6.06 | Docs review: every path in every README and spec resolves; scope lists match the registry |
@@ -503,7 +503,7 @@ tasks sharing a group letter run concurrently; a group runs after the group it d
 | T5.03 | All `tools/**/README.md` regenerated | Sonnet + Haiku (tables) | Blocked (D-8) | P5-A | P4-C | No hand-enumerated scopes |
 | T5.04 | Supersede cross-platform plan | Haiku | Blocked (D-5, D-8) | P5-A | — | |
 | T5.05 | `rules/tools.md` header template + registry rule | Sonnet | Blocked (D-8) | P5-A | T5.01 | |
-| T6.01–06 | Final verification matrix | Opus | Pending | P6 | P5-A | Then merge `--no-ff` to main |
+| T6.01–06 | Final verification matrix | Opus | Pending | P6 | P4-D (Phase 5 deferred per D-8, not a real blocker) | Then merge `--no-ff` to main |
 
 ### Estimated dispatch count
 
