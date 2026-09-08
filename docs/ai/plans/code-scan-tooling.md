@@ -4,7 +4,7 @@ id: code-scan-tooling
 version: 1.0
 status: decisions-signed-off
 last_updated: 2026-09-08
-scope: apps/cli/src/{scan,tool,test}/**, apps/cli/config/scan-*.json, tools/code-scan/**, tools/.shared/{cli.ps1,scopes.json}, .github/workflows/scan.yml, docs/ai/{specs/scan,rules/scan.md,skills/scan-*,workflows/scan.md,agents/scan-*,commands/scan.md} and the adapter cascade
+scope: apps/cli (new scan, dev and test command groups and their config), tools/Install-Cli (new root installer), tools/code-scan/**, tools/.shared (cli, dotenv, scopes), .env.example, a new scan workflow under .github/workflows, the docs/ai scan spec, rules, skills, workflows, agents and commands, and the adapter cascade
 -->
 
 # Plan: Code-Scan Tooling — one contract, twenty tools, `pineguard scan`
@@ -35,6 +35,12 @@ pipeline, or on GitHub's side with no job at all; cloud-only services still get 
 verb, but there the verb means *fetch* — their alerts are pulled through `gh api` into the same
 SARIF and summary shape as everything else (D-14).
 
+Developer-environment concerns get their own `dev` group (`pineguard dev install|doctor|list|env`)
+and a root `+ tools/Install-Cli.ps1`, so a contributor goes from clone to a complete toolchain in one
+command and CI runs that same command (D-7, D-15). A repository-root `.env` is the one place every
+variable lives; every entry script and the CLI load it first, and `.env.example` is generated from
+the manifests rather than maintained by hand (D-15, D-16).
+
 Six phases. Phase 0 is prerequisites and one handoff from the standardisation plan. Phase 1 lands
 the whole contract with two reference adapters (`nuget-audit`, `inspectcode`). Phase 2 fans the
 local tier out, one Sonnet dispatch per tool. Phase 3 wraps the existing tools, the cloud-backed
@@ -49,7 +55,7 @@ Opus for verification, Fable for names.
 
 | Item | Detail |
 |---|---|
-| In scope | Everything in the metadata header above. New CLI command groups `scan`, `tool`, `test`. New folder `tools/code-scan/` with one subfolder per tool. The two folder moves the standardisation plan listed as T3.04/T3.05 (`code-inspection/` → `code-scan/qodana/`, `sonar-scanner/` → `code-scan/sonarqube/`) transfer here as T1.08. |
+| In scope | Everything in the metadata header above. New CLI command groups `scan`, `dev`, `test`. A root `+ tools/Install-Cli.ps1`. New folder `tools/code-scan/` with one subfolder per tool. The two folder moves the standardisation plan listed as T3.04/T3.05 (`code-inspection/` → `code-scan/qodana/`, `sonar-scanner/` → `code-scan/sonarqube/`) transfer here as T1.08. |
 | Out of scope | Rewriting `Run-CodeCoverage.ps1`, `Run-Tests.ps1`, `Run-Qodana.ps1`, `Run-SonarScanner.ps1` or `Run-CompilerDiagnostics.ps1` in TypeScript — the CLI dispatches to them. The standardisation plan's remaining Phase 3 (git collapse, `.shared` consolidation, coverlet/dotcover layout, `clean/`, `github/`, `nuget/` moves). Debt burn-down of whatever the new scanners find (baselined, tracked separately, same as the audit ratchet). |
 | Environment | pwsh 7.6, Node 22 + pnpm, .NET 10 SDK, Windows 11 locally; `ubuntu-latest` in CI (pwsh preinstalled). The repository is public under MIT, which is what makes CodeQL, secret scanning, push protection, Dependabot, and SonarCloud free. |
 | Branch | `feature/code-scan-tooling` in worktree `.claude/worktrees/code-scan-tooling`, from `main` at `63ff60e`. |
@@ -114,10 +120,10 @@ not a `scan` member.
 | csharpier | **Removed** (D-6) | `dotnet format` is fully wired; two formatters fight; owner rule: prefer standard tooling. `jb cleanupcode` is out for the same reason. |
 | owasp-dc | **Removed** (D-9) | Its only job is SCA against the NVD. Trivy and Grype read the same lock files and draw on the same advisory sources, faster, without Java or an NVD API key; Snyk covers the cloud side. Its .NET analyzers are weaker and noisier than Trivy's. Re-add only if a client mandates it by name. |
 | gh-codeql | **Folded** into `codeql` | It is the installer and version pinner for the CodeQL CLI, not a scanner. |
-| reportgen | **Folded** into coverage | ReportGenerator is already pinned in `.config/dotnet-tools.json` on the standardisation branch. |
+| reportgen | **Folded** into coverage | ReportGenerator is already pinned in `+ .config/dotnet-tools.json` on the standardisation branch. |
 | dotnet-counters | **Parked** (D-5) | Observes a running process. PineGuard is a library. If a perf family is ever wanted, BenchmarkDotNet is the tool. |
 | gherklin | **Deferred** (D-5) | No feature files exist. BDD is a no for the library's unit tests: `Theory` plus `TheoryData` is already the executable spec, SpecFlow is discontinued, and Reqnroll plus gherklin would only earn its keep for integration-surface acceptance scenarios later. |
-| copilot | **Kept, outside `scan`** | A pull-request reviewer, not a scanner. Enabled as a repository setting; `tool doctor --remote` reports whether it is on. |
+| copilot | **Kept, outside `scan`** | A pull-request reviewer, not a scanner. Enabled as a repository setting; `dev doctor --remote` reports whether it is on. |
 | trivy secret scanner | **Kept enabled, not the secrets tier** | Working-tree only; gitleaks is history-aware and commit-range capable. |
 
 ---
@@ -140,29 +146,34 @@ apps/cli/src/
       filter.ts            post-filter results to the changed set
       convert/<slug>.ts    JSON/XML/API → SARIF for tools without native SARIF
     tools/<slug>.ts        ScannerAdapter: manifest + detect + buildArgs + run + parse
-  tool/
+  dev/
     channels.ts            dotnet-tool, gh-extension, npm, winget, brew, release-binary, pipx, docker
-    install.ts  list.ts  doctor.ts
+    install.ts             --all | --cli | --dependencies | <slug...>
+    doctor.ts  list.ts
+    env.ts                 --check | --list | --example (generates .env.example from the manifests)
   test/
     run.ts                 dispatch to tools/testing/Run-Tests.ps1; --include-cli adds pnpm -C apps/cli test
     coverage.ts            dispatch to tools/code-coverage/New-CoverageReport.ps1 -Engine (Run-CodeCoverage.ps1 until D-9 of the standardisation plan lands)
-  commands/scan.ts  tool.ts  test.ts
+  commands/scan.ts  dev.ts  test.ts
 apps/cli/config/
   scan-baseline.json       ratchet floor keyed by (slug, ruleId, file, normalised message)
   scan-exceptions.json
 apps/cli/test/
   scan/**                  engine, changed, sarif, per-adapter suites
   fixtures/scan/<slug>/    sample native output (pass and fail), expected summary, can-fail assertion (VIBE, as for audit)
+.env                       gitignored; the one place every variable lives (D-16)
+.env.example               committed; generated by `pineguard dev env --example`, never hand-edited
 tools/
+  Install-Cli.ps1          -All | -Cli | -Dependencies | -Tool <slug[]>  (D-15); -Cli is self-sufficient, the rest delegates to pineguard dev install
   .shared/cli.ps1          Resolve-PineGuardCli, Invoke-PineGuardCli (builds dist on demand, exit 2 if Node 22 or pnpm missing)
+  .shared/dotenv.ps1       Import-DotEnv (exists) + Get-DotEnvVariable, Set-DotEnvVariable, Test-DotEnvVariable (D-15)
   .shared/scopes.json      the scope registry (D-10)
   code-scan/
     README.md
     Run-Scan.ps1           -Tool <slug>|All  → pineguard scan
-    Install-Scanner.ps1    -Tool <slug>|All  → pineguard tool install
     <slug>/
       Run-<Tool>.ps1       tool-specific ValidateSets and help; maps to the contract; -ToolArgs passthrough
-      Install-<Tool>.ps1   → pineguard tool install <slug>
+      Install-<Tool>.ps1   → ../../Install-Cli.ps1 -Tool <slug>
       README.md
       config/              the tool's native config, passed explicitly (see structural rule below)
     qodana/                moved from code-inspection/, inner qodana/ level flattened (T1.08)
@@ -176,7 +187,7 @@ Structural rules, in addition to the standardisation plan's §3.4:
 
 - **Tool-native config lives under `tools/code-scan/<slug>/config/` and is passed explicitly**
   (`--config`, `-c`, `--rules`). No new dot-files at the repository root. The single exception is
-  actionlint, whose convention is `.github/actionlint.yaml`.
+  actionlint, whose convention is `+ .github/actionlint.yaml`.
 - **Downloaded binaries live outside the repository**: `$env:LOCALAPPDATA/pineguard/bin` on
   Windows, `~/.local/share/pineguard/bin` elsewhere, overridable with `PINEGUARD_TOOLS_BIN`. They
   are added to `PATH` for the process only. `Clean-Artifacts` never touches them.
@@ -185,6 +196,10 @@ Structural rules, in addition to the standardisation plan's §3.4:
 - **A dispatch adapter** (roslyn, sonarqube, qodana, `test run`, `test coverage`) invokes the
   PowerShell script by relative path via `pwsh -NoProfile -File`. This is the only place the CLI
   depends on pwsh; it is documented as transitional.
+- **`.env` is loaded first, everywhere.** Every entry script's fixed header dot-sources
+  `tools/.shared/dotenv.ps1` and calls `Import-DotEnv` before anything else; the CLI loads the same file
+  with `process.loadEnvFile`. No script reads a token any other way. `.env.example` is generated
+  from the manifests and is the documentation of every variable (D-15).
 
 ### 2.2 Manifest
 
@@ -241,7 +256,7 @@ every tool; tool-specific switches go through `--tool-args`.
 | `--output <dir>` | `-OutputPath` | Artifacts root | `artifacts/code-scan/` |
 | `--format pretty\|json\|github\|sarif` | `-Format` | Console reporter; SARIF and summary files are always written | `pretty`; `github` under `--ci` |
 | `--fail-on none\|low\|medium\|high\|critical` | `-FailOn` | Gate threshold (exit 3) | manifest default; `high` under `--ci` |
-| `--baseline <path>` / `--update-baseline` / `--no-baseline` | `-Baseline` / `-UpdateBaseline` / `-NoBaseline` | Ratchet, same semantics as `pineguard audit` | `apps/cli/config/scan-baseline.json` |
+| `--baseline <path>` / `--update-baseline` / `--no-baseline` | `-Baseline` / `-UpdateBaseline` / `-NoBaseline` | Ratchet, same semantics as `pineguard audit` | `+ apps/cli/config/scan-baseline.json` |
 | `--offline` | `-Offline` | Skip database updates; fail with exit 2 if no cache | off |
 | `--ci` | `-CI` | Non-interactive, `github` reporter, no browser, tier = pipeline | on when `GITHUB_ACTIONS=true` |
 | `--timeout <s>` | `-Timeout` | Seconds; exit 124 | per manifest |
@@ -273,7 +288,7 @@ The adapter then narrows by the best mechanism its manifest declares, in this or
    file list, or the set of directories it collapses to.
 3. **Scope mapping**, when only `targets.scope` (codeql, qodana, roslyn, sonarqube): changed files
    resolve to scopes through the registry; the tool runs per affected scope.
-4. **Post-filter**, always available: run in full, then `sarif/filter.ts` keeps only results whose
+4. **Post-filter**, always available: run in full, then `+ apps/cli/src/scan/sarif/filter.ts` keeps only results whose
    location is in the changed set. `--no-filter` disables it. This is the fallback for any tool
    with no native narrowing and the second pass on top of scope mapping.
 
@@ -285,7 +300,7 @@ with exit 0. `--force` overrides.
 ### 2.5 SARIF spine and output layout
 
 - Every run writes `results.sarif` (SARIF 2.1.0), `summary.json`, and `results.md` under
-  `artifacts/code-scan/<slug>/[<scope>/]`. `scan all` adds `artifacts/code-scan/summary.json`.
+  `artifacts/code-scan/<slug>/[<scope>/]`. `scan all` adds `+ artifacts/code-scan/summary.json`.
 - Tools without native SARIF get a converter under `sarif/convert/`: nuget-audit (JSON),
   sonarqube (issues API), roslyn (none needed — `dotnet build -p:ErrorLog=<file>,version=2.1`
   emits SARIF natively, which is the standard route), actionlint (its documented SARIF template),
@@ -307,7 +322,7 @@ devDependency, winget or brew, pinned release binary with SHA-256 verification, 
 
 | Channel | Local install | Pin lives in | CI |
 |---|---|---|---|
-| `dotnet-tool` | `dotnet tool restore` | `.config/dotnet-tools.json` (adds `JetBrains.ReSharper.GlobalTools`, `CycloneDX`) | same |
+| `dotnet-tool` | `dotnet tool restore` | `+ .config/dotnet-tools.json` (adds `JetBrains.ReSharper.GlobalTools`, `CycloneDX`) | same |
 | `gh-extension` | `gh extension install github/gh-codeql && gh codeql set-version <v>` | manifest | same |
 | `npm` | `pnpm install` (snyk is a devDependency of `apps/cli`) | `pnpm-lock.yaml` | same |
 | `winget` / `brew` | `winget install --id <id> --version <v>` / `brew install <formula>` | manifest | prefer release-binary for determinism |
@@ -316,12 +331,18 @@ devDependency, winget or brew, pinned release binary with SHA-256 verification, 
 | `docker` | `docker run <image>:<tag>` | manifest | fallback only |
 | `sdk` | nothing; the .NET SDK provides it | — | — |
 
-`pineguard tool install <slug>|all` is idempotent and honours `--version`, `--force`, `--dry-run`.
-`pineguard tool doctor` prints one row per tool: installed version versus pin, tokens present or
+`pineguard dev install` is idempotent and honours `--version`, `--force`, `--dry-run`. `--all`
+installs the CLI build, the dependencies (`dotnet tool restore`, `pnpm install`) and every active
+tool; `--cli`, `--dependencies` and `<slug>...` select subsets. `+ tools/Install-Cli.ps1` is the
+PowerShell front door with the same switches (D-15) and is the one command a contributor runs
+after cloning; CI runs the same path.
+`pineguard dev doctor` prints one row per tool: installed version versus pin, tokens present or
 absent, database cache age; exits 2 if anything a requested run needs is missing.
-`pineguard tool doctor --remote` queries `gh api repos/{owner}/{repo}` and reports whether secret
+`pineguard dev doctor --remote` queries `gh api repos/{owner}/{repo}` and reports whether secret
 scanning, push protection, Dependabot alerts, code scanning default setup, and Copilot review are
 enabled, so the cloud tier's state is visible from the terminal.
+`pineguard dev env --check` lists every variable the selected manifests declare, present or
+missing, without echoing a value; `--example` regenerates `.env.example`.
 
 ### 2.7 Environment variables
 
@@ -335,9 +356,10 @@ enabled, so the cloud tier's state is visible from the terminal.
 | `PINEGUARD_OFFLINE` | PineGuard | Default for `--offline` |
 | `PINEGUARD_TOOLS_BIN` | PineGuard | Where release binaries are placed |
 
-Precedence: flag, then environment, then the same `.env` file the PowerShell tools use (D-4 of the
-standardisation plan), loaded with Node's built-in `process.loadEnvFile`. `GITHUB_ACTIONS=true`
-turns `--ci` on. PineGuard-prefixed variables exist only for PineGuard's own knobs; a variable a
+Precedence: flag, then environment, then the repository-root `.env` (D-16), loaded by every
+PowerShell entry script through `Import-DotEnv` and by the CLI through Node's built-in
+`process.loadEnvFile`. `pineguard dev env --check` is how a contributor or a CI preflight learns
+what is missing. `GITHUB_ACTIONS=true` turns `--ci` on. PineGuard-prefixed variables exist only for PineGuard's own knobs; a variable a
 tool already names is never duplicated under a PineGuard name.
 
 ### 2.8 Command surface
@@ -348,9 +370,10 @@ pineguard scan <slug>|all [--scope] [--target] [--base] [--pr] [--paths] [--outp
                           [--ci] [--timeout] [--open] [--dry-run] [--force] [--tool-args]
 pineguard scan --list [--format json]
 
-pineguard tool install <slug>|all [--version <v>] [--force] [--dry-run]
-pineguard tool list
-pineguard tool doctor [--remote] [--format json]
+pineguard dev install [--all] [--cli] [--dependencies] [<slug>...] [--version <v>] [--force] [--dry-run]
+pineguard dev doctor [--remote] [--format json]
+pineguard dev list
+pineguard dev env [--check] [--list] [--example]
 
 pineguard test run [all|<scope>] [--include-cli] [--filter <expr>] [--framework <tfm>] [--configuration]
 pineguard test coverage [--engine coverlet|dotcover] [--scope] [--fail-below <n>] [--fail-branch-below <n>]
@@ -365,19 +388,29 @@ pineguard audit ...                                  unchanged
 `Run-CodeCoverage.ps1`. The `/coverage-*` and `/test-*` slash-command families do not change
 (rename folders, not commands).
 
+The contributor path this gives, from clone to the signal CI will produce, and the path CI itself
+runs:
+
+```
+./tools/Install-Cli.ps1 -All           # Node/pnpm check, pnpm install, apps/cli build, dotnet tool restore, every scanner
+pineguard dev env --check              # every variable the manifests need, present or missing, from .env
+pineguard dev doctor                   # versions vs pins, tokens, caches; --remote adds the GitHub settings
+pineguard scan all --target branch     # what the pipeline will say about this branch
+```
+
 ### 2.9 Cloud tier in the pipeline
 
-A new workflow `.github/workflows/scan.yml`, separate from `ci.yml` so the build-and-test pipeline
+A new workflow `+ .github/workflows/scan.yml`, separate from `ci.yml` so the build-and-test pipeline
 does not grow, triggered on `pull_request`, `push` to `main`, a weekly `schedule` (dependency
 findings appear without commits), and `workflow_dispatch` with a `tool` input.
 
 | Job | Runner | Does |
 |---|---|---|
-| `local-tier` | `ubuntu-latest` | `pnpm install`, `dotnet tool restore`, `pineguard tool install all`, `pineguard tool doctor`, `pineguard scan all --ci --target pr --format github`; uploads every `results.sarif` with `github/codeql-action/upload-sarif` under its `pineguard/<slug>` category; caches the Trivy and Grype databases and the CodeQL database by day. Fetch-only adapters run here too so the aggregate summary includes cloud alerts, but they never upload. |
+| `local-tier` | `ubuntu-latest` | `pineguard dev install --all` (or `tools/Install-Cli.ps1 -All`), `pineguard dev env --check`, `pineguard dev doctor`, `pineguard scan all --ci --target pr --format github`; uploads every `results.sarif` with `github/codeql-action/upload-sarif` under its `pineguard/<slug>` category; caches the Trivy and Grype databases and the CodeQL database by day. Fetch-only adapters run here too so the aggregate summary includes cloud alerts, but they never upload. |
 | `sonarcloud` | `ubuntu-latest` | The SonarCloud scan action with `SONAR_TOKEN`; gated by `vars.SONARCLOUD_ENABLED`, mirroring the existing `QODANA_ENABLED` gate. Gives branch and PR analysis that Community Build cannot. |
 | `qodana` | unchanged | Stays in `ci.yml` as it is. |
 | code scanning | none | CodeQL default setup, a repository setting (D-11). The local `codeql` adapter never uploads, so the two never collide. |
-| Dependabot, secret scanning, push protection, Copilot review | none | Repository settings, verified by `tool doctor --remote` in the `local-tier` job as a preflight. |
+| Dependabot, secret scanning, push protection, Copilot review | none | Repository settings, verified by `dev doctor --remote` in the `local-tier` job as a preflight. |
 
 Permissions: `contents: read`, `pull-requests: read`, `security-events: write`. The gate is
 `--fail-on high` with the baseline ratchet absorbing existing debt. Target wall-clock for the
@@ -390,9 +423,9 @@ Permissions: `contents: read`, `pull-requests: read`, `security-events: write`. 
 | Skill `scan-<slug>` | One per slug, all twenty, on the three skill surfaces (`docs/ai`, `.claude`, `.github`, `.pi`). The body carries what the tool finds, how to read its SARIF, and how to act on it. Generated from the manifest, then given a tool-specific section by Sonnet. |
 | Agent `scan-<slug>` | One per slug, two-line body, referencing the shared workflow with `Tool = <slug>`. |
 | Agent `scan-<slug>-<scope>` | Only where the manifest says `scopeVariants: true`: `inspectcode`, `codeql`, `semgrep`. Existing `roslyn` and `qodana` variants are unchanged. Everything else follows the `/scan-sonar` precedent: one command, whole solution, narrowed by `--target`. |
-| Workflow | One parameterised `docs/ai/workflows/scan.md` for every new slug. The three existing workflows (`scan-roslyn.md`, `scan-sonar.md`, `scan-qodana.md`) are left as they are. |
+| Workflow | One parameterised `+ docs/ai/workflows/scan.md` for every new slug. The three existing workflows (`scan-roslyn.md`, `scan-sonar.md`, `scan-qodana.md`) are left as they are. |
 | Command | `docs/ai/commands/scan.md` gains one row per agent. |
-| Skill `fix-<slug>` | Only where the manifest says `fix: true`: `inspectcode`, `semgrep`, `codeql`, backed by one shared `docs/ai/workflows/fix-scan.md` that reads the SARIF and fixes by severity, never suppressing. SCA "fixes" are dependency bumps and belong to Dependabot. Phase 5b, lower priority. |
+| Skill `fix-<slug>` | Only where the manifest says `fix: true`: `inspectcode`, `semgrep`, `codeql`, backed by one shared `+ docs/ai/workflows/fix-scan.md` that reads the SARIF and fixes by severity, never suppressing. SCA "fixes" are dependency bumps and belong to Dependabot. Phase 5b, lower priority. |
 | Adapter surfaces | `docs/ai/meta/adapter-surfaces.md` §4 gains an exception row: solution-wide scanners have no scope variants by policy. The Copilot subset already carries `scan-sonar` as the family's representative. |
 | `scaffold-quality-tool` | Rewritten (T5.06) so the recipe becomes: manifest, adapter, fixtures, two front doors, README, skill, agent, command row. The 52-file recipe is retired. |
 
@@ -404,7 +437,7 @@ Permissions: `contents: read`, `pull-requests: read`, `security-events: write`. 
 
 | ID | Task | Notes |
 |---|---|---|
-| P0.01 | Merge `feature/tools-standardisation` (Phases 1 and 2) to `main` with `--no-ff`; rebase this branch | Clean merge verified 2026-09-08 (32 ahead, 47 behind, no conflicts). Gives this plan `.config/dotnet-tools.json`, `Test-Tools.ps1`, the Pester suite, and the `tools-lint` job. Owner go-ahead is D-2. |
+| P0.01 | Merge `feature/tools-standardisation` (Phases 1 and 2) to `main` with `--no-ff`; rebase this branch | Clean merge verified 2026-09-08 (32 ahead, 47 behind, no conflicts). Gives this plan `+ .config/dotnet-tools.json`, `Test-Tools.ps1`, the Pester suite, and the `tools-lint` job. Owner go-ahead is D-2. |
 | P0.02 | `packages.lock.json`: `RestorePackagesWithLockFile=true`, `NuGetAuditMode=all`, `NuGetAuditLevel=low` in `Directory.Build.props`; commit lock files; `dotnet restore --locked-mode` in CI | D-3. Without a lock file, trivy, grype and snyk miss transitive dependencies. `NuGetAudit` warnings (`NU1901`–`NU1904`) then surface at restore and are parsed by the diagnostics tool after the standardisation plan's T1.02. Do not add them to `TreatWarningsAsErrors`; the scan gate handles them. |
 | P0.03 | Record the handoff in the standardisation plan: T3.04 and T3.05 transfer to this plan as T1.08 | One-line status change in that plan's playbook. |
 | P0.04 | Remove the merged `audit-cli-rebuild` worktree and `worktree-audit-cli-rebuild` branch; delete the empty `tools/audit-cli/solution` directory | Hygiene. Merged on 2026-09-07 (`7d3547f`). |
@@ -414,18 +447,18 @@ Permissions: `contents: read`, `pull-requests: read`, `security-events: write`. 
 
 | ID | Task | Acceptance |
 |---|---|---|
-| T1.01 | Scope registry as data: `tools/.shared/scopes.json`; PowerShell reader replacing the literal lists; TS reader `scan/scopes.ts`; Pester and vitest parity tests against `src/*.csproj`, `tests/*.csproj`, `PineGuard.slnx`, and the `ci.yml` path filter | D-10. One place spells a scope. Both readers produce identical tables. |
-| T1.02 | `scan/contract.ts`, `scan/catalog.ts`, the manifest type, `scan --list` | `--list --format json` validates against the schema. |
-| T1.03 | `scan/changed.ts`: branch, pr, paths; scope mapping; change triggers | Fixture repository tests for each target, including uncommitted work and a missing PR. |
+| T1.01 | Scope registry as data: `+ tools/.shared/scopes.json`; PowerShell reader replacing the literal lists; TS reader `+ apps/cli/src/scan/scopes.ts`; Pester and vitest parity tests against `src/*.csproj`, `tests/*.csproj`, `PineGuard.slnx`, and the `ci.yml` path filter | D-10. One place spells a scope. Both readers produce identical tables. |
+| T1.02 | `+ apps/cli/src/scan/contract.ts`, `+ apps/cli/src/scan/catalog.ts`, the manifest type, `scan --list` | `--list --format json` validates against the schema. |
+| T1.03 | `+ apps/cli/src/scan/changed.ts`: branch, pr, paths; scope mapping; change triggers | Fixture repository tests for each target, including uncommitted work and a missing PR. |
 | T1.04 | `scan/sarif/`: normalise, summary, filter, aggregate | Golden-file tests; a filtered SARIF keeps only changed-set locations. |
-| T1.05 | `scan/engine.ts`: resolve, doctor check, narrow, spawn with timeout, normalise, baseline, gate, report; exit codes | Every exit code has a test. `all` returns the highest member code. |
-| T1.06 | `tool/`: channels, `install`, `list`, `doctor`, `doctor --remote` | Install is idempotent; `doctor` exit 2 on a missing pin; `--dry-run` prints and does nothing. |
-| T1.07 | `tools/.shared/cli.ps1`; `tools/code-scan/Run-Scan.ps1`; `tools/code-scan/Install-Scanner.ps1`; Pester tests for the switch mapping | `Run-Scan -Tool inspectcode -Target Branch -WhatIf` prints the resolved CLI command. Exit 2 with guidance when Node 22 or pnpm is absent. |
+| T1.05 | `+ apps/cli/src/scan/engine.ts`: resolve, doctor check, narrow, spawn with timeout, normalise, baseline, gate, report; exit codes | Every exit code has a test. `all` returns the highest member code. |
+| T1.06 | `dev/`: channels, `install` (`--all`, `--cli`, `--dependencies`, slugs), `list`, `doctor`, `doctor --remote`, `env` (`--check`, `--list`, `--example`) | Install is idempotent; `doctor` exit 2 on a missing pin; `env --check` never echoes a value; `--dry-run` prints and does nothing; `.env.example` round-trips through `env --example`. |
+| T1.07 | `+ tools/Install-Cli.ps1`; `+ tools/.shared/cli.ps1`; `Get-`/`Set-`/`Test-DotEnvVariable` in `tools/.shared/dotenv.ps1`; the fixed script header that imports `.env` first; the `.env` move to the root with `Clean-Root.ps1` allow-listing it (D-16); `+ tools/code-scan/Run-Scan.ps1`; Pester tests for the switch mapping | `Install-Cli.ps1 -All -WhatIf` prints every step; `-Cli` succeeds on a machine with only Node 22 and pnpm; `Run-Scan -Tool inspectcode -Target Branch -WhatIf` prints the resolved CLI command; exit 2 with guidance when Node 22 or pnpm is absent. |
 | T1.08 | Folder moves: `code-inspection/` → `code-scan/qodana/` (inner `qodana/` flattened), `sonar-scanner/` → `code-scan/sonarqube/`; reference sweep across `docs/ai`, `.claude`, `.github`, `.agent`, `.pi`, `.vscode/tasks.json`, `ci.yml`, the registry's Qodana config paths | Haiku sweep from an exact old→new table; `pineguard audit doc-links` clean; a grep for the old paths returns nothing. |
 | T1.09 | Reference adapter A: `nuget-audit` | SDK channel; JSON converter; change triggers; fixtures with a known-vulnerable package; can-fail test. |
-| T1.10 | Reference adapter B: `inspectcode` | dotnet-tool channel pinned in `.config/dotnet-tools.json`; `--format=Sarif`; `--include` for paths, `--project` for scope; `-ToolArgs` passthrough; verify `.slnx` support in the pinned version, else pass `PineGuard.slnx` through a generated `.sln` and record the workaround in `## Baselines`. |
-| T1.11 | Front-door template: `Run-<Tool>.ps1`, `Install-<Tool>.ps1`, `README.md` per slug, generated from the manifest; instantiate for the two reference adapters | Pester: every generated script parses, has real `.PARAMETER` text, and at least one `.EXAMPLE`. |
-| T1.12 | Scan baseline: `apps/cli/config/scan-baseline.json`, `--update-baseline`; snapshot the two reference adapters on this repository | Numbers recorded in `## Baselines`. |
+| T1.10 | Reference adapter B: `inspectcode` | dotnet-tool channel pinned in `+ .config/dotnet-tools.json`; `--format=Sarif`; `--include` for paths, `--project` for scope; `-ToolArgs` passthrough; verify `.slnx` support in the pinned version, else pass `PineGuard.slnx` through a generated `.sln` and record the workaround in `## Baselines`. |
+| T1.11 | Front-door template: `Run-<Tool>.ps1`, `Install-<Tool>.ps1` (delegates to `tools/Install-Cli.ps1 -Tool <slug>`), `README.md` per slug, generated from the manifest; instantiate for the two reference adapters | Pester: every generated script parses, has real `.PARAMETER` text, and at least one `.EXAMPLE`. |
+| T1.12 | Scan baseline: `+ apps/cli/config/scan-baseline.json`, `--update-baseline`; snapshot the two reference adapters on this repository | Numbers recorded in `## Baselines`. |
 | T1.V | Verify Phase 1 (Opus): contract conformance, `--target branch` correctness on a fixture repo and on this one, exit codes, doctor, both adapters end to end on Windows and ubuntu | Written report appended to `## Baselines`. |
 
 ### Phase 2 — Local tier fan-out
@@ -434,10 +467,10 @@ One Sonnet dispatch per tool, template T1.10, all concurrent after T1.V.
 
 | ID | Tool | Notes |
 |---|---|---|
-| T2.01 | `trivy` | `trivy fs --scanners vuln,secret,misconfig,license --format sarif`; database cache; `--offline` maps to `--skip-db-update`; config under `config/trivy.yaml`. |
-| T2.02 | `gitleaks` | `gitleaks git --log-opts="<base>..HEAD" --report-format sarif`; `config/gitleaks.toml` with PineGuard-specific patterns (Sonar, Qodana, NuGet API keys); optional pre-commit hook task listed as T2.10. |
+| T2.01 | `trivy` | `trivy fs --scanners vuln,secret,misconfig,license --format sarif`; database cache; `--offline` maps to `--skip-db-update`; config under `+ tools/code-scan/trivy/config/trivy.yaml`. |
+| T2.02 | `gitleaks` | `gitleaks git --log-opts="<base>..HEAD" --report-format sarif`; `+ tools/code-scan/gitleaks/config/gitleaks.toml` with PineGuard-specific patterns (Sonar, Qodana, NuGet API keys); optional pre-commit hook task listed as T2.10. |
 | T2.03 | `semgrep` | `semgrep scan --config <pinned packs> --sarif --metrics=off --baseline-commit <base>`; rule packs pinned by version or vendored under `config/`. |
-| T2.04 | `actionlint` | Paths; the documented SARIF template under `config/`; `.github/actionlint.yaml` is the one root-convention exception. |
+| T2.04 | `actionlint` | Paths; the documented SARIF template under `config/`; `+ .github/actionlint.yaml` is the one root-convention exception. |
 | T2.05 | `codeql` | gh-codeql install and `set-version`; `codeql database create --language=csharp --build-mode=none` per scope; `database analyze` with the `codeql/csharp-security-and-quality` pack; database cached under `artifacts/code-scan/codeql/db/`; never uploads (D-11). |
 | T2.06 | `cyclonedx` | `dotnet CycloneDX PineGuard.slnx --json --out artifacts/code-scan/cyclonedx/`; produces `bom.json`; no SARIF; change-triggered. |
 | T2.07 | `grype` | `grype sbom:artifacts/code-scan/cyclonedx/bom.json -o sarif --fail-on <sev>`; runs T2.06 first when the SBOM is missing or stale; database cache. |
@@ -464,7 +497,7 @@ One Sonnet dispatch per tool, template T1.10, all concurrent after T1.V.
 
 | ID | Task | Notes |
 |---|---|---|
-| T4.01 | `.github/workflows/scan.yml` | §2.9 `local-tier` job: triggers, install, doctor preflight, `scan all --ci --target pr`, per-slug SARIF upload, caches, permissions, `--fail-on high`, baseline. |
+| T4.01 | `+ .github/workflows/scan.yml` | §2.9 `local-tier` job: triggers, install, doctor preflight, `scan all --ci --target pr`, per-slug SARIF upload, caches, permissions, `--fail-on high`, baseline. |
 | T4.02 | `sonarcloud` job | Token-gated by `vars.SONARCLOUD_ENABLED`; SonarCloud project created by the owner (Tier 1, outside this plan). |
 | T4.03 | Repository settings | Enable CodeQL default setup; confirm secret scanning, push protection, Dependabot alerts, Copilot review. Tier 1 operations — the owner confirms each; `tool doctor --remote` then reports them green. |
 | T4.04 | `ci.yml`: `dotnet restore --locked-mode`; the `cli` job runs the vitest suite on both runners | Follow-through of P0.02 and the cross-platform rule. |
@@ -476,21 +509,21 @@ One Sonnet dispatch per tool, template T1.10, all concurrent after T1.V.
 
 | ID | Task | Notes |
 |---|---|---|
-| T5.01 | `docs/ai/specs/scan/spec.md` v2 | Tiers, manifest, contract, narrowing, SARIF spine, output paths, exit codes, fetch-only semantics, config placement rule. `specs/tools/code-inspection/qodana.md` follows the folder move. |
+| T5.01 | `docs/ai/specs/scan/spec.md` v2 | Tiers, manifest, contract, narrowing, SARIF spine, output paths, exit codes, fetch-only semantics, config placement rule. `docs/ai/specs/tools/code-inspection/qodana.md` follows the folder move. |
 | T5.02 | `docs/ai/rules/scan.md` | Generalised from SonarQube-only to the scan family; keeps the "never suppress" and token rules. |
 | T5.03 | Skills `scan-<slug>` for all twenty slugs on `docs/ai`, `.claude`, `.github`, `.pi` | Haiku instantiates from the manifest template; Sonnet writes each tool-specific section. |
-| T5.04 | Workflow `docs/ai/workflows/scan.md`; agents `scan-<slug>` and `scan-<slug>-<scope>` per §2.10; `commands/scan.md`; palettes in `CLAUDE.md`, `AGENTS.md`, `.pi/AGENTS.md`; `.claude/commands`, `.pi/prompts`, `.agent/workflows`; `.github/prompts` per the declared subset | Cascade checklist in `adapter-surfaces.md` §5, row by row. |
+| T5.04 | Workflow `+ docs/ai/workflows/scan.md`; agents `scan-<slug>` and `scan-<slug>-<scope>` per §2.10; `docs/ai/commands/scan.md`; palettes in `CLAUDE.md`, `AGENTS.md`, `.pi/AGENTS.md`; `.claude/commands`, `.pi/prompts`, `.agent/workflows`; `.github/prompts` per the declared subset | Cascade checklist in `adapter-surfaces.md` §5, row by row. |
 | T5.05 | `adapter-surfaces.md` §4 exception row and §5 checklist row for manifest and CLI registration; `docs/ai/skills/INDEX.md`; `docs/ai/README.md` | |
 | T5.06 | `scaffold-quality-tool` skill v2 | The new add-a-scanner recipe (§2.10 last row). |
-| T5.07 | `tools/code-scan/README.md`, `tools/README.md` index, `apps/cli/README.md` | READMEs generated from the manifest, never hand-enumerated. |
-| T5.08 | `fix-<slug>` skills for `inspectcode`, `semgrep`, `codeql`; shared `workflows/fix-scan.md` | Phase 5b, after T5.04. |
+| T5.07 | `+ tools/code-scan/README.md`, `tools/README.md` index, `apps/cli/README.md` | READMEs generated from the manifest, never hand-enumerated. |
+| T5.08 | `fix-<slug>` skills for `inspectcode`, `semgrep`, `codeql`; shared `+ docs/ai/workflows/fix-scan.md` | Phase 5b, after T5.04. |
 | T5.V | `pineguard audit surface-parity` and `doc-links` clean; Opus review of the spec text | |
 
 ### Phase 6 — Verification and merge
 
 | ID | Task |
 |---|---|
-| T6.01 | Full matrix on Windows local and ubuntu CI: `tool doctor`, `scan all` under `solution` and `branch`, `test run all --include-cli`, `test coverage` on both engines, coverage still 100/100 on both TFMs, Pester + PSScriptAnalyzer + vitest + `pineguard audit --gate` green. |
+| T6.01 | Full matrix on Windows local and ubuntu CI: `Install-Cli.ps1 -All` on a clean machine, `dev env --check`, `dev doctor`, `scan all` under `solution` and `branch`, `test run all --include-cli`, `test coverage` on both engines, coverage still 100/100 on both TFMs, Pester + PSScriptAnalyzer + vitest + `pineguard audit --gate` green. |
 | T6.02 | Plan status, `## Baselines`, and session memory updated; the standardisation plan's handoff row closed. |
 | T6.03 | Merge `--no-ff` to `main` after the owner's go-ahead; remove the worktree. |
 
@@ -532,7 +565,7 @@ The standardisation plan's §5 applies unchanged, with these substitutions:
 | SARIF category collision with default-setup CodeQL | Local `codeql` never uploads (D-11); every upload category is `pineguard/<slug>` |
 | Baseline debt is large on first run | Same ratchet as audit; debt burn-down is a separate plan; the gate only fires on new findings |
 | `local-tier` job too slow | Parallel per-tool steps, database caches, codeql database cache; ten-minute target measured in T4.V |
-| Token sprawl across seven services | `tool doctor` is the single view; `.env` is the single local store; CI uses Actions secrets only |
+| Token sprawl across seven services | `dev doctor` and `dev env --check` are the single view; the root `.env` is the single local store; `.env.example` is generated so it cannot drift; CI uses Actions secrets only |
 | Windows-only assumptions creep into adapters | vitest on both runners in the `cli` job; the standardisation Pester Windows-ism test extended to the new scripts |
 | The CLI's pwsh dependency for dispatch adapters | Documented as transitional; ubuntu runners have pwsh; the four wrapped scripts migrate in a later plan if ever |
 | Two initiatives touching `tools/` at once | This plan owns only `code-scan/` and the two moves; the standardisation plan's remaining Phase 3 tasks touch none of the same files |
@@ -558,8 +591,8 @@ letter run concurrently; a group runs after the group it depends on.
 | T1.03 | `changed.ts` | Sonnet | Pending | P1-A | — |
 | T1.04 | SARIF normalise/summary/filter | Sonnet | Pending | P1-A | — |
 | T1.05 | Engine and exit codes | Sonnet | Pending | P1-B | T1.02–T1.04 |
-| T1.06 | `tool` group | Sonnet | Pending | P1-A | — |
-| T1.07 | `cli.ps1`, root front doors | Sonnet | Pending | P1-B | T1.02 |
+| T1.06 | `dev` group | Sonnet | Pending | P1-A | — |
+| T1.07 | `Install-Cli.ps1`, `cli.ps1`, dotenv helpers, `.env` move, `Run-Scan.ps1` | Sonnet | Pending | P1-B | T1.02 |
 | T1.08 | Folder moves + sweep | Sonnet + Haiku | Pending | P1-A | P0.01 |
 | T1.09 | `nuget-audit` adapter | Sonnet | Pending | P1-C | T1.05 |
 | T1.10 | `inspectcode` adapter | Sonnet | Pending | P1-C | T1.05, T1.06 |
@@ -600,10 +633,11 @@ letter run concurrently; a group runs after the group it depends on.
 
 ## Decisions
 
-Session: 2026-09-08, owner (Steve McCormack) by chat, Fable 5.1. D-2, D-7, D-9 and D-11 to D-14
+Session: 2026-09-08, owner (Steve McCormack) by chat, Fable 5.1. D-2, D-9, D-11 to D-14 and D-16
 are Fable recommendations the owner asked for by name or that fell out of the accepted design;
-they are recorded as decided but the owner can veto any of them before Phase 1 dispatch. Slugs in
-D-13 need explicit naming sign-off.
+D-7 and D-15 were revised mid-session on the owner's instruction. All are recorded as decided but
+the owner can veto any of them before Phase 1 dispatch. Slugs in D-13 need explicit naming
+sign-off.
 
 | ID | Decision | Rejected alternatives | Notes |
 |---|---|---|---|
@@ -613,13 +647,15 @@ D-13 need explicit naming sign-off.
 | D-4 | **Gaps accepted**: `gitleaks`, `actionlint`, `nuget-audit`, `cyclonedx` (SBOM), and `zizmor` as optional. | Rely on Trivy's secret scanner (working-tree only); rely on GitHub secret scanning alone (fires only after push, no custom patterns without Advanced Security on a private repo) | Owner: "Yes." Gitleaks is not the engine behind GitHub secret scanning; the two are independent, which is exactly why both tiers need one. |
 | D-5 | **Park `dotnet-counters`; BDD is a no; `gherklin` deferred.** | Add a perf family now; adopt Reqnroll and gherklin for the library's unit tests | Owner: "Ok." |
 | D-6 | **Remove CSharpier; always prefer standard tooling.** `dotnet format` is the formatter; `jb cleanupcode` is out too. Corollary: dotnet SDK features and dotnet tools are the first install channel; `gh api` over a hand-written GitHub client; vendor-official actions for the cloud tier. | Run CSharpier check-only beside `dotnet format` | Owner: "Remove CSharpier - we already have full support for dotnet format. Always prefer standard tooling e.g. dotnet format or other dotnet tools." |
-| D-7 | **CLI nouns**: `pineguard scan <slug>\|all`, `pineguard tool install\|list\|doctor`, `pineguard test run\|coverage`. `scan` mirrors `audit <rule>\|all`; `test` is a group because it hosts two operations and the owner wants room for more (`test run all\|<scope> --include-cli`). | `pineguard coverage` top-level (matches the `/coverage-*` family and the `code-coverage/` root, but the owner prefers grouping under `test`; slash commands do not rename either way); `pineguard install <slug>` flat (reads as installing the CLI itself); `pineguard tools` plural (the CLI's nouns are singular); `pineguard doctor` top-level (it diagnoses tools, so it lives under `tool`); `pineguard scan run <slug>` (asymmetric with `audit`) | Owner preferred `pineguard test coverage`; asked for the recommendation on the rest. |
-| D-8 | **Fan-out policy**: scope variants only for SAST tools that honour project scope (`inspectcode`, `codeql`, `semgrep`; existing `roslyn`, `qodana` unchanged); everything else is one command narrowed by `--target`; one parameterised `workflows/scan.md`; `fix-<slug>` only for SAST, via a shared `fix-scan.md`; skills for all twenty. | Full 52-file recipe per tool (roughly a thousand files); one parameterised `scan` skill with a tool argument (breaks the `<verb>-<tool>` naming invariant and the surface-parity rule) | Owner: "Sure." Needs the `adapter-surfaces.md` §4 exception row (T5.05). |
+| D-7 | **CLI nouns**: `pineguard scan <slug>\|all`, `pineguard dev install\|doctor\|list\|env`, `pineguard test run\|coverage`. `scan` mirrors `audit <rule>\|all`; `test` is a group because it hosts two operations and the owner wants room for more (`test run all\|<scope> --include-cli`); `dev` is the group for developer-environment concerns, so that installing the toolchain reads as a repository-development action and never as integrating PineGuard into a consumer's project. `scan`, `test` and `audit` stay top-level: they are work verbs, and a consumer-facing PineGuard CLI, if one is ever built, would be a dotnet tool (`dotnet pineguard …`) under D-6, so the two namespaces cannot collide. | `pineguard tool install\|list\|doctor` (Fable's first proposal, withdrawn: "tool" names the thing installed, "dev" names the concern); `pineguard install <slug>`, `pineguard init`, `pineguard bootstrap` flat (all read as consumer actions); `pineguard coverage` top-level (matches the `/coverage-*` family and the `code-coverage/` root, but the owner prefers grouping under `test`; slash commands do not rename either way); `pineguard tools` plural (the CLI's nouns are singular); `pineguard doctor` top-level; `pineguard scan run <slug>` (asymmetric with `audit`); moving `scan`, `test` and `audit` under `dev` as well (consistent but verbose, renames a shipped command across ten adapter surfaces, and unnecessary given the dotnet-tool point) | Owner preferred `pineguard test coverage` and, mid-session, `pineguard dev install --dependencies --cli` "so it is DEAD CLEAR that these are dev concerns not implementation integration concerns"; asked for the recommendation on the rest. |
+| D-8 | **Fan-out policy**: scope variants only for SAST tools that honour project scope (`inspectcode`, `codeql`, `semgrep`; existing `roslyn`, `qodana` unchanged); everything else is one command narrowed by `--target`; one parameterised `+ docs/ai/workflows/scan.md`; `fix-<slug>` only for SAST, via a shared `fix-scan.md`; skills for all twenty. | Full 52-file recipe per tool (roughly a thousand files); one parameterised `scan` skill with a tool argument (breaks the `<verb>-<tool>` naming invariant and the surface-parity rule) | Owner: "Sure." Needs the `adapter-surfaces.md` §4 exception row (T5.05). |
 | D-9 | **Remove OWASP Dependency-Check.** | Keep as the lowest-priority third SCA tool | Owner asked mid-session whether it has value or whether snyk, wiz and the others cover it. They do: Trivy and Grype read the same lock files and advisory sources, Snyk covers the pipeline. Re-add only if a client mandates it by name. |
-| D-10 | **Scope registry becomes data**: `tools/.shared/scopes.json`, read by PowerShell and TypeScript; a parity test keeps it aligned with the csproj files, the solution, and the CI path filter. | Keep the registry in `dotnet-projects.ps1` and have the CLI shell out to read it; derive scopes from `PineGuard.slnx` at run time in both languages (two derivations drift); `.config/scopes.json` (that folder is dotnet's); `apps/cli/config/scopes.json` (PowerShell reading under `apps/` is inverted) | Location is a proposal; the owner may prefer another. Three scope vocabularies exist today (PS `MustClauses`, CI `must-clauses`, CLI `library\|testing\|docs`); the JSON carries all three spellings per scope so nothing renames. |
+| D-10 | **Scope registry becomes data**: `+ tools/.shared/scopes.json`, read by PowerShell and TypeScript; a parity test keeps it aligned with the csproj files, the solution, and the CI path filter. | Keep the registry in `dotnet-projects.ps1` and have the CLI shell out to read it; derive scopes from `PineGuard.slnx` at run time in both languages (two derivations drift); `.config/` (that folder is dotnet's); `apps/cli/config/` (PowerShell reading under `apps/` is inverted) | Location is a proposal; the owner may prefer another. Three scope vocabularies exist today (PS `MustClauses`, CI `must-clauses`, CLI `library\|testing\|docs`); the JSON carries all three spellings per scope so nothing renames. |
 | D-11 | **CodeQL in the cloud tier is GitHub's default setup; the local `codeql` adapter never uploads.** | `github/codeql-action` with an explicit workflow (more control, but a second CodeQL run to maintain and category collisions with local uploads) | Standard tooling, zero YAML, free on public repos, and a clean tier split. |
 | D-12 | **Pipeline runs the same CLI for the local tier** in a new `scan.yml`; vendor scan actions are used only for the cloud tier (existing Qodana action, SonarCloud action). | Vendor actions for every tool (the command CI runs is then not the command a developer runs, and the contract is never exercised in CI); more jobs inside `ci.yml` | |
-| D-13 | **Exit codes and parameter names align with the standardisation plan** (§3.3 names, §3.4 codes `0/1/2/3/124`). **Slugs**: `roslyn`, `inspectcode`, `qodana`, `codeql`, `semgrep`, `sonarqube`, `snyk`, `nuget-audit`, `trivy`, `cyclonedx`, `grype`, `gitleaks`, `actionlint`, `zizmor`, `hadolint`, `dependabot`, `secret-scanning`, `code-scanning`, `wiz`. Root front doors `Run-Scan.ps1 -Tool` and `Install-Scanner.ps1 -Tool`; shared helper `tools/.shared/cli.ps1`. | `resharper` or `jb` for `inspectcode` (the product and the host CLI; `inspectcode` is the concrete command, and `jb` also hosts a formatter); `dotnet-list-package` or `nuget` for `nuget-audit` (NuGetAudit is Microsoft's own feature name for the same data); `sbom` for `cyclonedx` (activity, not tool — folders inside `code-scan/` name the tool per D-1a of the standardisation plan); `Install-Scanners.ps1` plural (PowerShell nouns are singular; only `Run-Tests`/`Run-Commits` are sanctioned plurals) | **Owner naming sign-off required** before T1.02. |
+| D-13 | **Exit codes and parameter names align with the standardisation plan** (§3.3 names, §3.4 codes `0/1/2/3/124`). **Slugs**: `roslyn`, `inspectcode`, `qodana`, `codeql`, `semgrep`, `sonarqube`, `snyk`, `nuget-audit`, `trivy`, `cyclonedx`, `grype`, `gitleaks`, `actionlint`, `zizmor`, `hadolint`, `dependabot`, `secret-scanning`, `code-scanning`, `wiz`. Root front doors `+ tools/Install-Cli.ps1` and `tools/code-scan/Run-Scan.ps1 -Tool`; shared helpers `+ tools/.shared/cli.ps1` and `tools/.shared/dotenv.ps1`. | `resharper` or `jb` for `inspectcode` (the product and the host CLI; `inspectcode` is the concrete command, and `jb` also hosts a formatter); `dotnet-list-package` or `nuget` for `nuget-audit` (NuGetAudit is Microsoft's own feature name for the same data); `sbom` for `cyclonedx` (activity, not tool — folders inside `code-scan/` name the tool per D-1a of the standardisation plan); `Install-Clis.ps1` or `Install-Scanners.ps1` plural (PowerShell nouns are singular, the owner's own phrase is "plural in its singular form", and only `Run-Tests`/`Run-Commits` are sanctioned plurals); `Install-Scanner.ps1` under `code-scan/` (withdrawn under D-15) | **Owner naming sign-off required** before T1.02. |
+| D-15 | **Root installer and `.env` discipline.** `tools/Install-Cli.ps1 -All \| -Cli \| -Dependencies \| -Tool <slug[]>` is the one command from clone to a complete toolchain: `-Cli` is self-sufficient (checks Node 22 and pnpm, `pnpm install`, builds `apps/cli`), `-Dependencies` runs `dotnet tool restore` and `pnpm install`, `-Tool` delegates to `pineguard dev install`. Per-tool `Install-<Tool>.ps1` scripts delegate to it. `tools/.shared/dotenv.ps1` gains `Get-DotEnvVariable`, `Set-DotEnvVariable` and `Test-DotEnvVariable` beside the existing `Import-DotEnv`; every entry script's fixed header imports `.env` first; the CLI loads the same file; `.env.example` is generated from the manifests by `pineguard dev env --example` and lists every variable with its owner and purpose. CI runs the same install path, so local and pipeline never diverge. | Per-tool installers with no single entry point; `Install-Scanner.ps1` per family (Fable's first proposal, withdrawn: the owner wants one root helper for every CLI); `Load-DotEnv` (not an approved PowerShell verb, and `Import-DotEnv` already exists); a hand-maintained `.env.example` (drifts) | Owner, mid-session 2026-09-08: a public library owes contributors one documented path "from local development to integration". |
+| D-16 | **`.env` moves to the repository root**: `.env` gitignored, `.env.example` committed and generated, replacing the `.etc/powershell/` location and its hand-written example. Root is the convention every tool, Node's `process.loadEnvFile` and every contributor already expects; `.etc/powershell/` is legacy the standardisation plan flagged as out of scope. `Clean-Root.ps1` allow-lists both names. `Import-DotEnv` keeps its `-Path` parameter so nothing breaks during the move. | Keep the `.etc/powershell/` location (the CLI and every new script would hard-code a legacy path); `.etc/`; `tools/` (a secret store inside the tools tree) | Fable recommendation; owner to confirm. |
 | D-14 | **Cloud-only services are fetch adapters.** `pineguard scan dependabot\|secret-scanning\|code-scanning` pull open alerts through `gh api` into SARIF and summary; they never run a scanner and never upload. `wiz` is a stub until a tenant exists. | Leave cloud-only services out of the CLI (then `scan all` cannot show the whole picture and the skills have nothing to run) | |
 
 ## Baselines
