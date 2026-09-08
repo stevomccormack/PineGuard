@@ -24,7 +24,8 @@ Run code coverage analysis and improve unit tests to reach 100% line and branch 
 1.  **Run Coverage Command**
     - One-shot: `tools/code-coverage/Run-CodeCoverage.ps1 -Scope [Scope]`
       (`-Mode Generate|Analyze|GenerateAndAnalyze`; scopes: `Core`, `MustClauses`, `GuardClauses`,
-      `DataAnnotations`, `FluentValidation`, `Testing`, `All`).
+      `DataAnnotations`, `FluentValidation`, `Options`, `DependencyInjection`, `AspNetCore`,
+      `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`, `Analyzers`, `Testing`, `All`).
     - Or drive the two stages directly, which is the loop the coverage spec defines:
       - `tools/code-coverage/New-CoverageReport.ps1 -Scope [Scope]`
       - `tools/code-coverage/Test-Coverage.ps1 -Scope [Scope] -Top 30`

@@ -18,7 +18,9 @@ version: 1.1
 
 ## Parameters
 
-- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`)
+- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`,
+  `Options`, `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`,
+  `Analyzers`, `Testing`)
 - **Code**: (optional) Regex pattern to filter diagnostic codes (e.g. `CS86` for nullability)
 
 ## Auto-Approval

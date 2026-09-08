@@ -34,6 +34,14 @@ Libraries covered by this workflow:
 - `PineGuard.GuardClauses`
 - `PineGuard.DataAnnotations`
 - `PineGuard.FluentValidation`
+- `PineGuard.Extensions.Options`
+- `PineGuard.Extensions.DependencyInjection`
+- `PineGuard.AspNetCore`
+- `PineGuard.ErrorOr`
+- `PineGuard.FluentResults`
+- `PineGuard.OneOf`
+- `PineGuard.MediatR`
+- `PineGuard.Analyzers`
 - `PineGuard.Testing` _(shared test infrastructure library; exercised directly by `tests/PineGuard.Testing.UnitTests/` and indirectly by every other `*.UnitTests` run)_
 
 Per-library run notes live in:
@@ -163,7 +171,9 @@ Rule:
 
 Supported presets:
 
-- `Core`, `MustClauses`, `GuardClauses`, `DataAnnotations`, `FluentValidation`, `Testing`, `All`
+- `Core`, `MustClauses`, `GuardClauses`, `DataAnnotations`, `FluentValidation`, `Options`,
+  `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`, `Analyzers`,
+  `Testing`, `All`
 - `Custom` (analyzer only)
 
 ### PineGuard.Testing scope

@@ -19,15 +19,23 @@ version: 1.0
 
 This workflow accepts a **Scope** parameter to determine which project to analyze.
 
-| Scope              | Description                                                                                                       |
-| :----------------- | :---------------------------------------------------------------------------------------------------------------- |
-| `All`              | Runs coverage for the entire solution (every `*.UnitTests` project).                                              |
-| `Core`             | PineGuard.Core                                                                                                    |
-| `MustClauses`      | PineGuard.MustClauses                                                                                             |
-| `GuardClauses`     | PineGuard.GuardClauses                                                                                            |
-| `FluentValidation` | PineGuard.FluentValidation                                                                                        |
-| `DataAnnotations`  | PineGuard.DataAnnotations                                                                                         |
-| `Testing`          | PineGuard.Testing — run directly with `-Scope Testing`.                                                           |
+| Scope                 | Description                                                                                                       |
+| :-------------------- | :---------------------------------------------------------------------------------------------------------------- |
+| `All`                 | Runs coverage for the entire solution (every `*.UnitTests` project).                                              |
+| `Core`                | PineGuard.Core                                                                                                    |
+| `MustClauses`         | PineGuard.MustClauses                                                                                             |
+| `GuardClauses`        | PineGuard.GuardClauses                                                                                            |
+| `FluentValidation`    | PineGuard.FluentValidation                                                                                        |
+| `DataAnnotations`     | PineGuard.DataAnnotations                                                                                         |
+| `Options`             | PineGuard.Extensions.Options                                                                                      |
+| `DependencyInjection` | PineGuard.Extensions.DependencyInjection                                                                          |
+| `AspNetCore`          | PineGuard.AspNetCore                                                                                              |
+| `ErrorOr`             | PineGuard.ErrorOr                                                                                                 |
+| `FluentResults`       | PineGuard.FluentResults                                                                                           |
+| `OneOf`               | PineGuard.OneOf                                                                                                   |
+| `MediatR`             | PineGuard.MediatR                                                                                                 |
+| `Analyzers`           | PineGuard.Analyzers                                                                                               |
+| `Testing`             | PineGuard.Testing — run directly with `-Scope Testing`.                                                           |
 
 ## Auto-Approval
 

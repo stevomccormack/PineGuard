@@ -11,7 +11,7 @@
 - Command: `pwsh -NoProfile -ExecutionPolicy Bypass -Command "cd '...'; ./tools/code-coverage/Run-CodeCoverage.ps1 -Mode GenerateAndAnalyze -Scope [ProjectName] -Top 30 -SkipHtml -Format cobertura"`
 - Note: `-Engine` parameter DOES exist on `Run-CodeCoverage.ps1` (`Coverlet` | `DotCover`, default `Coverlet`), forwarded through the D-9 front door (`New-CoverageReport.ps1`) and to the gate (`Test-Coverage.ps1`). `-Engine DotCover` is snapshot-only and cannot be gated — do not remove a stored `-Engine` flag.
 - dotCover: blocker resolved (Mar 2026) by adding Webroot AV exclusions — 2025.3.3 verified on net8.0 and net10.0, as is Coverlet. The dotCover wrapper ships at `tools/code-coverage/dotcover/New-CoverageReport.ps1`, but it is snapshot-only (writes a `.dcvr` file into `artifacts/code-coverage/dotcover/<scope>/snapshots/`, opened in Rider's coverage viewer; never gated). Coverlet remains the sole CI/gate-authority engine — use it for any result that needs to be gated.
-- Valid scopes: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All
+- Valid scopes: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All
 - Reports land in: `artifacts/code-coverage/coverlet/`
 
 ### Common Gap Patterns
