@@ -150,7 +150,7 @@ apps/cli/src/
     channels.ts            dotnet-tool, gh-extension, npm, winget, brew, release-binary, pipx, docker
     install.ts             --all | --cli | --dependencies | <slug...>
     doctor.ts  list.ts
-    env.ts                 --check | --list | --example (generates .env.example from the manifests)
+    env.ts                 --check | --list | --example (generates .env.example) | --relocate <root> [--write] (§2.7.2 block under one writable root)
   test/
     run.ts                 dispatch to tools/testing/Run-Tests.ps1; --include-cli adds pnpm -C apps/cli test
     coverage.ts            dispatch to tools/code-coverage/New-CoverageReport.ps1 -Engine (Run-CodeCoverage.ps1 until D-9 of the standardisation plan lands)
@@ -221,7 +221,11 @@ interface ScannerManifest {
     fallback?: "docker";              // image pinned by tag
     detect: string[];                 // ["trivy", "--version"]
   };
-  env: { required: string[]; optional: string[] };   // native names only, never renamed: SNYK_TOKEN, SONAR_TOKEN
+  env: {                               // vendor names only, never renamed (D-17)
+    required: string[];                // tokens a run cannot proceed without: SNYK_TOKEN
+    optional: string[];                // endpoints and overrides: SNYK_API, SNYK_CFG_ORG
+    homes: string[];                   // relocation variables `dev env --relocate` sets: SNYK_CACHE_PATH
+  };
   targets: {                           // what narrowing the tool supports natively
     scope: boolean;                    // per project or solution file
     paths: boolean;                    // explicit file list
@@ -342,25 +346,129 @@ absent, database cache age; exits 2 if anything a requested run needs is missing
 scanning, push protection, Dependabot alerts, code scanning default setup, and Copilot review are
 enabled, so the cloud tier's state is visible from the terminal.
 `pineguard dev env --check` lists every variable the selected manifests declare, present or
-missing, without echoing a value; `--example` regenerates `.env.example`.
+missing, without echoing a value, and fails on a relocation variable that names an unwritable
+directory or on `NODE_TLS_REJECT_UNAUTHORIZED=0`; `--example` regenerates `.env.example`;
+`--relocate <root>` emits the §2.7.2 block for a locked-down machine.
 
 ### 2.7 Environment variables
 
-| Variable | Owner | Purpose |
+Four groups. Every name in the first three is the name the vendor documents, checked against the
+vendor's own page on 2026-09-08 (D-17; sources at the end of this section). `.env.example` is
+generated from the manifests in the same four groups, one commented line per variable naming its
+consumer and tier, and nothing is ever echoed by any script or command.
+
+#### 2.7.1 Tokens and endpoints
+
+| Variable | Consumer | Tier | Notes |
+|---|---|---|---|
+| `GH_TOKEN`, then `GITHUB_TOKEN` | `gh`; zizmor (also `ZIZMOR_GITHUB_TOKEN`); CodeQL upload and pack registries (`GITHUB_TOKEN` only); CycloneDX licence lookup fallback; the three fetch-only adapters | both | Precedence as `gh` documents it. Actions provides `GITHUB_TOKEN`; locally `gh auth login` is enough for `gh`. |
+| `GH_ENTERPRISE_TOKEN`, `GH_HOST` | `gh` and zizmor against GitHub Enterprise Server | both | Federated customers on GHES. `GITHUB_HOST` is the MCP server's spelling of the same thing. |
+| `COPILOT_GITHUB_TOKEN` | Copilot CLI, ahead of `GH_TOKEN` and `GITHUB_TOKEN` | local | |
+| `GITHUB_PERSONAL_ACCESS_TOKEN`, `GITHUB_HOST` | GitHub MCP server | local | |
+| `SONAR_TOKEN`, `SONAR_HOST_URL` | SonarScanner CLI's documented names; PineGuard's scripts read them and pass `/d:sonar.token` and `/d:sonar.host.url` to `dotnet-sonarscanner` explicitly; the SonarCloud action reads `SONAR_TOKEN` | both | Replaces the repository's current `SONARQUBE_TOKEN` in scripts (T1.07). Whether the .NET scanner reads them natively is unconfirmed (its tracking issue closed without a visible note), and moot because they are passed explicitly. |
+| `SONARQUBE_TOKEN`, `SONARQUBE_URL`, `SONARQUBE_ORG` | SonarQube MCP server only | local | The name the repository uses today; it stays, but only for the MCP server. |
+| `QODANA_TOKEN`, `QODANA_ENDPOINT` | Qodana CLI and action | pipeline; local docker optional | |
+| `SNYK_TOKEN`, `SNYK_API`, `SNYK_CFG_ORG` | Snyk CLI | pipeline | Org selection is the generic `SNYK_CFG_<KEY>` mechanism. |
+| `SEMGREP_APP_TOKEN`, `SEMGREP_APP_URL` | Semgrep, only for `semgrep ci` | none by default | Not set; the CE run uses `SEMGREP_RULES` or `--config`, which is incompatible with the token. |
+| `CYCLONEDX_GITHUB_BEARER_TOKEN` | CycloneDX licence resolution; falls back to `GITHUB_TOKEN` | both, optional | |
+| `CODEQL_REGISTRIES_AUTH` | CodeQL pack registries on GHES | federated | |
+| `GITLEAKS_CONFIG` | gitleaks config path | both | PineGuard passes `--config` explicitly; listed so a contributor's global value is understood. |
+| `WIZ_CLIENT_ID`, `WIZ_CLIENT_SECRET`, `WIZ_ENV`, `WIZ_DIR` | `wizcli` | deferred | **Unverified**: the Wiz documentation site rate-limited every fetch. Confirm on the vendor page when a tenant exists; the stub adapter does not use them until then. |
+
+Not variables, despite appearing in the request: OWASP Dependency-Check takes `--nvdApiKey` on the
+command line and lets the user pick any variable name to source it from, so `NVD_API_KEY` is a
+convention, not a vendor name, and is moot under D-9. OWASP ZAP takes `-config api.key=<key>`; no
+official ZAP CLI, image or action reads a `ZAP_API_KEY` variable. ZAP is not adopted; if a DAST tool
+is ever wanted for the AspNetCore surface it enters through the manifest like everything else.
+
+#### 2.7.2 Tool homes and caches, for federated machines
+
+Locked-down enterprise machines allow writes only under a demilitarised root such as `C:\Dev` or
+`C:\Tools`. Every row below is the vendor's documented variable for moving that tool's home or
+cache. `pineguard dev env --relocate <root>` prints this whole block pointed under `<root>`, and
+`--write` appends it to `.env`; `dev env --check` verifies each one that is set names a writable
+directory. Persisting them to the user profile is the contributor's own step and is documented, not
+automated.
+
+| Variable | Tool | Moves | Notes |
+|---|---|---|---|
+| `DOTNET_ROOT` | .NET | Runtime location used by generated apphosts | Needed when the SDK is unpacked rather than installed. |
+| `DOTNET_CLI_HOME` | .NET CLI | Workload packs, first-run sentinels, the default local-tool install location | The SDK appends `.dotnet` itself: set `C:\Dev`, never `C:\Dev\.dotnet`. |
+| `NUGET_PACKAGES` | NuGet | Global packages folder, which is also where `dotnet tool restore` places local tools | Takes precedence over `globalPackagesFolder` in `nuget.config`. |
+| `NUGET_HTTP_CACHE_PATH`, `NUGET_PLUGINS_CACHE_PATH`, `NUGET_SCRATCH` | NuGet | HTTP cache, plugins cache, lock files | `NUGET_SCRATCH` must be identical for every NuGet process on the machine. |
+| `DOTNET_CLI_TELEMETRY_OPTOUT`, `DOTNET_NOLOGO` | .NET CLI | Telemetry and first-run text | `DOTNET_SKIP_FIRST_TIME_EXPERIENCE` is obsolete. `DOTNET_INSTALL_DIR` is not a variable; it is the install script's `-InstallDir` parameter. |
+| `npm_config_prefix`, `npm_config_cache` | npm | Global prefix, cache | The vendor's casing is lowercase; `NPM_CONFIG_PREFIX` is documented as equivalent. |
+| `PNPM_HOME` | pnpm | Home; global bin under it; the store under `$PNPM_HOME/store` takes priority | `store-dir`, `cache-dir` and `global-dir` are settings; no dedicated variable form is documented. |
+| `COREPACK_HOME`, `COREPACK_NPM_REGISTRY` | corepack | Package-manager binaries; the registry they come from | Windows default `%LOCALAPPDATA%\node\corepack`. |
+| `PIPX_HOME`, `PIPX_BIN_DIR`, or `UV_TOOL_DIR`, `UV_TOOL_BIN_DIR`, `UV_CACHE_DIR` | pipx or uv, for the semgrep install | Virtual environments and shims | The manifest picks one channel. |
+| `PIP_CACHE_DIR`, `PIP_INDEX_URL` | pip | Cache; index mirror | |
+| `JAVA_HOME` | Java, for the local SonarQube stack | JDK location | |
+| `GH_CONFIG_DIR` | `gh` | Config and extension state | |
+| `COPILOT_HOME`, `COPILOT_CACHE_HOME` | Copilot CLI | Config and data; cache | |
+| `SONAR_USER_HOME` | SonarScanner | Downloads and cache, default `~/.sonar` | |
+| `SNYK_CACHE_PATH` | Snyk | Cache | Not `SNYK_CACHE_HOME`, which does not exist. |
+| `TRIVY_CACHE_DIR`, `TRIVY_DB_REPOSITORY`, `TRIVY_SKIP_DB_UPDATE` | Trivy | Cache; database mirror for air-gapped use; offline | Every flag is available as `TRIVY_<FLAG>`. |
+| `GRYPE_DB_CACHE_DIR`, `GRYPE_DB_UPDATE_URL`, `GRYPE_DB_AUTO_UPDATE` | Grype | Database cache; mirror; auto-update off | `GRYPE_<SECTION>_<KEY>` convention; the registry-auth keys are documented with an inconsistent prefix upstream and are verified empirically in T2.07. |
+| `SYFT_CACHE_DIR` | Syft | Cache | Only if Syft is ever used beside CycloneDX. |
+| `DOCKER_CONFIG`, `DOCKER_HOST` | Docker | Client config, which Trivy prefers for registry auth; daemon socket | |
+| `XDG_CONFIG_HOME`, `XDG_CACHE_HOME`, `XDG_DATA_HOME` | Go-based tools and hadolint config discovery on Linux | | On Windows these tools use `%APPDATA%` and `%LOCALAPPDATA%` instead. zizmor's docs spell its cache variable `XDG_CACHE_DIR`, which is not the specification's name. |
+| `PINEGUARD_TOOLS_BIN` | PineGuard | Where release binaries are placed | The one PineGuard variable in this group. |
+
+Flags only, no variable: `jb inspectcode --caches-home`; the CodeQL CLI, whose database PineGuard
+keeps under `artifacts/`; actionlint, which has no environment variables at all.
+
+#### 2.7.3 Proxy and trust
+
+| Variable | Honoured by | Notes |
 |---|---|---|
-| `SONAR_TOKEN`, `QODANA_TOKEN`, `SNYK_TOKEN`, `SEMGREP_APP_TOKEN`, `WIZ_CLIENT_ID`, `WIZ_CLIENT_SECRET`, `GH_TOKEN` / `GITHUB_TOKEN` | The tool's own name | Never renamed, never echoed. The CLI passes them through the environment, never on the command line. |
-| `PINEGUARD_OUTPUT_PATH` | PineGuard | Default for `--output` |
-| `PINEGUARD_BASE_REF` | PineGuard | Default for `--base` |
-| `PINEGUARD_FAIL_ON` | PineGuard | Default for `--fail-on` |
-| `PINEGUARD_TIER` | PineGuard | `local` or `pipeline`; overrides the `GITHUB_ACTIONS` inference |
-| `PINEGUARD_OFFLINE` | PineGuard | Default for `--offline` |
-| `PINEGUARD_TOOLS_BIN` | PineGuard | Where release binaries are placed |
+| `HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, `ALL_PROXY` | .NET and NuGet, `dotnet-sonarscanner`, Snyk, Semgrep, uv, Git through curl, Go-based tools | Set both cases: .NET checks lowercase first; curl honours `http_proxy` in lowercase only. |
+| `NODE_EXTRA_CA_CERTS` | Node, and so the `pineguard` CLI and Snyk | The corporate CA bundle under TLS inspection. |
+| `npm_config_cafile`, `npm_config_strict_ssl` | npm | |
+| `SSL_CERT_FILE`, `SSL_CERT_DIR` | uv; OpenSSL-backed .NET on Linux | |
+| `PIP_CERT`, `REQUESTS_CA_BUNDLE` | pip; Semgrep through Python requests | |
+| `GIT_SSL_CAINFO`, `GIT_SSL_CAPATH` | Git | |
+| `GRYPE_DB_CA_CERT`, `GRYPE_REGISTRY_CA_CERT`, `SYFT_REGISTRY_CA_CERT` | Grype, Syft | |
+| `JAVA_TOOL_OPTIONS`, `SONAR_SCANNER_JAVA_OPTS` | Any JVM; SonarScanner 6 and later | `-Dhttps.proxyHost`, `-Djavax.net.ssl.trustStore`. |
+| `NODE_TLS_REJECT_UNAUTHORIZED=0` | Nothing, ever | Node's own docs call it strongly discouraged. `dev env --check` fails when it is set. |
+
+#### 2.7.4 PineGuard's own variables
+
+| Variable | Purpose |
+|---|---|
+| `PINEGUARD_OUTPUT_PATH` | Default for `--output` |
+| `PINEGUARD_BASE_REF` | Default for `--base` |
+| `PINEGUARD_FAIL_ON` | Default for `--fail-on` |
+| `PINEGUARD_TIER` | `local` or `pipeline`; overrides the `GITHUB_ACTIONS` inference |
+| `PINEGUARD_OFFLINE` | Default for `--offline` |
+| `PINEGUARD_TOOLS_BIN` | Where release binaries are placed (also in §2.7.2) |
 
 Precedence: flag, then environment, then the repository-root `.env` (D-16), loaded by every
 PowerShell entry script through `Import-DotEnv` and by the CLI through Node's built-in
 `process.loadEnvFile`. `pineguard dev env --check` is how a contributor or a CI preflight learns
 what is missing. `GITHUB_ACTIONS=true` turns `--ci` on. PineGuard-prefixed variables exist only for PineGuard's own knobs; a variable a
 tool already names is never duplicated under a PineGuard name.
+
+Sources checked on 2026-09-08 for the names above: https://cli.github.com/manual/gh_help_environment
+(also `gh help environment` locally on 2.87); https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-programmatic-reference
+and the config-dir reference beside it; https://github.com/github/github-mcp-server (README);
+https://docs.github.com/en/code-security/codeql-cli/codeql-cli-manual/github-upload-results and
+database-analyze; https://github.com/gitleaks/gitleaks (README); https://docs.zizmor.sh/usage/;
+https://github.com/rhysd/actionlint; https://github.com/hadolint/hadolint;
+https://docs.snyk.io/developer-tools/snyk-cli/configure-the-snyk-cli/environment-variables-for-snyk-cli;
+https://semgrep.dev/docs/semgrep-ci/ci-environment-variables and https://semgrep.dev/docs/cli-reference;
+https://trivy.dev/docs/latest/configuration/ and the air-gap page; https://oss.anchore.com/docs/reference/grype/configuration/
+and the Syft equivalent; https://github.com/CycloneDX/cyclonedx-dotnet (README);
+https://www.jetbrains.com/help/qodana/github.html; https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/scanners/sonarscanner
+and the .NET scanner's configuring page; https://github.com/SonarSource/sonarqube-mcp-server (README);
+https://dependency-check.github.io/DependencyCheck/dependency-check-cli/arguments.html;
+https://www.zaproxy.org/docs/docker/about/; https://www.jetbrains.com/help/resharper/InspectCode.html;
+https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-environment-variables and the NuGet
+cache-folders and environment-variables references; https://docs.npmjs.com/cli/v10/using-npm/config;
+https://pnpm.io/cli/setup and https://pnpm.io/settings/store; https://github.com/nodejs/corepack;
+https://nodejs.org/api/cli.html; https://pipx.pypa.io/latest/reference/environment-variables.html;
+https://docs.astral.sh/uv/reference/environment/; https://pip.pypa.io/en/stable/topics/https-certificates/;
+https://git-scm.com/docs/git-config; https://docs.docker.com/reference/cli/docker/;
+https://specifications.freedesktop.org/basedir/latest/. The Wiz page returned HTTP 429 on every attempt.
 
 ### 2.8 Command surface
 
@@ -373,7 +481,7 @@ pineguard scan --list [--format json]
 pineguard dev install [--all] [--cli] [--dependencies] [<slug>...] [--version <v>] [--force] [--dry-run]
 pineguard dev doctor [--remote] [--format json]
 pineguard dev list
-pineguard dev env [--check] [--list] [--example]
+pineguard dev env [--check] [--list] [--example] [--relocate <root> [--write]]
 
 pineguard test run [all|<scope>] [--include-cli] [--filter <expr>] [--framework <tfm>] [--configuration]
 pineguard test coverage [--engine coverlet|dotcover] [--scope] [--fail-below <n>] [--fail-branch-below <n>]
@@ -452,8 +560,8 @@ Permissions: `contents: read`, `pull-requests: read`, `security-events: write`. 
 | T1.03 | `+ apps/cli/src/scan/changed.ts`: branch, pr, paths; scope mapping; change triggers | Fixture repository tests for each target, including uncommitted work and a missing PR. |
 | T1.04 | `scan/sarif/`: normalise, summary, filter, aggregate | Golden-file tests; a filtered SARIF keeps only changed-set locations. |
 | T1.05 | `+ apps/cli/src/scan/engine.ts`: resolve, doctor check, narrow, spawn with timeout, normalise, baseline, gate, report; exit codes | Every exit code has a test. `all` returns the highest member code. |
-| T1.06 | `dev/`: channels, `install` (`--all`, `--cli`, `--dependencies`, slugs), `list`, `doctor`, `doctor --remote`, `env` (`--check`, `--list`, `--example`) | Install is idempotent; `doctor` exit 2 on a missing pin; `env --check` never echoes a value; `--dry-run` prints and does nothing; `.env.example` round-trips through `env --example`. |
-| T1.07 | `+ tools/Install-Cli.ps1`; `+ tools/.shared/cli.ps1`; `Get-`/`Set-`/`Test-DotEnvVariable` in `tools/.shared/dotenv.ps1`; the fixed script header that imports `.env` first; the `.env` move to the root with `Clean-Root.ps1` allow-listing it (D-16); `+ tools/code-scan/Run-Scan.ps1`; Pester tests for the switch mapping | `Install-Cli.ps1 -All -WhatIf` prints every step; `-Cli` succeeds on a machine with only Node 22 and pnpm; `Run-Scan -Tool inspectcode -Target Branch -WhatIf` prints the resolved CLI command; exit 2 with guidance when Node 22 or pnpm is absent. |
+| T1.06 | `dev/`: channels, `install` (`--all`, `--cli`, `--dependencies`, slugs), `list`, `doctor`, `doctor --remote`, `env` (`--check`, `--list`, `--example`, `--relocate <root> [--write]`) | Install is idempotent and honours the §2.7.2 relocation variables when placing tools; `doctor` exit 2 on a missing pin; `env --check` never echoes a value and fails on an unwritable relocation directory; `--relocate` output is byte-identical to the §2.7.2 table's variable set; `--dry-run` prints and does nothing; `.env.example` round-trips through `env --example`. |
+| T1.07 | `+ tools/Install-Cli.ps1`; `+ tools/.shared/cli.ps1`; `Get-`/`Set-`/`Test-DotEnvVariable` in `tools/.shared/dotenv.ps1`; the fixed script header that imports `.env` first; the `.env` move to the root with `Clean-Root.ps1` allow-listing it (D-16); the scripts' `SONARQUBE_TOKEN` read switched to `SONAR_TOKEN` and `SONAR_HOST_URL` with `docs/ai/rules/scan.md` updated (D-17); `+ tools/code-scan/Run-Scan.ps1`; Pester tests for the switch mapping | `Install-Cli.ps1 -All -WhatIf` prints every step; `-Cli` succeeds on a machine with only Node 22 and pnpm; `Run-Scan -Tool inspectcode -Target Branch -WhatIf` prints the resolved CLI command; exit 2 with guidance when Node 22 or pnpm is absent. |
 | T1.08 | Folder moves: `code-inspection/` → `code-scan/qodana/` (inner `qodana/` flattened), `sonar-scanner/` → `code-scan/sonarqube/`; reference sweep across `docs/ai`, `.claude`, `.github`, `.agent`, `.pi`, `.vscode/tasks.json`, `ci.yml`, the registry's Qodana config paths | Haiku sweep from an exact old→new table; `pineguard audit doc-links` clean; a grep for the old paths returns nothing. |
 | T1.09 | Reference adapter A: `nuget-audit` | SDK channel; JSON converter; change triggers; fixtures with a known-vulnerable package; can-fail test. |
 | T1.10 | Reference adapter B: `inspectcode` | dotnet-tool channel pinned in `+ .config/dotnet-tools.json`; `--format=Sarif`; `--include` for paths, `--project` for scope; `-ToolArgs` passthrough; verify `.slnx` support in the pinned version, else pass `PineGuard.slnx` through a generated `.sln` and record the workaround in `## Baselines`. |
@@ -570,6 +678,8 @@ The standardisation plan's §5 applies unchanged, with these substitutions:
 | The CLI's pwsh dependency for dispatch adapters | Documented as transitional; ubuntu runners have pwsh; the four wrapped scripts migrate in a later plan if ever |
 | Two initiatives touching `tools/` at once | This plan owns only `code-scan/` and the two moves; the standardisation plan's remaining Phase 3 tasks touch none of the same files |
 | Owner finds the fan-out "too much" | Every phase is independently mergeable; Phase 5b and the optional tasks (T2.09, T2.10, T4.06) are explicit opt-ins |
+| Enterprise machines only allow writes under a demilitarised folder, and tools default to the user profile | `dev env --relocate <root>` emits every vendor relocation variable under one root; `dev install` places binaries under `PINEGUARD_TOOLS_BIN` and honours the relocation variables; `dev env --check` verifies writability before anything runs |
+| TLS inspection breaks downloads and API calls behind a corporate proxy | §2.7.3 lists the trust variable each runtime honours; `dev env --check` refuses `NODE_TLS_REJECT_UNAUTHORIZED=0` so the fix is always the CA bundle, never disabling verification |
 
 ---
 
@@ -656,6 +766,7 @@ sign-off.
 | D-13 | **Exit codes and parameter names align with the standardisation plan** (§3.3 names, §3.4 codes `0/1/2/3/124`). **Slugs**: `roslyn`, `inspectcode`, `qodana`, `codeql`, `semgrep`, `sonarqube`, `snyk`, `nuget-audit`, `trivy`, `cyclonedx`, `grype`, `gitleaks`, `actionlint`, `zizmor`, `hadolint`, `dependabot`, `secret-scanning`, `code-scanning`, `wiz`. Root front doors `+ tools/Install-Cli.ps1` and `tools/code-scan/Run-Scan.ps1 -Tool`; shared helpers `+ tools/.shared/cli.ps1` and `tools/.shared/dotenv.ps1`. | `resharper` or `jb` for `inspectcode` (the product and the host CLI; `inspectcode` is the concrete command, and `jb` also hosts a formatter); `dotnet-list-package` or `nuget` for `nuget-audit` (NuGetAudit is Microsoft's own feature name for the same data); `sbom` for `cyclonedx` (activity, not tool — folders inside `code-scan/` name the tool per D-1a of the standardisation plan); `Install-Clis.ps1` or `Install-Scanners.ps1` plural (PowerShell nouns are singular, the owner's own phrase is "plural in its singular form", and only `Run-Tests`/`Run-Commits` are sanctioned plurals); `Install-Scanner.ps1` under `code-scan/` (withdrawn under D-15) | **Owner naming sign-off required** before T1.02. |
 | D-15 | **Root installer and `.env` discipline.** `tools/Install-Cli.ps1 -All \| -Cli \| -Dependencies \| -Tool <slug[]>` is the one command from clone to a complete toolchain: `-Cli` is self-sufficient (checks Node 22 and pnpm, `pnpm install`, builds `apps/cli`), `-Dependencies` runs `dotnet tool restore` and `pnpm install`, `-Tool` delegates to `pineguard dev install`. Per-tool `Install-<Tool>.ps1` scripts delegate to it. `tools/.shared/dotenv.ps1` gains `Get-DotEnvVariable`, `Set-DotEnvVariable` and `Test-DotEnvVariable` beside the existing `Import-DotEnv`; every entry script's fixed header imports `.env` first; the CLI loads the same file; `.env.example` is generated from the manifests by `pineguard dev env --example` and lists every variable with its owner and purpose. CI runs the same install path, so local and pipeline never diverge. | Per-tool installers with no single entry point; `Install-Scanner.ps1` per family (Fable's first proposal, withdrawn: the owner wants one root helper for every CLI); `Load-DotEnv` (not an approved PowerShell verb, and `Import-DotEnv` already exists); a hand-maintained `.env.example` (drifts) | Owner, mid-session 2026-09-08: a public library owes contributors one documented path "from local development to integration". |
 | D-16 | **`.env` moves to the repository root**: `.env` gitignored, `.env.example` committed and generated, replacing the `.etc/powershell/` location and its hand-written example. Root is the convention every tool, Node's `process.loadEnvFile` and every contributor already expects; `.etc/powershell/` is legacy the standardisation plan flagged as out of scope. `Clean-Root.ps1` allow-lists both names. `Import-DotEnv` keeps its `-Path` parameter so nothing breaks during the move. | Keep the `.etc/powershell/` location (the CLI and every new script would hard-code a legacy path); `.etc/`; `tools/` (a secret store inside the tools tree) | Fable recommendation; owner to confirm. |
+| D-17 | **Vendor names only, verified against the vendor.** Every token, endpoint, home, cache, proxy and trust variable in §2.7 is the name the vendor documents, checked on 2026-09-08 against the pages listed at the end of §2.7, with three parallel research passes and independent re-checks of every name that contradicted the request. Corrections to the requested list: `SNYK_CACHE_PATH`, not `SNYK_CACHE_HOME`; `SONAR_TOKEN` and `SONAR_HOST_URL` for the scanners and SonarCloud, with `SONARQUBE_TOKEN`, `SONARQUBE_URL` and `SONARQUBE_ORG` kept only for the SonarQube MCP server, so the repository's scripts switch (T1.07); `NVD_API_KEY` is a user-chosen name for Dependency-Check's `--nvdApiKey` flag and is moot under D-9; `ZAP_API_KEY` does not exist, ZAP takes `-config api.key=`, and ZAP is not adopted; `npm_config_prefix` is the vendor's casing with uppercase accepted; `DOTNET_INSTALL_DIR` is an install-script parameter, not a variable; `DOTNET_SKIP_FIRST_TIME_EXPERIENCE` is obsolete. `GH_TOKEN`, `GITHUB_PERSONAL_ACCESS_TOKEN`, `COPILOT_GITHUB_TOKEN`, `SNYK_TOKEN`, `SEMGREP_APP_TOKEN`, `DOTNET_ROOT`, `DOTNET_CLI_HOME` and `NUGET_PACKAGES` are exactly right. Unverified and flagged in place: the Wiz variables (the vendor site rate-limited every fetch) and Qodana's forward-report variables (not needed with the action, omitted). Federated machines are a first-class case: the manifest carries each tool's relocation variables in `env.homes`, `dev env --relocate <root>` emits them under one writable root, and `dev env --check` verifies writability. | PineGuard-prefixed aliases for vendor variables; keep `SONARQUBE_TOKEN` for the scanner scripts because it is what exists today; a hand-maintained variable list; a single umbrella `PINEGUARD_DEV_ROOT` variable that the scripts expand into every vendor variable (rejected: the vendor variables must be set for the vendor tools to see them from an IDE or a plain shell, so a generator that emits them is right and an alias that hides them is wrong) | Owner, mid-session 2026-09-08: "MUST look these up for specificity NOT make our own", and the federated-customer framing with `C:\Dev` and `C:\Tools`. |
 | D-14 | **Cloud-only services are fetch adapters.** `pineguard scan dependabot\|secret-scanning\|code-scanning` pull open alerts through `gh api` into SARIF and summary; they never run a scanner and never upload. `wiz` is a stub until a tenant exists. | Leave cloud-only services out of the CLI (then `scan all` cannot show the whole picture and the skills have nothing to run) | |
 
 ## Baselines
