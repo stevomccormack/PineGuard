@@ -1,14 +1,22 @@
 # ===================================================================
-# Line-ending normalisation — LF in repo, CRLF on Windows checkout
+# Line endings — LF everywhere, on every platform
 # ===================================================================
-# Git stores LF in the repo. On checkout, core.autocrlf=true
-# converts to CRLF on Windows. .editorconfig uses end_of_line=lf.
+# Git stores LF in the repository and checks out LF on every platform.
+# `eol=lf` here overrides `core.autocrlf=true` (the Git for Windows
+# installer default), so a Windows checkout gets the same LF endings
+# that `.editorconfig` (`end_of_line = lf`) tells `dotnet format` to
+# write. The two agree, so formatting never rewrites a line ending and
+# git never reports phantom "modified" files after a format pass.
+#
+# After pulling this change into a checkout that still has CRLF files,
+# refresh the working tree once (clean tree required):
+#     git rm -rq --cached . && git reset -q --hard
 # ===================================================================
 
-* text=auto
+* text=auto eol=lf
 
 # ===================================================================
-# Explicitly text files — normalise to LF in repo
+# Explicitly text files — normalise to LF in repo and checkout
 # ===================================================================
 *.cs        text
 *.csproj    text
@@ -31,8 +39,10 @@
 *.psm1      text
 *.psd1      text
 *.sh        text eol=lf
-*.cmd       text
-*.bat       text
+
+# CMD batch files are the one format that needs CRLF (matches .editorconfig)
+*.cmd       text eol=crlf
+*.bat       text eol=crlf
 
 # ===================================================================
 # Binary files — never normalise
