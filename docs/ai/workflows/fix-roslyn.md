@@ -19,7 +19,7 @@ version: 1.1
 ## Parameters
 
 - **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`)
-- **Filter**: (optional) Regex pattern to filter warning codes (e.g. `CS86` for nullability)
+- **Code**: (optional) Regex pattern to filter diagnostic codes (e.g. `CS86` for nullability)
 
 ## Auto-Approval
 

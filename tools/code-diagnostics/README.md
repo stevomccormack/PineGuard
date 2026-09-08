@@ -1,6 +1,8 @@
 # Code Diagnostics (Roslyn Compiler Warnings)
 
-Captures and reports Roslyn compiler warnings (CS-prefixed codes) from `dotnet build`.
+Captures and reports warning- and error-severity compiler diagnostics from `dotnet build` — any
+`<PREFIX><digits>` code the build pipeline emits (Roslyn `CS` today, plus e.g. NuGet audit `NU19xx`,
+ApiCompat `CP0xxx`, IL trimmer/AOT `IL2xxx`/`IL3xxx`), not just `CS`-prefixed ones.
 
 ## Prerequisites
 

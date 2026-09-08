@@ -3,7 +3,9 @@
 **Version**: 1.0
 
 ## 1. Context & Goal
-Run the Roslyn compiler diagnostics tool against a specified scope and report all CS warnings.
+Run the Roslyn compiler diagnostics tool against a specified scope and report all warning- and
+error-severity `<PREFIX><digits>` diagnostics (Roslyn `CS` codes today, plus any other prefix the
+build pipeline emits, e.g. `NU19xx`, `CP0xxx`, `IL2xxx`/`IL3xxx`).
 
 ## 2. Inputs
 - **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`)
@@ -44,8 +46,8 @@ Run the Roslyn compiler diagnostics tool against a specified scope and report al
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Build errors (not warnings) | Missing dependency or syntax error | Fix build errors first; diagnostics only capture warnings |
-| No JSON output | Script ran without `-OutputFormat Json` | Add `-OutputFormat Json` flag to the script call |
+| Script exits with code `2` | A build target failed to compile outright (genuine compile error, not just warnings) | Check the "BUILD FAILED" block in stdout / the `FailedBuildTargets` and `Errors` fields in `diagnostics.json` for the failing target and compiler errors; fix the compile error, then re-run |
+| JSON not printed to stdout | Script ran without `-OutputFormat Json` (default is `Text`) | Add `-OutputFormat Json` to also print the report to stdout — `artifacts/code-diagnostics/<scope>/diagnostics.json` is written unconditionally either way |
 | Warnings from test projects | Scope set to `All` | Use specific scope (e.g., `Core`) to focus on production code |
 | Zero warnings reported | Project already clean | Confirm scope matches target; try `All` to verify |
 

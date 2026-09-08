@@ -53,7 +53,14 @@ Create the PowerShell wrapper and operational docs:
 **Script conventions:**
 - `-Scope` parameter mapping All → `.slnx`, per-project → `.csproj`
 - Structured output to `artifacts/{ToolDir}/{scope}/`
-- Exit code: 0 = clean, 1 = issues found
+- Exit codes: the repo-wide convention is `0` success, `1` failure/issues found, `2` usage or
+  prerequisite error, `3` quality gate not met, `124` timeout (§3.4 of
+  `docs/ai/plans/tools-review-and-standardisation.md`, pending promotion into
+  `docs/ai/specs/tools/spec.md`). Use this scheme for new tools by default.
+- `tools/code-diagnostics/Run-CompilerDiagnostics.ps1` deliberately uses its own narrower `0`/`1`/`2`
+  scheme (0 = clean, 1 = warnings found, 2 = build failed to compile — see its script `.NOTES`) to
+  preserve a warnings-vs-broken-build distinction. That is a documented one-off exception, not a
+  pattern to copy into a new tool without an equally well-documented reason.
 - `-OutputFormat Text|Json` parameter
 
 ### Step 2 — Brain Spec (1 file)

@@ -7,7 +7,7 @@ Run the Roslyn compiler diagnostics tool, then fix all reported CS warnings usin
 
 ## 2. Inputs
 - **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`) — which projects to analyze
-- **Filter**: (optional) Regex pattern to filter warning codes (e.g. `CS86` for nullability, `CS0618` for obsolete)
+- **Code**: (optional) Regex pattern to filter diagnostic codes (e.g. `CS86` for nullability, `CS0618` for obsolete)
 
 ## 3. Critical Rules (The "Must Dos")
 > [!IMPORTANT]
@@ -49,7 +49,7 @@ Run the Roslyn compiler diagnostics tool, then fix all reported CS warnings usin
    - Warnings skipped (file, code, reason)
 
 ## 5. Definition of Done
-- [ ] All fixable warnings for the requested scope/filter are resolved
+- [ ] All fixable warnings for the requested scope/code filter are resolved
 - [ ] Solution builds cleanly after all fixes
 - [ ] Summary report provided
 
