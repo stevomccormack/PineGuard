@@ -5,7 +5,8 @@
 .DESCRIPTION
     Part of the PineGuard PowerShell toolchain.
     Runs the full SonarQube analysis pipeline:
-      1. Verifies the local SonarQube server is UP (start it with Initialize-SonarQube.ps1).
+      1. Verifies the local SonarQube server is UP (start it with Install-SonarQube.ps1 or
+         Start-SonarQube.ps1, then commission it with Initialize-SonarQube.ps1).
       2. Begins the SonarScanner session.
       3. Builds the solution.
       4. Collects code coverage via the existing coverage script.
@@ -16,7 +17,8 @@
     the scanner; run it manually first only if you want to pre-warm the tool cache.
 
 .PARAMETER ProjectToken
-    SonarQube project authentication token. Falls back to SONARQUBE_TOKEN environment variable.
+    SonarQube project authentication token. Resolution order (D-4, via Resolve-SonarQubeToken):
+    this parameter -> $env:SONARQUBE_TOKEN -> the SONARQUBE_TOKEN key in .etc/powershell/.env.
 
 .PARAMETER RepoRoot
     Absolute path to the repository root. Auto-resolved from script location if not specified.
@@ -28,7 +30,7 @@
     SonarQube project key. Default: PineGuard.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Run-SonarScanner.ps1 -ProjectToken sqp_xxx
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Run-SonarScanner.ps1 -ProjectToken sqp_xxx
     Runs a full SonarQube analysis.
 #>
 
@@ -44,9 +46,9 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '../.shared/commands.ps1')
-. (Join-Path $PSScriptRoot '../.shared/path.ps1')
-. (Join-Path $PSScriptRoot '../.shared/sonarqube.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/path.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/sonarqube.ps1')
 
 # Apply defaults from shared constants.
 if ([string]::IsNullOrWhiteSpace($SonarUrl))   { $SonarUrl   = $SonarQubeDefaultUrl }
@@ -93,7 +95,7 @@ catch { }
 # --- Validate prerequisites ---
 
 if (-not (Test-CommandExists -Name 'java')) {
-    Write-Host 'Java not found. Run Initialize-SonarQube.ps1 to install OpenJDK 21.' -ForegroundColor Red
+    Write-Host 'Java not found. Run Install-SonarQube.ps1 to install OpenJDK 21.' -ForegroundColor Red
     Write-Host 'Or install manually: winget install Microsoft.OpenJDK.21' -ForegroundColor DarkGray
     exit 1
 }
@@ -121,7 +123,7 @@ finally {
 
 Write-Host "Verifying SonarQube is UP at $SonarUrl..." -ForegroundColor Cyan
 if (-not (Test-SonarQubeUp -SonarUrl $SonarUrl)) {
-    Write-Host "SonarQube at $SonarUrl is not UP. Run Initialize-SonarQube.ps1 first." -ForegroundColor Red
+    Write-Host "SonarQube at $SonarUrl is not UP. Run Install-SonarQube.ps1 or Start-SonarQube.ps1 first." -ForegroundColor Red
     exit 1
 }
 
@@ -145,7 +147,7 @@ foreach ($key in $sonarProps.Keys) {
 
 Push-Location $repoRootResolved
 
-# The properties file lives under tools/sonar-scanner/ (not the repo root) because
+# The properties file lives under tools/code-scan/sonarqube/ (not the repo root) because
 # dotnet-sonarscanner refuses to run if it finds a sonar-project.properties file in its
 # working directory. The scanner runs from $repoRootResolved, where no such file exists,
 # so no hide/restore step is needed.
@@ -170,6 +172,13 @@ try {
     dotnet build $slnPath --no-incremental
 
     # Step 3: Coverage (OpenCover format for SonarQube, all scopes, skip HTML)
+    #
+    # -Framework net8.0 is pinned deliberately, not left to dotnet test's default of running
+    # every target framework (netstandard2.1, net8.0, net10.0 - Directory.Build.props): collecting
+    # coverage across multiple TFMs into one opencover XML would double/triple-count every line
+    # SonarQube then imports via sonar.cs.opencover.reportsPaths. net8.0 is the actively-supported
+    # LTS baseline (netstandard2.1 has no test host to run against; net10.0 coverage can be added
+    # as a second Sonar import later if the owner wants it tracked too).
     Write-Host 'Step 3: Collecting code coverage...' -ForegroundColor Cyan
     if (Test-Path -LiteralPath $coverageScript) {
         & $coverageScript -Scope All -Format opencover -SkipHtml -NoOpen -Clean -Framework net8.0

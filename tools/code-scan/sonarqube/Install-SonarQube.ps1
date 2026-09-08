@@ -1,13 +1,16 @@
 <#
 .SYNOPSIS
-    Initialize the local SonarQube environment.
+    Install prerequisites and start the local SonarQube server.
 
 .DESCRIPTION
     Part of the PineGuard PowerShell toolchain.
     Installs Java (OpenJDK 21) if not already present, then starts the SonarQube Community
-    Edition server via Docker Compose. dotnet-sonarscanner comes from the repo-root local
-    tool manifest (.config/dotnet-tools.json) - Run-SonarScanner.ps1 restores it via
-    `dotnet tool restore` before use.
+    Edition server via Start-SonarQube.ps1 (Docker Compose). dotnet-sonarscanner comes from the
+    repo-root local tool manifest (.config/dotnet-tools.json) - Run-SonarScanner.ps1 restores it
+    via `dotnet tool restore` before use.
+
+    Once the server is UP, commission it (admin password, project, token) with
+    Initialize-SonarQube.ps1.
 
     For CI/CD, use the SonarQube GitHub Action with SONARQUBE_TOKEN stored as a
     repository secret - do not use this script in pipelines.
@@ -24,11 +27,11 @@
     Open the SonarQube dashboard in the default browser once the server is healthy.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Initialize-SonarQube.ps1
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Install-SonarQube.ps1
     Installs prerequisites and starts SonarQube.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Initialize-SonarQube.ps1 -Open
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Install-SonarQube.ps1 -Open
     Installs prerequisites, starts SonarQube, and opens the dashboard.
 #>
 
@@ -43,7 +46,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
 
 function Get-LocalJavaVersion {
     <#
@@ -105,5 +108,5 @@ $upArgs = @{
 }
 if ($Open) { $upArgs['Open'] = $true }
 
-& (Join-Path $PSScriptRoot '../docker/sonarqube-up.ps1') @upArgs
+& (Join-Path $PSScriptRoot 'Start-SonarQube.ps1') @upArgs
 exit $LASTEXITCODE

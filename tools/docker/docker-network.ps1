@@ -6,7 +6,8 @@
     Part of the PineGuard PowerShell toolchain.
     Creates the named Docker bridge network used by docker-compose.qodana.yml and
     docker-compose.sonarqube.yml. Run once before the first docker-up.ps1 or
-    sonarqube-up.ps1 invocation (they also auto-create the network if missing).
+    tools/code-scan/sonarqube/Start-SonarQube.ps1 invocation (they also auto-create the network
+    if missing).
 
 .PARAMETER Name
     Network name. Default: pineguard.

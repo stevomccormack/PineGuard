@@ -294,7 +294,7 @@ function Get-SonarExclusionEntry {
 if ($Scope -in 'All', 'Sonar') {
     Write-Check 'Sonar path validation'
 
-    $sonarFile = Join-Path $repoRoot 'tools/sonar-scanner/sonar-project.properties'
+    $sonarFile = Join-Path $repoRoot 'tools/code-scan/sonarqube/sonar-project.properties'
     if (Test-Path $sonarFile) {
         $sonarLines = [System.IO.File]::ReadAllLines((Resolve-Path $sonarFile).Path)
 

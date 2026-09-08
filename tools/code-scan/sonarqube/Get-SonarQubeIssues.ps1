@@ -7,7 +7,8 @@
     Queries the local SonarQube server API for issues and outputs structured JSON
     to stdout. Designed for AI agents to consume and fix issues programmatically.
 
-    Requires a running SonarQube instance. Run Initialize-SonarQube.ps1 first.
+    Requires a running, commissioned SonarQube instance. Start it with Install-SonarQube.ps1 or
+    Start-SonarQube.ps1, then commission it with Initialize-SonarQube.ps1.
 
 .PARAMETER Severity
     Issue severity filter. Default: All.
@@ -24,17 +25,18 @@
     SonarQube project key. Default: PineGuard.
 
 .PARAMETER ProjectToken
-    SonarQube project authentication token. Falls back to SONARQUBE_TOKEN environment variable.
+    SonarQube project authentication token. Resolution order (D-4, via Resolve-SonarQubeToken):
+    this parameter -> $env:SONARQUBE_TOKEN -> the SONARQUBE_TOKEN key in .etc/powershell/.env.
 
 .PARAMETER MaxIssues
     Maximum number of issues to retrieve. Default: 500.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Get-SonarIssues.ps1 -Severity Blocker
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1 -Severity Blocker
     Retrieves all Blocker-severity issues as JSON.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Get-SonarIssues.ps1 -Severity All -MaxIssues 100
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1 -Severity All -MaxIssues 100
     Retrieves the first 100 issues of any severity.
 #>
 
@@ -53,8 +55,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '../.shared/commands.ps1')
-. (Join-Path $PSScriptRoot '../.shared/sonarqube.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/sonarqube.ps1')
 
 # Apply defaults from shared constants.
 if ([string]::IsNullOrWhiteSpace($SonarUrl))   { $SonarUrl   = $SonarQubeDefaultUrl }
@@ -76,7 +78,7 @@ if ($null -eq $tokenValue) {
 
 Write-Host "Verifying SonarQube is UP at $SonarUrl..." -ForegroundColor Cyan
 if (-not (Test-SonarQubeUp -SonarUrl $SonarUrl)) {
-    Write-Host "SonarQube at $SonarUrl is not UP. Run Initialize-SonarQube.ps1 first." -ForegroundColor Red
+    Write-Host "SonarQube at $SonarUrl is not UP. Run Install-SonarQube.ps1 or Start-SonarQube.ps1 first." -ForegroundColor Red
     exit 1
 }
 

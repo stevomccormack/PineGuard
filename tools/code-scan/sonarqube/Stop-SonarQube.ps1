@@ -12,11 +12,11 @@
     Also remove named volumes (data, extensions, logs). Resets SonarQube to a clean state.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/sonarqube-down.ps1
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Stop-SonarQube.ps1
     Stops the SonarQube server. Data is preserved in named volumes.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/sonarqube-down.ps1 -RemoveVolumes
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Stop-SonarQube.ps1 -RemoveVolumes
     Stops the server and deletes all persistent SonarQube data.
 #>
 
@@ -29,14 +29,15 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '../.shared/commands.ps1')
-. (Join-Path $PSScriptRoot '../.shared/docker.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/docker.ps1')
 
 if (-not (Test-CommandExists -Name 'docker')) {
     throw "Docker ('docker') was not found on PATH. Ensure Docker Desktop is running."
 }
 
-$composeFile = Join-Path $PSScriptRoot 'docker-compose.sonarqube.yml'
+# docker-compose.sonarqube.yml stays in tools/docker/ (D-3) - it did not move with this script.
+$composeFile = Join-Path $PSScriptRoot '../../docker/docker-compose.sonarqube.yml'
 if (-not (Test-Path -LiteralPath $composeFile)) {
     throw "Compose file not found: $composeFile"
 }

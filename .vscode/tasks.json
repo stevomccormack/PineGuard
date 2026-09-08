@@ -737,7 +737,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Scanner: Initialize Local SonarQube",
+            "label": "Scanner: Install & Start Local SonarQube",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -745,7 +745,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Initialize-SonarQube.ps1"
+                "./tools/code-scan/sonarqube/Install-SonarQube.ps1"
             ],
             "problemMatcher": []
         },
@@ -758,7 +758,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Run-SonarScanner.ps1"
+                "./tools/code-scan/sonarqube/Run-SonarScanner.ps1"
             ],
             "problemMatcher": []
         },
@@ -771,7 +771,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "All"
             ],
@@ -786,7 +786,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "Blocker"
             ],
@@ -801,7 +801,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "High"
             ],
@@ -816,7 +816,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "Medium"
             ],
@@ -831,7 +831,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "Low"
             ],

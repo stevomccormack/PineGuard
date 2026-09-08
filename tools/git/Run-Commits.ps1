@@ -180,7 +180,7 @@ $metaScopePaths = [ordered]@{
         'tests/PineGuard.Testing/AGENTS.md',
         'tools/AGENTS.md',
         'tools/code-diagnostics/AGENTS.md',
-        'tools/sonar-scanner/AGENTS.md'
+        'tools/code-scan/sonarqube/AGENTS.md'
     )
     Docs = @(
         'docs',

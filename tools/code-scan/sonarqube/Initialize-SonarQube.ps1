@@ -13,7 +13,8 @@
     Idempotent — safe to re-run. Detects existing configuration and skips
     completed steps.
 
-    Prerequisites: SonarQube must be running. Start it with Initialize-SonarQube.ps1.
+    Prerequisites: SonarQube must be running. Start it with Install-SonarQube.ps1 (installs Java
+    and starts the container) or Start-SonarQube.ps1 (container only).
 
 .PARAMETER SonarUrl
     Base URL of the local SonarQube instance. Default: http://localhost:9001.
@@ -32,11 +33,11 @@
     Name of the user token to generate. Default: LocalDev.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Setup-SonarQube.ps1
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Initialize-SonarQube.ps1
     Commissions SonarQube with default settings.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Setup-SonarQube.ps1 -NewPassword "MyPassword123"
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Initialize-SonarQube.ps1 -NewPassword "MyPassword123"
     Commissions SonarQube with a custom admin password.
 #>
 
@@ -53,8 +54,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProgressPreference    = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '../.shared/commands.ps1')
-. (Join-Path $PSScriptRoot '../.shared/sonarqube.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/sonarqube.ps1')
 
 # Apply defaults from shared constants.
 if ([string]::IsNullOrWhiteSpace($SonarUrl))     { $SonarUrl     = $SonarQubeDefaultUrl }
@@ -82,7 +83,7 @@ if (Test-SonarQubeUp -SonarUrl $SonarUrl) {
 }
 else {
     Write-Host 'FAILED' -ForegroundColor Red
-    Write-Host "SonarQube at $SonarUrl is not UP. Run Initialize-SonarQube.ps1 first." -ForegroundColor Red
+    Write-Host "SonarQube at $SonarUrl is not UP. Run Install-SonarQube.ps1 or Start-SonarQube.ps1 first." -ForegroundColor Red
     exit 1
 }
 
@@ -227,5 +228,5 @@ Write-Host 'Done (User environment variable)' -ForegroundColor Green
 
 Write-Host ''
 Write-Host 'Setup complete. You can now run:' -ForegroundColor Green
-Write-Host '  pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Run-SonarScanner.ps1' -ForegroundColor White
+Write-Host '  pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Run-SonarScanner.ps1' -ForegroundColor White
 Write-Host ''

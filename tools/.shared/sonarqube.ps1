@@ -5,7 +5,7 @@
 .DESCRIPTION
     Dot-source this file to import SonarQube constants and helper functions
     into the calling script's scope.
-    Used by tools/sonar-scanner/* and tools/docker/sonarqube-up.ps1.
+    Used by tools/code-scan/sonarqube/*.
 #>
 
 Set-StrictMode -Version Latest

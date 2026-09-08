@@ -9,7 +9,7 @@
     healthy before returning.
 
     Once UP, run the analysis with:
-        pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/sonar-scanner/Run-SonarScanner.ps1
+        pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Run-SonarScanner.ps1
 
     Default credentials (first run): admin / admin - SonarQube will prompt you to change them.
 
@@ -26,11 +26,11 @@
     Open the SonarQube dashboard in the default browser once the server is healthy.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/sonarqube-up.ps1
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Start-SonarQube.ps1
     Starts the SonarQube server and waits for it to be healthy.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/sonarqube-up.ps1 -Open
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Start-SonarQube.ps1 -Open
     Starts the server and opens the dashboard.
 #>
 
@@ -46,9 +46,9 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '../.shared/commands.ps1')
-. (Join-Path $PSScriptRoot '../.shared/docker.ps1')
-. (Join-Path $PSScriptRoot '../.shared/sonarqube.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/docker.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/sonarqube.ps1')
 
 # --- Validation ---
 
@@ -56,7 +56,8 @@ if (-not (Test-CommandExists -Name 'docker')) {
     throw "Docker ('docker') was not found on PATH. Ensure Docker Desktop is running."
 }
 
-$composeFile = Join-Path $PSScriptRoot 'docker-compose.sonarqube.yml'
+# docker-compose.sonarqube.yml stays in tools/docker/ (D-3) - it did not move with this script.
+$composeFile = Join-Path $PSScriptRoot '../../docker/docker-compose.sonarqube.yml'
 if (-not (Test-Path -LiteralPath $composeFile)) {
     throw "Compose file not found: $composeFile"
 }

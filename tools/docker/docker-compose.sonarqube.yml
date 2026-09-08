@@ -1,10 +1,11 @@
 # docker-compose.sonarqube.yml
 # SonarQube Community Edition — local dev server for PineGuard.
 #
-# Do not run directly. Use sonarqube-up.ps1 / sonarqube-down.ps1.
+# Do not run directly. Use tools/code-scan/sonarqube/Start-SonarQube.ps1 / Stop-SonarQube.ps1
+# (or tools/docker/docker-up.ps1 / docker-down.ps1 to bring up both stacks together).
 #
 # First run: default credentials are admin / admin (SonarQube will prompt to change).
-# Analysis:  run tools/sonar-scanner/Run-SonarScanner.ps1 once the server is UP.
+# Analysis:  run tools/code-scan/sonarqube/Run-SonarScanner.ps1 once the server is UP.
 #
 # Network: pineguard must exist before running (docker-network.ps1 creates it).
 
