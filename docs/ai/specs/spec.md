@@ -488,7 +488,7 @@ Other directories:
 
 - `docs/ai/specs/language/` — vocabulary and naming-collision specs
 - `docs/ai/specs/scan/` — SonarQube scan spec
-- `docs/ai/specs/tools/` — tool specs (`audit-cli/`, `code-diagnostics/`, `code-inspection/`)
+- `docs/ai/specs/tools/` — tool specs (`audit-cli/`, `code-diagnostics/`, `code-scan/qodana/`)
 
 ### 11.2 Scope identifier → spec directory map
 
