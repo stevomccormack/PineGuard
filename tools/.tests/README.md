@@ -23,12 +23,13 @@ than one major version is installed, pin the one you want with
 |---|---|
 | `Registry-Parity.Tests.ps1` | `tools/.shared/dotnet-projects.ps1`'s scope registry against `src/*.csproj`, `tests/*.csproj`, `PineGuard.slnx`, the packable list in `tools/release/Run-NugetUnlist.ps1`, Qodana config presence, and per-project `AGENTS.md` (plan §3.4) |
 | `Dotenv-Parser.Tests.ps1` | `Import-DotEnv` in `tools/.shared/dotenv.ps1`, against `fixtures/sample.env` |
-| `Cobertura-Parser.Tests.ps1` | `Read-CoberturaCoverage`, `ConvertTo-Rate`, `Try-ParseConditionCoverage` in `tools/.shared/coverage.ps1`, against `fixtures/sample-coverage.cobertura.xml` |
+| `Cobertura-Parser.Tests.ps1` | `Read-CoberturaCoverage`, `ConvertTo-Rate`, `ConvertFrom-ConditionCoverage` in `tools/.shared/coverage.ps1`, against `fixtures/sample-coverage.cobertura.xml` |
 | `RepoRoot.Tests.ps1` | `Get-RepoRoot` in `tools/.shared/path.ps1`, from several starting directories |
 | `Git-Helpers.Tests.ps1` | `Assert-IndexClean` in `tools/.shared/git.ps1` — the F-16 Tier-0-safety regression fixed in T1.01, tested against real throwaway git repos under `$TestDrive` |
 | `Help-Placeholder.Tests.ps1` | F-46: no script still carries the placeholder `.PARAMETER` text |
 | `Bom-Absence.Tests.ps1` | F-47: no script has a UTF-8 byte-order mark |
 | `Windows-Isms.Tests.ps1` | F-30: no hardcoded backslash path separators, `.exe`, `$env:TEMP`, or `SetEnvironmentVariable(...,'User')` |
+| `Shared-Load-Order.Tests.ps1` | D-2: every `tools/.shared/*.ps1` file dot-sources standalone in a fresh process, in filename-alphabetical order, with no undeclared load-order dependency on another `.shared/*.ps1` file — T3.01's condition for keeping `.shared/` dot-sourced instead of converting it to a script module |
 
 ## Intentionally red tests
 

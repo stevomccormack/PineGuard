@@ -38,7 +38,7 @@ if (-not (Test-Path -LiteralPath $composeFile)) {
     throw "Compose file not found: $composeFile"
 }
 
-Ensure-DockerNetwork -NetworkName $NetworkName
+Initialize-DockerNetwork -NetworkName $NetworkName
 
 Write-Host 'Starting Qodana...' -ForegroundColor Cyan
 docker compose -p $DockerProjectName -f $composeFile up -d

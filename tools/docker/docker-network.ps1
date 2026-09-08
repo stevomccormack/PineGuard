@@ -75,4 +75,4 @@ if ($Info) {
 }
 
 # Default: ensure the network exists.
-Ensure-DockerNetwork -NetworkName $Name -Driver $Driver
+Initialize-DockerNetwork -NetworkName $Name -Driver $Driver

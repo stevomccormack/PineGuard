@@ -49,11 +49,10 @@ param(
     [switch]$SkipTest
 )
 
+. (Join-Path $PSScriptRoot '..\.shared\path.ps1')
+
 $ErrorActionPreference = 'Continue'
-$repoRoot = (git -C $PSScriptRoot rev-parse --show-toplevel 2>$null)
-if (-not $repoRoot) {
-    $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-}
+$repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
 $artifactDir = Join-Path $repoRoot 'artifacts/maintenance'
 if (-not (Test-Path $artifactDir)) { New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null }

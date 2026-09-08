@@ -30,7 +30,7 @@ function Test-DockerNetwork {
     return ($result -contains $NetworkName)
 }
 
-function Ensure-DockerNetwork {
+function Initialize-DockerNetwork {
     <#
     .SYNOPSIS
         Creates a Docker network if it does not already exist.

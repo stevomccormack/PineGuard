@@ -45,19 +45,18 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
 . (Join-Path $PSScriptRoot '../.shared/commands.ps1')
-. (Join-Path $PSScriptRoot '../.shared/env.ps1')
+. (Join-Path $PSScriptRoot '../.shared/path.ps1')
 . (Join-Path $PSScriptRoot '../.shared/sonarqube.ps1')
-. (Join-Path $PSScriptRoot '../audit-cli/helpers/Load-AuditHelpers.ps1')
 
 # Apply defaults from shared constants.
 if ([string]::IsNullOrWhiteSpace($SonarUrl))   { $SonarUrl   = $SonarQubeDefaultUrl }
 if ([string]::IsNullOrWhiteSpace($ProjectKey)) { $ProjectKey = $SonarQubeDefaultProjectKey }
 
-# Refresh all environment variables from the registry (picks up SONARQUBE_TOKEN
-# and PATH changes made in other terminal sessions without a restart).
-Sync-Env
-
 # --- Token ---
+#
+# No registry refresh here (the removed Sync-Env used to merge Machine+User registry values into
+# the session before this point): Sync-Env clobbered a session-scoped SONARQUBE_TOKEN with a
+# stale persisted one (F-25). $env:SONARQUBE_TOKEN in the current session is authoritative.
 
 $tokenValue = Resolve-SonarQubeToken -ProjectToken $ProjectToken
 if ($null -eq $tokenValue) {
@@ -70,7 +69,12 @@ if ([string]::IsNullOrWhiteSpace($tokenValue)) {
 
 # --- Resolve paths ---
 
-$repoRootResolved = Resolve-PineGuardRepoRoot -RepoRoot $RepoRoot -ScriptRoot $PSScriptRoot
+$repoRootResolved = if (-not [string]::IsNullOrWhiteSpace($RepoRoot)) {
+    (Resolve-Path -LiteralPath $RepoRoot).Path
+}
+else {
+    Get-RepoRoot -StartDirectory $PSScriptRoot
+}
 $slnPath          = Join-Path $repoRootResolved 'PineGuard.slnx'
 $coveragePath     = 'artifacts/code-coverage/xplat/testresults/**/coverage.opencover.xml'
 $coverageScript   = Join-Path $repoRootResolved 'tools/code-coverage/xplat/Gen-CoverageReport.ps1'

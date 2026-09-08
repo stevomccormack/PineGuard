@@ -92,7 +92,7 @@ foreach ($buildTarget in $buildTargets) {
 
 $scopeSlug = $Scope.ToLowerInvariant()
 $outputDir = Join-Path $repoRoot "artifacts\code-diagnostics\$scopeSlug"
-Ensure-Directory -Path $outputDir
+New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 

@@ -66,14 +66,11 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Write-Step($m) { Write-Host "==> $m" -ForegroundColor Cyan }
-function Write-Info($m) { Write-Host "    $m" -ForegroundColor Gray }
-function Write-Ok($m) { Write-Host "    OK   $m" -ForegroundColor Green }
-function Write-Warn($m) { Write-Host "    WARN $m" -ForegroundColor Yellow }
-function Fail($m) { Write-Host "    FAIL $m" -ForegroundColor Red; exit 1 }
-
 . (Join-Path $PSScriptRoot '..\.shared\path.ps1')
 . (Join-Path $PSScriptRoot '..\.shared\dotenv.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\console.ps1')
+
+function Fail($m) { Write-Fail $m; exit 1 }
 
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 if ([string]::IsNullOrWhiteSpace($EnvFile)) {
@@ -85,7 +82,7 @@ $token = $vars['NUGET_TOKEN']
 if ([string]::IsNullOrWhiteSpace($token)) {
     Fail "NUGET_TOKEN not found in $EnvFile"
 }
-Write-Ok "NUGET_TOKEN loaded"
+Write-Success "NUGET_TOKEN loaded"
 
 if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     Fail "dotnet CLI not found on PATH."
@@ -110,7 +107,7 @@ foreach ($pkg in $Package) {
     $versions = @($resp.versions)
     $pre = @($versions | Where-Object { $_ -match '-' })
     if ($pre.Count -eq 0) {
-        Write-Info "$pkg : no prereleases"
+        Write-Detail "$pkg : no prereleases"
         continue
     }
 
@@ -118,12 +115,12 @@ foreach ($pkg in $Package) {
         $toUnlist = $pre
     }
     elseif ($pre.Count -le 1) {
-        Write-Info "$pkg : only one prerelease ($($pre[0])) — keeping it"
+        Write-Detail "$pkg : only one prerelease ($($pre[0])) — keeping it"
         continue
     }
     else {
         $toUnlist = $pre[0..($pre.Count - 2)]
-        Write-Info "$pkg : keeping latest prerelease $($pre[-1])"
+        Write-Detail "$pkg : keeping latest prerelease $($pre[-1])"
     }
 
     foreach ($v in $toUnlist) {
@@ -138,11 +135,11 @@ if ($actions.Count -eq 0) {
 
 Write-Step "Unlist plan"
 foreach ($a in $actions) {
-    Write-Info ("{0,-34} {1}" -f $a.Package, $a.Version)
+    Write-Detail ("{0,-34} {1}" -f $a.Package, $a.Version)
 }
 Write-Host ""
 $distinctCount = ($actions | Select-Object -ExpandProperty Package -Unique).Count
-Write-Info "Total: $($actions.Count) operations across $distinctCount packages"
+Write-Detail "Total: $($actions.Count) operations across $distinctCount packages"
 
 if ($DryRun) {
     Write-Step "Dry run — no API calls made"
@@ -165,7 +162,7 @@ foreach ($a in $actions) {
         --source $source `
         --non-interactive 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Ok ("{0,-34} {1}" -f $a.Package, $a.Version)
+        Write-Success ("{0,-34} {1}" -f $a.Package, $a.Version)
     }
     else {
         Write-Host "    FAIL $($a.Package) $($a.Version)" -ForegroundColor Red
@@ -178,4 +175,4 @@ Write-Host ""
 if ($failures -gt 0) {
     Fail "$failures of $($actions.Count) operations failed."
 }
-Write-Ok "All $($actions.Count) operations succeeded."
+Write-Success "All $($actions.Count) operations succeeded."

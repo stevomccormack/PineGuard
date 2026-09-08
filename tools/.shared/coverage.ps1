@@ -5,10 +5,10 @@
 .DESCRIPTION
     Dot-source this file to import coverage artifact path helpers, Coverlet RunSettings
     generation, and Cobertura XML parsing into the calling script's scope.
-    Requires path.ps1 (Get-RepoRoot) to be loaded first.
-    Dot-sources dotnet-projects.ps1 itself (Get-PineGuardScope) so Normalize-CoberturaFilename
+    Dot-sources dotnet-projects.ps1 itself (Get-PineGuardScope) so Resolve-CoberturaFilename
     can resolve the registry's per-scope default source prefixes even if a future caller loads
-    this file directly instead of through Import-CodeCoverageUtility.ps1.
+    this file directly instead of through the previous Import-CodeCoverageUtility.ps1 aggregator
+    (removed; each caller now dot-sources the .shared/*.ps1 files it actually needs, F-10).
 #>
 
 Set-StrictMode -Version Latest
@@ -244,7 +244,7 @@ function ConvertTo-Rate {
     return $Value
 }
 
-function Try-ParseConditionCoverage {
+function ConvertFrom-ConditionCoverage {
     <#
     .SYNOPSIS
         Parses "50% (1/2)" format from Cobertura condition-coverage; returns [covered, total].
@@ -262,7 +262,7 @@ function Try-ParseConditionCoverage {
     return $null
 }
 
-function Normalize-CoberturaFilename {
+function Resolve-CoberturaFilename {
     <#
     .SYNOPSIS
         Normalizes Cobertura class filenames to repo-relative paths.
@@ -402,7 +402,7 @@ function Read-CoberturaCoverage {
                     continue
                 }
 
-                $matchFilename = Normalize-CoberturaFilename -RepoRoot $RepoRoot -CoberturaFilename $filenameRaw -DefaultSourcePrefix $DefaultSourcePrefix
+                $matchFilename = Resolve-CoberturaFilename -RepoRoot $RepoRoot -CoberturaFilename $filenameRaw -DefaultSourcePrefix $DefaultSourcePrefix
 
                 if ($IncludeFileRegex -and ($matchFilename -notmatch $IncludeFileRegex)) {
                     $reader.Skip()
@@ -495,7 +495,7 @@ function Read-CoberturaCoverage {
                             }
 
                             if (-not [string]::IsNullOrWhiteSpace($condCoverage)) {
-                                $parsed = Try-ParseConditionCoverage -ConditionCoverage $condCoverage
+                                $parsed = ConvertFrom-ConditionCoverage -ConditionCoverage $condCoverage
                                 if ($null -ne $parsed) {
                                     $coveredCount = $parsed[0]
                                     $totalCount = $parsed[1]

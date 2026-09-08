@@ -63,7 +63,7 @@ if (-not (Test-Path -LiteralPath $composeFile)) {
 
 # --- Network ---
 
-Ensure-DockerNetwork -NetworkName $NetworkName
+Initialize-DockerNetwork -NetworkName $NetworkName
 
 # --- Start server ---
 

@@ -83,7 +83,7 @@ $ProgressPreference = 'SilentlyContinue'
 
 . (Join-Path $PSScriptRoot '../.shared/commands.ps1')
 . (Join-Path $PSScriptRoot '../.shared/dotnet-projects.ps1')
-. (Join-Path $PSScriptRoot '../audit-cli/helpers/Load-AuditHelpers.ps1')
+. (Join-Path $PSScriptRoot '../.shared/path.ps1')
 
 function Get-QodanaConfigPath {
     param(
@@ -194,7 +194,12 @@ function Write-SarifSummary {
 
 # -------------------------------------------------------------------------------------------------
 
-$repoRootResolved = Resolve-PineGuardRepoRoot -RepoRoot $RepoRoot -ScriptRoot $PSScriptRoot
+$repoRootResolved = if (-not [string]::IsNullOrWhiteSpace($RepoRoot)) {
+    (Resolve-Path -LiteralPath $RepoRoot).Path
+}
+else {
+    Get-RepoRoot -StartDirectory $PSScriptRoot
+}
 $configPath = Get-QodanaConfigPath -RepoRootResolved $repoRootResolved -Scope $Scope
 if (-not (Test-Path -LiteralPath $configPath)) {
     throw "Qodana config not found for scope '$Scope': $configPath"
@@ -231,7 +236,7 @@ if ($Clean -and (Test-Path -LiteralPath $resultsDirResolved)) {
     Remove-Item -LiteralPath $resultsDirResolved -Recurse -Force
 }
 
-Ensure-PineGuardDirectory -Path $resultsDirResolved
+New-Item -ItemType Directory -Path $resultsDirResolved -Force | Out-Null
 
 # token/endpoint (do not print)
 if (-not [string]::IsNullOrWhiteSpace($Token)) { $env:QODANA_TOKEN = $Token }

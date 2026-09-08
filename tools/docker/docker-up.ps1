@@ -34,7 +34,7 @@ if (-not (Test-CommandExists -Name 'docker')) {
     throw "Docker ('docker') was not found on PATH. Ensure Docker Desktop is running."
 }
 
-Ensure-DockerNetwork -NetworkName $NetworkName
+Initialize-DockerNetwork -NetworkName $NetworkName
 
 $sonarFile  = Join-Path $PSScriptRoot 'docker-compose.sonarqube.yml'
 $qodanaFile = Join-Path $PSScriptRoot 'docker-compose.qodana.yml'

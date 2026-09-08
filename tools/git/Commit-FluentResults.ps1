@@ -29,9 +29,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-. "$PSScriptRoot/Import-GitHelpers.ps1"
+. "$PSScriptRoot/../.shared/path.ps1"
+. "$PSScriptRoot/../.shared/git.ps1"
 
-$repoRoot = Resolve-RepoRoot
+$repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
 $paths = @('src/PineGuard.FluentResults')
 if ($IncludeTests.IsPresent) {

@@ -45,10 +45,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Write-Step($m) { Write-Host "==> $m" -ForegroundColor Cyan }
-function Write-Info($m) { Write-Host "    $m" -ForegroundColor Gray }
-function Write-Ok($m) { Write-Host "    OK   $m" -ForegroundColor Green }
-function Fail($m) { Write-Host "    FAIL $m" -ForegroundColor Red; exit 1 }
+. (Join-Path $PSScriptRoot '../.shared/console.ps1')
+
+function Fail($m) { Write-Fail $m; exit 1 }
 
 $rulesetKeyToName = @{
     'main-branch' = 'main: PR required, no force push, no delete'
@@ -91,7 +90,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 $full = $fullJson | ConvertFrom-Json
 if ($full.enforcement -eq $targetEnforcement) {
-    Write-Ok "${Name}: ruleset #$($full.id) already '$targetEnforcement' — no change."
+    Write-Success "${Name}: ruleset #$($full.id) already '$targetEnforcement' — no change."
     exit 0
 }
 
@@ -116,14 +115,14 @@ $null = New-Item -ItemType Directory -Path $artifactsDir -Force
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $backupPath = Join-Path $artifactsDir "${Name}-${stamp}.json"
 $fullJson | Set-Content -Path $backupPath -Encoding utf8
-Write-Info "Backup saved: $backupPath"
+Write-Detail "Backup saved: $backupPath"
 
 # 5. DELETE the existing ruleset
 $deleteResult = gh api -X DELETE "repos/:owner/:repo/rulesets/$($full.id)" 2>&1
 if ($LASTEXITCODE -ne 0) {
     Fail "gh api DELETE rulesets/$($full.id) failed: $deleteResult"
 }
-Write-Info "Deleted ruleset #$($full.id)."
+Write-Detail "Deleted ruleset #$($full.id)."
 
 # 6. POST the replacement
 $createResult = $payload | gh api -X POST 'repos/:owner/:repo/rulesets' --input - 2>&1
@@ -131,4 +130,4 @@ if ($LASTEXITCODE -ne 0) {
     Fail "gh api POST rulesets failed: $createResult. Backup at: $backupPath"
 }
 $created = $createResult | ConvertFrom-Json
-Write-Ok "${Name}: ruleset #$($created.id) created with enforcement '$targetEnforcement'."
+Write-Success "${Name}: ruleset #$($created.id) created with enforcement '$targetEnforcement'."

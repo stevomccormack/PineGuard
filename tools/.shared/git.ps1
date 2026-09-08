@@ -20,25 +20,6 @@ function Assert-GitAvailable {
     }
 }
 
-function Resolve-RepoRoot {
-    <#
-    .SYNOPSIS
-        Uses git rev-parse --show-toplevel to find the repo root.
-    #>
-    param(
-        [string]$StartPath = (Get-Location).Path
-    )
-
-    Assert-GitAvailable
-
-    $root = & git -C $StartPath rev-parse --show-toplevel 2>$null
-    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($root)) {
-        throw 'Not inside a git repository.'
-    }
-
-    return $root.Trim()
-}
-
 function Invoke-Git {
     <#
     .SYNOPSIS

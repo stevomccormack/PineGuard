@@ -83,11 +83,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Write-Step($msg) { Write-Host "==> $msg" -ForegroundColor Cyan }
-function Write-Info($msg) { Write-Host "    $msg" -ForegroundColor Gray }
-function Write-Ok($msg) { Write-Host "    OK   $msg" -ForegroundColor Green }
-function Write-Warn($msg) { Write-Host "    WARN $msg" -ForegroundColor Yellow }
-function Fail($msg) { Write-Host "    FAIL $msg" -ForegroundColor Red; exit 1 }
+. (Join-Path $PSScriptRoot '../.shared/console.ps1')
+
+function Fail($msg) { Write-Fail $msg; exit 1 }
 
 # -------------------------------------------------------------------------------------------------
 # Normalise version
@@ -103,13 +101,13 @@ if ($semver -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z\.-]+)?(\+[0-9A-Za-z\.-]+)?$') 
 $isPrerelease = $semver -match '-(alpha|beta|rc)'
 
 Write-Step "Release plan"
-Write-Info "Tag:        $tag"
-Write-Info "Prerelease: $isPrerelease"
-Write-Info "BypassPR:   $($BypassPR.IsPresent)"
-Write-Info "Draft:      $($Draft.IsPresent)"
-Write-Info "Watch:      $($Watch.IsPresent)"
-Write-Info "Unlist:     $($Unlist.IsPresent)"
-Write-Info "DryRun:     $($DryRun.IsPresent)"
+Write-Detail "Tag:        $tag"
+Write-Detail "Prerelease: $isPrerelease"
+Write-Detail "BypassPR:   $($BypassPR.IsPresent)"
+Write-Detail "Draft:      $($Draft.IsPresent)"
+Write-Detail "Watch:      $($Watch.IsPresent)"
+Write-Detail "Unlist:     $($Unlist.IsPresent)"
+Write-Detail "DryRun:     $($DryRun.IsPresent)"
 
 # -------------------------------------------------------------------------------------------------
 # Pre-flight
@@ -124,20 +122,20 @@ $null = gh auth status 2>&1
 if ($LASTEXITCODE -ne 0) {
     Fail "gh not authenticated. Run 'gh auth login' or set GH_TOKEN."
 }
-Write-Ok "gh authenticated"
+Write-Success "gh authenticated"
 
 if (-not $Force) {
     $branch = (git rev-parse --abbrev-ref HEAD).Trim()
     if ($branch -ne 'main') {
         Fail "Current branch is '$branch', expected 'main'. Use -Force to override."
     }
-    Write-Ok "On main"
+    Write-Success "On main"
 
     $dirty = git status --porcelain
     if ($dirty) {
         Fail "Working tree is dirty. Commit or stash first, or use -Force."
     }
-    Write-Ok "Working tree clean"
+    Write-Success "Working tree clean"
 
     git fetch --tags --quiet
     $existing = git tag --list $tag
@@ -148,7 +146,7 @@ if (-not $Force) {
     if ($LASTEXITCODE -eq 0) {
         Fail "Tag $tag already exists on the remote."
     }
-    Write-Ok "Tag $tag is available"
+    Write-Success "Tag $tag is available"
 }
 else {
     Write-Warn "Pre-flight checks skipped (-Force)"
@@ -167,7 +165,7 @@ if ($BypassPR) {
     $aheadCount = if ([string]::IsNullOrWhiteSpace($aheadCountRaw)) { 0 } else { [int]$aheadCountRaw.Trim() }
 
     if ($aheadCount -eq 0) {
-        Write-Info "No local commits ahead of upstream — skipping BypassPR cycle."
+        Write-Detail "No local commits ahead of upstream — skipping BypassPR cycle."
     }
     elseif ($DryRun) {
         Write-Warn "DryRun: would disable main-branch ruleset, push $aheadCount commit(s), re-enable."
@@ -180,7 +178,7 @@ if ($BypassPR) {
         try {
             & git push origin main
             if ($LASTEXITCODE -ne 0) { throw "git push origin main failed" }
-            Write-Ok "Pushed $aheadCount commit(s) to origin/main"
+            Write-Success "Pushed $aheadCount commit(s) to origin/main"
         }
         finally {
             & pwsh -NoProfile -ExecutionPolicy Bypass -File $rulesetScript Enable main-branch
@@ -203,7 +201,7 @@ if ($Draft) { $releaseArgs += '--draft' }
 
 if ($DryRun) {
     Write-Step "DryRun: would create release $tag"
-    Write-Info ("gh " + ($releaseArgs -join ' '))
+    Write-Detail ("gh " + ($releaseArgs -join ' '))
     Write-Step "DryRun complete — no release created, no workflow triggered, no unlist performed."
     exit 0
 }
@@ -211,7 +209,7 @@ if ($DryRun) {
 Write-Step "Creating release $tag"
 & gh @releaseArgs
 if ($LASTEXITCODE -ne 0) { Fail "gh release create failed." }
-Write-Ok "Release created"
+Write-Success "Release created"
 
 if ($Draft) {
     Write-Warn "Draft created. Publish it in the GitHub UI to trigger publish.yml."
@@ -236,16 +234,16 @@ if (-not $runId) {
     exit 0
 }
 
-Write-Ok "Run #$runId queued"
+Write-Success "Run #$runId queued"
 $repo = gh repo view --json nameWithOwner --jq .nameWithOwner
-Write-Info "https://github.com/$repo/actions/runs/$runId"
+Write-Detail "https://github.com/$repo/actions/runs/$runId"
 
 $workflowSucceeded = $false
 if ($Watch) {
     Write-Step "Tailing run (Ctrl-C to detach)"
     gh run watch $runId --exit-status
     if ($LASTEXITCODE -ne 0) { Fail "Workflow failed. See run log above." }
-    Write-Ok "Workflow succeeded"
+    Write-Success "Workflow succeeded"
     $workflowSucceeded = $true
 }
 
@@ -274,7 +272,7 @@ if ($Unlist) {
 # -------------------------------------------------------------------------------------------------
 
 Write-Step "Done"
-Write-Info "Packages will appear on nuget.org within a few minutes of workflow completion:"
+Write-Detail "Packages will appear on nuget.org within a few minutes of workflow completion:"
 foreach ($p in 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Extensions.Options', 'Extensions.DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing', 'MediatR', 'Analyzers') {
-    Write-Info "  https://www.nuget.org/packages/PineGuard.$p/$semver"
+    Write-Detail "  https://www.nuget.org/packages/PineGuard.$p/$semver"
 }

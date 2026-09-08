@@ -54,7 +54,6 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference    = 'SilentlyContinue'
 
 . (Join-Path $PSScriptRoot '../.shared/commands.ps1')
-. (Join-Path $PSScriptRoot '../.shared/env.ps1')
 . (Join-Path $PSScriptRoot '../.shared/sonarqube.ps1')
 
 # Apply defaults from shared constants.
@@ -71,11 +70,11 @@ Write-Host "Project       : $ProjectName ($ProjectKey)"
 Write-Host "Token Name    : $TokenName"
 Write-Host ''
 
-# --- 1. Sync environment ---
-
-Sync-Env
-
-# --- 2. Health check ---
+# --- 1. Health check ---
+#
+# No registry refresh here (the removed Sync-Env used to merge Machine+User registry values into
+# the session before this point): Sync-Env clobbered a session-scoped SONARQUBE_TOKEN with a
+# stale persisted one (F-25). $env:SONARQUBE_TOKEN in the current session is authoritative.
 
 Write-Host 'Checking server health...     ' -NoNewline
 if (Test-SonarQubeUp -SonarUrl $SonarUrl) {
@@ -87,7 +86,7 @@ else {
     exit 1
 }
 
-# --- 3. Determine auth state ---
+# --- 2. Determine auth state ---
 
 Write-Host 'Checking admin credentials... ' -NoNewline
 
@@ -112,7 +111,7 @@ else {
     exit 1
 }
 
-# --- 4. Change password ---
+# --- 3. Change password ---
 
 if ($isFreshInstall) {
     Write-Host 'Changing admin password...    ' -NoNewline
@@ -133,7 +132,7 @@ if ($isFreshInstall) {
     }
 }
 
-# --- 5. Create project ---
+# --- 4. Create project ---
 
 Write-Host 'Creating project...           ' -NoNewline
 try {
@@ -156,7 +155,7 @@ catch {
     }
 }
 
-# --- 6. Generate token ---
+# --- 5. Generate token ---
 
 Write-Host 'Checking existing token...    ' -NoNewline
 
@@ -215,7 +214,7 @@ if ($null -eq $tokenValue) {
     Write-Host 'Done' -ForegroundColor Green
 }
 
-# --- 7. Persist token ---
+# --- 6. Persist token ---
 
 Write-Host 'Persisting SONARQUBE_TOKEN... ' -NoNewline
 
@@ -224,7 +223,7 @@ $env:SONARQUBE_TOKEN = $tokenValue
 
 Write-Host 'Done (User environment variable)' -ForegroundColor Green
 
-# --- 8. Summary ---
+# --- 7. Summary ---
 
 Write-Host ''
 Write-Host 'Setup complete. You can now run:' -ForegroundColor Green

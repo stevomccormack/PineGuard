@@ -16,7 +16,7 @@
         to miss").
 
     Read-CoberturaCoverage also always normalizes the returned filename separator to '\\'
-    regardless of platform (Normalize-CoberturaFilename does an unconditional
+    regardless of platform (Resolve-CoberturaFilename does an unconditional
     `-replace '/', '\'`) — itself a Windows-ism (F-30), but not one this suite's Windows-ism grep
     (tools/.tests/Windows-Isms.Tests.ps1) flags, since it isn't a hardcoded path literal. The
     assertions below encode that actual current behaviour rather than the cross-platform behaviour
@@ -97,14 +97,14 @@ Describe 'ConvertTo-Rate' {
     }
 }
 
-Describe 'Try-ParseConditionCoverage' {
+Describe 'ConvertFrom-ConditionCoverage' {
     It 'parses the "NN% (covered/total)" Cobertura format' {
-        $result = Try-ParseConditionCoverage -ConditionCoverage '50% (1/2)'
+        $result = ConvertFrom-ConditionCoverage -ConditionCoverage '50% (1/2)'
         $result[0] | Should -Be 1
         $result[1] | Should -Be 2
     }
 
     It 'returns $null for text with no (covered/total) suffix' {
-        Try-ParseConditionCoverage -ConditionCoverage '100%' | Should -BeNullOrEmpty
+        ConvertFrom-ConditionCoverage -ConditionCoverage '100%' | Should -BeNullOrEmpty
     }
 }

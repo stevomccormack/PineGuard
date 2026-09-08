@@ -65,14 +65,11 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-$utilityPath = Join-Path $PSScriptRoot '..\Import-CodeCoverageUtility.ps1'
-if (-not (Test-Path $utilityPath)) {
-    throw "Import-CodeCoverageUtility.ps1 not found at: $utilityPath"
-}
+. (Join-Path $PSScriptRoot '..\..\.shared\path.ps1')
+. (Join-Path $PSScriptRoot '..\..\.shared\dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..\..\.shared\coverage.ps1')
 
-. $utilityPath
-
-$repoRoot = Get-RepoRoot
+$repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
 if ($Scope -notin @('All', 'Custom')) {
     $scopeSourceDir = Join-Path $repoRoot (Get-PineGuardScope -Name $Scope).SourceDir
@@ -140,7 +137,7 @@ try {
     if ($Isolated) {
         Write-Host "Isolated mode: Copying coverage files to temp to avoid locking..." -ForegroundColor Cyan
         $isoDir = Join-Path ([IO.Path]::GetTempPath()) "PineGuard-Coverage-Analyze-$([Guid]::NewGuid())"
-        Ensure-Directory $isoDir
+        New-Item -ItemType Directory -Path $isoDir -Force | Out-Null
 
         $isoFiles = @()
         foreach ($file in $coverageFiles) {
