@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\block-sln-edit.sh'"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/block-sln-edit.sh\""
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\enforce-output-dirs.sh'"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-output-dirs.sh\""
           }
         ]
       },
@@ -24,11 +24,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\pre-bash-lock.sh'"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/pre-bash-lock.sh\""
           },
           {
             "type": "command",
-            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\pre-bash-destructive-guard.sh'"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/pre-bash-destructive-guard.sh\""
           }
         ]
       }
@@ -39,11 +39,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\post-edit-format-check.sh'"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/post-edit-format-check.sh\""
           },
           {
             "type": "command",
-            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\post-edit-testdata-check.sh'"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/post-edit-testdata-check.sh\""
           }
         ]
       },
@@ -52,7 +52,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\post-bash-lock.sh'"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/post-bash-lock.sh\""
           }
         ]
       }
@@ -62,7 +62,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash 'd:\\Steve McCormack\\GitHub\\@stevomccormack\\PineGuard\\.codex\\hooks\\on-stop.sh'"
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/on-stop.sh\""
           }
         ]
       }

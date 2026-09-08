@@ -1,10 +1,9 @@
 # PineGuard Skills Catalog
 
-> Quick-reference index of all skills across the Brain and its four skill-hosting adapter
-> surfaces (`.claude/`, `.github/`, `.pi/`, `.agents/`). OpenCode hosts no skills of its own: it
-> loads `.claude/skills/` and `.agents/skills/` natively. Each entry links to its canonical
-> SKILL.md. The full surface inventory lives in
-> [`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md).
+> Quick-reference index of all skills across the Brain and its three skill-hosting adapter
+> surfaces (`.claude/`, `.github/`, `.agents/`). OpenCode hosts no skills of its own: it loads
+> `.claude/skills/` and `.agents/skills/` natively. Each entry links to its canonical SKILL.md.
+> The full surface inventory lives in [`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md).
 
 ## Brain Skills (`docs/ai/skills/`)
 
@@ -82,32 +81,6 @@ Thin `context: fork` wrappers that delegate to Brain skills or standalone toolin
 
 ---
 
-## Pi Adapter Skills (`.pi/skills/`)
-
-Thin wrappers for the Pi adapter. Same delegation contract as the Claude Code set.
-
-| Skill | Brain Delegate | Description |
-|-------|---------------|-------------|
-| [scaffold-rule](../../../.pi/skills/scaffold-rule/SKILL.md) | `scaffold-rule` | Core Rule/Util implementation |
-| [scaffold-must](../../../.pi/skills/scaffold-must/SKILL.md) | `scaffold-must` | MustClause implementation |
-| [scaffold-guard](../../../.pi/skills/scaffold-guard/SKILL.md) | `scaffold-guard` | GuardClause implementation |
-| [scaffold-fluent](../../../.pi/skills/scaffold-fluent/SKILL.md) | `scaffold-fluent` | FluentValidation extension |
-| [scaffold-annotation](../../../.pi/skills/scaffold-annotation/SKILL.md) | `scaffold-annotation` | DataAnnotations attribute |
-| [scaffold-unit-test](../../../.pi/skills/scaffold-unit-test/SKILL.md) | `scaffold-unit-test` | xUnit test implementation |
-| [improve-coverage](../../../.pi/skills/improve-coverage/SKILL.md) | `improve-coverage` | Coverage gap analysis |
-| [new-validation](../../../.pi/skills/new-validation/SKILL.md) | `new-validation` | Simple in-memory predicate vertical slice |
-| [format-code](../../../.pi/skills/format-code/SKILL.md) | `format-code` | Code formatting |
-| [scan-roslyn](../../../.pi/skills/scan-roslyn/SKILL.md) | `scan-roslyn` | Roslyn diagnostics |
-| [fix-roslyn](../../../.pi/skills/fix-roslyn/SKILL.md) | `fix-roslyn` | Roslyn warning fixes |
-| [scan-sonar](../../../.pi/skills/scan-sonar/SKILL.md) | `scan-sonar` | SonarQube analysis |
-| [fix-sonar](../../../.pi/skills/fix-sonar/SKILL.md) | `fix-sonar` | SonarQube issue fixes |
-| [document](../../../.pi/skills/document/SKILL.md) | `document` | XML documentation generation |
-| [changelog](../../../.pi/skills/changelog/SKILL.md) | *(standalone)* | Generate changelog from git history |
-| [dependency-audit](../../../.pi/skills/dependency-audit/SKILL.md) | *(standalone)* | Check NuGet vulnerabilities and outdated packages |
-| [ask-council](../../../.pi/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
-
----
-
 ## GitHub Adapter Skills (`.github/skills/`)
 
 Copilot-compatible wrappers - one per Brain skill.
@@ -167,7 +140,6 @@ Generic `AGENTS.md`-convention adapters. Same delegation contract as the Claude 
 ```
 .claude/skills/        ← Claude Code adapters (context: fork)
 .github/skills/        ← GitHub Copilot adapters
-.pi/skills/            ← Pi adapters
 .agents/skills/        ← Generic AGENTS.md-convention adapters
 docs/ai/skills/        ← Brain (canonical, model-agnostic)
     ├── INDEX.md       ← This file

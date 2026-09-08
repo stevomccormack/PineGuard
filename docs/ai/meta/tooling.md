@@ -28,7 +28,7 @@ Treat GitHub as the system of record:
 - **Decisions / durable knowledge**: GitHub Wiki or repo docs
 - **Automation**: GitHub Actions
 
-AI output is only “done” when it becomes a reviewable PR-level artifact and the checks pass.
+AI output is only "done" when it becomes a reviewable PR-level artifact and the checks pass.
 
 ## VS Code Tasks (.vscode/tasks.json)
 
@@ -38,7 +38,7 @@ VS Code tasks are the primary local automation surface.
 - Guidance:
   - Keep task labels stable (they become user muscle memory and tool triggers).
   - Tasks should call repo scripts (e.g., `tools/testing/Run-Tests.ps1`) rather than embedding complex logic.
-  - Prefer tasks that map 1:1 with `docs/ai/commands/*.md` “Command contracts”.
+  - Prefer tasks that map 1:1 with `docs/ai/commands/*.md` "Command contracts".
 
 Recommended DRY mapping (label families as they exist in `.vscode/tasks.json`):
 
@@ -81,17 +81,16 @@ Shows the full adapter fan-out from one Brain capability:
 | Claude | `.claude/skills/ask-council/SKILL.md`, `.claude/commands/ask-council.md`, `.claude/commands/plan-with-council.md` |
 | Copilot | `.github/skills/ask-council/SKILL.md`, `.github/prompts/ask-council.prompt.md`, `.github/prompts/plan-with-council.prompt.md` |
 | Antigravity | `.agent/workflows/ask-council.md` |
-| Pi | `.pi/skills/ask-council/SKILL.md` |
 | OpenCode | `.opencode/commands/ask-council.md`, `.opencode/commands/plan-with-council.md` |
 
-Only the five **full adapters** appear here. The rules-only surfaces (Cline, Cursor, Windsurf,
-Junie, Amazon Q) carry no per-capability files, so a capability never fans out to them — see
+Only the four **full adapters** appear here. The rules-only surface (Cursor) carries no
+per-capability files, so a capability never fans out to it — see
 `docs/ai/meta/adapter-surfaces.md` §3.
 
 Best practice for portability (Claude Code / other tools):
 
 - Keep the **Brain** free of tool-specific syntax.
-- Put “trigger language” and auto-approval annotations in adapters.
+- Put "trigger language" and auto-approval annotations in adapters.
 - Use `docs/ai/commands/*.md` as the shared interface layer that adapters can implement.
 
 ## GitHub CLI, GitHub MCP, and Automation
@@ -101,7 +100,7 @@ When tooling allows, prefer:
 - GitHub CLI (`gh`) for repeatable repo operations
 - GitHub MCP for tool-driven automation (where available)
 
-But keep the canonical “what to do” in Brain docs; tools are just execution surfaces.
+But keep the canonical "what to do" in Brain docs; tools are just execution surfaces.
 
 ## Quality Gates (Industry Standard)
 
@@ -139,5 +138,5 @@ Use this order so the system stays DRY and portable:
 - Root Spec precedence: `docs/ai/specs/spec.md`
 
 <!-- footer
-last_verified: 2026-08-20
+last_verified: 2026-09-08
 -->

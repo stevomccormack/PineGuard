@@ -38,6 +38,5 @@ they report is contracted in [`fix.md`](fix.md) — it writes code and is never 
 
 - **Claude Code**: implicitly allowed via project context.
 - **Antigravity**: `// turbo-all` active in the adapter stub `.agent/workflows/test-[scope].md`.
-- **Pi**: `.pi/prompts/test-[scope].md`.
 - **OpenCode**: `.opencode/commands/test-[scope].md`.
 - **Copilot**: `.github/prompts/test-[scope].prompt.md`.

@@ -38,6 +38,5 @@ contracted in [`fix.md`](fix.md) — it writes code and is never auto-approved.
 
 - **Claude Code**: implicitly allowed via project context.
 - **Antigravity**: `// turbo-all` active in the adapter stub `.agent/workflows/coverage-[scope].md`.
-- **Pi**: `.pi/prompts/coverage-[scope].md`.
 - **OpenCode**: `.opencode/commands/coverage-[scope].md`.
 - **Copilot**: `.github/prompts/coverage-[scope].prompt.md`.
