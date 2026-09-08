@@ -103,7 +103,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
 
 # Every real (non-aggregate) scope is held to 100% unless -Relaxed says otherwise. Derived from
 # the registry rather than a literal list so a newly registered scope cannot silently opt out.

@@ -331,7 +331,7 @@ function Resolve-CoberturaFilename {
         [Parameter(Mandatory)]
         [string] $CoberturaFilename,
 
-        [string] $DefaultSourcePrefix = 'src\PineGuard.Core'
+        [string] $DefaultSourcePrefix = 'src/PineGuard.Core'
     )
 
     $matchFilename = ($CoberturaFilename -replace '/', '\')
@@ -421,7 +421,7 @@ function Read-CoberturaCoverage {
         [string] $IncludeClassNameRegex,
         [string] $ExcludeClassNameRegex,
 
-        [string] $DefaultSourcePrefix = 'src\PineGuard.Core'
+        [string] $DefaultSourcePrefix = 'src/PineGuard.Core'
     )
 
     $classMap = @{}

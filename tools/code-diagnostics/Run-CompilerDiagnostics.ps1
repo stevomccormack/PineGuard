@@ -90,9 +90,9 @@ $ProgressPreference = 'SilentlyContinue'
 
 # ── Scope → Build Target Mapping ──────────────────────────────────────────────
 
-. (Join-Path $PSScriptRoot '..\.shared\path.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\transcript.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'transcript.ps1')
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 $transcriptPath = Start-ToolTranscript -Domain 'code-diagnostics' -RepoRoot $repoRoot
 Write-Verbose "Transcript: $transcriptPath"

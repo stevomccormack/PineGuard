@@ -32,8 +32,8 @@ param(
     [switch]$Recursive
 )
 
-. (Join-Path $PSScriptRoot '..\.shared\path.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\clean.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'clean.ps1')
 
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 $logsDir = Join-Path $repoRoot 'logs'

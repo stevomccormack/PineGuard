@@ -66,9 +66,9 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '..\..\.shared\path.ps1')
-. (Join-Path $PSScriptRoot '..\..\.shared\dotnet-projects.ps1')
-. (Join-Path $PSScriptRoot '..\..\.shared\coverage.ps1')
+. (Join-Path $PSScriptRoot '..' '..' '.shared' 'path.ps1')
+. (Join-Path $PSScriptRoot '..' '..' '.shared' 'dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..' '..' '.shared' 'coverage.ps1')
 
 $coverageFileName = "coverage.$Format.xml"
 

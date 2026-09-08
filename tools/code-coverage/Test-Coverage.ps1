@@ -77,9 +77,9 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '..\.shared\path.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\coverage.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'coverage.ps1')
 
 if ($Engine -eq 'DotCover') {
     throw (
@@ -130,7 +130,7 @@ if ([string]::IsNullOrWhiteSpace($ResultsRoot)) {
     }
 }
 
-$defaultSourcePrefix = 'src\PineGuard.Core'
+$defaultSourcePrefix = 'src/PineGuard.Core'
 
 switch ($Scope) {
     'All' {

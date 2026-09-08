@@ -87,9 +87,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-. (Join-Path $PSScriptRoot '..\.shared\path.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\transcript.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'transcript.ps1')
 
 # --- Resolve repo root ---
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot

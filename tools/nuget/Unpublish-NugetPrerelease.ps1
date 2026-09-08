@@ -57,10 +57,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-. (Join-Path $PSScriptRoot '..\.shared\path.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\dotenv.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\console.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'dotenv.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'console.ps1')
 
 function Fail($m) { Write-Fail $m; exit 1 }
 

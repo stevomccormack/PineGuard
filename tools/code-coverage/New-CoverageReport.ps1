@@ -70,8 +70,8 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
 $engineScriptPaths = @{
-    Coverlet = Join-Path $PSScriptRoot 'coverlet\New-CoverageReport.ps1'
-    DotCover = Join-Path $PSScriptRoot 'dotcover\New-CoverageReport.ps1'
+    Coverlet = Join-Path $PSScriptRoot 'coverlet' 'New-CoverageReport.ps1'
+    DotCover = Join-Path $PSScriptRoot 'dotcover' 'New-CoverageReport.ps1'
 }
 
 $engineScript = $engineScriptPaths[$Engine]

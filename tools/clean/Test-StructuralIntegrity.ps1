@@ -49,8 +49,8 @@ param(
     [switch]$SkipTest
 )
 
-. (Join-Path $PSScriptRoot '..\.shared\path.ps1')
-. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
 
 $ErrorActionPreference = 'Continue'
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
