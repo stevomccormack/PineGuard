@@ -21,7 +21,7 @@ applies_to:
 PineGuard uses a local SonarQube Community Edition (Docker) for static analysis.
 The scanner (`dotnet-sonarscanner`) runs locally and requires Java (OpenJDK 21).
 
-## 2. SonarQube Severity Model (9.x)
+## 2. SonarQube Severity Model (2025.1)
 
 | PineGuard Alias | SonarQube API Value(s) | Description |
 |-----------------|------------------------|-------------|
@@ -60,9 +60,15 @@ Authorization: Bearer <token>
 Priority order:
 1. `-ProjectToken` parameter (explicit)
 2. `$env:SONARQUBE_TOKEN` environment variable
-3. `.etc/powershell/.env` (loaded by `Sync-Env`)
+3. `.etc/powershell/.env` (loaded by `Import-DotEnv` / `Get-ToolSecret` in `tools/.shared/dotenv.ps1` and `tools/.shared/secret.ps1`)
 
 **Never hard-code tokens in scripts or documentation.**
+
+`tools/code-scan/sonarqube/Initialize-SonarQube.ps1` commissions the server: it generates a
+cryptographically random 32-byte, base64-encoded admin password (via
+`System.Security.Cryptography.RandomNumberGenerator`), replacing the old hardcoded default. Both
+`SONARQUBE_ADMIN_PASSWORD` and `SONARQUBE_TOKEN` are written only to `.etc/powershell/.env` —
+neither is ever written to a User/Machine environment variable.
 
 ## 5. Output Paths
 
@@ -75,10 +81,10 @@ Priority order:
 
 | Script | Purpose |
 |--------|---------|
-| `tools/code-scan/sonarqube/Install-SonarQube.ps1` | Install Java, scanner, start Docker |
+| `tools/code-scan/sonarqube/Install-SonarQube.ps1` | Install prerequisites (OpenJDK 21) and start the SonarQube server |
 | `tools/code-scan/sonarqube/Run-SonarScanner.ps1` | Full analysis pipeline |
 | `tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1` | Fetch issues by severity (JSON output) |
-| `tools/code-scan/sonarqube/docker-compose.yml` | Docker Compose definition |
+| `tools/docker/docker-compose.sonarqube.yml` | Docker Compose definition |
 | `tools/code-scan/sonarqube/Start-SonarQube.ps1` | Start SonarQube container |
 
 ## 7. Fix Workflow Rules

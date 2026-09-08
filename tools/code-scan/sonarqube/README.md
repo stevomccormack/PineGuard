@@ -89,7 +89,7 @@ The pipeline will:
 1. Verify SonarQube is UP at `http://localhost:9001`
 2. Begin a SonarScanner session
 3. Build the solution
-4. Collect Cobertura code coverage
+4. Collect OpenCover code coverage
 5. Submit findings to SonarQube
 
 ### 4. Review findings

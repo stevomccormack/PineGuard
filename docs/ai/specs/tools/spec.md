@@ -56,9 +56,13 @@ We use a strict **Verb-Noun** standard, with specific semantic meanings for verb
   - Dot-sourced by other scripts to share functions; never invoked directly as a task.
   - **Example**: `Import-GitHelpers.ps1`, `Load-AuditHelpers.ps1`.
 
-- **`Initialize-` / `Setup-` / Container starters**: One-time environment bootstrap.
+- **`Install-` / Container starters**: One-time environment bootstrap.
   - Installs a CLI or brings a local container stack up. Never used in CI.
-  - **Example**: `tools/docker/qodana-up.ps1`, `tools/code-scan/sonarqube/Initialize-SonarQube.ps1`.
+  - **Example**: `tools/docker/qodana-up.ps1`, `tools/code-scan/sonarqube/Install-SonarQube.ps1`.
+
+- **`Initialize-`**: Post-start commissioning of an already-running service.
+  - Configures a service that is already up (accounts, projects, tokens). Never used in CI.
+  - **Example**: `tools/code-scan/sonarqube/Initialize-SonarQube.ps1`.
 
 - **`Get-`**: Read-only queries.
   - Returns data from a local or remote source; makes no changes.

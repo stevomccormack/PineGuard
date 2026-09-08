@@ -11,18 +11,30 @@ Run a full SonarQube static analysis against the PineGuard codebase and direct t
 ## 3. Critical Rules (The "Must Dos")
 > [!IMPORTANT]
 > - Docker Desktop must be running before initialization.
-> - Never hard-code tokens. Use `$env:SONARQUBE_TOKEN` or `-ProjectToken`.
-> - If the script prompts for a token, notify the user to generate one at `http://localhost:9001`.
+> - Never hard-code tokens. Resolution order: `-ProjectToken` parameter -> `$env:SONARQUBE_TOKEN` ->
+>   the `SONARQUBE_TOKEN` key in `.etc/powershell/.env`.
+> - Commissioning (admin password, project, token) is automated by `Initialize-SonarQube.ps1`,
+>   which writes `SONARQUBE_TOKEN` to `.etc/powershell/.env` — never persist it to a
+>   User/Machine environment variable.
 > - Do not attempt to run MSBuild or coverage separately — the wrapper script handles everything.
 
 ## 4. Execution Steps
 
-1. **Initialize the Container**
+1. **Install & start**
 
    Always verify the container is running first (idempotent):
 
    ```powershell
    pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/sonarqube/Install-SonarQube.ps1"
+   ```
+
+1b. **Commission (first run only)**
+
+   Idempotent — safe to re-run. Generates the admin password and `SONARQUBE_TOKEN`, writing both
+   to `.etc/powershell/.env` (never to a User/Machine environment variable):
+
+   ```powershell
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-scan/sonarqube/Initialize-SonarQube.ps1"
    ```
 
 2. **Run the Analysis**
@@ -49,7 +61,7 @@ Run a full SonarQube static analysis against the PineGuard codebase and direct t
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | Container not starting | Docker Desktop not running | Start Docker Desktop and wait for it to be ready |
-| Token prompt appears | No `$env:SONARQUBE_TOKEN` set | Generate token at `http://localhost:9001` and set env var |
+| Token prompt appears | Server not yet commissioned | Run `Initialize-SonarQube.ps1` to generate `SONARQUBE_TOKEN` and persist it to `.etc/powershell/.env` |
 | Analysis hangs | Container resource limits | Increase Docker memory allocation (4 GB+ recommended) |
 | Dashboard shows stale results | Previous run cached | Wait for analysis task to complete; refresh dashboard |
 
