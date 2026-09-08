@@ -1,4 +1,4 @@
-# Code Formatter
+# Code Format
 
 Wraps `dotnet format` with named scope support and verification mode.
 
@@ -51,7 +51,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps
 |-----------|------|---------|-------------|
 | `-Project` | string | — | Path to a specific `.csproj` file |
 | `-Solution` | string | — | Path to a specific `.sln`/`.slnx` file |
-| `-Scope` | string | — | Named scope: `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `Testing`, `All` |
+| `-Scope` | string | — | Named scope: `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`, `Analyzers`, `Testing`, `All` |
 | `-VerifyNoChanges` | switch | `$false` | Verification mode (`--verify-no-changes`). Exits non-zero if changes needed |
 | `-Severity` | string | — | Minimum severity: `info`, `warn`, `error` |
 | `-NoRestore` | switch | `$false` | Skip the implicit restore phase (`--no-restore`) |
@@ -68,6 +68,13 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps
 | `FluentValidation` | `src/PineGuard.FluentValidation/PineGuard.FluentValidation.csproj` |
 | `DataAnnotations` | `src/PineGuard.DataAnnotations/PineGuard.DataAnnotations.csproj` |
 | `Options` | `src/PineGuard.Extensions.Options/PineGuard.Extensions.Options.csproj` |
+| `DependencyInjection` | `src/PineGuard.Extensions.DependencyInjection/PineGuard.Extensions.DependencyInjection.csproj` |
+| `AspNetCore` | `src/PineGuard.AspNetCore/PineGuard.AspNetCore.csproj` |
+| `ErrorOr` | `src/PineGuard.ErrorOr/PineGuard.ErrorOr.csproj` |
+| `FluentResults` | `src/PineGuard.FluentResults/PineGuard.FluentResults.csproj` |
+| `OneOf` | `src/PineGuard.OneOf/PineGuard.OneOf.csproj` |
+| `MediatR` | `src/PineGuard.MediatR/PineGuard.MediatR.csproj` |
+| `Analyzers` | `src/PineGuard.Analyzers/PineGuard.Analyzers.csproj` **and** `src/PineGuard.Analyzers.CodeFixes/PineGuard.Analyzers.CodeFixes.csproj` (one scope, two projects — each gets its own `dotnet format` pass) |
 | `Testing` | `tests/PineGuard.Testing/PineGuard.Testing.csproj` |
 | `All` | `PineGuard.slnx` (src + tests) |
 

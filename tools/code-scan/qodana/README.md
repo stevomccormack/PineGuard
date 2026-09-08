@@ -1,4 +1,4 @@
-# Code Inspection (Qodana)
+# Qodana
 
 Local [JetBrains Qodana](https://www.jetbrains.com/qodana/) static code inspection for PineGuard.
 
@@ -64,7 +64,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-down.ps1
 
 | Parameter | Default | Description |
 |---|---|---|
-| `-Scope` | `Core` | `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `Testing`, `All` |
+| `-Scope` | `Core` | `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`, `Analyzers`, `Testing`, `All` |
 | `-Clean` | `$false` | Delete previous results before scanning |
 | `-OpenReport` | `$false` | Open HTML report in browser after scan |
 | `-ShowReport` | `$false` | Show inline SARIF summary after scan |
@@ -89,6 +89,13 @@ Each scope maps to a dedicated `.slnx` file and Qodana config. Per-scope solutio
 | `FluentValidation` | `tools/code-scan/qodana/config/qodana.fluent-validation.yaml` |
 | `DataAnnotations` | `tools/code-scan/qodana/config/qodana.data-annotations.yaml` |
 | `Options` | `tools/code-scan/qodana/config/qodana.options.yaml` |
+| `DependencyInjection` | `tools/code-scan/qodana/config/qodana.dependency-injection.yaml` |
+| `AspNetCore` | `tools/code-scan/qodana/config/qodana.asp-net-core.yaml` |
+| `ErrorOr` | `tools/code-scan/qodana/config/qodana.error-or.yaml` |
+| `FluentResults` | `tools/code-scan/qodana/config/qodana.fluent-results.yaml` |
+| `OneOf` | `tools/code-scan/qodana/config/qodana.one-of.yaml` |
+| `MediatR` | `tools/code-scan/qodana/config/qodana.mediatr.yaml` |
+| `Analyzers` | `tools/code-scan/qodana/config/qodana.analyzers.yaml` |
 | `Testing` | `tools/code-scan/qodana/config/qodana.testing.yaml` |
 | `All` | `tools/code-scan/qodana/config/qodana.all.yaml` |
 

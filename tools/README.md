@@ -12,22 +12,24 @@ PowerShell scripts for building, testing, auditing, formatting, generating, and 
 | Directory | Purpose | Entry Point | Scopes |
 |-----------|---------|-------------|--------|
 | [audit-cli](audit-cli/README.md) | Static analysis, parity checks, naming audits | `Run-All.ps1` | Rule filtering (`-RuleId`, `-RuleName`) |
-| [code-coverage](code-coverage/README.md) | Cobertura coverage collection and analysis | `Run-CodeCoverage.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, Testing, All, Custom |
-| [code-diagnostics](code-diagnostics/README.md) | Roslyn compiler warning capture and reporting | `Run-CompilerDiagnostics.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, Testing, All |
-| [code-format](code-format/README.md) | `dotnet format` wrapper with scope support | `Run-Format.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, Testing, All |
-| [code-scan/qodana](code-scan/qodana/README.md) | JetBrains Qodana static inspection | `Run-Qodana.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, Testing, All |
+| [code-coverage](code-coverage/README.md) | Coverage collection and analysis — Coverlet (Cobertura + HTML, authoritative) and JetBrains dotCover (Rider `.dcvr` snapshots) behind one front door | `Run-CodeCoverage.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All (plus Custom on `Test-Coverage.ps1` only) |
+| [code-diagnostics](code-diagnostics/README.md) | Roslyn compiler warning capture and reporting | `Run-CompilerDiagnostics.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All |
+| [code-format](code-format/README.md) | `dotnet format` wrapper with scope support | `Run-Format.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All |
+| [code-scan/qodana](code-scan/qodana/README.md) | JetBrains Qodana static inspection | `Run-Qodana.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All |
 | [code-scan/sonarqube](code-scan/sonarqube/README.md) | SonarQube static analysis scanning | `Run-SonarScanner.ps1` | Project-level scanning |
-| [git](git/README.md) | Scoped commit orchestration | `Run-Commits.ps1` | Agent, Core, DataAnnotations, Docs, FluentValidation, GuardClauses, MustClauses, Options, Testing, Tools, Solution |
+| [git](git/README.md) | Scoped commit orchestration | `Run-Commits.ps1` | Registry scopes: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing. Meta-scopes: Agent, Docs, Tools, Solution, Ci |
 | [clean](clean/README.md) | Cleanup of artifacts, logs, and root build files; structural-integrity checks after folder/namespace moves | `Run-Clean.ps1`, `Test-StructuralIntegrity.ps1` | `-Target Logs`, `-Target Artifacts`, `-Target Root`; Build, Test, Paths, Namespaces, Sonar, All |
-| [github](github/README.md) | GitHub Release publishing and ruleset toggles | `Run-Release.ps1`, `Set-GithubRuleset.ps1` | `-BypassPR`, `-Draft`, `-Force`, `-Watch` |
-| [nuget](nuget/README.md) | NuGet package management | `Unpublish-NugetPrerelease.ps1` | `-All`, `-Watch` |
-| [testing](testing/README.md) | `dotnet test` wrapper with async support | `Run-Tests.ps1` | Project or Solution targeting |
+| [github](github/README.md) | GitHub Release publishing and ruleset toggles | `Run-Release.ps1`, `Set-GithubRuleset.ps1` | `-BypassPR`, `-Draft`, `-Force`, `-Watch`, `-Unlist`, `-WhatIf`; `Enable`/`Disable` + `-Name` |
+| [nuget](nuget/README.md) | NuGet package management | `Unpublish-NugetPrerelease.ps1` | `-Package`, `-All`, `-WhatIf`/`-DryRun`, `-Force`, `-EnvFile` |
+| [testing](testing/README.md) | `dotnet test` wrapper with scope, project or solution targeting and async support | `Run-Tests.ps1` | `-Scope` (the fourteen registry scopes plus All), or `-Project` / `-Solution` |
 
 ### Internal Directories
 
 | Directory | Purpose |
 |-----------|---------|
-| [.shared](.shared/) | Shared PowerShell helper modules (path, coverage, git, HTML, Docker, etc.) imported by other tools |
+| [.shared](.shared/) | Shared PowerShell helper modules (path, project registry, coverage, git, Docker, SonarQube, dotenv, secrets, transcript, console, clean, commands) imported by other tools |
+| [.tests](.tests/README.md) | Pester suite for `tools/**` (D-7) — registry parity, Cobertura/dotenv parsers, repo-root resolution, git helpers, and BOM/Windows-ism/help hygiene. Run via [`testing/Test-Tools.ps1`](testing/Test-Tools.ps1) |
+| [docker](docker/README.md) | Docker Compose stacks, the shared network helper, and the combined up/down scripts backing the two containerised scanners (Qodana, SonarQube) |
 
 ## Running Scripts
 
@@ -43,9 +45,19 @@ These parameters are common across multiple tools:
 
 | Parameter | Tools | Description |
 |-----------|-------|-------------|
-| `-Configuration` | coverage, diagnostics, formatter, testing | `Debug` (default) or `Release` |
-| `-Scope` | coverage, diagnostics, formatter, inspection | Named scope resolving to a specific project |
-| `-DryRun` | git | Preview what would be committed without making changes |
+| `-Scope` | code-coverage, code-diagnostics, code-format, code-scan/qodana, testing, git, clean (`Test-StructuralIntegrity.ps1`) | Named scope resolving to that scope's project(s). The fourteen registry scopes come from `tools/.shared/dotnet-projects.ps1`; `git` adds the five meta-scopes and `clean` uses its own check names |
+| `-Engine` | code-coverage | `Coverlet` (default, authoritative) or `DotCover`. Validated and delegated by the `New-CoverageReport.ps1` front door (D-9) |
+| `-Configuration` | code-coverage, code-diagnostics, code-format, testing | `Debug` (default) or `Release` |
+| `-Clean` | code-coverage, code-diagnostics, code-scan/qodana | Delete previous output / run a clean build before collecting |
+| `-WhatIf` / `-DryRun` | git, github, nuget, clean | Preview the plan without making changes. `-DryRun` is a declared alias of the same switch on `git`, `github` and `nuget` (D-1d); `clean` exposes the native `SupportsShouldProcess` `-WhatIf` only |
+| `-Filter` | code-coverage, testing | `dotnet test`'s own `--filter` expression. Reserved exclusively for that meaning — a diagnostic-code regex is `-Code`, and a test-project glob is `-ProjectFilter` |
+| `-Framework` | code-coverage, testing | Target framework moniker (e.g. `net10.0`) passed through as `--framework` |
+| `-NoRestore` | code-format | Skip the implicit restore phase |
+| `-OutputPath` | testing | Directory for test results (trx). Relative paths resolve against the repository root |
+| `-OpenReport` / `-Open` | code-scan/qodana (`-OpenReport`), code-scan/sonarqube (`-Open`) | Open the generated report or the server UI in a browser afterwards |
+| `-Token` | code-scan/qodana | Qodana Cloud token; falls back to `QODANA_TOKEN`. SonarQube's equivalent is `-ProjectToken`, resolved through `Resolve-SonarQubeToken` / `.shared/secret.ps1` (D-4) |
+| `-Force` | github, nuget | Skip the interactive confirmation prompt |
+| `-TimeoutMinutes` | code-scan/qodana | Hard timeout (1–1440); exceeding it exits with `-TimeoutExitCode` (default `124`) |
 
 ## Output Conventions
 

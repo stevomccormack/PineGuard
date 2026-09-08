@@ -29,7 +29,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-Comp
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `-Scope` | ValidateSet | `All` | `All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `Testing` |
+| `-Scope` | ValidateSet | `All` | `All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`, `Analyzers`, `Testing` |
 | `-Code` | string | _(none)_ | Regex pattern to filter diagnostic codes (e.g. `CS86`, `CS0618`, `NU19`). Not `-Filter` — that name is reserved for `dotnet test`'s own filter syntax elsewhere in the toolchain |
 | `-OutputFormat` | ValidateSet | `Text` | `Text` (human-readable) or `Json` (structured) |
 | `-Configuration` | ValidateSet | `Debug` | `Debug` or `Release` |
@@ -44,12 +44,40 @@ Written to `artifacts/code-diagnostics/<scope>/diagnostics.json`:
 ```json
 {
   "Scope": "All",
+  "Configuration": "Debug",
+  "Code": null,
+  "Timestamp": "2026-09-09T10:14:52.1234567+01:00",
+  "BuildSucceeded": true,
+  "FailedBuildTargets": [],
   "TotalWarnings": 2,
+  "TotalErrors": 0,
   "ByCode": [{ "Code": "CS8604", "Count": 1 }, { "Code": "CS8619", "Count": 1 }],
   "ByFile": [{ "File": "...", "Count": 2 }],
-  "Warnings": [{ "File": "...", "Line": 56, "Column": 31, "Code": "CS8604", "Message": "..." }]
+  "Warnings": [
+    {
+      "File": "...",
+      "Line": 56,
+      "Column": 31,
+      "Severity": "warning",
+      "CodePrefix": "CS",
+      "CodeNumber": "8604",
+      "Code": "CS8604",
+      "Message": "...",
+      "Project": "...",
+      "TargetFrameworks": ["net8.0", "net10.0"],
+      "Occurrences": 2
+    }
+  ],
+  "Errors": []
 }
 ```
+
+`Code` echoes the `-Code` filter (`null` when none was given). `BuildSucceeded` and
+`FailedBuildTargets` record whether every target actually compiled — a consumer that ignores them
+can end up "fixing warnings" against a broken build. `Warnings` and `Errors` are separate arrays
+split by `Severity`; entries are deduped across a multi-targeting project's per-TFM build passes,
+with `TargetFrameworks` recording which TFMs each diagnostic was seen in and `Occurrences` the raw
+pre-dedupe count.
 
 ### Exit Codes
 

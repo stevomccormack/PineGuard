@@ -18,7 +18,7 @@ All scripts run from the repository root.
 ## `Unpublish-NugetPrerelease.ps1` — standalone nuget.org cleanup
 
 ```powershell
-pwsh -File ./tools/nuget/Unpublish-NugetPrerelease.ps1 [-All] [-WhatIf] [-Force]
+pwsh -File ./tools/nuget/Unpublish-NugetPrerelease.ps1 [-Package <ids>] [-All] [-WhatIf] [-Force] [-EnvFile <path>]
 ```
 
 | Switch | Effect |
@@ -27,8 +27,9 @@ pwsh -File ./tools/nuget/Unpublish-NugetPrerelease.ps1 [-All] [-WhatIf] [-Force]
 | `-All` | Unlist every prerelease, including the latest. Default keeps the latest prerelease listed. |
 | `-WhatIf` | Print the plan without making API calls. `-DryRun` is a supported alias of the same switch. |
 | `-Force` | Skip the interactive confirmation prompt. |
+| `-EnvFile` | Path to the `.env` file holding `NUGET_TOKEN`. Defaults to `.etc/powershell/.env` under the repository root. |
 
-The `NUGET_TOKEN` env var is loaded from `.etc/powershell/.env` via `tools/.shared/dotenv.ps1`. The token requires the `Unlist Package` scope on the `PineGuard.*` glob.
+The `NUGET_TOKEN` env var is loaded from `-EnvFile` (default `.etc/powershell/.env`) via `tools/.shared/dotenv.ps1`. The token requires the `Unlist Package` scope on the `PineGuard.*` glob.
 
 ## Auth Requirements
 

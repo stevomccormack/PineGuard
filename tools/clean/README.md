@@ -71,6 +71,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/clean/Run-Clean.ps1" -All
 | `-Extensions` | string[] | — | File extensions to target |
 | `-All` | switch | `$false` | Passed to children (clean all file types); also a shorthand for `-Target Artifacts,Logs,Root` when `-Target` is not itself given |
 | `-Recursive` | switch | `$false` | Passed to `Clear-Logs.ps1` only (recurse subdirectories); has no effect on the Root or Artifacts targets |
+| `-WhatIf` | switch | `$false` | Native `SupportsShouldProcess` preview — lists what each target would delete without deleting anything (see the "Preview only" example above). No `-DryRun` alias here: the alias exists on the git/github/nuget scripts, not on this one |
 
 ## Safety differences between the three scripts
 
