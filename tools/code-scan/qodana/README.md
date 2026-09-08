@@ -26,7 +26,7 @@ per-stack up/down scripts.
 Installs the Qodana CLI via Winget if not present and starts the Qodana container.
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-inspection/Initialize-Qodana.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Install-Qodana.ps1
 ```
 
 ### 3. Set your Qodana Cloud token
@@ -41,13 +41,13 @@ Token is optional for local dev — omit it to keep results local only (no cloud
 
 ```powershell
 # Core scope (default)
-pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-inspection/Run-Qodana.ps1 -Scope Core -Clean
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Run-Qodana.ps1 -Scope Core -Clean
 
 # All projects
-pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-inspection/Run-Qodana.ps1 -Scope All -Clean
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Run-Qodana.ps1 -Scope All -Clean
 
 # Open the HTML report after scan
-pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-inspection/Run-Qodana.ps1 -Scope Core -Clean -OpenReport
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Run-Qodana.ps1 -Scope Core -Clean -OpenReport
 ```
 
 ### 5. Review findings
@@ -79,33 +79,22 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-down.ps1
 
 ## Per-Scope Solution Files
 
-Each scope maps to a dedicated `.slnx` file and Qodana config. Per-scope solution files live in `tools/code-inspection/qodana/` and config YAML files live in `tools/code-inspection/qodana/config/`.
+Each scope maps to a dedicated `.slnx` file and Qodana config. Per-scope solution files live in `tools/code-scan/qodana/` and config YAML files live in `tools/code-scan/qodana/config/`.
 
 | Scope | Config |
 |---|---|
-| `Core` | `tools/code-inspection/qodana/config/qodana.core.yaml` |
-| `MustClauses` | `tools/code-inspection/qodana/config/qodana.must-clauses.yaml` |
-| `GuardClauses` | `tools/code-inspection/qodana/config/qodana.guard-clauses.yaml` |
-| `FluentValidation` | `tools/code-inspection/qodana/config/qodana.fluent-validation.yaml` |
-| `DataAnnotations` | `tools/code-inspection/qodana/config/qodana.data-annotations.yaml` |
-| `Options` | `tools/code-inspection/qodana/config/qodana.options.yaml` |
-| `Testing` | `tools/code-inspection/qodana/config/qodana.testing.yaml` |
-| `All` | `tools/code-inspection/qodana/config/qodana.all.yaml` |
+| `Core` | `tools/code-scan/qodana/config/qodana.core.yaml` |
+| `MustClauses` | `tools/code-scan/qodana/config/qodana.must-clauses.yaml` |
+| `GuardClauses` | `tools/code-scan/qodana/config/qodana.guard-clauses.yaml` |
+| `FluentValidation` | `tools/code-scan/qodana/config/qodana.fluent-validation.yaml` |
+| `DataAnnotations` | `tools/code-scan/qodana/config/qodana.data-annotations.yaml` |
+| `Options` | `tools/code-scan/qodana/config/qodana.options.yaml` |
+| `Testing` | `tools/code-scan/qodana/config/qodana.testing.yaml` |
+| `All` | `tools/code-scan/qodana/config/qodana.all.yaml` |
 
 ## Artifacts
 
 Results go to `artifacts/qodana/<scope>/`.
-
-## Auto Scripts
-
-The `auto/` subdirectory contains agent-generated convenience wrappers whitelisted for automated execution:
-
-| Script | Purpose |
-|---|---|
-| `auto/Run-Coverage.ps1` | Forwards to `Run-CodeCoverage.ps1` with `-Clean`. Accepts `-Scope` and `-Filter`. |
-| `auto/Run-Last.ps1` | Re-runs the last requested test command via `Run-Tests.ps1`. Accepts `-Project` and `-Filter`. |
-
-These scripts are intended to be whitelisted in agent settings via the wildcard `tools/code-inspection/auto/*.ps1`.
 
 ## CI/CD
 

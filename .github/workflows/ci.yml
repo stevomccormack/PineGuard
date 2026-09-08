@@ -773,7 +773,7 @@ jobs:
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
-          args: --config, tools/code-inspection/qodana/config/qodana.all.yaml
+          args: --config, tools/code-scan/qodana/config/qodana.all.yaml
           upload-result: true
 
   # ---------------------------------------------------------------------------

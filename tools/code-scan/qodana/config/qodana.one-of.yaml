@@ -6,8 +6,8 @@ profile:
   name: qodana.recommended
 
 dotnet:
-  solution: tools/code-inspection/qodana/PineGuard.OneOf.Qodana.slnx
+  solution: tools/code-scan/qodana/PineGuard.OneOf.Qodana.slnx
 
-bootstrap: dotnet build tools/code-inspection/qodana/PineGuard.OneOf.Qodana.slnx -c Release
+bootstrap: dotnet build tools/code-scan/qodana/PineGuard.OneOf.Qodana.slnx -c Release
 
 

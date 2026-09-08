@@ -16,7 +16,7 @@
     Docker network name. Default: pineguard.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-inspection/Initialize-Qodana.ps1
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Install-Qodana.ps1
     Installs Qodana CLI if missing and starts the Qodana container.
 #>
 
@@ -29,7 +29,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
 
 # --- Qodana CLI ---
 
@@ -53,5 +53,5 @@ else {
 
 # --- Container ---
 
-& (Join-Path $PSScriptRoot '../docker/qodana-up.ps1') -NetworkName $NetworkName
+& (Join-Path $PSScriptRoot '../../docker/qodana-up.ps1') -NetworkName $NetworkName
 exit $LASTEXITCODE

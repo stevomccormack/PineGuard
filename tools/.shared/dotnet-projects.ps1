@@ -78,7 +78,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.Core]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.Core[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.Core'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.core.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.core.yaml'
             QodanaSlug               = 'core'
             IncludeEmptyTestProjects = $false
         }
@@ -91,7 +91,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.MustClauses]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.MustClauses[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.MustClauses'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.must-clauses.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.must-clauses.yaml'
             QodanaSlug               = 'must-clauses'
             IncludeEmptyTestProjects = $false
         }
@@ -104,7 +104,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.GuardClauses]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.GuardClauses[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.GuardClauses'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.guard-clauses.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.guard-clauses.yaml'
             QodanaSlug               = 'guard-clauses'
             IncludeEmptyTestProjects = $false
         }
@@ -117,7 +117,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.DataAnnotations]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.DataAnnotations[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.DataAnnotations'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.data-annotations.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.data-annotations.yaml'
             QodanaSlug               = 'data-annotations'
             IncludeEmptyTestProjects = $true
         }
@@ -130,7 +130,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.FluentValidation]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.FluentValidation[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.FluentValidation'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.fluent-validation.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.fluent-validation.yaml'
             QodanaSlug               = 'fluent-validation'
             IncludeEmptyTestProjects = $true
         }
@@ -143,7 +143,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.Extensions.Options]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.Extensions\.Options[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.Extensions.Options'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.options.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.options.yaml'
             QodanaSlug               = 'options'
             IncludeEmptyTestProjects = $false
         }
@@ -156,7 +156,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.Extensions.DependencyInjection]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.Extensions\.DependencyInjection[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.Extensions.DependencyInjection'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.dependency-injection.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.dependency-injection.yaml'
             QodanaSlug               = 'dependency-injection'
             IncludeEmptyTestProjects = $false
         }
@@ -169,8 +169,8 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.AspNetCore]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.AspNetCore[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.AspNetCore'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.aspnetcore.yaml'
-            QodanaSlug               = 'aspnetcore'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.asp-net-core.yaml'
+            QodanaSlug               = 'asp-net-core'
             IncludeEmptyTestProjects = $false
         }
         ErrorOr           = [pscustomobject]@{
@@ -182,8 +182,8 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.ErrorOr]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.ErrorOr[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.ErrorOr'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.erroror.yaml'
-            QodanaSlug               = 'erroror'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.error-or.yaml'
+            QodanaSlug               = 'error-or'
             IncludeEmptyTestProjects = $false
         }
         FluentResults     = [pscustomobject]@{
@@ -195,8 +195,8 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.FluentResults]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.FluentResults[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.FluentResults'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.fluentresults.yaml'
-            QodanaSlug               = 'fluentresults'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.fluent-results.yaml'
+            QodanaSlug               = 'fluent-results'
             IncludeEmptyTestProjects = $false
         }
         OneOf             = [pscustomobject]@{
@@ -208,8 +208,8 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.OneOf]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.OneOf[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.OneOf'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.oneof.yaml'
-            QodanaSlug               = 'oneof'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.one-of.yaml'
+            QodanaSlug               = 'one-of'
             IncludeEmptyTestProjects = $false
         }
         MediatR           = [pscustomobject]@{
@@ -221,7 +221,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.MediatR]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.MediatR[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.MediatR'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.mediatr.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.mediatr.yaml'
             QodanaSlug               = 'mediatr'
             IncludeEmptyTestProjects = $false
         }
@@ -239,7 +239,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.Analyzers]*', '[PineGuard.Analyzers.CodeFixes]*')
             PathIncludeRegex         = '^src[/\\]+PineGuard\.Analyzers(\.CodeFixes)?[/\\]+'
             DefaultSourcePrefix      = 'src\PineGuard.Analyzers'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.analyzers.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.analyzers.yaml'
             QodanaSlug               = 'analyzers'
             IncludeEmptyTestProjects = $false
         }
@@ -255,7 +255,7 @@ function Get-PineGuardScope {
             CoverageIncludePatterns  = @('[PineGuard.Testing]*')
             PathIncludeRegex         = '^tests[/\\]+PineGuard\.Testing[/\\]+'
             DefaultSourcePrefix      = 'tests\PineGuard.Testing'
-            QodanaConfig             = 'tools/code-inspection/qodana/config/qodana.testing.yaml'
+            QodanaConfig             = 'tools/code-scan/qodana/config/qodana.testing.yaml'
             QodanaSlug               = 'testing'
             IncludeEmptyTestProjects = $false
         }

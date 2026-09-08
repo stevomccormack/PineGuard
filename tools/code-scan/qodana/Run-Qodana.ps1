@@ -11,7 +11,7 @@
     as a repository secret - do not use this script in pipelines.
 
     Prerequisites: Docker Desktop running, Qodana CLI on PATH.
-    Run Initialize-Qodana.ps1 to install prerequisites.
+    Run Install-Qodana.ps1 to install prerequisites.
 
 .PARAMETER Scope
     The inspection scope. Determines the Qodana config and results directory.
@@ -53,11 +53,11 @@
     Qodana linter image. Default: qodana-dotnet.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-inspection/Run-Qodana.ps1 -Scope Core
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Run-Qodana.ps1 -Scope Core
     Runs a Core inspection locally. Results written to artifacts/qodana/core/.
 
 .EXAMPLE
-    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-inspection/Run-Qodana.ps1 -Scope All -Clean -OpenReport
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Run-Qodana.ps1 -Scope All -Clean -OpenReport
     Runs a full inspection, clears previous results, and opens the HTML report.
 #>
 
@@ -81,9 +81,9 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '../.shared/commands.ps1')
-. (Join-Path $PSScriptRoot '../.shared/dotnet-projects.ps1')
-. (Join-Path $PSScriptRoot '../.shared/path.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '../../.shared/path.ps1')
 
 function Get-QodanaConfigPath {
     param(
@@ -94,7 +94,7 @@ function Get-QodanaConfigPath {
     )
 
     if ($Scope -eq 'All') {
-        return (Join-Path $RepoRootResolved 'tools/code-inspection/qodana/config/qodana.all.yaml')
+        return (Join-Path $RepoRootResolved 'tools/code-scan/qodana/config/qodana.all.yaml')
     }
 
     return (Join-Path $RepoRootResolved (Get-PineGuardScope -Name $Scope).QodanaConfig)
@@ -272,7 +272,7 @@ $scanArgs = @('scan', '-i', $repoRootResolved, '-o', $resultsDirResolved, '--con
 if ($Linter -ne 'auto' -and [string]::IsNullOrWhiteSpace($env:QODANA_TOKEN)) {
     Write-Host "QODANA_TOKEN is required to run Qodana ($Linter)." -ForegroundColor Yellow
     Write-Host "Set it and re-run (example):" -ForegroundColor DarkGray
-    Write-Host "  `$env:QODANA_TOKEN = '<token>'; pwsh -NoProfile -ExecutionPolicy Bypass -File './tools/code-inspection/Run-Qodana.ps1' -Scope $Scope -Clean" -ForegroundColor DarkGray
+    Write-Host "  `$env:QODANA_TOKEN = '<token>'; pwsh -NoProfile -ExecutionPolicy Bypass -File './tools/code-scan/qodana/Run-Qodana.ps1' -Scope $Scope -Clean" -ForegroundColor DarkGray
     exit 2
 }
 
