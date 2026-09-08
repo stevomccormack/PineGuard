@@ -12,10 +12,14 @@ dotnet:
 bootstrap: dotnet build tools/code-scan/qodana/PineGuard.All.Qodana.slnx -c Release
 
 exclude:
+  - name: All
+    paths:
+      - .etc
+      - artifacts
+      - .git
   - name: InconsistentNaming
     paths:
       - src/PineGuard.Core/Polyfills/IsExternalInit.cs
   - name: CheckNamespace
     paths:
       - src/PineGuard.Core/Polyfills/IsExternalInit.cs
-

@@ -9,3 +9,10 @@ dotnet:
   solution: tools/code-scan/qodana/PineGuard.DependencyInjection.Qodana.slnx
 
 bootstrap: dotnet build tools/code-scan/qodana/PineGuard.DependencyInjection.Qodana.slnx -c Release
+
+exclude:
+  - name: All
+    paths:
+      - .etc
+      - artifacts
+      - .git

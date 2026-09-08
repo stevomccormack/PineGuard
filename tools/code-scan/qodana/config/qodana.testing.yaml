@@ -10,5 +10,9 @@ dotnet:
 
 bootstrap: dotnet build tools/code-scan/qodana/PineGuard.Testing.Qodana.slnx -c Release
 
-
-
+exclude:
+  - name: All
+    paths:
+      - .etc
+      - artifacts
+      - .git
