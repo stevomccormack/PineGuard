@@ -25,7 +25,7 @@ Run the Roslyn compiler diagnostics tool, then fix all reported CS warnings usin
    pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-CompilerDiagnostics.ps1" -Scope [SCOPE] -OutputFormat Json
    ```
 
-   If a Filter is provided, add `-Filter [FILTER]`.
+   If a Code filter is provided, add `-Code [CODE]`.
 
 2. **Parse the JSON Output**
 

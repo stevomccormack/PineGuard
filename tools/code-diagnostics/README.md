@@ -17,7 +17,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-Comp
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-CompilerDiagnostics.ps1" -Scope Core
 
 # Filter to nullability warnings only
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-CompilerDiagnostics.ps1" -Scope All -Filter "CS86"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-CompilerDiagnostics.ps1" -Scope All -Code "CS86"
 
 # JSON output
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-CompilerDiagnostics.ps1" -Scope All -OutputFormat Json
@@ -28,7 +28,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-Comp
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `-Scope` | ValidateSet | `All` | `All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `Testing` |
-| `-Filter` | string | _(none)_ | Regex pattern to filter warning codes (e.g. `CS86`, `CS0618`) |
+| `-Code` | string | _(none)_ | Regex pattern to filter diagnostic codes (e.g. `CS86`, `CS0618`, `NU19`). Not `-Filter` — that name is reserved for `dotnet test`'s own filter syntax elsewhere in the toolchain |
 | `-OutputFormat` | ValidateSet | `Text` | `Text` (human-readable) or `Json` (structured) |
 | `-Configuration` | ValidateSet | `Debug` | `Debug` or `Release` |
 | `-Clean` | switch | `$false` | Run `dotnet clean` before building |
@@ -51,8 +51,11 @@ Written to `artifacts/code-diagnostics/<scope>/diagnostics.json`:
 
 ### Exit Codes
 
-- `0` — No warnings found
-- `1` — Warnings detected
+- `0` — Build succeeded, no diagnostics matched
+- `1` — Build succeeded, warnings found
+- `2` — One or more build targets failed to compile
+
+A transcript of each run is written under `logs/code-diagnostics/<yyyyMMdd-HHmmss>.log`.
 
 ## Common Warning Categories
 

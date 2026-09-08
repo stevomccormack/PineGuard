@@ -30,7 +30,7 @@ See [`../commands/fix.md`](../commands/fix.md).
 ## Steps
 
 1. **Execute the canonical procedure** in [`../skills/fix-roslyn/SKILL.md`](../skills/fix-roslyn/SKILL.md)
-   with **Scope = [SCOPE]** (and `-Filter [FILTER]` if provided): run the diagnostics script, then
+   with **Scope = [SCOPE]** (and `-Code [CODE]` if provided): run the diagnostics script, then
    fix the warnings one file at a time — idiomatic C# per `docs/ai/specs/coding-standard.md`,
    never suppressing a warning — building after each file.
 
