@@ -22,8 +22,8 @@ version: 1.1
   `Analyzers`, `Testing`) or the five meta-scopes (`Agent`, `Docs`, `Tools`, `Solution`, `Ci`).
   `-All` commits every scope in one invocation instead.
 - **IncludeTests**: (optional switch) include the paired `*.UnitTests` project in the same commit.
-  Implied by `-All`; has no effect on the five meta-scopes (`-Agent`, `-Docs`, `-Tools`,
-  `-Solution`, `-Ci`).
+  Implied by `-All`; has no effect on the five meta-scopes (`-Scope Agent`, `-Scope Docs`,
+  `-Scope Tools`, `-Scope Solution`, `-Scope Ci`).
 - **AutoMessage**: (optional switch) auto-generate the commit message; omit to open the editor per scope.
 - **Push** / **Rebase**: (optional switches) `-Rebase` fetches and rebases onto the remote if
   behind, before and after committing; `-Push` pushes afterward. `-Push -Rebase` together is the
