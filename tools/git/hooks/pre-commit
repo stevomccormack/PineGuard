@@ -1,0 +1,10 @@
+#!/bin/sh
+# PineGuard pre-commit hook (shim). The logic lives in pre-commit.ps1 so that
+# tools/ stays PowerShell; git runs hooks through sh, so this shim is required.
+# Enable once per clone (shared by all its worktrees):
+#     git config core.hooksPath tools/git/hooks
+if ! command -v pwsh >/dev/null 2>&1; then
+  echo "pre-commit: pwsh (PowerShell 7) is required but not on PATH." >&2
+  exit 1
+fi
+exec pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(dirname "$0")/pre-commit.ps1"

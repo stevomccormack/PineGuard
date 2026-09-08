@@ -22,6 +22,12 @@ trim_trailing_whitespace = false
 # -------------------------------------------------------------------
 # JSON / YAML / XML project files
 # -------------------------------------------------------------------
+# -------------------------------------------------------------------
+# Windows batch files — CMD requires CRLF (matches .gitattributes)
+# -------------------------------------------------------------------
+[*.{cmd,bat}]
+end_of_line = crlf
+
 [*.{json,yml,yaml}]
 indent_size = 2
 
