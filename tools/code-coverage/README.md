@@ -22,18 +22,43 @@ Coverage collection is engine-pluggable behind a delegating front door (`New-Cov
 
 | Engine | Folder | Status |
 |---|---|---|
-| Coverlet | `coverlet/` | Authoritative. CI and the 100% gate use it. Collects via `dotnet test --collect:"XPlat Code Coverage"` on both test TFMs (`net8.0`, `net10.0`). |
-| JetBrains dotCover | `dotcover/` | Not yet implemented — see T3.11. `New-CoverageReport.ps1 -Engine DotCover` and `Test-Coverage.ps1 -Engine DotCover` both throw a clear "not yet implemented" error until it lands. |
+| Coverlet | `coverlet/` | Authoritative. CI and the 100% gate use it. Collects via `dotnet test --collect:"XPlat Code Coverage"` on both test TFMs (`net8.0`, `net10.0`), rendered to HTML + Cobertura by ReportGenerator. |
+| JetBrains dotCover | `dotcover/` | Local, snapshot-only. Collects a Rider-native `.dcvr` snapshot via `dotCover cover --snapshot-output` on both test TFMs. Not gated, not converted to HTML/Cobertura — see below for why. |
 
 The engine folder is named after the tool, never after a collector's display string:
 `coverlet.collector` registers the data collector `friendlyName` "XPlat Code Coverage" — that is
 where the old `xplat/` folder name came from, but the tool is Coverlet.
 
-Both engines share one parameter contract (`coverlet/New-CoverageReport.ps1` and, once it exists,
-`dotcover/New-CoverageReport.ps1`) and one output shape:
-`artifacts/code-coverage/<engine>/<scope>/{testresults,report}`. The front door
-(`New-CoverageReport.ps1`) validates `-Engine` and delegates only — it holds no collection logic
-of its own — and `Test-Coverage.ps1` gates on whichever engine's Cobertura output you point it at.
+Both engines share one parameter contract (`coverlet/New-CoverageReport.ps1` and
+`dotcover/New-CoverageReport.ps1`) and one output root:
+`artifacts/code-coverage/<engine>/<scope>/`. The front door (`New-CoverageReport.ps1`) validates
+`-Engine` and delegates only — it holds no collection logic of its own. `Test-Coverage.ps1` gates
+on Cobertura output, so it only works for `-Engine Coverlet`; `-Engine DotCover` throws (see
+below).
+
+### Why dotCover is snapshot-only, not full-featured
+
+The plan originally scoped a full-featured dotCover engine: XML collection via
+`--xml-report-output`, rendered to Html/HtmlSummary/Cobertura by ReportGenerator, gateable by
+`Test-Coverage.ps1 -Engine DotCover` exactly like Coverlet. Spike T3.10
+(`docs/ai/plans/tools-review-and-standardisation.md` `## Baselines`, "T3.10 — dotCover spike")
+found that path genuinely broken in dotCover 2025.3.3 on **both** `net8.0` and `net10.0`: `cover
+--xml-report-output` either hangs indefinitely against a persistent `VBCSCompiler` (Roslyn
+compiler-server) process, or — once that hang is avoided — throws `Unhandled exception: Snapshot
+container is not initialized` from `ReportBuilder.BuildReports` and produces no XML at all. This
+was reproduced four times, including a `--no-build` run that rules out the build step as the
+cause; it is a real, documented upstream JetBrains bug, not a local misconfiguration.
+
+What T3.10 proved DOES work reliably on both TFMs is `dotCover cover --snapshot-output
+<path>.dcvr` (omitting `--xml-report-output` entirely) — a plain coverage snapshot in JetBrains
+Rider's own native format. `dotcover/New-CoverageReport.ps1` (T3.11) implements exactly that: it
+collects `.dcvr` snapshot(s) under `artifacts/code-coverage/dotcover/<scope>/snapshots/` and
+prints where they landed, but never invokes ReportGenerator and never produces HTML or Cobertura
+— there is no dotCover XML to feed it. Open the `.dcvr` file(s) directly in Rider's coverage
+viewer for visual, file-by-file exploration. `Test-Coverage.ps1 -Engine DotCover` throws a clear,
+accurate error explaining this rather than pretending to gate on numbers that do not exist;
+Coverlet (§3.5: "Coverlet is authoritative … dotCover is the local second opinion, reported not
+gated") remains the only engine this repo's automated 100% gate can enforce against.
 
 ## Prerequisites
 
@@ -74,8 +99,8 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Covera
 Validates `-Engine Coverlet|DotCover` and delegates to the matching engine folder's own
 `New-CoverageReport.ps1`, forwarding every other parameter unchanged. Calling it directly with
 `-Engine Coverlet` behaves identically to calling `coverlet/New-CoverageReport.ps1` directly;
-`-Engine DotCover` throws a clear "not yet implemented" error (T3.11) instead of a confusing
-file-not-found.
+`-Engine DotCover` behaves identically to calling `dotcover/New-CoverageReport.ps1` directly (the
+snapshot-only fallback — see "Why dotCover is snapshot-only" above).
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/New-CoverageReport.ps1" -Engine Coverlet -Scope Core -NoOpen
@@ -146,8 +171,11 @@ Reads the newest Cobertura XML file per test project under `artifacts/code-cover
 - filtered line + branch totals
 - lowest-covered classes list
 
-Engine-agnostic via `-Engine Coverlet|DotCover` (default `Coverlet`); `-Engine DotCover` throws a
-clear "not yet implemented" error until T3.11 lands.
+Accepts `-Engine Coverlet|DotCover` (default `Coverlet`), but only `Coverlet` actually gates:
+`-Engine DotCover` throws a clear "not supported" error, because dotCover's snapshot-only fallback
+(T3.10/T3.11 — see "Why dotCover is snapshot-only" above) produces no Cobertura output for this
+script to read. Coverlet remains the only engine this repo's automated 100% gate can enforce
+against.
 
 Run from repo root:
 
@@ -201,14 +229,41 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Covera
 
 ```
 
+### dotcover/New-CoverageReport.ps1
+
+Collects a JetBrains dotCover snapshot only — see "Why dotCover is snapshot-only" above for the
+T3.10 finding this implements. Same parameter contract as `coverlet/New-CoverageReport.ps1`
+(`-Scope`, `-Configuration`, `-Clean`, `-Framework`, `-ProjectFilter`, `-Filter`, `-Isolated`);
+`-NoOpen`, `-SkipHtml`, `-Format` are accepted for contract parity with Coverlet but have no
+effect (there is no HTML/Cobertura step here to open, skip, or format — each prints a warning
+when passed explicitly).
+
+Run from repo root:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/dotcover/New-CoverageReport.ps1"
+
+# Collect only one TFM (faster than the both-TFM default)
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/dotcover/New-CoverageReport.ps1" -Scope Core -Framework net8.0
+
+# Clean this scope's previous snapshot(s) first
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/dotcover/New-CoverageReport.ps1" -Scope Core -Clean
+```
+
+After collection, open the printed `.dcvr` file(s) directly in Rider's coverage viewer.
+
 ## Outputs
 
-- HTML report:
-  - `artifacts/code-coverage/coverlet/<scope>/report/index.html`
-  - `artifacts/code-coverage/coverlet/<scope>/report/summary.html`
-  - `artifacts/code-coverage/coverlet/<scope>/report/Cobertura.xml` (merged, per-scope)
-- Raw test results + Cobertura XML (per test project run):
-  - `artifacts/code-coverage/coverlet/<scope>/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
+- Coverlet (`coverlet/New-CoverageReport.ps1`):
+  - HTML report:
+    - `artifacts/code-coverage/coverlet/<scope>/report/index.html`
+    - `artifacts/code-coverage/coverlet/<scope>/report/summary.html`
+    - `artifacts/code-coverage/coverlet/<scope>/report/Cobertura.xml` (merged, per-scope)
+  - Raw test results + Cobertura XML (per test project run):
+    - `artifacts/code-coverage/coverlet/<scope>/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
+- dotCover (`dotcover/New-CoverageReport.ps1`):
+  - Raw snapshot(s) only (T3.10: no HTML/Cobertura is ever produced):
+    - `artifacts/code-coverage/dotcover/<scope>/snapshots/<ProjectName>.<tfm>.dcvr`
 
 Notes about the structure:
 

@@ -12,7 +12,9 @@
     Cobertura XML that the same Read-CoberturaCoverage parser can read (§3.5).
 
 .PARAMETER Engine
-    Coverlet (default) or DotCover. DotCover is not yet implemented -- see T3.11.
+    Coverlet (default) or DotCover. DotCover throws: this repo's automated coverage gate cannot
+    read dotCover's output (T3.10/T3.11 -- see the throw site below for the full explanation and
+    where to look instead).
 
 .PARAMETER Top
     See the param block for details.
@@ -80,7 +82,22 @@ $ProgressPreference = 'SilentlyContinue'
 . (Join-Path $PSScriptRoot '..\.shared\coverage.ps1')
 
 if ($Engine -eq 'DotCover') {
-    throw "DotCover engine not yet implemented for Test-Coverage.ps1 -- see T3.11 (tools/code-coverage/dotcover/New-CoverageReport.ps1 does not exist yet). Use -Engine Coverlet (the default) for now."
+    throw (
+        "-Engine DotCover is not supported by Test-Coverage.ps1 -- not because it is unimplemented, " +
+        "but because there is nothing here to gate on. dotCover 2025.3.3's --xml-report-output " +
+        "collection genuinely fails on both net8.0 and net10.0 (a real, documented upstream " +
+        "JetBrains bug: it either hangs against a persistent Roslyn compiler-server process " +
+        "(VBCSCompiler), or throws 'Snapshot container is not initialized' from " +
+        "ReportBuilder.BuildReports -- reproduced 4 " +
+        "times, see docs/ai/plans/tools-review-and-standardisation.md ## Baselines, 'T3.10 -- " +
+        "dotCover spike'), so dotcover/New-CoverageReport.ps1 (T3.11) collects a raw Rider .dcvr " +
+        "snapshot only -- never a Cobertura XML this parser could read. To inspect dotCover's " +
+        "numbers, open the .dcvr file(s) under " +
+        "artifacts/code-coverage/dotcover/<scope>/snapshots/ directly in Rider's coverage viewer " +
+        "for manual, file-by-file exploration. Coverlet (-Engine Coverlet, the default) remains " +
+        "the only engine this repo's automated 100% gate can enforce against (§3.5: 'Coverlet is " +
+        "authoritative ... dotCover is the local second opinion, reported not gated')."
+    )
 }
 
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot

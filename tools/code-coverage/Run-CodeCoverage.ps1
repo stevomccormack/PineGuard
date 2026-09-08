@@ -10,8 +10,12 @@
 
 .PARAMETER Engine
     Coverage engine: Coverlet (default) or DotCover. Forwarded to the D-9 front door
-    (New-CoverageReport.ps1) and to the engine-agnostic gate (Test-Coverage.ps1). DotCover is
-    not yet implemented -- see T3.11.
+    (New-CoverageReport.ps1) and to the engine-agnostic gate (Test-Coverage.ps1). DotCover
+    collects a Rider-native .dcvr snapshot only (T3.10's proven fallback; see
+    dotcover/New-CoverageReport.ps1) -- -Mode Analyze/GenerateAndAnalyze then fails at the
+    Test-Coverage.ps1 step, since there is no Cobertura output for it to gate on (by design; see
+    that script's own -Engine DotCover error for why). Use -Mode Generate -Engine DotCover to
+    collect the snapshot without hitting that gate.
 
 .PARAMETER Scope
     See the param block for details.
