@@ -1422,7 +1422,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Solution.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Solution",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1436,7 +1438,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Tools.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Tools",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1450,7 +1454,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Agent.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Agent",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1464,7 +1470,25 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Docs.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Docs",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit CI (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Ci",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1478,7 +1502,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Testing.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Testing",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1492,7 +1518,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Core.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Core",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1506,7 +1534,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-MustClauses.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "MustClauses",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1520,7 +1550,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-GuardClauses.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "GuardClauses",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1534,7 +1566,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-FluentValidation.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "FluentValidation",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1548,7 +1582,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-DataAnnotations.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "DataAnnotations",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1562,7 +1598,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Options.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Options",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1576,7 +1614,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-DependencyInjection.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "DependencyInjection",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1590,11 +1630,14 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-AspNetCore.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "AspNetCore",
                 "-AutoMessage"
             ],
             "problemMatcher": []
-        },        {
+        },
+        {
             "label": "Git: Commit ErrorOr (auto message)",
             "type": "shell",
             "command": "pwsh",
@@ -1603,7 +1646,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-ErrorOr.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "ErrorOr",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1617,7 +1662,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-FluentResults.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "FluentResults",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1631,7 +1678,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-OneOf.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "OneOf",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1662,7 +1711,7 @@
                 "-File",
                 "./tools/git/Run-Commits.ps1",
                 "-All",
-                "-DryRun"
+                "-WhatIf"
             ],
             "problemMatcher": []
         },
@@ -1678,7 +1727,8 @@
                 "./tools/git/Run-Commits.ps1",
                 "-All",
                 "-AutoMessage",
-                "-SafePush"
+                "-Push",
+                "-Rebase"
             ],
             "problemMatcher": []
         },
