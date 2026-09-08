@@ -14,6 +14,7 @@ Read these files completely:
 Execute `docs/ai/skills/scan-roslyn/SKILL.md` exactly as written.
 
 ## Step 2: Verify
-- Build completed without errors
+- The build outcome is reported explicitly — a failed build is a distinct exit-2 outcome
+  (`BuildSucceeded: false`, `FailedBuildTargets`, `Errors`), not a silent blocker
 - Warning summary reported (count by code, count by file)
 - JSON artifact written to `artifacts/code-diagnostics/<scope>/`

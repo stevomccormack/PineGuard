@@ -17,7 +17,8 @@ version: 1.0
 
 ## Parameters
 
-- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All)
+- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options,
+  DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All)
 
 ## Auto-Approval
 
@@ -37,26 +38,25 @@ See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface invento
    **Command Template**:
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Project "[TEST_PROJECT]"
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Scope [SCOPE]
    ```
 
-   **Project map**:
-   - Core: `tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj`
-   - MustClauses: `tests/PineGuard.MustClauses.UnitTests/PineGuard.MustClauses.UnitTests.csproj`
-   - GuardClauses: `tests/PineGuard.GuardClauses.UnitTests/PineGuard.GuardClauses.UnitTests.csproj`
-   - FluentValidation: `tests/PineGuard.FluentValidation.UnitTests/PineGuard.FluentValidation.UnitTests.csproj`
-   - DataAnnotations: `tests/PineGuard.DataAnnotations.UnitTests/PineGuard.DataAnnotations.UnitTests.csproj`
-   - Testing: `tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj`
+   `-Scope` resolves the scope's own `*.UnitTests` project from the shared registry
+   (`tools/.shared/dotnet-projects.ps1`), so there is no project-path map to keep in step here.
+   A new registry scope becomes a valid `-Scope` value with no edit to this workflow.
 
    > `tests/PineGuard.Testing/` is the shared test-infrastructure library itself — it has no test methods and is never run directly. Its tests live in `tests/PineGuard.Testing.UnitTests/`, which is what the `Testing` scope runs.
 
-   **All**: run the six project commands above (sequentially).
-
-   Optional (final verification): run the solution (slower).
+   **All**: `-Scope All` resolves to `PineGuard.slnx` and runs every project in one invocation —
+   it replaces the old "run each project command in sequence" step.
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Solution "./PineGuard.slnx"
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/testing/Run-Tests.ps1" -Scope All
    ```
+
+   `-Project <path>` and `-Solution <path>` remain available for a one-off target outside the
+   registry. Exactly one of `-Scope`, `-Project` or `-Solution` may be given; supplying none or
+   more than one exits `2`.
 
 2. **Check Results**
    Ensure all tests passed (Green).

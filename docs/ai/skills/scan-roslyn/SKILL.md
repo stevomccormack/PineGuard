@@ -8,7 +8,9 @@ error-severity `<PREFIX><digits>` diagnostics (Roslyn `CS` codes today, plus any
 build pipeline emits, e.g. `NU19xx`, `CP0xxx`, `IL2xxx`/`IL3xxx`).
 
 ## 2. Inputs
-- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`)
+- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`,
+  `Options`, `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`,
+  `Analyzers`, `Testing`)
 
 ## 3. Critical Rules (The "Must Dos")
 > [!IMPORTANT]
@@ -38,7 +40,10 @@ build pipeline emits, e.g. `NU19xx`, `CP0xxx`, `IL2xxx`/`IL3xxx`).
    - Top affected files (with counts)
 
 ## 5. Definition of Done
-- [ ] Build completed without errors
+- [ ] The build outcome is reported explicitly. A failed build is its own outcome, not a silent
+      blocker: `Run-CompilerDiagnostics.ps1` exits `2`, sets `BuildSucceeded: false` and fills
+      `FailedBuildTargets` / `Errors` (T1.02). Report that as the result — do not present the
+      partial warning list as a clean scan
 - [ ] Warning summary reported (count by code, count by file)
 - [ ] JSON artifact written to `artifacts/code-diagnostics/<scope>/`
 
@@ -56,7 +61,7 @@ build pipeline emits, e.g. `NU19xx`, `CP0xxx`, `IL2xxx`/`IL3xxx`).
 | User says | Actions | Result |
 |-----------|---------|--------|
 | "Check Core for compiler warnings" | Run diagnostics with `-Scope Core` | Warning summary grouped by code and file |
-| "How many CS8600 warnings do we have?" | Run diagnostics with `-Scope All`, filter for CS8600 | Count of nullability warnings across all projects |
+| "How many CS8600 warnings do we have?" | Run diagnostics with `-Scope All -Code CS8600` | Count of nullability warnings across all projects |
 | "Run Roslyn on the whole solution" | Run diagnostics with `-Scope All` | Full warning report + JSON artifact |
 
 ## 8. Reference Material (Deep Dive)

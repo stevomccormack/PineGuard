@@ -24,10 +24,16 @@ version: 1.1
 - **IncludeTests**: (optional switch) include the paired `*.UnitTests` project in the same commit.
   Implied by `-All`; has no effect on the five meta-scopes (`-Scope Agent`, `-Scope Docs`,
   `-Scope Tools`, `-Scope Solution`, `-Scope Ci`).
+- **Message**: (optional string) an explicit commit message applied to every scope in the
+  invocation. Meaningful since T3.02 made the tool commit in-process: it previously could not
+  cross the per-scope child-process boundary and was silently dropped.
 - **AutoMessage**: (optional switch) auto-generate the commit message; omit to open the editor per scope.
 - **Push** / **Rebase**: (optional switches) `-Rebase` fetches and rebases onto the remote if
   behind, before and after committing; `-Push` pushes afterward. `-Push -Rebase` together is the
   old `-SafePush` shorthand — rebase if needed, then push.
+- **Remote**: (optional string, default `origin`) the git remote used by `-Push` and `-Rebase`.
+- **WhatIf** / **DryRun**: (optional switch) preview what each selected scope would stage and
+  commit without changing anything. Both spellings are the same switch (D-1d).
 
 ## Auto-Approval
 

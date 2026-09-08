@@ -12,7 +12,9 @@ Adds a new quality/inspection tool to the PineGuard Brain as a first-class citiz
 - **ToolName**: Human-readable name (e.g., "Roslyn Compiler Diagnostics", "SonarQube").
 - **ToolDir**: Directory under `tools/` (e.g., `code-diagnostics`, `code-coverage`).
 - **CommandPrefix**: Slash command prefix (e.g., `roslyn`, `sonar`, `qodana`).
-- **ScopeModel**: List of scopes (e.g., All, Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing).
+- **ScopeModel**: List of scopes (e.g., All, Core, MustClauses, GuardClauses, FluentValidation,
+  DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR,
+  Analyzers, Testing).
 - **HasFixWorkflow**: Boolean — does this tool have a fix/remediation workflow?
 - **RunRole**: Canonical role from `docs/ai/roles/` for scan commands (e.g. `reviewer`, `verifier`).
 - **FixRole**: Canonical role from `docs/ai/roles/` for fix commands (e.g. `owner`). Only if HasFixWorkflow=true.
@@ -41,18 +43,24 @@ Adds a new quality/inspection tool to the PineGuard Brain as a first-class citiz
 
 ## 4. Execution Steps
 
-### Step 1 — Tools Layer (2 files)
+### Step 1 — Tools Layer (3 files)
 
-Create the PowerShell wrapper and operational docs:
+Create the PowerShell wrapper, operational docs, and the domain's agent pointer:
 
 | File | Template |
 |------|----------|
 | `tools/{ToolDir}/Run-{ScriptName}.ps1` | See `tools/code-diagnostics/Run-CompilerDiagnostics.ps1` or `tools/code-coverage/Run-CodeCoverage.ps1` |
 | `tools/{ToolDir}/README.md` | See `tools/code-diagnostics/README.md` or `tools/code-coverage/README.md` |
+| `tools/{ToolDir}/AGENTS.md` | See `tools/code-diagnostics/AGENTS.md` or `tools/code-scan/sonarqube/AGENTS.md` — a two-line pointer (`# {Domain}` + "Read `docs/ai/rules/{RuleName}.md` before …"), never logic. Required for any domain that gets its own rules file in Step 3; `tools/AGENTS.md` is the root fallback for domains that do not |
 
 **Script conventions:**
 - `-Scope` parameter mapping All → `.slnx`, per-project → `.csproj`
-- Structured output to `artifacts/{ToolDir}/{scope}/`
+- Structured output to `artifacts/{tool}/{scope}/` — the artifacts folder is named after the
+  **tool**, not after the `tools/` folder path. `tools/code-scan/qodana/` writes to
+  `artifacts/qodana/<scope>/` (not `artifacts/code-scan/qodana/`), and `tools/code-diagnostics/`
+  writes to `artifacts/code-diagnostics/<scope>/` only because its folder and tool name coincide.
+  Coverage is the documented exception: it inserts an engine level,
+  `artifacts/code-coverage/<engine>/<scope>/`, because two engines share one scope namespace
 - Exit codes: the repo-wide convention is `0` success, `1` failure/issues found, `2` usage or
   prerequisite error, `3` quality gate not met, `124` timeout (§3.4 of
   `docs/ai/plans/tools-review-and-standardisation.md`, pending promotion into
@@ -165,12 +173,23 @@ Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if
 3. **JSON output**: Verify artifacts file is valid JSON
 4. **Slash commands**: Verify all `/scan-{tool}-*` and `/fix-{tool}-*` commands trigger correctly
 5. **Build**: `dotnet build PineGuard.slnx` — solution still builds cleanly
-6. **Cross-reference**: Verify `CLAUDE.md`, `AGENTS.md`, `.pi/AGENTS.md`, `docs/ai/README.md`, `docs/ai/skills/INDEX.md` and every adapter command directory are consistent
-7. **Parity**: `pwsh ./tools/audit-cli/Run-All.ps1` — the adapter-parity rule is clean
+6. **Tools gate**: `pwsh ./tools/testing/Test-Tools.ps1` — PSScriptAnalyzer over `tools/**` plus
+   the Pester suite in `tools/.tests/`. The new script must not add an Error- or Warning-severity
+   PSScriptAnalyzer finding, and must not break a Pester test (`Registry-Parity`, `Windows-Isms`,
+   `Bom-Absence`, `Help-Placeholder` and the shared-helper tests all sweep every `.ps1` under
+   `tools/`, so a new script is in scope the moment it lands). CI runs the same script in the
+   `tools-lint` job (`.github/workflows/ci.yml`) and uploads its summary; that job is
+   `continue-on-error: true` today because the gate still carries a known cosmetic backlog, so it
+   reports rather than blocks — do not read a green CI run as proof your script is clean. Run it
+   locally and compare against the recorded baseline
+7. **Cross-reference**: Verify `CLAUDE.md`, `AGENTS.md`, `.pi/AGENTS.md`, `docs/ai/README.md`, `docs/ai/skills/INDEX.md` and every adapter command directory are consistent
+8. **Parity**: `pwsh ./tools/audit-cli/Run-All.ps1` — the adapter-parity rule is clean
 
 ## 5. Definition of Done
 
-- [ ] Tools layer: Script + README created and tested
+- [ ] Tools layer: Script + README + `AGENTS.md` pointer created and tested
+- [ ] Tools gate: `pwsh ./tools/testing/Test-Tools.ps1` run locally — no new PSScriptAnalyzer
+      Error/Warning finding and no new Pester failure attributable to the new script
 - [ ] Brain spec: Normative spec created
 - [ ] Brain rules: Compressed invariants created, inheriting from `global.md`
 - [ ] Brain skills: Run skill created (+ fix skill if applicable)
@@ -209,7 +228,7 @@ For a tool with 7 scopes and a fix workflow:
 
 | Layer | Files |
 |-------|-------|
-| Tools (script + README) | 2 |
+| Tools (script + README + `AGENTS.md`) | 3 |
 | Brain Spec | 1 |
 | Brain Rules | 1 |
 | Brain Skills (run + fix) | 2 |
@@ -220,4 +239,4 @@ For a tool with 7 scopes and a fix workflow:
 | Adapter Skills (scan + fix × `.claude`, `.github`, `.pi`) | 6 |
 | Adapter Commands (7 scopes + fix × `.claude`, `.pi`, `.agent`) | 24 |
 | Registration (modify existing) | 5–6 |
-| **Total** | **~52 new + 5–6 modified** |
+| **Total** | **~53 new + 5–6 modified** |

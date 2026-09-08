@@ -107,7 +107,7 @@ To re-run a specific, ad-hoc command (like `dotnet test` with a filter) without 
 - Workflow: [`docs/ai/workflows/test-last.md`](../workflows/test-last.md)
 - Script: `tools/testing/Run-Tests.ps1`
 
-Parameterise the run through the script's `-Project` / `-Filter` parameters. Do not inline ad-hoc command scripts into an adapter workflow — that is logic in an adapter, which `docs/ai/specs/protocol.md` Rule #1 forbids.
+Parameterise the run through the script's `-Scope` parameter (the primary target selector since T3.06 — `-Scope All` covers the whole solution), falling back to `-Project` / `-Solution` for an off-registry target, plus `-Filter` / `-Framework`. Do not inline ad-hoc command scripts into an adapter workflow — that is logic in an adapter, which `docs/ai/specs/protocol.md` Rule #1 forbids.
 
 ## Honesty rule
 
