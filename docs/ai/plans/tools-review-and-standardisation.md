@@ -3,7 +3,7 @@ type: plan
 id: tools-review-and-standardisation
 version: 1.1
 status: decisions-signed-off
-last_updated: 2026-09-06
+last_updated: 2026-09-08
 scope: tools/** excluding tools/audit-cli/** (under separate review)
 -->
 
@@ -491,7 +491,7 @@ tasks sharing a group letter run concurrently; a group runs after the group it d
 | T3.07 | `clean/` folder move + consolidation | Sonnet | Pending | P3-B | T3.01 | |
 | T3.08 | `github/` folder move + new `nuget/` split; registry package list | Sonnet | Pending | P3-B | T3.01 | |
 | T3.09 | Windows-ism sweep; CI audit job untouched (audit-cli out of scope) | Sonnet | Pending | P3-C | P3-B | No CI job change — belongs to audit-cli |
-| T3.10 | dotCover CLI spike | Sonnet | Pending | P3-B | T3.01 | Time-boxed; findings to `## Baselines` |
+| T3.10 | dotCover CLI spike | Sonnet | Done | P3-B | T3.01 | Findings in `## Baselines`: `--xml-report-output` fails both TFMs (real dotCover 2025.3.3 bug, 9-process snapshot consolidation); snapshot-only fallback (`--snapshot-output` + `--exclude-processes VBCSCompiler.exe;MSBuild.exe`) succeeds both TFMs. Go for T3.11 with the fallback only. |
 | T3.11 | dotCover engine wrapper, called by the D-9 front door | Sonnet | Pending | P3-C | T3.03, T3.10 | Same contract as the Coverlet script |
 | T3.V | Verify Phase 3 per domain (build, test, coverage, lint, Pester) | Opus | Pending | P3-V | P3-C | |
 | T4.01 | `git mv` cascade inside `tools/` | Sonnet | Blocked (D-1) | P4-A | P3-V | One commit |
@@ -578,4 +578,197 @@ rules file changes name.
 
 - **Assessment:** Cosmetic findings (whitespace/indentation, 291/296) do not block Phase 3 work. The 5 unapproved-verb findings are expected and will be resolved by the D-1b verb renames during Phase 4's cascade (§3.2). A Pester test (T2.03) will enforce no new unapproved-verb introductions during Phase 3. The full per-file breakdown is recorded in `artifacts/tools-lint/baseline.json` (gitignored; future readers should regenerate by re-running this same invocation rather than expect the file to be checked in).
 
-**dotCover spike status** (T3.10): pending Phase 3 start. Will be recorded in a follow-up `## dotCover spike results` section.
+### T3.10 — dotCover spike
+
+Executed 2026-09-08 in this worktree, against the global `jetbrains.dotcover.commandlinetools`
+2025.3.3 install (`~/.dotnet/tools/dotCover.exe`, confirmed present:
+`JetBrains dotCover Console Runner 2025.3.3. Build 20260219.74449 (windows-x64)`). Target:
+`tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj` (the test project — `dotCover
+cover -- test <csproj>` wraps `dotnet test`, which needs the test project, not
+`src/PineGuard.Core/PineGuard.Core.csproj`). SDK: 10.0.400; runtimes present for both `net8.0`
+(8.0.30) and `net10.0` (10.0.11). Ran nine `dotCover cover` invocations across both TFMs and
+several flag combinations; every raw log/exception is preserved during this session's scratchpad
+if a re-check is ever needed, but is not part of this commit.
+
+**Headline result: one-step `cover --xml-report-output` does NOT work in this environment for
+either TFM, in any of five configurations tried — but a snapshot-only fallback (`--snapshot-output`
+with no `--xml-report-output`) works reliably, fast, on both TFMs.** This is a genuine engine
+limitation encountered here, not a misconfiguration on my part — see the isolation trail below.
+
+**(a) Does one-step `cover --xml-report-output` avoid the previously-observed `report`-command hang? — NO, not on its own; two independent causes, one avoidable, one not.**
+
+- **Attempt 1 (net10.0, default settings):** `dotCover cover --xml-report-output ... --snapshot-output
+  ... --exclude-assemblies *.UnitTests -- test <csproj> -c Release -f net10.0`. Tests passed in
+  635ms (5296/5296), then the process sat idle. Killed by a 300s `timeout` at the 5-minute mark.
+  The dotCover log's last lines before the kill show a broken pipe against
+  `C:\...\sdk\10.0.400\Roslyn\bincore\VBCSCompiler.exe` (`WIN32_ERROR_BROKEN_PIPE`,
+  `NamedPipeStream.cpp:363`). No `.xml` or `.dcvr` file was written.
+- **Root-caused the hang:** a fresh `VBCSCompiler.exe` (the Roslyn compiler server) spawns during
+  the build-then-test sequence and, because it is designed to persist across invocations for build
+  speed, never signals profiling completion back to dotCover — so the coverage session never
+  finalizes. Confirmed by process inspection: after each hung/killed run, `VBCSCompiler.exe`
+  remained alive (`Get-Process` showed it minutes after the parent `dotCover.exe`/`dotnet.exe`
+  were gone), and killing it manually was necessary before the next attempt.
+- **Two independent fixes eliminate the hang**, tested separately: (1) `DOTNET_CLI_UseSharedCompilation=false`
+  + `MSBUILDDISABLENODEREUSE=1` env vars (no compiler-server process spawns at all) — net10.0
+  completed in 24s instead of hanging; (2) dotCover's own `--exclude-processes VBCSCompiler.exe`
+  `--exclude-processes MSBuild.exe` (compiler server still spawns, just isn't profiled) — net8.0
+  completed in 24s instead of hanging (net8.0 was independently confirmed to hang exactly like
+  net10.0 under default settings: `timeout 360` fired, exit 124, tests passed in 1s, then 6
+  minutes idle — **the hang is not net10.0-specific**).
+- **But eliminating the hang exposes a second, unconditional failure**: with either fix applied,
+  dotCover throws `Unhandled exception: Snapshot container is not initialized` from
+  `JetBrains.dotCover.ConsoleRunner.Components.ReportBuilder.BuildReports`, called from
+  `CoverCommand.Execute`. No `.xml` and no `.dcvr` file is produced. **Reproduced 4 times**: net10.0
+  with shared-compilation disabled (fresh build), net10.0 with shared-compilation disabled AND
+  pre-built `--no-build --no-restore` (rules out the build step itself as a contributing cause —
+  identical crash, 13.9s), net8.0 with `--exclude-processes` (fresh build, 24.0s). Log inspection
+  (`grep OnSnapshotDone`) shows **9 distinct profiled child-process snapshots** for one
+  `dotnet test` invocation of a single test project — the .NET 10 SDK's `dotnet test`/VSTest
+  execution model spawns considerably more child processes than dotCover 2025.3.3's report
+  consolidation appears to expect, and `ReportBuilder.BuildReports` fails to initialize a
+  container for all of them.
+- **Isolating the two failure modes** (build step vs. report-building step) was the key move:
+  swapping in `--no-build` proved the crash has nothing to do with building; it is specific to the
+  `--xml-report-output` report-generation path.
+- **The fix: drop `--xml-report-output` entirely and collect only `--snapshot-output`.** With
+  `--exclude-processes VBCSCompiler.exe;MSBuild.exe` and no `--xml-report-output`, both TFMs
+  succeeded cleanly with full lifecycle logging (`Coverage session finished` →
+  `Coverage results post-processing started` → `Merging snapshots` → `Snapshots merging finished`
+  → `Coverage results post-processing finished`), exit code 0:
+  - net8.0 (`--no-build --no-restore`): 14.8s, produced a 4,941,133-byte `.dcvr`.
+  - net10.0 (normal build, no `--no-build`): 24.9s, produced a 5,167,522-byte `.dcvr`.
+
+  This is exactly the plan's own anticipated contingency ("§6 Risks": *"dotCover ...
+  hangs... T3.11 ships snapshot-only collection for Rider"*) — and it is confirmed to work.
+
+**Verdict for (a): full `--xml-report-output` collection FAILS on both TFMs (0/5 configurations
+produced a report); snapshot-only collection (`--snapshot-output` + `--exclude-processes
+VBCSCompiler.exe;MSBuild.exe`) SUCCEEDS on both TFMs (2/2).**
+
+**(b) Does ReportGenerator accept the dotCover XML as `DotCover`-format input, and does its Cobertura output match Coverlet's Core numbers? — Could not be empirically tested; (a)'s failure means no dotCover XML ever existed to feed it.**
+
+- ReportGenerator 5.5.11.0's CLI (`reportgenerator -help`) has **no explicit input-format-selection
+  flag** — only `-reports:`, which takes any number of report files, and `-reporttypes:` for
+  *output* formats. Input format is auto-detected per file (ReportGenerator's documented behaviour
+  is to inspect each file's root schema and dispatch to the matching internal parser, one of which
+  is its `DotCoverParser`). I could not exercise this parser against a real dotCover XML because
+  (a) never produced one — I deliberately did not fabricate a synthetic dotCover XML to test
+  against, since a hand-built fixture would not be evidence of anything real.
+- **Fresh Coverlet baseline for Core, captured for context/future comparison** (`pwsh
+  tools/code-coverage/Run-CodeCoverage.ps1 -Scope Core -NoOpen`, net8.0):
+  ```
+  Coverage summary (filtered scope):
+    Line coverage:   100.00% (4590/4590)
+    Branch coverage: 100.00% (3133/3133)
+  Found 152 classes matching filters.
+  ```
+  This matches every prior Phase 1-3 verification (100%/100%) and is what a future dotCover
+  Cobertura output would need to be checked against once (a) is resolved upstream.
+
+**Verdict for (b): unverified, blocked by (a). No divergence claim can be made either way.**
+
+**(c) Which `--exclude-attributes` values reproduce Coverlet's `ExcludeByAttribute` set, including GeneratedRegex? — Documented from `dotCover cover --help`; NOT empirically verified (same block as (b)); one gap confirmed by absence in the documented flag set.**
+
+- `dotCover cover --help`'s `--exclude-attributes` description: *"Comma-separated list of fully
+  qualified attribute names. Code marked with these will be excluded, e.g.,
+  `System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute`. Wildcards (`*`) allowed."*
+  This is a real, documented syntax difference from Coverlet: Coverlet's `ExcludeByAttribute`
+  (`GeneratedCodeAttribute;CompilerGeneratedAttribute;ExcludeFromCodeCoverageAttribute`) uses bare
+  short names; dotCover's help text and example both use fully-qualified names. The likely
+  equivalent for dotCover is `--exclude-attributes
+  "System.CodeDom.Compiler.GeneratedCodeAttribute" --exclude-attributes
+  "System.Runtime.CompilerServices.CompilerGeneratedAttribute" --exclude-attributes
+  "System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute"` (or the same three joined by
+  commas in one flag) — but whether short names also work, whether wildcards are needed, and
+  whether this actually excludes the same code paths as Coverlet, could not be confirmed: doing so
+  requires comparing real coverage numbers with and without the flag, which requires a working
+  report, which (a) blocks.
+- **The GeneratedRegex gap is real and confirmed by absence, not inference.** `dotCover cover
+  --help`'s complete "Filter options" section lists exactly three flags: `--exclude-assemblies`
+  (assembly name, wildcards), `--exclude-attributes` (fully-qualified attribute name, wildcards),
+  `--exclude-processes` (process name, wildcards). **There is no type-name-pattern exclusion flag
+  of any kind.** Coverlet's second exclusion line —
+  `<Exclude>[*]System.Text.RegularExpressions.Generated.*</Exclude>` — excludes the DFA
+  state-machine class that `GeneratedRegexAttribute`'s source generator emits, specifically because
+  that attribute sits on the source `partial` method, not the emitted class, so
+  `ExcludeByAttribute` alone cannot reach it. dotCover's `--exclude-attributes` has the identical
+  limitation (it matches attributes on the member/type actually decorated) and has **no fallback
+  mechanism** — no type-pattern flag, no path/file filter, nothing else in the `cover` command's
+  option set — to reach an undecorated generated class by name. Confirmed present in Core:
+  `GeneratedRegex` is used in `src/PineGuard.Core/Utils/EmailUtility.cs`,
+  `src/PineGuard.Core/Rules/VersionRules.cs`, `src/PineGuard.Core/Rules/StringRules.NumberTypes.cs`,
+  `src/PineGuard.Core/Rules/Owasp/OwaspRegex.cs`. **This is a genuine, reportable capability gap
+  between the two engines**, not something a flag combination papers over.
+
+**Verdict for (c): syntax difference documented (fully-qualified vs. short names); the
+GeneratedRegex wildcard-exclusion gap is confirmed to have no dotCover equivalent. Numeric
+exclusion-equivalence is unverified, blocked by (a).**
+
+**(d) Do per-TFM runs need `dotCover merge`, or does ReportGenerator's own merging suffice? — Could not be empirically tested; both TFMs never independently produced a report to merge. Architectural note only, from documentation.**
+
+- `dotCover merge --help`: operates on **raw `.dcvr` snapshot files**
+  (`--snapshot-source <list>` → one merged `.dcvr`) — a pre-report-generation step.
+  `dotCover report --help` then turns *one* `.dcvr` into XML/JSON.
+- ReportGenerator's own `-reports:file1;file2` merging (already used today for Coverlet's
+  multi-TFM Cobertura outputs) operates on **already-rendered report files**, of any format
+  ReportGenerator can parse — it is not documented anywhere as accepting raw `.dcvr` snapshots.
+- **These operate at different pipeline stages and are not interchangeable alternatives for the
+  same job**: `dotCover merge` is how you'd combine two `.dcvr` snapshots (e.g., net8.0 + net10.0)
+  into one before running a single `dotCover report`/`cover --xml-report-output`; ReportGenerator's
+  merge is how you'd combine two already-built XML/Cobertura reports after each was independently
+  rendered. Since (a) never got past `--xml-report-output` on either path, I could not exercise
+  either merge in practice — this section states the documented architecture only, not a tested
+  conclusion.
+
+**Verdict for (d): unverified, blocked by (a). Architecturally, `dotCover merge` (snapshot-level)
+and ReportGenerator merge (report-level) are not substitutes for each other; whichever wrapper
+ships in T3.11 needs to pick one merge point deliberately, not assume either works like the other.**
+
+**Stale `.dotnet/dotcover/2024.3.9` copy**: searched this worktree fully (no hits) and, read-only,
+the main checkout at `D:\Steve McCormack\GitHub\@stevomccormack\PineGuard\` — **found** at
+`D:\Steve McCormack\GitHub\@stevomccormack\PineGuard\.dotnet\dotcover\2024.3.9\.store\jetbrains.dotcover.commandlinetools`.
+`.dotnet/` is gitignored (`.gitignore:7`), so this is a filesystem artifact, not a git object — but
+it sits inside the **main checkout**, which this task's instructions explicitly forbid touching
+("Do NOT touch the main checkout... no worktree suffix"). I did not delete it. This is flagged for
+the owner (or a task with main-checkout write access) to remove manually; it does not block T3.11,
+since T3.11 will use the local-tool manifest entry below or the global 2025.3.3 install, not this
+stale 2024.3.9 copy.
+
+**Local tool manifest**: **added.** `dotnet tool install jetbrains.dotcover.commandlinetools
+--version 2025.3.3 --local --tool-manifest .config/dotnet-tools.json` succeeded cleanly (first
+tried unpinned, which resolved `2026.2.1` — re-installed pinned to `2025.3.3` to match the exact
+version this entire spike tested against). Verified it runs: `dotnet tool run dotCover --
+--version` rendered the correct version banner and command list. This is a genuine positive result
+— the tool installs and invokes correctly as a local, manifest-pinned tool, independent of the
+`--xml-report-output` limitation found in (a). `.config/dotnet-tools.json` now lists
+`dotnet-reportgenerator-globaltool`, `dotnet-sonarscanner`, and `jetbrains.dotcover.commandlinetools`
+(all pinned, `rollForward: false`).
+
+**Go/no-go recommendation for T3.11: GO, but only for the snapshot-only fallback the plan already
+anticipated — NOT full `--xml-report-output` collection.** Concretely:
+
+- `dotcover/New-CoverageReport.ps1` should call `dotCover cover --snapshot-output <path>.dcvr
+  --exclude-assemblies *.UnitTests --exclude-processes VBCSCompiler.exe --exclude-processes
+  MSBuild.exe -- test <csproj> -c <cfg> -f <tfm>` — **omit `--xml-report-output` entirely**. This
+  is proven to work on both net8.0 and net10.0, fast (15-25s for Core), with clean exit codes and
+  full lifecycle logging.
+  - The `--exclude-processes VBCSCompiler.exe;MSBuild.exe` pair is load-bearing, not optional: drop
+    it and the run reverts to the multi-minute hang documented in (a). It should be a fixed,
+    non-configurable part of every dotCover invocation this wrapper makes, not a `-Framework`-style
+    parameter.
+- **Do not attempt Html/Cobertura/ReportGenerator output from a dotCover XML** in T3.11 — there is
+  no dotCover XML to feed it. Questions (b), (c), and (d) all remain genuinely open (not "resolved
+  as fine", not "resolved as broken" — actually unknown) until either this JetBrains bug is fixed
+  upstream or a workaround is found for the 9-process snapshot-consolidation crash.
+  `dotCover cover --xml-report-output` should not be wired into any script until that happens.
+- Rider imports `.dcvr` snapshots natively, so this fallback delivers real local-IDE value (the
+  plan's own framing for why dotCover exists at all) without needing the HTML/Cobertura pipeline.
+- **File the JetBrains issue** (plan's own instruction under "if T3.10 (a) fails"): report
+  "`dotCover cover --xml-report-output` throws `Snapshot container is not initialized` via
+  `ReportBuilder.BuildReports` when `dotnet test` spawns multiple profiled child processes (9
+  observed for one xUnit test project); `--snapshot-output`-only collection is unaffected" against
+  dotCover 2025.3.3 build 20260219.74449 on `windows-x64`, .NET SDK 10.0.400. I have not filed this
+  externally — that is a follow-up action for the owner or T3.11's implementer, since it requires a
+  JetBrains account/tracker access I was not asked to use.
+- Coverlet remains the sole CI/100%-gate authority, unchanged — this finding does not touch that.
