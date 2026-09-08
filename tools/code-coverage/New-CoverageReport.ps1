@@ -16,8 +16,8 @@
 .PARAMETER Engine
     Coverlet (default) or DotCover. DotCover delegates to dotcover/New-CoverageReport.ps1, T3.11's
     snapshot-only fallback (see that script's own .DESCRIPTION and T3.10's findings in
-    docs/ai/plans/tools-review-and-standardisation.md ## Baselines for why it collects a Rider
-    .dcvr snapshot instead of HTML/Cobertura).
+    docs/ai/plans/tools-review-and-standardisation.md ## Baselines for why it collects a
+    Rider .dcvr snapshot instead of HTML/Cobertura).
 
 .PARAMETER Configuration
     Forwarded to the selected engine script. See coverlet/New-CoverageReport.ps1 for its meaning

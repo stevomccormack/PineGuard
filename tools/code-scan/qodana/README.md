@@ -18,7 +18,7 @@ Qodana runs as a Docker container. Results are written to `artifacts/qodana/<sco
 pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-up.ps1
 ```
 
-See [tools/docker/README.md](../docker/README.md) for the compose stacks, the shared network, and the
+See [tools/docker/README.md](../../docker/README.md) for the compose stacks, the shared network, and the
 per-stack up/down scripts.
 
 ### 2. Install (first run only)
@@ -105,7 +105,7 @@ Results go to `artifacts/qodana/<scope>/`.
 
 ## CI/CD
 
-For CI/CD, use the [JetBrains Qodana GitHub Action](https://github.com/JetBrains/qodana-action) — this repo's workflow pins `JetBrains/qodana-action@v2025.3` — with `QODANA_TOKEN` stored as a GitHub repository secret. Do not use these scripts in pipelines.
+For CI/CD, use the [JetBrains Qodana GitHub Action](https://github.com/JetBrains/qodana-action) — this repo's workflow pins `JetBrains/qodana-action@v2026.2` — with `QODANA_TOKEN` stored as a GitHub repository secret. Do not use these scripts in pipelines.
 
 ```bash
 gh secret set QODANA_TOKEN --body "<ci-token>"

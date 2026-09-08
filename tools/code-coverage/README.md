@@ -112,7 +112,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/New-Coverag
 
 Generates fresh coverage output by:
 
-- discovering runnable unit test projects under `tests/**/*.UnitTests.csproj` (or narrowed to a single project for `-Scope Core|MustClauses|GuardClauses|DataAnnotations|FluentValidation|Options|Testing` for speed)
+- discovering runnable unit test projects under `tests/**/*.UnitTests.csproj` (or narrowed to that scope's own default test project, for speed, whenever `-Scope` names a single registry scope rather than `All`)
 - running `dotnet test` with `--collect:"XPlat Code Coverage"`
 - generating a scope-specific runsettings file under `artifacts/code-coverage/coverlet/<scope>/coverlet.runsettings`
 - producing HTML (plus a merged Cobertura.xml) under `artifacts/code-coverage/coverlet/<scope>/report/`

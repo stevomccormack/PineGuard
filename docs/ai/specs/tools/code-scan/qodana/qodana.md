@@ -6,7 +6,7 @@ spec:
   template:
     - ../../../../meta/template-project.md
   parent:
-    - ../spec.md
+    - ../../spec.md
   dependencies:
     - ../../../dependencies.md
 applies_to:

@@ -80,8 +80,8 @@ function Set-DotEnvVariable {
         Creates or updates a single KEY=value line in a .env file.
 
     .DESCRIPTION
-        The write-side counterpart to Import-DotEnv (D-4: secrets are written to a gitignored
-        .env file, never to the User/Machine environment — F-24/F-25).
+        The write-side counterpart to Import-DotEnv (D-4: secrets are written to a
+        gitignored .env file, never to the User/Machine environment — F-24/F-25).
 
         - If -Path does not exist, it is created (parent directories too).
         - If -Name already appears as a key on some line, that line is replaced in place;
