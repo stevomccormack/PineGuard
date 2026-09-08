@@ -17,11 +17,23 @@ The workflow is:
 
 ## Engines
 
-These scripts wrap exactly one collector: coverlet's `XPlat Code Coverage`, which is why every generator and
-analyzer lives under `xplat/`. It collects on both test TFMs (`net8.0`, `net10.0`).
+Coverage collection is engine-pluggable behind a delegating front door (`New-CoverageReport.ps1
+-Engine`):
 
-There is deliberately no `dotcover/` folder here — JetBrains dotCover is driven from its own tooling, not from
-this directory, so its absence is not a missing file.
+| Engine | Folder | Status |
+|---|---|---|
+| Coverlet | `coverlet/` | Authoritative. CI and the 100% gate use it. Collects via `dotnet test --collect:"XPlat Code Coverage"` on both test TFMs (`net8.0`, `net10.0`). |
+| JetBrains dotCover | `dotcover/` | Not yet implemented — see T3.11. `New-CoverageReport.ps1 -Engine DotCover` and `Test-Coverage.ps1 -Engine DotCover` both throw a clear "not yet implemented" error until it lands. |
+
+The engine folder is named after the tool, never after a collector's display string:
+`coverlet.collector` registers the data collector `friendlyName` "XPlat Code Coverage" — that is
+where the old `xplat/` folder name came from, but the tool is Coverlet.
+
+Both engines share one parameter contract (`coverlet/New-CoverageReport.ps1` and, once it exists,
+`dotcover/New-CoverageReport.ps1`) and one output shape:
+`artifacts/code-coverage/<engine>/<scope>/{testresults,report}`. The front door
+(`New-CoverageReport.ps1`) validates `-Engine` and delegates only — it holds no collection logic
+of its own — and `Test-Coverage.ps1` gates on whichever engine's Cobertura output you point it at.
 
 ## Prerequisites
 
@@ -34,7 +46,7 @@ The HTML report uses ReportGenerator via `dotnet-reportgenerator-globaltool` ins
 
 ### Run-CodeCoverage.ps1
 
-Single entry-point for local usage.
+Single entry-point for local usage. Defaults to `-Engine Coverlet`.
 
 ```powershell
 # Generate + analyze Core
@@ -54,120 +66,136 @@ For ad-hoc slicing that no preset covers, generate with the widest scope you nee
 existing Cobertura files with `Custom`:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Custom -IncludeClassNameRegex "^PineGuard\.Testing\." -Top 30 -Enforce100
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope Custom -IncludeClassNameRegex "^PineGuard\.Testing\." -Top 30 -Enforce100
 ```
 
-### xplat/Gen-CoverageReport.ps1
+### New-CoverageReport.ps1 (D-9 front door)
+
+Validates `-Engine Coverlet|DotCover` and delegates to the matching engine folder's own
+`New-CoverageReport.ps1`, forwarding every other parameter unchanged. Calling it directly with
+`-Engine Coverlet` behaves identically to calling `coverlet/New-CoverageReport.ps1` directly;
+`-Engine DotCover` throws a clear "not yet implemented" error (T3.11) instead of a confusing
+file-not-found.
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/New-CoverageReport.ps1" -Engine Coverlet -Scope Core -NoOpen
+```
+
+### coverlet/New-CoverageReport.ps1
 
 Generates fresh coverage output by:
 
 - discovering runnable unit test projects under `tests/**/*.UnitTests.csproj` (or narrowed to a single project for `-Scope Core|MustClauses|GuardClauses|DataAnnotations|FluentValidation|Options|Testing` for speed)
 - running `dotnet test` with `--collect:"XPlat Code Coverage"`
-- generating a scope-specific runsettings file under `artifacts/code-coverage/xplat/coverlet.<Scope>.runsettings`
-- producing HTML under `artifacts/code-coverage/xplat/html`
+- generating a scope-specific runsettings file under `artifacts/code-coverage/coverlet/<scope>/coverlet.runsettings`
+- producing HTML (plus a merged Cobertura.xml) under `artifacts/code-coverage/coverlet/<scope>/report/`
 
 Run from repo root:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1"
 ```
 
 Common variants:
 
 ```powershell
 # Debug (default)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Configuration Debug
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Configuration Debug
 
 # Release
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Configuration Release
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Configuration Release
 
 # Clean the generated output folder first
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Clean
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Clean
 
 # CI / non-interactive (don't try to open the browser)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Configuration Release -Clean -NoOpen
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Configuration Release -Clean -NoOpen
 
 # Scope to MustClauses
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Scope MustClauses
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Scope MustClauses
 
 # Override which test projects run
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Scope Core -ProjectFilter "*.UnitTests.csproj"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Scope Core -ProjectFilter "*.UnitTests.csproj"
 
 # Fast path: collect Cobertura XML only (skip HTML generation)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Scope Core -SkipHtml
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Scope Core -SkipHtml
 
 # Clean + Debug
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Configuration Debug -Clean
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Configuration Debug -Clean
 
 # Run in isolated mode (separate test results per run)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Scope All -Isolated
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Scope All -Isolated
 
 # Filter tests (dotnet test --filter expression)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Scope Core -Filter "FullyQualifiedName~SomeTests"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Scope Core -Filter "FullyQualifiedName~SomeTests"
 
 # Use OpenCover format instead of Cobertura (default)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Scope Core -Format opencover
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Scope Core -Format opencover
 ```
 
 Notes:
 
 - The script skips `*.UnitTests.csproj` projects that contain no `*.cs` files (outside `bin/`/`obj/`) to avoid misleading "No test is available" runs.
 - Coverage collection is occasionally intermittent (empty/invalid Cobertura output). The script detects that and automatically retries once.
+- When not `-NoOpen`, the browser opens `report/index.html` directly — there is no intermediate redirect page.
 
-### xplat/Test-CoverageAnalysis.ps1
+### Test-Coverage.ps1
 
-Reads the newest Cobertura XML file per test project under `artifacts/code-coverage/xplat/testresults/**/coverage.cobertura.xml`, filters coverage to a scope (by default `Core`), and prints:
+Reads the newest Cobertura XML file per test project under `artifacts/code-coverage/coverlet/<scope>/testresults/**/coverage.cobertura.xml`, filters coverage to a scope (by default `Core`), and prints:
 
 - filtered line + branch totals
 - lowest-covered classes list
 
+Engine-agnostic via `-Engine Coverlet|DotCover` (default `Coverlet`); `-Engine DotCover` throws a
+clear "not yet implemented" error until T3.11 lands.
+
 Run from repo root:
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1"
 ```
 
 Common variants:
 
 ```powershell
 # Show more/less rows
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Top 10
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Top 50
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Top 10
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Top 50
 
 # Open the HTML report after printing the summary
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -OpenHtml
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -OpenHtml
 
 # Fail the command if the filtered scope is not 100% line+branch
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Enforce100
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Enforce100
 
 # Threshold gates (accept 0..1 or 0..100)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Core -FailCoverageBelow 95 -FailBranchBelow 95
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope Core -FailCoverageBelow 95 -FailBranchBelow 95
 
 # Preset scoping
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope MustClauses
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope GuardClauses
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Testing
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope All
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope MustClauses
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope GuardClauses
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope Testing
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope All
 
 # Print a formatted table (may truncate depending on console width)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -AsTable
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -AsTable
 ```
 
 Changing the filtered scope (matches Cobertura `class filename` values):
 
 ```powershell
 # Include only PineGuard.Core (default)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" `
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" `
   -IncludeFileRegex '^src[\\/]+PineGuard\.Core[\\/]+'
 
 
 # Exclude build artifacts (default)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" `
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" `
   -ExcludeFileRegex '^src[\\/]+PineGuard\.Core[\\/]obj[\\/]+'
 
 
 # Example: analyze a different project folder under src
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" `
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" `
   -IncludeFileRegex '^src[\\/]+PineGuard\.GuardClauses[\\/]+'
 
 
@@ -176,40 +204,45 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-
 ## Outputs
 
 - HTML report:
-  - `artifacts/code-coverage/xplat/html/index.html`
-  - `artifacts/code-coverage/xplat/html/summary.html`
-- Stable redirect (always points at the latest HTML):
-  - `artifacts/code-coverage/xplat-report.html`
+  - `artifacts/code-coverage/coverlet/<scope>/report/index.html`
+  - `artifacts/code-coverage/coverlet/<scope>/report/summary.html`
+  - `artifacts/code-coverage/coverlet/<scope>/report/Cobertura.xml` (merged, per-scope)
 - Raw test results + Cobertura XML (per test project run):
-  - `artifacts/code-coverage/xplat/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
+  - `artifacts/code-coverage/coverlet/<scope>/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
 
 Notes about the structure:
 
+- `<scope>` is the lower-cased `-Scope` value (e.g. `core`, `mustclauses`, `all`) — each scope gets its own physically separate folder, so cleaning or reading one scope's output can never touch another's (F-19).
 - `<ProjectName>` comes from the test project file name (e.g., `PineGuard.Core.UnitTests`).
 - `<RunId>` is a GUID created by `dotnet test` for the run.
 - The scripts always pick the newest Cobertura file per test project folder.
 
 ## coverlet.runsettings (what gets measured)
 
-Coverage collection is configured by a generated runsettings file that is created per run.
+Coverage collection is configured by a generated runsettings file that is created per run, and by
+CI's own step directly. Both derive from a single static template (F-35) — there used to be two
+independently-typed copies (the file below, and an inline heredoc in `Write-CoverletRunSettings`),
+which could drift; the generator now reads the same file CI uses and patches only `<Include>` (and
+`<Format>`, if a non-default format is requested) onto a copy of it.
 
 The generator writes:
 
-- `artifacts/code-coverage/xplat/coverlet.<Scope>.runsettings`
+- `artifacts/code-coverage/coverlet/<scope>/coverlet.runsettings`
 
-The template lives at:
+The template — and what CI's own coverage step passes to `dotnet test --settings` directly — lives at:
 
 - `tools/code-coverage/coverlet.runsettings`
 
 Key settings:
 
-- `<Include>` controls which assemblies are included in collection. Today it's intentionally set to the main library to avoid collector regressions that only report helper/test assemblies.
+- `<Include>` controls which assemblies are included in collection. The generator overwrites this per scope; the static file's own value (`[PineGuard.*]*`) is what CI uses.
 - `<ExcludeByFile>` excludes build artifacts and generated sources (e.g., `**/obj/**`, `**/bin/**`).
 - `<ExcludeByAttribute>` excludes compiler/source-generated code (including `GeneratedRegex` output) so the report stays stable.
+- `<Format>` is absent from the static file (Coverlet's "XPlat Code Coverage" collector defaults to Cobertura); the generator inserts it only when `-Format opencover` is requested.
 
 ### When you need coverage for other projects
 
-Use the `-Scope` parameter on the xplat generator to change which assemblies are included.
+Use the `-Scope` parameter on the Coverlet generator to change which assemblies are included.
 
 Examples:
 
@@ -244,12 +277,12 @@ Some test projects are intentionally empty placeholders. The generator script sk
 
 ```powershell
 # 1) generate coverage
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Configuration Debug -Scope Core
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Configuration Debug -Scope Core
 
 # 2) analyze and pick targets
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Core -Top 30
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope Core -Top 30
 
 # 3) (after adding tests) repeat
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Configuration Debug -Scope Core
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Core -Top 30
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Configuration Debug -Scope Core
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope Core -Top 30
 ```

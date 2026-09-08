@@ -1,9 +1,18 @@
 <#
 .SYNOPSIS
-    Test Coverage Analysis
+    Test Coverage (the coverage gate/report)
 
 .DESCRIPTION
-    Part of the PineGuard PowerShell toolchain.
+    Reads the newest Cobertura XML per test project, filters it to a scope, prints filtered
+    line/branch totals plus the lowest-covered classes, and optionally fails the run if coverage
+    is below a threshold. This is the coverage gate (F-14: renamed from Test-CoverageAnalysis,
+    which read as "test the coverage analysis" rather than what it actually does), and it lives
+    at the code-coverage domain root rather than inside an engine folder, because it is
+    engine-agnostic (-Engine Coverlet|DotCover): both engines' ReportGenerator output ends up as
+    Cobertura XML that the same Read-CoberturaCoverage parser can read (§3.5).
+
+.PARAMETER Engine
+    Coverlet (default) or DotCover. DotCover is not yet implemented -- see T3.11.
 
 .PARAMETER Top
     See the param block for details.
@@ -47,6 +56,7 @@
 
 [CmdletBinding()]
 param(
+    [ValidateSet('Coverlet', 'DotCover')] [string] $Engine = 'Coverlet',
     [ValidateRange(1, 500)] [int] $Top = 30,
     [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
     [string] $IncludeFileRegex,
@@ -65,9 +75,13 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-. (Join-Path $PSScriptRoot '..\..\.shared\path.ps1')
-. (Join-Path $PSScriptRoot '..\..\.shared\dotnet-projects.ps1')
-. (Join-Path $PSScriptRoot '..\..\.shared\coverage.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\path.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\coverage.ps1')
+
+if ($Engine -eq 'DotCover') {
+    throw "DotCover engine not yet implemented for Test-Coverage.ps1 -- see T3.11 (tools/code-coverage/dotcover/New-CoverageReport.ps1 does not exist yet). Use -Engine Coverlet (the default) for now."
+}
 
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
@@ -86,7 +100,17 @@ if ($Scope -notin @('All', 'Custom')) {
 }
 
 if ([string]::IsNullOrWhiteSpace($ResultsRoot)) {
-    $ResultsRoot = Join-Path $repoRoot 'artifacts/code-coverage/xplat/testresults'
+    # 'Custom' has no single scope folder to read from -- it is the power-user escape hatch that
+    # re-filters whatever has already been collected, so its default is the whole engine root
+    # (every scope's coverlet/<scope>/testresults/ folder), scanned recursively (F-19: every
+    # other scope still gets its own physically separate coverlet/<scope>/ folder; only 'Custom'
+    # deliberately looks across all of them at once).
+    $ResultsRoot = if ($Scope -eq 'Custom') {
+        Get-CoverageEngineRoot -RepoRoot $repoRoot -Engine $Engine
+    }
+    else {
+        Join-Path (Get-CoverageScopeRoot -RepoRoot $repoRoot -Engine $Engine -Scope $Scope) 'testresults'
+    }
 }
 
 $defaultSourcePrefix = 'src\PineGuard.Core'
@@ -117,6 +141,7 @@ switch ($Scope) {
 }
 
 Write-Host "Repo root: $repoRoot" -ForegroundColor DarkGray
+Write-Host "Engine: $Engine" -ForegroundColor DarkGray
 Write-Host "Coverage results: $ResultsRoot" -ForegroundColor DarkGray
 Write-Host "Scope: $Scope" -ForegroundColor DarkGray
 
@@ -201,14 +226,18 @@ else {
 }
 
 if ($OpenHtml) {
-    $redirectPath = Join-Path $repoRoot "artifacts/code-coverage/xplat-$($Scope.ToLower())-report.html"
-    if (Test-Path $redirectPath) {
+    # F-39: open the scope's own report/index.html directly -- there is no redirect page to go
+    # through any more (each scope has always had its own coverlet/<scope>/report/ folder since
+    # this restructuring; the old shared xplat/ layout is what needed the redirect indirection).
+    $reportDirForOpen = Join-Path (Get-CoverageScopeRoot -RepoRoot $repoRoot -Engine $Engine -Scope $Scope) 'report'
+    $reportIndexPath = Join-Path $reportDirForOpen 'index.html'
+    if (Test-Path $reportIndexPath) {
         Write-Host ''
-        Write-Host "Opening HTML report: $redirectPath" -ForegroundColor Cyan
-        Start-Process -FilePath $redirectPath | Out-Null
+        Write-Host "Opening HTML report: $reportIndexPath" -ForegroundColor Cyan
+        Start-Process -FilePath $reportIndexPath | Out-Null
     }
     else {
-        Write-Warning "HTML report not found at: $redirectPath"
+        Write-Warning "HTML report not found at: $reportIndexPath"
     }
 }
 

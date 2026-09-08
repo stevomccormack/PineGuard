@@ -9,12 +9,15 @@
     can resolve the registry's per-scope default source prefixes even if a future caller loads
     this file directly instead of through the previous Import-CodeCoverageUtility.ps1 aggregator
     (removed; each caller now dot-sources the .shared/*.ps1 files it actually needs, F-10).
+    Also dot-sources path.ps1 itself (Get-RepoRoot), which Write-CoverletRunSettings uses to
+    locate the tools/code-coverage/coverlet.runsettings template (F-35, D-2 self-containment).
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 . (Join-Path $PSScriptRoot 'dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot 'path.ps1')
 
 # -------------------------------------------------------------------------------------------------
 # Artifact Paths
@@ -34,18 +37,55 @@ function Get-CodeCoverageArtifactsRoot {
     return (Join-Path $RepoRoot 'artifacts/code-coverage')
 }
 
-function Get-XplatArtifactsRoot {
+function Get-CoverageEngineRoot {
     <#
     .SYNOPSIS
-        Returns the artifacts/code-coverage/xplat path.
+        Returns artifacts/code-coverage/<engine> (lower-cased) for the given repo root.
+
+    .DESCRIPTION
+        Engine-agnostic by design (D-9/§3.5): the same helper serves Coverlet today and dotCover
+        once T3.11 lands, since the two engines' artifact roots differ only by this one path
+        segment (`coverlet` vs `dotcover`).
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [string] $RepoRoot
+        [string] $RepoRoot,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Coverlet', 'DotCover')]
+        [string] $Engine
     )
 
-    return (Join-Path (Get-CodeCoverageArtifactsRoot -RepoRoot $RepoRoot) 'xplat')
+    return (Join-Path (Get-CodeCoverageArtifactsRoot -RepoRoot $RepoRoot) $Engine.ToLower())
+}
+
+function Get-CoverageScopeRoot {
+    <#
+    .SYNOPSIS
+        Returns artifacts/code-coverage/<engine>/<scope> (both lower-cased).
+
+    .DESCRIPTION
+        This is the per-engine, per-scope root that holds both a scope's raw collection output
+        (testresults/ for Coverlet, snapshots/ for dotCover) and its ReportGenerator report/
+        output. Physically separating scopes under their own folder (rather than a shared
+        testresults/ pool differentiated only by project name) is what makes -Clean and
+        analysis naturally per-scope (T1.04) without cross-scope leakage (F-19).
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepoRoot,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Coverlet', 'DotCover')]
+        [string] $Engine,
+
+        [Parameter(Mandatory)]
+        [string] $Scope
+    )
+
+    return (Join-Path (Get-CoverageEngineRoot -RepoRoot $RepoRoot -Engine $Engine) $Scope.ToLower())
 }
 
 # -------------------------------------------------------------------------------------------------
@@ -58,16 +98,16 @@ function Get-ScopeTestProjectPaths {
         Resolves the test-project paths that a coverage scope's own generate run collects.
 
     .DESCRIPTION
-        Mirrors the resolution Gen-CoverageReport.ps1 performs when the caller does not
+        Mirrors the resolution coverlet/New-CoverageReport.ps1 performs when the caller does not
         override -ProjectFilter: a registry scope's own DefaultProjectFilter and
         IncludeEmptyTestProjects, or '*.UnitTests.csproj' with empty projects excluded for
         the 'All' aggregate (which is not a registry entry). This is the single place that
-        answers "which test projects does this scope canonically own", so Gen-CoverageReport
-        (-Clean) and Test-CoverageAnalysis (aggregation) cannot drift apart and re-open the
+        answers "which test projects does this scope canonically own", so New-CoverageReport.ps1
+        (-Clean) and Test-Coverage.ps1 (aggregation) cannot drift apart and re-open the
         stale-data problem (F-19): a run for one scope must never touch or read another
         scope's results.
 
-        An explicit -ProjectFilter override passed to Gen-CoverageReport for a one-off run is
+        An explicit -ProjectFilter override passed to New-CoverageReport.ps1 for a one-off run is
         intentionally NOT reflected here — this answers what the scope owns by default, which
         is what -Clean and analysis need for isolation, not what a particular ad hoc run chose.
     #>
@@ -95,8 +135,8 @@ function Get-ScopeTestResultsPaths {
         Resolves the testresults/<ProjectName> folders that belong to a coverage scope.
 
     .DESCRIPTION
-        Used by Gen-CoverageReport.ps1 (-Clean) to delete only this scope's own previous
-        output, and by Test-CoverageAnalysis.ps1 to aggregate only this scope's own results —
+        Used by New-CoverageReport.ps1 (-Clean) to delete only this scope's own previous
+        output, and by Test-Coverage.ps1 to aggregate only this scope's own results —
         never another scope's leftovers on disk (F-19).
     #>
     [CmdletBinding()]
@@ -127,7 +167,20 @@ function Get-ScopeTestResultsPaths {
 function Write-CoverletRunSettings {
     <#
     .SYNOPSIS
-        Generates a .runsettings XML file for Coverlet code coverage configuration.
+        Generates a .runsettings file for Coverlet code coverage configuration.
+
+    .DESCRIPTION
+        Single source of truth (F-35): reads tools/code-coverage/coverlet.runsettings -- the
+        same static file CI passes to `dotnet test --settings` directly -- as a template, and
+        patches only two elements onto a copy of it: <Include> (the per-scope assembly patterns
+        a local run needs) and <Format> (cobertura/opencover). Every other element --
+        <Exclude>, <ExcludeByFile>, <ExcludeByAttribute> -- is carried over from the template
+        byte-for-byte, so CI and local runs can no longer drift apart on what gets excluded; only
+        this function ever re-typed that XML independently before.
+
+        The template has no <Format> element of its own today (its implicit default is
+        cobertura, matching this function's own default), so when one is needed it is inserted
+        rather than replaced.
     #>
     [CmdletBinding()]
     param(
@@ -141,32 +194,35 @@ function Write-CoverletRunSettings {
         [string] $Format = 'cobertura'
     )
 
+    $repoRoot = Get-RepoRoot
+    $templatePath = Join-Path $repoRoot 'tools/code-coverage/coverlet.runsettings'
+    if (-not (Test-Path -LiteralPath $templatePath)) {
+        throw "Coverlet runsettings template not found at: $templatePath"
+    }
+
+    [xml] $xml = Get-Content -Raw -LiteralPath $templatePath
+
+    $configuration = $xml.SelectSingleNode('//DataCollector[@friendlyName="XPlat Code Coverage"]/Configuration')
+    if ($null -eq $configuration) {
+        throw "Could not find <DataCollector friendlyName=`"XPlat Code Coverage`"><Configuration> in template: $templatePath"
+    }
+
     $includeValue = ($IncludePatterns -join ';')
+    $includeNode = $configuration.SelectSingleNode('Include')
+    if ($null -eq $includeNode) {
+        $includeNode = $xml.CreateElement('Include')
+        $configuration.AppendChild($includeNode) | Out-Null
+    }
+    $includeNode.InnerText = $includeValue
 
-    $xml = @"
-<?xml version="1.0" encoding="utf-8"?>
-<RunSettings>
-    <DataCollectionRunSettings>
-        <DataCollectors>
-            <DataCollector friendlyName="XPlat Code Coverage">
-                <Configuration>
-                    <Format>$Format</Format>
-                    <!-- Explicitly include the assemblies for the requested scope to keep coverage focused and avoid collector regressions -->
-                    <Include>$includeValue</Include>
-                    <!-- Exclude build artifacts and generated sources from coverage to keep reports stable -->
-                    <ExcludeByFile>**/obj/**;**\\obj\\**;**/bin/**;**\\bin\\**</ExcludeByFile>
-                    <!-- Exclude compiler/source-generated code (including GeneratedRegex output) -->
-                    <ExcludeByAttribute>GeneratedCodeAttribute;CompilerGeneratedAttribute;ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
-                    <!-- Exclude RegexGenerator output which skews coverage -->
-                    <Exclude>[*]System.Text.RegularExpressions.Generated.*</Exclude>
-                </Configuration>
-            </DataCollector>
-        </DataCollectors>
-    </DataCollectionRunSettings>
-</RunSettings>
-"@
+    $formatNode = $configuration.SelectSingleNode('Format')
+    if ($null -eq $formatNode) {
+        $formatNode = $xml.CreateElement('Format')
+        $configuration.PrependChild($formatNode) | Out-Null
+    }
+    $formatNode.InnerText = $Format
 
-    Set-Content -LiteralPath $OutputPath -Value $xml -Encoding UTF8
+    $xml.Save($OutputPath)
 }
 
 # -------------------------------------------------------------------------------------------------

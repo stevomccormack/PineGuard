@@ -1,36 +1,52 @@
 <#
 .SYNOPSIS
-    Gen Coverage Report
+    New Coverage Report (Coverlet engine)
 
 .DESCRIPTION
-    Part of the PineGuard PowerShell toolchain.
+    Collects code coverage for the given scope via Coverlet's "XPlat Code Coverage" collector
+    (`dotnet test --collect`), then renders it to HTML with ReportGenerator. This is the Coverlet
+    engine script behind the D-9 front door (tools/code-coverage/New-CoverageReport.ps1
+    -Engine Coverlet); it holds all of Coverlet's own collection logic and none of the
+    engine-selection logic, which lives in the front door.
+
+    Output lands at artifacts/code-coverage/coverlet/<scope>/ (F-11: named after the tool,
+    Coverlet, not the "XPlat Code Coverage" collector friendlyName that the old xplat/ folder
+    was named after):
+      - testresults/<ProjectName>/<RunId>/coverage.<format>.xml -- raw collection output
+      - report/index.html                                       -- ReportGenerator HTML output
 
 .PARAMETER Configuration
-    See the param block for details.
+    Build configuration: Debug (default) or Release.
 
 .PARAMETER Scope
-    See the param block for details.
+    Registry coverage scope (see tools/.shared/dotnet-projects.ps1's Get-PineGuardScope), or
+    'All' to run every *.UnitTests.csproj project with no scope-specific narrowing.
 
 .PARAMETER Clean
-    See the param block for details.
+    Delete this scope's own previous output (testresults/ and report/) before collecting.
 
 .PARAMETER NoOpen
-    See the param block for details.
+    Do not open the generated HTML report in the default browser.
 
 .PARAMETER SkipHtml
-    See the param block for details.
+    Collect coverage XML only; skip the ReportGenerator HTML step entirely.
 
 .PARAMETER ProjectFilter
-    See the param block for details.
+    Glob used to discover test projects. Defaults to the scope's own DefaultProjectFilter when
+    left at the generic '*.UnitTests.csproj' value.
 
 .PARAMETER Filter
-    See the param block for details.
+    `dotnet test --filter` expression, forwarded as-is.
 
 .PARAMETER Isolated
-    See the param block for details.
+    Publish each test project to a temp directory before testing it, to avoid locking source
+    bin/ folders (useful when running coverage alongside an open IDE build).
+
+.PARAMETER Format
+    Coverlet collector output format: cobertura (default) or opencover.
 
 .PARAMETER Framework
-    See the param block for details.
+    TFM passthrough to `dotnet test -f`.
 #>
 
 [CmdletBinding()]
@@ -104,14 +120,16 @@ function Test-CoverageLooksValid {
 }
 
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
-$generatedRoot = Get-XplatArtifactsRoot -RepoRoot $repoRoot
-$resultsRoot = Join-Path $generatedRoot 'testresults'
+$scopeRoot = Get-CoverageScopeRoot -RepoRoot $repoRoot -Engine 'Coverlet' -Scope $Scope
+$resultsRoot = Join-Path $scopeRoot 'testresults'
 
 if ($Clean) {
-    # Delete only this scope's own previous output: its testresults/<project> folder(s) and
-    # its html-<scope> report. Every other scope's testresults/** and html-<otherscope> must
-    # survive untouched — wiping $generatedRoot wholesale here used to destroy every scope's
-    # already-collected results at once (F-19, the "stale data problem").
+    # Delete only this scope's own previous output: its testresults/<project> folder(s) and its
+    # report/ folder. Every other scope's coverlet/<otherscope>/ must survive untouched -- wiping
+    # the shared xplat/ root wholesale used to destroy every scope's already-collected results at
+    # once (F-19, the "stale data problem"); physically separating scopes under their own
+    # coverlet/<scope>/ folder (rather than a testresults/ pool shared across scopes) is what
+    # makes that isolation hold today.
     $scopeResultsPaths = @(Get-ScopeTestResultsPaths -RepoRoot $repoRoot -ResultsRoot $resultsRoot -Scope $Scope)
     foreach ($scopeResultsPath in $scopeResultsPaths) {
         if (Test-Path -LiteralPath $scopeResultsPath) {
@@ -119,16 +137,13 @@ if ($Clean) {
         }
     }
 
-    $scopeHtmlDir = Join-Path $generatedRoot "html-$($Scope.ToLower())"
-    if (Test-Path -LiteralPath $scopeHtmlDir) {
-        Remove-Item -LiteralPath $scopeHtmlDir -Recurse -Force
+    $scopeReportDir = Join-Path $scopeRoot 'report'
+    if (Test-Path -LiteralPath $scopeReportDir) {
+        Remove-Item -LiteralPath $scopeReportDir -Recurse -Force
     }
-
-    $redirectPath = Join-Path (Get-CodeCoverageArtifactsRoot -RepoRoot $repoRoot) "xplat-$($Scope.ToLower())-report.html"
-    Remove-Item -LiteralPath $redirectPath -Force -ErrorAction SilentlyContinue
 }
 
-New-Item -ItemType Directory -Path $generatedRoot -Force | Out-Null
+New-Item -ItemType Directory -Path $scopeRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $resultsRoot -Force | Out-Null
 
 $generateScopeEntry = if ($Scope -in @(Get-PineGuardScope -All | ForEach-Object Name)) {
@@ -153,7 +168,7 @@ if ($ProjectFilter -eq '*.UnitTests.csproj') {
     $ProjectFilter = if ($null -ne $generateScopeEntry) { $generateScopeEntry.DefaultProjectFilter } else { '*.UnitTests.csproj' }
 }
 
-$runSettingsPath = Join-Path $generatedRoot ("coverlet.$Scope.runsettings")
+$runSettingsPath = Join-Path $scopeRoot 'coverlet.runsettings'
 Write-CoverletRunSettings -OutputPath $runSettingsPath -IncludePatterns $includePatterns -Format $Format
 
 $includeEmptyTestProjects = if ($null -ne $generateScopeEntry) { [bool]$generateScopeEntry.IncludeEmptyTestProjects } else { $false }
@@ -192,7 +207,7 @@ try {
         if ($Isolated) {
             # Publish to temp directory to avoid locking source bin folders
             $tempDirName = "iso-test-" + [Guid]::NewGuid().ToString('N')
-            $tempDir = Join-Path $generatedRoot $tempDirName
+            $tempDir = Join-Path $scopeRoot $tempDirName
             New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
             $cleanupTempDir = $tempDir
 
@@ -276,7 +291,7 @@ if ($SkipHtml) {
     return
 }
 
-$reportDir = Join-Path $generatedRoot "html-$($Scope.ToLower())"
+$reportDir = Join-Path $scopeRoot 'report'
 New-Item -ItemType Directory -Path $reportDir -Force | Out-Null
 
 # reportgenerator accepts semicolon-separated patterns/paths
@@ -295,7 +310,10 @@ try {
     }
 
     Write-Host "Generating HTML coverage report..." -ForegroundColor Cyan
-    & dotnet reportgenerator "-reports:$reportsArg" "-targetdir:$reportDir" "-reporttypes:Html;HtmlSummary" "-filefilters:-obj\\*;-*\\obj\\*;-obj/*;-*/obj/*;-bin\\*;-*\\bin\\*;-bin/*;-*/bin/*" "-verbosity:Error"
+    # Also emits a merged Cobertura.xml alongside the HTML (§3.5): one canonical per-scope
+    # cobertura file, in the same report/ output shape the dotCover engine will use (T3.11), even
+    # though Test-Coverage.ps1 reads the raw per-project testresults/ files directly today.
+    & dotnet reportgenerator "-reports:$reportsArg" "-targetdir:$reportDir" "-reporttypes:Html;HtmlSummary;Cobertura" "-filefilters:-obj\\*;-*\\obj\\*;-obj/*;-*/obj/*;-bin\\*;-*\\bin\\*;-bin/*;-*/bin/*" "-verbosity:Error"
     if ($LASTEXITCODE -ne 0) {
         throw "reportgenerator failed with exit code: $LASTEXITCODE"
     }
@@ -311,37 +329,17 @@ Write-Host "Coverage report generated:" -ForegroundColor Green
 Write-Host "  $reportDir" -ForegroundColor Green
 Write-Host "Open: $indexPath" -ForegroundColor Green
 
-# A small, stable-named entry point at the code-coverage artifacts root, so callers (and
-# Test-CoverageAnalysis.ps1 -OpenHtml) can open "the Core report" without knowing the per-scope
-# html-<scope>/ folder name. F-39: this used to be generated by the now-deleted .shared/html.ps1,
-# whose JS auto-redirect never worked from file:// anyway (the meta refresh below is what actually
-# does the redirecting, on every platform, with no dead code alongside it).
-$redirectPath = Join-Path (Get-CodeCoverageArtifactsRoot -RepoRoot $repoRoot) "xplat-$($Scope.ToLower())-report.html"
-$redirectTarget = "xplat/html-$($Scope.ToLower())/index.html"
-$redirectTitleEncoded = [System.Net.WebUtility]::HtmlEncode("$Scope coverage report")
-$redirectTargetEncoded = [System.Net.WebUtility]::HtmlEncode($redirectTarget)
-$redirectHtml = @"
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta http-equiv="refresh" content="0; url=$redirectTargetEncoded" />
-<title>$redirectTitleEncoded</title>
-</head>
-<body>
-<p>Redirecting to: <a href="$redirectTargetEncoded">$redirectTargetEncoded</a></p>
-</body>
-</html>
-"@
-Set-Content -LiteralPath $redirectPath -Value $redirectHtml -Encoding UTF8
-
 if (-not $NoOpen) {
     try {
         Write-Host "Opening coverage report in browser..." -ForegroundColor Cyan
-        # Open the redirect file so it's always the canonical entry point.
-        Start-Process -FilePath $redirectPath | Out-Null
+        # F-39: open index.html directly. The redirect-page mechanism this used to go through
+        # (a meta-refresh page one level up in artifacts/code-coverage/) existed only because
+        # every scope's report shared one xplat/ folder with no stable per-scope entry point;
+        # now that each scope has its own coverlet/<scope>/report/ folder, index.html itself is
+        # already the stable entry point and the redirect has nothing left to do.
+        Start-Process -FilePath $indexPath | Out-Null
     }
     catch {
-        Write-Warning "Failed to auto-open coverage report. Open manually: $redirectPath"
+        Write-Warning "Failed to auto-open coverage report. Open manually: $indexPath"
     }
 }

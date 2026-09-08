@@ -24,7 +24,7 @@ function Get-PineGuardScope {
         repeated as switch/hashtable blocks across tools/code-coverage, tools/code-formatter,
         tools/code-diagnostics and tools/code-inspection scripts.
 
-        'All' (the aggregate pseudo-scope) and 'Custom' (Test-CoverageAnalysis.ps1 only) are
+        'All' (the aggregate pseudo-scope) and 'Custom' (Test-Coverage.ps1 only) are
         NOT registry entries — callers that need the aggregate keep handling those cases
         specially, using -All to enumerate the fourteen real entries in a stable order
         (Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options,

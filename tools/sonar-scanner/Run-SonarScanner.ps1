@@ -76,8 +76,8 @@ else {
     Get-RepoRoot -StartDirectory $PSScriptRoot
 }
 $slnPath          = Join-Path $repoRootResolved 'PineGuard.slnx'
-$coveragePath     = 'artifacts/code-coverage/xplat/testresults/**/coverage.opencover.xml'
-$coverageScript   = Join-Path $repoRootResolved 'tools/code-coverage/xplat/Gen-CoverageReport.ps1'
+$coveragePath     = 'artifacts/code-coverage/coverlet/all/testresults/**/coverage.opencover.xml'
+$coverageScript   = Join-Path $repoRootResolved 'tools/code-coverage/coverlet/New-CoverageReport.ps1'
 
 # --- Version (from latest git tag, or fallback) ---
 
