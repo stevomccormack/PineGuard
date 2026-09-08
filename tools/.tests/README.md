@@ -21,7 +21,7 @@ than one major version is installed, pin the one you want with
 
 | File | Covers |
 |---|---|
-| `Registry-Parity.Tests.ps1` | `tools/.shared/dotnet-projects.ps1`'s scope registry against `src/*.csproj`, `tests/*.csproj`, `PineGuard.slnx`, the packable list in `tools/release/Run-NugetUnlist.ps1`, Qodana config presence, and per-project `AGENTS.md` (plan §3.4) |
+| `Registry-Parity.Tests.ps1` | `tools/.shared/dotnet-projects.ps1`'s scope registry against `src/*.csproj`, `tests/*.csproj`, `PineGuard.slnx`, `Get-PineGuardPackableProjects`'s registry-derived packable list (used by `tools/github/Run-Release.ps1` and `tools/nuget/Unpublish-NugetPrerelease.ps1`), Qodana config presence, and per-project `AGENTS.md` (plan §3.4) |
 | `Dotenv-Parser.Tests.ps1` | `Import-DotEnv` in `tools/.shared/dotenv.ps1`, against `fixtures/sample.env` |
 | `Cobertura-Parser.Tests.ps1` | `Read-CoberturaCoverage`, `ConvertTo-Rate`, `ConvertFrom-ConditionCoverage` in `tools/.shared/coverage.ps1`, against `fixtures/sample-coverage.cobertura.xml` |
 | `RepoRoot.Tests.ps1` | `Get-RepoRoot` in `tools/.shared/path.ps1`, from several starting directories |

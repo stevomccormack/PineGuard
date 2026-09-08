@@ -19,8 +19,8 @@
     stable "Latest" release.
 
     Sub-scripts used (callable standalone):
-      tools/release/Run-GithubRuleset.ps1   (BypassPR phase)
-      tools/release/Run-NugetUnlist.ps1     (Unlist phase)
+      tools/github/Set-GithubRuleset.ps1          (BypassPR phase)
+      tools/nuget/Unpublish-NugetPrerelease.ps1   (Unlist phase)
 
 .PARAMETER Version
     Semver, with or without leading "v". Examples: 0.1.0-alpha.6, v1.0.0.
@@ -31,7 +31,7 @@
     depends on commits that haven't landed on origin/main yet.
 
 .PARAMETER Unlist
-    After the publish workflow succeeds, run Run-NugetUnlist.ps1 to unlist
+    After the publish workflow succeeds, run Unpublish-NugetPrerelease.ps1 to unlist
     older prereleases on nuget.org. The latest prerelease is kept listed.
     Ignored when -Draft is set.
 
@@ -46,25 +46,27 @@
     After the release is cut, tail the triggered publish.yml run in the
     terminal until it completes. Required for -Unlist to know when to run.
 
-.PARAMETER DryRun
+.PARAMETER WhatIf
     Run through pre-flight and print the plan, but skip the ruleset cycle,
     skip `gh release create`, and skip the unlist. Use this to validate the
-    release arguments before committing to a real cut.
+    release arguments before committing to a real cut. -DryRun is a supported
+    alias of the same switch (D-1d in docs/ai/plans/tools-review-and-standardisation.md):
+    both spellings resolve to one implementation.
 
 .EXAMPLE
-    pwsh -File ./tools/release/Run-GithubRelease.ps1 -Version 0.1.0-alpha.6 -Watch
+    pwsh -File ./tools/github/Run-Release.ps1 -Version 0.1.0-alpha.6 -Watch
 
 .EXAMPLE
-    pwsh -File ./tools/release/Run-GithubRelease.ps1 -Version 0.1.0-alpha.6 -BypassPR -Unlist -Watch -DryRun
+    pwsh -File ./tools/github/Run-Release.ps1 -Version 0.1.0-alpha.6 -BypassPR -Unlist -Watch -WhatIf
     Prints the full plan without performing any action.
 
 .EXAMPLE
-    pwsh -File ./tools/release/Run-GithubRelease.ps1 -Version 0.1.0-alpha.6 -BypassPR -Unlist -Watch
+    pwsh -File ./tools/github/Run-Release.ps1 -Version 0.1.0-alpha.6 -BypassPR -Unlist -Watch
     Full workflow: push pending commits through protected main, cut the
     release, watch the publish run, then unlist older alphas.
 
 .EXAMPLE
-    pwsh -File ./tools/release/Run-GithubRelease.ps1 -Version v1.0.0
+    pwsh -File ./tools/github/Run-Release.ps1 -Version v1.0.0
 #>
 
 [CmdletBinding()]
@@ -77,13 +79,19 @@ param(
     [switch] $Draft,
     [switch] $Force,
     [switch] $Watch,
-    [switch] $DryRun
+
+    [Alias('DryRun')]
+    [switch] $WhatIf
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+. (Join-Path $PSScriptRoot '../.shared/path.ps1')
+. (Join-Path $PSScriptRoot '../.shared/dotnet-projects.ps1')
 . (Join-Path $PSScriptRoot '../.shared/console.ps1')
+
+$repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
 function Fail($msg) { Write-Fail $msg; exit 1 }
 
@@ -107,7 +115,7 @@ Write-Detail "BypassPR:   $($BypassPR.IsPresent)"
 Write-Detail "Draft:      $($Draft.IsPresent)"
 Write-Detail "Watch:      $($Watch.IsPresent)"
 Write-Detail "Unlist:     $($Unlist.IsPresent)"
-Write-Detail "DryRun:     $($DryRun.IsPresent)"
+Write-Detail "WhatIf:     $($WhatIf.IsPresent)"
 
 # -------------------------------------------------------------------------------------------------
 # Pre-flight
@@ -156,9 +164,9 @@ else {
 # Optional BypassPR: ruleset cycle + push
 
 if ($BypassPR) {
-    $rulesetScript = Join-Path $PSScriptRoot 'Run-GithubRuleset.ps1'
+    $rulesetScript = Join-Path $PSScriptRoot 'Set-GithubRuleset.ps1'
     if (-not (Test-Path $rulesetScript)) {
-        Fail "Run-GithubRuleset.ps1 not found at $rulesetScript"
+        Fail "Set-GithubRuleset.ps1 not found at $rulesetScript"
     }
 
     $aheadCountRaw = git rev-list --count '@{upstream}..HEAD' 2>$null
@@ -167,8 +175,8 @@ if ($BypassPR) {
     if ($aheadCount -eq 0) {
         Write-Detail "No local commits ahead of upstream — skipping BypassPR cycle."
     }
-    elseif ($DryRun) {
-        Write-Warn "DryRun: would disable main-branch ruleset, push $aheadCount commit(s), re-enable."
+    elseif ($WhatIf) {
+        Write-Warn "WhatIf: would disable main-branch ruleset, push $aheadCount commit(s), re-enable."
     }
     else {
         Write-Step "BypassPR: disabling main-branch ruleset, pushing $aheadCount commit(s), re-enabling"
@@ -199,10 +207,10 @@ $releaseArgs = @(
 if ($isPrerelease) { $releaseArgs += '--prerelease'; $releaseArgs += '--latest=false' }
 if ($Draft) { $releaseArgs += '--draft' }
 
-if ($DryRun) {
-    Write-Step "DryRun: would create release $tag"
+if ($WhatIf) {
+    Write-Step "WhatIf: would create release $tag"
     Write-Detail ("gh " + ($releaseArgs -join ' '))
-    Write-Step "DryRun complete — no release created, no workflow triggered, no unlist performed."
+    Write-Step "WhatIf complete — no release created, no workflow triggered, no unlist performed."
     exit 0
 }
 
@@ -260,9 +268,9 @@ if ($Unlist) {
     else {
         Write-Step "Waiting 30s for nuget.org flat-container indexing before unlist"
         Start-Sleep -Seconds 30
-        $unlistScript = Join-Path $PSScriptRoot 'Run-NugetUnlist.ps1'
+        $unlistScript = Join-Path $repoRoot 'tools/nuget/Unpublish-NugetPrerelease.ps1'
         if (-not (Test-Path $unlistScript)) {
-            Fail "Run-NugetUnlist.ps1 not found at $unlistScript"
+            Fail "Unpublish-NugetPrerelease.ps1 not found at $unlistScript"
         }
         & pwsh -NoProfile -ExecutionPolicy Bypass -File $unlistScript -Force
         if ($LASTEXITCODE -ne 0) { Write-Warn "Unlist reported failures — inspect output above" }
@@ -273,6 +281,6 @@ if ($Unlist) {
 
 Write-Step "Done"
 Write-Detail "Packages will appear on nuget.org within a few minutes of workflow completion:"
-foreach ($p in 'Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Extensions.Options', 'Extensions.DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'Testing', 'MediatR', 'Analyzers') {
-    Write-Detail "  https://www.nuget.org/packages/PineGuard.$p/$semver"
+foreach ($pkg in (Get-PineGuardPackableProjects -RepoRoot $repoRoot)) {
+    Write-Detail "  https://www.nuget.org/packages/$pkg/$semver"
 }

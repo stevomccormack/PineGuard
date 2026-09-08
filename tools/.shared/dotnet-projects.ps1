@@ -3,8 +3,8 @@
     Shared .NET project discovery helpers for the PineGuard PowerShell toolchain.
 
 .DESCRIPTION
-    Dot-source this file to import Test-ProjectHasSources, Get-TestProjects and
-    Get-PineGuardScope into the calling script's scope.
+    Dot-source this file to import Test-ProjectHasSources, Get-TestProjects,
+    Get-PineGuardScope and Get-PineGuardPackableProjects into the calling script's scope.
 #>
 
 Set-StrictMode -Version Latest
@@ -266,6 +266,70 @@ function Get-PineGuardScope {
     }
 
     return $registry[$Name]
+}
+
+function Get-PineGuardPackableProjects {
+    <#
+    .SYNOPSIS
+        Returns the nuget.org package name for every registry SourceCsproj that is packable.
+
+    .DESCRIPTION
+        Replaces the hand-maintained package-name lists that used to be duplicated, independently
+        typed, and drift-prone in tools/release/Run-GithubRelease.ps1 (a URL-printing loop) and
+        tools/release/Run-NugetUnlist.ps1 (a -Package default array) — T1.06 patched both by hand
+        to add MediatR and Analyzers; this is the F-21 root-cause fix so no future scope addition
+        needs a second manual edit here (T3.08).
+
+        Walks every scope from Get-PineGuardScope -All and every csproj in that scope's
+        SourceCsprojs, reading each csproj file and checking for a literal
+        '<IsPackable>false</IsPackable>' element (case-insensitive, whitespace-tolerant between the
+        tag name and its value). A csproj without that element defaults to IsPackable=true (the
+        SDK-style class-library default) and is included; one that sets it to false is excluded —
+        today that is only src/PineGuard.Analyzers.CodeFixes/PineGuard.Analyzers.CodeFixes.csproj,
+        which ships bundled inside the PineGuard.Analyzers NuGet package rather than as its own
+        package. Nothing here hard-codes that exception: the flag is read from disk on every call,
+        so a future project marked non-packable is excluded automatically.
+
+        The package name is the csproj's own filename without extension (e.g.
+        'PineGuard.Core.csproj' -> 'PineGuard.Core'), which is the naming convention every
+        PineGuard package follows — including PineGuard.Testing, whose SourceDir lives under
+        tests/ rather than src/ but is packable like every other scope.
+
+    .PARAMETER RepoRoot
+        Repository root used to resolve registry-relative SourceCsproj paths. Callers should pass
+        Get-RepoRoot's result (tools/.shared/path.ps1).
+
+    .EXAMPLE
+        Get-PineGuardPackableProjects -RepoRoot (Get-RepoRoot -StartDirectory $PSScriptRoot)
+
+        Returns 14 package names today: the 13 packable projects under src/ (every scope except
+        PineGuard.Analyzers.CodeFixes, which is excluded) plus PineGuard.Testing under tests/.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepoRoot
+    )
+
+    $names = New-Object System.Collections.Generic.List[string]
+
+    foreach ($scope in (Get-PineGuardScope -All)) {
+        foreach ($csproj in $scope.SourceCsprojs) {
+            $fullPath = Join-Path $RepoRoot $csproj
+            if (-not (Test-Path -LiteralPath $fullPath)) {
+                throw "Registry SourceCsprojs entry '$csproj' for scope '$($scope.Name)' does not exist at '$fullPath'."
+            }
+
+            $content = Get-Content -LiteralPath $fullPath -Raw
+            if ($content -match '(?i)<IsPackable>\s*false\s*</IsPackable>') {
+                continue
+            }
+
+            $names.Add([System.IO.Path]::GetFileNameWithoutExtension($csproj))
+        }
+    }
+
+    return @($names)
 }
 
 function Test-ProjectHasSources {

@@ -16,14 +16,19 @@
     versions (no -alpha/-beta/-rc suffix) are never touched.
 
 .PARAMETER Package
-    Limit to specific package IDs. Defaults to the six PineGuard packages.
+    Limit to specific package IDs. Defaults to the registry-derived list of every packable
+    PineGuard project (tools/.shared/dotnet-projects.ps1's Get-PineGuardPackableProjects, F-21) —
+    currently 14 packages: every scope under src/ except PineGuard.Analyzers.CodeFixes (bundled
+    inside the PineGuard.Analyzers package, not shipped on its own), plus PineGuard.Testing.
 
 .PARAMETER All
     Unlist every prerelease, including the latest. Default keeps the
     latest prerelease listed.
 
-.PARAMETER DryRun
-    Print the unlist plan without making any API calls.
+.PARAMETER WhatIf
+    Print the unlist plan without making any API calls. -DryRun is a supported alias of the same
+    switch (D-1d in docs/ai/plans/tools-review-and-standardisation.md): both spellings resolve to
+    one implementation.
 
 .PARAMETER Force
     Skip the confirmation prompt.
@@ -33,32 +38,18 @@
     .etc/powershell/.env under the repo root.
 
 .EXAMPLE
-    pwsh -File ./tools/release/Run-NugetUnlist.ps1 -DryRun
+    pwsh -File ./tools/nuget/Unpublish-NugetPrerelease.ps1 -WhatIf
 
 .EXAMPLE
-    pwsh -File ./tools/release/Run-NugetUnlist.ps1 -All -Force
+    pwsh -File ./tools/nuget/Unpublish-NugetPrerelease.ps1 -All -Force
 #>
 
 [CmdletBinding()]
 param(
-    [string[]] $Package = @(
-        'PineGuard.Core',
-        'PineGuard.MustClauses',
-        'PineGuard.GuardClauses',
-        'PineGuard.FluentValidation',
-        'PineGuard.DataAnnotations',
-        'PineGuard.Extensions.Options',
-        'PineGuard.Extensions.DependencyInjection',
-        'PineGuard.AspNetCore',
-        'PineGuard.ErrorOr',
-        'PineGuard.FluentResults',
-        'PineGuard.OneOf',
-        'PineGuard.Testing',
-        'PineGuard.MediatR',
-        'PineGuard.Analyzers'
-    ),
+    [string[]] $Package,
     [switch] $All,
-    [switch] $DryRun,
+    [Alias('DryRun')]
+    [switch] $WhatIf,
     [switch] $Force,
     [string] $EnvFile
 )
@@ -67,12 +58,21 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 . (Join-Path $PSScriptRoot '..\.shared\path.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
 . (Join-Path $PSScriptRoot '..\.shared\dotenv.ps1')
 . (Join-Path $PSScriptRoot '..\.shared\console.ps1')
 
 function Fail($m) { Write-Fail $m; exit 1 }
 
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
+
+if (-not $PSBoundParameters.ContainsKey('Package')) {
+    # Registry-derived default (F-21): computed here, not as the param block's default value,
+    # because default-value expressions run before this script's own dot-sourcing above, so
+    # Get-PineGuardPackableProjects would not exist yet if called there.
+    $Package = Get-PineGuardPackableProjects -RepoRoot $repoRoot
+}
+
 if ([string]::IsNullOrWhiteSpace($EnvFile)) {
     $EnvFile = Join-Path $repoRoot '.etc/powershell/.env'
 }
@@ -141,8 +141,8 @@ Write-Host ""
 $distinctCount = ($actions | Select-Object -ExpandProperty Package -Unique).Count
 Write-Detail "Total: $($actions.Count) operations across $distinctCount packages"
 
-if ($DryRun) {
-    Write-Step "Dry run — no API calls made"
+if ($WhatIf) {
+    Write-Step "WhatIf — no API calls made"
     exit 0
 }
 

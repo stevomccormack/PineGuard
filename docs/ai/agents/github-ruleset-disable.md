@@ -25,7 +25,7 @@ Temporarily disables enforcement on the `main-branch` ruleset (or a named altern
 ## Pre-flight
 
 - Confirm with the user why protection is being lifted (typically to push an ad-hoc commit or land a release).
-- Remind them to re-enable promptly afterwards — `Run-GithubRuleset.ps1 Enable` or `/github-ruleset-enable`.
+- Remind them to re-enable promptly afterwards — `Set-GithubRuleset.ps1 Enable` or `/github-ruleset-enable`.
 
 ## Steps
 
@@ -33,7 +33,7 @@ Temporarily disables enforcement on the `main-branch` ruleset (or a named altern
 
    ```powershell
    pwsh -NoProfile -ExecutionPolicy Bypass `
-       -File ./tools/release/Run-GithubRuleset.ps1 Disable [<Name>]
+       -File ./tools/github/Set-GithubRuleset.ps1 Disable [<Name>]
    ```
 
 2. **Report**
@@ -43,5 +43,5 @@ Temporarily disables enforcement on the `main-branch` ruleset (or a named altern
 ## Related
 
 - Paired agent: [`github-ruleset-enable.md`](github-ruleset-enable.md)
-- Script: [`tools/release/Run-GithubRuleset.ps1`](../../../tools/release/Run-GithubRuleset.ps1)
+- Script: [`tools/github/Set-GithubRuleset.ps1`](../../../tools/github/Set-GithubRuleset.ps1)
 - Used by: [`github-release-publish.md`](github-release-publish.md) when `-BypassPR` is requested.

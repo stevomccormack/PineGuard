@@ -23,13 +23,23 @@
       - 'main-branch' → "main: PR required, no force push, no delete"
       - 'v-tags'      → "v* tags: maintainers only"
 
+.PARAMETER WhatIf
+    Look up the ruleset and print what would change, but skip the backup, the DELETE, and the
+    POST. -DryRun is a supported alias of the same switch (D-1d in
+    docs/ai/plans/tools-review-and-standardisation.md): both spellings resolve to one
+    implementation.
+
 .EXAMPLE
-    pwsh -File ./tools/release/Run-GithubRuleset.ps1 Disable
+    pwsh -File ./tools/github/Set-GithubRuleset.ps1 Disable
     Disables the main-branch ruleset for a direct push cycle.
 
 .EXAMPLE
-    pwsh -File ./tools/release/Run-GithubRuleset.ps1 Enable
+    pwsh -File ./tools/github/Set-GithubRuleset.ps1 Enable
     Re-enables the main-branch ruleset after the push.
+
+.EXAMPLE
+    pwsh -File ./tools/github/Set-GithubRuleset.ps1 Disable -WhatIf
+    Previews the toggle without deleting or recreating the ruleset.
 #>
 
 [CmdletBinding()]
@@ -39,12 +49,16 @@ param(
     [string] $Action,
 
     [Parameter(Position = 1)]
-    [string] $Name = 'main-branch'
+    [string] $Name = 'main-branch',
+
+    [Alias('DryRun')]
+    [switch] $WhatIf
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+. (Join-Path $PSScriptRoot '../.shared/path.ps1')
 . (Join-Path $PSScriptRoot '../.shared/console.ps1')
 
 function Fail($m) { Write-Fail $m; exit 1 }
@@ -108,9 +122,15 @@ $body = [ordered]@{
 }
 $payload = $body | ConvertTo-Json -Depth 20 -Compress
 
+if ($WhatIf) {
+    Write-Warn "WhatIf: would back up ruleset #$($full.id), DELETE it, then POST it back with enforcement '$targetEnforcement'."
+    exit 0
+}
+
 # 4. Safety: persist the current config to artifacts/ before deleting.
 #    If POST fails, the operator has the JSON to recreate manually.
-$artifactsDir = Join-Path (Split-Path -Parent $PSScriptRoot) '../artifacts/github-rulesets'
+$repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
+$artifactsDir = Join-Path $repoRoot 'artifacts/github-rulesets'
 $null = New-Item -ItemType Directory -Path $artifactsDir -Force
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $backupPath = Join-Path $artifactsDir "${Name}-${stamp}.json"

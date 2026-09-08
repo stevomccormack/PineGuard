@@ -6,11 +6,19 @@
 .DESCRIPTION
     tools/.shared/dotnet-projects.ps1's Get-PineGuardScope registry is meant to be the single
     place a PineGuard scope is spelled out (plan §3.4). Every other list that enumerates scopes
-    by hand — PineGuard.slnx, the Qodana config folder, tools/release/Run-NugetUnlist.ps1's
-    packable -Package default, and each project's own AGENTS.md — must agree with it. This test
-    walks every registry entry and checks each of those other sources for a match, so a future
-    drift (a new scope added to the registry but forgotten in one of the hand-maintained lists)
-    shows up here instead of silently shipping.
+    by hand — PineGuard.slnx, the Qodana config folder, and each project's own AGENTS.md — must
+    agree with it. This test walks every registry entry and checks each of those other sources
+    for a match, so a future drift (a new scope added to the registry but forgotten in one of the
+    hand-maintained lists) shows up here instead of silently shipping.
+
+    The packable-project list used to be one more hand-maintained list here (T3.08 packable
+    context, before the fix): tools/release/Run-NugetUnlist.ps1's -Package default array. F-21's
+    root cause is now fixed — tools/.shared/dotnet-projects.ps1's own Get-PineGuardPackableProjects
+    computes that list from the registry plus each csproj's IsPackable flag, and
+    tools/nuget/Unpublish-NugetPrerelease.ps1 (renamed from Run-NugetUnlist.ps1, T3.08) calls it
+    directly — there is no separate hand-maintained list left to parity-check here. The 'Packable
+    list' Context below now asserts against Get-PineGuardPackableProjects's own output instead of
+    regex-scraping a literal array out of the script file.
 
     T1.05 (commit history on this branch) already added the previously-missing MediatR Qodana
     config and PineGuard.MediatR.Qodana.slnx, so the Qodana-config-presence check is expected to
@@ -48,17 +56,10 @@ Describe 'Registry parity (tools/.shared/dotnet-projects.ps1 vs. disk and other 
 
     BeforeAll {
         . (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
+        . (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
         $script:RepoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
         $script:SlnxContent = Get-Content -Raw (Join-Path $script:RepoRoot 'PineGuard.slnx')
-
-        $nugetUnlistPath = Join-Path $script:RepoRoot 'tools' 'release' 'Run-NugetUnlist.ps1'
-        $nugetUnlistContent = Get-Content -Raw $nugetUnlistPath
-        $script:PackableList = @()
-        if ($nugetUnlistContent -match '(?s)\$Package\s*=\s*@\((.*?)\)') {
-            $script:PackableList = @(
-                [regex]::Matches($Matches[1], "'([^']+)'") | ForEach-Object { $_.Groups[1].Value }
-            )
-        }
+        $script:PackableList = @(Get-PineGuardPackableProjects -RepoRoot $script:RepoRoot)
     }
 
     Context 'Every registry SourceCsproj exists on disk' {
@@ -103,18 +104,26 @@ Describe 'Registry parity (tools/.shared/dotnet-projects.ps1 vs. disk and other 
         }
     }
 
-    Context 'Packable list (tools/release/Run-NugetUnlist.ps1 -Package) matches the registry' {
-        It 'the packable-project default list is non-empty (sanity check on the extraction regex)' {
-            $script:PackableList.Count | Should -BeGreaterThan 0 -Because 'Run-NugetUnlist.ps1 should declare a non-empty default -Package array'
+    Context 'Packable list (Get-PineGuardPackableProjects) matches the registry' {
+        It 'the packable-project list is non-empty (sanity check on the helper itself)' {
+            $script:PackableList.Count | Should -BeGreaterThan 0 -Because 'Get-PineGuardPackableProjects should return at least one packable project'
         }
 
-        It '<Name>''s package name appears in Run-NugetUnlist.ps1''s -Package default' -ForEach (Get-ScopeTestCases) {
+        It '<Name>''s package name appears in Get-PineGuardPackableProjects''s output, unless its csproj is IsPackable=false' -ForEach (Get-ScopeTestCases) {
             # The package name is the leaf of the registry's own SourceDir (e.g.
             # 'src\PineGuard.Extensions.Options' -> 'PineGuard.Extensions.Options'), which is
-            # exactly the convention every packable PineGuard project follows.
+            # exactly the convention every packable PineGuard project follows. This only checks
+            # the scope's SourceDir-leaf project (e.g. 'Analyzers' -> 'PineGuard.Analyzers'), not
+            # every entry in a multi-csproj scope's SourceCsprojs — PineGuard.Analyzers.CodeFixes
+            # is deliberately IsPackable=false and is covered by its own test below, not this one.
             $packageName = Split-Path $SourceDir -Leaf
             $script:PackableList |
-                Should -Contain $packageName -Because "scope '$Name' (package '$packageName') should be in Run-NugetUnlist.ps1's default -Package list (F-21)"
+                Should -Contain $packageName -Because "scope '$Name' (package '$packageName') should be in Get-PineGuardPackableProjects's output (F-21)"
+        }
+
+        It 'PineGuard.Analyzers.CodeFixes is excluded (IsPackable=false; ships bundled inside PineGuard.Analyzers)' {
+            $script:PackableList |
+                Should -Not -Contain 'PineGuard.Analyzers.CodeFixes' -Because 'it is IsPackable=false and ships inside the PineGuard.Analyzers package, not as its own package'
         }
     }
 
