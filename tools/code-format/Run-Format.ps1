@@ -93,7 +93,7 @@ $ErrorActionPreference = 'Stop'
 
 # --- Resolve repo root ---
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
-$transcriptPath = Start-ToolTranscript -Domain 'code-formatter' -RepoRoot $repoRoot
+$transcriptPath = Start-ToolTranscript -Domain 'code-format' -RepoRoot $repoRoot
 Write-Verbose "Transcript: $transcriptPath"
 
 try {

@@ -7,7 +7,7 @@
     support for async/detached execution and standard filtering parameters.
 
     Related scripts:
-      - tools/code-formatter/Run-Format.ps1 (this script's -Scope mutual-exclusion pattern)
+      - tools/code-format/Run-Format.ps1 (this script's -Scope mutual-exclusion pattern)
       - tools/code-diagnostics/Run-CompilerDiagnostics.ps1
 
 .PARAMETER Project

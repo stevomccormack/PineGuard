@@ -21,7 +21,7 @@ function Get-PineGuardScope {
     .DESCRIPTION
         Centralises the per-scope source directory, project paths, coverage include patterns,
         path-include regex, default source prefix and Qodana config/slug that used to be
-        repeated as switch/hashtable blocks across tools/code-coverage, tools/code-formatter,
+        repeated as switch/hashtable blocks across tools/code-coverage, tools/code-format,
         tools/code-diagnostics and tools/code-inspection scripts.
 
         'All' (the aggregate pseudo-scope) and 'Custom' (Test-Coverage.ps1 only) are

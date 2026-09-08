@@ -12,37 +12,37 @@ Run from the repository root.
 
 ```powershell
 # Format Core project only
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope Core
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps1" -Scope Core
 
 # Format all projects (full solution)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope All
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps1" -Scope All
 ```
 
 ### Format specific project or solution
 
 ```powershell
 # Specific project
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Project src/PineGuard.Core/PineGuard.Core.csproj
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps1" -Project src/PineGuard.Core/PineGuard.Core.csproj
 
 # Specific solution
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Solution ./PineGuard.slnx
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps1" -Solution ./PineGuard.slnx
 ```
 
 ### Verification mode (CI / dry-run)
 
 ```powershell
 # Fail if any files would be changed (useful for CI pipelines)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope All -VerifyNoChanges
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps1" -Scope All -VerifyNoChanges
 ```
 
 ### Additional options
 
 ```powershell
 # Only format warnings and above
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope Core -Severity warn
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps1" -Scope Core -Severity warn
 
 # Skip the implicit restore phase
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope Core -NoRestore
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-format/Run-Format.ps1" -Scope Core -NoRestore
 ```
 
 ## Parameters
@@ -75,4 +75,4 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format
 
 - Specify either `-Project`, `-Solution`, or `-Scope` — not multiple.
 - `All` scope targets the full solution including test projects.
-- A transcript of each run is written under `logs/code-formatter/<yyyyMMdd-HHmmss>.log`.
+- A transcript of each run is written under `logs/code-format/<yyyyMMdd-HHmmss>.log`.
