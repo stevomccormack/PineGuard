@@ -41,8 +41,8 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format
 # Only format warnings and above
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope Core -Severity warn
 
-# Skip restore/build phase
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope Core -NoBuild
+# Skip the implicit restore phase
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format.ps1" -Scope Core -NoRestore
 ```
 
 ## Parameters
@@ -54,7 +54,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format
 | `-Scope` | string | — | Named scope: `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `Testing`, `All` |
 | `-VerifyNoChanges` | switch | `$false` | Verification mode (`--verify-no-changes`). Exits non-zero if changes needed |
 | `-Severity` | string | — | Minimum severity: `info`, `warn`, `error` |
-| `-NoBuild` | switch | `$false` | Skip implicit restore/build (`--no-restore`) |
+| `-NoRestore` | switch | `$false` | Skip the implicit restore phase (`--no-restore`) |
 | `-Verbosity` | string | — | MSBuild verbosity: `quiet`, `minimal`, `normal`, `detailed`, `diagnostic` |
 | `-Configuration` | string | `Debug` | Build configuration |
 
@@ -75,3 +75,4 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-formatter/Run-Format
 
 - Specify either `-Project`, `-Solution`, or `-Scope` — not multiple.
 - `All` scope targets the full solution including test projects.
+- A transcript of each run is written under `logs/code-formatter/<yyyyMMdd-HHmmss>.log`.

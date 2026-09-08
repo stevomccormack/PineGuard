@@ -31,14 +31,23 @@
 .PARAMETER Severity
     Minimum severity of diagnostics to format (info, warn, error).
 
-.PARAMETER NoBuild
-    Skip the implicit restore/build phase (--no-restore).
+.PARAMETER NoRestore
+    Skip the implicit restore phase (--no-restore).
 
 .PARAMETER Verbosity
     MSBuild verbosity level (q[uiet], m[inimal], n[ormal], d[etailed], diag[nostic]).
 
 .PARAMETER Configuration
     Build configuration (Debug/Release).
+
+.NOTES
+    Exit codes: 0 = no formatting differences (or changes applied outside
+    -VerifyNoChanges); 2 = usage/prerequisite problem (conflicting or missing
+    -Project/-Solution/-Scope, or a resolved target that does not exist). Any other nonzero
+    code is `dotnet format`'s own exit code, propagated as-is — most notably the code it uses
+    under -VerifyNoChanges to report that files would be reformatted (a quality-gate-not-met
+    result), which is not remapped here to avoid guessing at a mapping `dotnet format` does
+    not document as stable.
 
 .EXAMPLE
     Run-Format.ps1 -Scope Core
@@ -66,7 +75,7 @@ param(
     [ValidateSet('info', 'warn', 'error')]
     [string]$Severity,
 
-    [switch]$NoBuild,
+    [switch]$NoRestore,
 
     [ValidateSet('q', 'quiet', 'm', 'minimal', 'n', 'normal', 'd', 'detailed', 'diag', 'diagnostic')]
     [string]$Verbosity,
@@ -78,84 +87,104 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-# --- Mutual exclusion ---
-$targetCount = @($Project, $Solution, $Scope).Where({ $_ }).Count
-if ($targetCount -gt 1) {
-    Write-Error "Specify only one of -Project, -Solution, or -Scope."
-    exit 1
-}
-if ($targetCount -eq 0) {
-    Write-Error "Specify one of -Project, -Solution, or -Scope."
-    exit 1
-}
-
 . (Join-Path $PSScriptRoot '..\.shared\path.ps1')
 . (Join-Path $PSScriptRoot '..\.shared\dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..\.shared\transcript.ps1')
 
 # --- Resolve repo root ---
 $repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
+$transcriptPath = Start-ToolTranscript -Domain 'code-formatter' -RepoRoot $repoRoot
+Write-Verbose "Transcript: $transcriptPath"
 
-# --- Scope resolution ---
-# A scope can own more than one source project (Analyzers = analyzer + code fixes), and
-# 'dotnet format' formats only the project it is handed — it logs "Skipping referenced project"
-# for the rest — so every project in the scope gets its own pass.
-if ($Scope) {
-    $targets = if ($Scope -eq 'All') {
-        @(Join-Path $repoRoot 'PineGuard.slnx')
+try {
+    # Write-Error is non-terminating (-ErrorAction Continue) at every usage-error site below so
+    # the following `exit 2` actually runs — under this script's $ErrorActionPreference = 'Stop',
+    # a terminating Write-Error would abort the script immediately and fall through to pwsh's
+    # default uncaught-error exit code (1), silently losing the intended 2.
+
+    # --- Mutual exclusion ---
+    $targetCount = @($Project, $Solution, $Scope).Where({ $_ }).Count
+    if ($targetCount -gt 1) {
+        Write-Error "Specify only one of -Project, -Solution, or -Scope." -ErrorAction Continue
+        exit 2
     }
-    else {
-        @((Get-PineGuardScope -Name $Scope).SourceCsprojs | ForEach-Object { Join-Path $repoRoot $_ })
+    if ($targetCount -eq 0) {
+        Write-Error "Specify one of -Project, -Solution, or -Scope." -ErrorAction Continue
+        exit 2
     }
-    foreach ($target in $targets) {
-        if (-not (Test-Path $target)) {
-            throw "Resolved target not found: $target"
+
+    # --- Scope resolution ---
+    # A scope can own more than one source project (Analyzers = analyzer + code fixes), and
+    # 'dotnet format' formats only the project it is handed — it logs "Skipping referenced
+    # project" for the rest — so every project in the scope gets its own pass.
+    if ($Scope) {
+        $targets = if ($Scope -eq 'All') {
+            @(Join-Path $repoRoot 'PineGuard.slnx')
+        }
+        else {
+            @((Get-PineGuardScope -Name $Scope).SourceCsprojs | ForEach-Object { Join-Path $repoRoot $_ })
+        }
+        foreach ($target in $targets) {
+            if (-not (Test-Path $target)) {
+                Write-Error "Resolved target not found: $target" -ErrorAction Continue
+                exit 2
+            }
         }
     }
-}
-elseif ($Solution) {
-    if (-not (Test-Path $Solution)) { throw "Solution file not found: $Solution" }
-    $targets = @($Solution)
-}
-else {
-    if (-not (Test-Path $Project)) { throw "Project file not found: $Project" }
-    $targets = @($Project)
-}
-
-# --- Build command args ---
-$commonArgs = @()
-
-if ($VerifyNoChanges) {
-    $commonArgs += "--verify-no-changes"
-}
-
-if ($Severity) {
-    $commonArgs += "--severity", $Severity
-}
-
-if ($NoBuild) {
-    $commonArgs += "--no-restore"
-}
-
-if ($Verbosity) {
-    $commonArgs += "--verbosity", $Verbosity
-}
-
-# --- Execute ---
-$label = if ($Scope) { $Scope } elseif ($Solution) { Split-Path $Solution -Leaf } else { Split-Path $Project -Leaf }
-Write-Host "Formatting: $label" -ForegroundColor Cyan
-
-foreach ($target in $targets) {
-    $cmdArgs = @("format", $target) + $commonArgs
-
-    Write-Host "Target:     $target" -ForegroundColor DarkGray
-    Write-Host "Command:    dotnet $($cmdArgs -join ' ')" -ForegroundColor DarkGray
-
-    & dotnet $cmdArgs
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "dotnet format exited with code $LASTEXITCODE" -ForegroundColor Red
-        exit $LASTEXITCODE
+    elseif ($Solution) {
+        if (-not (Test-Path $Solution)) {
+            Write-Error "Solution file not found: $Solution" -ErrorAction Continue
+            exit 2
+        }
+        $targets = @($Solution)
     }
-}
+    else {
+        if (-not (Test-Path $Project)) {
+            Write-Error "Project file not found: $Project" -ErrorAction Continue
+            exit 2
+        }
+        $targets = @($Project)
+    }
 
-Write-Host "Format complete." -ForegroundColor Green
+    # --- Build command args ---
+    $commonArgs = @()
+
+    if ($VerifyNoChanges) {
+        $commonArgs += "--verify-no-changes"
+    }
+
+    if ($Severity) {
+        $commonArgs += "--severity", $Severity
+    }
+
+    if ($NoRestore) {
+        $commonArgs += "--no-restore"
+    }
+
+    if ($Verbosity) {
+        $commonArgs += "--verbosity", $Verbosity
+    }
+
+    # --- Execute ---
+    $label = if ($Scope) { $Scope } elseif ($Solution) { Split-Path $Solution -Leaf } else { Split-Path $Project -Leaf }
+    Write-Host "Formatting: $label" -ForegroundColor Cyan
+
+    foreach ($target in $targets) {
+        $cmdArgs = @("format", $target) + $commonArgs
+
+        Write-Host "Target:     $target" -ForegroundColor DarkGray
+        Write-Host "Command:    dotnet $($cmdArgs -join ' ')" -ForegroundColor DarkGray
+
+        & dotnet $cmdArgs
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "dotnet format exited with code $LASTEXITCODE" -ForegroundColor Red
+            exit $LASTEXITCODE
+        }
+    }
+
+    Write-Host "Format complete." -ForegroundColor Green
+}
+finally {
+    Stop-Transcript | Out-Null
+}
