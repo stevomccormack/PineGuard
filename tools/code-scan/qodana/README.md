@@ -21,7 +21,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-up.ps1
 See [tools/docker/README.md](../docker/README.md) for the compose stacks, the shared network, and the
 per-stack up/down scripts.
 
-### 2. Initialize (first run only)
+### 2. Install (first run only)
 
 Installs the Qodana CLI via Winget if not present and starts the Qodana container.
 

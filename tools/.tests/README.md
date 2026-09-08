@@ -39,7 +39,7 @@ job (T2.05) runs it with `continue-on-error: true` on purpose: several tests her
 "nobody's tracking this" into "here's exactly what's still broken." Do not weaken an assertion
 here to make it pass early; let the corresponding phase task turn it green instead.
 
-As of the run when this suite was added (Pester 5.7.1, 261 tests, 223 passed / 38 failed):
+At the run when this suite was added (Pester 5.7.1, 261 tests, 223 passed / 38 failed):
 
 - **`Help-Placeholder.Tests.ps1`** — 21 of 60 tests red. 21 scripts still have the placeholder
   text (F-46, exact match); Phase 5 replaces it with real documentation.
@@ -54,16 +54,29 @@ As of the run when this suite was added (Pester 5.7.1, 261 tests, 223 passed / 3
   (old SonarQube setup script) — T3.05 fixed it: the renamed
   `code-scan/sonarqube/Initialize-SonarQube.ps1` now writes the admin password and token to
   `.etc/powershell/.env` via the new `Set-DotEnvVariable` (`tools/.shared/dotenv.ps1`) instead of
-  the User environment variable. Category D is green. Current state: 1 of 5 tests red (A only;
-  T3.09).
+  the User environment variable. Category D is green.
 - **`Bom-Absence.Tests.ps1`** — 14 of 68 tests red (14 files carry a BOM, matching F-47 for this
   scope). Red until T2.06 lands (BOM/whitespace strip); green after.
 
-Everything else (registry parity — 99/99, the dotenv parser — 9/9, the Cobertura parser — 10/10,
-`Get-RepoRoot` — 6/6, and the git helpers — 4/4) passes today. If one of those goes red, that's a
-real bug — in the test or in the code under test — not expected debt. (One already surfaced and
-was fixed while authoring this suite: `Assert-IndexClean`'s exception message used
-`"a " + "b" -f x, y` — since PowerShell's `-f` binds tighter than `+`, the format only ever
-applied to the second half of the string, so `{0}`/`{1}` were never substituted. Fixed in
-`tools/.shared/git.ps1` by parenthesizing the full string before `-f`; the safety behaviour
-itself — throw, never unstage — was already correct.)
+**Current state** (re-measured 2026-09-09 via `Invoke-Pester -Path tools/.tests/ -PassThru`,
+Pester 6.1.0, 251 tests, 249 passed / 2 failed, after Phase 3 of the plan):
+
+- **`Help-Placeholder.Tests.ps1`** — 2 of 44 tests red. Only `Run-CodeCoverage.ps1` and
+  `Test-Coverage.ps1` still carry the placeholder `.PARAMETER` text; Phase 5 replaces it with
+  real documentation. (The candidate count dropped from 60 to 44 as scripts were consolidated
+  during Phase 3.)
+- **`Windows-Isms.Tests.ps1`** — 0 of 5 tests red. T3.09 (D-5 sweep) landed and cleared the last
+  Category A hardcoded-backslash hits; all four categories are now green.
+- **`Bom-Absence.Tests.ps1`** — 0 of 54 tests red. T2.06 (BOM/whitespace strip) landed and the
+  suite is fully green. (The file count dropped from 68 to 54 since the 16
+  `tools/git/Commit-*.ps1` scripts were deleted as part of the git-tooling standardisation.)
+
+Everything else (registry parity — 100/100, the dotenv parser — 9/9, the Cobertura parser —
+10/10, `Get-RepoRoot` — 6/6, the git helpers — 4/4, the dotCover snapshot suite — 6/6, and the
+shared load-order suite — 13/13) passes today. If one of those goes red, that's a real bug — in
+the test or in the code under test — not expected debt. (One already surfaced and was fixed while
+authoring this suite: `Assert-IndexClean`'s exception message used `"a " + "b" -f x, y` — since
+PowerShell's `-f` binds tighter than `+`, the format only ever applied to the second half of the
+string, so `{0}`/`{1}` were never substituted. Fixed in `tools/.shared/git.ps1` by parenthesizing
+the full string before `-f`; the safety behaviour itself — throw, never unstage — was already
+correct.)

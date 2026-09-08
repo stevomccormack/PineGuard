@@ -22,12 +22,13 @@
       2   a required module is missing: PSScriptAnalyzer, or Pester >= 5.0.
       3   PSScriptAnalyzer reported an Error- or Warning-severity finding, or a Pester test failed.
 
-    As of Phase 2, this gate is EXPECTED to exit 3. PSScriptAnalyzer still carries the pre-Phase-3
-    whitespace/indentation/verb findings recorded in the plan's T2.02 baseline, and the Pester
-    suite still carries roughly 21-23 intentionally red tests (Help-Placeholder, Windows-Isms)
-    that Phase 3 through 5 clear. The plan's own CI wiring (T2.05) runs this script with
-    continue-on-error: true for exactly that reason — a non-zero exit here today is correct, not a
-    bug in this script.
+    As of Phase 3, this gate is still EXPECTED to exit 3. PSScriptAnalyzer reports 290 findings,
+    all cosmetic (262 PSUseConsistentWhitespace, 28 PSUseConsistentIndentation; 0 Error, 0
+    unapproved-verb hits), and the Pester suite carries 2 intentionally red tests
+    (Help-Placeholder only, on Run-CodeCoverage.ps1/Test-Coverage.ps1 — Windows-Isms and
+    Bom-Absence are now green after T3.09/T2.06) that Phase 5 clears. The plan's own CI wiring
+    (T2.05) runs this script with continue-on-error: true for exactly that reason — a non-zero
+    exit here today is correct, not a bug in this script.
 
 .PARAMETER Path
     Root folder to scan with PSScriptAnalyzer, relative to the repository root (or an absolute

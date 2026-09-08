@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Initialize the local Qodana environment.
+    Install the local Qodana environment.
 
 .DESCRIPTION
     Part of the PineGuard PowerShell toolchain.

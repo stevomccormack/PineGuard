@@ -789,12 +789,13 @@ jobs:
   #
   #    SOFT GATE (continue-on-error: true on the run step, matching this
   #    file's existing soft-check convention — see format/roslyn/audit).
-  #    Test-Tools.ps1 is EXPECTED to exit 3 today: the Phase 2 baseline
-  #    (T2.02) recorded 296 PSScriptAnalyzer findings (291 cosmetic
-  #    whitespace/indentation, 5 real unapproved-verb hits) and the Pester
-  #    suite carries ~21-23 intentionally red tests (Help-Placeholder,
-  #    Windows-Isms, Bom-Absence — see tools/.tests/README.md) that encode
-  #    target-state invariants Phase 3 through 5 clear, not current bugs.
+  #    Test-Tools.ps1 is EXPECTED to exit 3 today: as of Phase 3 it reports
+  #    290 PSScriptAnalyzer findings (all cosmetic — 262 PSUseConsistentWhitespace,
+  #    28 PSUseConsistentIndentation; 0 Error, 0 unapproved-verb hits) and the
+  #    Pester suite carries 2 intentionally red tests (Help-Placeholder only —
+  #    Windows-Isms and Bom-Absence are green after T3.09/T2.06; see
+  #    tools/.tests/README.md) that encode target-state invariants Phase 5
+  #    clears, not current bugs.
   #
   #    TODO(tools-review-and-standardisation, Phase 3): once the lint/test
   #    baseline above is clean, make this a hard gate — set
