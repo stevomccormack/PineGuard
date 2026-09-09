@@ -10,7 +10,7 @@ Adopt the role it declares: [reviewer.md](../../docs/ai/roles/reviewer.md).
 
 Start with:
 - [safety.md](../../docs/ai/specs/safety.md)
-- [qodana.md](../../docs/ai/specs/tools/code-inspection/qodana.md)
+- [qodana.md](../../docs/ai/specs/tools/code-scan/qodana/qodana.md)
 - [code-reviewer memory](../../docs/ai/memory/code-reviewer.md)
 
 Keep the Brain as the source of truth.
