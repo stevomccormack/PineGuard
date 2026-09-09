@@ -75,8 +75,8 @@ Thin `context: fork` wrappers that delegate to Brain skills or standalone toolin
 | [document](../../../.claude/skills/document/SKILL.md) | `document` | XML documentation generation |
 | [scaffold-workflow](../../../.claude/skills/scaffold-workflow/SKILL.md) | `scaffold-workflow` | New agent playbook + adapter cascade |
 | [scaffold-quality-tool](../../../.claude/skills/scaffold-quality-tool/SKILL.md) | `scaffold-quality-tool` | New quality/inspection tool scaffold |
-| [changelog](../../../.claude/skills/changelog/SKILL.md) | *(standalone)* | Generate changelog from git history |
-| [dependency-audit](../../../.claude/skills/dependency-audit/SKILL.md) | *(standalone)* | Check NuGet vulnerabilities and outdated packages |
+| [changelog](../../../.claude/skills/changelog/SKILL.md) | *(surface-native — [§2.1](../meta/adapter-surfaces.md#surface-native-utility-skills-declared-exemption))* | Generate changelog from git history |
+| [dependency-audit](../../../.claude/skills/dependency-audit/SKILL.md) | *(surface-native — [§2.1](../meta/adapter-surfaces.md#surface-native-utility-skills-declared-exemption))* | Check NuGet vulnerabilities and outdated packages |
 | [ask-council](../../../.claude/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
 
 ---
@@ -129,8 +129,8 @@ Generic `AGENTS.md`-convention adapters. Same delegation contract as the Claude 
 | [document](../../../.agents/skills/document/SKILL.md) | `document` | XML documentation generation |
 | [scaffold-workflow](../../../.agents/skills/scaffold-workflow/SKILL.md) | `scaffold-workflow` | New agent playbook + adapter cascade |
 | [scaffold-quality-tool](../../../.agents/skills/scaffold-quality-tool/SKILL.md) | `scaffold-quality-tool` | New quality/inspection tool scaffold |
-| [changelog](../../../.agents/skills/changelog/SKILL.md) | *(standalone)* | Generate changelog from git history |
-| [dependency-audit](../../../.agents/skills/dependency-audit/SKILL.md) | *(standalone)* | Check NuGet vulnerabilities and outdated packages |
+| [changelog](../../../.agents/skills/changelog/SKILL.md) | *(surface-native — [§2.1](../meta/adapter-surfaces.md#surface-native-utility-skills-declared-exemption))* | Generate changelog from git history |
+| [dependency-audit](../../../.agents/skills/dependency-audit/SKILL.md) | *(surface-native — [§2.1](../meta/adapter-surfaces.md#surface-native-utility-skills-declared-exemption))* | Check NuGet vulnerabilities and outdated packages |
 | [ask-council](../../../.agents/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
 
 ---
@@ -148,4 +148,6 @@ docs/ai/skills/        ← Brain (canonical, model-agnostic)
         └── references/    ← Exemplar pointers (DRY)
 ```
 
-**Flow**: Adapter → Brain → Specs. Adapters never embed logic; they point to Brain skills.
+**Flow**: Adapter → Brain → Specs. Adapters never embed logic; they point to Brain skills. The two
+surface-native utility skills are a declared exemption — see
+[adapter-surfaces §2.1](../meta/adapter-surfaces.md#surface-native-utility-skills-declared-exemption).

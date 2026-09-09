@@ -38,6 +38,12 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 
 # -------------------------------------------------------------------
+# Windows batch files — the one format that needs CRLF (matches .gitattributes)
+# -------------------------------------------------------------------
+[*.{cmd,bat}]
+end_of_line = crlf
+
+# -------------------------------------------------------------------
 # Solution / project files
 # -------------------------------------------------------------------
 [*.sln]

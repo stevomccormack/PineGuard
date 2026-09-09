@@ -5,9 +5,5 @@
         140,
         400
     ],
-    "editor.minimap.enabled": true,
-    "sonarlint.connectedMode.project": {
-        "connectionId": "http-localhost-9001",
-        "projectKey": "PineGuard"
-    }
+    "editor.minimap.enabled": true
 }

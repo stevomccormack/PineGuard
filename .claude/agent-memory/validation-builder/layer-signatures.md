@@ -62,7 +62,7 @@ where a parsed value was available. Reference: `docs/ai/specs/core/project.md` �
 - Return the typed `result.Result!` on success — Guard methods return `T`, not a `MustResult`.
 - Method named after the forbidden state (`Guard.Against.NullOrEmpty`).
 - File ordering follows the Must clause each guard invokes, mirroring the Must file — not alphabetical,
-  not "all negatives first" (guard-clauses/project.md §4).
+  not "all negatives first" (docs/ai/specs/guard-clauses/project.md §4).
 
 ## FluentValidation signatures
 
