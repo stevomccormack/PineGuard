@@ -146,7 +146,7 @@ FluentValidation follows the standard "skip on null" behavior:
 
 This is intentionally different from Must/Guard behavior:
 
-- MustClauses follow the Rule07 hybrid nullability strategy — **null is invalid by default** unless the method name encodes it (e.g., `NullOrXxx`). Canonical statement: `../must-clauses/project.md` §Nullability.
+- MustClauses follow the `nullability` hybrid nullability strategy — **null is invalid by default** unless the method name encodes it (e.g., `NullOrXxx`). Canonical statement: `../must-clauses/project.md` §Nullability.
 - The adapter layer is responsible for the FluentValidation UX: presence/required checks are expressed via FluentValidation chaining, not by failing on null in PineGuard rules.
 
 Rules:

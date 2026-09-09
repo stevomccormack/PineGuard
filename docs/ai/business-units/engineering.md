@@ -41,12 +41,9 @@ The Engineering department is responsible for the design, implementation, testin
 - [Brain Index](../README.md)
 - [Adapter Surfaces](../meta/adapter-surfaces.md)
 - [Claude Master Instructions](../../../CLAUDE.md)
-- [Gemini Master Instructions](../../../GEMINI.md)
 - [Generic Agent Instructions](../../../AGENTS.md)
 - [Copilot Instructions](../../../.github/copilot-instructions.md)
-- [Pi Instructions](../../../.pi/AGENTS.md)
-- [Cline Rules](../../../.clinerules/01-global.md)
 
 <!-- footer
-last_verified: 2026-04-15
+last_verified: 2026-09-08
 -->

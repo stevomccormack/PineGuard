@@ -5,13 +5,12 @@ PowerShell scripts for building, testing, auditing, formatting, generating, and 
 ## Prerequisites
 
 - PowerShell 7+ (`pwsh`)
-- .NET 10 SDK (builds every target framework). Libraries multi-target `netstandard2.1;net8.0;net10.0`; test projects target `net8.0;net10.0`; `tools/audit-cli` targets `net10.0`.
+- .NET 10 SDK (builds every target framework). Libraries multi-target `netstandard2.1;net8.0;net10.0`; test projects target `net8.0;net10.0`.
 
 ## Tool Directories
 
 | Directory | Purpose | Entry Point | Scopes |
 |-----------|---------|-------------|--------|
-| [audit-cli](audit-cli/README.md) | Static analysis, parity checks, naming audits | `Run-All.ps1` | Rule filtering (`-RuleId`, `-RuleName`) |
 | [code-coverage](code-coverage/README.md) | Coverage collection and analysis — Coverlet (Cobertura + HTML, authoritative) and JetBrains dotCover (Rider `.dcvr` snapshots) behind one front door | `Run-CodeCoverage.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All (plus Custom on `Test-Coverage.ps1` only) |
 | [code-diagnostics](code-diagnostics/README.md) | Roslyn compiler warning capture and reporting | `Run-CompilerDiagnostics.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All |
 | [code-format](code-format/README.md) | `dotnet format` wrapper with scope support | `Run-Format.ps1` | Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options, DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All |
@@ -69,5 +68,6 @@ These parameters are common across multiple tools:
 For normative rules governing tool implementation:
 
 - Root tool spec: `docs/ai/specs/tools/spec.md`
-- Audit CLI spec: `docs/ai/specs/tools/audit-cli/spec.md`
 - Safety tiers: `docs/ai/specs/safety.md`
+
+**Note:** The audit CLI was migrated to TypeScript as `pnpm -C apps/cli exec tsx src/index.ts audit`. See `apps/cli/README.md` and `docs/ai/agents/audit-cli.md` for the new command usage.

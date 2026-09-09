@@ -43,7 +43,7 @@ against a copy of them:
 Where two specs disagree, the narrower one wins and the conflict is itself a finding to report.
 
 ### CI Gates (block on these)
-- [ ] No `[Fact]` / `[InlineData]` — `[Theory]` + `TheoryData` + `[MemberData]` only, and every `XxxTests.cs` has a paired `XxxTestData.cs` (audit-cli Rule50, per `docs/ai/agents/audit-cli.md`)
+- [ ] No `[Fact]` / `[InlineData]` — `[Theory]` + `TheoryData` + `[MemberData]` only, and every `XxxTests.cs` has a paired `XxxTestData.cs` (audit-cli `test-files`, per `docs/ai/agents/audit-cli.md`)
 
 ## Review Output Format
 For each issue found:

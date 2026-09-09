@@ -10,13 +10,13 @@ Read these files before changing tests:
 1. [spec.md](../../../docs/ai/specs/spec.md)
 2. [coverage.md](../../../docs/ai/specs/testing/coverage.md)
 3. [unit-test.md](../../../docs/ai/specs/testing/unit-test.md)
-4. [improve-coverage/SKILL.md](../../../docs/ai/skills/improve-coverage/SKILL.md)
+4. [improve-coverage SKILL.md](../../../docs/ai/skills/improve-coverage/SKILL.md)
 5. [coverage-analyst memory](../../../docs/ai/memory/coverage-analyst.md)
 6. [test-writer memory](../../../docs/ai/memory/test-writer.md)
 
 ## Execute
 
-Follow the canonical recipe in [docs/ai/skills/improve-coverage/SKILL.md](../../../docs/ai/skills/improve-coverage/SKILL.md) exactly.
+Follow the canonical recipe in [improve-coverage SKILL.md](../../../docs/ai/skills/improve-coverage/SKILL.md) exactly.
 
 ## Verify
 

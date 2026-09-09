@@ -133,7 +133,7 @@ Act as **{Role}**. Execute workflow `docs/ai/workflows/scan-{tool}.md` with Scop
 
 Work `docs/ai/meta/adapter-surfaces.md` §5 cascade checklist row by row. Each row below is either
 **created** or **N/A under a declared policy** (§4 of that file) — never silently skipped. Three
-surfaces host skills (`.claude/`, `.github/`, `.pi/`); omitting two of them is what leaves adapters
+surfaces host skills (`.claude/`, `.github/`, `.agents/`); omitting any of them is what leaves adapters
 permanently behind the Brain.
 
 | File | Template |
@@ -146,11 +146,11 @@ permanently behind the Brain.
 | `.claude/commands/fix-{tool}-all.md` | Fix command (if HasFixWorkflow) |
 | `.github/skills/scan-{tool}/SKILL.md` | Copilot wrapper. See `.github/skills/scan-roslyn/SKILL.md` |
 | `.github/skills/fix-{tool}/SKILL.md` | Copilot wrapper (if HasFixWorkflow). See `.github/skills/fix-roslyn/SKILL.md` |
-| `.github/prompts/*.prompt.md` | Only if the command is in the declared Copilot subset (adapter-surfaces §4) |
-| `.pi/skills/scan-{tool}/SKILL.md` | Pi wrapper. See `.pi/skills/scan-roslyn/SKILL.md` |
-| `.pi/skills/fix-{tool}/SKILL.md` | Pi wrapper (if HasFixWorkflow). See `.pi/skills/fix-roslyn/SKILL.md` |
-| `.pi/prompts/scan-{tool}-{scope}.md`, `.pi/prompts/fix-{tool}-all.md` | One per command |
+| `.github/prompts/*.prompt.md` | One per command, `.github/prompts/scan-{tool}-{scope}.prompt.md` and `.github/prompts/fix-{tool}-all.prompt.md` |
+| `.agents/skills/scan-{tool}/SKILL.md` | Generic `AGENTS.md`-convention wrapper. See `.agents/skills/scan-roslyn/SKILL.md` |
+| `.agents/skills/fix-{tool}/SKILL.md` | Generic `AGENTS.md`-convention wrapper (if HasFixWorkflow). See `.agents/skills/fix-roslyn/SKILL.md` |
 | `.agent/workflows/scan-{tool}-{scope}.md`, `.agent/workflows/fix-{tool}-all.md` | One per command |
+| `.opencode/commands/scan-{tool}-{scope}.md`, `.opencode/commands/fix-{tool}-all.md` | One per command |
 
 Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if the new tool changes a
 **layer mapping** — a new quality tool normally does not.
@@ -161,7 +161,7 @@ Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if
 |------|-------------|
 | `CLAUDE.md` | New `### {ToolName}` section in the Command Palette |
 | `AGENTS.md` | Same palette rows, tool-neutral phrasing |
-| `.pi/AGENTS.md` | Same palette rows for the Pi surface |
+| `.github/copilot-instructions.md` | Same palette rows for the Copilot surface |
 | `docs/ai/README.md` | Rule in Rules Hierarchy tree, skills in Skills Inventory table |
 | `docs/ai/skills/INDEX.md` | Brain rows, plus one row per adapter table the tool lands in |
 | `.claude/settings.json` | Verify tool commands are whitelisted (e.g., `Bash(pwsh:*)`) |
@@ -182,8 +182,8 @@ Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if
    `continue-on-error: true` today because the gate still carries a known cosmetic backlog, so it
    reports rather than blocks — do not read a green CI run as proof your script is clean. Run it
    locally and compare against the recorded baseline
-7. **Cross-reference**: Verify `CLAUDE.md`, `AGENTS.md`, `.pi/AGENTS.md`, `docs/ai/README.md`, `docs/ai/skills/INDEX.md` and every adapter command directory are consistent
-8. **Parity**: `pwsh ./tools/audit-cli/Run-All.ps1` — the adapter-parity rule is clean
+7. **Cross-reference**: Verify `CLAUDE.md`, `AGENTS.md`, `docs/ai/README.md`, `docs/ai/skills/INDEX.md` and every adapter command directory are consistent
+8. **Parity**: `pnpm -C apps/cli exec tsx src/index.ts audit surface-parity` is clean
 
 ## 5. Definition of Done
 
@@ -198,10 +198,10 @@ Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if
 - [ ] Brain commands: Command contract table created
 - [ ] Adapter rules: Path-scoped pointer created in `.claude/rules/`
 - [ ] Adapter skills: `context: fork` wrappers created in `.claude/skills/`
-- [ ] Adapter skills: wrappers created in `.github/skills/` and `.pi/skills/`
-- [ ] Adapter commands: created in `.claude/commands/`, `.pi/prompts/` and `.agent/workflows/`
-- [ ] Adapter commands: `.github/prompts/` — created, or N/A under the declared Copilot subset
-- [ ] Registration: `CLAUDE.md`, `AGENTS.md` and `.pi/AGENTS.md` palettes updated
+- [ ] Adapter skills: wrappers created in `.github/skills/` and `.agents/skills/`
+- [ ] Adapter commands: created in `.claude/commands/` and `.agent/workflows/`
+- [ ] Adapter commands: created in `.github/prompts/` and `.opencode/commands/`
+- [ ] Registration: `CLAUDE.md`, `AGENTS.md` and `.github/copilot-instructions.md` palettes updated
 - [ ] Registration: `docs/ai/README.md` Rules Hierarchy + Skills Inventory updated
 - [ ] Registration: `docs/ai/skills/INDEX.md` updated in the Brain table and every adapter table
 - [ ] Verification: Script runs, commands trigger, cross-references consistent
@@ -236,7 +236,7 @@ For a tool with 7 scopes and a fix workflow:
 | Brain Agents (7 scopes + fix) | 8 |
 | Brain Commands | 1 |
 | Adapter Rules | 1 |
-| Adapter Skills (scan + fix × `.claude`, `.github`, `.pi`) | 6 |
-| Adapter Commands (7 scopes + fix × `.claude`, `.pi`, `.agent`) | 24 |
+| Adapter Skills (scan + fix × `.claude`, `.github`, `.agents`) | 6 |
+| Adapter Commands (7 scopes + fix × `.claude`, `.agent`, `.github`, `.opencode`) | 32 |
 | Registration (modify existing) | 5–6 |
-| **Total** | **~53 new + 5–6 modified** |
+| **Total** | **~57 new + 5–6 modified** |

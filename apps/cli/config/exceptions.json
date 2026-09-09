@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Allowlisted exceptions for audit rules. Keyed by rule slug; values are substrings matched against finding.file or finding.message. Ported from legacy tools/audit-cli/test-audit-exceptions.json at cutover (P6.2).",
+  "test-files": [
+    "tests/PineGuard.DataAnnotations.UnitTests/ErrorMessageAttributesTests.cs",
+    "tests/PineGuard.Testing.UnitTests/UnitTests/Rules/RuleScenarioExtensionsTests.cs"
+  ]
+}

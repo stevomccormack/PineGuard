@@ -21,6 +21,6 @@ Before writing tests, read:
 - the project-specific testing spec under [docs/ai/specs](../../docs/ai/specs)
 - durable patterns in [test-writer memory](../../docs/ai/memory/test-writer.md)
 
-Use the canonical recipe in [scaffold-unit-test/SKILL.md](../../docs/ai/skills/scaffold-unit-test/SKILL.md).
+Use the canonical recipe in [scaffold-unit-test SKILL.md](../../docs/ai/skills/scaffold-unit-test/SKILL.md).
 
 Keep the Brain as the source of truth.

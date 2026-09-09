@@ -30,13 +30,12 @@ Pick the layer the user named. If none was named, default to `MustClauses`.
 
 2. **Analyze coverage report**
    - Report every class in the latest Cobertura run below 100% line or branch coverage, using the vetted helper rather than an ad-hoc pipeline.
-   - Run (substituting the layer's coverage filter):
+   - For a per-class table report, use:
 
      ```powershell
-     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/helpers/Test-CoverageLatest.ps1" -TargetFilter '*PineGuard.MustClauses.UnitTests*' -OutputPath 'artifacts/audit/util/audit-gap-latest-coverage.txt'
+     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope <Layer> -AsTable
      ```
 
-   - For a richer per-class table instead of a flat report, use `tools/code-coverage/Test-Coverage.ps1 -Scope <Layer> -AsTable`.
    - If no report is found, generate one first via the matching `/coverage-<layer>` agent.
 
 3. **Transition: remediate**

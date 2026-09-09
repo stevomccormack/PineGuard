@@ -9,7 +9,7 @@ spec:
     - ../dependencies.md
 applies_to:
   - "docs/ai/specs/**"
-  - "tools/audit-cli/**"
+  - "apps/cli/**"
 ---
 
 # PineGuard Vocabulary Map (Opposites + Alternatives)
@@ -41,7 +41,7 @@ This exists to prevent repeated churn around:
 
 ## 2) Audit normalization (required)
 
-Audit scripts that compare method-name parity (notably Rule06) **MUST** normalize names to concept names using the machine-readable map at:
+Audit scripts that compare method-name parity (notably `layer-parity`) **MUST** normalize names to concept names using the machine-readable map at:
 
 - `docs/ai/specs/language/vocabulary.json`
 
@@ -113,6 +113,6 @@ When a new naming question arises:
 
 1. Add/adjust entries in `vocabulary.json`.
 2. Update this MD file if a human-readable explanation is needed.
-3. Update any audit scripts that consume the JSON (Rule06, etc.).
+3. Update any audit scripts that consume the JSON (`layer-parity`, etc.).
 
 This keeps the spec and tooling aligned.

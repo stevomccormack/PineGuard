@@ -2,7 +2,7 @@
 title: Adapter Surfaces
 type: meta
 status: normative
-last_verified: 2026-08-20
+last_verified: 2026-09-08
 ---
 
 # Adapter Surfaces
@@ -10,7 +10,7 @@ last_verified: 2026-08-20
 > [!IMPORTANT]
 > This file is the **single inventory** of every AI-tool surface in this repository.
 > `docs/ai/README.md`, `docs/ai/specs/protocol.md`, `docs/ai/skills/scaffold-workflow/SKILL.md`
-> and the adapter-parity rule in `tools/audit-cli/` all reference this file rather than
+> and the `surface-parity` audit rule in `apps/cli/` all reference this file rather than
 > maintaining their own lists. When a surface is added, removed, or retiered, change it **here**
 > and let the references follow.
 
@@ -18,10 +18,9 @@ The Brain lives in `docs/ai/`. Everything listed below is an **adapter**: a thin
 that routes a tool's native entry points into the Brain. Adapters carry no logic of their own
 (`docs/ai/specs/protocol.md` Rule #1).
 
-There are **eleven** adapter surfaces (four full, two skill/hook-only, five rules-only — plus two
-legacy single-file variants) and three root boot files. Tiering matters: what counts as parity
-debt differs per tier, and treating a rules-only surface as though it were missing dozens of
-command files generates directories no tool reads.
+There are **seven** adapter surfaces (four full, two skill/hook-only, one rules-only) and three
+boot files. Tiering matters: what counts as parity debt differs per tier, and treating a rules-only
+surface as though it were missing dozens of command files generates directories no tool reads.
 
 ## 1. Root boot files
 
@@ -31,8 +30,8 @@ entry point only: role adoption, the command palette, and a link into the Brain 
 | File | Tool | Notes |
 |------|------|-------|
 | `CLAUDE.md` | Claude Code | Carries the canonical slash-command palette. |
-| `AGENTS.md` | Generic / OpenAI-style agents | Tool-neutral phrasing of the same contract. |
-| `GEMINI.md` | Gemini | Adds the `.agent/workflows/` pointer. |
+| `AGENTS.md` | Generic / OpenAI-style agents | Tool-neutral phrasing of the same contract; read natively by OpenCode as its primary instructions file. |
+| `.github/copilot-instructions.md` | GitHub Copilot | Carries the Copilot prompt-file palette. Lives under `.github/` rather than the root because that is where Copilot loads it from; it is injected into every Copilot request exactly as the root files are loaded. |
 
 ## 2. Full adapters
 
@@ -43,13 +42,19 @@ Surfaces with a **per-command file format**. These are checked for command parit
 |---------|------|-------------|--------|-------|
 | `.claude/` | Claude Code | `commands/` | `skills/` | `rules/`, `agents/`, `agent-memory/`, `hooks/` |
 | `.agent/` | Antigravity | `workflows/` | — | — |
-| `.pi/` | Pi | `prompts/` | `skills/` | `AGENTS.md`, `extensions/` |
 | `.github/` | GitHub Copilot | `prompts/` | `skills/` | `copilot-instructions.md`, `instructions/`, `agents/` |
+| `.opencode/` | OpenCode | `commands/` | — | — |
 
 > [!WARNING]
 > `.agent/` (singular, Antigravity workflows) and `.agents/` (plural, skills — see §2.1) are
-> **different surfaces**. Neither is the Gemini adapter; that is the root `GEMINI.md`. Conflating
-> `.agent/` with Gemini is a long-standing documentation error — do not reintroduce it.
+> **different surfaces**. Neither is a Gemini adapter: Gemini is not a supported surface, and its
+> root boot file was retired in September 2026 (see §3.1).
+
+`.opencode/` carries commands only, by design. OpenCode reads the root `AGENTS.md` as its
+instructions file and natively loads `.claude/skills/` and `.agents/skills/`, so it needs no boot
+file, skills directory, or rules directory of its own. Its subagent format (`.opencode/agent/`) and
+its JavaScript plugin system are incompatible with `.claude/agents/` and `.claude/hooks/`;
+OpenCode-native rebuilds of those are deferred and are not parity debt.
 
 ### 2.1 Skill- and hook-only adapters
 
@@ -72,22 +77,20 @@ must not report one.
 
 | Surface | Tool | Shape |
 |---------|------|-------|
-| `.clinerules/` | Cline | Numbered rule files (`01-global.md`, …) |
 | `.cursor/rules/` | Cursor | `*.mdc` with frontmatter globs — current Cursor format |
-| `.windsurf/rules/` | Windsurf | `global.md`, `layers.md` — current Windsurf format |
-| `.amazonq/rules/` | Amazon Q | Plain rule files |
-| `.junie/guidelines.md` | JetBrains Junie | Single guidelines file |
 
 Rules-only adapters carry **path-scoped pointers only**. They MUST NOT carry an intent-routing
 table mapping user phrasing to agent files — that is what `docs/ai/commands/` is for, and a
 duplicated routing table is exactly what rots when agents are renamed.
 
-### 3.1 Legacy single-file variants
+### 3.1 Retired surfaces
 
-`.cursorrules` and `.windsurfrules` are the pre-directory formats for Cursor and Windsurf. They are
-retained **only** for older editor builds and are reduced to pointer stubs. Never grow them back:
-the directory formats above are authoritative, and maintaining two files per tool is what let both
-legacy files drift a full rename cycle behind the Brain.
+Retired on 2026-09-08 and deliberately not recreated: the Pi adapter, the Cline, Windsurf, Amazon Q
+and JetBrains Junie rules surfaces, the legacy single-file Cursor and Windsurf stubs, and the Gemini
+root boot file. Every one of those tools reads the root `AGENTS.md` natively (Cline only when it
+finds no rules directory of its own), so removing them lost no support. Amazon Q itself reached
+end-of-support in 2026. Supported tools are Claude Code, GitHub Copilot, OpenAI Codex, and the
+surfaces in §2–§3 above.
 
 ## 4. Parity policy
 
@@ -97,10 +100,11 @@ Anything not listed here is parity debt and the audit-cli adapter-parity rule wi
 | Exception | Surfaces | Rationale |
 |-----------|----------|-----------|
 | **Release family** — `github-release-publish`, `github-ruleset-enable`, `github-ruleset-disable`, `nuget-unlist` | Claude Code only | These publish releases, mutate branch protection, and unlist packages from nuget.org — the Tier 0/1 irreversible operations of `docs/ai/specs/safety.md`. They MUST NOT be exposed on surfaces that apply blanket auto-approval. |
-| **Copilot subset** — `.github/prompts/` carries one representative per command family (coverage, test, fix-coverage, format, scan, audit, council) rather than every agent | `.github/` | Copilot prompt files are the least-used entry point; mirroring all 84 agents would multiply the maintenance surface for no gain. The subset is deliberate and its selection rule is stated here. |
 
-Both exceptions are **decisions, not gaps**. A future parity pass must read this table before
-generating missing files.
+The exception is a **decision, not a gap**. A future parity pass must read this table before
+generating missing files. The former reduced GitHub Copilot prompt roster was retired on
+2026-09-08: `.github/prompts/` now carries every non-release command, so the surface is checked
+for full parity like the others.
 
 ## 5. Cascade checklist
 
@@ -113,12 +117,13 @@ omitted three surfaces and thereby produced the drift this file exists to preven
 - [ ] `.claude/commands/<name>.md`
 - [ ] `CLAUDE.md` — palette row
 - [ ] `.agent/workflows/<name>.md`
-- [ ] `.pi/prompts/<name>.md`
-- [ ] `.pi/AGENTS.md` — palette row
-- [ ] `.github/prompts/<name>.prompt.md` — only if the agent is in the declared Copilot subset (§4)
-- [ ] `.agents/skills/<name>/SKILL.md` and `.codex/agents/<name>.toml` (§2.1) — only when the change adds or renames a **skill or subagent**, not for ordinary agent changes
+- [ ] `.github/prompts/<name>.prompt.md` — release family excepted (§4)
+- [ ] `.github/copilot-instructions.md` — palette row
+- [ ] `.opencode/commands/<name>.md` — release family excepted (§4)
+- [ ] `.agents/skills/<name>/SKILL.md`, `.github/skills/<name>/SKILL.md` and `.codex/agents/<name>.toml` (§2.1) — only when the change adds or renames a **skill or subagent**, not for ordinary agent changes
 - [ ] Rules-only adapters (§3) — only if the change alters a **layer mapping**, not for ordinary agent changes
 - [ ] `.vscode/tasks.json` — only if the agent has a task-runner equivalent
+- [ ] `.github/agents/<role>.agent.md` — only when the change adds or renames a **role** in `docs/ai/roles/`, not for ordinary agent changes
 
 ## 6. Related
 

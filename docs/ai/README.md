@@ -1,4 +1,4 @@
-﻿<!-- metadata_header
+<!-- metadata_header
 type: meta
 id: ai-docs-index
 version: 2.0
@@ -8,7 +8,7 @@ version: 2.0
 
 > [!IMPORTANT]
 > This directory is the **portable, model-agnostic Brain**.
-> Any AI tool (GitHub Copilot, Claude Code, Gemini, Cursor, etc.) should start here.
+> Any AI tool (GitHub Copilot, Claude Code, Codex, Cursor, etc.) should start here.
 
 ## Start Here
 
@@ -179,6 +179,8 @@ points to for role adoption. That file is the single roster; this index does not
 | `.claude/agents/code-reviewer.md` | `roles/reviewer.md` | Critic |
 | `.claude/agents/migration-checker.md` | `roles/owner.md` | Owner |
 
+GitHub Copilot exposes every role directly: `.github/agents/<role>.agent.md` exists for each file in `docs/ai/roles/` and carries the same name, so no mapping table is needed.
+
 ## Adapter Layer (keeps this portable)
 
 Adapters are thin pointers that map tool-specific features to the canonical Brain.
@@ -188,14 +190,13 @@ Adapters are thin pointers that map tool-specific features to the canonical Brai
 [`meta/adapter-surfaces.md`](meta/adapter-surfaces.md) is the **single inventory** of every surface,
 its tier, and where command parity is expected. Do not keep a second copy here — in summary:
 
-- **Root boot files** — `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`.
+- **Root boot files** — `CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`
+  (loaded from `.github/`; see `meta/adapter-surfaces.md` §1).
 - **Full adapters** (per-command file format; parity expected) — `.claude/`, `.agent/` (Antigravity),
-  `.pi/`, `.github/`.
+  `.github/`, `.opencode/`.
 - **Skill/hook-only adapters** (no command format; skill-name and hook-path resolution checked) —
   `.agents/skills/`, `.codex/`.
-- **Rules-only adapters** (no command format; parity not expected) — `.clinerules/`, `.cursor/rules/`,
-  `.windsurf/rules/`, `.amazonq/rules/`, `.junie/guidelines.md` (plus the legacy single-file
-  `.cursorrules` / `.windsurfrules` stubs).
+- **Rules-only adapters** (no command format; parity not expected) — `.cursor/rules/`.
 
 The two sections below detail the native features of the two richest surfaces; every other surface is
 described in the inventory.
@@ -207,8 +208,8 @@ GitHub Copilot supports native features that **reference** the Brain without dup
 | Feature | Directory | How It Maps to Brain |
 |---------|-----------|---------------------|
 | Instructions | `.github/copilot-instructions.md` + `.github/instructions/` | Repo-wide + path-scoped adapters → `docs/ai/rules/` |
-| Agents | `.github/agents/` | Custom agents → `docs/ai/roles/`, `docs/ai/agents/`, `docs/ai/memory/` |
-| Prompts | `.github/prompts/` | Slash-command wrappers → `docs/ai/commands/` and `docs/ai/agents/` |
+| Agents | `.github/agents/` | Custom agents → one `<role>.agent.md` per role in `docs/ai/roles/`, plus the five subagent personas mirrored from `.claude/agents/` (`docs/ai/memory/`) |
+| Prompts | `.github/prompts/` | One `<name>.prompt.md` per palette command → `docs/ai/agents/` (release family excepted) |
 | Skills | `.github/skills/` | Agent Skills wrappers → `docs/ai/skills/` |
 | Shared agent instructions | `AGENTS.md` | Cross-tool always-on adapter → `docs/ai/README.md` |
 
@@ -249,5 +250,5 @@ Adapters MUST NOT embed logic; they should point to `docs/ai/`.
 - Document template: `docs/ai/meta/template-spec.md`
 
 <!-- footer
-last_verified: 2026-08-20
+last_verified: 2026-09-08
 -->

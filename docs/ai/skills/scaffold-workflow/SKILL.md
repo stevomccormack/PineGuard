@@ -71,21 +71,22 @@ maintain its own list — read that file, then work its §5 cascade checklist ro
     | 3 | `.claude/commands/<name>.md` | `Act as **<Role>**. Read and execute docs/ai/agents/<name>.md.` | never |
     | 4 | `CLAUDE.md` | Palette row under the matching `###` section | never |
     | 5 | `.agent/workflows/<name>.md` | YAML frontmatter (`description`) + `1. Read and execute docs/ai/agents/<name>.md.` | release family (§4) |
-    | 6 | `.pi/prompts/<name>.md` | Pi prompt pointing at the playbook | release family (§4) |
-    | 7 | `.pi/AGENTS.md` | Palette row | release family (§4) |
-    | 8 | `.github/prompts/<name>.prompt.md` | Copilot prompt pointing at the playbook | agent is outside the declared Copilot subset (§4) |
-    | 9 | `.agents/skills/<name>/SKILL.md`, `.codex/agents/<name>.toml` (§2.1) | One `SKILL.md` per Brain skill; TOML per Codex agent | ordinary agent changes; only touch these if the change adds or renames a **skill or subagent** |
+    | 6 | `.github/copilot-instructions.md` | Palette row under the matching `###` section | release family (§4) |
+    | 7 | `.github/prompts/<name>.prompt.md` | Copilot prompt pointing at the playbook | release family (§4) |
+    | 8 | `.opencode/commands/<name>.md` | `Act as **<Role>**. Read and execute docs/ai/agents/<name>.md.` (same one-liner as `.claude/commands/`, plus a `description:` frontmatter) | release family (§4) |
+    | 9 | `.agents/skills/<name>/SKILL.md`, `.github/skills/<name>/SKILL.md`, `.codex/agents/<name>.toml` (§2.1) | One `SKILL.md` per Brain skill; TOML per Codex agent | ordinary agent changes; only touch these if the change adds or renames a **skill or subagent** |
     | 10 | Rules-only adapters (§3) | — | ordinary agent changes; only touch these if the change alters a **layer mapping** |
-    | 11 | `.vscode/tasks.json` | Task entry | the agent has no task-runner equivalent |
+    | 11 | `.github/agents/<role>.agent.md` | One `<role>.agent.md` per role in `docs/ai/roles/` | ordinary agent changes; only touch this if the change adds or renames a **role** |
+    | 12 | `.vscode/tasks.json` | Task entry | the agent has no task-runner equivalent |
 
-    Rows 5–7 take `// turbo-all` only under the Turbo Safety rule above.
+    Row 5 takes `// turbo-all` only under the Turbo Safety rule above.
 
 4.  **Validation**
     - Verify every generated file exists at the path written and ends in `.md`.
     - Verify adapter YAML frontmatter is valid.
     - Verify no adapter contains embedded scripts, steps, or logic — only a pointer.
     - Verify the role named in each adapter resolves to the role the playbook declares.
-    - Run `pwsh ./tools/audit-cli/Run-All.ps1` and confirm the adapter-parity rule is clean.
+    - Run `pnpm -C apps/cli exec tsx src/index.ts audit surface-parity` and confirm it is clean.
 
 ## 5. Definition of Done
 
@@ -96,14 +97,15 @@ One checkbox per cascade row. Tick **Done** or **N/A (policy)** — never leave 
 - [ ] `.claude/commands/<name>.md` created
 - [ ] `CLAUDE.md` palette row added
 - [ ] `.agent/workflows/<name>.md` created (or N/A — release family)
-- [ ] `.pi/prompts/<name>.md` created (or N/A — release family)
-- [ ] `.pi/AGENTS.md` palette row added (or N/A — release family)
-- [ ] `.github/prompts/<name>.prompt.md` created (or N/A — outside the Copilot subset)
-- [ ] `.agents/skills/<name>/SKILL.md` and `.codex/agents/<name>.toml` created (or N/A — no skill/subagent change)
+- [ ] `.github/copilot-instructions.md` palette row added (or N/A — release family)
+- [ ] `.github/prompts/<name>.prompt.md` created (or N/A — release family)
+- [ ] `.opencode/commands/<name>.md` created (or N/A — release family)
+- [ ] `.agents/skills/<name>/SKILL.md`, `.github/skills/<name>/SKILL.md` and `.codex/agents/<name>.toml` created (or N/A — no skill/subagent change)
 - [ ] Rules-only adapters reviewed (or N/A — no layer-mapping change)
+- [ ] `.github/agents/<role>.agent.md` created (or N/A — no role change)
 - [ ] `.vscode/tasks.json` updated (or N/A — no task-runner equivalent)
 - [ ] Every adapter is a pointer only, and names the playbook's role
-- [ ] `tools/audit-cli` adapter-parity rule passes
+- [ ] The `surface-parity` audit rule passes
 
 ## 6. Reference Material (Deep Dive)
 

@@ -17,7 +17,7 @@ The `tools/` directory contains 90 PowerShell scripts that only run natively on 
 - Platform-agnostic tooling (Windows Git Bash, macOS, Linux)
 - Bash `.sh` equivalents for all 53 in-scope scripts (everything except `tools/audit-cli/`)
 - Platform-specific alternatives where a script assumes a Windows-only installer (e.g. Qodana CLI acquisition via brew/apt/direct download)
-- Audit-cli deferred to a separate future plan
+- Audit-cli migrated to TypeScript/Node under `apps/cli/` (see `docs/ai/plans/audit-cli-rebuild.md`)
 
 ## Conventions
 

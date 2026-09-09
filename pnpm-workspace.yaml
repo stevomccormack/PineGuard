@@ -1,0 +1,13 @@
+packages:
+  - "apps/*"
+
+# pnpm 12 requires explicit opt-in for dependency install/postinstall scripts.
+# esbuild: needed by tsup/vite to select the platform-specific binary — safe, required.
+# tree-sitter-c-sharp: its install script (node-gyp-build) only wires up the native
+#   `tree-sitter` binding, which this package does not use — we only read the
+#   prebuilt tree-sitter-c_sharp.wasm file for web-tree-sitter, so the script is
+#   left disabled.
+allowBuilds:
+  esbuild: true
+  tree-sitter-c-sharp: false
+

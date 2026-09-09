@@ -11,7 +11,7 @@ passes a `MustCodes.<Domain>.<Aspect>.<Condition>` constant — `Fail(code, temp
 `FromBool(ok, code, template, paramName, value, result)`.
 
 **Why:** the code is the stable contract for 400 bodies, log lines, localisation tables and the Guard
-exception map; the message is the human half and is free to change. Plan 00 §5.4 is the grammar; Rule13
+exception map; the message is the human half and is free to change. Plan 00 §5.4 is the grammar; `must-codes`
 (audit) and `MustCodesTests` (reflection, in Core) are the two gates.
 
 **How to apply when writing or reviewing a clause:**
@@ -40,7 +40,7 @@ whole tree, so a new domain file is auto-enrolled):
 
 Test wiring: `MustExpected`/`FluentExpected`/`GuardExpected`/`DataAnnotationExpected` take a trailing
 `Code`, asserted by the layer base class only when non-null. Spot-check one representative group per
-clause; Rule13 is the exhaustive check. Legacy-shaped test files (raw `IsCase<T>` + `Assert.Equal`, e.g.
+clause; `must-codes` is the exhaustive check. Legacy-shaped test files (raw `IsCase<T>` + `Assert.Equal`, e.g.
 `MustStringClausesTests`) have no `MustExpected` to hang it on — add a small
 `AssertCode(expectedCode, result)` helper that asserts only when `result.Failed` rather than rewriting
 the file to the v2 fixture architecture.

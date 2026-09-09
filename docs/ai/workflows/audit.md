@@ -1,44 +1,62 @@
 <!-- metadata_header
 type: workflow
 id: workflow-audit
-version: 1.0
+version: 2.0
 -->
 
 # Workflow: Audit
 
 > [!NOTE]
-> Runs PineGuard's repo audits via the PowerShell wrappers under `tools/audit-cli/`.
-> These audits check convention compliance and cross-layer mapping/parity.
+> Runs PineGuard's repo audits via `pineguard audit`, the TypeScript CLI in `apps/cli`.
+> These audits check convention compliance and cross-layer mapping/parity. See
+> `docs/ai/specs/tools/audit-cli/spec.md` (v2) for the full specification — layout, command
+> surface, rule catalog, baseline ratchet, and parser approach.
 
 ## Context
 
 - **Role**: [DevOps Engineer](../roles/shipper.md)
-- **Reference**: `tools/audit-cli/Run-All.ps1` (compat: `tools/audit-cli/Run-AuditRules.ps1`)
+- **Reference**: `apps/cli/src/commands/audit.ts`; spec: `docs/ai/specs/tools/audit-cli/spec.md`
 
-## Rule08 Notes (ordering parity)
+## `ordering` notes (cross-layer method ordering)
 
 - MustClauses define the canonical concept ordering.
-- GuardClauses are frequently named for forbidden states and implemented via Must complements; Rule08 compares Guard ordering using the **Must clause each Guard method invokes** (not the Guard method name).
+- GuardClauses are frequently named for forbidden states and implemented via Must complements;
+  `ordering` (legacy Rule08) compares Guard ordering using the **Must clause each Guard method
+  invokes** (not the Guard method name).
 
 ## Parameters
 
-- **Scope**: (`All`, `Library`, `Testing`) — implemented via wrapper scripts under `tools/audit-cli/`.
-- **RuleId**: (optional, alias `-Rule`) any RuleId present in `tools/audit-cli/rules/Load-Catalog.ps1`.
-  - Library rules: Rule01..Rule13
-  - Testing rules: Rule50..Rule54
-- **Configuration**: (`Debug`, `Release`) — used by rules that build/analyze compiled output
-- **RepoRoot**: (optional) repo root path; defaults to auto-resolve
-- **AllowViolations**: (optional switch) applies to rules that support policy allowlists (e.g., Rule07 + Rule08)
+- **Rule selection**: zero or more slugs or legacy `RuleNN` ids as positional arguments, e.g.
+  `pineguard audit layer-parity test-files` or `pineguard audit Rule50` (legacy ids still
+  resolve — see the spec §7). No selection (or the literal token `all`) runs every registered
+  rule.
+- **`--scope <scope>`**: `library`, `testing`, or `docs` — see the spec §3 for which rules live
+  in each scope.
+- **`--gate`**: only run merge-blocking rules (`test-files`, `doc-links`, `surface-parity` today
+  — spec §8).
+- **`--format <format>`**: `pretty` (default), `json`, `github`, or `sarif`.
+- **`--changed`**: restrict file discovery to files changed vs `main`/`origin/main`, for fast
+  pre-commit feedback.
+- **`--update-baseline`** / **`--no-baseline`**: baseline ratchet controls — see spec §4.
+- **`--list`**: print the full rule catalog (slug, legacy id, scope, gate, description).
 
 ## CI Gate
 
-`.github/workflows/ci.yml` runs `Run-All.ps1 -Configuration Release -RuleId Rule50` on every PR.
-Rule50 (Theory-only + Tests/TestData pairing) is the only audit rule that gates merges, and a
-Rule50 violation is a merge blocker — reproduce it locally before pushing:
+`.github/workflows/ci.yml`'s audit job runs `pineguard audit --gate --format github` on every
+PR. `test-files` (legacy Rule50, Theory-only + `Tests`/`TestData` pairing), `doc-links` (legacy
+Rule11), and `surface-parity` (legacy Rule12) are the three merge-blocking rules — a violation
+in any of them is a merge blocker. Reproduce the gate locally before pushing:
 
-```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RuleId Rule50
+```sh
+pnpm -C apps/cli exec tsx src/index.ts audit --gate
 ```
+
+> [!NOTE]
+> Until `apps/cli/config/baseline.json` is snapshotted at cutover (plan §9.2 P6.1), the gate is
+> **expected** to fail on pre-existing debt in `doc-links` (real drift the rebuild newly
+> surfaced — see the spec's §3.2 and the plan's §2.4) — this is by design, not a regression
+> introduced by your change. Once the baseline lands, a gate failure means your change
+> introduced a genuinely new, un-baselined finding.
 
 ## Auto-Approval
 
@@ -54,42 +72,46 @@ See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface invento
 
 1. **Run all audit rules (recommended)**
 
-   ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RepoRoot "."
+   ```sh
+   pnpm -C apps/cli exec tsx src/index.ts audit
    ```
 
-   Optional: allow violations for Rule07 (useful while tightening the policy):
+   Show the full accumulated debt, ignoring the baseline ratchet (useful for a debt survey, not
+   for deciding mergeability):
 
-   ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-All.ps1" -Configuration Release -RepoRoot "." -AllowViolations
+   ```sh
+   pnpm -C apps/cli exec tsx src/index.ts audit --no-baseline
    ```
 
-   Library-only (default subset):
+   Scope to one area:
 
-   ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-AuditLibraryRules.ps1" -Configuration Release -RepoRoot "."
-   ```
-
-   Testing-only (default subset):
-
-   ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/Run-AuditTestingRules.ps1" -Configuration Release -RepoRoot "."
+   ```sh
+   pnpm -C apps/cli exec tsx src/index.ts audit --scope library
+   pnpm -C apps/cli exec tsx src/index.ts audit --scope testing
+   pnpm -C apps/cli exec tsx src/index.ts audit --scope docs
    ```
 
 2. **Run a single rule (when iterating)**
 
-   Examples:
+   By slug (preferred) or legacy id — both resolve to the same rule:
 
-   ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/rules/Test-Rule02-RulesUsage.ps1" -Configuration Release -RepoRoot "."
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/rules/Test-Rule07-Nullability.ps1" -RepoRoot "."
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/audit-cli/rules/Test-Rule08-Ordering.ps1" -RepoRoot "."
+   ```sh
+   pnpm -C apps/cli exec tsx src/index.ts audit rules-usage
+   pnpm -C apps/cli exec tsx src/index.ts audit nullability
+   pnpm -C apps/cli exec tsx src/index.ts audit ordering
+   pnpm -C apps/cli exec tsx src/index.ts audit Rule50   # legacy alias for test-files
    ```
 
 3. **Inspect outputs**
-   - Rule output files are written under `artifacts/audit/` (e.g., `artifacts/audit/Rule02-rules-to-must-usage-scan.txt`).
-   - Treat any reported violations as blocking unless the run explicitly used `-AllowViolations`.
+   - Pretty output prints directly to the terminal. `--format json` also writes
+     `+ artifacts/audit/<slug>.json` per rule plus `+ artifacts/audit/summary.json` — runtime
+     output under the gitignored `artifacts/` directory, never a tracked file.
+   - Treat any un-baselined finding as blocking; a baselined finding is pre-existing debt (spec
+     §4) — a *new* finding in an already-baselined file still surfaces and still blocks, so
+     baselined debt never grants a file blanket immunity.
 
 4. **Triage + remediate**
-   - Fix the highest-signal violations first (naming/collisions, missing mappings, parity).
-   - Re-run the specific rule you’re iterating on, then re-run `Run-All.ps1` before finalizing.
+   - Fix the highest-signal violations first: the three gate rules (`test-files`, `doc-links`,
+     `surface-parity`), then naming/collisions and missing mappings in the `library` scope.
+   - Re-run the specific rule you're iterating on, then re-run the full `pineguard audit` before
+     finalizing.

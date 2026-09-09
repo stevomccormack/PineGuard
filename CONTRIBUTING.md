@@ -32,17 +32,18 @@ Every pull request runs through `.github/workflows/ci.yml`:
 1. **Build** — Release build of `PineGuard.slnx`, zero warnings (`TreatWarningsAsErrors`,
    .NET analyzers at `AnalysisMode=Recommended`, XML docs enforced via CS1591).
 2. **Tests** — all test projects, `[Theory]` + `TheoryData` only. `[Fact]` is rejected unless the
-   file is allowlisted in `tools/audit-cli/test-audit-exceptions.json` under `Rule50.AllowFact`,
+   file is allowlisted in `apps/cli/config/exceptions.json` under `test-files`,
    and adding an entry there needs reviewer sign-off. See
    `docs/ai/specs/testing/unit-test.md`.
 3. **Coverage** — 100% line **and** branch coverage, gated via ReportGenerator
    (`tools/code-coverage/coverlet.runsettings`).
 4. **Format** — `dotnet format --verify-no-changes`.
 5. **Roslyn** — zero `CS*` warnings.
-6. **Audit** — machine-checked test-file conventions via `tools/audit-cli` (Rule50: `[Theory]`-only
-   plus `Tests`/`TestData` file pairing). Reproduce locally with
-   `./tools/audit-cli/Run-All.ps1 -Configuration Release -RuleId Rule50`. Rule51–54 exist but are
-   not yet gated — they report pre-existing debt.
+6. **Audit** — machine-checked repo conventions via `apps/cli` (`pineguard audit`). The
+   test-file rule is `test-files` (`[Theory]`-only plus `Tests`/`TestData` file pairing).
+   Reproduce locally with `pnpm -C apps/cli exec tsx src/index.ts audit test-files`.
+   `test-structure`, `test-records`, `test-orphans` and `test-tuples` exist but are not yet
+   gated — they report pre-existing debt.
 
 A **Qodana** (JetBrains static analysis) job also exists but is opt-in: it runs only when the
 `QODANA_ENABLED` repository variable is `true`.

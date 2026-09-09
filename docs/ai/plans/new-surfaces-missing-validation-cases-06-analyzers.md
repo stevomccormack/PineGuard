@@ -90,7 +90,7 @@ Files (`+ src/PineGuard.Analyzers/…`): `DiagnosticIds.cs` (`internal static cl
 
 ### 3.2 Onboarding differences
 
-Plan 00 §8 applies with these deltas: two source projects map to one test project and one coverage scope (`Analyzers`). The coverage scripts resolve one source directory and one path regex per scope, so the registry entry is `SourceDir = src/PineGuard.Analyzers` (existence probe), `PathRegex = '(?i)(^|[\\/])(src[\\/]+)?PineGuard\.Analyzers(\.CodeFixes)?[\\/]'` and `IncludePattern = @('[PineGuard.Analyzers]*', '[PineGuard.Analyzers.CodeFixes]*')` — the `switch` blocks take the regex, not an array of directories; `ci.yml` filter covers both `src/` folders; Qodana slnx lists both; `tools/release/Run-GithubRelease.ps1` / `Run-NugetUnlist.ps1` list `PineGuard.Analyzers` only; the `.editorconfig` test brace list gains `PineGuard.Analyzers.UnitTests`; Rule53 maps `PineGuard.Analyzers.UnitTests` → `+ src/PineGuard.Analyzers` — code-fix assertions live inside the analyzer test classes as `Fix` operation groups so no orphan allowlist entry is needed.
+Plan 00 §8 applies with these deltas: two source projects map to one test project and one coverage scope (`Analyzers`). The coverage scripts resolve one source directory and one path regex per scope, so the registry entry is `SourceDir = src/PineGuard.Analyzers` (existence probe), `PathRegex = '(?i)(^|[\\/])(src[\\/]+)?PineGuard\.Analyzers(\.CodeFixes)?[\\/]'` and `IncludePattern = @('[PineGuard.Analyzers]*', '[PineGuard.Analyzers.CodeFixes]*')` — the `switch` blocks take the regex, not an array of directories; `ci.yml` filter covers both `src/` folders; Qodana slnx lists both; `tools/release/Run-GithubRelease.ps1` / `Run-NugetUnlist.ps1` list `PineGuard.Analyzers` only; the `.editorconfig` test brace list gains `PineGuard.Analyzers.UnitTests`; `test-orphans` maps `PineGuard.Analyzers.UnitTests` → `+ src/PineGuard.Analyzers` — code-fix assertions live inside the analyzer test classes as `Fix` operation groups so no orphan allowlist entry is needed.
 
 ### 3.3 Docs
 
@@ -98,13 +98,13 @@ Plan 00 §8 applies with these deltas: two source projects map to one test proje
 
 ## 4. Testing plan
 
-Project `+ tests/PineGuard.Analyzers.UnitTests/` (`net8.0;net10.0`), test-only packages `Microsoft.CodeAnalysis.CSharp.Analyzer.Testing` and `Microsoft.CodeAnalysis.CSharp.CodeFix.Testing` (the current `Testing` line with `DefaultVerifier`), ordinary `ProjectReference`s (default `ReferenceOutputAssembly`) to **both** analyzer projects so both DLLs and PDBs land in the test output — verify with `Get-ChildItem tests/PineGuard.Analyzers.UnitTests/bin/Debug/net10.0 -Filter PineGuard.Analyzers*.pdb` before the first coverage run — **and** to `PineGuard.Core`, `PineGuard.MustClauses`, `PineGuard.GuardClauses` (their built assemblies are added to `TestState.AdditionalReferences` so test sources can resolve `Guard`/`Must`). Every `XxxTests.cs` ships with `XxxTestData.cs` (Rule50).
+Project `+ tests/PineGuard.Analyzers.UnitTests/` (`net8.0;net10.0`), test-only packages `Microsoft.CodeAnalysis.CSharp.Analyzer.Testing` and `Microsoft.CodeAnalysis.CSharp.CodeFix.Testing` (the current `Testing` line with `DefaultVerifier`), ordinary `ProjectReference`s (default `ReferenceOutputAssembly`) to **both** analyzer projects so both DLLs and PDBs land in the test output — verify with `Get-ChildItem tests/PineGuard.Analyzers.UnitTests/bin/Debug/net10.0 -Filter PineGuard.Analyzers*.pdb` before the first coverage run — **and** to `PineGuard.Core`, `PineGuard.MustClauses`, `PineGuard.GuardClauses` (their built assemblies are added to `TestState.AdditionalReferences` so test sources can resolve `Guard`/`Must`). Every `XxxTests.cs` ships with `XxxTestData.cs` (`test-files`).
 
 Base `BaseUnitTest`; project-local records:
 
 ```csharp
 public sealed record AnalyzerExpected(bool IsValid, string? Message = null, string? DiagnosticId = null, int? Line = null, int? Column = null, string? FixedSource = null) : ReturnExpected(IsValid, Message);
-public sealed record AnalyzerCase(string Name, string Source, AnalyzerExpected Expected) : ReturnCase<string, AnalyzerExpected>(Name, Source, Expected);   // the positional is the C# source, named so (Rule54 reads `Value` as the value under test)
+public sealed record AnalyzerCase(string Name, string Source, AnalyzerExpected Expected) : ReturnCase<string, AnalyzerExpected>(Name, Source, Expected);   // the positional is the C# source, named so (`test-tuples` reads `Value` as the value under test)
 ```
 
 Sources are C# snippets held as `const string` fields in the TestData shared-fields section (they are test data, not fixtures — no cross-layer reuse). Helper methods at the bottom of each TestData class build the `CSharpAnalyzerTest`/`CSharpCodeFixTest` with the reference set. Async test methods use the Phase 3 `public async Task` form.
@@ -131,7 +131,7 @@ Coverage: `-Scope Analyzers` 100/100 (analyzers run in-process under the test ho
 
 **W5** `dotnet pack src/PineGuard.Analyzers -c Release -o artifacts/nupkg` and inspect the package layout (unzip; assert `analyzers/dotnet/cs/*.dll`, no `lib/`); release-tracking files; README; commit `build(analyzers): pack both assemblies as a development dependency`.
 
-**W6** Brain/agents/README (Rule11/12); `-Scope Analyzers` and `-Scope All` 100/100; Plan 00 §7; PR; merge; cleanup.
+**W6** Brain/agents/README (`doc-links`/12); `-Scope Analyzers` and `-Scope All` 100/100; Plan 00 §7; PR; merge; cleanup.
 
 ## 6. Definition of Done
 

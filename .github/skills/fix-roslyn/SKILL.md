@@ -7,15 +7,15 @@ description: Fix Roslyn compiler diagnostics for PineGuard by following the cano
 ## Load First
 
 Read these files before editing code:
-1. [tools/code-diagnostics/spec.md](../../../docs/ai/specs/tools/code-diagnostics/spec.md)
+1. [code-diagnostics spec](../../../docs/ai/specs/tools/code-diagnostics/spec.md)
 2. [roslyn.md](../../../docs/ai/rules/roslyn.md)
-3. [fix-roslyn/SKILL.md](../../../docs/ai/skills/fix-roslyn/SKILL.md)
+3. [fix-roslyn SKILL.md](../../../docs/ai/skills/fix-roslyn/SKILL.md)
 4. [validation-builder memory](../../../docs/ai/memory/validation-builder.md)
 5. [code-reviewer memory](../../../docs/ai/memory/code-reviewer.md)
 
 ## Execute
 
-Follow the canonical recipe in [docs/ai/skills/fix-roslyn/SKILL.md](../../../docs/ai/skills/fix-roslyn/SKILL.md) exactly.
+Follow the canonical recipe in [fix-roslyn SKILL.md](../../../docs/ai/skills/fix-roslyn/SKILL.md) exactly.
 
 ## Verify
 
