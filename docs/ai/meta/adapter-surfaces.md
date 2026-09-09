@@ -2,7 +2,7 @@
 title: Adapter Surfaces
 type: meta
 status: normative
-last_verified: 2026-09-08
+last_verified: 2026-09-09
 ---
 
 # Adapter Surfaces
@@ -68,6 +68,26 @@ command parity; they are checked for skill-name and hook-path resolution.
 
 Skill files on these surfaces MUST use the **current** Brain skill names — a directory carrying a
 retired verb (taxonomy §N.3) is drift, not a variant.
+
+#### Surface-native utility skills (declared exemption)
+
+Two skills — `changelog` and `dependency-audit` — are **surface-native**: they live on
+`.claude/skills/` and `.agents/skills/` only, have no `docs/ai/skills/<name>/SKILL.md`
+counterpart, and are **exempt from skill-name parity** with `.github/skills/`. This is a
+decision, not a gap. Both are generic developer utilities — formatting `git log` output, and
+running `dotnet list package --vulnerable / --outdated / --deprecated` — that carry no PineGuard
+architecture knowledge: no layer stack, no Must/Guard semantics, no spec or rules references.
+Nothing in the Brain routes to them; no agent, workflow, command or slash command names either
+one. Both also set `disable-model-invocation: true`, which no other skill on any surface does:
+they are explicitly user-invoked conveniences, not recipes the model reaches for. Promoting some
+340 words of `git` and `dotnet` invocations into a Brain skill plus three wrappers apiece would
+add eight files that restate what two already say. Protocol Rule #1 governs **routing** surfaces —
+files that map a tool's entry points onto Brain playbooks — and neither of these routes anything.
+
+**Tripwire.** Promote a surface-native skill into the Brain the moment either becomes true: it
+acquires PineGuard-specific knowledge (layer stack, validation semantics, spec or rules
+references), or it gains an agent, command or slash-command counterpart. At that point it is Brain
+content wearing an adapter's clothes, and Rule #1 applies in full.
 
 ## 3. Rules-only adapters
 
