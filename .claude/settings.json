@@ -57,10 +57,7 @@
       "Bash(reg query \"HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Internet Settings\":*)",
       "Bash(tasklist:*)",
       "Bash(ForEach-Object { $_Name })",
-      "Bash(\"c:/Users/stevo/.vscode/extensions/sonarsource.sonarlint-vscode-4.44.0-win32-x64/jre/21.0.10-win32-x86_64.tar/bin/java\" -Djava.net.useSystemProxies=false -jar /dev/null)",
-      "Read(//d/Steve McCormack/GitHub/@stevomccormack/**)",
-      "Bash(gh repo *)",
-      "Edit(/.claude/skills/ask-council/**)"
+      "Bash(gh repo *)"
     ],
     "deny": [
       ".etc/powershell/.env",

@@ -35,7 +35,7 @@ cast form is only needed when one dataset mixes multiple concrete case types.
 ### Best current precedents (read these, not the older Utils/*Tests.cs files)
 - `tests/PineGuard.Core.UnitTests/Codes/MustCodesTests.cs` — cleanest fully-flat "(Other)" example.
 - `tests/PineGuard.Core.UnitTests/Common/EnumerationTestData.cs` (`IntConstructor`, `FromName` groups)
-  and `Common/ThrowHelperTests.cs` — `ReturnCase`/`ThrowsCase` + `ThrowsCaseAssert` end-to-end.
+  and `tests/PineGuard.Core.UnitTests/Common/ThrowHelperTests.cs` — `ReturnCase`/`ThrowsCase` + `ThrowsCaseAssert` end-to-end.
 - Most existing `tests/PineGuard.Core.UnitTests/Utils/*Tests.cs` files (e.g. `CollectionUtilityTests`,
   `StringUtilityTests`, `FilePathUtilityTests`) still use the pre-v2 `_ReturnsExpected` naming and
   `IsCase<T>`/no-`ITestOutputHelper`-ctor style — that's drift from before the flat-v2 migration, not
