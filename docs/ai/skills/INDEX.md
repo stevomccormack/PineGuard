@@ -2,8 +2,10 @@
 
 > Quick-reference index of all skills across the Brain and its three skill-hosting adapter
 > surfaces (`.claude/`, `.github/`, `.agents/`). OpenCode hosts no skills of its own: it loads
-> `.claude/skills/` and `.agents/skills/` natively. Each entry links to its canonical SKILL.md.
-> The full surface inventory lives in [`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md).
+> `.claude/skills/` and `.agents/skills/` natively. Each entry links to its canonical SKILL.md,
+> except the `.agents/skills/`-only command-family routers noted in their own section below, which
+> have no Brain-level canonical file. The full surface inventory lives in
+> [`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md).
 
 ## Brain Skills (`docs/ai/skills/`)
 
@@ -132,6 +134,27 @@ Generic `AGENTS.md`-convention adapters. Same delegation contract as the Claude 
 | [changelog](../../../.agents/skills/changelog/SKILL.md) | *(standalone)* | Generate changelog from git history |
 | [dependency-audit](../../../.agents/skills/dependency-audit/SKILL.md) | *(standalone)* | Check NuGet vulnerabilities and outdated packages |
 | [ask-council](../../../.agents/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
+
+### `.agents/skills/`-only: Command-Family Routers
+
+Codex carries no per-command prompt-file format at all, so `.agents/skills/` also carries one
+`SKILL.md` per multi-command family in [`docs/ai/commands/`](../commands/) — these have **no**
+Brain delegate under `docs/ai/skills/`, unlike every entry above. Each reads its matching
+`docs/ai/commands/<family>.md` intent table and resolves the user's requested scope/tool/severity
+to the row's `docs/ai/agents/*.md` playbook. See
+[`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md) §2.1.1 for the full rationale and
+the excluded families (`ask-council`, `document`, `scaffold-*`, and the Claude-only release family).
+
+| Skill | Command contract | Description |
+|-------|-------------------|-------------|
+| [commit](../../../.agents/skills/commit/SKILL.md) | [`commands/commit.md`](../commands/commit.md) | Route `/commit-*` to its scoped commit agent |
+| [scan](../../../.agents/skills/scan/SKILL.md) | [`commands/scan.md`](../commands/scan.md) | Route `/scan-roslyn-*`, `/scan-qodana-*`, `/scan-sonar` to its tool+scope agent |
+| [fix](../../../.agents/skills/fix/SKILL.md) | [`commands/fix.md`](../commands/fix.md) | Route `/fix-coverage-*`, `/fix-test-*`, `/fix-roslyn-all`, `/fix-sonar-*` to its agent |
+| [test](../../../.agents/skills/test/SKILL.md) | [`commands/test.md`](../commands/test.md) | Route `/test-*` to its scoped test agent |
+| [coverage](../../../.agents/skills/coverage/SKILL.md) | [`commands/coverage.md`](../commands/coverage.md) | Route `/coverage-*` to its scoped coverage agent |
+| [format](../../../.agents/skills/format/SKILL.md) | [`commands/format.md`](../commands/format.md) | Route `/format-*` to its scoped format agent |
+| [clean](../../../.agents/skills/clean/SKILL.md) | [`commands/clean.md`](../commands/clean.md) | Route `/clean-*` to its target-scoped clean agent |
+| [audit](../../../.agents/skills/audit/SKILL.md) | [`commands/audit.md`](../commands/audit.md) | Route `/audit-cli`, `/audit-gap` to its agent |
 
 ---
 

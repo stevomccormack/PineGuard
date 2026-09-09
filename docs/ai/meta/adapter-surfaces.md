@@ -2,7 +2,7 @@
 title: Adapter Surfaces
 type: meta
 status: normative
-last_verified: 2026-09-08
+last_verified: 2026-09-09
 ---
 
 # Adapter Surfaces
@@ -63,11 +63,37 @@ command parity; they are checked for skill-name and hook-path resolution.
 
 | Surface | Tool | Shape |
 |---------|------|-------|
-| `.agents/skills/` | Generic `AGENTS.md`-convention tools | One `SKILL.md` directory per Brain skill, mirroring `docs/ai/skills/` (the roster lives in [`docs/ai/skills/INDEX.md`](../skills/INDEX.md) — do not maintain a count here) |
+| `.agents/skills/` | Generic `AGENTS.md`-convention tools, read natively by OpenCode and OpenAI Codex | One `SKILL.md` directory per Brain skill, mirroring `docs/ai/skills/`, **plus** one `SKILL.md` per command family that has no Brain-level counterpart (see §2.1.1). The Brain-mirror roster lives in [`docs/ai/skills/INDEX.md`](../skills/INDEX.md) — do not maintain a count here. |
 | `.codex/` | OpenAI Codex | `agents/*.toml`, `hooks/*.sh`, `hooks.json`, `config.toml` |
 
 Skill files on these surfaces MUST use the **current** Brain skill names — a directory carrying a
 retired verb (taxonomy §N.3) is drift, not a variant.
+
+#### 2.1.1 Command-family routers in `.agents/skills/`
+
+Codex carries no per-command prompt-file format at all (unlike the full adapters in §2), so a
+`.codex/agents/*.toml` session has no native file that maps a `/<family>-*` palette entry (e.g.
+`/scan-qodana-guard`) to its `docs/ai/agents/*.md` playbook — its only discoverable route is a
+skill. `.agents/skills/` therefore carries a second kind of entry beyond the Brain mirrors above:
+one `SKILL.md` per multi-command family in `docs/ai/commands/` — `commit`, `scan`, `fix`, `test`,
+`coverage`, `format`, `clean`, `audit`. Each reads its matching `docs/ai/commands/<family>.md`
+intent table, resolves the user's requested scope/tool/severity to a row, and executes that row's
+`docs/ai/agents/*.md` playbook.
+
+These router skills have **no** `docs/ai/skills/` counterpart — they exist only on this surface,
+because only this surface lacks a per-command adapter of its own. They are named after the bare
+family verb (`scan`, not `source-command-scan-qodana-guard`): a per-command mirror was considered
+and rejected as needlessly granular, and a vendor-prefix mirror of OpenAI's `migrate-to-codex`
+tool output (`source-command-*`) was rejected outright as an implementation-detail prefix banned by
+taxonomy §N.2/§N.3 with no rationale of its own.
+
+Excluded by design, with a Brain-level skill or adapter already covering the intent: `ask-council`
+and `document` (each already has a matching `docs/ai/skills/` capability skill by that exact name);
+the single-layer `scaffold-*` intents (`scaffold-rule`, `scaffold-must`, `scaffold-guard`,
+`scaffold-fluent`, `scaffold-annotation`, `scaffold-unit-test`, `new-validation`,
+`scaffold-quality-tool`, `scaffold-workflow` — each is already its own skill per
+`docs/ai/commands/scaffold.md`); and the `github-*`/`nuget-*` release family, which is Claude
+Code-only per §4 and must never reach an auto-approving surface such as this one.
 
 ## 3. Rules-only adapters
 
