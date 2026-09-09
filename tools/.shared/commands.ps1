@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Dot-source this file to import Test-CommandExists into the calling script's scope.
-    Used by tools/docker/* and tools/sonar-scanner/*.
+    Used by tools/docker/* and tools/code-scan/sonarqube/*.
 #>
 
 Set-StrictMode -Version Latest

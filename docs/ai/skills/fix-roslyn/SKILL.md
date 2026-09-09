@@ -6,8 +6,10 @@
 Run the Roslyn compiler diagnostics tool, then fix all reported CS warnings using idiomatic C#.
 
 ## 2. Inputs
-- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`) — which projects to analyze
-- **Filter**: (optional) Regex pattern to filter warning codes (e.g. `CS86` for nullability, `CS0618` for obsolete)
+- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`,
+  `Options`, `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`,
+  `Analyzers`, `Testing`) — which projects to analyze
+- **Code**: (optional) Regex pattern to filter diagnostic codes (e.g. `CS86` for nullability, `CS0618` for obsolete)
 
 ## 3. Critical Rules (The "Must Dos")
 > [!IMPORTANT]
@@ -25,11 +27,32 @@ Run the Roslyn compiler diagnostics tool, then fix all reported CS warnings usin
    pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-diagnostics/Run-CompilerDiagnostics.ps1" -Scope [SCOPE] -OutputFormat Json
    ```
 
-   If a Filter is provided, add `-Filter [FILTER]`.
+   If a Code filter is provided, add `-Code [CODE]`.
 
 2. **Parse the JSON Output**
 
-   Read `artifacts/code-diagnostics/<scope>/diagnostics.json`. Each warning contains: `File`, `Line`, `Column`, `Code`, `Message`, `Project`.
+   Read `artifacts/code-diagnostics/<scope>/diagnostics.json`. The report object is:
+
+   | Field | Meaning |
+   |-------|---------|
+   | `Scope`, `Configuration`, `Code`, `Timestamp` | The invocation that produced this report (`Code` is the `-Code` filter, or `null`) |
+   | `BuildSucceeded` | `false` if any build target failed to compile outright |
+   | `FailedBuildTargets` | The projects/solution that failed to compile |
+   | `TotalWarnings`, `TotalErrors` | Counts after the `-Code` filter |
+   | `ByCode`, `ByFile` | Warning counts grouped by diagnostic code and by file |
+   | `Warnings`, `Errors` | Two separate arrays, split by severity |
+
+   Each entry in `Warnings` / `Errors` contains: `File`, `Line`, `Column`, `Severity`,
+   `CodePrefix`, `CodeNumber`, `Code`, `Message`, `Project`, `TargetFrameworks` (the TFMs the
+   diagnostic was seen in — entries are deduped across a multi-targeting project's per-TFM build
+   passes) and `Occurrences`.
+
+   > [!WARNING]
+   > **Check `BuildSucceeded` and `Errors` before fixing anything.** A report with
+   > `BuildSucceeded: false` came from a broken build, and its warning list is whatever the
+   > compiler managed to emit before giving up — not a complete picture. Fix the compile errors in
+   > `Errors` / `FailedBuildTargets` first (the script also exits `2` in this case), then re-run
+   > the diagnostics and work from the fresh report.
 
 3. **Fix Warnings (per file)**
 
@@ -49,7 +72,7 @@ Run the Roslyn compiler diagnostics tool, then fix all reported CS warnings usin
    - Warnings skipped (file, code, reason)
 
 ## 5. Definition of Done
-- [ ] All fixable warnings for the requested scope/filter are resolved
+- [ ] All fixable warnings for the requested scope/code filter are resolved
 - [ ] Solution builds cleanly after all fixes
 - [ ] Summary report provided
 

@@ -1,0 +1,278 @@
+<#
+.SYNOPSIS
+    Test Coverage (the coverage gate/report)
+
+.DESCRIPTION
+    Reads the newest Cobertura XML per test project, filters it to a scope, prints filtered
+    line/branch totals plus the lowest-covered classes, and optionally fails the run if coverage
+    is below a threshold. This is the coverage gate (F-14: renamed from Test-CoverageAnalysis,
+    which read as "test the coverage analysis" rather than what it actually does), and it lives
+    at the code-coverage domain root rather than inside an engine folder, because it is
+    engine-agnostic (-Engine Coverlet|DotCover): both engines' ReportGenerator output ends up as
+    Cobertura XML that the same Read-CoberturaCoverage parser can read (§3.5).
+
+.PARAMETER Engine
+    Coverlet (default) or DotCover. DotCover throws: this repo's automated coverage gate cannot
+    read dotCover's output (T3.10/T3.11 -- see the throw site below for the full explanation and
+    where to look instead).
+
+.PARAMETER Top
+    See the param block for details.
+
+.PARAMETER Scope
+    See the param block for details.
+
+.PARAMETER IncludeFileRegex
+    See the param block for details.
+
+.PARAMETER ExcludeFileRegex
+    See the param block for details.
+
+.PARAMETER IncludeClassNameRegex
+    See the param block for details.
+
+.PARAMETER ExcludeClassNameRegex
+    See the param block for details.
+
+.PARAMETER ResultsRoot
+    See the param block for details.
+
+.PARAMETER OpenHtml
+    See the param block for details.
+
+.PARAMETER Enforce100
+    See the param block for details.
+
+.PARAMETER FailCoverageBelow
+    See the param block for details.
+
+.PARAMETER FailBranchBelow
+    See the param block for details.
+
+.PARAMETER AsTable
+    See the param block for details.
+
+.PARAMETER Isolated
+    See the param block for details.
+#>
+
+[CmdletBinding()]
+param(
+    [ValidateSet('Coverlet', 'DotCover')] [string] $Engine = 'Coverlet',
+    [ValidateRange(1, 500)] [int] $Top = 30,
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Custom', 'Testing')] [string] $Scope = 'Core',
+    [string] $IncludeFileRegex,
+    [string] $ExcludeFileRegex,
+    [string] $IncludeClassNameRegex,
+    [string] $ExcludeClassNameRegex,
+    [string] $ResultsRoot,
+    [switch] $OpenHtml,
+    [switch] $Enforce100,
+    [ValidateRange(0.0, 100.0)] [double] $FailCoverageBelow = 0.0,
+    [ValidateRange(0.0, 100.0)] [double] $FailBranchBelow = 0.0,
+    [switch] $AsTable,
+    [switch] $Isolated
+)
+
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+
+. (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
+. (Join-Path $PSScriptRoot '..' '.shared' 'coverage.ps1')
+
+if ($Engine -eq 'DotCover') {
+    throw (
+        "-Engine DotCover is not supported by Test-Coverage.ps1 -- not because it is unimplemented, " +
+        "but because there is nothing here to gate on. dotCover 2025.3.3's --xml-report-output " +
+        "collection genuinely fails on both net8.0 and net10.0 (a real, documented upstream " +
+        "JetBrains bug: it either hangs against a persistent Roslyn compiler-server process " +
+        "(VBCSCompiler), or throws 'Snapshot container is not initialized' from " +
+        "ReportBuilder.BuildReports -- reproduced 4 " +
+        "times, see docs/ai/plans/tools-review-and-standardisation.md ## Baselines, 'T3.10 -- " +
+        "dotCover spike'), so dotcover/New-CoverageReport.ps1 (T3.11) collects a raw Rider .dcvr " +
+        "snapshot only -- never a Cobertura XML this parser could read. To inspect dotCover's " +
+        "numbers, open the .dcvr file(s) under " +
+        "artifacts/code-coverage/dotcover/<scope>/snapshots/ directly in Rider's coverage viewer " +
+        "for manual, file-by-file exploration. Coverlet (-Engine Coverlet, the default) remains " +
+        "the only engine this repo's automated 100% gate can enforce against (§3.5: 'Coverlet is " +
+        "authoritative ... dotCover is the local second opinion, reported not gated')."
+    )
+}
+
+$repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
+
+if ($Scope -notin @('All', 'Custom')) {
+    $scopeSourceDir = Join-Path $repoRoot (Get-PineGuardScope -Name $Scope).SourceDir
+
+    if (-not [string]::IsNullOrWhiteSpace($scopeSourceDir) -and (Test-Path $scopeSourceDir)) {
+        $anyCs = Get-ChildItem -LiteralPath $scopeSourceDir -Recurse -File -Filter '*.cs' -ErrorAction SilentlyContinue |
+        Where-Object { $_.FullName -notmatch '([\\/])(bin|obj)\1' } |
+        Select-Object -First 1
+        if ($null -eq $anyCs) {
+            Write-Warning "No *.cs files found under '$scopeSourceDir' for Scope='$Scope'. Skipping coverage analysis."
+            return
+        }
+    }
+}
+
+if ([string]::IsNullOrWhiteSpace($ResultsRoot)) {
+    # 'Custom' has no single scope folder to read from -- it is the power-user escape hatch that
+    # re-filters whatever has already been collected, so its default is the whole engine root
+    # (every scope's coverlet/<scope>/testresults/ folder), scanned recursively (F-19: every
+    # other scope still gets its own physically separate coverlet/<scope>/ folder; only 'Custom'
+    # deliberately looks across all of them at once).
+    $ResultsRoot = if ($Scope -eq 'Custom') {
+        Get-CoverageEngineRoot -RepoRoot $repoRoot -Engine $Engine
+    }
+    else {
+        Join-Path (Get-CoverageScopeRoot -RepoRoot $repoRoot -Engine $Engine -Scope $Scope) 'testresults'
+    }
+}
+
+$defaultSourcePrefix = 'src/PineGuard.Core'
+
+switch ($Scope) {
+    'All' {
+        if (-not $IncludeFileRegex) {
+            # 'All' = the union of every per-scope path filter. Each PathIncludeRegex is
+            # self-anchored (^src... / ^tests...), so a plain '|' join is the exact aggregate —
+            # and scopes whose folder is not 'PineGuard.<Name>' (Options ->
+            # PineGuard.Extensions.Options) stay correct because the registry regex, not the
+            # scope Name, is the source.
+            $IncludeFileRegex = (Get-PineGuardScope -All | ForEach-Object PathIncludeRegex) -join '|'
+        }
+        if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
+        $defaultSourcePrefix = (Get-PineGuardScope -Name 'Core').DefaultSourcePrefix
+    }
+    'Custom' {
+        # No defaults.
+    }
+    default {
+        # Every real (non-aggregate) registry scope.
+        $scopeEntry = Get-PineGuardScope -Name $Scope
+        if (-not $IncludeFileRegex) { $IncludeFileRegex = $scopeEntry.PathIncludeRegex }
+        if (-not $ExcludeFileRegex) { $ExcludeFileRegex = '(^|[/\\])obj[/\\]' }
+        $defaultSourcePrefix = $scopeEntry.DefaultSourcePrefix
+    }
+}
+
+Write-Host "Repo root: $repoRoot" -ForegroundColor DarkGray
+Write-Host "Engine: $Engine" -ForegroundColor DarkGray
+Write-Host "Coverage results: $ResultsRoot" -ForegroundColor DarkGray
+Write-Host "Scope: $Scope" -ForegroundColor DarkGray
+
+# Read only this scope's own results, never "whatever happens to be on disk" (F-19): a stale
+# leftover from a previous run of a different scope must not leak into this scope's numbers.
+# 'Custom' has no registry entry to resolve against, so it keeps the original unrestricted
+# ResultsRoot scan -- that is its documented purpose as a power-user escape hatch.
+if ($Scope -eq 'Custom') {
+    $coverageFiles = Get-LatestCoverageFiles -ResultsRoot $ResultsRoot
+}
+else {
+    $scopeResultsPaths = @(Get-ScopeTestResultsPaths -RepoRoot $repoRoot -ResultsRoot $ResultsRoot -Scope $Scope)
+    $coverageFiles = Get-LatestCoverageFiles -ProjectResultsPaths $scopeResultsPaths
+}
+
+$isoDir = $null
+try {
+    if ($Isolated) {
+        Write-Host "Isolated mode: Copying coverage files to temp to avoid locking..." -ForegroundColor Cyan
+        $isoDir = Join-Path ([IO.Path]::GetTempPath()) "PineGuard-Coverage-Analyze-$([Guid]::NewGuid())"
+        New-Item -ItemType Directory -Path $isoDir -Force | Out-Null
+
+        $isoFiles = @()
+        foreach ($file in $coverageFiles) {
+            $dest = Join-Path $isoDir (Split-Path $file -Leaf)
+            Copy-Item -LiteralPath $file -Destination $dest -Force
+            $isoFiles += $dest
+        }
+        $coverageFiles = $isoFiles
+    }
+
+    $classes = Read-CoberturaCoverage -CoverageFiles $coverageFiles -RepoRoot $repoRoot -IncludeFileRegex $IncludeFileRegex -ExcludeFileRegex $ExcludeFileRegex -IncludeClassNameRegex $IncludeClassNameRegex -ExcludeClassNameRegex $ExcludeClassNameRegex -DefaultSourcePrefix $defaultSourcePrefix
+}
+finally {
+    if ($isoDir -and (Test-Path -LiteralPath $isoDir)) {
+        Remove-Item -LiteralPath $isoDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+
+
+
+if (-not $classes -or $classes.Count -eq 0) {
+    throw "No covered classes matched the include/exclude filters. IncludeFileRegex='$IncludeFileRegex' ExcludeFileRegex='$ExcludeFileRegex'"
+}
+
+Write-Host "Found $($classes.Count) classes matching filters." -ForegroundColor Cyan
+
+[int]$totalLines = ($classes | Measure-Object -Property LinesTotal -Sum).Sum
+[int]$coveredLines = ($classes | Measure-Object -Property LinesCovered -Sum).Sum
+[int]$totalBranches = ($classes | Measure-Object -Property BranchesTotal -Sum).Sum
+[int]$coveredBranches = ($classes | Measure-Object -Property BranchesCovered -Sum).Sum
+
+$lineRate = if ($totalLines -gt 0) { [double]$coveredLines / [double]$totalLines } else { 0.0 }
+$branchRate = if ($totalBranches -gt 0) { [double]$coveredBranches / [double]$totalBranches } else { 0.0 }
+
+Write-Host ''
+Write-Host 'Coverage summary (filtered scope):' -ForegroundColor Cyan
+Write-Host ("  Line coverage:   {0:P2} ({1}/{2})" -f $lineRate, $coveredLines, $totalLines)
+Write-Host ("  Branch coverage: {0:P2} ({1}/{2})" -f $branchRate, $coveredBranches, $totalBranches)
+
+Write-Host ''
+Write-Host ("Lowest-covered classes (Top {0}):" -f $Top) -ForegroundColor Cyan
+
+$bottom = $classes |
+Sort-Object BranchRate, LineRate, Name |
+Select-Object -First $Top LineRate, BranchRate, LinesCovered, LinesTotal, BranchesCovered, BranchesTotal, Name, File
+
+if ($AsTable) {
+    $bottom |
+    Select-Object @{Name = 'Line%'; Expression = { "{0:P2}" -f $_.LineRate } }, @{Name = 'Branch%'; Expression = { "{0:P2}" -f $_.BranchRate } }, LinesCovered, LinesTotal, BranchesCovered, BranchesTotal, Name, File |
+    Format-Table -AutoSize
+}
+else {
+    Write-Host "Line%`tBranch%`tLines`tBranches`tClass`tFile"
+    foreach ($row in $bottom) {
+        $linePct = ("{0:P2}" -f $row.LineRate)
+        $branchPct = ("{0:P2}" -f $row.BranchRate)
+        $lines = ("{0}/{1}" -f $row.LinesCovered, $row.LinesTotal)
+        $branches = ("{0}/{1}" -f $row.BranchesCovered, $row.BranchesTotal)
+        Write-Host ("{0}`t{1}`t{2}`t{3}`t{4}`t{5}" -f $linePct, $branchPct, $lines, $branches, $row.Name, $row.File)
+    }
+}
+
+if ($OpenHtml) {
+    # F-39: open the scope's own report/index.html directly -- there is no redirect page to go
+    # through any more (each scope has always had its own coverlet/<scope>/report/ folder since
+    # this restructuring; the old shared xplat/ layout is what needed the redirect indirection).
+    $reportDirForOpen = Join-Path (Get-CoverageScopeRoot -RepoRoot $repoRoot -Engine $Engine -Scope $Scope) 'report'
+    $reportIndexPath = Join-Path $reportDirForOpen 'index.html'
+    if (Test-Path $reportIndexPath) {
+        Write-Host ''
+        Write-Host "Opening HTML report: $reportIndexPath" -ForegroundColor Cyan
+        Start-Process -FilePath $reportIndexPath | Out-Null
+    }
+    else {
+        Write-Warning "HTML report not found at: $reportIndexPath"
+    }
+}
+
+if ($Enforce100) {
+    $FailCoverageBelow = 1.0
+    $FailBranchBelow = 1.0
+}
+
+$requiredLine = ConvertTo-Rate -Value $FailCoverageBelow
+$requiredBranch = ConvertTo-Rate -Value $FailBranchBelow
+
+$shouldEnforce = ($requiredLine -gt 0.0) -or ($requiredBranch -gt 0.0)
+if ($shouldEnforce) {
+    $lineOk = ($lineRate -ge $requiredLine)
+    $branchOk = ($totalBranches -eq 0) -or ($branchRate -ge $requiredBranch)
+
+    if (-not $lineOk -or -not $branchOk) {
+        Write-Error "Coverage below threshold for the filtered scope. RequiredLine=$requiredLine RequiredBranch=$requiredBranch LineRate=$lineRate BranchRate=$branchRate"
+        exit 1
+    }
+}

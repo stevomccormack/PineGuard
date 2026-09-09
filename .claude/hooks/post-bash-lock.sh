@@ -14,7 +14,7 @@ COMMAND=$(echo "$INPUT" | sed -n 's/.*"command" *: *"\([^"]*\)".*/\1/p' | head -
 
 # Only act on heavy commands that may have acquired the lock
 if ! echo "$COMMAND" | grep -qiE \
-    '(dotnet[[:space:]]+(test|build|publish)|Run-CodeCoverage|Run-SonarScanner|sonar-scanner|sonarscanner)'; then
+    '(dotnet[[:space:]]+(test|build|publish)|Run-CodeCoverage|New-CoverageReport|Test-Coverage|Run-SonarScanner|sonar-scanner|sonarscanner)'; then
   exit 0
 fi
 

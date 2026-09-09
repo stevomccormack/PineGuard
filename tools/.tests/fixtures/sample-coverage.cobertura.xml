@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fixture Cobertura report for tools/.tests/Cobertura-Parser.Tests.ps1.
+     Widget: 4 lines / 3 covered (line-rate 0.75); one branch line with
+     condition-coverage "50% (1/2)" (branch-rate 0.5).
+     Helper: 2 lines / 2 covered (line-rate 1.0); no branch lines (branch-rate
+     defaults to 1.0 per Read-CoberturaCoverage). -->
+<coverage line-rate="0.8333" branch-rate="0.5" version="1.9" timestamp="0">
+  <packages>
+    <package name="PineGuard.Sample" line-rate="0.75" branch-rate="0.5">
+      <classes>
+        <class name="PineGuard.Sample.Widget" filename="src/PineGuard.Sample/Widget.cs" line-rate="0.75" branch-rate="0.5">
+          <lines>
+            <line number="10" hits="1" branch="false" />
+            <line number="11" hits="1" branch="false" />
+            <line number="12" hits="1" branch="true" condition-coverage="50% (1/2)" />
+            <line number="13" hits="0" branch="false" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name="PineGuard.Sample.Other" line-rate="1.0" branch-rate="1.0">
+      <classes>
+        <class name="PineGuard.Sample.Other.Helper" filename="src/PineGuard.Sample.Other/Helper.cs" line-rate="1.0" branch-rate="1.0">
+          <lines>
+            <line number="5" hits="2" branch="false" />
+            <line number="6" hits="3" branch="false" />
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>

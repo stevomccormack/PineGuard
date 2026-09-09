@@ -1,5 +1,5 @@
 ---
-applyTo: "tools/sonar-scanner/**"
+applyTo: "tools/code-scan/sonarqube/**"
 ---
 
 Read [global rules](../../docs/ai/rules/global.md) and [scan rules](../../docs/ai/rules/scan.md) before editing the SonarQube tooling.

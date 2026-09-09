@@ -234,7 +234,7 @@ Adapters MUST NOT embed logic; they should point to `docs/ai/`.
 ## Best-Practice DRY Rules
 
 - **Specs** are the only source of truth for normative rules and constraints.
-- **Tool READMEs** (`tools/*/README.md`) are the source of truth for operational documentation (usage, parameters, examples).
+- **Tool READMEs** (`tools/*/README.md`, and `tools/code-scan/*/README.md` for the nested per-CLI scan domains) are the source of truth for operational documentation (usage, parameters, examples).
 - **Rules** reference specs — they do not duplicate them.
 - **Skills/Workflows** are the only source of truth for procedures.
 - **Agents** are composed from Skills/Workflows (don't duplicate instructions).

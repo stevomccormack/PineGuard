@@ -18,8 +18,10 @@ version: 1.1
 
 ## Parameters
 
-- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`)
-- **Filter**: (optional) Regex pattern to filter warning codes (e.g. `CS86` for nullability)
+- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`,
+  `Options`, `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`,
+  `Analyzers`, `Testing`)
+- **Code**: (optional) Regex pattern to filter diagnostic codes (e.g. `CS86` for nullability)
 
 ## Auto-Approval
 
@@ -30,7 +32,7 @@ See [`../commands/fix.md`](../commands/fix.md).
 ## Steps
 
 1. **Execute the canonical procedure** in [`../skills/fix-roslyn/SKILL.md`](../skills/fix-roslyn/SKILL.md)
-   with **Scope = [SCOPE]** (and `-Filter [FILTER]` if provided): run the diagnostics script, then
+   with **Scope = [SCOPE]** (and `-Code [CODE]` if provided): run the diagnostics script, then
    fix the warnings one file at a time — idiomatic C# per `docs/ai/specs/coding-standard.md`,
    never suppressing a warning — building after each file.
 

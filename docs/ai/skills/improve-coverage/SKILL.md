@@ -24,17 +24,18 @@ Run code coverage analysis and improve unit tests to reach 100% line and branch 
 1.  **Run Coverage Command**
     - One-shot: `tools/code-coverage/Run-CodeCoverage.ps1 -Scope [Scope]`
       (`-Mode Generate|Analyze|GenerateAndAnalyze`; scopes: `Core`, `MustClauses`, `GuardClauses`,
-      `DataAnnotations`, `FluentValidation`, `Testing`, `All`).
+      `DataAnnotations`, `FluentValidation`, `Options`, `DependencyInjection`, `AspNetCore`,
+      `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`, `Analyzers`, `Testing`, `All`).
     - Or drive the two stages directly, which is the loop the coverage spec defines:
-      - `tools/code-coverage/xplat/Gen-CoverageReport.ps1 -Scope [Scope]`
-      - `tools/code-coverage/xplat/Test-CoverageAnalysis.ps1 -Scope [Scope] -Top 30`
+      - `tools/code-coverage/New-CoverageReport.ps1 -Scope [Scope]`
+      - `tools/code-coverage/Test-Coverage.ps1 -Scope [Scope] -Top 30`
 
 2.  **Analyze Report**
-    - HTML: `artifacts/code-coverage/xplat/html/index.html`
-      (stable redirect: `artifacts/code-coverage/xplat-report.html`).
+    - HTML: `artifacts/code-coverage/coverlet/<scope>/report/index.html`
+      (each scope's report is its own entry point; there is no redirect page).
     - Identify red lines (uncovered) and yellow diamonds (partial branches).
     - For a fast console-only pass, add `-SkipHtml` and read the ranked gap table from
-      `Test-CoverageAnalysis.ps1` instead of opening the report.
+      `tools/code-coverage/Test-Coverage.ps1` instead of opening the report.
 
 3.  **Fill Gaps**
     - **Null Checks**: Did you test passing `null`?
@@ -42,12 +43,15 @@ Run code coverage analysis and improve unit tests to reach 100% line and branch 
     - **Conditions**: Did you hit both `true` and `false` paths for every `if`?
 
 4.  **Verification**
-    - Re-run step 1 with `-Enforce100` and confirm it exits 0.
+    - Re-run step 1 with `-Enforce100` and confirm it exits 0. Note: for every registry scope,
+      `Run-CodeCoverage.ps1` now sets `-Enforce100` automatically unless `-Relaxed` is passed, so
+      the flag is implied — pass `-Relaxed` explicitly if you need the non-enforcing behavior.
 
 ## 5. Definition of Done
 
 - [ ] Report shows 100% coverage for the target class/project.
-- [ ] `Run-CodeCoverage.ps1 -Scope [Scope] -Enforce100` (or `Test-CoverageAnalysis.ps1 -Enforce100`) exits 0.
+- [ ] `Run-CodeCoverage.ps1 -Scope [Scope] -Enforce100` (or `tools/code-coverage/Test-Coverage.ps1 -Enforce100`) exits 0.
+      `-Enforce100` is implied automatically for registry scopes; `-Relaxed` is the opt-out flag.
 
 ## 6. Troubleshooting
 

@@ -17,7 +17,9 @@ version: 1.0
 
 ## Parameters
 
-- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Testing`)
+- **Scope**: (`All`, `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`,
+  `Options`, `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`,
+  `Analyzers`, `Testing`)
 
 ## Auto-Approval
 
@@ -39,7 +41,9 @@ See [Adapter Surfaces](../meta/adapter-surfaces.md) for the full surface invento
 
    Notes:
    - No Docker or external tool dependencies.
-   - The script builds the scoped project and captures all `warning CS\d+` output.
+   - The script builds the scoped project and captures every `<PREFIX><digits>` diagnostic (e.g.
+     Roslyn `CS`, NuGet audit `NU19xx`) at both warning and error severity. A build that fails to
+     compile outright is reported distinctly and is never conflated with "no warnings found".
 
 2. **Review findings**
 

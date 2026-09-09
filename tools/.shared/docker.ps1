@@ -5,7 +5,7 @@
 .DESCRIPTION
     Dot-source this file to import the Docker project name constant and helper
     functions into the calling script's scope.
-    Used by tools/docker/* and tools/sonar-scanner/*.
+    Used by tools/docker/* and tools/code-scan/sonarqube/*.
 
     All Docker Compose stacks run under a single project name ($DockerProjectName)
     so that `docker compose ls` shows one unified PineGuard project.
@@ -30,7 +30,7 @@ function Test-DockerNetwork {
     return ($result -contains $NetworkName)
 }
 
-function Ensure-DockerNetwork {
+function Initialize-DockerNetwork {
     <#
     .SYNOPSIS
         Creates a Docker network if it does not already exist.

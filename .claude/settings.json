@@ -52,7 +52,6 @@
       "Bash(qodana:*)",
       "Bash(sonar-scanner:*)",
       "Bash(sonarscanner:*)",
-      "Bash(\"./.dotnet/tools/reportgenerator.exe\":*)",
       "Skill(format-code:*)",
       "Bash(netstat -ano)",
       "Bash(reg query \"HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Internet Settings\":*)",

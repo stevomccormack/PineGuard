@@ -169,7 +169,7 @@ git status  # confirm the operation completed as expected
 | `Remove-Item` on specific files the agent did not create | Cleanup of obsolete files at user's request |
 | `Move-Item` / `Rename-Item` on source files | Refactoring file structure |
 | Overwriting an existing file with entirely new content | Even if the agent is "improving" it |
-| Running cleanup scripts with `-Root` or `-Recursive` flags | These scripts may have broad scope |
+| Running cleanup scripts with `-Target Root` or `-Recursive` flags | These scripts may have broad scope |
 
 ### 3.3 Tier 2 — SAFE WITH PROTOCOL
 
@@ -399,10 +399,10 @@ Real scenarios where AI agents have caused damage or nearly caused damage. Each 
 
 ### 9.9 Cleanup scripts with broad flags
 
-**Scenario**: Agent runs `Clean-Root.ps1 -Recursive -All` without checking what it does.
+**Scenario**: Agent runs `Run-Clean.ps1 -Target Root -All` without checking what it does.
 **Why it seems reasonable**: The agent was asked to clean up.
-**What actually happens**: The script with those flags scans the entire repository and deletes files matching a default extension filter that may be too broad.
-**Correct action**: Read the script first. Use the narrowest scope possible. Prefer `Clean-Artifacts.ps1` or `Clean-Logs.ps1` which target safe zones.
+**What actually happens**: `Clear-Root.ps1` is top-level-only and can never recurse (no `-Recursive` parameter exists on it), but it still scans the entire repository root and deletes files matching a default extension filter that may be too broad.
+**Correct action**: Read the script first. Use the narrowest scope possible. Prefer `Clear-Artifacts.ps1` or `Clear-Logs.ps1` which target safe zones.
 
 ### 9.10 Package restore modifies lockfiles
 

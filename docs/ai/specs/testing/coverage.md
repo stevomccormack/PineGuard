@@ -19,7 +19,7 @@ This is the repo's **coverage playbook**.
 
 Primary goal:
 
-- Reach **100% line + 100% branch** in the repo's **filtered scope** (enforced via the xplat analyzer).
+- Reach **100% line + 100% branch** in the repo's **filtered scope** (enforced via the Coverlet-gated analyzer, `tools/code-coverage/Test-Coverage.ps1`).
 
 Important constraints:
 
@@ -34,6 +34,14 @@ Libraries covered by this workflow:
 - `PineGuard.GuardClauses`
 - `PineGuard.DataAnnotations`
 - `PineGuard.FluentValidation`
+- `PineGuard.Extensions.Options`
+- `PineGuard.Extensions.DependencyInjection`
+- `PineGuard.AspNetCore`
+- `PineGuard.ErrorOr`
+- `PineGuard.FluentResults`
+- `PineGuard.OneOf`
+- `PineGuard.MediatR`
+- `PineGuard.Analyzers`
 - `PineGuard.Testing` _(shared test infrastructure library; exercised directly by `tests/PineGuard.Testing.UnitTests/` and indirectly by every other `*.UnitTests` run)_
 
 Per-library run notes live in:
@@ -67,9 +75,9 @@ Note:
 
 ---
 
-## The Efficient Workflow (xplat loop)
+## The Efficient Workflow (Coverlet loop)
 
-Use this loop until xplat enforcement is green.
+Use this loop until Coverlet enforcement is green.
 
 ### Quick start (coverage agents)
 
@@ -84,8 +92,13 @@ adapter surface exposes it under its own entry-point convention (slash command, 
 - **Testing**: `docs/ai/agents/coverage-testing.md` (`/coverage-testing`)
 - **All**: `docs/ai/agents/coverage-all.md` (`/coverage-all`)
 
-Engine: xplat/Coverlet is the only engine wired into `tools/code-coverage/`; `Run-CodeCoverage.ps1`
-has no `-Engine` switch.
+Engine: `-Engine Coverlet|DotCover` (default `Coverlet`) is wired into `Run-CodeCoverage.ps1`,
+forwarded through the D-9 front door (`New-CoverageReport.ps1`) and to the gate (`Test-Coverage.ps1`).
+`-Engine DotCover` is snapshot-only (`tools/code-coverage/dotcover/New-CoverageReport.ps1` writes a
+`.dcvr` file for Rider's coverage viewer, never a Cobertura report); `Test-Coverage.ps1 -Engine DotCover`
+throws by design — there is no Cobertura output for dotCover to gate on. Coverlet remains the sole
+CI/gate-authority engine; dotCover also cannot reproduce Coverlet's `GeneratedRegex` exclusion
+behavior, a real, documented gap.
 
 ### Manual commands (fallback / custom args)
 
@@ -93,19 +106,19 @@ Only use these if you need custom arguments not covered by the agents.
 
 ```powershell
 # Generate (Cobertura XML + HTML)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Gen-CoverageReport.ps1" -Scope Core
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/New-CoverageReport.ps1" -Scope Core
 
 # Analyze (pick targets)
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Core -Top 30
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope Core -Top 30
 
 # Enforce 100%
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope Core -Enforce100
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope Core -Enforce100
 ```
 
 Speed rules:
 
 - Prefer `-SkipHtml` while iterating.
-- By default, generation runs the tightest test project for `Core|Must|Guard` for speed.
+- By default, generation runs each registry scope's own tightest test project (its `DefaultProjectFilter`) for speed — every registry scope carries one, not just `Core|Must|Guard`.
 - Use `-ProjectFilter "*.UnitTests.csproj"` only when you need broader execution.
 
 ---
@@ -119,7 +132,7 @@ Work from the "Lowest-covered classes" list until everything is 100%.
 ### 2) For branch misses, read Cobertura to see the exact missing condition outcomes
 
 - Open the newest Cobertura XML under:
-  - `artifacts/code-coverage/xplat/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
+  - `artifacts/code-coverage/coverlet/<scope>/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
 
 - Search for:
   - `<line ... condition-coverage="50% (1/2)">` (or any `<100%`)
@@ -150,7 +163,7 @@ Not allowed (unless exceptional/high-level defect):
 
 Rule:
 
-- If you refactor, immediately rerun the xplat loop to confirm branch counts actually dropped.
+- If you refactor, immediately rerun the Coverlet loop to confirm branch counts actually dropped.
 
 ---
 
@@ -158,12 +171,14 @@ Rule:
 
 Supported presets:
 
-- `Core`, `MustClauses`, `GuardClauses`, `DataAnnotations`, `FluentValidation`, `Testing`, `All`
+- `Core`, `MustClauses`, `GuardClauses`, `DataAnnotations`, `FluentValidation`, `Options`,
+  `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`, `Analyzers`,
+  `Testing`, `All`
 - `Custom` (analyzer only)
 
 ### PineGuard.Testing scope
 
-`Testing` is a first-class preset in the `ValidateSet` of `Run-CodeCoverage.ps1`, `Gen-CoverageReport.ps1` and `Test-CoverageAnalysis.ps1`. Run it like any other scope:
+`Testing` is a first-class preset in the `ValidateSet` of `Run-CodeCoverage.ps1`, `New-CoverageReport.ps1` and `Test-Coverage.ps1`. Run it like any other scope:
 
 ```powershell
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Run-CodeCoverage.ps1" -Mode GenerateAndAnalyze -Scope Testing
@@ -180,12 +195,12 @@ Notes:
 
 ## Artifacts (where things land)
 
-- HTML report:
-  - `artifacts/code-coverage/xplat/html/index.html`
-- Stable redirect (open this most of the time):
-  - `artifacts/code-coverage/xplat-report.html`
+- HTML report (each scope is its own entry point; there is no redirect page):
+  - `artifacts/code-coverage/coverlet/<scope>/report/index.html`
 - Cobertura XML:
-  - `artifacts/code-coverage/xplat/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
+  - `artifacts/code-coverage/coverlet/<scope>/testresults/<ProjectName>/<RunId>/coverage.cobertura.xml`
+- dotCover snapshot (`-Engine DotCover`, snapshot-only, opened in Rider):
+  - `artifacts/code-coverage/dotcover/<scope>/snapshots/<project>.<tfm>.dcvr`
 
 ---
 
@@ -206,6 +221,6 @@ Notes:
 
 - [tools/code-coverage/README.md](../../../../tools/code-coverage/README.md)
 - [tools/code-coverage/Run-CodeCoverage.ps1](../../../../tools/code-coverage/Run-CodeCoverage.ps1)
-- [tools/code-coverage/xplat/Gen-CoverageReport.ps1](../../../../tools/code-coverage/xplat/Gen-CoverageReport.ps1)
-- [tools/code-coverage/xplat/Test-CoverageAnalysis.ps1](../../../../tools/code-coverage/xplat/Test-CoverageAnalysis.ps1)
+- [tools/code-coverage/New-CoverageReport.ps1](../../../../tools/code-coverage/New-CoverageReport.ps1)
+- [tools/code-coverage/Test-Coverage.ps1](../../../../tools/code-coverage/Test-Coverage.ps1)
 - `tools/code-coverage/coverlet.runsettings`

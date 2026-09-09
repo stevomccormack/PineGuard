@@ -31,7 +31,7 @@ Provide DataAnnotations-specific command lines and defaults while keeping the gl
 
 Important:
 
-- After xplat reaches **100% line + 100% branch** for DataAnnotations, the scope is complete.
+- After Coverlet reaches **100% line + 100% branch** for DataAnnotations, the scope is complete.
 - If the analyzer reports this scope as skipped, treat it as a tooling failure — the library has full source coverage under `src/PineGuard.DataAnnotations/`.
 
 ## Quick start (DataAnnotations only)

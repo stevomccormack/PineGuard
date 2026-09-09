@@ -14,7 +14,7 @@ version: 1.0
 
 ## Purpose
 
-Cuts a GitHub Release that triggers `.github/workflows/publish.yml`, which builds, packs, and pushes the six PineGuard packages to nuget.org via OIDC (Trusted Publishing). Optionally handles the full release flow end-to-end: push pending commits through the protected `main` branch, cut the release, watch the workflow, unlist older prereleases.
+Cuts a GitHub Release that triggers `.github/workflows/publish.yml`, which builds, packs, and pushes every packable PineGuard package to nuget.org via OIDC (Trusted Publishing). Optionally handles the full release flow end-to-end: push pending commits through the protected `main` branch, cut the release, watch the workflow, unlist older prereleases.
 
 ## Inputs
 
@@ -26,7 +26,7 @@ Cuts a GitHub Release that triggers `.github/workflows/publish.yml`, which build
 | `Draft` | | Create as a draft. `publish.yml` does not fire until the draft is published manually. |
 | `Force` | | Skip the main-branch and clean-tree pre-flight checks. |
 | `Watch` | | Tail the triggered publish run until it completes. Required for `Unlist`. |
-| `DryRun` | | Print the plan — including the exact `gh release create` invocation — without cutting the release, running sub-scripts, or contacting nuget.org. |
+| `WhatIf` | | Print the plan — including the exact `gh release create` invocation — without cutting the release, running sub-scripts, or contacting nuget.org. `-DryRun` is a supported alias. |
 
 ## Pre-flight
 
@@ -39,7 +39,7 @@ Cuts a GitHub Release that triggers `.github/workflows/publish.yml`, which build
 
    ```powershell
    pwsh -NoProfile -ExecutionPolicy Bypass `
-       -File ./tools/release/Run-GithubRelease.ps1 `
+       -File ./tools/github/Run-Release.ps1 `
        -Version <VERSION> [-BypassPR] [-Unlist] [-Draft] [-Force] [-Watch]
    ```
 
@@ -55,7 +55,7 @@ Cuts a GitHub Release that triggers `.github/workflows/publish.yml`, which build
 
 3. **On success**
 
-   Report the release tag, the workflow run URL, and the six nuget.org package URLs from the script's summary output.
+   Report the release tag, the workflow run URL, and the nuget.org package URLs (one per packable PineGuard package, derived from the registry) from the script's summary output.
 
 4. **On failure**
 
@@ -63,7 +63,7 @@ Cuts a GitHub Release that triggers `.github/workflows/publish.yml`, which build
 
 ## Related
 
-- Script: [`tools/release/Run-GithubRelease.ps1`](../../../tools/release/Run-GithubRelease.ps1)
-- Sub-scripts: [`Run-GithubRuleset.ps1`](../../../tools/release/Run-GithubRuleset.ps1), [`Run-NugetUnlist.ps1`](../../../tools/release/Run-NugetUnlist.ps1)
+- Script: [`tools/github/Run-Release.ps1`](../../../tools/github/Run-Release.ps1)
+- Sub-scripts: [`Set-GithubRuleset.ps1`](../../../tools/github/Set-GithubRuleset.ps1), [`Unpublish-NugetPrerelease.ps1`](../../../tools/nuget/Unpublish-NugetPrerelease.ps1)
 - Workflow: [`.github/workflows/publish.yml`](../../../.github/workflows/publish.yml)
 - Safety classification: [`docs/ai/specs/safety.md`](../specs/safety.md)

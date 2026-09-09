@@ -23,7 +23,7 @@ services:
       - ${QODANA_PROJECT_DIR:-../../}:/data/project
       - ${QODANA_RESULTS_DIR:-../../artifacts/qodana}:/data/results
       - pineguard-qodana-cache:/data/cache
-    command: ["--config", "${QODANA_CONFIG_PATH:-/data/project/tools/code-inspection/qodana/config/qodana.all.yaml}"]
+    command: ["--config", "${QODANA_CONFIG_PATH:-/data/project/tools/code-scan/qodana/config/qodana.all.yaml}"]
     networks:
       - pineguard
 

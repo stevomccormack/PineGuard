@@ -110,9 +110,11 @@ Use automated gates that fit enterprise expectations:
 - Test shape: the `test-files` audit rule gates every PR — `[Theory]` + `TheoryData`
   only, and every `*Tests.cs` file must have a paired `*TestData.cs` file. See
   `docs/ai/specs/tools/audit-cli/spec.md` and `docs/ai/specs/testing/unit-test.md` §1.
-- Coverage: Cobertura output via the cross-platform collector (`xplat`) — the engine every repo
-  run uses; JetBrains dotCover 2025.3.3 also works on `net8.0`/`net10.0` from the IDE, but the
-  repo ships no dotCover wrapper under `tools/code-coverage/`. CI enforces the
+- Coverage: Cobertura output via Coverlet (`tools/code-coverage/coverlet/`) — the sole CI/gate
+  authority engine every repo run uses by default; JetBrains dotCover 2025.3.3 also works on
+  `net8.0`/`net10.0`, and a wrapper ships at `tools/code-coverage/dotcover/New-CoverageReport.ps1`,
+  but it is snapshot-only (writes a `.dcvr` file for Rider's coverage viewer) and ungateable — it
+  cannot reproduce Coverlet's `GeneratedRegex` exclusion behavior. CI enforces the
   `MIN_CODE_COVERAGE` threshold (default 100%).
 - Inspection: JetBrains Qodana (static analysis) — available in CI behind the
   `QODANA_ENABLED` repository variable (opt-in, not always-on)

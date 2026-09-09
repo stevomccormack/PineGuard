@@ -14,8 +14,8 @@ version: 1.0
 ## Steps
 
 1. **Clean Logs (Recursive + All)**
-   - Run: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/maintenance/Clean-Logs.ps1" -Recursive -All`
-   - This executes the maintenance scripts which wipe out testing logs and run logs under the `logs/` folder.
+   - Run: `pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/clean/Clear-Logs.ps1" -Recursive -All`
+   - This executes the clean scripts which wipe out testing logs and run logs under the `logs/` folder.
 
 ## Related
 

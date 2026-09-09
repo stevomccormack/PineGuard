@@ -1,5 +1,5 @@
 ---
-description: "PineGuard tools rules — PowerShell scripts, code-diagnostics, sonar-scanner"
+description: "PineGuard tools rules — PowerShell scripts, code-coverage, code-diagnostics, code-format, code-scan (Qodana, SonarQube), testing, git, github, nuget, clean, docker"
 globs: ["tools/**"]
 alwaysApply: false
 ---

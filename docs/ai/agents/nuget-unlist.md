@@ -14,15 +14,15 @@ version: 1.0
 
 ## Purpose
 
-Unlists older prerelease versions across the six PineGuard packages on nuget.org. By default the latest prerelease of each package stays listed so `install latest alpha` still resolves; everything below it is hidden from search and default resolution. Stable versions (no `-alpha`/`-beta`/`-rc` suffix) are never touched.
+Unlists older prerelease versions across every packable PineGuard package on nuget.org. By default the latest prerelease of each package stays listed so `install latest alpha` still resolves; everything below it is hidden from search and default resolution. Stable versions (no `-alpha`/`-beta`/`-rc` suffix) are never touched.
 
 ## Inputs
 
 | Parameter | Required | Default | Description |
 |-----------|----------|---------|-------------|
-| `Package` | | all six PineGuard packages | Restrict to specific package IDs. |
+| `Package` | | every packable PineGuard package (registry-derived, F-21) | Restrict to specific package IDs. |
 | `All` | | | Unlist every prerelease, including the latest. |
-| `DryRun` | | | Print the plan without calling the NuGet API. |
+| `WhatIf` | | | Print the plan without calling the NuGet API. `-DryRun` is a supported alias. |
 | `Force` | | | Skip the interactive confirmation prompt. |
 | `EnvFile` | | `.etc/powershell/.env` | Alternate `.env` file supplying `NUGET_TOKEN`. |
 
@@ -32,7 +32,7 @@ Requires `NUGET_TOKEN` with the `Unlist Package` scope on the `PineGuard.*` glob
 
 ## Pre-flight
 
-- Run with `-DryRun` first and share the plan with the user if the unlist is not part of a just-completed release.
+- Run with `-WhatIf` first and share the plan with the user if the unlist is not part of a just-completed release.
 - If `-All` is requested, confirm explicitly — it removes the latest prerelease too, which can break consumers using floating-version ranges (`0.1.0-*`).
 
 ## Steps
@@ -41,14 +41,14 @@ Requires `NUGET_TOKEN` with the `Unlist Package` scope on the `PineGuard.*` glob
 
    ```powershell
    pwsh -NoProfile -ExecutionPolicy Bypass `
-       -File ./tools/release/Run-NugetUnlist.ps1 -DryRun
+       -File ./tools/nuget/Unpublish-NugetPrerelease.ps1 -WhatIf
    ```
 
 2. **Execute**
 
    ```powershell
    pwsh -NoProfile -ExecutionPolicy Bypass `
-       -File ./tools/release/Run-NugetUnlist.ps1 [-All] [-Force]
+       -File ./tools/nuget/Unpublish-NugetPrerelease.ps1 [-All] [-Force]
    ```
 
 3. **Report**
@@ -57,5 +57,5 @@ Requires `NUGET_TOKEN` with the `Unlist Package` scope on the `PineGuard.*` glob
 
 ## Related
 
-- Script: [`tools/release/Run-NugetUnlist.ps1`](../../../tools/release/Run-NugetUnlist.ps1)
+- Script: [`tools/nuget/Unpublish-NugetPrerelease.ps1`](../../../tools/nuget/Unpublish-NugetPrerelease.ps1)
 - Used by: [`github-release-publish.md`](github-release-publish.md) when `-Unlist` + `-Watch` are both requested.

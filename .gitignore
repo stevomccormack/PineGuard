@@ -32,9 +32,12 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 
-# Negate: tools/release/ is source code, not build output
-!tools/release/
-!tools/release/**
+# Negate: tools/github/ and tools/nuget/ are source code, not build output
+# (formerly tools/release/, split by T3.08 — D-1a)
+!tools/github/
+!tools/github/**
+!tools/nuget/
+!tools/nuget/**
 bld/
 [Bb]in/
 [Oo]bj/

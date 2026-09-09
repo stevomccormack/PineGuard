@@ -1,0 +1,18 @@
+version: "1.0"
+
+linter: qodana-dotnet
+
+profile:
+  name: qodana.recommended
+
+dotnet:
+  solution: tools/code-scan/qodana/PineGuard.MustClauses.Qodana.slnx
+
+bootstrap: dotnet build tools/code-scan/qodana/PineGuard.MustClauses.Qodana.slnx -c Release
+
+exclude:
+  - name: All
+    paths:
+      - .etc
+      - artifacts
+      - .git

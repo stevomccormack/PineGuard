@@ -1,0 +1,112 @@
+<#
+.SYNOPSIS
+    Install prerequisites and start the local SonarQube server.
+
+.DESCRIPTION
+    Part of the PineGuard PowerShell toolchain.
+    Installs Java (OpenJDK 21) if not already present, then starts the SonarQube Community
+    Edition server via Start-SonarQube.ps1 (Docker Compose). dotnet-sonarscanner comes from the
+    repo-root local tool manifest (.config/dotnet-tools.json) - Run-SonarScanner.ps1 restores it
+    via `dotnet tool restore` before use.
+
+    Once the server is UP, commission it (admin password, project, token) with
+    Initialize-SonarQube.ps1.
+
+    For CI/CD, use the SonarQube GitHub Action with SONARQUBE_TOKEN stored as a
+    repository secret - do not use this script in pipelines.
+
+    Prerequisites: Docker Desktop running, Winget available (Windows 10/11).
+
+.PARAMETER Port
+    Host port SonarQube is mapped to. Default: 9001.
+
+.PARAMETER HealthTimeoutSeconds
+    Maximum seconds to wait for SonarQube to report UP. Default: 120.
+
+.PARAMETER Open
+    Open the SonarQube dashboard in the default browser once the server is healthy.
+
+.EXAMPLE
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Install-SonarQube.ps1
+    Installs prerequisites and starts SonarQube.
+
+.EXAMPLE
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/sonarqube/Install-SonarQube.ps1 -Open
+    Installs prerequisites, starts SonarQube, and opens the dashboard.
+#>
+
+[CmdletBinding()]
+param(
+    [ValidateRange(1, 65535)] [int] $Port = 9001,
+    [ValidateRange(10, 600)]  [int] $HealthTimeoutSeconds = 120,
+    [switch] $Open
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+
+. (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
+
+function Get-LocalJavaVersion {
+    <#
+    .SYNOPSIS
+        Returns the first line of java -version output without triggering ErrorActionPreference.
+    .DESCRIPTION
+        java -version writes to stderr, which PowerShell treats as an error record when
+        ErrorActionPreference is Stop. This helper suppresses that by running in a Continue scope.
+        Local to this script (formerly the shared env.ps1's Get-JavaVersion, removed per D-4/F-25
+        along with Sync-Env/Sync-Path — this is its only real caller).
+    #>
+    $prev = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = & java -version 2>&1
+        return ($output | Select-Object -First 1).ToString()
+    }
+    finally {
+        $ErrorActionPreference = $prev
+    }
+}
+
+# --- Java ---
+#
+# No registry/PATH refresh here (the removed Sync-Env/Sync-Path used to do this before and after
+# the winget install): Sync-Env clobbered session-scoped environment variables such as
+# SONARQUBE_TOKEN with stale persisted ones (F-25). If `java` is still not resolvable immediately
+# after a fresh install, the error below tells the operator to restart their terminal, rather than
+# silently papering over it with a registry-wide session refresh.
+
+if (-not (Test-CommandExists -Name 'java')) {
+    Write-Host 'Java not found. Installing OpenJDK 21 via Winget...' -ForegroundColor Cyan
+
+    if (-not (Test-CommandExists -Name 'winget')) {
+        throw "Winget not found. Install App Installer from the Microsoft Store or upgrade to Windows 10/11."
+    }
+
+    winget install Microsoft.OpenJDK.21 --silent --accept-package-agreements --accept-source-agreements
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "OpenJDK 21 installation failed (exit code: $LASTEXITCODE)." -ForegroundColor Red
+        exit $LASTEXITCODE
+    }
+
+    if (-not (Test-CommandExists -Name 'java')) {
+        throw 'OpenJDK 21 installed but java is still not on PATH in this session. Restart your terminal and try again.'
+    }
+
+    Write-Host "OpenJDK 21 installed: $(Get-LocalJavaVersion)" -ForegroundColor Green
+}
+else {
+    Write-Host "Java found: $(Get-LocalJavaVersion)" -ForegroundColor DarkGray
+}
+
+# --- SonarQube server ---
+
+$upArgs = @{
+    Port                 = $Port
+    HealthTimeoutSeconds = $HealthTimeoutSeconds
+}
+if ($Open) { $upArgs['Open'] = $true }
+
+& (Join-Path $PSScriptRoot 'Start-SonarQube.ps1') @upArgs
+exit $LASTEXITCODE

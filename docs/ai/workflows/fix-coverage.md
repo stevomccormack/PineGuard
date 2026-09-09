@@ -17,7 +17,8 @@ version: 1.1
 
 ## Parameters
 
-- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All)
+- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options,
+  DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All)
 
 ## Auto-Approval
 

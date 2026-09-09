@@ -5,11 +5,17 @@
 .DESCRIPTION
     Dot-source this file to import SonarQube constants and helper functions
     into the calling script's scope.
-    Used by tools/sonar-scanner/* and tools/docker/sonarqube-up.ps1.
+    Used by tools/code-scan/sonarqube/*.
+
+    Self-contained: dot-sources secret.ps1 (Get-ToolSecret, which itself pulls in dotenv.ps1 and
+    path.ps1) itself so Resolve-SonarQubeToken below works standalone, per D-2's Pester
+    load-order test (every tools/.shared/*.ps1 file must dot-source standalone).
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+. (Join-Path $PSScriptRoot 'secret.ps1')
 
 # -------------------------------------------------------------------------------------------------
 # Constants
@@ -33,17 +39,20 @@ $script:SonarQubeSeverityMap = @{
 function Resolve-SonarQubeToken {
     <#
     .SYNOPSIS
-        Resolves a SonarQube token from parameter, environment, or returns $null.
+        Resolves a SonarQube token from an explicit parameter, then Get-ToolSecret.
+
+    .DESCRIPTION
+        Resolution order (D-4): -ProjectToken -> $env:SONARQUBE_TOKEN -> the
+        SONARQUBE_TOKEN key in .etc/powershell/.env. Wires every SonarQube-domain caller
+        (Run-SonarScanner.ps1, Get-SonarQubeIssues.ps1) to the D-4 secrets resolver in one
+        place, per T3.05.
     #>
     param([string] $ProjectToken = '')
 
     if (-not [string]::IsNullOrWhiteSpace($ProjectToken)) {
         return $ProjectToken
     }
-    if (-not [string]::IsNullOrWhiteSpace($env:SONARQUBE_TOKEN)) {
-        return $env:SONARQUBE_TOKEN
-    }
-    return $null
+    return Get-ToolSecret -Name 'SONARQUBE_TOKEN'
 }
 
 function New-BasicAuthHeader {

@@ -105,9 +105,9 @@ Use these annotations ONLY when you are confident the commands are safe or when 
 To re-run a specific, ad-hoc command (like `dotnet test` with a filter) without rebuilding the invocation each time, use the workflow that already exists rather than authoring a new playbook:
 
 - Workflow: [`docs/ai/workflows/test-last.md`](../workflows/test-last.md)
-- Script: `tools/code-inspection/auto/Run-Last.ps1`
+- Script: `tools/testing/Run-Tests.ps1`
 
-Parameterise the run through the script's `-Project` / `-Filter` parameters. Do not inline ad-hoc command scripts into an adapter workflow — that is logic in an adapter, which `docs/ai/specs/protocol.md` Rule #1 forbids.
+Parameterise the run through the script's `-Scope` parameter (the primary target selector since T3.06 — `-Scope All` covers the whole solution), falling back to `-Project` / `-Solution` for an off-registry target, plus `-Filter` / `-Framework`. Do not inline ad-hoc command scripts into an adapter workflow — that is logic in an adapter, which `docs/ai/specs/protocol.md` Rule #1 forbids.
 
 ## Honesty rule
 

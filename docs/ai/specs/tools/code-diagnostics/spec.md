@@ -22,7 +22,7 @@ applies_to:
 
 PineGuard uses the Roslyn C# compiler (built into `dotnet build`) to detect code quality issues at compile time. Unlike SonarQube or Qodana, Roslyn diagnostics require **no Docker container or external tool** — they are emitted natively during the build process.
 
-Warning codes use the `CS` prefix (e.g., CS8604, CS8619, CS0618).
+Diagnostic codes follow the generic `<PREFIX><digits>` shape, captured at both warning and error severity — Roslyn's `CS` prefix today (e.g., CS8604, CS8619, CS0618), but also any other prefix the build pipeline emits, such as NuGet audit `NU19xx`, ApiCompat `CP0xxx`, or IL trimmer/AOT `IL2xxx`/`IL3xxx`. If a build target fails to compile outright, that failure is reported explicitly and distinctly — never silently folded into "No compiler warnings found".
 
 ## 2. How It Differs From Other Tools
 

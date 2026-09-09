@@ -612,7 +612,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "All",
                 "-Clean",
@@ -629,14 +629,13 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Clean-Artifacts.ps1",
-                "-Recursive",
+                "./tools/clean/Clear-Artifacts.ps1",
                 "-All"
             ],
             "problemMatcher": []
         },
         {
-            "label": "Scanner: Initialize Local SonarQube",
+            "label": "Scanner: Install & Start Local SonarQube",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -644,7 +643,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Initialize-SonarQube.ps1"
+                "./tools/code-scan/sonarqube/Install-SonarQube.ps1"
             ],
             "problemMatcher": []
         },
@@ -657,7 +656,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Run-SonarScanner.ps1"
+                "./tools/code-scan/sonarqube/Run-SonarScanner.ps1"
             ],
             "problemMatcher": []
         },
@@ -670,7 +669,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "All"
             ],
@@ -685,7 +684,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "Blocker"
             ],
@@ -700,7 +699,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "High"
             ],
@@ -715,7 +714,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "Medium"
             ],
@@ -730,7 +729,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/sonar-scanner/Get-SonarIssues.ps1",
+                "./tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1",
                 "-Severity",
                 "Low"
             ],
@@ -745,7 +744,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Clean-Logs.ps1",
+                "./tools/clean/Clear-Logs.ps1",
                 "-Recursive",
                 "-All"
             ],
@@ -760,12 +759,12 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Clean-Root.ps1"
+                "./tools/clean/Clear-Root.ps1"
             ],
             "problemMatcher": []
         },
         {
-            "label": "Clean: Root (recursive, WhatIf)",
+            "label": "Clean: Root (WhatIf)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -773,10 +772,8 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Clean-Root.ps1",
-                "-WhatIf",
-                "-Recursive",
-                "-All"
+                "./tools/clean/Clear-Root.ps1",
+                "-WhatIf"
             ],
             "problemMatcher": []
         },
@@ -789,9 +786,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Run-Clean.ps1",
-                "-Logs",
-                "-Artifacts",
+                "./tools/clean/Run-Clean.ps1",
+                "-Target",
+                "Logs,Artifacts",
                 "-Recursive",
                 "-All"
             ],
@@ -806,13 +803,10 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/maintenance/Run-Clean.ps1",
+                "./tools/clean/Run-Clean.ps1",
                 "-WhatIf",
-                "-Logs",
-                "-Artifacts",
-                "-Root",
-                "-Recursive",
-                "-All"
+                "-All",
+                "-Recursive"
             ],
             "problemMatcher": []
         },
@@ -1084,7 +1078,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "Core",
                 "-Clean",
@@ -1101,7 +1095,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "MustClauses",
                 "-Clean",
@@ -1118,7 +1112,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "GuardClauses",
                 "-Clean",
@@ -1135,7 +1129,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "FluentValidation",
                 "-Clean",
@@ -1152,7 +1146,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "DataAnnotations",
                 "-Clean",
@@ -1169,7 +1163,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "Options",
                 "-Clean",
@@ -1186,7 +1180,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "DependencyInjection",
                 "-Clean",
@@ -1203,7 +1197,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "AspNetCore",
                 "-Clean",
@@ -1219,7 +1213,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "ErrorOr",
                 "-Clean",
@@ -1236,7 +1230,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "FluentResults",
                 "-Clean",
@@ -1253,7 +1247,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "OneOf",
                 "-Clean",
@@ -1270,7 +1264,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "Testing",
                 "-Clean",
@@ -1287,7 +1281,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-inspection/Run-Qodana.ps1",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
                 "-Scope",
                 "All",
                 "-Clean",
@@ -1321,7 +1315,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Solution.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Solution",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1335,7 +1331,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Tools.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Tools",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1349,7 +1347,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Agent.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Agent",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1363,7 +1363,25 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Docs.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Docs",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Git: Commit CI (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Ci",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1377,7 +1395,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Testing.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Testing",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1391,7 +1411,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Core.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Core",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1405,7 +1427,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-MustClauses.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "MustClauses",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1419,7 +1443,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-GuardClauses.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "GuardClauses",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1433,7 +1459,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-FluentValidation.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "FluentValidation",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1447,7 +1475,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-DataAnnotations.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "DataAnnotations",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1461,7 +1491,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-Options.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Options",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1475,7 +1507,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-DependencyInjection.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "DependencyInjection",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1489,11 +1523,14 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-AspNetCore.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "AspNetCore",
                 "-AutoMessage"
             ],
             "problemMatcher": []
-        },        {
+        },
+        {
             "label": "Git: Commit ErrorOr (auto message)",
             "type": "shell",
             "command": "pwsh",
@@ -1502,7 +1539,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-ErrorOr.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "ErrorOr",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1516,7 +1555,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-FluentResults.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "FluentResults",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1530,7 +1571,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/git/Commit-OneOf.ps1",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "OneOf",
                 "-AutoMessage"
             ],
             "problemMatcher": []
@@ -1561,7 +1604,7 @@
                 "-File",
                 "./tools/git/Run-Commits.ps1",
                 "-All",
-                "-DryRun"
+                "-WhatIf"
             ],
             "problemMatcher": []
         },
@@ -1577,7 +1620,8 @@
                 "./tools/git/Run-Commits.ps1",
                 "-All",
                 "-AutoMessage",
-                "-SafePush"
+                "-Push",
+                "-Rebase"
             ],
             "problemMatcher": []
         },
@@ -1590,7 +1634,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "Core"
             ],
@@ -1605,7 +1649,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "MustClauses"
             ],
@@ -1620,7 +1664,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "GuardClauses"
             ],
@@ -1635,7 +1679,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "FluentValidation"
             ],
@@ -1650,7 +1694,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "DataAnnotations"
             ],
@@ -1665,7 +1709,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "Options"
             ],
@@ -1680,7 +1724,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "DependencyInjection"
             ],
@@ -1695,7 +1739,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "AspNetCore"
             ],
@@ -1709,7 +1753,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "ErrorOr"
             ],
@@ -1724,7 +1768,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "FluentResults"
             ],
@@ -1739,7 +1783,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "OneOf"
             ],
@@ -1754,7 +1798,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "Testing"
             ],
@@ -1769,7 +1813,7 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/code-formatter/Run-Format.ps1",
+                "./tools/code-format/Run-Format.ps1",
                 "-Scope",
                 "All"
             ],
@@ -1791,6 +1835,58 @@
                 "Format: FluentResults",
                 "Format: OneOf",
                 "Format: Testing"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: GitHub Release Publish",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/github/Run-Release.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: GitHub Ruleset",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/github/Set-GithubRuleset.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: NuGet Unpublish Prerelease",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/nuget/Unpublish-NugetPrerelease.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Tools: Lint (PSScriptAnalyzer + Pester)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Test-Tools.ps1"
             ],
             "problemMatcher": []
         }

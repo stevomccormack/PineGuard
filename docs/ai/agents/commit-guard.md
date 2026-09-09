@@ -13,10 +13,10 @@ version: 1.0
 ## Steps
 
 1. Read the master workflow at `docs/ai/workflows/commit.md`.
-2. Limit execution strictly to the `-GuardClauses` scope; add `-IncludeTests` to include the paired `*.UnitTests` project in the same commit.
+2. Limit execution strictly to the `-Scope GuardClauses` scope; add `-IncludeTests` to include the paired `*.UnitTests` project in the same commit.
 3. Dry-run the plan first, then create the commits:
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -GuardClauses -DryRun
-   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -GuardClauses -AutoMessage
+   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -Scope GuardClauses -WhatIf
+   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -Scope GuardClauses -AutoMessage
    ```

@@ -33,7 +33,7 @@ Pick the layer the user named. If none was named, default to `MustClauses`.
    - For a per-class table report, use:
 
      ```powershell
-     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/xplat/Test-CoverageAnalysis.ps1" -Scope <Layer> -AsTable
+     pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/Test-Coverage.ps1" -Scope <Layer> -AsTable
      ```
 
    - If no report is found, generate one first via the matching `/coverage-<layer>` agent.

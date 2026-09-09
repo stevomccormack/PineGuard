@@ -13,10 +13,10 @@ version: 1.0
 ## Steps
 
 1. Read the master workflow at `docs/ai/workflows/commit.md`.
-2. Limit execution strictly to the `-Docs` scope. `-IncludeTests` has no effect on this scope.
+2. Limit execution strictly to the `-Scope Docs` scope. `-IncludeTests` has no effect on this scope.
 3. Dry-run the plan first, then create the commits:
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -Docs -DryRun
-   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -Docs -AutoMessage
+   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -Scope Docs -WhatIf
+   pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/git/Run-Commits.ps1 -Scope Docs -AutoMessage
    ```

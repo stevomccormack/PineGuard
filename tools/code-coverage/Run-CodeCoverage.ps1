@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Run Code Coverage
 
@@ -7,6 +7,15 @@
 
 .PARAMETER Mode
     See the param block for details.
+
+.PARAMETER Engine
+    Coverage engine: Coverlet (default) or DotCover. Forwarded to the D-9 front door
+    (New-CoverageReport.ps1) and to the engine-agnostic gate (Test-Coverage.ps1). DotCover
+    collects a Rider-native .dcvr snapshot only (T3.10's proven fallback; see
+    dotcover/New-CoverageReport.ps1) -- -Mode Analyze/GenerateAndAnalyze then fails at the
+    Test-Coverage.ps1 step, since there is no Cobertura output for it to gate on (by design; see
+    that script's own -Engine DotCover error for why). Use -Mode Generate -Engine DotCover to
+    collect the snapshot without hitting that gate.
 
 .PARAMETER Scope
     See the param block for details.
@@ -69,6 +78,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Generate', 'Analyze', 'GenerateAndAnalyze')] [string] $Mode = 'GenerateAndAnalyze',
+    [ValidateSet('Coverlet', 'DotCover')] [string] $Engine = 'Coverlet',
     [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Testing')] [string] $Scope = 'Core',
     [ValidateSet('Debug', 'Release')] [string] $Configuration = 'Debug',
     [switch] $Clean,
@@ -93,12 +103,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-$utilityPath = Join-Path $PSScriptRoot 'Import-CodeCoverageUtility.ps1'
-if (-not (Test-Path $utilityPath)) {
-    throw "Import-CodeCoverageUtility.ps1 not found at: $utilityPath"
-}
-
-. $utilityPath
+. (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
 
 # Every real (non-aggregate) scope is held to 100% unless -Relaxed says otherwise. Derived from
 # the registry rather than a literal list so a newly registered scope cannot silently opt out.
@@ -110,8 +115,8 @@ if ($Scope -in $registryScopeNames) {
     }
 }
 
-$xplatGenerate = Join-Path $PSScriptRoot 'xplat\Gen-CoverageReport.ps1'
-$xplatAnalyze = Join-Path $PSScriptRoot 'xplat\Test-CoverageAnalysis.ps1'
+$coverageFrontDoor = Join-Path $PSScriptRoot 'New-CoverageReport.ps1'
+$coverageGate = Join-Path $PSScriptRoot 'Test-Coverage.ps1'
 
 # If the user didn't explicitly supply a ProjectFilter, prefer the tightest default per scope
 # (keeps coverage loops fast and avoids running unrelated test projects).
@@ -127,6 +132,7 @@ if (-not $PSBoundParameters.ContainsKey('ProjectFilter')) {
 
 if ($Mode -in @('Generate', 'GenerateAndAnalyze')) {
     $generateParams = @{
+        Engine        = $Engine
         Configuration = $Configuration
         Scope         = $Scope
         Clean         = $Clean
@@ -140,9 +146,9 @@ if ($Mode -in @('Generate', 'GenerateAndAnalyze')) {
     if ($PSBoundParameters.ContainsKey('Format')) {
         $generateParams['Format'] = $Format
     }
-    & $xplatGenerate @generateParams
+    & $coverageFrontDoor @generateParams
 }
 
 if ($Mode -in @('Analyze', 'GenerateAndAnalyze')) {
-    & $xplatAnalyze -Scope $Scope -Top $Top -IncludeFileRegex $IncludeFileRegex -ExcludeFileRegex $ExcludeFileRegex -IncludeClassNameRegex $IncludeClassNameRegex -ExcludeClassNameRegex $ExcludeClassNameRegex -FailCoverageBelow $FailCoverageBelow -FailBranchBelow $FailBranchBelow -Enforce100:$Enforce100
+    & $coverageGate -Engine $Engine -Scope $Scope -Top $Top -IncludeFileRegex $IncludeFileRegex -ExcludeFileRegex $ExcludeFileRegex -IncludeClassNameRegex $IncludeClassNameRegex -ExcludeClassNameRegex $ExcludeClassNameRegex -FailCoverageBelow $FailCoverageBelow -FailBranchBelow $FailBranchBelow -Enforce100:$Enforce100
 }

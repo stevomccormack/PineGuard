@@ -30,7 +30,7 @@ A test operation group reaches **GOLD** when:
 2. No empty arrays (`=> [];`) exist — omit datasets that have no cases
 3. EdgeCases reference Core constants/statics where applicable (boundary values, min/max, enum ranges)
 4. Fixtures are the source of truth for cross-layer validation inputs (§9)
-5. 100% line and branch coverage confirmed via Coverlet (the xplat collector), enforced by the xplat analyzer with `-Enforce100`
+5. 100% line and branch coverage confirmed via Coverlet, enforced by `tools/code-coverage/Test-Coverage.ps1` with `-Enforce100`
 
 ## Project Summary
 
@@ -53,8 +53,8 @@ A test operation group reaches **GOLD** when:
 
 ## Coverage Verification (2026-08-21)
 
-`Test-CoverageAnalysis.ps1 -Enforce100` exits 0 for `All` and for every individual
-scope, against a full `Gen-CoverageReport.ps1 -Scope All` run covering net8.0 and
+`tools/code-coverage/Test-Coverage.ps1 -Enforce100` exits 0 for `All` and for every individual
+scope, against a full `tools/code-coverage/New-CoverageReport.ps1 -Scope All` run covering net8.0 and
 net10.0 (13,698 tests per target framework, 0 failures):
 
 | Scope | Line | Branch |

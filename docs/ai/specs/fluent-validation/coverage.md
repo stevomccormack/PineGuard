@@ -31,7 +31,7 @@ Provide FluentValidation-specific command lines and defaults while keeping the g
 
 Important:
 
-- After xplat reaches **100% line + 100% branch** for FluentValidation, the scope is complete.
+- After Coverlet reaches **100% line + 100% branch** for FluentValidation, the scope is complete.
 
 ## Quick start (FluentValidation only)
 

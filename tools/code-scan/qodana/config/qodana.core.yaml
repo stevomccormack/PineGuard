@@ -1,0 +1,24 @@
+version: "1.0"
+
+linter: qodana-dotnet
+
+profile:
+  name: qodana.recommended
+
+dotnet:
+  solution: tools/code-scan/qodana/PineGuard.Core.Qodana.slnx
+
+bootstrap: dotnet build tools/code-scan/qodana/PineGuard.Core.Qodana.slnx -c Release
+
+exclude:
+  - name: All
+    paths:
+      - .etc
+      - artifacts
+      - .git
+  - name: InconsistentNaming
+    paths:
+      - src/PineGuard.Core/Polyfills/IsExternalInit.cs
+  - name: CheckNamespace
+    paths:
+      - src/PineGuard.Core/Polyfills/IsExternalInit.cs

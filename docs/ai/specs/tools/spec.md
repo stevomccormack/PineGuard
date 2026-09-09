@@ -37,16 +37,16 @@ We use a strict **Verb-Noun** standard, with specific semantic meanings for verb
 - **`Test-`**: Audit and Verification scripts.
   - Performs checks, scans, or assertions.
   - **Output**: JSON/Text reports in `artifacts/audit/` or console pass/fail.
-  - **Example**: `Test-SpecNaming.ps1`, `tools/code-coverage/xplat/Test-CoverageAnalysis.ps1`.
+  - **Example**: `Test-SpecNaming.ps1`, `tools/code-coverage/Test-Coverage.ps1` (renamed from Test-CoverageAnalysis in Phase 3).
 
-- **`Gen-`**: Generator scripts.
+- **`Gen-` / `New-`**: Generator scripts.
   - Generates reports or output based on templates or data.
   - **Output**: Files in `artifacts/` (preview) or `src/` (when `-EnableUpdateTarget` is set).
-  - **Example**: `tools/code-coverage/xplat/Gen-CoverageReport.ps1`.
+  - **Example**: `tools/code-coverage/New-CoverageReport.ps1`.
 
-- **`Clean-`**: Maintenance scripts.
+- **`Clear-`**: Maintenance scripts.
   - Deletes files/folders.
-  - **Example**: `Clean-Artifacts.ps1`, `Clean-Root.ps1`.
+  - **Example**: `tools/clean/Clear-Artifacts.ps1`, `tools/clean/Clear-Root.ps1`.
 
 - **`Find-`**: specialized Audit finders (sub-components).
   - Used by `Test-` scripts or `audit-cli` to locate specific items.
@@ -56,17 +56,21 @@ We use a strict **Verb-Noun** standard, with specific semantic meanings for verb
   - Dot-sourced by other scripts to share functions; never invoked directly as a task.
   - **Example**: `Import-GitHelpers.ps1`, `Load-AuditHelpers.ps1`.
 
-- **`Initialize-` / `Setup-`**: One-time environment bootstrap.
+- **`Install-` / Container starters**: One-time environment bootstrap.
   - Installs a CLI or brings a local container stack up. Never used in CI.
-  - **Example**: `Initialize-Qodana.ps1`, `Setup-SonarQube.ps1`.
+  - **Example**: `tools/docker/qodana-up.ps1`, `tools/code-scan/sonarqube/Install-SonarQube.ps1`.
+
+- **`Initialize-`**: Post-start commissioning of an already-running service.
+  - Configures a service that is already up (accounts, projects, tokens). Never used in CI.
+  - **Example**: `tools/code-scan/sonarqube/Initialize-SonarQube.ps1`.
 
 - **`Get-`**: Read-only queries.
   - Returns data from a local or remote source; makes no changes.
-  - **Example**: `Get-SonarIssues.ps1`.
+  - **Example**: `tools/code-scan/sonarqube/Get-SonarQubeIssues.ps1`.
 
-- **`Commit-`**: Scoped git commit wrappers.
-  - Stages and commits one declared scope by name (never `git add .`).
-  - **Example**: `Commit-Core.ps1`, `Commit-Docs.ps1`.
+- **Entry-point commit wrappers**: Scoped git commit orchestrators.
+  - Stages and commits one or more declared scopes by name (never `git add .`).
+  - **Example**: `tools/git/Run-Commits.ps1 -Scope Core,Docs` (consolidated from individual scope-specific scripts in Phase 3).
 
 - **`Sync-`**: Reference synchronisation.
   - Reconciles references between docs and scripts.
@@ -147,14 +151,14 @@ Most tool domains are governed by this spec alone. A domain gets its own spec on
 |--------|------|
 | `tools/audit-cli/` | `docs/ai/specs/tools/audit-cli/spec.md` |
 | `tools/code-diagnostics/` | `docs/ai/specs/tools/code-diagnostics/spec.md` |
-| `tools/code-inspection/` | `docs/ai/specs/tools/code-inspection/qodana.md` |
-| `tools/sonar-scanner/` | `docs/ai/specs/scan/spec.md` |
+| `tools/code-scan/qodana/` | `docs/ai/specs/tools/code-scan/qodana/qodana.md` |
+| `tools/code-scan/sonarqube/` | `docs/ai/specs/scan/spec.md` |
 | `tools/code-coverage/` | This spec only |
-| `tools/code-formatter/` | This spec only |
-| `tools/docker/` | This spec only |
+| `tools/code-format/` | This spec only |
+| `tools/clean/` | This spec only |
 | `tools/git/` | This spec only |
-| `tools/maintenance/` | This spec only |
-| `tools/release/` | This spec only |
+| `tools/github/` | This spec only |
+| `tools/nuget/` | This spec only |
 | `tools/testing/` | This spec only |
 
 Per-domain operational documentation (usage, parameters) lives in each `tools/<domain>/README.md`, not in a spec.

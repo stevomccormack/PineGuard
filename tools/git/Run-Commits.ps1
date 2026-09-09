@@ -1,204 +1,254 @@
-﻿<#
+<#
 .SYNOPSIS
-    Run Commits
+    Creates one or more clean, scoped git commits in-process, driven by the PineGuard project
+    registry plus a small fixed table of cross-cutting meta-scopes.
 
 .DESCRIPTION
-    Part of the PineGuard PowerShell toolchain.
+    Replaces the sixteen near-identical tools/git/Commit-*.ps1 scripts (F-33). Each registry
+    scope (Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options,
+    DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing —
+    from tools/.shared/dotnet-projects.ps1's Get-PineGuardScope) and five meta-scopes that do not
+    correspond to a single shipped project (Agent, Docs, Tools, Solution, Ci) resolve to a stage
+    path list and commit through tools/.shared/git.ps1's Invoke-Commit, all inside this one pwsh
+    process — no child pwsh is spawned per scope, so -Message now actually reaches every commit
+    it applies to (previously it could not cross the process boundary at all).
 
-.PARAMETER Agent
-    See the param block for details.
+    -Scope accepts any number of these nineteen names; validity is checked against the live
+    registry plus the five hard-coded meta-scope names, so a new registry scope (e.g. a future
+    fifteenth project) becomes a valid -Scope value automatically, with no literal list here to
+    edit.
 
-.PARAMETER Core
-    See the param block for details.
+    README.md is staged by exactly one scope going forward: Docs (F-34). Previously it was staged by
+    both the old Commit-Docs and Commit-Solution scripts, so whichever ran first "won" it; Solution's
+    path list no longer includes it. .github/workflows moves out of the Agent meta-scope into the
+    new Ci meta-scope, since it is CI configuration, not an assistant-adapter surface.
 
-.PARAMETER MustClauses
-    See the param block for details.
-
-.PARAMETER GuardClauses
-    See the param block for details.
-
-.PARAMETER FluentValidation
-    See the param block for details.
-
-.PARAMETER DataAnnotations
-    See the param block for details.
-
-.PARAMETER Options
-    See the param block for details.
-
-.PARAMETER DependencyInjection
-    See the param block for details.
-
-.PARAMETER AspNetCore
-    See the param block for details.
-
-.PARAMETER ErrorOr
-    See the param block for details.
-
-.PARAMETER FluentResults
-    See the param block for details.
-
-.PARAMETER OneOf
-    See the param block for details.
-
-.PARAMETER Testing
-    See the param block for details.
-
-.PARAMETER Docs
-    See the param block for details.
-
-.PARAMETER Tools
-    See the param block for details.
-
-.PARAMETER Solution
-    See the param block for details.
+.PARAMETER Scope
+    One or more scope names to commit: the fourteen registry scopes, or the five meta-scopes
+    Agent, Docs, Tools, Solution, Ci. Case-insensitive. Ignored if -All is also given.
 
 .PARAMETER All
-    See the param block for details.
+    Commit every registry scope and every meta-scope (implies -IncludeTests).
 
 .PARAMETER IncludeTests
-    See the param block for details.
+    For registry-derived scopes, also stage the paired test project's directory. Has no effect on
+    the five meta-scopes, which are not registry entries.
+
+.PARAMETER Message
+    An explicit commit message applied to every scope selected in this invocation. Reaches
+    Invoke-Commit directly now that every scope commits in-process (previously this could not
+    cross the per-scope child-process boundary at all).
 
 .PARAMETER AutoMessage
-    See the param block for details.
-
-.PARAMETER AutoRebase
-    See the param block for details.
+    Generate a conventional-commits-style message per scope (subject + flowing prose body; see
+    tools/.shared/git.ps1's New-AutoCommitMessage) instead of requiring -Message or opening an
+    editor. Ignored for a scope where -Message is also supplied.
 
 .PARAMETER Push
-    See the param block for details.
+    Push to -Remote after all selected scopes have committed. Alone, this is a plain push that
+    throws if the local branch is behind upstream (matching git's own refusal); combined with
+    -Rebase it becomes a safe push (fetch, rebase-if-behind, then push).
 
-.PARAMETER SafePush
-    See the param block for details.
+.PARAMETER Rebase
+    Fetch and rebase onto -Remote (via `git pull --rebase --autostash`) if the local branch is
+    behind, both before and after committing. Renamed from the old script's -AutoRebase.
+    Combined with -Push, this is the old script's -SafePush shorthand (rebase, then push) with no
+    separate switch needed.
 
 .PARAMETER Remote
-    See the param block for details.
+    Git remote name for -Push and -Rebase. Defaults to 'origin'.
 
-.PARAMETER DryRun
-    See the param block for details.
+.PARAMETER WhatIf
+    Preview what would be staged and committed for each selected scope without making any
+    changes. -DryRun is a supported alias of the same switch (D-1d in
+    docs/ai/plans/tools-review-and-standardisation.md): both spellings resolve to one
+    implementation.
+
+.EXAMPLE
+    ./tools/git/Run-Commits.ps1 -Scope Core -WhatIf
+
+    Previews the Core scope's commit without staging or committing anything.
+
+.EXAMPLE
+    ./tools/git/Run-Commits.ps1 -Scope Core,Tools -IncludeTests -AutoMessage
+
+    Commits the Core scope (including its paired test project) and the Tools scope, each with an
+    auto-generated conventional-commit message.
+
+.EXAMPLE
+    ./tools/git/Run-Commits.ps1 -All -AutoMessage -Push -Rebase
+
+    Commits every scope with auto-generated messages, rebasing onto the remote first and last,
+    then safely pushes.
 #>
 
 [CmdletBinding()]
 param(
-    [switch]$Agent,
-    [switch]$Core,
-    [switch]$MustClauses,
-    [switch]$GuardClauses,
-    [switch]$FluentValidation,
-    [switch]$DataAnnotations,
-    [switch]$Options,
-    [switch]$DependencyInjection,
-    [switch]$AspNetCore,
-    [switch]$ErrorOr,
-    [switch]$FluentResults,
-    [switch]$OneOf,
-    [switch]$Testing,
-    [switch]$Docs,
-    [switch]$Tools,
-    [switch]$Solution,
-    [switch]$All,
-    [switch]$IncludeTests,
-    [switch]$AutoMessage,
-    [switch]$AutoRebase,
-    [switch]$Push,
-    [switch]$SafePush,
-    [string]$Remote = 'origin',
-    [switch]$DryRun
+    [Parameter(Position = 0)]
+    [ValidateScript({
+            # This block runs at parameter-binding time, before the script body below (including its
+            # own dot-source of dotnet-projects.ps1) executes — so it dot-sources its own copy here,
+            # scoped to this validation only. The registry lookup is what keeps -Scope's valid values
+            # in sync with tools/.shared/dotnet-projects.ps1 automatically; only the five meta-scope
+            # names are a literal list, and that list is small and stable by design (§3.1's two-level
+            # rule), unlike the registry scopes it is meant to sit beside.
+            . (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
+            $metaScopeNames = @('Agent', 'Docs', 'Tools', 'Solution', 'Ci')
+            $validScopes = @((Get-PineGuardScope -All).Name) + $metaScopeNames
+            foreach ($value in $_) {
+                if ($value -notin $validScopes) {
+                    throw "Invalid -Scope value '$value'. Valid scopes: $($validScopes -join ', ')."
+                }
+            }
+            return $true
+        })]
+    [string[]] $Scope,
+
+    [switch] $All,
+    [switch] $IncludeTests,
+    [string] $Message,
+    [switch] $AutoMessage,
+    [switch] $Push,
+    [switch] $Rebase,
+    [string] $Remote = 'origin',
+
+    [Alias('DryRun')]
+    [switch] $WhatIf
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-. "$PSScriptRoot/Import-GitHelpers.ps1"
+. "$PSScriptRoot/../.shared/path.ps1"
+. "$PSScriptRoot/../.shared/dotnet-projects.ps1"
+. "$PSScriptRoot/../.shared/git.ps1"
 
-$repoRoot = Resolve-RepoRoot
+$repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 
-if ($SafePush.IsPresent) {
-    $AutoRebase = $true
-    $Push = $true
+# Meta-scopes are cross-cutting file groups that do not correspond to a single registry entry —
+# each is a fixed path list, not derived from Get-PineGuardScope. Order here is just the order
+# -All commits them in (broadest/most-global first, then the registry scopes in registry order);
+# it has no effect on correctness since every scope commits independently.
+$metaScopePaths = [ordered]@{
+    Solution = @(
+        'PineGuard.slnx',
+        'PineGuard.sln.DotSettings',
+        'Directory.Packages.props',
+        '.editorconfig',
+        '.gitignore',
+        'NuGet.config',
+        'LICENSE'
+    )
+    Tools = @(
+        'tools'
+    )
+    Agent = @(
+        '.agent',
+        '.claude',
+        '.cursor/rules',
+        '.github/agents',
+        '.github/instructions',
+        '.github/prompts',
+        '.github/skills',
+        '.github/copilot-instructions.md',
+        '.vscode/settings.json',
+        '.vscode/tasks.json',
+        'AGENTS.md',
+        'CLAUDE.md',
+        'src/PineGuard.Core/AGENTS.md',
+        'src/PineGuard.MustClauses/AGENTS.md',
+        'src/PineGuard.GuardClauses/AGENTS.md',
+        'src/PineGuard.FluentValidation/AGENTS.md',
+        'src/PineGuard.DataAnnotations/AGENTS.md',
+        'src/PineGuard.Extensions.Options/AGENTS.md',
+        'src/PineGuard.Extensions.DependencyInjection/AGENTS.md',
+        'src/PineGuard.AspNetCore/AGENTS.md',
+        'src/PineGuard.ErrorOr/AGENTS.md',
+        'src/PineGuard.FluentResults/AGENTS.md',
+        'src/PineGuard.OneOf/AGENTS.md',
+        'src/PineGuard.Analyzers/AGENTS.md',
+        'src/PineGuard.MediatR/AGENTS.md',
+        'tests/AGENTS.md',
+        'tests/PineGuard.Testing/AGENTS.md',
+        'tools/AGENTS.md',
+        'tools/code-diagnostics/AGENTS.md',
+        'tools/code-scan/sonarqube/AGENTS.md'
+    )
+    Docs = @(
+        'docs',
+        'README.md'
+    )
+    Ci = @(
+        '.github/workflows'
+    )
 }
 
 if ($All.IsPresent) {
-    $Agent = $true
-    $Core = $true
-    $MustClauses = $true
-    $GuardClauses = $true
-    $FluentValidation = $true
-    $DataAnnotations = $true
-    $Options = $true
-    $DependencyInjection = $true
-    $AspNetCore = $true
-    $ErrorOr = $true
-    $FluentResults = $true
-    $OneOf = $true
-    $Testing = $true
-    $Docs = $true
-    $Tools = $true
-    $Solution = $true
+    $Scope = @($metaScopePaths.Keys) + @((Get-PineGuardScope -All).Name)
     $IncludeTests = $true
 }
 
-$any = $Agent -or $Core -or $MustClauses -or $GuardClauses -or $FluentValidation -or $DataAnnotations -or $Options -or $DependencyInjection -or $AspNetCore -or $ErrorOr -or $FluentResults -or $OneOf -or $Testing -or $Docs -or $Tools -or $Solution
-if (-not $any) {
-    throw 'No scopes selected. Use -All or specify one or more scopes (e.g. -Core -Tools).'
+if (-not $Scope -or $Scope.Count -eq 0) {
+    throw 'No scopes selected. Use -All, or -Scope <Name[,Name...]> (e.g. -Scope Core,Tools).'
 }
 
-if ($AutoRebase.IsPresent -and -not $DryRun.IsPresent) {
-    Invoke-AutoRebaseIfNeeded -RepoRoot $repoRoot -Remote $Remote
-}
+$effectiveIncludeTests = $IncludeTests.IsPresent -or $All.IsPresent
 
 function Invoke-ScopedCommit {
-    param(
-        [Parameter(Mandatory = $true)][string]$ScriptName,
-        [bool]$IncludeTests = $false
-    )
+    <#
+    .SYNOPSIS
+        Resolves one scope name (registry or meta) to its stage paths and commits it in-process.
+    #>
+    param([Parameter(Mandatory = $true)][string]$ScopeName)
 
-    $path = Join-Path $PSScriptRoot $ScriptName
-    if (-not (Test-Path -LiteralPath $path)) {
-        throw "Missing script: $path"
+    if ($metaScopePaths.Contains($ScopeName)) {
+        $stagePaths = @($metaScopePaths[$ScopeName])
+    }
+    else {
+        $entry = Get-PineGuardScope -Name $ScopeName
+
+        # A scope's SourceCsprojs is an array so a multi-project scope (e.g. Analyzers, which
+        # ships PineGuard.Analyzers and the sibling PineGuard.Analyzers.CodeFixes as one NuGet
+        # package) stages every project directory it owns, not just SourceDir's single directory
+        # — the same reasoning the registry itself documents for why SourceCsprojs is plural.
+        $dirs = [System.Collections.Generic.List[string]]::new()
+        foreach ($csproj in $entry.SourceCsprojs) {
+            $dir = (Split-Path -Parent $csproj) -replace '\\', '/'
+            if (-not $dirs.Contains($dir)) {
+                $dirs.Add($dir)
+            }
+        }
+
+        if ($effectiveIncludeTests) {
+            $testDir = (Split-Path -Parent $entry.TestCsproj) -replace '\\', '/'
+            if (-not $dirs.Contains($testDir)) {
+                $dirs.Add($testDir)
+            }
+        }
+
+        $stagePaths = $dirs.ToArray()
     }
 
-    $childArgs = @()
-    if ($IncludeTests) { $childArgs += '-IncludeTests' }
-    if ($script:AutoMessage.IsPresent) { $childArgs += '-AutoMessage' }
-    if ($script:DryRun.IsPresent) { $childArgs += '-DryRun' }
+    $title = "${ScopeName}: updates"
 
-    if ($script:DryRun.IsPresent) {
-        Write-Host ("[DryRun] Invoking: {0} {1}" -f $path, ($childArgs -join ' ')) -ForegroundColor DarkGray
-    }
-
-    $pwshArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $path) + $childArgs
-    & pwsh @pwshArgs
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host ("Failed invoking: {0}" -f $path) -ForegroundColor Red
-        Write-Host ("Args: {0}" -f ($childArgs -join ' ')) -ForegroundColor Red
-        throw "Child script failed with exit code $LASTEXITCODE."
-    }
+    Invoke-Commit -RepoRoot $repoRoot -Title $title -StagePaths $stagePaths `
+        -WhatIf:$WhatIf.IsPresent -AutoMessage:$AutoMessage.IsPresent -Message $Message
 }
 
-if ($Solution) { Invoke-ScopedCommit -ScriptName 'Commit-Solution.ps1' }
-if ($Tools) { Invoke-ScopedCommit -ScriptName 'Commit-Tools.ps1' }
-if ($Agent) { Invoke-ScopedCommit -ScriptName 'Commit-Agent.ps1' }
-if ($Docs) { Invoke-ScopedCommit -ScriptName 'Commit-Docs.ps1' }
-if ($Testing) { Invoke-ScopedCommit -ScriptName 'Commit-Testing.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($Core) { Invoke-ScopedCommit -ScriptName 'Commit-Core.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($MustClauses) { Invoke-ScopedCommit -ScriptName 'Commit-MustClauses.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($GuardClauses) { Invoke-ScopedCommit -ScriptName 'Commit-GuardClauses.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($FluentValidation) { Invoke-ScopedCommit -ScriptName 'Commit-FluentValidation.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($DataAnnotations) { Invoke-ScopedCommit -ScriptName 'Commit-DataAnnotations.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($Options) { Invoke-ScopedCommit -ScriptName 'Commit-Options.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($DependencyInjection) { Invoke-ScopedCommit -ScriptName 'Commit-DependencyInjection.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($AspNetCore) { Invoke-ScopedCommit -ScriptName 'Commit-AspNetCore.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($ErrorOr) { Invoke-ScopedCommit -ScriptName 'Commit-ErrorOr.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($FluentResults) { Invoke-ScopedCommit -ScriptName 'Commit-FluentResults.ps1' -IncludeTests:$IncludeTests.IsPresent }
-if ($OneOf) { Invoke-ScopedCommit -ScriptName 'Commit-OneOf.ps1' -IncludeTests:$IncludeTests.IsPresent }
-
-if ($AutoRebase.IsPresent -and -not $DryRun.IsPresent) {
+if ($Rebase.IsPresent -and -not $WhatIf.IsPresent) {
     Invoke-AutoRebaseIfNeeded -RepoRoot $repoRoot -Remote $Remote
 }
 
-if ($Push.IsPresent -and -not $DryRun.IsPresent) {
-    if ($SafePush.IsPresent) {
+foreach ($scopeName in $Scope) {
+    Invoke-ScopedCommit -ScopeName $scopeName
+}
+
+if ($Rebase.IsPresent -and -not $WhatIf.IsPresent) {
+    Invoke-AutoRebaseIfNeeded -RepoRoot $repoRoot -Remote $Remote
+}
+
+if ($Push.IsPresent -and -not $WhatIf.IsPresent) {
+    if ($Rebase.IsPresent) {
         Invoke-SafePush -RepoRoot $repoRoot -Remote $Remote
     }
     else {

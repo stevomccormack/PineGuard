@@ -31,7 +31,7 @@ Provide MustClauses-specific command lines and defaults while keeping the global
 
 Important:
 
-- After xplat reaches **100% line + 100% branch** for MustClauses, the scope is complete.
+- After Coverlet reaches **100% line + 100% branch** for MustClauses, the scope is complete.
 
 ## Quick start (MustClauses only)
 

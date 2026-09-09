@@ -1,0 +1,112 @@
+# Qodana
+
+Local [JetBrains Qodana](https://www.jetbrains.com/qodana/) static code inspection for PineGuard.
+
+Qodana runs as a Docker container. Results are written to `artifacts/qodana/<scope>/report/index.html`.
+
+## Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) running
+- [Winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (Windows 10/11 built-in)
+- `QODANA_TOKEN` environment variable (from [Qodana Cloud](https://qodana.cloud/))
+
+## Workflow
+
+### 1. Start the Docker infrastructure
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-up.ps1
+```
+
+See [tools/docker/README.md](../../docker/README.md) for the compose stacks, the shared network, and the
+per-stack up/down scripts.
+
+### 2. Install (first run only)
+
+Installs the Qodana CLI via Winget if not present and starts the Qodana container.
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Install-Qodana.ps1
+```
+
+### 3. Set your Qodana Cloud token
+
+```powershell
+$env:QODANA_TOKEN = '<your-token>'
+```
+
+Token is optional for local dev — omit it to keep results local only (no cloud upload).
+
+### 4. Run an inspection
+
+```powershell
+# Core scope (default)
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Run-Qodana.ps1 -Scope Core -Clean
+
+# All projects
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Run-Qodana.ps1 -Scope All -Clean
+
+# Open the HTML report after scan
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/code-scan/qodana/Run-Qodana.ps1 -Scope Core -Clean -OpenReport
+```
+
+### 5. Review findings
+
+Results are written to `artifacts/qodana/<scope>/report/index.html`. Open in a browser or use `-OpenReport`.
+
+### 6. Stop the container
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/docker/docker-down.ps1
+```
+
+## Parameters — Run-Qodana.ps1
+
+| Parameter | Default | Description |
+|---|---|---|
+| `-Scope` | `Core` | `Core`, `MustClauses`, `GuardClauses`, `FluentValidation`, `DataAnnotations`, `Options`, `DependencyInjection`, `AspNetCore`, `ErrorOr`, `FluentResults`, `OneOf`, `MediatR`, `Analyzers`, `Testing`, `All` |
+| `-Clean` | `$false` | Delete previous results before scanning |
+| `-OpenReport` | `$false` | Open HTML report in browser after scan |
+| `-ShowReport` | `$false` | Show inline SARIF summary after scan |
+| `-NonInteractive` | `$false` | Suppress Qodana's interactive prompts (script-friendly) |
+| `-Token` | env `QODANA_TOKEN` | Qodana Cloud token (optional for local dev) |
+| `-Endpoint` | env `QODANA_ENDPOINT` | Qodana Cloud endpoint override |
+| `-Linter` | `qodana-dotnet` | Qodana linter image (`qodana-dotnet` or `auto`) |
+| `-TimeoutMinutes` | `30` | Hard timeout in minutes (1--1440) |
+| `-TimeoutExitCode` | `124` | Exit code returned on timeout (1--255) |
+| `-RepoRoot` | auto-detected | Path to repository root |
+| `-ResultsDir` | auto | Override results output directory |
+
+## Per-Scope Solution Files
+
+Each scope maps to a dedicated `.slnx` file and Qodana config. Per-scope solution files live in `tools/code-scan/qodana/` and config YAML files live in `tools/code-scan/qodana/config/`.
+
+| Scope | Config |
+|---|---|
+| `Core` | `tools/code-scan/qodana/config/qodana.core.yaml` |
+| `MustClauses` | `tools/code-scan/qodana/config/qodana.must-clauses.yaml` |
+| `GuardClauses` | `tools/code-scan/qodana/config/qodana.guard-clauses.yaml` |
+| `FluentValidation` | `tools/code-scan/qodana/config/qodana.fluent-validation.yaml` |
+| `DataAnnotations` | `tools/code-scan/qodana/config/qodana.data-annotations.yaml` |
+| `Options` | `tools/code-scan/qodana/config/qodana.options.yaml` |
+| `DependencyInjection` | `tools/code-scan/qodana/config/qodana.dependency-injection.yaml` |
+| `AspNetCore` | `tools/code-scan/qodana/config/qodana.asp-net-core.yaml` |
+| `ErrorOr` | `tools/code-scan/qodana/config/qodana.error-or.yaml` |
+| `FluentResults` | `tools/code-scan/qodana/config/qodana.fluent-results.yaml` |
+| `OneOf` | `tools/code-scan/qodana/config/qodana.one-of.yaml` |
+| `MediatR` | `tools/code-scan/qodana/config/qodana.mediatr.yaml` |
+| `Analyzers` | `tools/code-scan/qodana/config/qodana.analyzers.yaml` |
+| `Testing` | `tools/code-scan/qodana/config/qodana.testing.yaml` |
+| `All` | `tools/code-scan/qodana/config/qodana.all.yaml` |
+
+## Artifacts
+
+Results go to `artifacts/qodana/<scope>/`.
+
+## CI/CD
+
+For CI/CD, use the [JetBrains Qodana GitHub Action](https://github.com/JetBrains/qodana-action) — this repo's workflow pins `JetBrains/qodana-action@v2026.2` — with `QODANA_TOKEN` stored as a GitHub repository secret. Do not use these scripts in pipelines.
+
+```bash
+gh secret set QODANA_TOKEN --body "<ci-token>"
+```

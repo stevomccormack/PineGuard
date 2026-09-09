@@ -20,6 +20,6 @@ Follow the canonical recipe in [improve-coverage SKILL.md](../../../docs/ai/skil
 
 ## Verify
 
-- Use xplat coverage for the final result.
+- Use the Coverlet engine (the default) for the final result — DotCover is snapshot-only and cannot be gated.
 - Stop only when the requested scope reaches the expected target.
 - Keep the Brain as the source of truth.

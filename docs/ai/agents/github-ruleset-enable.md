@@ -20,7 +20,9 @@ Sets enforcement back to `active` on the `main-branch` ruleset (or a named alter
 
 | Parameter | Required | Default | Description |
 |-----------|----------|---------|-------------|
-| `Name` | | `main-branch` | Ruleset short key. Currently `main-branch` or `v-tags`. |
+| `Action` | ✅ | — | Positional (position 0). `Enable` or `Disable` — this agent always passes `Enable`. |
+| `Name` | | `main-branch` | Positional (position 1). Ruleset short key. Currently `main-branch` or `v-tags`. |
+| `-WhatIf` / `-DryRun` | | `$false` | Look up the ruleset and print what would change, but skip the backup, the DELETE, and the POST. Both spellings are the same switch (D-1d). |
 
 ## Steps
 
@@ -28,7 +30,7 @@ Sets enforcement back to `active` on the `main-branch` ruleset (or a named alter
 
    ```powershell
    pwsh -NoProfile -ExecutionPolicy Bypass `
-       -File ./tools/release/Run-GithubRuleset.ps1 Enable [<Name>]
+       -File ./tools/github/Set-GithubRuleset.ps1 Enable [<Name>]
    ```
 
 2. **Report**
@@ -38,5 +40,5 @@ Sets enforcement back to `active` on the `main-branch` ruleset (or a named alter
 ## Related
 
 - Paired agent: [`github-ruleset-disable.md`](github-ruleset-disable.md)
-- Script: [`tools/release/Run-GithubRuleset.ps1`](../../../tools/release/Run-GithubRuleset.ps1)
+- Script: [`tools/github/Set-GithubRuleset.ps1`](../../../tools/github/Set-GithubRuleset.ps1)
 - Used by: [`github-release-publish.md`](github-release-publish.md) when `-BypassPR` is requested.

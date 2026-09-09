@@ -13,11 +13,12 @@ version: 1.1
 
 - **Role**: [Software Engineer](../roles/builder.md)
 - **Skill**: [Format Code](../skills/format-code/SKILL.md) — the canonical procedure
-- **Reference**: `tools/code-formatter/Run-Format.ps1`
+- **Reference**: `tools/code-format/Run-Format.ps1`
 
 ## Parameters
 
-- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Testing, All)
+- **Scope**: (Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options,
+  DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing, All)
 
 ## Auto-Approval
 

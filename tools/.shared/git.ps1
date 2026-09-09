@@ -20,25 +20,6 @@ function Assert-GitAvailable {
     }
 }
 
-function Resolve-RepoRoot {
-    <#
-    .SYNOPSIS
-        Uses git rev-parse --show-toplevel to find the repo root.
-    #>
-    param(
-        [string]$StartPath = (Get-Location).Path
-    )
-
-    Assert-GitAvailable
-
-    $root = & git -C $StartPath rev-parse --show-toplevel 2>$null
-    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($root)) {
-        throw 'Not inside a git repository.'
-    }
-
-    return $root.Trim()
-}
-
 function Invoke-Git {
     <#
     .SYNOPSIS
@@ -46,11 +27,11 @@ function Invoke-Git {
     #>
     param(
         [Parameter(Mandatory = $true)][string]$RepoRoot,
-        [Parameter(Mandatory = $true)][string[]]$Args
+        [Parameter(Mandatory = $true)][string[]]$GitArgs
     )
 
     Assert-GitAvailable
-    $output = & git -C $RepoRoot @Args
+    $output = & git -C $RepoRoot @GitArgs
     $exitCode = $LASTEXITCODE
     return [pscustomobject]@{
         Output = $output
@@ -65,7 +46,7 @@ function Get-StagedFiles {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('diff', '--cached', '--name-only')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('diff', '--cached', '--name-only')
     if ($r.ExitCode -ne 0) {
         throw 'Failed to check staged changes.'
     }
@@ -85,23 +66,16 @@ function Get-StagedFiles {
     Write-Output -NoEnumerate ([string[]]$lines)
 }
 
-function Unstage-AllChanges {
+function Assert-IndexClean {
     <#
     .SYNOPSIS
-        Runs git restore --staged . to unstage all changes.
-    #>
-    param([Parameter(Mandatory = $true)][string]$RepoRoot)
+        Throws if the git index already has staged changes.
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('restore', '--staged', '.')
-    if ($r.ExitCode -ne 0) {
-        throw 'Failed to unstage changes.'
-    }
-}
-
-function Ensure-IndexClean {
-    <#
-    .SYNOPSIS
-        Unstages any existing staged changes before committing.
+    .DESCRIPTION
+        `git restore --staged .` is a Tier 0 NEVER command (docs/ai/specs/safety.md §2.1) because
+        it can silently discard the user's own staged work. This function never unstages
+        anything; it only reports the problem and stops, so the caller (a human, or an agent
+        acting on human instruction) can decide what to do with the pre-existing staged changes.
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
@@ -110,8 +84,8 @@ function Ensure-IndexClean {
         return
     }
 
-    Write-Host "Detected existing staged changes; unstaging them to avoid mixing commits." -ForegroundColor Yellow
-    Unstage-AllChanges -RepoRoot $RepoRoot
+    throw (("The git index already has {0} staged file(s): {1}. Commit or unstage them yourself " +
+        "before running this script; it will not unstage changes for you.") -f $staged.Count, ($staged -join ', '))
 }
 
 function Get-StatusPorcelain {
@@ -124,13 +98,13 @@ function Get-StatusPorcelain {
         [Parameter(Mandatory = $false)][string[]]$Paths
     )
 
-    $args = @('status', '--porcelain=v1')
+    $statusArgs = @('status', '--porcelain=v1')
     if ($Paths -and $Paths.Count -gt 0) {
-        $args += '--'
-        $args += $Paths
+        $statusArgs += '--'
+        $statusArgs += $Paths
     }
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args $args
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs $statusArgs
     if ($r.ExitCode -ne 0) {
         throw 'Failed to read git status.'
     }
@@ -160,8 +134,8 @@ function Add-Paths {
         [Parameter(Mandatory = $true)][string[]]$Paths
     )
 
-    $args = @('add', '--') + $Paths
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args $args
+    $addArgs = @('add', '--') + $Paths
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs $addArgs
     if ($r.ExitCode -ne 0) {
         throw 'git add failed.'
     }
@@ -174,7 +148,7 @@ function Get-StagedNameStatus {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('diff', '--cached', '--name-status')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('diff', '--cached', '--name-status')
     if ($r.ExitCode -ne 0) {
         throw 'Failed to compute staged diff.'
     }
@@ -201,7 +175,7 @@ function Get-StagedNumStat {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('diff', '--cached', '--numstat')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('diff', '--cached', '--numstat')
     if ($r.ExitCode -ne 0) {
         throw 'Failed to compute staged numstat.'
     }
@@ -224,18 +198,26 @@ function Get-StagedNumStat {
 function Get-CommitTitleSuggestion {
     <#
     .SYNOPSIS
-        Suggests commit title based on scope (tools/, src/, tests/, etc.).
+        Refines a scope's generic "updates" suffix into a more specific phrase, using
+        path-fragment heuristics over the staged files.
+
+    .DESCRIPTION
+        Returns a short phrase (e.g. "rules updates", "git automation scripts") describing what
+        changed, for use as the summary half of the conventional-commit subject line that
+        New-AutoCommitMessage builds. Falls back to the scope's own suffix (usually "updates")
+        when nothing more specific matches.
+
+        Pre-T3.02 this function returned a full "Prefix: Suffix" title string; it now returns
+        only the suffix phrase, because the subject line's "<type>(<scope>):" prefix is built
+        separately (F-33).
     #>
     param(
         [Parameter(Mandatory = $true)][string]$DefaultTitle,
         [Parameter(Mandatory = $true)][string[]]$NameStatusLines
     )
 
-    $prefix = $DefaultTitle
     $suffix = 'updates'
-
     if ($DefaultTitle -match '^([^:]+):\s*(.+)$') {
-        $prefix = $Matches[1].Trim()
         $suffix = $Matches[2].Trim()
     }
 
@@ -250,21 +232,82 @@ function Get-CommitTitleSuggestion {
         return (@($paths | Where-Object { $_ -like "*$fragment*" })).Count -gt 0
     }
 
-    if (& $has 'tools/git/') { return "${prefix}: git automation scripts" }
-    if (& $has 'tools/audit-cli/') { return "${prefix}: audit-cli orchestration" }
-    if (& $has 'tools/code-coverage/') { return "${prefix}: coverage tooling updates" }
-    if (& $has 'docs/') { return "${prefix}: documentation updates" }
-    if (& $has 'src/PineGuard.Core/Rules/') { return "${prefix}: rules updates" }
-    if (& $has 'src/PineGuard.Core/Utils/') { return "${prefix}: utils updates" }
-    if (& $has 'tests/') { return "${prefix}: tests updates" }
+    if (& $has 'tools/git/') { return 'git automation scripts' }
+    if (& $has 'tools/audit-cli/') { return 'audit-cli orchestration' }
+    if (& $has 'tools/code-coverage/') { return 'coverage tooling updates' }
+    if (& $has 'docs/') { return 'documentation updates' }
+    if (& $has 'src/PineGuard.Core/Rules/') { return 'rules updates' }
+    if (& $has 'src/PineGuard.Core/Utils/') { return 'utils updates' }
+    if (& $has 'tests/') { return 'tests updates' }
 
-    return "${prefix}: $suffix"
+    return $suffix
+}
+
+function Get-CommitTypeSuggestion {
+    <#
+    .SYNOPSIS
+        Infers a conventional-commits type (docs/test/chore) from the staged file paths.
+
+    .DESCRIPTION
+        A mechanical generator cannot know true intent (a behaviour change vs. a fix vs. a
+        refactor), so this only distinguishes what it CAN tell from paths alone: 'docs' when
+        every changed path is doc-like (under docs/, or any *.md file), 'test' when every changed
+        path is under tests/, and 'chore' as the safe default for everything else (including any
+        mix of the two, and all src/ or tools/ changes).
+    #>
+    param([Parameter(Mandatory = $true)][string[]]$Paths)
+
+    if ($Paths.Count -eq 0) {
+        return 'chore'
+    }
+
+    $nonDoc = @($Paths | Where-Object { $_ -notmatch '(^|/)docs/' -and $_ -notmatch '\.md$' })
+    if ($nonDoc.Count -eq 0) {
+        return 'docs'
+    }
+
+    $nonTest = @($Paths | Where-Object { $_ -notmatch '^tests/' })
+    if ($nonTest.Count -eq 0) {
+        return 'test'
+    }
+
+    return 'chore'
+}
+
+function ConvertTo-KebabCase {
+    <#
+    .SYNOPSIS
+        Converts a PascalCase scope name (e.g. "MustClauses") to kebab-case ("must-clauses").
+
+    .DESCRIPTION
+        A plain word-boundary conversion: a hyphen is inserted wherever a lowercase letter or
+        digit is followed by an uppercase letter, then the whole string is lowercased. This is
+        mechanical, not a lookup against the hand-curated Qodana slug table (F-13), so a name
+        with a trailing single capital that isn't a true word boundary (e.g. "MediatR") splits
+        as "mediat-r" — an accepted quirk of a generic heuristic, not a bug to chase here.
+    #>
+    param([Parameter(Mandatory = $true)][string]$Value)
+
+    $withHyphens = [regex]::Replace($Value, '(?<=[a-z0-9])(?=[A-Z])', '-')
+    return $withHyphens.ToLowerInvariant()
 }
 
 function New-AutoCommitMessage {
     <#
     .SYNOPSIS
-        Generates a multi-line commit message with stats and file list.
+        Generates a conventional-commits-style message: a "<type>(<scope>): <summary>" subject
+        line, a blank line, then one flowing prose paragraph describing what changed (F-33).
+
+    .DESCRIPTION
+        This is a BEST-EFFORT MECHANICAL summary standing in for a human-written -Message. It can
+        describe *what* changed — which files, how many, how many lines — because that is all
+        `git diff --cached` can tell it. It has no notion of *why* the change was made. The
+        owner's standing convention (a conventional-commits subject followed by a flowing prose
+        body; see project memory feedback_commit-messages.md) is achievable here only for the
+        "what" half of that convention. Prefer -Message over -AutoMessage whenever the change is
+        meaningful enough to be worth explaining — this generator exists for the mechanical,
+        low-stakes commits where writing a message by hand would not teach a reader anything a
+        stat line can't already show.
     #>
     param(
         [Parameter(Mandatory = $true)][string]$RepoRoot,
@@ -295,37 +338,29 @@ function New-AutoCommitMessage {
         if ($parts[1] -match '^\d+$') { $del += [int]$parts[1] }
     }
 
-    $isSmall = ($fileCount -le 2) -and (($ins + $del) -le 40)
-    $title = Get-CommitTitleSuggestion -DefaultTitle $DefaultTitle -NameStatusLines $nameStatus
+    $changedPaths = @(
+        $nameStatus |
+            ForEach-Object { ($_ -split "\t")[-1].Trim() } |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+    )
 
+    $scopeName = $DefaultTitle
+    if ($DefaultTitle -match '^([^:]+):') {
+        $scopeName = $Matches[1].Trim()
+    }
+
+    $type = Get-CommitTypeSuggestion -Paths $changedPaths
+    $scopeSlug = ConvertTo-KebabCase -Value $scopeName
+    $summary = Get-CommitTitleSuggestion -DefaultTitle $DefaultTitle -NameStatusLines $nameStatus
+
+    $subject = '{0}({1}): {2}' -f $type, $scopeSlug, $summary
+
+    $fileWord = if ($fileCount -eq 1) { 'file' } else { 'files' }
     $scopeText = ($StagePaths -join ', ')
-    $statsLine = "Files: $fileCount (M:$modified A:$added D:$deleted); Diff: +$ins/-$del"
+    $body = 'Updates {0} {1} under {2} ({3} modified, {4} added, {5} deleted; +{6}/-{7} lines).' -f `
+        $fileCount, $fileWord, $scopeText, $modified, $added, $deleted, $ins, $del
 
-    $lines = @()
-    $lines += $title
-    $lines += ''
-
-    if ($isSmall) {
-        $lines += "Summary: Small scoped update ($statsLine)."
-        $lines += "Scope: $scopeText"
-    }
-    else {
-        $lines += "Summary: Scoped update for $($DefaultTitle.Split(':')[0].Trim())."
-        $lines += $statsLine
-        $lines += "Scope: $scopeText"
-        $lines += ''
-
-        $lines += 'Changes:'
-        $max = [Math]::Min(12, $nameStatus.Count)
-        for ($i = 0; $i -lt $max; $i++) {
-            $lines += "- $($nameStatus[$i])"
-        }
-        if ($nameStatus.Count -gt $max) {
-            $lines += "- ...and $($nameStatus.Count - $max) more"
-        }
-    }
-
-    return ($lines -join [Environment]::NewLine)
+    return ($subject, '', $body) -join [Environment]::NewLine
 }
 
 function New-CommitTemplateFile {
@@ -393,7 +428,7 @@ function Invoke-Commit {
     )
 
     if (-not $WhatIf.IsPresent) {
-        Ensure-IndexClean -RepoRoot $RepoRoot
+        Assert-IndexClean -RepoRoot $RepoRoot
     }
 
     $statusBefore = Get-StatusPorcelain -RepoRoot $RepoRoot -Paths $StagePaths
@@ -406,7 +441,7 @@ function Invoke-Commit {
         $staged = @()
         try { $staged = Get-StagedFiles -RepoRoot $RepoRoot } catch { $staged = @() }
         if ($staged.Count -gt 0) {
-            Write-Host "[WhatIf] Note: staged changes already exist; real commits would unstage them first." -ForegroundColor Yellow
+            Write-Host "[WhatIf] Note: staged changes already exist; a real commit would fail here (commit or unstage them first)." -ForegroundColor Yellow
         }
         Write-Host ("[WhatIf] Would stage: {0}" -f ($StagePaths -join ', ')) -ForegroundColor Yellow
         Write-Host ("[WhatIf] Would commit: {0}" -f $Title) -ForegroundColor Yellow
@@ -432,12 +467,12 @@ function Invoke-Commit {
                 Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
         )
 
-        $args = @('commit')
+        $commitArgs = @('commit')
         foreach ($p in $paragraphs) {
-            $args += @('-m', $p)
+            $commitArgs += @('-m', $p)
         }
 
-        $r = Invoke-Git -RepoRoot $RepoRoot -Args $args
+        $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs $commitArgs
         if ($r.ExitCode -ne 0) {
             throw 'git commit failed.'
         }
@@ -446,7 +481,7 @@ function Invoke-Commit {
     }
 
     $templateFile = New-CommitTemplateFile -RepoRoot $RepoRoot -Title $Title -StagePaths $StagePaths -ExtraNotes $ExtraNotes
-    $r2 = Invoke-Git -RepoRoot $RepoRoot -Args @('commit', '--template', $templateFile)
+    $r2 = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('commit', '--template', $templateFile)
     if ($r2.ExitCode -ne 0) {
         throw 'git commit failed.'
     }
@@ -459,7 +494,7 @@ function Get-CurrentBranch {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('rev-parse', '--abbrev-ref', 'HEAD')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('rev-parse', '--abbrev-ref', 'HEAD')
     if ($r.ExitCode -ne 0) {
         throw 'Failed to get current branch.'
     }
@@ -474,7 +509,7 @@ function Get-UpstreamRef {
     #>
     param([Parameter(Mandatory = $true)][string]$RepoRoot)
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}')
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}')
     if ($r.ExitCode -ne 0) {
         return $null
     }
@@ -494,7 +529,7 @@ function Get-AheadBehind {
         [Parameter(Mandatory = $true)][string]$Upstream
     )
 
-    $r = Invoke-Git -RepoRoot $RepoRoot -Args @('rev-list', '--left-right', '--count', ("HEAD...{0}" -f $Upstream))
+    $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('rev-list', '--left-right', '--count', ("HEAD...{0}" -f $Upstream))
     if ($r.ExitCode -ne 0) {
         throw 'Failed to compute ahead/behind.'
     }
@@ -521,7 +556,7 @@ function Invoke-AutoRebaseIfNeeded {
         [string]$Remote = 'origin'
     )
 
-    $fetch = Invoke-Git -RepoRoot $RepoRoot -Args @('fetch', $Remote)
+    $fetch = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('fetch', $Remote)
     if ($fetch.ExitCode -ne 0) {
         throw 'git fetch failed.'
     }
@@ -540,7 +575,7 @@ function Invoke-AutoRebaseIfNeeded {
 
     Write-Host ("Remote is ahead by {0} commit(s); rebasing..." -f $ab.Behind) -ForegroundColor Cyan
 
-    $pull = Invoke-Git -RepoRoot $RepoRoot -Args @('pull', '--rebase', '--autostash')
+    $pull = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('pull', '--rebase', '--autostash')
     if ($pull.ExitCode -ne 0) {
         Write-Host ''
         Write-Host 'Auto rebase failed (likely conflicts).' -ForegroundColor Red
@@ -562,7 +597,7 @@ function Invoke-Push {
         [string]$Remote = 'origin'
     )
 
-    $fetch = Invoke-Git -RepoRoot $RepoRoot -Args @('fetch', $Remote)
+    $fetch = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('fetch', $Remote)
     if ($fetch.ExitCode -ne 0) {
         throw 'git fetch failed.'
     }
@@ -571,7 +606,7 @@ function Invoke-Push {
     $upstream = Get-UpstreamRef -RepoRoot $RepoRoot
 
     if ($null -eq $upstream) {
-        $r = Invoke-Git -RepoRoot $RepoRoot -Args @('push', '-u', $Remote, $branch)
+        $r = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('push', '-u', $Remote, $branch)
         if ($r.ExitCode -ne 0) {
             throw 'git push failed.'
         }
@@ -588,7 +623,7 @@ function Invoke-Push {
         return
     }
 
-    $r2 = Invoke-Git -RepoRoot $RepoRoot -Args @('push', $Remote, $branch)
+    $r2 = Invoke-Git -RepoRoot $RepoRoot -GitArgs @('push', $Remote, $branch)
     if ($r2.ExitCode -ne 0) {
         throw 'git push failed.'
     }

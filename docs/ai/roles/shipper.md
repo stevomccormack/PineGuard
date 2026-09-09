@@ -24,7 +24,7 @@ and repo tooling (often PowerShell-first in this repo).
 4. **Ship NuGet Correctly**: Ensure packaging metadata, versioning inputs, and release artifacts are repeatable.
 5. **License Hygiene**: Make it easy to comply (e.g., ensure license files/attribution conventions are preserved and validated).
 6. **GitHub Automation**: Prefer GitHub Actions + GitHub CLI (`gh`) + GitHub MCP (when available) for repeatable repo operations.
-7. **Quality Gates Everywhere**: Integrate tests, coverage (xplat + Cobertura), and inspection (JetBrains Qodana) into CI so releases are boring.
+7. **Quality Gates Everywhere**: Integrate tests, coverage (Coverlet + Cobertura), and inspection (JetBrains Qodana) into CI so releases are boring.
 
 ## Constraints
 
