@@ -92,7 +92,7 @@ if ($LASTEXITCODE -ne 0) {
 $rulesets = $rulesetsJson | ConvertFrom-Json
 $existing = $rulesets | Where-Object { $_.name -eq $displayName } | Select-Object -First 1
 if (-not $existing) {
-    Fail "Ruleset '$displayName' not found on this repo. Run .etc/powershell/github-rulesets.ps1 Apply to create it."
+    Fail "Ruleset '$displayName' not found on this repo. Run .etc/powershell/Sync-GithubRuleset.ps1 Apply to create it."
 }
 
 $targetEnforcement = if ($Action -eq 'Enable') { 'active' } else { 'disabled' }
