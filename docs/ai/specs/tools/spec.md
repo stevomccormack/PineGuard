@@ -11,6 +11,7 @@ spec:
     - ../dependencies.md
 applies_to:
   - "tools/**"
+  - ".etc/powershell/**"
 ---
 
 # PineGuard Tools Specification
@@ -87,6 +88,7 @@ We use a strict **Verb-Noun** standard, with specific semantic meanings for verb
 Two directories are exempt from the PascalCase Verb-Noun rule:
 
 - `tools/.shared/*.ps1` — dot-sourced module files (`path.ps1`, `git.ps1`, `coverage.ps1`, …). These are libraries, not commands, and use lowercase names to make that obvious at a glance.
+- `.etc/powershell/.shared/*.ps1` — the same carve-out for the maintainer shell (`index.ps1`, `project.ps1`, `solution.ps1`, …), for the same reason.
 - `tools/docker/*.ps1` — Docker Compose wrappers (`docker-up.ps1`, `qodana-down.ps1`, …) named after the compose stack they drive. Renaming these to `Start-*`/`Stop-*` is a tracked follow-up, not current practice.
 
 No other directory may introduce lowercase script names.
@@ -162,3 +164,28 @@ Most tool domains are governed by this spec alone. A domain gets its own spec on
 | `tools/testing/` | This spec only |
 
 Per-domain operational documentation (usage, parameters) lives in each `tools/<domain>/README.md`, not in a spec.
+
+## 5. Governed surfaces
+
+This spec governs two PowerShell surfaces. They share the naming rules in §1 and the
+implementation standards in §2, and differ in what they may depend on.
+
+| | `tools/**` | `.etc/powershell/**` |
+|---|---|---|
+| Role | Repository tooling | Maintainer workstation shell |
+| Audience | Anyone, including CI | The maintainer only |
+| May depend on | `tools/.shared/` only | `tools/.shared/`, plus the maintainer's external `Onboarding` library |
+| Carries identity | No | Yes — git identity, account credentials |
+| Runs in CI | Yes | **Never** |
+| Console helpers | `tools/.shared/console.ps1` (`Write-Step`, `Write-Success`, …) | Onboarding chrome (`Write-MastHead`, `Write-Var`, …) |
+
+Anything a contributor or CI job needs belongs in `tools/`. A script only belongs in
+`.etc/powershell/` if it genuinely requires the maintainer's own machine, identity or accounts.
+
+Where the same operation exists on both surfaces, `tools/` is authoritative and
+`.etc/powershell/README.md` records which to prefer. Credentials live in one place —
+`.etc/powershell/.env`, gitignored — and are resolved through
+`tools/.shared/secret.ps1`'s `Get-ToolSecret` (process environment first, then `.env`), never
+persisted to the User or Machine environment.
+
+Operational documentation for the maintainer shell lives in `.etc/powershell/README.md`.

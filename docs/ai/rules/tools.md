@@ -5,6 +5,7 @@
 Before writing or editing PowerShell tooling, also read:
 - `docs/ai/specs/tools/spec.md` (normative specification: naming, parameters, output rules)
 - `tools/README.md` (operational index: all tool directories, standard parameters, usage)
+- `.etc/powershell/README.md` (the maintainer-shell surface, when editing anything under `.etc/powershell/`)
 
 All script output MUST go to `artifacts/` or `logs/`.
 NEVER create temporary files in the project root.

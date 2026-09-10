@@ -1,260 +1,100 @@
 <#
 .SYNOPSIS
-    solution
+    Declares the $Solution variable describing PineGuard.slnx and every project in it.
 
 .DESCRIPTION
-    Part of the PineGuard PowerShell toolchain.
+    Dot-sourced by index.ps1, after project.ps1.
+
+    Every project path here is PROJECTED FROM tools/.shared/dotnet-projects.ps1, the repository's
+    single project registry - nothing is hand-listed. The previous version of this file was a
+    hand-maintained literal that had drifted badly: it named 5 of the 14 scopes, pointed Qodana at
+    the pre-rename tools/code-inspection/qodana/ folder, and still declared a
+    tools/audit-cli/solution/PineGuard.AuditCli.csproj that no longer exists (the audit CLI moved
+    to TypeScript under apps/cli). Deriving the list means adding a scope to the registry is the
+    only edit a new scope ever needs.
+
+    Package versions are NOT modelled here. Directory.Packages.props sets
+    ManagePackageVersionsCentrally, so a project's PackageReference carries no version of its own
+    and there is nothing per-project left to declare.
+
+.NOTES
+    Shape of $Solution:
+      Name, Path, RepoRoot        - the solution file and where it lives
+      TargetFrameworks            - Directory.Build.props' repo-wide <TargetFrameworks>
+      Scopes                      - the 14 registry scopes, each with absolute paths
+      Projects / TestProjects     - flat absolute csproj lists, for build and test loops
+      PackableProjects            - nuget.org package ids (excludes IsPackable=false projects)
 #>
 
-# .etc/powershell/.shared/solution.ps1
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+. (Join-Path $PSScriptRoot '../../../tools/.shared/dotnet-projects.ps1')
 
 # -------------------------------------------------------------------------------------------------
-# Solution Variables
+# Solution variables (projected from the project registry)
 # -------------------------------------------------------------------------------------------------
+
+function Resolve-SolutionPath {
+    <#
+    .SYNOPSIS
+        Turns a registry-relative path into an absolute one under the repository root.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [string] $RelativePath
+    )
+
+    if ([string]::IsNullOrWhiteSpace($RelativePath)) {
+        return $null
+    }
+
+    return [System.IO.Path]::GetFullPath((Join-Path $PineGuardRepoRoot $RelativePath))
+}
+
+$solutionScopes = foreach ($scope in (Get-PineGuardScope -All)) {
+    [pscustomobject]@{
+        Name           = $scope.Name
+        SourceDir      = Resolve-SolutionPath -RelativePath $scope.SourceDir
+        SourceProjects = @($scope.SourceCsprojs | ForEach-Object { Resolve-SolutionPath -RelativePath $_ })
+        TestProject    = Resolve-SolutionPath -RelativePath $scope.TestCsproj
+        QodanaConfig   = Resolve-SolutionPath -RelativePath $scope.QodanaConfig
+        QodanaSolution = Resolve-SolutionPath -RelativePath "tools/code-scan/qodana/PineGuard.$($scope.Name).Qodana.slnx"
+        QodanaSlug     = $scope.QodanaSlug
+    }
+}
+
+$solutionScopes = @($solutionScopes)
+
+$targetFrameworks = @()
+$buildPropsPath = Join-Path $PineGuardRepoRoot 'Directory.Build.props'
+if (Test-Path -LiteralPath $buildPropsPath) {
+    $buildProps = [xml](Get-Content -LiteralPath $buildPropsPath -Raw)
+    $declared = $buildProps.SelectSingleNode('//TargetFrameworks')
+    if ($null -ne $declared) {
+        $targetFrameworks = @($declared.InnerText -split ';' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    }
+}
 
 $Solution = [pscustomobject]@{
-    Name        = $Project.Name
-    LocalPath   = $Project.LocalPath
-    Path        = [System.IO.Path]::Combine($Project.LocalPath, 'PineGuard.slnx')
-    DotNetSdk   = '10.0'
-    Projects    = @(
-        [pscustomobject]@{
-            Name         = 'PineGuard.Core'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.Core')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.Core', 'PineGuard.Core.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @()
-            References   = @()
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.DataAnnotations'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.DataAnnotations')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.DataAnnotations', 'PineGuard.DataAnnotations.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @()
-            References   = @(
-                'PineGuard.Core'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.FluentValidation'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.FluentValidation')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.FluentValidation', 'PineGuard.FluentValidation.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @(
-                'FluentValidation'
-            )
-            References   = @(
-                'PineGuard.Core'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.GuardClauses'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.GuardClauses')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.GuardClauses', 'PineGuard.GuardClauses.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @()
-            References   = @(
-                'PineGuard.Core'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.MustClauses'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.MustClauses')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'src', 'PineGuard.MustClauses', 'PineGuard.MustClauses.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @()
-            References   = @(
-                'PineGuard.Core'
-            )
-        }
-    )
-    TestProjects    = @(
-        [pscustomobject]@{
-            Name         = 'PineGuard.Testing'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.Testing')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.Testing', 'PineGuard.Testing.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @(
-                'xunit.abstractions'
-            )
-            References   = @()
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.Core.UnitTests'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.Core.UnitTests')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.Core.UnitTests', 'PineGuard.Core.UnitTests.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @()
-            References   = @(
-                'PineGuard.Core'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.DataAnnotations.UnitTests'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.DataAnnotations.UnitTests')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.DataAnnotations.UnitTests', 'PineGuard.DataAnnotations.UnitTests.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @()
-            References   = @(
-                'PineGuard.Core',
-                'PineGuard.DataAnnotations'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.FluentValidation.UnitTests'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.FluentValidation.UnitTests')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.FluentValidation.UnitTests', 'PineGuard.FluentValidation.UnitTests.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @(
-                'FluentValidation'
-            )
-            References   = @(
-                'PineGuard.Core',
-                'PineGuard.FluentValidation'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.GuardClauses.UnitTests'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.GuardClauses.UnitTests')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.GuardClauses.UnitTests', 'PineGuard.GuardClauses.UnitTests.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @()
-            References   = @(
-                'PineGuard.Core',
-                'PineGuard.GuardClauses'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.MustClauses.UnitTests'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.MustClauses.UnitTests')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tests', 'PineGuard.MustClauses.UnitTests', 'PineGuard.MustClauses.UnitTests.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @()
-            References   = @(
-                'PineGuard.Core',                
-                'PineGuard.MustClauses'
-            )
-        }
-    )
-    ToolProjects    = @(
-        [pscustomobject]@{
-            Name         = 'PineGuard.AuditCli'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'audit-cli', 'solution')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'audit-cli', 'solution', 'PineGuard.AuditCli.csproj')
-            DotNetVersion = 'net10.0'
-            Packages     = @(
-                'Microsoft.Build.Locator',
-                'Microsoft.CodeAnalysis.CSharp.Workspaces',
-                'Microsoft.CodeAnalysis.Workspaces.MSBuild'
-            )
-            References   = @()
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.AuditCli.slnx'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'audit-cli')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'audit-cli', 'PineGuard.AuditCli.slnx')
-            DotNetVersion = ''
-            Packages     = @()
-            References   = @(
-                'PineGuard.AuditCli'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.All.Qodana.slnx'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana', 'PineGuard.All.Qodana.slnx')
-            DotNetVersion = ''
-            Packages     = @()
-            References   = @(
-                'PineGuard.Core',
-                'PineGuard.Core.UnitTests',
-                'PineGuard.MustClauses',
-                'PineGuard.MustClauses.UnitTests',
-                'PineGuard.GuardClauses',
-                'PineGuard.GuardClauses.UnitTests',
-                'PineGuard.FluentValidation',
-                'PineGuard.FluentValidation.UnitTests',
-                'PineGuard.DataAnnotations',
-                'PineGuard.DataAnnotations.UnitTests',
-                'PineGuard.Testing',
-                'PineGuard.Testing.UnitTests'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.Core.Qodana.slnx'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana', 'PineGuard.Core.Qodana.slnx')
-            DotNetVersion = ''
-            Packages     = @()
-            References   = @(
-                'PineGuard.Core',
-                'PineGuard.Core.UnitTests'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.DataAnnotations.Qodana.slnx'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana', 'PineGuard.DataAnnotations.Qodana.slnx')
-            DotNetVersion = ''
-            Packages     = @()
-            References   = @(
-                'PineGuard.DataAnnotations',
-                'PineGuard.DataAnnotations.UnitTests'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.FluentValidation.Qodana.slnx'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana', 'PineGuard.FluentValidation.Qodana.slnx')
-            DotNetVersion = ''
-            Packages     = @()
-            References   = @(
-                'PineGuard.FluentValidation',
-                'PineGuard.FluentValidation.UnitTests'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.GuardClauses.Qodana.slnx'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana', 'PineGuard.GuardClauses.Qodana.slnx')
-            DotNetVersion = ''
-            Packages     = @()
-            References   = @(
-                'PineGuard.GuardClauses',
-                'PineGuard.GuardClauses.UnitTests'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.MustClauses.Qodana.slnx'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana', 'PineGuard.MustClauses.Qodana.slnx')
-            DotNetVersion = ''
-            Packages     = @()
-            References   = @(
-                'PineGuard.MustClauses',
-                'PineGuard.MustClauses.UnitTests'
-            )
-        }
-        [pscustomobject]@{
-            Name         = 'PineGuard.Testing.Qodana.slnx'
-            DirPath      = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana')
-            Path         = [System.IO.Path]::Combine($Project.LocalPath, 'tools', 'code-inspection', 'qodana', 'PineGuard.Testing.Qodana.slnx')
-            DotNetVersion = ''
-            Packages     = @()
-            References   = @(
-                'PineGuard.Testing',
-                'PineGuard.Testing.UnitTests'
-            )
-        }
-    )
+    Name             = $Project.Name
+    RepoRoot         = $PineGuardRepoRoot
+    Path             = Join-Path $PineGuardRepoRoot 'PineGuard.slnx'
+    TargetFrameworks = $targetFrameworks
+    Scopes           = $solutionScopes
+    Projects         = @($solutionScopes | ForEach-Object { $_.SourceProjects } | Where-Object { $_ })
+    TestProjects     = @($solutionScopes | ForEach-Object { $_.TestProject } | Where-Object { $_ })
+    PackableProjects = @(Get-PineGuardPackableProjects -RepoRoot $PineGuardRepoRoot)
+    QodanaSolutions  = @(
+        Resolve-SolutionPath -RelativePath 'tools/code-scan/qodana/PineGuard.All.Qodana.slnx'
+    ) + @($solutionScopes | ForEach-Object { $_.QodanaSolution })
 }
 
 # -------------------------------------------------------------------------------------------------
 
 if ($Global.Log.Enabled) {
-    Write-Header "`$Project` Variable:"
-    # Write-ObjectPathTree -Object $Projects -RootPath '$Projects'   
-
+    Write-Header "`$Solution variable:"
     $Solution | Format-List
 }

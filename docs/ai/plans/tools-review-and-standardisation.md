@@ -110,7 +110,7 @@ correctness bug, **S2** standards or DRY defect, **S3** hygiene or documentation
 | F-42 | S2 | **`Run-Tests` has no `-Scope`.** It is the most-referenced script (14 doc references, 12 VS Code tasks) and the only dotnet wrapper that does not use the registry; every VS Code task hand-copies a csproj path. | `tools/testing/Run-Tests.ps1`, `.vscode/tasks.json` |
 | F-43 | S2 | **Nothing writes to `logs/`.** The README promises output to `artifacts/` or `logs/`; `Clean-Logs` cleans a directory nobody populates. No orchestrator records a transcript, so agents cannot read back a run. | `tools/README.md:52`, `tools/maintenance/Clean-Logs.ps1` |
 | F-44 | S2 | **Exit-code convention is ad hoc**: `throw`, `exit 1`, `Write-Error; exit 1`, `Fail()`, exit = issue count, exit 2 for missing token, 124 for timeout. | all entry scripts |
-| F-45 | S2 | **`.env.example` and `Run-GithubRuleset` still reference the legacy `.etc/powershell/` scripts**, and `.etc/powershell/.shared/index.ps1` hard-codes an absolute path to a *different repository* (`…\Onboarding\`). Adjacent scope; noted for the owner. | `.etc/powershell/.shared/index.ps1:14`, `Run-GithubRuleset.ps1:82` |
+| F-45 | S2 | **`.env.example` and `Run-GithubRuleset` still reference the legacy `.etc/powershell/` scripts**, and `.etc/powershell/.shared/index.ps1` hard-codes an absolute path to a *different repository* (`…\Onboarding\`). Adjacent scope; noted for the owner. **RESOLVED** — `.etc/powershell/**` was standardised separately: every script renamed to Verb-Noun per §1, the Onboarding path resolved via `$Env:PINEGUARD_ONBOARDING_ROOT` or an upward sibling walk, and `.env.example`, `Set-GithubRuleset.ps1` and the `.claude/settings.local.json` allow entries repointed. See `.etc/powershell/README.md`. | `.etc/powershell/.shared/index.ps1:14`, `Run-GithubRuleset.ps1:82` |
 
 ### 2.4 Hygiene and documentation (S3)
 
@@ -450,6 +450,10 @@ Verification (Opus, T1.V): re-run the §1 inventory; every touched script execut
 Out of scope, flagged for the owner: `.etc/powershell/**` (hard-coded path to another repo,
 duplicate `sonarqube.ps1`, legacy `github-*.ps1`); `.claude/settings.local.json` stale allow
 entries for `.etc/powershell/github-rulesets.ps1`.
+
+**Both were subsequently addressed** in a separate pass that standardised the maintainer
+shell against this spec — see `.etc/powershell/README.md` for the surface boundary and
+F-45 above for what changed.
 
 ---
 

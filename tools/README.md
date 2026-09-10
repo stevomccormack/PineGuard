@@ -30,6 +30,18 @@ PowerShell scripts for building, testing, auditing, formatting, generating, and 
 | [.tests](.tests/README.md) | Pester suite for `tools/**` (D-7) — registry parity, Cobertura/dotenv parsers, repo-root resolution, git helpers, and BOM/Windows-ism/help hygiene. Run via [`testing/Test-Tools.ps1`](testing/Test-Tools.ps1) |
 | [docker](docker/README.md) | Docker Compose stacks, the shared network helper, and the combined up/down scripts backing the two containerised scanners (Qodana, SonarQube) |
 
+## Related Surfaces
+
+`tools/` is the **portable** PowerShell surface: self-contained, CI-safe, no external
+dependencies. [`.etc/powershell/`](../.etc/powershell/README.md) is the **maintainer workstation**
+surface — one-time clone bring-up plus GitHub and nuget.org account administration. It follows the
+same Verb-Noun spec, but depends on the maintainer's personal `Onboarding` helper library and
+carries their identity, so nothing there ever runs in CI.
+
+Three scripts exist on both surfaces; the maintainer-shell README says which to prefer in each
+case. `.etc/powershell/.env` is the repository's single credential file, read from `tools/` via
+[`.shared/secret.ps1`](.shared/secret.ps1).
+
 ## Running Scripts
 
 All scripts should be run from the **repository root**:
