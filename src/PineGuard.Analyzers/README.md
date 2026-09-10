@@ -16,7 +16,7 @@ Ships as a development dependency: it flows into your build and your IDE, and it
 
 ### Supported frameworks
 
-The analyzer assemblies target `netstandard2.0` and load into any Roslyn 4.14-or-later compiler — the .NET 8 SDK and newer.
+The analyzer assemblies target `netstandard2.0` and run inside the compiler, so the consuming project's own target does not matter. They are built against Roslyn 5.9, which ships with the .NET 10 SDK (10.0.400 or newer); an older compiler skips the analyzer with a CS9057 warning rather than loading it.
 
 ## Diagnostics
 

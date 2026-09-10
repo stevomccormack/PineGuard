@@ -37,7 +37,7 @@ var callback = Guard.Against.NotHttpsUrl(url);   // returns a parsed Uri, not th
 
 **Built by AI. Verified like it matters. Made for engineers.** Fourteen packages, 500+ rules, 18,000+ tests
 per target framework, 100% line *and* branch coverage, and zero findings from SonarQube, Qodana and Roslyn.
-The whole thing is gated in CI, so the number you read here is the number that merged.
+Every gate is a hard failure in CI, so the number you read here is the number that merged.
 
 ---
 
@@ -45,16 +45,13 @@ The whole thing is gated in CI, so the number you read here is the number that m
 
 - [Why PineGuard](#why-pineguard)
 - [Quick start](#quick-start)
-- [Follow one rule](#follow-one-rule)
-  - [Ask it](#1-ask-it-must) · [Enforce it](#2-enforce-it-guard) · [Declare it](#3-declare-it-fluentvalidation-and-dataannotations) · [Compose it](#4-compose-it-mustvalidatort)
-  - [Boot with it](#5-boot-with-it-options) · [Serve it](#6-serve-it-aspnet-core) · [Dispatch it](#7-dispatch-it-mediatr) · [Return it](#8-return-it-erroror-fluentresults-oneof)
-  - [Let the compiler write it](#9-let-the-compiler-write-it-analyzers) · [Test it](#10-test-it-pineguardtesting)
+- [Follow one rule](#follow-one-rule), a ten-stop tour of one email address:
+  [Ask it](#1-ask-it-must) · [Enforce it](#2-enforce-it-guard) · [Declare it](#3-declare-it-fluentvalidation-and-dataannotations) · [Compose it](#4-compose-it-mustvalidatort) · [Boot with it](#5-boot-with-it-options) · [Serve it](#6-serve-it-aspnet-core) · [Dispatch it](#7-dispatch-it-mediatr) · [Return it](#8-return-it-erroror-fluentresults-oneof) · [Let the compiler write it](#9-let-the-compiler-write-it-analyzers) · [Test it](#10-test-it-pineguardtesting)
 - [Every failure has a name](#every-failure-has-a-name)
 - [What's in the box](#whats-in-the-box)
-- [Built by AI. Verified like it matters.](#built-by-ai-verified-like-it-matters)
-- [Packages](#packages)
+- [Packages](#packages) · [Target frameworks](#target-frameworks)
 - [Where PineGuard fits](#where-pineguard-fits)
-- [Supported frameworks](#supported-frameworks)
+- [Built by AI. Verified like it matters.](#built-by-ai-verified-like-it-matters)
 - [Documentation](#documentation) · [Contributing](#contributing) · [Security](#security) · [License](#license)
 
 ---
@@ -81,6 +78,8 @@ host startup, in the request pipeline, in the mediator, and inside your result t
 - **A name on every failure.** Each rule carries a stable machine-readable code, so a client, a log, or a
   localiser can branch on *what* failed without parsing prose.
 
+Every package is a different call site for the same engine:
+
 ```mermaid
 flowchart LR
     Core["PineGuard.Core<br/>400+ rules · MustResult · MustValidator"]
@@ -99,9 +98,6 @@ flowchart LR
     Core --> Bridges["ErrorOr · FluentResults · OneOf"]
     Analyzers["Analyzers<br/>PG1001 to PG2002"] -.->|"writes guards into"| You["your code"]
 ```
-
-> **The story of this README is one rule.** Watch an email address travel from a constructor to an HTTP
-> 400 without ever being spelled twice.
 
 ---
 
@@ -129,6 +125,9 @@ That is the whole learning curve. Everything below is the same rule, at a differ
 ---
 
 ## Follow one rule
+
+> **The story of this README is one rule.** Watch an email address travel from a constructor to an HTTP
+> 400, and on into your tests, without ever being spelled twice.
 
 ### 1. Ask it: Must
 
@@ -366,11 +365,11 @@ app.MapPost("/orders", (CreateOrder order) => TypedResults.Created($"/orders/{or
   "status": 400,
   "errors": {
     "email": ["email must be a valid email address."],
-    "lines[1].sku": ["lines[1].sku must not be null or whitespace."]
+    "endDate": ["endDate must be after the specified date/time."]
   },
   "failures": [
     { "property": "email", "code": "email.address.invalid", "message": "email must be a valid email address." },
-    { "property": "lines[1].sku", "code": "text.content.blank", "message": "lines[1].sku must not be null or whitespace." }
+    { "property": "endDate", "code": "date.order.not-after", "message": "endDate must be after the specified date/time." }
   ]
 }
 ```
@@ -426,7 +425,7 @@ OneOf<string, MustFailure> c = Must.Be.Email(input).ToOneOf();     // match on t
 ErrorOr<OrderLine> line = new OrderLineValidator().Validate(input).ToErrorOr(input);   // every failure, kept
 ```
 
-> **Same rule, last stop:** the code you have not written yet.
+> **Same rule, next stop:** the code you have not written yet.
 
 ### 9. Let the compiler write it: Analyzers
 
@@ -450,6 +449,8 @@ Must.Be.NotNull(name);            // PG2001: result discarded, nothing was check
 | `PG1001` to `PG1004` | hand-rolled null, null-or-whitespace, null-or-empty and range checks | Info |
 | `PG2001` / `PG2002` | a `MustResult` or `MustValidationResult` that nothing reads | Warning |
 
+> **Same rule, last stop:** your own test suite.
+
 ### 10. Test it: PineGuard.Testing
 
 **Test your validators the way PineGuard tests its own.** The base classes, case records and the
@@ -457,15 +458,21 @@ exhaustive valid/invalid fixture catalogue behind PineGuard's 18,000-test suite 
 tests read the same way and reuse the same data.
 
 ```csharp
-// MustEmailClausesTestData turns the shipped EmailRulesFixtures into TheoryData<MustCase<string?>>
-public sealed class MustEmailClausesTests(ITestOutputHelper output) : BaseMustUnitTest(output)
+using PineGuard.MustClauses;
+using PineGuard.Testing.UnitTests.MustClauses;
+using Xunit;
+using Xunit.Abstractions;
+using F = PineGuard.Testing.Fixtures.EmailRulesFixtures;
+
+public sealed class EmailTests(ITestOutputHelper output) : BaseMustUnitTest(output)
 {
-    [Theory]
-    [MemberData(nameof(MustEmailClausesTestData.Email.ValidCases), MemberType = typeof(MustEmailClausesTestData.Email))]
-    [MemberData(nameof(MustEmailClausesTestData.Email.InvalidCases), MemberType = typeof(MustEmailClausesTestData.Email))]
+    // The shipped fixture catalogue as theory data: every valid email, every invalid one
+    public static TheoryData<MustCase<string?>> Cases => F.IsEmail.AllScenarios.ToMustCases();
+
+    [Theory, MemberData(nameof(Cases))]
     public void Email_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.Email(tc.Value, paramName: "value");
+        var result = Must.Be.Email(tc.Value);
         AssertResult(tc, result);
     }
 }
@@ -473,6 +480,8 @@ public sealed class MustEmailClausesTests(ITestOutputHelper output) : BaseMustUn
 
 A `FixedTimeProvider` freezes the clock for every temporal rule, because "is this person 18" should not
 depend on the day the test runs.
+
+That is the whole tour: one rule, ten call sites, spelled once.
 
 ---
 
@@ -497,7 +506,7 @@ if (failure.Code.StartsWith(MustCodes.Owasp.Prefix + '.', StringComparison.Ordin
 | FluentValidation | `ValidationFailure.ErrorCode` |
 | ASP.NET Core | the `failures[].code` array on the 400 body |
 | ErrorOr / FluentResults / OneOf | `Error.Code`, `MustError.Code`, `MustFailure.Code` |
-| DataAnnotations | `attribute.Code` at design time; the framework's own `ValidationResult` has nowhere to carry it |
+| DataAnnotations | `attribute.Code` on every attribute, and `DataAnnotationsAttributeValidator.Validate(model)` when you need a `MustValidationResult` with codes, because the framework's own `ValidationResult` has nowhere to carry one |
 
 Localise by code through `IStringLocalizer` in ASP.NET Core, log by code, or branch by code in a client.
 Nobody parses prose.
@@ -510,17 +519,17 @@ Fourteen packages built on one rule engine. A sample of what `Must.Be.*` (and th
 surface) understands out of the box:
 
 ```csharp
-Must.Be.Email(value);              Must.Be.StrictEmail(value);          Must.Be.PhoneNumber(value);
-Must.Be.HttpsUrl(value);           Must.Be.Hostname(value);             Must.Be.PortNumber(port);
-Must.Be.Ipv6(value);               Must.Be.InCidrRange(ip, "10.0.0.0/8"); Must.Be.MacAddress(value);
-Must.Be.Jwt(token);                Must.Be.Ulid(id);                    Must.Be.SemVer(version);
-Must.Be.CronExpression(schedule);  Must.Be.Slug(value);                 Must.Be.Luhn(cardNumber);
-Must.Be.Percentage(ratio);         Must.Be.ScaleAtMost(amount, 2);      Must.Be.InRange(qty, 1, 100);
-Must.Be.MinimumAge(dob, 18);       Must.Be.WithinDaysFromNow(due, 30);  Must.Be.Weekday(date);
-Must.Be.KnownFileSignature(bytes); Must.Be.Utf8(bytes);                 Must.Be.WellFormedUtf16(text);
-Must.Be.HasMinGraphemeCount(name, 2); Must.Be.KebabCase(value);         Must.Be.LengthBetween(value, 3, 64);
-Must.Be.Json(payload);             Must.Be.Xml(document);               Must.Be.CsvLine(row);
-Must.Be.XssSafe(input);            Must.Be.PathTraversalSafe(path);     Must.Be.OwaspSafe(input);
+Must.Be.Email(value);                 Must.Be.StrictEmail(value);           Must.Be.PhoneNumber(value);
+Must.Be.HttpsUrl(value);              Must.Be.Hostname(value);              Must.Be.PortNumber(port);
+Must.Be.Ipv6(value);                  Must.Be.InCidrRange(ip, cidr);        Must.Be.MacAddress(value);
+Must.Be.Jwt(token);                   Must.Be.Ulid(id);                     Must.Be.SemVer(version);
+Must.Be.CronExpression(schedule);     Must.Be.Slug(value);                  Must.Be.Luhn(cardNumber);
+Must.Be.Percentage(ratio);            Must.Be.ScaleAtMost(amount, 2);       Must.Be.InRange(qty, 1, 100);
+Must.Be.MinimumAge(dob, 18);          Must.Be.WithinDaysFromNow(due, 30);   Must.Be.Weekday(date);
+Must.Be.KnownFileSignature(bytes);    Must.Be.Utf8(bytes);                  Must.Be.WellFormedUtf16(text);
+Must.Be.HasMinGraphemeCount(name, 2); Must.Be.KebabCase(value);             Must.Be.LengthBetween(value, 3, 64);
+Must.Be.Json(payload);                Must.Be.Xml(document);                Must.Be.CsvLine(row);
+Must.Be.XssSafe(input);               Must.Be.PathTraversalSafe(path);      Must.Be.OwaspSafe(input);
 ```
 
 | Domain | Highlights |
@@ -536,68 +545,46 @@ Must.Be.XssSafe(input);            Must.Be.PathTraversalSafe(path);     Must.Be.
 | **Objects and enums** | null and default, type assignability, defined enum values and names, flags combinations, `[Description]` and `[Display]` metadata, obsolete members |
 | **Tasks and predicates** | completed, faulted, canceled tasks; `Satisfies` and `SatisfiesAsync` for anything custom |
 
-Every rule is built vertically: the Core predicate, the Must clause and its `Not` twin, the Guard, the
-FluentValidation extension, the attribute, and the tests. In that order, every time. That is not a
-convention written down somewhere. It is how every rule in this repository came to exist.
-
----
-
-## Built by AI. Verified like it matters.
-
-PineGuard was built by AI agents working from a specification-first engineering brain that is checked into
-this repository at [docs/ai](docs/ai/README.md): normative specs, 84 agent playbooks, 85 slash commands, 17
-skills, and adapters for ten AI coding tools. Every rule was scaffolded vertically through every layer,
-tested against exhaustive fixtures, and audited by machine before it merged.
-
-The pitch is not "trust the AI". The pitch is **trust the gates**, because every one of them is a hard
-failure in CI and every number below is live on `main`.
-
-| Gate | Result | Enforced by |
-|---|---|---|
-| Line coverage | **100%** of 23,000+ coverable lines | CI threshold, `MIN_CODE_COVERAGE=100` |
-| Branch coverage | **100%** of 7,000+ branches | CI threshold, same variable |
-| Tests | **18,704** per target framework, 0 failed, 0 skipped | CI matrix, 14 projects x 2 TFMs |
-| Roslyn | **0 warnings**, `TreatWarningsAsErrors`, `AnalysisMode=Recommended`, code style enforced in build | every build |
-| SonarQube | Quality Gate **passed**: 0 issues, 0 security hotspots, 0.0% duplication | [report](docs/reports/code-scanner/pineguard-sonarqube-report.jpeg) |
-| Qodana | **0 problems** across 3,194 inspections | [report](docs/reports/code-analysis/pineguard-qodana-report--problems.jpeg) |
-| Formatting | `dotnet format --verify-no-changes` | CI and a pre-commit hook |
-| XML docs | every public member documented, `CS1591` is an error | every build |
-| Test discipline | `[Theory]` + `TheoryData` only, `Tests`/`TestData` file pairing | `tools/audit-cli` in CI |
-| Packaging | deterministic builds, SourceLink, symbol packages, central package management | `Directory.Build.props` |
-
-```mermaid
-flowchart LR
-    Build["Build<br/>0 warnings"] --> Test["Test<br/>14 projects x 2 TFMs"] --> Cov["Coverage<br/>100% line · 100% branch"]
-    Cov --> Fmt["Format<br/>verify-no-changes"] --> Ros["Roslyn<br/>0 CS warnings"] --> Audit["Audit<br/>Theory-only"] --> Merge["main"]
-```
-
-Suppressions are not a fix. Contributions that silence a finding instead of resolving it do not merge.
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full list.
-
 ---
 
 ## Packages
 
-| Package | What it adds | Targets |
-|---|---|---|
-| [`PineGuard.Core`](src/PineGuard.Core/README.md) | The rule engine: 400+ pure predicates, 120+ parsing utilities, `MustResult<T>`, `MustValidator<T>`, error codes. No third-party dependencies. | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.MustClauses`](src/PineGuard.MustClauses/README.md) | `Must.Be.*`: 500+ result-returning clauses that never throw | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.GuardClauses`](src/PineGuard.GuardClauses/README.md) | `Guard.Against.*`: 580+ fail-fast guards with parsed returns and the exception policy | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.FluentValidation`](src/PineGuard.FluentValidation/README.md) | 670+ `IRuleBuilder` extensions, plus bridges between the two validator models | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.DataAnnotations`](src/PineGuard.DataAnnotations/README.md) | 390+ `ValidationAttribute`s for DTOs, MVC binding and Blazor forms | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.Extensions.Options`](src/PineGuard.Extensions.Options/README.md) | `ValidateMustRules()` for `IOptions<T>`; fail at host start with every violation listed | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.Extensions.DependencyInjection`](src/PineGuard.Extensions.DependencyInjection/README.md) | Register one validator or scan an assembly; resolve by `Type` at run time | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.AspNetCore`](src/PineGuard.AspNetCore/README.md) | Minimal API and MVC auto-validation, RFC 9457 bodies with codes, exception handler, .NET 10 validation resolver, localisation seam | `net8.0` `net10.0` |
-| [`PineGuard.MediatR`](src/PineGuard.MediatR/README.md) | `IPipelineBehavior` that validates every request, throw or respond | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.ErrorOr`](src/PineGuard.ErrorOr/README.md) | `ToErrorOr()`, `ToErrors()`: code, message and path onto `Error.Validation` | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.FluentResults`](src/PineGuard.FluentResults/README.md) | `ToResult()` with a `MustError` that carries the code | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.OneOf`](src/PineGuard.OneOf/README.md) | `ToOneOf()`: the value or PineGuard's own failure type, no exceptions | `netstandard2.1` `net8.0` `net10.0` |
-| [`PineGuard.Analyzers`](src/PineGuard.Analyzers/README.md) | Roslyn analyzers and code fixes, `PG1001` to `PG2002`, development dependency | `netstandard2.0` (Roslyn 4.14+) |
-| [`PineGuard.Testing`](tests/PineGuard.Testing/README.md) | Base test classes, case records, fixture catalogue, `FixedTimeProvider` | `net8.0` `net10.0` |
+| Package | What it adds |
+|---|---|
+| [`PineGuard.Core`](src/PineGuard.Core/README.md) | The rule engine: 400+ pure predicates, 120+ parsing utilities, `MustResult<T>`, `MustValidator<T>`, error codes. No third-party dependencies. |
+| [`PineGuard.MustClauses`](src/PineGuard.MustClauses/README.md) | `Must.Be.*`: 500+ result-returning clauses that never throw |
+| [`PineGuard.GuardClauses`](src/PineGuard.GuardClauses/README.md) | `Guard.Against.*`: 580+ fail-fast guards with parsed returns and the exception policy |
+| [`PineGuard.FluentValidation`](src/PineGuard.FluentValidation/README.md) | 670+ `IRuleBuilder` extensions, plus bridges between the two validator models |
+| [`PineGuard.DataAnnotations`](src/PineGuard.DataAnnotations/README.md) | 390+ `ValidationAttribute`s for DTOs, MVC binding and Blazor forms, plus a coded runner for the attributes |
+| [`PineGuard.Extensions.Options`](src/PineGuard.Extensions.Options/README.md) | `ValidateMustRules()` for `IOptions<T>`; fail at host start with every violation listed |
+| [`PineGuard.Extensions.DependencyInjection`](src/PineGuard.Extensions.DependencyInjection/README.md) | Register one validator or scan an assembly; resolve by `Type` at run time |
+| [`PineGuard.AspNetCore`](src/PineGuard.AspNetCore/README.md) | Minimal API and MVC auto-validation, RFC 9457 bodies with codes, exception handler, .NET 10 validation resolver, localisation seam |
+| [`PineGuard.MediatR`](src/PineGuard.MediatR/README.md) | `IPipelineBehavior` that validates every request, throw or respond |
+| [`PineGuard.ErrorOr`](src/PineGuard.ErrorOr/README.md) | `ToErrorOr()`, `ToErrors()`: code, message and path onto `Error.Validation` |
+| [`PineGuard.FluentResults`](src/PineGuard.FluentResults/README.md) | `ToResult()` with a `MustError` that carries the code |
+| [`PineGuard.OneOf`](src/PineGuard.OneOf/README.md) | `ToOneOf()`: the value or PineGuard's own failure type, no exceptions |
+| [`PineGuard.Analyzers`](src/PineGuard.Analyzers/README.md) | Roslyn analyzers and code fixes, `PG1001` to `PG2002`, a development dependency |
+| [`PineGuard.Testing`](tests/PineGuard.Testing/README.md) | Base test classes, case records, fixture catalogue, `FixedTimeProvider` |
 
 The six original packages are on [NuGet](https://www.nuget.org/profiles/stevomccormack) today as
 `0.1.0-alpha` builds. The eight seam packages (Options through Analyzers) are merged on `main` and ship with
 the next release. Every package is versioned together from git tags via MinVer.
+
+### Target frameworks
+
+| Target | Packages |
+|---|---|
+| `netstandard2.1` | every library package except `PineGuard.AspNetCore` (no ASP.NET Core asset exists) and `PineGuard.Testing` (uses `TimeOnly`) |
+| `net8.0` | every package |
+| `net10.0` | every package, plus the `Microsoft.Extensions.Validation` integration in `PineGuard.AspNetCore` |
+
+`PineGuard.Analyzers` targets `netstandard2.0` and runs inside the compiler, not your app, so the project's
+own target does not matter. It is built against Roslyn 5.9, so the build machine needs the compiler that
+ships with the .NET 10 SDK (10.0.400 or newer).
+
+Generic-math clauses such as `Must.Be.Positive<T>` need `INumber<T>` and therefore `net8.0` or later.
+`PineGuard.Core` carries no third-party dependencies: only `System.Text.Json`,
+`System.ComponentModel.Annotations`, and `Microsoft.Bcl.TimeProvider` on `netstandard2.1` alone.
 
 ---
 
@@ -617,20 +604,45 @@ PineGuard amplifies what you already run. It does not ask you to leave it.
 
 ---
 
-## Supported frameworks
+## Built by AI. Verified like it matters.
 
-| Target | Packages |
-|---|---|
-| `netstandard2.1` | every library package except `PineGuard.AspNetCore` (no ASP.NET Core asset exists) and `PineGuard.Testing` (uses `TimeOnly`) |
-| `net8.0` | every package |
-| `net10.0` | every package, plus the `Microsoft.Extensions.Validation` integration in `PineGuard.AspNetCore` |
+PineGuard was built by AI agents working from a specification-first engineering brain that is checked into
+this repository at [docs/ai](docs/ai/README.md): normative specs, 84 agent playbooks, 85 slash commands, 17
+skills, and adapters for Claude Code, GitHub Copilot, OpenAI Codex, Cursor, Antigravity, OpenCode and any
+tool that reads `AGENTS.md`.
 
-`PineGuard.Analyzers` runs inside the compiler, not your app, so it works for any project built with the
-.NET 8 SDK or newer regardless of the project's own target.
+Every rule is built vertically: the Core predicate, the Must clause and its `Not` twin, the Guard, the
+FluentValidation extension, the attribute, and the tests. In that order, every time. That is not a
+convention written down somewhere. It is how every rule in this repository came to exist.
 
-Generic-math clauses such as `Must.Be.Positive<T>` need `INumber<T>` and therefore `net8.0` or later.
-`PineGuard.Core` carries no third-party dependencies: only `System.Text.Json`,
-`System.ComponentModel.Annotations`, and `Microsoft.Bcl.TimeProvider` on `netstandard2.1` alone.
+The pitch is not "trust the AI". The pitch is **trust the gates**, because every one of them is a hard
+failure in CI and every number below is live on `main`.
+
+| Gate | Result | Enforced by |
+|---|---|---|
+| Line coverage | **100%** of 23,000+ coverable lines | CI threshold, `MIN_CODE_COVERAGE=100` |
+| Branch coverage | **100%** of 7,000+ branches | CI threshold, same variable |
+| Tests | **18,687** on `net8.0` and **18,712** on `net10.0`, 0 failed, 0 skipped | CI matrix, 14 projects × 2 TFMs |
+| Roslyn | **0 warnings**, `TreatWarningsAsErrors`, `AnalysisMode=Recommended`, code style enforced in build | every build |
+| SonarQube | Quality Gate **passed**: 0 issues, 0 security hotspots, 0.0% duplication | [report](docs/reports/code-scanner/pineguard-sonarqube-report.jpeg) |
+| Qodana | **0 problems** across 3,194 inspections | [report](docs/reports/code-analysis/pineguard-qodana-report--problems.jpeg) |
+| Formatting | `dotnet format --verify-no-changes` | CI and a pre-commit hook |
+| XML docs | every public member documented, `CS1591` is an error | every build |
+| Test discipline | `[Theory]` + `TheoryData` only, `Tests`/`TestData` file pairing | `pineguard audit` ([apps/cli](apps/cli)) in CI |
+| Packaging | deterministic builds, SourceLink, symbol packages, central package management | `Directory.Build.props` |
+
+```mermaid
+flowchart LR
+    Build["Build<br/>0 warnings"] --> Test["Test<br/>14 projects × 2 TFMs"] --> Cov["Coverage<br/>100% line · 100% branch"] --> Merge["main"]
+    Build --> Ros["Roslyn<br/>0 CS warnings"] --> Merge
+    Fmt["Format<br/>verify-no-changes"] --> Merge
+    Audit["Audit<br/>Theory-only, file pairing"] --> Merge
+```
+
+Suppressions are not a fix. Contributions that silence a finding instead of resolving it do not merge.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full list.
+
+---
 
 ## Documentation
 
