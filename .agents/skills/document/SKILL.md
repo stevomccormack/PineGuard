@@ -1,5 +1,5 @@
 ---
-name: generate-xml-docs
+name: document
 description: Generate gold-standard XML documentation comments for all public members in a PineGuard project. Use whenever the user says "add XML docs", "document the X class", "generate docs", "add doc comments", "fix CS1591 warnings", or wants layer-aware documentation with cross-references, examples, and doc site links.
 argument-hint: "[ProjectName] (e.g., PineGuard.Core, PineGuard.MustClauses, or all)"
 context: fork

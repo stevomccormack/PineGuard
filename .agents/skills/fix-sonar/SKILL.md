@@ -1,5 +1,5 @@
 ---
-name: scan-fix
+name: fix-sonar
 description: Fix SonarQube issues by severity. Use whenever the user says "fix Sonar issues", "fix code smells", "fix blockers", "fix critical/major/minor issues", "resolve scan findings", or wants SonarQube violations resolved. Always fix the root cause — do NOT suppress. Trigger on any Sonar/scan fix request.
 argument-hint: "[Severity]"
 context: fork
