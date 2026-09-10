@@ -8,6 +8,17 @@ essentials: how to build, test, and submit changes that pass CI on the first try
 - [.NET SDK 10.0](https://dotnet.microsoft.com/download) (the solution multi-targets
   `netstandard2.1;net8.0;net10.0`; test projects run on `net8.0` and `net10.0`)
 - PowerShell 7+ (repo tooling under `tools/` is PowerShell-based)
+- Node 22+ and pnpm (only for the audit CLI under `apps/cli`; `.node-version` pins the version)
+
+## Where things live
+
+| Path | What it holds |
+|------|---------------|
+| `src/` | The fourteen packages, one project each, with a README per package |
+| `tests/` | One `*.UnitTests` project per package, plus `PineGuard.Testing` (the shared test toolkit, also a package) |
+| `tools/` | PowerShell tooling: coverage, diagnostics, formatting, scanning, git hooks, release |
+| `apps/cli/` | The TypeScript audit CLI (`pineguard audit`) that machine-checks repo conventions |
+| `docs/ai/` | The engineering specs, rules, skills and agent playbooks that built the library |
 
 ## Build, test, format
 
@@ -15,15 +26,18 @@ essentials: how to build, test, and submit changes that pass CI on the first try
 # Build (Release, zero warnings — TreatWarningsAsErrors is on)
 dotnet build PineGuard.slnx -c Release
 
-# Run all tests (6 projects × 2 target frameworks)
+# Run all tests (14 test projects × 2 target frameworks)
 dotnet test PineGuard.slnx -c Release
 
 # Formatting must be clean before you push (CI gates on this)
 dotnet format PineGuard.slnx --verify-no-changes
 ```
 
-A `pre-commit` git hook runs `dotnet format` automatically and re-stages
-formatted files.
+A `pre-commit` hook formats the staged C# files and re-stages them. Enable it once per clone:
+
+```bash
+git config core.hooksPath tools/git/hooks
+```
 
 ## Quality gates (what CI enforces)
 
@@ -41,9 +55,9 @@ Every pull request runs through `.github/workflows/ci.yml`:
 5. **Roslyn** — zero `CS*` warnings.
 6. **Audit** — machine-checked repo conventions via `apps/cli` (`pineguard audit`). The
    test-file rule is `test-files` (`[Theory]`-only plus `Tests`/`TestData` file pairing).
-   Reproduce locally with `pnpm -C apps/cli exec tsx src/index.ts audit test-files`.
-   `test-structure`, `test-records`, `test-orphans` and `test-tuples` exist but are not yet
-   gated — they report pre-existing debt.
+   Reproduce what CI runs with `pnpm -C apps/cli exec tsx src/index.ts audit --gate`, or a single
+   rule with `... audit test-files`. `test-structure`, `test-records`, `test-orphans` and
+   `test-tuples` exist but are not yet gated — they report pre-existing debt.
 
 A **Qodana** (JetBrains static analysis) job also exists but is opt-in: it runs only when the
 `QODANA_ENABLED` repository variable is `true`.
@@ -54,10 +68,11 @@ Run coverage locally with `tools/code-coverage/Run-CodeCoverage.ps1`.
 
 PineGuard is a layered validation library: **Core** (pure boolean rules + utilities)
 → **MustClauses** (result-returning, never throws) → **GuardClauses** (throwing) →
-**FluentValidation** / **DataAnnotations** (framework adapters). New validations are
-implemented across *all* layers, plus tests, in that order. The canonical
-engineering specs live in [`docs/ai/`](docs/ai/README.md) — start there before
-changing conventions.
+**FluentValidation** / **DataAnnotations** (framework adapters). The remaining packages are
+seams that carry the same validators into a host: Options, DependencyInjection, AspNetCore,
+MediatR, the ErrorOr / FluentResults / OneOf bridges, and the Roslyn Analyzers. New validations
+are implemented across *all* layers, plus tests, in that order. The canonical engineering specs
+live in [`docs/ai/`](docs/ai/README.md) — start there before changing conventions.
 
 ## Commit messages
 
