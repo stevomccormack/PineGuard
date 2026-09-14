@@ -193,7 +193,7 @@ registry entry (after `MediatR`, before `Analyzers`) plus one `ValidateSet` toke
 ones plus the `All` Qodana slnx; `tools/git/Run-Commits.ps1`; `tools/github/*Release*.ps1` and
 `tools/nuget/*Unlist*.ps1` package lists; `apps/cli/src/audit/rules/must-codes.ts` extra roots (the package
 carries `Must.Be.*` call sites); `apps/cli/config/baseline.json` gains
-`doc-links:src/PineGuard.Xml/AGENTS.md:docs/ai/rules/xml.md` (same precedent as OneOf — the Brain cascade in
+the OneOf-style `doc-links` entry for the not-yet-written `xml.md` rules file (same precedent as OneOf — the Brain cascade in
 §8.4 is a follow-up, see §4). Root `README.md`: package table row, install snippet, *Supported frameworks*,
 and every "fourteen-package" count becomes fifteen (Haiku inventories the exact lines: W2-H2).
 
@@ -267,7 +267,7 @@ S9 and F1 are independent of everything except their inputs.
 
 ## 4. Follow-ups (not in these two commits)
 
-- Brain cascade for the `xml` scope (Plan 00 §8.4 items 22–29): `docs/ai/specs/xml/`, `docs/ai/rules/xml.md`
+- Brain cascade for the `xml` scope (Plan 00 §8.4 items 22–29): `docs/ai/specs/xml/`, `xml.md` under the rules folder
   (removes the baseline entry), nine agent stubs across all adapter surfaces, command rows, taxonomy id.
 - Byte/`Stream` overloads for `IsXml`/`HasXmlRoot` and for `XmlSchemaUtility.TryValidate` (encoding declared in
   the document, BOM handling).

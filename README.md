@@ -35,7 +35,7 @@ var result   = Must.Be.Email(input);             // never throws: a MustResult w
 var callback = Guard.Against.NotHttpsUrl(url);   // returns a parsed Uri, not the string you passed in
 ```
 
-**Built by AI. Verified like it matters. Made for engineers.** Fourteen packages, 500+ rules, 18,000+ tests
+**Built by AI. Verified like it matters. Made for engineers.** Fifteen packages, 500+ rules, 18,000+ tests
 per target framework, 100% line *and* branch coverage, and zero findings from SonarQube, Qodana and Roslyn.
 Every gate is a hard failure in CI, so the number you read here is the number that merged.
 
@@ -515,7 +515,7 @@ Nobody parses prose.
 
 ## What's in the box
 
-Fourteen packages built on one rule engine. A sample of what `Must.Be.*` (and therefore every other
+Fifteen packages built on one rule engine. A sample of what `Must.Be.*` (and therefore every other
 surface) understands out of the box:
 
 ```csharp
@@ -556,6 +556,7 @@ Must.Be.XssSafe(input);               Must.Be.PathTraversalSafe(path);      Must
 | [`PineGuard.GuardClauses`](src/PineGuard.GuardClauses/README.md) | `Guard.Against.*`: 580+ fail-fast guards with parsed returns and the exception policy |
 | [`PineGuard.FluentValidation`](src/PineGuard.FluentValidation/README.md) | 670+ `IRuleBuilder` extensions, plus bridges between the two validator models |
 | [`PineGuard.DataAnnotations`](src/PineGuard.DataAnnotations/README.md) | 390+ `ValidationAttribute`s for DTOs, MVC binding and Blazor forms, plus a coded runner for the attributes |
+| [`PineGuard.Xml`](src/PineGuard.Xml/README.md) | `Must.Be.ValidXml(payload, schemas)`: XSD conformance over a compiled schema set, every violation listed by element path |
 | [`PineGuard.Extensions.Options`](src/PineGuard.Extensions.Options/README.md) | `ValidateMustRules()` for `IOptions<T>`; fail at host start with every violation listed |
 | [`PineGuard.Extensions.DependencyInjection`](src/PineGuard.Extensions.DependencyInjection/README.md) | Register one validator or scan an assembly; resolve by `Type` at run time |
 | [`PineGuard.AspNetCore`](src/PineGuard.AspNetCore/README.md) | Minimal API and MVC auto-validation, RFC 9457 bodies with codes, exception handler, .NET 10 validation resolver, localisation seam |

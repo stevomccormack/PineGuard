@@ -166,6 +166,21 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: Xml (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.Xml.UnitTests/PineGuard.Xml.UnitTests.csproj"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Test: Testing (fast)",
             "type": "shell",
             "command": "pwsh",
@@ -195,6 +210,7 @@
                 "Test: ErrorOr (fast)",
                 "Test: FluentResults (fast)",
                 "Test: OneOf (fast)",
+                "Test: Xml (fast)",
                 "Test: Testing (fast)"
             ],
             "problemMatcher": []
@@ -578,6 +594,13 @@
             "problemMatcher": []
         },
         {
+            "label": "Inspect: Qodana: Xml",
+            "dependsOn": [
+                "Quality: Qodana: Xml"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Inspect: Qodana: Testing",
             "dependsOn": [
                 "Quality: Qodana: Testing"
@@ -599,6 +622,7 @@
                 "Inspect: Qodana: ErrorOr",
                 "Inspect: Qodana: FluentResults",
                 "Inspect: Qodana: OneOf",
+                "Inspect: Qodana: Xml",
                 "Inspect: Qodana: Testing"
             ],
             "problemMatcher": []
@@ -1019,6 +1043,25 @@
             "problemMatcher": []
         },
         {
+            "label": "Coverage: Xml (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-coverage/Run-CodeCoverage.ps1",
+                "-Mode",
+                "GenerateAndAnalyze",
+                "-Scope",
+                "Xml",
+                "-NoOpen",
+                "-SkipHtml"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Coverage: Testing (fast)",
             "type": "shell",
             "command": "pwsh",
@@ -1052,6 +1095,7 @@
                 "Coverage: ErrorOr (fast)",
                 "Coverage: FluentResults (fast)",
                 "Coverage: OneOf (fast)",
+                "Coverage: Xml (fast)",
                 "Coverage: Testing (fast)"
             ],
             "problemMatcher": []
@@ -1256,6 +1300,23 @@
             "problemMatcher": []
         },
         {
+            "label": "Quality: Qodana: Xml",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-scan/qodana/Run-Qodana.ps1",
+                "-Scope",
+                "Xml",
+                "-Clean",
+                "-Native"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Quality: Qodana: Testing",
             "type": "shell",
             "command": "pwsh",
@@ -1302,6 +1363,7 @@
                 "Quality: Qodana: ErrorOr",
                 "Quality: Qodana: FluentResults",
                 "Quality: Qodana: OneOf",
+                "Quality: Qodana: Xml",
                 "Quality: Qodana: Testing"
             ],
             "problemMatcher": []
@@ -1579,6 +1641,22 @@
             "problemMatcher": []
         },
         {
+            "label": "Git: Commit Xml (auto message)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/git/Run-Commits.ps1",
+                "-Scope",
+                "Xml",
+                "-AutoMessage"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Git: Run Commits (all, auto message)",
             "type": "shell",
             "command": "pwsh",
@@ -1790,6 +1868,21 @@
             "problemMatcher": []
         },
         {
+            "label": "Format: Xml",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/code-format/Run-Format.ps1",
+                "-Scope",
+                "Xml"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Format: Testing",
             "type": "shell",
             "command": "pwsh",
@@ -1834,6 +1927,7 @@
                 "Format: ErrorOr",
                 "Format: FluentResults",
                 "Format: OneOf",
+                "Format: Xml",
                 "Format: Testing"
             ],
             "problemMatcher": []

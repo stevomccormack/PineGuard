@@ -19,7 +19,7 @@
 .PARAMETER Scope
     Named scope that resolves to that scope's TestCsproj from the shared registry. Valid
     values: Core, MustClauses, GuardClauses, FluentValidation, DataAnnotations, Options,
-    DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers,
+    DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Xml, Analyzers,
     Testing, All.
     'All' resolves to PineGuard.slnx (every project in the solution) rather than a single
     TestCsproj. Exactly one of -Project, -Solution, or -Scope must be specified.
@@ -79,7 +79,7 @@ param(
     [string]$Project,
     [string]$Solution,
 
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'Testing', 'All')]
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'FluentValidation', 'DataAnnotations', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Xml', 'Analyzers', 'Testing', 'All')]
     [string]$Scope,
 
     [string]$Filter,

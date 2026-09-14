@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>XSD conformance for XML payloads, validated through PineGuard. One compiled schema set, every violation listed by element path, the unknown-namespace trap closed by default.</Description>
+    <PackageTags>$(PackageTags);xml;xsd;xml-schema;iso20022;schema-validation</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PineGuard.Xml.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
+    <ProjectReference Include="..\PineGuard.MustClauses\PineGuard.MustClauses.csproj" />
+    <ProjectReference Include="..\PineGuard.GuardClauses\PineGuard.GuardClauses.csproj" />
+    <ProjectReference Include="..\PineGuard.DataAnnotations\PineGuard.DataAnnotations.csproj" />
+  </ItemGroup>
+
+</Project>
