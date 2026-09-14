@@ -1,8 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Allowlisted exceptions for audit rules. Keyed by rule slug; values are substrings matched against finding.file or finding.message. Ported from legacy tools/audit-cli/test-audit-exceptions.json at cutover (P6.2).",
+  "description": "Allowlisted exceptions for audit rules. Keyed by rule slug; values are substrings matched against finding.file or finding.message. test-files: ported from legacy tools/audit-cli/test-audit-exceptions.json at cutover (P6.2). doc-links: (1) `.etc/powershell/.env` and `.claude/settings.local.json` are gitignored by design, so every reference to them is correct yet never resolves in a clean checkout such as CI; (2) `docs/ai/plans/tools-review-and-standardisation.md` is the ledger of the 2026-09 tools/ renames and cites the pre-rename paths on purpose; (3) `docs/ai/plans/new-surfaces-orchestration.md` (status: complete) and the P6.2 completion row of `docs/ai/plans/audit-cli-rebuild.md` record the tree as it stood when that work was done. Rewriting any of these would falsify the record; a new broken reference in any other file still fails the gate.",
   "test-files": [
     "tests/PineGuard.DataAnnotations.UnitTests/ErrorMessageAttributesTests.cs",
     "tests/PineGuard.Testing.UnitTests/UnitTests/Rules/RuleScenarioExtensionsTests.cs"
+  ],
+  "doc-links": [
+    ".etc/powershell/.env",
+    ".claude/settings.local.json",
+    "docs/ai/plans/tools-review-and-standardisation.md",
+    "docs/ai/plans/new-surfaces-orchestration.md",
+    "docs/ai/plans/audit-cli-rebuild.md"
   ]
 }

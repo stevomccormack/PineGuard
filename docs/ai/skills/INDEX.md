@@ -151,14 +151,14 @@ the excluded families (`ask-council`, `document`, `scaffold-*`, and the Claude-o
 
 | Skill | Command contract | Description |
 |-------|-------------------|-------------|
-| [commit](../../../.agents/skills/commit/SKILL.md) | [`commands/commit.md`](../commands/commit.md) | Route `/commit-*` to its scoped commit agent |
-| [scan](../../../.agents/skills/scan/SKILL.md) | [`commands/scan.md`](../commands/scan.md) | Route `/scan-roslyn-*`, `/scan-qodana-*`, `/scan-sonar` to its tool+scope agent |
-| [fix](../../../.agents/skills/fix/SKILL.md) | [`commands/fix.md`](../commands/fix.md) | Route `/fix-coverage-*`, `/fix-test-*`, `/fix-roslyn-all`, `/fix-sonar-*` to its agent |
-| [test](../../../.agents/skills/test/SKILL.md) | [`commands/test.md`](../commands/test.md) | Route `/test-*` to its scoped test agent |
-| [coverage](../../../.agents/skills/coverage/SKILL.md) | [`commands/coverage.md`](../commands/coverage.md) | Route `/coverage-*` to its scoped coverage agent |
-| [format](../../../.agents/skills/format/SKILL.md) | [`commands/format.md`](../commands/format.md) | Route `/format-*` to its scoped format agent |
-| [clean](../../../.agents/skills/clean/SKILL.md) | [`commands/clean.md`](../commands/clean.md) | Route `/clean-*` to its target-scoped clean agent |
-| [audit](../../../.agents/skills/audit/SKILL.md) | [`commands/audit.md`](../commands/audit.md) | Route `/audit-cli`, `/audit-gap` to its agent |
+| [commit](../../../.agents/skills/commit/SKILL.md) | [`docs/ai/commands/commit.md`](../commands/commit.md) | Route `/commit-*` to its scoped commit agent |
+| [scan](../../../.agents/skills/scan/SKILL.md) | [`docs/ai/commands/scan.md`](../commands/scan.md) | Route `/scan-roslyn-*`, `/scan-qodana-*`, `/scan-sonar` to its tool+scope agent |
+| [fix](../../../.agents/skills/fix/SKILL.md) | [`docs/ai/commands/fix.md`](../commands/fix.md) | Route `/fix-coverage-*`, `/fix-test-*`, `/fix-roslyn-all`, `/fix-sonar-*` to its agent |
+| [test](../../../.agents/skills/test/SKILL.md) | [`docs/ai/commands/test.md`](../commands/test.md) | Route `/test-*` to its scoped test agent |
+| [coverage](../../../.agents/skills/coverage/SKILL.md) | [`docs/ai/commands/coverage.md`](../commands/coverage.md) | Route `/coverage-*` to its scoped coverage agent |
+| [format](../../../.agents/skills/format/SKILL.md) | [`docs/ai/commands/format.md`](../commands/format.md) | Route `/format-*` to its scoped format agent |
+| [clean](../../../.agents/skills/clean/SKILL.md) | [`docs/ai/commands/clean.md`](../commands/clean.md) | Route `/clean-*` to its target-scoped clean agent |
+| [audit](../../../.agents/skills/audit/SKILL.md) | [`docs/ai/commands/audit.md`](../commands/audit.md) | Route `/audit-cli`, `/audit-gap` to its agent |
 
 ### `.agents/skills/`-only: Promoted per-command skills
 
