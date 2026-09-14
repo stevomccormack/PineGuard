@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Behavioural tests for tools/codex/Remove-CodexSkillPrefix.ps1.
+    Behavioural tests for tools/codex/Rename-CodexSkills.ps1.
 
 .DESCRIPTION
     Exercises the script against real throwaway git repositories under Pester's $TestDrive, each
@@ -15,7 +15,7 @@
 #>
 
 BeforeAll {
-    $script:ScriptPath = Join-Path $PSScriptRoot '..' 'codex' 'Remove-CodexSkillPrefix.ps1'
+    $script:ScriptPath = Join-Path $PSScriptRoot '..' 'codex' 'Rename-CodexSkills.ps1'
 
     function New-CodexScratchRepo {
         <#
@@ -95,7 +95,7 @@ BeforeAll {
     }
 }
 
-Describe 'Remove-CodexSkillPrefix.ps1' {
+Describe 'Rename-CodexSkills.ps1' {
 
     Context 'a fresh Codex import' {
         BeforeAll {
@@ -152,7 +152,7 @@ Describe 'Remove-CodexSkillPrefix.ps1' {
         It 'names the promoted skill and the script in the commit body' {
             $body = (& git -C $script:Repo log -1 --format=%b) -join "`n"
             $body | Should -Match 'commit-core'
-            $body | Should -Match 'tools/codex/Remove-CodexSkillPrefix\.ps1'
+            $body | Should -Match 'tools/codex/Rename-CodexSkills\.ps1'
         }
 
         It 'stages only the promoted folder' {

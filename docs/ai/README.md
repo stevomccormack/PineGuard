@@ -135,7 +135,7 @@ and the adapter wrappers that delegate to each one.
 | Fix Roslyn Warnings | `skills/fix-roslyn/` | Fix compiler warnings by code pattern |
 | Scaffold Quality Tool | `skills/scaffold-quality-tool/` | Meta-skill: add a new quality/inspection tool |
 | Create Workflow | `skills/scaffold-workflow/` | Agent playbook generation |
-| Migrate Codex Skills | `skills/migrate-codex-skill/` | Strip Codex's `source-command-` prefix from generated `.agents/skills/` folders and commit them |
+| Rename Codex Skills | `skills/rename-codex-skills/` | Strip Codex's `source-command-` prefix from generated `.agents/skills/` folders and commit them |
 | Ask Council | `skills/ask-council/` | Pressure-test a decision via 5 advisors + peer review + chairman synthesis |
 
 ## Workflows Inventory

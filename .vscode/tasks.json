@@ -1891,7 +1891,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Codex: Remove skill prefix (WhatIf)",
+            "label": "Codex: Rename skills (WhatIf)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -1899,13 +1899,15 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/codex/Remove-CodexSkillPrefix.ps1",
+                "./tools/codex/Rename-CodexSkills.ps1",
+                "-RemovePrefix",
+                "source-command-",
                 "-WhatIf"
             ],
             "problemMatcher": []
         },
         {
-            "label": "Codex: Remove skill prefix (promote + commit)",
+            "label": "Codex: Rename skills (promote + commit)",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -1913,7 +1915,9 @@
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "./tools/codex/Remove-CodexSkillPrefix.ps1"
+                "./tools/codex/Rename-CodexSkills.ps1",
+                "-RemovePrefix",
+                "source-command-"
             ],
             "problemMatcher": []
         }

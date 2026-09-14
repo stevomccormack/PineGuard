@@ -88,8 +88,8 @@ Codex's session import writes here are an implementation-detail prefix banned by
 committed as-is.
 
 Codex's import also produces one placeholder skill per `.claude/commands/*.md`. Those reach this
-surface only after `tools/codex/Remove-CodexSkillPrefix.ps1` (`/migrate-codex-skill`, playbook
-`docs/ai/agents/migrate-codex-skill.md`) has stripped the prefix, aligned each frontmatter
+surface only after `tools/codex/Rename-CodexSkills.ps1` (`/rename-codex-skills`, playbook
+`docs/ai/agents/rename-codex-skills.md`) has stripped the prefix, aligned each frontmatter
 `name:` with its directory and committed the bare-named folders. A per-command entry named after
 the command itself (`commit-core`, `scan-qodana-guard`) is therefore acceptable on this surface; a
 prefixed one is drift. The routers stay alongside them as the hand-written, intent-table-aware

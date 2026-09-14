@@ -7,7 +7,7 @@ conventions.
 
 ```
 tools/codex/
-└── Remove-CodexSkillPrefix.ps1   # Strip `source-command-` from Codex-generated .agents/skills/ folders and commit them
+└── Rename-CodexSkills.ps1   # Strip `source-command-` from Codex-generated .agents/skills/ folders and commit them
 ```
 
 ## Why this exists
@@ -20,7 +20,7 @@ the body is the command file's one-line pointer at its Brain playbook.
 
 The prefix is a vendor implementation detail with no meaning here (`docs/ai/meta/taxonomy.md`
 §N.2/§N.3 bans exactly this kind of leading segment), so `.gitignore` hides every
-`.agents/skills/source-command-*/` folder. `Remove-CodexSkillPrefix.ps1` finishes the migration
+`.agents/skills/source-command-*/` folder. `Rename-CodexSkills.ps1` finishes the migration
 on the repository's terms so the skills can be committed under their bare command names.
 
 ## Usage
@@ -29,22 +29,23 @@ Run from the repository root.
 
 ```powershell
 # Preview: list every prefixed folder with the action a real run would take
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Remove-CodexSkillPrefix.ps1" -WhatIf
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Rename-CodexSkills.ps1" -WhatIf
 
-# Promote every prefixed folder and commit the result in one chore(agents) commit
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Remove-CodexSkillPrefix.ps1"
+# Rename every source-command-* folder to its bare name and commit the result in one chore(agents) commit
+# (-RemovePrefix defaults to source-command-; shown explicitly so the intent is on the tin)
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Rename-CodexSkills.ps1" -RemovePrefix 'source-command-'
 
 # Promote only; leave the folders unstaged for a hand-written commit
-pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Remove-CodexSkillPrefix.ps1" -NoCommit
+pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Rename-CodexSkills.ps1" -NoCommit
 ```
 
-## Parameters (Remove-CodexSkillPrefix.ps1)
+## Parameters (Rename-CodexSkills.ps1)
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `-RepoRoot` | string | resolved from the script's location | Repository to operate on. The Pester suite passes a scratch repo here. |
 | `-SkillsDir` | string | `.agents/skills` | Skills directory, relative to `-RepoRoot`, that Codex writes into. |
-| `-Prefix` | string | `source-command-` | The vendor prefix to strip. |
+| `-RemovePrefix` | string | `source-command-` | The vendor prefix to strip. |
 | `-Exclude` | string[] | `github-*`, `nuget-*` | Bare command names matching any pattern are never promoted. The default is the release family, which is Claude Code-only (`docs/ai/meta/adapter-surfaces.md` §4). |
 | `-Force` | switch | `$false` | Overwrite an existing unprefixed skill whose `SKILL.md` differs. Without it such a candidate is skipped and reported. |
 | `-NoCommit` | switch | `$false` | Rename and rewrite only; leave the results unstaged. |
@@ -84,6 +85,6 @@ import (and the transcript sync that comes with it); this script then reports "N
 
 ## Tests
 
-`tools/.tests/Codex-SkillPrefix.Tests.ps1` runs the script against throwaway git repositories
+`tools/.tests/Rename-CodexSkills.Tests.ps1` runs the script against throwaway git repositories
 under Pester's `$TestDrive`, seeded with the exact template Codex emits. Run via
-`tools/testing/Test-Tools.ps1` or `Invoke-Pester -Path tools/.tests/Codex-SkillPrefix.Tests.ps1`.
+`tools/testing/Test-Tools.ps1` or `Invoke-Pester -Path tools/.tests/Rename-CodexSkills.Tests.ps1`.

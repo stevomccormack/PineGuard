@@ -190,6 +190,7 @@ Only these verbs may appear as the leading segment of an action filename. Any ve
 | `improve` | Raise a measured metric toward its target (coverage only) |
 | `ask` | Put a question to an advisory body (`ask-council`) |
 | `plan` | Produce a plan rather than a change (`plan-with-council`) |
+| `rename` | Rename files or folders into this repository's naming (`rename-codex-skills`) |
 
 Two further verbs are reserved for **vendor-prefixed operations** only — see §N.9:
 `publish` (`github-release-publish`) and `unlist` (`nuget-unlist`).

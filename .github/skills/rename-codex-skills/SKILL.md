@@ -1,19 +1,19 @@
 ---
-name: migrate-codex-skill
+name: rename-codex-skills
 description: Strip Codex's source-command- prefix from the generated .agents/skills/ folders and commit them by following the canonical Brain workflow.
 ---
-# Skill: Migrate Codex Skills
+# Skill: Rename Codex Skills
 
 ## Load First
 
 Read these files before running the migration:
 1. [safety.md](../../../docs/ai/specs/safety.md)
 2. [adapter-surfaces.md](../../../docs/ai/meta/adapter-surfaces.md)
-3. [migrate-codex-skill SKILL.md](../../../docs/ai/skills/migrate-codex-skill/SKILL.md)
+3. [rename-codex-skills SKILL.md](../../../docs/ai/skills/rename-codex-skills/SKILL.md)
 
 ## Execute
 
-Follow the canonical recipe in [migrate-codex-skill SKILL.md](../../../docs/ai/skills/migrate-codex-skill/SKILL.md) exactly.
+Follow the canonical recipe in [rename-codex-skills SKILL.md](../../../docs/ai/skills/rename-codex-skills/SKILL.md) exactly.
 
 ## Verify
 

@@ -26,7 +26,7 @@ than one major version is installed, pin the one you want with
 | `Cobertura-Parser.Tests.ps1` | `Read-CoberturaCoverage`, `ConvertTo-Rate`, `ConvertFrom-ConditionCoverage` in `tools/.shared/coverage.ps1`, against `fixtures/sample-coverage.cobertura.xml` |
 | `RepoRoot.Tests.ps1` | `Get-RepoRoot` in `tools/.shared/path.ps1`, from several starting directories |
 | `Git-Helpers.Tests.ps1` | `Assert-IndexClean` in `tools/.shared/git.ps1` — the F-16 Tier-0-safety regression fixed in T1.01, tested against real throwaway git repos under `$TestDrive` |
-| `Codex-SkillPrefix.Tests.ps1` | `tools/codex/Remove-CodexSkillPrefix.ps1` — the rename and frontmatter rewrite, the release-family exclusion, collision skip and `-Force`, identical-duplicate removal, the scoped commit, `-NoCommit`, `-WhatIf`/`-DryRun`, and the clean-index guard, against real throwaway git repos under `$TestDrive` seeded with the exact template Codex emits |
+| `Rename-CodexSkills.Tests.ps1` | `tools/codex/Rename-CodexSkills.ps1` — the rename and frontmatter rewrite, the release-family exclusion, collision skip and `-Force`, identical-duplicate removal, the scoped commit, `-NoCommit`, `-WhatIf`/`-DryRun`, and the clean-index guard, against real throwaway git repos under `$TestDrive` seeded with the exact template Codex emits |
 | `Help-Placeholder.Tests.ps1` | F-46: no script still carries the placeholder `.PARAMETER` text |
 | `Bom-Absence.Tests.ps1` | F-47: no script has a UTF-8 byte-order mark |
 | `Windows-Isms.Tests.ps1` | F-30: no hardcoded backslash path separators, `.exe`, `$env:TEMP`, or `SetEnvironmentVariable(...,'User')` |

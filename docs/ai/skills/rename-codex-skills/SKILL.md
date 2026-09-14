@@ -1,5 +1,5 @@
-# Skill: Migrate Codex Skills
-**ID**: pineguard.skill.migrate-codex-skill
+# Skill: Rename Codex Skills
+**ID**: pineguard.skill.rename-codex-skills
 **Version**: 1.0
 
 ## 1. Context & Goal
@@ -12,6 +12,7 @@ directory, give it a real description, and commit only the folders that were pro
 
 ## 2. Inputs
 - None required. The script finds every prefixed folder itself.
+- `--remove-prefix "<prefix>"` (script: `-RemovePrefix`), default `source-command-`: the prefix to strip.
 - Optional: `-WhatIf` (preview), `-NoCommit`, `-Force`, `-Message`, `-Exclude`.
 
 ## 3. Critical Rules (The "Must Dos")
@@ -32,7 +33,7 @@ directory, give it a real description, and commit only the folders that were pro
 1. **Preview**
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Remove-CodexSkillPrefix.ps1" -WhatIf
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Rename-CodexSkills.ps1" -WhatIf
    ```
 
    Read the per-folder actions: `renamed`, `duplicate` (identical copy removed), `skipped`
@@ -41,7 +42,7 @@ directory, give it a real description, and commit only the folders that were pro
 2. **Promote and commit**
 
    ```powershell
-   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Remove-CodexSkillPrefix.ps1"
+   pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/codex/Rename-CodexSkills.ps1"
    ```
 
    One `chore(agents): promote N Codex-migrated command skills to bare names` commit is created,

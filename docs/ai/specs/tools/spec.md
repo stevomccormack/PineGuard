@@ -79,7 +79,7 @@ We use a strict **Verb-Noun** standard, with specific semantic meanings for verb
 
 - **`Remove-`**: Strips one named artefact from repository files.
   - Removes exactly the thing in its noun and nothing else; a blanket delete of a directory is `Clear-`.
-  - **Example**: `tools/codex/Remove-CodexSkillPrefix.ps1`.
+  - **Example**: `tools/codex/Rename-CodexSkills.ps1`.
 
 ### 1.2 Nouns
 

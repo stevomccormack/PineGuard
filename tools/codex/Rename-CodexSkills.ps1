@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
-    Strips the `source-command-` prefix that OpenAI Codex's session import stamps on every
-    `.agents/skills/` folder it generates, then commits the renamed skills.
+    Renames the `.agents/skills/` folders OpenAI Codex's session import generates by removing a
+    prefix (-RemovePrefix, default `source-command-`), then commits the renamed skills.
 
 .DESCRIPTION
     The Codex desktop app's Claude-session import (`[desktop] external-agent-import-sync-enabled`
@@ -42,9 +42,10 @@
 .PARAMETER SkillsDir
     Skills directory, relative to -RepoRoot, that Codex writes into. Defaults to `.agents/skills`.
 
-.PARAMETER Prefix
-    The vendor prefix to strip. Defaults to `source-command-`, the literal string Codex's
-    `migrated-command-skills` template uses.
+.PARAMETER RemovePrefix
+    The prefix to remove from every matching folder name. Defaults to `source-command-`, the
+    literal string Codex's `migrated-command-skills` template uses; the slash command exposes it
+    as `--remove-prefix "<prefix>"`.
 
 .PARAMETER Exclude
     Wildcard patterns, matched against the bare command name, that are never promoted. Defaults
@@ -66,17 +67,18 @@
     or git. -DryRun is a supported alias of the same switch.
 
 .EXAMPLE
-    ./tools/codex/Remove-CodexSkillPrefix.ps1 -WhatIf
+    ./tools/codex/Rename-CodexSkills.ps1 -WhatIf
 
     Lists every prefixed folder with the action that a real run would take.
 
 .EXAMPLE
-    ./tools/codex/Remove-CodexSkillPrefix.ps1
+    ./tools/codex/Rename-CodexSkills.ps1 -RemovePrefix 'source-command-'
 
-    Promotes every prefixed folder, then commits the promoted skills in one commit.
+    Renames every `source-command-*` folder to its bare name, then commits the renamed skills in
+    one commit. `-RemovePrefix` may be omitted; `source-command-` is the default.
 
 .EXAMPLE
-    ./tools/codex/Remove-CodexSkillPrefix.ps1 -NoCommit
+    ./tools/codex/Rename-CodexSkills.ps1 -NoCommit
 
     Promotes the folders and leaves the changes in the working tree for a hand-written commit.
 #>
@@ -87,7 +89,7 @@ param(
     [ValidateNotNullOrEmpty()]
     [string] $SkillsDir = '.agents/skills',
     [ValidateNotNullOrEmpty()]
-    [string] $Prefix = 'source-command-',
+    [string] $RemovePrefix = 'source-command-',
     [string[]] $Exclude = @('github-*', 'nuget-*'),
     [switch] $Force,
     [switch] $NoCommit,
@@ -122,11 +124,11 @@ function ConvertTo-BareSkillContent {
     #>
     param(
         [Parameter(Mandatory)] [string] $Content,
-        [Parameter(Mandatory)] [string] $Prefix,
+        [Parameter(Mandatory)] [string] $RemovePrefix,
         [Parameter(Mandatory)] [string] $Name
     )
 
-    $prefixed = [regex]::Escape($Prefix + $Name)
+    $prefixed = [regex]::Escape($RemovePrefix + $Name)
     $escapedName = [regex]::Escape($Name)
     $text = $Content -replace "`r`n", "`n"
 
@@ -187,11 +189,11 @@ function Test-Excluded {
     return $false
 }
 
-Write-Step ("Scanning {0} for '{1}*' folders" -f $SkillsDir, $Prefix)
+Write-Step ("Scanning {0} for '{1}*' folders" -f $SkillsDir, $RemovePrefix)
 
 $candidates = @(
     Get-ChildItem -LiteralPath $skillsRoot -Directory |
-        Where-Object { $_.Name.StartsWith($Prefix, [System.StringComparison]::Ordinal) -and $_.Name.Length -gt $Prefix.Length } |
+        Where-Object { $_.Name.StartsWith($RemovePrefix, [System.StringComparison]::Ordinal) -and $_.Name.Length -gt $RemovePrefix.Length } |
         Sort-Object Name
 )
 
@@ -211,7 +213,7 @@ $stagePaths = [System.Collections.Generic.List[string]]::new()
 $separators = [char[]]@('/', [System.IO.Path]::DirectorySeparatorChar)
 
 foreach ($source in $candidates) {
-    $name = $source.Name.Substring($Prefix.Length)
+    $name = $source.Name.Substring($RemovePrefix.Length)
     $sourceSkill = Join-Path $source.FullName 'SKILL.md'
     $targetDir = Join-Path $skillsRoot $name
     $targetSkill = Join-Path $targetDir 'SKILL.md'
@@ -234,7 +236,7 @@ foreach ($source in $candidates) {
         continue
     }
 
-    $newContent = ConvertTo-BareSkillContent -Content (Get-Content -LiteralPath $sourceSkill -Raw) -Prefix $Prefix -Name $name
+    $newContent = ConvertTo-BareSkillContent -Content (Get-Content -LiteralPath $sourceSkill -Raw) -RemovePrefix $RemovePrefix -Name $name
 
     if (Test-Path -LiteralPath $targetSkill -PathType Leaf) {
         $existing = (Get-Content -LiteralPath $targetSkill -Raw) -replace "`r`n", "`n"
@@ -321,7 +323,7 @@ if ([string]::IsNullOrWhiteSpace($Message)) {
         'their bare command names ({2}), rewriting each SKILL.md so its frontmatter name and heading ' +
         'match the directory as the Agent Skills spec requires and its description names the command ' +
         'and its Brain playbook instead of the placeholder text. Produced by ' +
-        'tools/codex/Remove-CodexSkillPrefix.ps1.') -f $Prefix, $SkillsDir, $names
+        'tools/codex/Rename-CodexSkills.ps1.') -f $RemovePrefix, $SkillsDir, $names
     $Message = ($subject, '', $body) -join "`n"
 }
 
