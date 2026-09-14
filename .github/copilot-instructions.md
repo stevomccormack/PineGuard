@@ -133,6 +133,10 @@ Every entry below is a prompt file `.github/prompts/<name>.prompt.md`. In Copilo
 - `/audit-gap`: Act as **Planner / Verifier**. Execute `docs/ai/agents/audit-gap.md`.
 - `/audit-cli`: Act as **Shipper**. Execute `docs/ai/agents/audit-cli.md`.
 
+### Rename
+
+- `/rename-codex-skills --remove-prefix "source-command-"`: Act as **Shipper**. Execute `docs/ai/agents/rename-codex-skills.md`. The argument shown is the default.
+
 ### Scaffold
 
 - `/scaffold-vertical-slice`: Act as **Owner**. Execute `docs/ai/agents/scaffold-vertical-slice.md`.

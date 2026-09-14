@@ -114,7 +114,7 @@ docs/ai/rules/global.md          (always applies — invariants, file hygiene)
 
 ## Skills Inventory
 
-The 17 Brain skills. [`skills/INDEX.md`](skills/INDEX.md) carries the same list with per-skill IDs
+The 18 Brain skills. [`skills/INDEX.md`](skills/INDEX.md) carries the same list with per-skill IDs
 and the adapter wrappers that delegate to each one.
 
 | Skill | Directory | Purpose |
@@ -135,6 +135,7 @@ and the adapter wrappers that delegate to each one.
 | Fix Roslyn Warnings | `skills/fix-roslyn/` | Fix compiler warnings by code pattern |
 | Scaffold Quality Tool | `skills/scaffold-quality-tool/` | Meta-skill: add a new quality/inspection tool |
 | Create Workflow | `skills/scaffold-workflow/` | Agent playbook generation |
+| Rename Codex Skills | `skills/rename-codex-skills/` | Strip Codex's `source-command-` prefix from generated `.agents/skills/` folders and commit them |
 | Ask Council | `skills/ask-council/` | Pressure-test a decision via 5 advisors + peer review + chairman synthesis |
 
 ## Workflows Inventory

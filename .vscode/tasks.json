@@ -1889,6 +1889,37 @@
                 "./tools/testing/Test-Tools.ps1"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Codex: Rename skills (WhatIf)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/codex/Rename-CodexSkills.ps1",
+                "-RemovePrefix",
+                "source-command-",
+                "-WhatIf"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Codex: Rename skills (promote + commit)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/codex/Rename-CodexSkills.ps1",
+                "-RemovePrefix",
+                "source-command-"
+            ],
+            "problemMatcher": []
         }
     ]
 }
