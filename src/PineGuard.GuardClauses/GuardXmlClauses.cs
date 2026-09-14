@@ -100,13 +100,21 @@ public static class GuardXmlClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> is not a valid XML document (i.e., does not have a root element).
+    /// Throws if <paramref name="value"/> is not well-formed XML with the given root element.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The string to guard.</param>
+    /// <param name="localName">
+    /// The expected root element local name, compared ordinally. Must not be <see langword="null"/> or whitespace.
+    /// </param>
+    /// <param name="namespaceUri">
+    /// The expected root element namespace, compared ordinally. <see langword="null"/> (the default) matches
+    /// any namespace; <see cref="string.Empty"/> matches only the no-namespace case reported by
+    /// <see cref="System.Xml.XmlReader"/>.
+    /// </param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
-    /// from <see cref="MustXmlClauses.XmlDocument"/>.
+    /// from <see cref="MustXmlClauses.HasXmlRoot"/>.
     /// </param>
     /// <param name="exceptionCreator">
     /// An optional factory to create a custom exception. If <see langword="null"/>,
@@ -118,26 +126,28 @@ public static class GuardXmlClauses
     /// </param>
     /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
     /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is not a valid XML document and no
+    /// Thrown when <paramref name="value"/> is not well-formed XML with the given root element and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <remarks>
-    /// This guard is the complement of <see cref="MustXmlClauses.XmlDocument"/>:
-    /// <c>Guard.Against.NotXmlDocument</c> passes when the value is a valid XML document with a root element.
+    /// This guard is the complement of <see cref="MustXmlClauses.HasXmlRoot"/>:
+    /// <c>Guard.Against.NotHasXmlRoot</c> passes when the value is well-formed XML whose root element matches.
     /// </remarks>
     /// <example>
     /// <code>
-    /// Guard.Against.NotXmlDocument(xmlPayload);
+    /// Guard.Against.NotHasXmlRoot(xmlPayload, "Document", "urn:test:doc");
     /// </code>
     /// </example>
-    /// <seealso cref="MustXmlClauses.XmlDocument"/>
-    public static string NotXmlDocument(this IGuardClause _,
+    /// <seealso cref="MustXmlClauses.HasXmlRoot"/>
+    public static string NotHasXmlRoot(this IGuardClause _,
         string? value,
+        string localName,
+        string? namespaceUri = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.XmlDocument(value, paramName); // Guard.Against.NotXmlDocument => Must.Be.XmlDocument
+        var result = Must.Be.HasXmlRoot(value, localName, namespaceUri, paramName); // Guard.Against.NotHasXmlRoot => Must.Be.HasXmlRoot
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

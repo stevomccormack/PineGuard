@@ -6,13 +6,17 @@ using PineGuard.MustClauses;
 namespace PineGuard.DataAnnotations;
 
 /// <summary>
-/// Validates that the annotated <see cref="string"/> property or field is a well-formed XML fragment
-/// or document.
+/// Validates that the annotated <see cref="string"/> property or field is a well-formed, complete XML
+/// document with a single root element.
 /// </summary>
 /// <remarks>
 /// <para>
 /// Delegates to <see cref="MustXmlClauses.Xml"/>. Supported on properties, fields, and parameters
 /// of type <see cref="string"/>.
+/// </para>
+/// <para>
+/// There is no fragment mode: a value such as <c>&lt;a/&gt;&lt;b/&gt;</c>, which has more than one root
+/// element, fails validation.
 /// </para>
 /// <para>
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
@@ -27,7 +31,6 @@ namespace PineGuard.DataAnnotations;
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="XmlDocumentStringAttribute"/>
 /// <seealso cref="MustXmlClauses.Xml"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/xml">XML Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
@@ -95,16 +98,19 @@ public sealed class XmlContentTypeAttribute() : ValidationAttributeBase(typeof(o
 }
 
 /// <summary>
-/// Validates that the annotated <see cref="string"/> property or field is a well-formed, complete XML
-/// document with a single root element.
+/// Validates that the annotated <see cref="string"/> property or field is well-formed XML whose root
+/// element matches the given local name and, optionally, namespace.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustXmlClauses.XmlDocument"/>. Supported on properties, fields, and parameters
+/// Delegates to <see cref="MustXmlClauses.HasXmlRoot"/>. Supported on properties, fields, and parameters
 /// of type <see cref="string"/>.
 /// </para>
 /// <para>
-/// Unlike <see cref="XmlStringAttribute"/>, this attribute requires a complete document rather than a fragment.
+/// <see cref="NamespaceUri"/> defaults to <see langword="null"/>, which matches any namespace. Pass
+/// <see cref="string.Empty"/> to require the no-namespace case reported by <see cref="System.Xml.XmlReader"/>.
+/// </para>
+/// <para>
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
 /// </remarks>
@@ -112,22 +118,30 @@ public sealed class XmlContentTypeAttribute() : ValidationAttributeBase(typeof(o
 /// <code>
 /// public class DataModel
 /// {
-///     [XmlDocumentString]
-///     public string XmlDocument { get; set; }
+///     [HasXmlRoot("Document", "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08")]
+///     public string XmlPayload { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="XmlStringAttribute"/>
-/// <seealso cref="MustXmlClauses.XmlDocument"/>
+/// <seealso cref="MustXmlClauses.HasXmlRoot"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/xml">XML Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class XmlDocumentStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Xml.Document.Invalid)
+public sealed class HasXmlRootAttribute(string localName, string? namespaceUri = null) : ValidationAttributeBase(typeof(string), MustCodes.Xml.Root.Mismatch)
 {
+    /// <summary>Gets the expected root element local name, compared ordinally.</summary>
+    public string LocalName { get; } = localName;
+
+    /// <summary>
+    /// Gets the expected root element namespace, compared ordinally. <see langword="null"/> matches any
+    /// namespace; <see cref="string.Empty"/> matches only the no-namespace case.
+    /// </summary>
+    public string? NamespaceUri { get; } = namespaceUri;
+
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.XmlDocument(strValue, paramName: null);
+        var result = Must.Be.HasXmlRoot(strValue, LocalName, NamespaceUri, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }

@@ -28,11 +28,25 @@ public sealed class XmlAttributesTests
     }
 
     [Theory]
-    [MemberData(nameof(XmlAttributesTestData.XmlDocumentString.ValidCases), MemberType = typeof(XmlAttributesTestData.XmlDocumentString))]
-    [MemberData(nameof(XmlAttributesTestData.XmlDocumentString.EdgeCases), MemberType = typeof(XmlAttributesTestData.XmlDocumentString))]
-    [MemberData(nameof(XmlAttributesTestData.XmlDocumentString.InvalidCases), MemberType = typeof(XmlAttributesTestData.XmlDocumentString))]
-    public void XmlDocumentString_ShouldReturnExpected(XmlAttributesTestData.ValidCase testCase)
-        => Verify(new XmlDocumentStringAttribute(), testCase);
+    [MemberData(nameof(XmlAttributesTestData.HasXmlRoot.ValidCases), MemberType = typeof(XmlAttributesTestData.HasXmlRoot))]
+    [MemberData(nameof(XmlAttributesTestData.HasXmlRoot.EdgeCases), MemberType = typeof(XmlAttributesTestData.HasXmlRoot))]
+    [MemberData(nameof(XmlAttributesTestData.HasXmlRoot.InvalidCases), MemberType = typeof(XmlAttributesTestData.HasXmlRoot))]
+    public void HasXmlRoot_ShouldReturnExpected(XmlAttributesTestData.ValidCase testCase)
+    {
+        var attribute = new HasXmlRootAttribute(XmlAttributesTestData.HasXmlRoot.LocalName, XmlAttributesTestData.HasXmlRoot.Namespace);
+        Assert.Equal(MustCodes.Xml.Root.Mismatch, attribute.Code);
+        Verify(attribute, testCase);
+    }
+
+    [Theory]
+    [MemberData(nameof(XmlAttributesTestData.HasXmlRoot.AnyNamespaceValidCases), MemberType = typeof(XmlAttributesTestData.HasXmlRoot))]
+    [MemberData(nameof(XmlAttributesTestData.HasXmlRoot.AnyNamespaceInvalidCases), MemberType = typeof(XmlAttributesTestData.HasXmlRoot))]
+    public void HasXmlRoot_ShouldReturnExpected_WhenAnyNamespace(XmlAttributesTestData.ValidCase testCase)
+    {
+        var attribute = new HasXmlRootAttribute(XmlAttributesTestData.HasXmlRoot.LocalName);
+        Assert.Equal(MustCodes.Xml.Root.Mismatch, attribute.Code);
+        Verify(attribute, testCase);
+    }
 
     [Theory]
     [MemberData(nameof(XmlAttributesTestData.XmlContentType.ValidCases), MemberType = typeof(XmlAttributesTestData.XmlContentType))]

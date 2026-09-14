@@ -28,5 +28,15 @@ public static partial class MustCodes
             /// <summary><c>xml.content-type.mismatch</c></summary>
             public const string Mismatch = Prefix + ".mismatch";
         }
+
+        /// <summary>The identity of the document's root element.</summary>
+        public static class Root
+        {
+            /// <summary>The code prefix for this node (<c>"xml.root"</c>).</summary>
+            public const string Prefix = Xml.Prefix + ".root";
+
+            /// <summary><c>xml.root.mismatch</c></summary>
+            public const string Mismatch = Prefix + ".mismatch";
+        }
     }
 }

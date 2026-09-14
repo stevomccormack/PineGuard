@@ -1,5 +1,6 @@
 using PineGuard.Testing.UnitTests.GuardClauses;
 using Xunit.Abstractions;
+using F = PineGuard.Testing.Fixtures.XmlRulesFixtures;
 
 namespace PineGuard.GuardClauses.UnitTests;
 
@@ -20,13 +21,26 @@ public sealed class GuardXmlClausesTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(GuardXmlClausesTestData.NotXmlDocument.ValidCases), MemberType = typeof(GuardXmlClausesTestData.NotXmlDocument))]
-    [MemberData(nameof(GuardXmlClausesTestData.NotXmlDocument.InvalidCases), MemberType = typeof(GuardXmlClausesTestData.NotXmlDocument))]
-    public void NotXmlDocument_BehavesAsExpected(GuardCase<string?> tc)
+    [MemberData(nameof(GuardXmlClausesTestData.NotHasXmlRoot.ValidCases), MemberType = typeof(GuardXmlClausesTestData.NotHasXmlRoot))]
+    [MemberData(nameof(GuardXmlClausesTestData.NotHasXmlRoot.InvalidCases), MemberType = typeof(GuardXmlClausesTestData.NotHasXmlRoot))]
+    public void NotHasXmlRoot_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.NotXmlDocument(value));
-        AssertCustomMessage(tc, () => Guard.Against.NotXmlDocument(value, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.NotHasXmlRoot(value, F.HasXmlRoot.LocalName, F.HasXmlRoot.Namespace));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasXmlRoot(value, F.HasXmlRoot.LocalName, F.HasXmlRoot.Namespace, message: CustomMessage));
+
+        if (tc.Expected.IsValid)
+            Assert.Equal(tc.Value, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardXmlClausesTestData.NotHasXmlRootAnyNamespace.ValidCases), MemberType = typeof(GuardXmlClausesTestData.NotHasXmlRootAnyNamespace))]
+    [MemberData(nameof(GuardXmlClausesTestData.NotHasXmlRootAnyNamespace.InvalidCases), MemberType = typeof(GuardXmlClausesTestData.NotHasXmlRootAnyNamespace))]
+    public void NotHasXmlRoot_AnyNamespace_BehavesAsExpected(GuardCase<string?> tc)
+    {
+        var value = tc.Value;
+        var result = AssertResult(tc, () => Guard.Against.NotHasXmlRoot(value, F.HasXmlRoot.LocalName));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasXmlRoot(value, F.HasXmlRoot.LocalName, message: CustomMessage));
 
         if (tc.Expected.IsValid)
             Assert.Equal(tc.Value, result);

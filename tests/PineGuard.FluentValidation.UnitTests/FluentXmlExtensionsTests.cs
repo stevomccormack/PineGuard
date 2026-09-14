@@ -1,6 +1,7 @@
 using FluentValidation;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
+using F = PineGuard.Testing.Fixtures.XmlRulesFixtures;
 
 namespace PineGuard.FluentValidation.UnitTests;
 
@@ -19,9 +20,14 @@ public sealed class FluentXmlExtensionsTests(ITestOutputHelper output) : BaseFlu
         public XmlContentTypeValidator() => RuleFor(x => x.Value).XmlContentType();
     }
 
-    private sealed class XmlDocumentValidator : AbstractValidator<Model>
+    private sealed class HasXmlRootValidator : AbstractValidator<Model>
     {
-        public XmlDocumentValidator() => RuleFor(x => x.Value).XmlDocument();
+        public HasXmlRootValidator() => RuleFor(x => x.Value).HasXmlRoot(F.HasXmlRoot.LocalName, F.HasXmlRoot.Namespace);
+    }
+
+    private sealed class HasXmlRootAnyNamespaceValidator : AbstractValidator<Model>
+    {
+        public HasXmlRootAnyNamespaceValidator() => RuleFor(x => x.Value).HasXmlRoot(F.HasXmlRoot.LocalName);
     }
 
     [Theory]
@@ -41,10 +47,18 @@ public sealed class FluentXmlExtensionsTests(ITestOutputHelper output) : BaseFlu
     }
 
     [Theory]
-    [MemberData(nameof(FluentXmlExtensionsTestData.XmlDocument.Cases), MemberType = typeof(FluentXmlExtensionsTestData.XmlDocument))]
-    public void XmlDocument_BehavesAsExpected(FluentCase<string?> tc)
+    [MemberData(nameof(FluentXmlExtensionsTestData.HasXmlRoot.Cases), MemberType = typeof(FluentXmlExtensionsTestData.HasXmlRoot))]
+    public void HasXmlRoot_BehavesAsExpected(FluentCase<string?> tc)
     {
-        var result = new XmlDocumentValidator().Validate(new Model { Value = tc.Value });
+        var result = new HasXmlRootValidator().Validate(new Model { Value = tc.Value });
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentXmlExtensionsTestData.HasXmlRootAnyNamespace.Cases), MemberType = typeof(FluentXmlExtensionsTestData.HasXmlRootAnyNamespace))]
+    public void HasXmlRootAnyNamespace_BehavesAsExpected(FluentCase<string?> tc)
+    {
+        var result = new HasXmlRootAnyNamespaceValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
     }
 }

@@ -30,19 +30,37 @@ public static class XmlAttributesTestData
         ];
     }
 
-    public static class XmlDocumentString
+    public static class HasXmlRoot
     {
+        public const string LocalName = F.HasXmlRoot.LocalName;
+        public const string Namespace = F.HasXmlRoot.Namespace;
+
         public static TheoryData<ValidCase> ValidCases =>
         [
-            new("decl", "<?xml version=\"1.0\"?><root/>", true),
-            new(nameof(F.IsXml.Valid), F.IsXml.Valid, true)
+            new(nameof(F.HasXmlRoot.Matching), F.HasXmlRoot.Matching, true)
         ];
 
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
 
         public static TheoryData<ValidCase> InvalidCases =>
         [
-            new(nameof(F.IsXml.Whitespace), F.IsXml.Whitespace, false)
+            new(nameof(F.HasXmlRoot.WrongName),      F.HasXmlRoot.WrongName,      false),
+            new(nameof(F.HasXmlRoot.WrongNamespace),  F.HasXmlRoot.WrongNamespace,  false),
+            new(nameof(F.HasXmlRoot.Malformed),       F.HasXmlRoot.Malformed,       false),
+            new(nameof(F.HasXmlRoot.Whitespace),      F.HasXmlRoot.Whitespace,      false)
+        ];
+
+        public static TheoryData<ValidCase> AnyNamespaceValidCases =>
+        [
+            new(nameof(F.HasXmlRoot.MatchingNoNamespace), F.HasXmlRoot.MatchingNoNamespace, true),
+            new(nameof(F.HasXmlRoot.WrongNamespace),      F.HasXmlRoot.WrongNamespace,      true)
+        ];
+
+        public static TheoryData<ValidCase> AnyNamespaceInvalidCases =>
+        [
+            new(nameof(F.HasXmlRoot.WrongName),  F.HasXmlRoot.WrongName,  false),
+            new(nameof(F.HasXmlRoot.Malformed),  F.HasXmlRoot.Malformed,  false),
+            new(nameof(F.HasXmlRoot.Whitespace), F.HasXmlRoot.Whitespace, false)
         ];
     }
 
