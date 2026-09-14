@@ -60,26 +60,34 @@ public static class FluentXmlExtensions
             message, MustCodes.Xml.ContentType.Mismatch);
 
     /// <summary>
-    /// Validates that the property value is a valid, parseable XML document.
+    /// Validates that the property value is well-formed XML whose root element matches the given local name
+    /// and, optionally, namespace URI.
     /// </summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="localName">The required root element local name (ordinal comparison).</param>
+    /// <param name="namespaceUri">
+    /// The required root element namespace URI (ordinal comparison). When <see langword="null"/>, any namespace
+    /// is accepted; pass <see cref="string.Empty"/> to require no namespace.
+    /// </param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustXmlClauses.XmlDocument"/>. If the value is <see langword="null"/>,
+    /// Delegates to <see cref="MustXmlClauses.HasXmlRoot"/>. If the value is <see langword="null"/>,
     /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
     /// reported as a distinct failure.
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.XmlContent).XmlDocument();
+    /// RuleFor(x => x.Payload).HasXmlRoot("Document", "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08");
     /// </code>
     /// </example>
-    /// <seealso cref="MustXmlClauses.XmlDocument"/>
-    public static IRuleBuilderOptions<TModel, string?> XmlDocument<TModel>(
+    /// <seealso cref="MustXmlClauses.HasXmlRoot"/>
+    public static IRuleBuilderOptions<TModel, string?> HasXmlRoot<TModel>(
         this IRuleBuilder<TModel, string?> ruleBuilder,
+        string localName,
+        string? namespaceUri = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.XmlDocument(val, paramName: null),
-            message, MustCodes.Xml.Document.Invalid);
+        ruleBuilder.MustBe(val => Must.Be.HasXmlRoot(val, localName, namespaceUri, paramName: null),
+            message, MustCodes.Xml.Root.Mismatch);
 }

@@ -1,3 +1,4 @@
+using PineGuard.Common;
 using PineGuard.Utils;
 
 namespace PineGuard.Rules;
@@ -25,7 +26,48 @@ public static class XmlRules
     /// ]]></code>
     /// </example>
     public static bool IsXml(string? value) =>
-        XmlUtility.TryParse(value, out _);
+        XmlUtility.TryGetRootName(value, out _);
+
+    /// <summary>
+    /// Determines whether the specified value is well-formed XML whose root element matches the given
+    /// local name and, optionally, namespace.
+    /// </summary>
+    /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
+    /// <param name="localName">
+    /// The expected root element local name, compared ordinally. Must not be <see langword="null"/> or whitespace.
+    /// </param>
+    /// <param name="namespaceUri">
+    /// The expected root element namespace, compared ordinally. <see langword="null"/> (the default) matches
+    /// any namespace; <see cref="string.Empty"/> matches only the no-namespace case reported by
+    /// <see cref="System.Xml.XmlReader"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> is well-formed XML and its root element's local name
+    /// (and, when <paramref name="namespaceUri"/> is not <see langword="null"/>, its namespace) matches;
+    /// otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="localName"/> is <see langword="null"/> or whitespace.
+    /// </exception>
+    /// <example>
+    /// <code><![CDATA[
+    /// bool valid = XmlRules.HasXmlRoot("<Document xmlns=\"urn:test:doc\"/>", "Document", "urn:test:doc"); // true
+    /// bool anyNs = XmlRules.HasXmlRoot("<Document/>", "Document");                                         // true
+    /// bool wrong = XmlRules.HasXmlRoot("<Envelope/>", "Document");                                         // false
+    /// ]]></code>
+    /// </example>
+    public static bool HasXmlRoot(string? value, string localName, string? namespaceUri = null)
+    {
+        ThrowHelper.ThrowIfNullOrWhiteSpace(localName);
+
+        if (!XmlUtility.TryGetRootName(value, out var rootName) || rootName is null)
+            return false;
+
+        if (!string.Equals(rootName.Name, localName, StringComparison.Ordinal))
+            return false;
+
+        return namespaceUri is null || string.Equals(rootName.Namespace, namespaceUri, StringComparison.Ordinal);
+    }
 
     /// <summary>
     /// Determines whether the HTTP headers indicate an XML content type

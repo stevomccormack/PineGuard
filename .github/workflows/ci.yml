@@ -38,6 +38,7 @@ jobs:
       erroror: ${{ steps.filter.outputs.erroror }}
       fluentresults: ${{ steps.filter.outputs.fluentresults }}
       oneof: ${{ steps.filter.outputs.oneof }}
+      xml: ${{ steps.filter.outputs.xml }}
       analyzers: ${{ steps.filter.outputs.analyzers }}
       testing: ${{ steps.filter.outputs.testing }}
       any-src: ${{ steps.filter.outputs.any-src }}
@@ -84,6 +85,9 @@ jobs:
             oneof:
               - 'src/PineGuard.OneOf/**'
               - 'tests/PineGuard.OneOf.UnitTests/**'
+            xml:
+              - 'src/PineGuard.Xml/**'
+              - 'tests/PineGuard.Xml.UnitTests/**'
             analyzers:
               - 'src/PineGuard.Analyzers/**'
               - 'src/PineGuard.Analyzers.CodeFixes/**'
@@ -215,6 +219,11 @@ jobs:
             name: OneOf
             run-if: core-or-oneof-or-testing-or-main
 
+          # Xml tests: run if core, must, guard, data (all referenced packages), xml, testing, or main
+          - project: tests/PineGuard.Xml.UnitTests/PineGuard.Xml.UnitTests.csproj
+            name: Xml
+            run-if: core-or-must-or-guard-or-data-or-xml-or-testing-or-main
+
           # Analyzers tests: run if core, must, guard (Guard.Against names the fix emits), analyzers, testing, or main
           - project: tests/PineGuard.Analyzers.UnitTests/PineGuard.Analyzers.UnitTests.csproj
             name: Analyzers
@@ -247,6 +256,7 @@ jobs:
           ERROROR="${{ needs.changes.outputs.erroror }}"
           FLUENTRESULTS="${{ needs.changes.outputs.fluentresults }}"
           ONEOF="${{ needs.changes.outputs.oneof }}"
+          XML="${{ needs.changes.outputs.xml }}"
           ANALYZERS="${{ needs.changes.outputs.analyzers }}"
           TESTING="${{ needs.changes.outputs.testing }}"
           RUN_IF="${{ matrix.run-if }}"
@@ -278,6 +288,8 @@ jobs:
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$FLUENTRESULTS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-oneof-or-testing-or-main)
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ONEOF" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-must-or-guard-or-data-or-xml-or-testing-or-main)
+              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$DATA" == "true" || "$XML" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-guard-or-analyzers-or-testing-or-main)
               [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$ANALYZERS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             testing-or-main)
@@ -420,6 +432,7 @@ jobs:
           ERROROR="${{ needs.changes.outputs.erroror }}"
           FLUENTRESULTS="${{ needs.changes.outputs.fluentresults }}"
           ONEOF="${{ needs.changes.outputs.oneof }}"
+          XML="${{ needs.changes.outputs.xml }}"
           ANALYZERS="${{ needs.changes.outputs.analyzers }}"
           TESTING="${{ needs.changes.outputs.testing }}"
 
@@ -483,6 +496,11 @@ jobs:
           # PineGuard.OneOf — core-or-oneof-or-testing-or-main
           if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ONEOF" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.OneOf;"
+          fi
+
+          # PineGuard.Xml — core-or-must-or-guard-or-data-or-xml-or-testing-or-main
+          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$DATA" == "true" || "$XML" == "true" || "$TESTING" == "true" ]]; then
+            FILTERS="${FILTERS}+PineGuard.Xml;"
           fi
 
           # PineGuard.Analyzers / PineGuard.Analyzers.CodeFixes — core-or-must-or-guard-or-analyzers-or-testing-or-main

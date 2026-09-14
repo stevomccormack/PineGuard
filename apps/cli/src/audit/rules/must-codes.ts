@@ -592,6 +592,7 @@ const EXTRA_USAGE_ROOTS = [
     "src/PineGuard.DataAnnotations",
     "src/PineGuard.AspNetCore",
     "src/PineGuard.Extensions.Options",
+    "src/PineGuard.Xml",
 ];
 
 function runMustCodes(ctx: RuleContext): Finding[] {

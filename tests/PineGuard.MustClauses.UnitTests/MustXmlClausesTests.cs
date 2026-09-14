@@ -1,5 +1,6 @@
 using PineGuard.Testing.UnitTests.MustClauses;
 using Xunit.Abstractions;
+using F = PineGuard.Testing.Fixtures.XmlRulesFixtures;
 
 namespace PineGuard.MustClauses.UnitTests;
 
@@ -31,12 +32,24 @@ public sealed class MustXmlClausesTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(MustXmlClausesTestData.XmlDocument.ValidCases), MemberType = typeof(MustXmlClausesTestData.XmlDocument))]
-    [MemberData(nameof(MustXmlClausesTestData.XmlDocument.InvalidCases), MemberType = typeof(MustXmlClausesTestData.XmlDocument))]
-    public void XmlDocument_BehavesAsExpected(MustCase<string?> tc)
+    [MemberData(nameof(MustXmlClausesTestData.HasXmlRoot.ValidCases), MemberType = typeof(MustXmlClausesTestData.HasXmlRoot))]
+    [MemberData(nameof(MustXmlClausesTestData.HasXmlRoot.InvalidCases), MemberType = typeof(MustXmlClausesTestData.HasXmlRoot))]
+    public void HasXmlRoot_BehavesAsExpected(MustCase<string?> tc)
     {
         // Act
-        var result = Must.Be.XmlDocument(tc.Value, paramName: "value");
+        var result = Must.Be.HasXmlRoot(tc.Value, F.HasXmlRoot.LocalName, F.HasXmlRoot.Namespace, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustXmlClausesTestData.HasXmlRootAnyNamespace.ValidCases), MemberType = typeof(MustXmlClausesTestData.HasXmlRootAnyNamespace))]
+    [MemberData(nameof(MustXmlClausesTestData.HasXmlRootAnyNamespace.InvalidCases), MemberType = typeof(MustXmlClausesTestData.HasXmlRootAnyNamespace))]
+    public void HasXmlRootAnyNamespace_BehavesAsExpected(MustCase<string?> tc)
+    {
+        // Act
+        var result = Must.Be.HasXmlRoot(tc.Value, F.HasXmlRoot.LocalName, paramName: "value");
 
         // Assert
         AssertResult(tc, result);

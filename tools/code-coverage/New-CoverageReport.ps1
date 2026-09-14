@@ -55,7 +55,7 @@
 param(
     [ValidateSet('Coverlet', 'DotCover')] [string] $Engine = 'Coverlet',
     [ValidateSet('Debug', 'Release')] [string] $Configuration,
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Testing')] [string] $Scope,
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Xml', 'Analyzers', 'All', 'Testing')] [string] $Scope,
     [switch] $Clean,
     [switch] $NoOpen,
     [switch] $SkipHtml,

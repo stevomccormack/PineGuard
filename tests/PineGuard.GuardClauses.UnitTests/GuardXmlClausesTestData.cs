@@ -11,10 +11,16 @@ public static class GuardXmlClausesTestData
         public static TheoryData<GuardCase<string?>> InvalidCases => F.IsXml.InvalidScenarios.ToGuardCases("value");
     }
 
-    public static class NotXmlDocument
+    public static class NotHasXmlRoot
     {
-        public static TheoryData<GuardCase<string?>> ValidCases => F.IsXml.ValidScenarios.ToGuardCases();
-        public static TheoryData<GuardCase<string?>> InvalidCases => F.IsXml.InvalidScenarios.ToGuardCases("value");
+        public static TheoryData<GuardCase<string?>> ValidCases => F.HasXmlRoot.ValidScenarios.ToGuardCases();
+        public static TheoryData<GuardCase<string?>> InvalidCases => F.HasXmlRoot.InvalidScenarios.ToGuardCases("value");
+    }
+
+    public static class NotHasXmlRootAnyNamespace
+    {
+        public static TheoryData<GuardCase<string?>> ValidCases => F.HasXmlRoot.AnyNamespaceValidScenarios.ToGuardCases();
+        public static TheoryData<GuardCase<string?>> InvalidCases => F.HasXmlRoot.AnyNamespaceInvalidScenarios.ToGuardCases("value");
     }
 
     public static class NotXmlContentType

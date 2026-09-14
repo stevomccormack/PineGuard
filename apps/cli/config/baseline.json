@@ -141,6 +141,7 @@
     "doc-links:src/PineGuard.FluentResults/AGENTS.md:docs/ai/rules/fluentresults.md",
     "doc-links:src/PineGuard.MediatR/AGENTS.md:docs/ai/rules/mediatr.md",
     "doc-links:src/PineGuard.OneOf/AGENTS.md:docs/ai/rules/oneof.md",
+    "doc-links:src/PineGuard.Xml/AGENTS.md:docs/ai/rules/xml.md",
     "doc-links:tools/audit-cli/solution/README.md:artifacts/audit/naming-spec.json",
     "doc-links:tools/code-coverage/README.md:artifacts/code-coverage/xplat-report.html",
     "doc-links:tools/code-coverage/README.md:artifacts/code-coverage/xplat/html/index.html",

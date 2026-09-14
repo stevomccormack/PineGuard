@@ -107,7 +107,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release')] [string] $Configuration = 'Debug',
-    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Analyzers', 'All', 'Testing')] [string] $Scope = 'Core',
+    [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Xml', 'Analyzers', 'All', 'Testing')] [string] $Scope = 'Core',
     [switch] $Clean,
     [switch] $NoOpen,
     [switch] $SkipHtml,

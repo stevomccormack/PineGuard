@@ -6,16 +6,16 @@
 .DESCRIPTION
     Replaces the sixteen near-identical tools/git/Commit-*.ps1 scripts (F-33). Each registry
     scope (Core, MustClauses, GuardClauses, DataAnnotations, FluentValidation, Options,
-    DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Analyzers, Testing —
-    from tools/.shared/dotnet-projects.ps1's Get-PineGuardScope) and five meta-scopes that do not
+    DependencyInjection, AspNetCore, ErrorOr, FluentResults, OneOf, MediatR, Xml, Analyzers,
+    Testing — from tools/.shared/dotnet-projects.ps1's Get-PineGuardScope) and five meta-scopes that do not
     correspond to a single shipped project (Agent, Docs, Tools, Solution, Ci) resolve to a stage
     path list and commit through tools/.shared/git.ps1's Invoke-Commit, all inside this one pwsh
     process — no child pwsh is spawned per scope, so -Message now actually reaches every commit
     it applies to (previously it could not cross the process boundary at all).
 
-    -Scope accepts any number of these nineteen names; validity is checked against the live
+    -Scope accepts any number of these twenty names; validity is checked against the live
     registry plus the five hard-coded meta-scope names, so a new registry scope (e.g. a future
-    fifteenth project) becomes a valid -Scope value automatically, with no literal list here to
+    sixteenth project) becomes a valid -Scope value automatically, with no literal list here to
     edit.
 
     README.md is staged by exactly one scope going forward: Docs (F-34). Previously it was staged by
@@ -24,7 +24,7 @@
     new Ci meta-scope, since it is CI configuration, not an assistant-adapter surface.
 
 .PARAMETER Scope
-    One or more scope names to commit: the fourteen registry scopes, or the five meta-scopes
+    One or more scope names to commit: the fifteen registry scopes, or the five meta-scopes
     Agent, Docs, Tools, Solution, Ci. Case-insensitive. Ignored if -All is also given.
 
 .PARAMETER All
@@ -168,6 +168,7 @@ $metaScopePaths = [ordered]@{
         'src/PineGuard.OneOf/AGENTS.md',
         'src/PineGuard.Analyzers/AGENTS.md',
         'src/PineGuard.MediatR/AGENTS.md',
+        'src/PineGuard.Xml/AGENTS.md',
         'tests/AGENTS.md',
         'tests/PineGuard.Testing/AGENTS.md',
         'tools/AGENTS.md',

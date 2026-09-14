@@ -6,15 +6,25 @@ namespace PineGuard.Core.UnitTests.Utils;
 public sealed class XmlUtilityTests : BaseUnitTest
 {
     [Theory]
-    [MemberData(nameof(XmlUtilityTestData.TryParse.ValidCases), MemberType = typeof(XmlUtilityTestData.TryParse))]
-    [MemberData(nameof(XmlUtilityTestData.TryParse.EdgeCases), MemberType = typeof(XmlUtilityTestData.TryParse))]
-    public void TryParse_ReturnsExpected(XmlUtilityTestData.TryParse.ValidCase testCase)
+    [MemberData(nameof(XmlUtilityTestData.TryGetRootName.ValidCases), MemberType = typeof(XmlUtilityTestData.TryGetRootName))]
+    [MemberData(nameof(XmlUtilityTestData.TryGetRootName.EdgeCases), MemberType = typeof(XmlUtilityTestData.TryGetRootName))]
+    public void TryGetRootName_ReturnsExpected(XmlUtilityTestData.TryGetRootName.ValidCase testCase)
     {
         // Act
-        var ok = XmlUtility.TryParse(testCase.Value, out var doc);
+        var ok = XmlUtility.TryGetRootName(testCase.Value, out var rootName);
 
         // Assert
         Assert.Equal(testCase.Expected.ok, ok);
-        Assert.Equal(testCase.Expected.hasDocument, doc is not null);
+
+        if (testCase.Expected.ok)
+        {
+            Assert.NotNull(rootName);
+            Assert.Equal(testCase.Expected.name, rootName!.Name);
+            Assert.Equal(testCase.Expected.ns, rootName.Namespace);
+        }
+        else
+        {
+            Assert.Null(rootName);
+        }
     }
 }
