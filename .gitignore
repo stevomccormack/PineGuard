@@ -4,6 +4,9 @@
 .claude/settings.local.json
 .claude/agent-memory-local/
 .claude/run/
+# Codex desktop session-import sync regenerates these placeholder skills from .claude/commands/;
+# never commit them (banned prefix, see docs/ai/meta/adapter-surfaces.md)
+.agents/skills/source-command-*/
 .dotnet/
 .etc/powershell/.env
 artifacts/

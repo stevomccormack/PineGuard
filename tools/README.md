@@ -21,13 +21,14 @@ PowerShell scripts for building, testing, auditing, formatting, generating, and 
 | [github](github/README.md) | GitHub Release publishing and ruleset toggles | `Run-Release.ps1`, `Set-GithubRuleset.ps1` | `-BypassPR`, `-Draft`, `-Force`, `-Watch`, `-Unlist`, `-WhatIf`; `Enable`/`Disable` + `-Name` |
 | [nuget](nuget/README.md) | NuGet package management | `Unpublish-NugetPrerelease.ps1` | `-Package`, `-All`, `-WhatIf`/`-DryRun`, `-Force`, `-EnvFile` |
 | [testing](testing/README.md) | `dotnet test` wrapper with scope, project or solution targeting and async support | `Run-Tests.ps1` | `-Scope` (the fourteen registry scopes plus All), or `-Project` / `-Solution` |
+| [codex](codex/README.md) | Reconcile the `.agents/skills/` folders OpenAI Codex's session import generates with repo naming: strip `source-command-`, align each `SKILL.md` name, commit only those folders | `Remove-CodexSkillPrefix.ps1` | `-WhatIf`/`-DryRun`, `-NoCommit`, `-Force`, `-Exclude`, `-Message` |
 
 ### Internal Directories
 
 | Directory | Purpose |
 |-----------|---------|
 | [.shared](.shared/) | Shared PowerShell helper modules (path, project registry, coverage, git, Docker, SonarQube, dotenv, secrets, transcript, console, clean, commands) imported by other tools |
-| [.tests](.tests/README.md) | Pester suite for `tools/**` (D-7) — registry parity, Cobertura/dotenv parsers, repo-root resolution, git helpers, and BOM/Windows-ism/help hygiene. Run via [`testing/Test-Tools.ps1`](testing/Test-Tools.ps1) |
+| [.tests](.tests/README.md) | Pester suite for `tools/**` (D-7) — registry parity, Cobertura/dotenv parsers, repo-root resolution, git helpers, the Codex skill-prefix script, and BOM/Windows-ism/help hygiene. Run via [`testing/Test-Tools.ps1`](testing/Test-Tools.ps1) |
 | [docker](docker/README.md) | Docker Compose stacks, the shared network helper, and the combined up/down scripts backing the two containerised scanners (Qodana, SonarQube) |
 
 ## Related Surfaces

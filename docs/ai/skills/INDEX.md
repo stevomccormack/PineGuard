@@ -46,6 +46,7 @@ Canonical, model-agnostic skill definitions. These are the source of truth.
 | [Format Code](format-code/SKILL.md) | `pineguard.skill.format-code` | Run `dotnet format` to enforce `.editorconfig` rules |
 | [Scaffold Workflow](scaffold-workflow/SKILL.md) | `pineguard.skill.scaffold-workflow` | Create a canonical agent playbook and cascade it to every adapter surface |
 | [Scaffold Quality Tool](scaffold-quality-tool/SKILL.md) | `pineguard.skill.scaffold-quality-tool` | Add a new quality/inspection tool as a first-class Brain citizen |
+| [Migrate Codex Skills](migrate-codex-skill/SKILL.md) | `pineguard.skill.migrate-codex-skill` | Strip Codex's `source-command-` prefix from generated `.agents/skills/` folders and commit them |
 
 ### Decision Support
 
@@ -77,6 +78,7 @@ Thin `context: fork` wrappers that delegate to Brain skills or standalone toolin
 | [document](../../../.claude/skills/document/SKILL.md) | `document` | XML documentation generation |
 | [scaffold-workflow](../../../.claude/skills/scaffold-workflow/SKILL.md) | `scaffold-workflow` | New agent playbook + adapter cascade |
 | [scaffold-quality-tool](../../../.claude/skills/scaffold-quality-tool/SKILL.md) | `scaffold-quality-tool` | New quality/inspection tool scaffold |
+| [migrate-codex-skill](../../../.claude/skills/migrate-codex-skill/SKILL.md) | `migrate-codex-skill` | Codex skill-prefix migration + scoped commit |
 | [changelog](../../../.claude/skills/changelog/SKILL.md) | *(surface-native — [§2.1](../meta/adapter-surfaces.md#surface-native-utility-skills-declared-exemption))* | Generate changelog from git history |
 | [dependency-audit](../../../.claude/skills/dependency-audit/SKILL.md) | *(surface-native — [§2.1](../meta/adapter-surfaces.md#surface-native-utility-skills-declared-exemption))* | Check NuGet vulnerabilities and outdated packages |
 | [ask-council](../../../.claude/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
@@ -105,6 +107,7 @@ Copilot-compatible wrappers - one per Brain skill.
 | [document](../../../.github/skills/document/SKILL.md) | `document` | XML documentation generation |
 | [scaffold-workflow](../../../.github/skills/scaffold-workflow/SKILL.md) | `scaffold-workflow` | New agent playbook + adapter cascade |
 | [scaffold-quality-tool](../../../.github/skills/scaffold-quality-tool/SKILL.md) | `scaffold-quality-tool` | New quality/inspection tool scaffold |
+| [migrate-codex-skill](../../../.github/skills/migrate-codex-skill/SKILL.md) | `migrate-codex-skill` | Codex skill-prefix migration + scoped commit |
 | [ask-council](../../../.github/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
 
 ---
@@ -131,6 +134,7 @@ Generic `AGENTS.md`-convention adapters. Same delegation contract as the Claude 
 | [document](../../../.agents/skills/document/SKILL.md) | `document` | XML documentation generation |
 | [scaffold-workflow](../../../.agents/skills/scaffold-workflow/SKILL.md) | `scaffold-workflow` | New agent playbook + adapter cascade |
 | [scaffold-quality-tool](../../../.agents/skills/scaffold-quality-tool/SKILL.md) | `scaffold-quality-tool` | New quality/inspection tool scaffold |
+| [migrate-codex-skill](../../../.agents/skills/migrate-codex-skill/SKILL.md) | `migrate-codex-skill` | Codex skill-prefix migration + scoped commit |
 | [changelog](../../../.agents/skills/changelog/SKILL.md) | *(surface-native — [§2.1](../meta/adapter-surfaces.md#surface-native-utility-skills-declared-exemption))* | Generate changelog from git history |
 | [dependency-audit](../../../.agents/skills/dependency-audit/SKILL.md) | *(surface-native — [§2.1](../meta/adapter-surfaces.md#surface-native-utility-skills-declared-exemption))* | Check NuGet vulnerabilities and outdated packages |
 | [ask-council](../../../.agents/skills/ask-council/SKILL.md) | `ask-council` | Pressure-test a decision via LLM Council |
@@ -155,6 +159,16 @@ the excluded families (`ask-council`, `document`, `scaffold-*`, and the Claude-o
 | [format](../../../.agents/skills/format/SKILL.md) | [`commands/format.md`](../commands/format.md) | Route `/format-*` to its scoped format agent |
 | [clean](../../../.agents/skills/clean/SKILL.md) | [`commands/clean.md`](../commands/clean.md) | Route `/clean-*` to its target-scoped clean agent |
 | [audit](../../../.agents/skills/audit/SKILL.md) | [`commands/audit.md`](../commands/audit.md) | Route `/audit-cli`, `/audit-gap` to its agent |
+
+### `.agents/skills/`-only: Promoted per-command skills
+
+OpenAI Codex's session import also generates one placeholder skill per `.claude/commands/*.md`,
+under a `source-command-` prefix that is gitignored. `/migrate-codex-skill`
+(`tools/codex/Remove-CodexSkillPrefix.ps1`) promotes those to bare command names
+(`commit-core`, `scan-qodana-guard`, …) and commits them. They are mechanical one-line pointers
+at the same `docs/ai/agents/*.md` playbooks the routers resolve to, are regenerated rather than
+hand-maintained, and are deliberately not enumerated here. See
+[`docs/ai/meta/adapter-surfaces.md`](../meta/adapter-surfaces.md) §2.1.1.
 
 ---
 

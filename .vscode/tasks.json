@@ -1889,6 +1889,33 @@
                 "./tools/testing/Test-Tools.ps1"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "Codex: Remove skill prefix (WhatIf)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/codex/Remove-CodexSkillPrefix.ps1",
+                "-WhatIf"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Codex: Remove skill prefix (promote + commit)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/codex/Remove-CodexSkillPrefix.ps1"
+            ],
+            "problemMatcher": []
         }
     ]
 }

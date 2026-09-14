@@ -82,10 +82,20 @@ intent table, resolves the user's requested scope/tool/severity to a row, and ex
 
 These router skills have **no** `docs/ai/skills/` counterpart — they exist only on this surface,
 because only this surface lacks a per-command adapter of its own. They are named after the bare
-family verb (`scan`, not `source-command-scan-qodana-guard`): a per-command mirror was considered
-and rejected as needlessly granular, and a vendor-prefix mirror of OpenAI's `migrate-to-codex`
-tool output (`source-command-*`) was rejected outright as an implementation-detail prefix banned by
-taxonomy §N.2/§N.3 with no rationale of its own.
+family verb (`scan`), never after a vendor prefix: the `source-command-*` folders that OpenAI
+Codex's session import writes here are an implementation-detail prefix banned by taxonomy
+§N.2/§N.3 with no rationale of its own, so `.gitignore` hides every such folder and none may be
+committed as-is.
+
+Codex's import also produces one placeholder skill per `.claude/commands/*.md`. Those reach this
+surface only after `tools/codex/Remove-CodexSkillPrefix.ps1` (`/migrate-codex-skill`, playbook
+`docs/ai/agents/migrate-codex-skill.md`) has stripped the prefix, aligned each frontmatter
+`name:` with its directory and committed the bare-named folders. A per-command entry named after
+the command itself (`commit-core`, `scan-qodana-guard`) is therefore acceptable on this surface; a
+prefixed one is drift. The routers stay alongside them as the hand-written, intent-table-aware
+entries, while the promoted per-command skills are mechanical one-line pointers at the same
+playbooks and are regenerated rather than maintained. The script never overwrites an existing
+skill of the same name, so `ask-council` and `scan-sonar` keep their Brain-mirror adapters.
 
 Excluded by design, with a Brain-level skill or adapter already covering the intent: `ask-council`
 and `document` (each already has a matching `docs/ai/skills/` capability skill by that exact name);

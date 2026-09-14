@@ -77,6 +77,10 @@ We use a strict **Verb-Noun** standard, with specific semantic meanings for verb
   - Reconciles references between docs and scripts.
   - **Example**: `Sync-MarkdownPs1Refs.ps1`.
 
+- **`Remove-`**: Strips one named artefact from repository files.
+  - Removes exactly the thing in its noun and nothing else; a blanket delete of a directory is `Clear-`.
+  - **Example**: `tools/codex/Remove-CodexSkillPrefix.ps1`.
+
 ### 1.2 Nouns
 
 - Use PascalCase nouns.
@@ -159,6 +163,7 @@ Most tool domains are governed by this spec alone. A domain gets its own spec on
 | `tools/code-format/` | This spec only |
 | `tools/clean/` | This spec only |
 | `tools/git/` | This spec only |
+| `tools/codex/` | This spec only |
 | `tools/github/` | This spec only |
 | `tools/nuget/` | This spec only |
 | `tools/testing/` | This spec only |

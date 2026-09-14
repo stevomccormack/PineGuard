@@ -131,6 +131,10 @@ line. The playbook is authoritative: if the two ever disagree, the playbook wins
 - `/audit-gap`: Act as **Planner / Verifier**. Execute `docs/ai/agents/audit-gap.md`.
 - `/audit-cli`: Act as **Shipper**. Execute `docs/ai/agents/audit-cli.md`.
 
+### Migrate
+
+- `/migrate-codex-skill`: Act as **Shipper**. Execute `docs/ai/agents/migrate-codex-skill.md`.
+
 ### Scaffold
 
 - `/scaffold-vertical-slice`: Act as **Owner**. Execute `docs/ai/agents/scaffold-vertical-slice.md`.
