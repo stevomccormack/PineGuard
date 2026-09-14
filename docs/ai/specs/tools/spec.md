@@ -103,7 +103,7 @@ No other directory may introduce lowercase script names.
 
 - **Root**: `tools/`
 - **Orchestrators**: Placed at the root of their domain (e.g., `tools/code-coverage/Run-CodeCoverage.ps1`).
-- **Helpers**: Use a dedicated `Import-*.ps1` / `Load-*.ps1` helper for shared logic (e.g., `tools/git/Import-GitHelpers.ps1`). Avoid loose functions in orchestrators if reused.
+- **Helpers**: Shared logic lives in `tools/.shared/*.ps1` and is dot-sourced (e.g., `tools/.shared/git.ps1`); the former per-domain `Import-*.ps1` / `Load-*.ps1` aggregators were retired in the tools standardisation. Avoid loose functions in orchestrators if reused.
 - **Cross-domain modules**: `tools/.shared/` holds modules dot-sourced by more than one domain (`path.ps1`, `git.ps1`, `coverage.ps1`, `docker.ps1`, …). Put logic there when a second domain needs it; do not copy it.
 
 ### 2.2 Parameters

@@ -48,34 +48,33 @@ The `tools/` directory contains 90 PowerShell scripts that only run natively on 
 
 ### Phase 2: Docker & Infrastructure
 - Convert all `tools/docker/*.ps1` (7 scripts)
-- Convert `tools/sonar-scanner/*.ps1` (4 scripts)
+- Convert `tools/code-scan/sonarqube/*.ps1` (6 scripts)
 - Key pattern: `Invoke-RestMethod` → `curl` + `jq`
 
 ### Phase 3: Dev Workflow
 - Convert `tools/testing/Run-Tests.ps1`
-- Convert `tools/code-formatter/Run-Format.ps1`
+- Convert `tools/code-format/Run-Format.ps1`
 - Convert `tools/clean/*.ps1` (5 scripts)
 
 ### Phase 4: Git Automation
-- Convert `tools/git/*.ps1` (12 scripts)
+- Convert `tools/git/Run-Commits.ps1` (1 script)
 - Key challenge: `tools/.shared/git.ps1` (616 lines) — object returns become stdout + `$?`.
-  `tools/git/Import-GitHelpers.ps1` is now a 17-line aggregator that dot-sources it, so its Bash
-  counterpart is a one-line `source` shim
+  `tools/git/Run-Commits.ps1` dot-sources it directly (the former `Import-GitHelpers` aggregator is
+  gone), so no shim is needed
 
 ### Phase 5: Code Inspection
-- Convert `tools/code-inspection/*.ps1` (4 scripts: `Initialize-Qodana.ps1`, `Run-Qodana.ps1`, and
-  the two under `auto/`)
+- Convert `tools/code-scan/qodana/*.ps1` (2 scripts: `Install-Qodana.ps1`, `Run-Qodana.ps1`)
 - Add cross-platform Qodana CLI acquisition (brew / apt / direct download)
 
 ### Phase 6: Code Coverage
 - Convert `tools/code-coverage/**/*.ps1` (4 scripts)
 - Key challenge: `tools/.shared/coverage.ps1` (469 lines) — XML streaming → Python helper script.
-  `tools/code-coverage/Import-CodeCoverageUtility.ps1` is now a 21-line aggregator and becomes a
-  one-line `source` shim
+  The coverage scripts dot-source it directly (the former `Import-CodeCoverageUtility` aggregator
+  is gone), so no shim is needed
 - Most complex phase; may need `parse-cobertura.py` support file
 
 ### Phase 7: Release & Diagnostics
-- Convert `tools/release/*.ps1` (3 scripts) — `gh` CLI driven, so mostly argument plumbing
+- Convert `tools/github/*.ps1` and `tools/nuget/*.ps1` (3 scripts) — `gh` CLI driven, so mostly argument plumbing
 - Convert `tools/code-diagnostics/Run-CompilerDiagnostics.ps1` (1 script)
 
 ### Phase 8: Documentation

@@ -212,9 +212,9 @@ Rules-only adapters (`docs/ai/meta/adapter-surfaces.md` §3) are touched only if
 
 | Tool | Tools Dir | Spec | Rules | Skills | Workflows | Agents | Commands |
 |------|-----------|------|-------|--------|-----------|--------|----------|
-| SonarQube | `tools/code-scan/sonarqube/` | `specs/scan/spec.md` | `rules/scan.md` | `skills/scan-sonar/`, `skills/fix-sonar/` | `workflows/scan-sonar.md`, `workflows/fix-sonar.md` | `agents/scan-sonar.md`, `agents/fix-sonar-*.md` | `commands/scan.md` |
-| Qodana | `tools/code-scan/qodana/` | `specs/tools/code-scan/qodana/qodana.md` | — | — | `workflows/scan-qodana.md` | `agents/scan-qodana-*.md` | `commands/scan.md` |
-| Roslyn | `tools/code-diagnostics/` | `specs/tools/code-diagnostics/spec.md` | `rules/roslyn.md` | `skills/scan-roslyn/`, `skills/fix-roslyn/` | `workflows/scan-roslyn.md`, `workflows/fix-roslyn.md` | `agents/scan-roslyn-*.md`, `agents/fix-roslyn-*.md` | `commands/scan.md` |
+| SonarQube | `tools/code-scan/sonarqube/` | `docs/ai/specs/scan/spec.md` | `docs/ai/rules/scan.md` | `docs/ai/skills/scan-sonar/`, `docs/ai/skills/fix-sonar/` | `docs/ai/workflows/scan-sonar.md`, `docs/ai/workflows/fix-sonar.md` | `docs/ai/agents/scan-sonar.md`, `docs/ai/agents/fix-sonar-*.md` | `docs/ai/commands/scan.md` |
+| Qodana | `tools/code-scan/qodana/` | `docs/ai/specs/tools/code-scan/qodana/qodana.md` | — | — | `docs/ai/workflows/scan-qodana.md` | `docs/ai/agents/scan-qodana-*.md` | `docs/ai/commands/scan.md` |
+| Roslyn | `tools/code-diagnostics/` | `docs/ai/specs/tools/code-diagnostics/spec.md` | `docs/ai/rules/roslyn.md` | `docs/ai/skills/scan-roslyn/`, `docs/ai/skills/fix-roslyn/` | `docs/ai/workflows/scan-roslyn.md`, `docs/ai/workflows/fix-roslyn.md` | `docs/ai/agents/scan-roslyn-*.md`, `docs/ai/agents/fix-roslyn-*.md` | `docs/ai/commands/scan.md` |
 | Coverage | `tools/code-coverage/` | `specs/testing/coverage.md` | `rules/testing.md` | `skills/improve-coverage/` | `workflows/coverage.md` | `agents/coverage-*.md` | `commands/coverage.md` |
 
 **Meta-references:**

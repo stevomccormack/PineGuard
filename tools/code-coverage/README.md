@@ -164,7 +164,7 @@ Notes:
 
 - The script skips `*.UnitTests.csproj` projects that contain no `*.cs` files (outside `bin/`/`obj/`) to avoid misleading "No test is available" runs.
 - Coverage collection is occasionally intermittent (empty/invalid Cobertura output). The script detects that and automatically retries once.
-- When not `-NoOpen`, the browser opens `report/index.html` directly — there is no intermediate redirect page.
+- When not `-NoOpen`, the browser opens `artifacts/code-coverage/coverlet/<scope>/report/index.html` directly — there is no intermediate redirect page.
 
 ### Test-Coverage.ps1
 

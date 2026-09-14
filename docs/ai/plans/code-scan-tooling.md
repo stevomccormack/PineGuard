@@ -617,7 +617,7 @@ One Sonnet dispatch per tool, template T1.10, all concurrent after T1.V.
 
 | ID | Task | Notes |
 |---|---|---|
-| T5.01 | `docs/ai/specs/scan/spec.md` v2 | Tiers, manifest, contract, narrowing, SARIF spine, output paths, exit codes, fetch-only semantics, config placement rule. `docs/ai/specs/tools/code-inspection/qodana.md` follows the folder move. |
+| T5.01 | `docs/ai/specs/scan/spec.md` v2 | Tiers, manifest, contract, narrowing, SARIF spine, output paths, exit codes, fetch-only semantics, config placement rule. `docs/ai/specs/tools/code-scan/qodana/qodana.md` follows the folder move. |
 | T5.02 | `docs/ai/rules/scan.md` | Generalised from SonarQube-only to the scan family; keeps the "never suppress" and token rules. |
 | T5.03 | Skills `scan-<slug>` for all twenty slugs on `docs/ai`, `.claude`, `.github`, `.agents` | Haiku instantiates from the manifest template; Sonnet writes each tool-specific section. |
 | T5.04 | Workflow `+ docs/ai/workflows/scan.md`; agents `scan-<slug>` and `scan-<slug>-<scope>` per §2.10; `docs/ai/commands/scan.md`; palettes in `CLAUDE.md` and `AGENTS.md`; `.claude/commands`, `.github/prompts`, `.agent/workflows`, `.opencode/commands`, per the parity policy in `docs/ai/meta/adapter-surfaces.md` §4 | Cascade checklist in `adapter-surfaces.md` §5, row by row. |
