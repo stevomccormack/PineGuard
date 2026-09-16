@@ -1,12 +1,25 @@
 <#
 .SYNOPSIS
-    Run Code Coverage
+    Run Code Coverage (the coverage entry point)
 
 .DESCRIPTION
-    Part of the PineGuard PowerShell toolchain.
+    The one script a developer or CI job calls to get coverage for a scope. It orchestrates the
+    two halves of the pipeline and holds no collection or gating logic of its own: -Mode Generate
+    delegates to the D-9 engine front door (New-CoverageReport.ps1), and -Mode Analyze delegates
+    to the engine-agnostic gate (Test-Coverage.ps1). GenerateAndAnalyze, the default, runs both
+    in that order.
+
+    Its one piece of real behaviour is scope policy. Every scope in the registry
+    (Get-PineGuardScope, tools/.shared/dotnet-projects.ps1) is held to 100% line and branch
+    coverage automatically unless -Relaxed is passed, and an unbound -ProjectFilter resolves to
+    that scope's own DefaultProjectFilter rather than the generic '*.UnitTests.csproj'. Both are
+    derived from the registry rather than a literal list here, so a newly registered scope cannot
+    silently opt out of the gate or drag unrelated test projects into the run.
 
 .PARAMETER Mode
-    See the param block for details.
+    Which half of the pipeline to run: Generate collects coverage via the D-9 front door
+    (New-CoverageReport.ps1), Analyze runs only the gate (Test-Coverage.ps1) over whatever has
+    already been collected, and GenerateAndAnalyze (default) does both in order.
 
 .PARAMETER Engine
     Coverage engine: Coverlet (default) or DotCover. Forwarded to the D-9 front door
@@ -18,61 +31,85 @@
     collect the snapshot without hitting that gate.
 
 .PARAMETER Scope
-    See the param block for details.
+    Registry coverage scope -- see Get-PineGuardScope in tools/.shared/dotnet-projects.ps1 for
+    the authoritative list -- or 'All' to run every *.UnitTests.csproj with no scope narrowing.
+    Every real (non-aggregate) scope is held to 100% automatically unless -Relaxed says
+    otherwise; the list is derived from the registry so a newly registered scope cannot silently
+    opt out of the gate.
 
 .PARAMETER Configuration
-    See the param block for details.
+    Build configuration to test under: Debug (default) or Release. Forwarded to the engine
+    script.
 
 .PARAMETER Clean
-    See the param block for details.
+    Delete this scope's previous output (its testresults/ and report/ folders) before
+    collecting, so a stale run cannot be mistaken for a fresh one. Forwarded to the engine
+    script.
 
 .PARAMETER NoOpen
-    See the param block for details.
+    Do not open the generated HTML report in the default browser once collection finishes.
+    Forwarded to the engine script.
 
 .PARAMETER SkipHtml
-    See the param block for details.
+    Collect the coverage XML only and skip the ReportGenerator HTML step entirely. Useful when
+    only the gate's numbers are wanted. Forwarded to the engine script.
 
 .PARAMETER ProjectFilter
-    See the param block for details.
+    Glob used to discover test projects. Left unbound, each scope's own DefaultProjectFilter
+    from the registry is used instead ('*.UnitTests.csproj' for -Scope All), which keeps coverage
+    loops fast by not running unrelated test projects.
 
 .PARAMETER Top
-    See the param block for details.
+    How many of the lowest-covered classes to list in the gate's summary. Defaults to 30;
+    forwarded to Test-Coverage.ps1.
 
 .PARAMETER IncludeFileRegex
-    See the param block for details.
+    Restrict the analysed classes to those whose source file path matches this regex. Forwarded
+    to Test-Coverage.ps1.
 
 .PARAMETER ExcludeFileRegex
-    See the param block for details.
+    Drop classes whose source file path matches this regex. Applied after -IncludeFileRegex and
+    forwarded to Test-Coverage.ps1.
 
 .PARAMETER IncludeClassNameRegex
-    See the param block for details.
+    Restrict the analysed classes to those whose class name matches this regex. Forwarded to
+    Test-Coverage.ps1.
 
 .PARAMETER ExcludeClassNameRegex
-    See the param block for details.
+    Drop classes whose class name matches this regex. Applied after -IncludeClassNameRegex and
+    forwarded to Test-Coverage.ps1.
 
 .PARAMETER FailCoverageBelow
-    See the param block for details.
+    Minimum line coverage for the filtered scope, below which the run fails. Accepts either a
+    percentage (90) or a rate (0.9). 0 (the default) means do not gate on line coverage.
 
 .PARAMETER FailBranchBelow
-    See the param block for details.
+    Minimum branch coverage for the filtered scope, below which the run fails. Accepts either a
+    percentage (90) or a rate (0.9). 0 (the default) means do not gate on branch coverage.
 
 .PARAMETER Enforce100
-    See the param block for details.
+    Shorthand for -FailCoverageBelow 100 -FailBranchBelow 100. Set automatically for every real
+    registry scope, so passing it explicitly only matters for -Scope All or alongside -Relaxed.
 
 .PARAMETER Isolated
-    See the param block for details.
+    Publish each test project to a temp directory before testing it, so an open IDE build cannot
+    lock the source bin/ folders mid-run. Forwarded to the engine script.
 
 .PARAMETER Relaxed
-    See the param block for details.
+    Opt this run out of the automatic 100% enforcement that every real registry scope otherwise
+    gets, leaving -FailCoverageBelow/-FailBranchBelow to decide. Intended for exploratory runs,
+    never for the gate.
 
 .PARAMETER Filter
-    See the param block for details.
+    `dotnet test --filter` expression, forwarded to the engine script as-is.
 
 .PARAMETER Framework
-    See the param block for details.
+    Target framework moniker, forwarded to the engine script's `dotnet test -f`. Restricts
+    collection to one TFM rather than all of them.
 
 .PARAMETER Format
-    See the param block for details.
+    Coverlet collector output format: cobertura (the default the engine script resolves) or
+    opencover. Only forwarded when explicitly bound.
 #>
 
 [CmdletBinding()]
@@ -132,16 +169,16 @@ if (-not $PSBoundParameters.ContainsKey('ProjectFilter')) {
 
 if ($Mode -in @('Generate', 'GenerateAndAnalyze')) {
     $generateParams = @{
-        Engine        = $Engine
+        Engine = $Engine
         Configuration = $Configuration
-        Scope         = $Scope
-        Clean         = $Clean
-        NoOpen        = $NoOpen
-        SkipHtml      = $SkipHtml
+        Scope = $Scope
+        Clean = $Clean
+        NoOpen = $NoOpen
+        SkipHtml = $SkipHtml
         ProjectFilter = $effectiveProjectFilter
-        Isolated      = $Isolated
-        Filter        = $Filter
-        Framework     = $Framework
+        Isolated = $Isolated
+        Filter = $Filter
+        Framework = $Framework
     }
     if ($PSBoundParameters.ContainsKey('Format')) {
         $generateParams['Format'] = $Format

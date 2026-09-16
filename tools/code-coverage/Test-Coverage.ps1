@@ -17,43 +17,56 @@
     where to look instead).
 
 .PARAMETER Top
-    See the param block for details.
+    How many of the lowest-covered classes to list under the coverage summary. Defaults to 30.
 
 .PARAMETER Scope
-    See the param block for details.
+    Registry coverage scope -- see Get-PineGuardScope in tools/.shared/dotnet-projects.ps1 --
+    plus two aggregates: 'All', and 'Custom', the power-user escape hatch that re-filters
+    whatever has already been collected across every scope at once.
 
 .PARAMETER IncludeFileRegex
-    See the param block for details.
+    Restrict the analysed classes to those whose source file path matches this regex. Applied to
+    the Cobertura class list before any totals are computed.
 
 .PARAMETER ExcludeFileRegex
-    See the param block for details.
+    Drop classes whose source file path matches this regex. Applied after -IncludeFileRegex.
 
 .PARAMETER IncludeClassNameRegex
-    See the param block for details.
+    Restrict the analysed classes to those whose class name matches this regex.
 
 .PARAMETER ExcludeClassNameRegex
-    See the param block for details.
+    Drop classes whose class name matches this regex. Applied after -IncludeClassNameRegex.
 
 .PARAMETER ResultsRoot
-    See the param block for details.
+    Folder to scan for the newest Cobertura XML per test project. Left unset it resolves to this
+    scope's own testresults/ folder -- or, for -Scope Custom, to the whole engine root so every
+    scope's results are scanned at once (F-19). Supply it only to read coverage from somewhere
+    the registry does not know about.
 
 .PARAMETER OpenHtml
-    See the param block for details.
+    Open this scope's existing report/index.html in the default browser after the summary is
+    printed. The gate never generates that report; it only opens what collection already left
+    behind.
 
 .PARAMETER Enforce100
-    See the param block for details.
+    Shorthand for -FailCoverageBelow 100 -FailBranchBelow 100.
 
 .PARAMETER FailCoverageBelow
-    See the param block for details.
+    Minimum line coverage for the filtered scope, below which this script exits 1. Accepts either
+    a percentage (90) or a rate (0.9). 0 (the default) means do not gate on line coverage.
 
 .PARAMETER FailBranchBelow
-    See the param block for details.
+    Minimum branch coverage for the filtered scope, below which this script exits 1. Accepts
+    either a percentage (90) or a rate (0.9). 0 (the default) means do not gate on branch
+    coverage. A scope with no branches at all always passes this check.
 
 .PARAMETER AsTable
-    See the param block for details.
+    Render the lowest-covered class list with Format-Table instead of the default tab-separated
+    lines. Easier to read interactively, worse to pipe.
 
 .PARAMETER Isolated
-    See the param block for details.
+    Copy the discovered coverage files to a temp directory before parsing them, so an open IDE
+    build cannot lock them mid-read. The temp directory is removed afterwards.
 #>
 
 [CmdletBinding()]
@@ -107,8 +120,8 @@ if ($Scope -notin @('All', 'Custom')) {
 
     if (-not [string]::IsNullOrWhiteSpace($scopeSourceDir) -and (Test-Path $scopeSourceDir)) {
         $anyCs = Get-ChildItem -LiteralPath $scopeSourceDir -Recurse -File -Filter '*.cs' -ErrorAction SilentlyContinue |
-        Where-Object { $_.FullName -notmatch '([\\/])(bin|obj)\1' } |
-        Select-Object -First 1
+            Where-Object { $_.FullName -notmatch '([\\/])(bin|obj)\1' } |
+            Select-Object -First 1
         if ($null -eq $anyCs) {
             Write-Warning "No *.cs files found under '$scopeSourceDir' for Scope='$Scope'. Skipping coverage analysis."
             return
@@ -223,13 +236,13 @@ Write-Host ''
 Write-Host ("Lowest-covered classes (Top {0}):" -f $Top) -ForegroundColor Cyan
 
 $bottom = $classes |
-Sort-Object BranchRate, LineRate, Name |
-Select-Object -First $Top LineRate, BranchRate, LinesCovered, LinesTotal, BranchesCovered, BranchesTotal, Name, File
+    Sort-Object BranchRate, LineRate, Name |
+    Select-Object -First $Top LineRate, BranchRate, LinesCovered, LinesTotal, BranchesCovered, BranchesTotal, Name, File
 
 if ($AsTable) {
     $bottom |
-    Select-Object @{Name = 'Line%'; Expression = { "{0:P2}" -f $_.LineRate } }, @{Name = 'Branch%'; Expression = { "{0:P2}" -f $_.BranchRate } }, LinesCovered, LinesTotal, BranchesCovered, BranchesTotal, Name, File |
-    Format-Table -AutoSize
+        Select-Object @{Name = 'Line%'; Expression = { "{0:P2}" -f $_.LineRate } }, @{Name = 'Branch%'; Expression = { "{0:P2}" -f $_.BranchRate } }, LinesCovered, LinesTotal, BranchesCovered, BranchesTotal, Name, File |
+        Format-Table -AutoSize
 }
 else {
     Write-Host "Line%`tBranch%`tLines`tBranches`tClass`tFile"
