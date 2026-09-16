@@ -53,7 +53,7 @@ Describe 'Windows-ism absence (F-30)' {
                 ForEach-Object {
                     [pscustomobject]@{
                         RelativePath = $_.FullName.Substring($script:RepoRootWIRun.Length).TrimStart('\', '/')
-                        FullName     = $_.FullName
+                        FullName = $_.FullName
                     }
                 }
         )

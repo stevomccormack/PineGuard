@@ -32,7 +32,7 @@ if (-not (Test-CommandExists -Name 'docker')) {
     throw "Docker ('docker') was not found on PATH. Ensure Docker Desktop is running."
 }
 
-$sonarFile  = Join-Path $PSScriptRoot 'docker-compose.sonarqube.yml'
+$sonarFile = Join-Path $PSScriptRoot 'docker-compose.sonarqube.yml'
 $qodanaFile = Join-Path $PSScriptRoot 'docker-compose.qodana.yml'
 
 $downArgs = @('down')

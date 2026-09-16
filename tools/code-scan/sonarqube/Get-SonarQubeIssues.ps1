@@ -45,8 +45,8 @@ param(
     [ValidateSet('All', 'Blocker', 'High', 'Medium', 'Low')]
     [string] $Severity = 'All',
 
-    [string] $SonarUrl    = $null,
-    [string] $ProjectKey  = $null,
+    [string] $SonarUrl = $null,
+    [string] $ProjectKey = $null,
     [string] $ProjectToken = '',
     [ValidateRange(1, 10000)] [int] $MaxIssues = 500
 )
@@ -59,7 +59,7 @@ $ProgressPreference = 'SilentlyContinue'
 . (Join-Path $PSScriptRoot '../../.shared/sonarqube.ps1')
 
 # Apply defaults from shared constants.
-if ([string]::IsNullOrWhiteSpace($SonarUrl))   { $SonarUrl   = $SonarQubeDefaultUrl }
+if ([string]::IsNullOrWhiteSpace($SonarUrl)) { $SonarUrl = $SonarQubeDefaultUrl }
 if ([string]::IsNullOrWhiteSpace($ProjectKey)) { $ProjectKey = $SonarQubeDefaultProjectKey }
 
 # --- Token ---
@@ -84,14 +84,14 @@ if (-not (Test-SonarQubeUp -SonarUrl $SonarUrl)) {
 
 # --- Build query ---
 
-$page     = 1
+$page = 1
 $pageSize = [Math]::Min($MaxIssues, 500)
 $allIssues = @()
 
 $baseParams = @{
     componentKeys = $ProjectKey
-    ps            = $pageSize
-    resolved      = 'false'
+    ps = $pageSize
+    resolved = 'false'
 }
 
 if ($Severity -ne 'All' -and $SonarQubeSeverityMap.ContainsKey($Severity)) {
@@ -125,11 +125,11 @@ do {
         }
 
         $allIssues += [PSCustomObject]@{
-            file      = $filePath
-            line      = if ($issue.PSObject.Properties['line']) { $issue.line } else { $null }
-            rule      = $issue.rule
-            severity  = $issue.severity
-            message   = $issue.message
+            file = $filePath
+            line = if ($issue.PSObject.Properties['line']) { $issue.line } else { $null }
+            rule = $issue.rule
+            severity = $issue.severity
+            message = $issue.message
             component = $issue.component
         }
     }

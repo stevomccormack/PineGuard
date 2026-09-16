@@ -34,7 +34,7 @@ $script:PlaceholderCandidates = @(
         ForEach-Object {
             @{
                 RelativePath = $_.FullName.Substring($script:RepoRootHP.Length).TrimStart('\', '/')
-                FullName     = $_.FullName
+                FullName = $_.FullName
             }
         }
 )
@@ -60,6 +60,6 @@ Describe 'Placeholder help text absence (F-46)' {
     It '<RelativePath> does not contain the placeholder ".PARAMETER" text' -ForEach $script:PlaceholderCandidates {
         (Get-Content -Raw $FullName) |
             Should -Not -Match 'See the param block for details' `
-            -Because "F-46: $RelativePath still has placeholder help text; Phase 5 replaces it with real .PARAMETER documentation"
+                -Because "F-46: $RelativePath still has placeholder help text; Phase 5 replaces it with real .PARAMETER documentation"
     }
 }

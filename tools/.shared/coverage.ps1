@@ -155,8 +155,8 @@ function Get-ScopeTestResultsPaths {
 
     return @(
         $projectPaths |
-        ForEach-Object { Join-Path $ResultsRoot ([IO.Path]::GetFileNameWithoutExtension($_)) } |
-        Sort-Object -Unique
+            ForEach-Object { Join-Path $ResultsRoot ([IO.Path]::GetFileNameWithoutExtension($_)) } |
+            Sort-Object -Unique
     )
 }
 
@@ -276,9 +276,9 @@ function Get-LatestCoverageFiles {
 
     return @(
         $files |
-        Group-Object { Split-Path -Parent (Split-Path -Parent $_.FullName) } |
-        ForEach-Object { $_.Group | Sort-Object LastWriteTime -Descending | Select-Object -First 1 } |
-        Sort-Object FullName
+            Group-Object { Split-Path -Parent (Split-Path -Parent $_.FullName) } |
+            ForEach-Object { $_.Group | Sort-Object LastWriteTime -Descending | Select-Object -First 1 } |
+            Sort-Object FullName
     )
 }
 
@@ -474,9 +474,9 @@ function Read-CoberturaCoverage {
 
                 if (-not $classMap.ContainsKey($classKey)) {
                     $classMap[$classKey] = [pscustomobject]@{
-                        Name     = $className
-                        File     = $matchFilename
-                        Lines    = @{}
+                        Name = $className
+                        File = $matchFilename
+                        Lines = @{}
                         Branches = @{}
                     }
                 }
@@ -517,7 +517,7 @@ function Read-CoberturaCoverage {
                         if (-not $classAgg.Branches.ContainsKey($lineNumber)) {
                             $classAgg.Branches[$lineNumber] = [pscustomobject]@{
                                 Conditions = @{}
-                                Fallback   = $null
+                                Fallback = $null
                             }
                         }
 
@@ -615,14 +615,14 @@ function Read-CoberturaCoverage {
         $branchRate = if ($branchesTotal -gt 0) { [double]$branchesCovered / [double]$branchesTotal } else { 1.0 }
 
         [pscustomobject]@{
-            LineRate        = $lineRate
-            BranchRate      = $branchRate
-            LinesCovered    = [int]$linesCovered
-            LinesTotal      = [int]$linesTotal
+            LineRate = $lineRate
+            BranchRate = $branchRate
+            LinesCovered = [int]$linesCovered
+            LinesTotal = [int]$linesTotal
             BranchesCovered = [int]$branchesCovered
-            BranchesTotal   = [int]$branchesTotal
-            Name            = [string]$entry.Name
-            File            = [string]$entry.File
+            BranchesTotal = [int]$branchesTotal
+            Name = [string]$entry.Name
+            File = [string]$entry.File
         }
     }
 

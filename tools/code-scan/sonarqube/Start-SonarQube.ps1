@@ -68,7 +68,7 @@ Initialize-DockerNetwork -NetworkName $NetworkName
 
 # --- Start server ---
 
-$sonarUrl  = "http://localhost:$Port"
+$sonarUrl = "http://localhost:$Port"
 $healthUrl = "$sonarUrl/api/system/status"
 
 Write-Host 'Starting SonarQube...' -ForegroundColor Cyan

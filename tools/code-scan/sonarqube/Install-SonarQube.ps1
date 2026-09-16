@@ -103,7 +103,7 @@ else {
 # --- SonarQube server ---
 
 $upArgs = @{
-    Port                 = $Port
+    Port = $Port
     HealthTimeoutSeconds = $HealthTimeoutSeconds
 }
 if ($Open) { $upArgs['Open'] = $true }

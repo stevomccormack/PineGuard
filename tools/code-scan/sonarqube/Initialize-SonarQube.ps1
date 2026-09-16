@@ -50,27 +50,27 @@
 
 [CmdletBinding()]
 param(
-    [string] $SonarUrl     = $null,
-    [string] $NewPassword  = '',
-    [string] $ProjectKey   = $null,
-    [string] $ProjectName  = $null,
-    [string] $TokenName    = 'LocalDev'
+    [string] $SonarUrl = $null,
+    [string] $NewPassword = '',
+    [string] $ProjectKey = $null,
+    [string] $ProjectName = $null,
+    [string] $TokenName = 'LocalDev'
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$ProgressPreference    = 'SilentlyContinue'
+$ProgressPreference = 'SilentlyContinue'
 
 . (Join-Path $PSScriptRoot '../../.shared/commands.ps1')
 . (Join-Path $PSScriptRoot '../../.shared/secret.ps1')
 . (Join-Path $PSScriptRoot '../../.shared/sonarqube.ps1')
 
 # Apply defaults from shared constants.
-if ([string]::IsNullOrWhiteSpace($SonarUrl))     { $SonarUrl     = $SonarQubeDefaultUrl }
-if ([string]::IsNullOrWhiteSpace($ProjectKey))   { $ProjectKey   = $SonarQubeDefaultProjectKey }
+if ([string]::IsNullOrWhiteSpace($SonarUrl)) { $SonarUrl = $SonarQubeDefaultUrl }
+if ([string]::IsNullOrWhiteSpace($ProjectKey)) { $ProjectKey = $SonarQubeDefaultProjectKey }
 if ([string]::IsNullOrWhiteSpace($ProjectName)) { $ProjectName = $SonarQubeDefaultProjectName }
 
-$repoRoot    = Get-RepoRoot -StartDirectory $PSScriptRoot
+$repoRoot = Get-RepoRoot -StartDirectory $PSScriptRoot
 $envFilePath = Join-Path $repoRoot '.etc/powershell/.env'
 
 # --- Resolve the effective admin password (F-23/D-4) ---
@@ -148,9 +148,9 @@ if ($isFreshInstall) {
     Write-Host 'Changing admin password...    ' -NoNewline
     try {
         $body = @{
-            login            = 'admin'
+            login = 'admin'
             previousPassword = 'admin'
-            password         = $NewPassword
+            password = $NewPassword
         }
         Invoke-RestMethod -Uri "$SonarUrl/api/users/change_password" -Method Post -Headers $defaultHeaders -Body $body -ErrorAction Stop
         $activeHeaders = New-BasicAuthHeader -Username 'admin' -Password $NewPassword
@@ -175,7 +175,7 @@ Write-Host 'Done (written to .etc/powershell/.env, not echoed)' -ForegroundColor
 Write-Host 'Creating project...           ' -NoNewline
 try {
     $body = @{
-        name    = $ProjectName
+        name = $ProjectName
         project = $ProjectKey
     }
     Invoke-RestMethod -Uri "$SonarUrl/api/projects/create" -Method Post -Headers $activeHeaders -Body $body -ErrorAction Stop

@@ -21,15 +21,15 @@ $ErrorActionPreference = 'Stop'
 # Constants
 # -------------------------------------------------------------------------------------------------
 
-$script:SonarQubeDefaultUrl         = 'http://localhost:9001'
-$script:SonarQubeDefaultProjectKey  = 'PineGuard'
+$script:SonarQubeDefaultUrl = 'http://localhost:9001'
+$script:SonarQubeDefaultProjectKey = 'PineGuard'
 $script:SonarQubeDefaultProjectName = 'PineGuard'
 
 $script:SonarQubeSeverityMap = @{
     'Blocker' = 'BLOCKER'
-    'High'    = 'CRITICAL'
-    'Medium'  = 'MAJOR'
-    'Low'     = 'MINOR,INFO'
+    'High' = 'CRITICAL'
+    'Medium' = 'MAJOR'
+    'Low' = 'MINOR,INFO'
 }
 
 # -------------------------------------------------------------------------------------------------
@@ -61,8 +61,8 @@ function New-BasicAuthHeader {
         Creates an HTTP Basic authentication header hashtable.
     #>
     param([string] $Username, [string] $Password)
-    $pair    = "${Username}:${Password}"
-    $bytes   = [Text.Encoding]::ASCII.GetBytes($pair)
+    $pair = "${Username}:${Password}"
+    $bytes = [Text.Encoding]::ASCII.GetBytes($pair)
     $encoded = [Convert]::ToBase64String($bytes)
     return @{ Authorization = "Basic $encoded" }
 }
@@ -155,7 +155,7 @@ function Import-SonarProperties {
         $eqIndex = $line.IndexOf('=')
         if ($eqIndex -lt 0) { continue }
 
-        $key   = $line.Substring(0, $eqIndex).Trim()
+        $key = $line.Substring(0, $eqIndex).Trim()
         $value = $line.Substring($eqIndex + 1).TrimEnd()
 
         if ($value.EndsWith('\')) {

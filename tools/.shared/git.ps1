@@ -85,7 +85,7 @@ function Assert-IndexClean {
     }
 
     throw (("The git index already has {0} staged file(s): {1}. Commit or unstage them yourself " +
-        "before running this script; it will not unstage changes for you.") -f $staged.Count, ($staged -join ', '))
+            "before running this script; it will not unstage changes for you.") -f $staged.Count, ($staged -join ', '))
 }
 
 function Get-StatusPorcelain {

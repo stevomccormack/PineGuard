@@ -37,9 +37,9 @@
 [CmdletBinding()]
 param(
     [string] $ProjectToken = '',
-    [string] $RepoRoot     = '',
-    [string] $SonarUrl     = $null,
-    [string] $ProjectKey   = $null
+    [string] $RepoRoot = '',
+    [string] $SonarUrl = $null,
+    [string] $ProjectKey = $null
 )
 
 Set-StrictMode -Version Latest
@@ -51,7 +51,7 @@ $ProgressPreference = 'SilentlyContinue'
 . (Join-Path $PSScriptRoot '../../.shared/sonarqube.ps1')
 
 # Apply defaults from shared constants.
-if ([string]::IsNullOrWhiteSpace($SonarUrl))   { $SonarUrl   = $SonarQubeDefaultUrl }
+if ([string]::IsNullOrWhiteSpace($SonarUrl)) { $SonarUrl = $SonarQubeDefaultUrl }
 if ([string]::IsNullOrWhiteSpace($ProjectKey)) { $ProjectKey = $SonarQubeDefaultProjectKey }
 
 # --- Token ---
@@ -77,9 +77,9 @@ $repoRootResolved = if (-not [string]::IsNullOrWhiteSpace($RepoRoot)) {
 else {
     Get-RepoRoot -StartDirectory $PSScriptRoot
 }
-$slnPath          = Join-Path $repoRootResolved 'PineGuard.slnx'
-$coveragePath     = 'artifacts/code-coverage/coverlet/all/testresults/**/coverage.opencover.xml'
-$coverageScript   = Join-Path $repoRootResolved 'tools/code-coverage/coverlet/New-CoverageReport.ps1'
+$slnPath = Join-Path $repoRootResolved 'PineGuard.slnx'
+$coveragePath = 'artifacts/code-coverage/coverlet/all/testresults/**/coverage.opencover.xml'
+$coverageScript = Join-Path $repoRootResolved 'tools/code-coverage/coverlet/New-CoverageReport.ps1'
 
 # --- Version (from latest git tag, or fallback) ---
 

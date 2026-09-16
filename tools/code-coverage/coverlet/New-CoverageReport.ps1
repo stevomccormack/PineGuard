@@ -82,8 +82,8 @@ function Test-CoverageLooksValid {
     )
 
     $latest = Get-ChildItem -LiteralPath $ProjectResults -Recurse -File -Filter $script:coverageFileName -ErrorAction SilentlyContinue |
-    Sort-Object LastWriteTime -Descending |
-    Select-Object -First 1
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
 
     if ($null -eq $latest) {
         return $false
@@ -106,8 +106,8 @@ function Test-CoverageLooksValid {
     $scopeHasAnySourceFiles = $true
     if (-not [string]::IsNullOrWhiteSpace($scopeSourceDir) -and (Test-Path $scopeSourceDir)) {
         $anyCs = Get-ChildItem -LiteralPath $scopeSourceDir -Recurse -File -Filter '*.cs' -ErrorAction SilentlyContinue |
-        Where-Object { $_.FullName -notmatch '([\\/])(bin|obj)\1' } |
-        Select-Object -First 1
+            Where-Object { $_.FullName -notmatch '([\\/])(bin|obj)\1' } |
+            Select-Object -First 1
         $scopeHasAnySourceFiles = ($null -ne $anyCs)
     }
 
@@ -262,8 +262,8 @@ try {
         }
 
         $latest = Get-ChildItem -LiteralPath $projectResults -Recurse -File -Filter $coverageFileName -ErrorAction SilentlyContinue |
-        Sort-Object LastWriteTime -Descending |
-        Select-Object -First 1
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
 
         if ($null -eq $latest) {
             throw "Coverage file not found after successful test run for '$name'. Expected a '$coverageFileName' under: $projectResults"

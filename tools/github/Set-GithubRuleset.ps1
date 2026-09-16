@@ -65,7 +65,7 @@ function Fail($m) { Write-Fail $m; exit 1 }
 
 $rulesetKeyToName = @{
     'main-branch' = 'main: PR required, no force push, no delete'
-    'v-tags'      = 'v* tags: maintainers only'
+    'v-tags' = 'v* tags: maintainers only'
 }
 
 if (-not $rulesetKeyToName.ContainsKey($Name)) {
@@ -113,11 +113,11 @@ if ($full.enforcement -eq $targetEnforcement) {
 #    EXCEPT for server-managed fields (id, source_type, source, node_id,
 #    created_at, updated_at, _links, current_user_can_bypass).
 $body = [ordered]@{
-    name          = $full.name
-    target        = $full.target
-    enforcement   = $targetEnforcement
-    conditions    = $full.conditions
-    rules         = $full.rules
+    name = $full.name
+    target = $full.target
+    enforcement = $targetEnforcement
+    conditions = $full.conditions
+    rules = $full.rules
     bypass_actors = $full.bypass_actors
 }
 $payload = $body | ConvertTo-Json -Depth 20 -Compress

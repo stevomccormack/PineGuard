@@ -42,11 +42,11 @@ function Get-ScopeTestCases {
     return @(
         Get-PineGuardScope -All | ForEach-Object {
             @{
-                Name          = $_.Name
+                Name = $_.Name
                 SourceCsprojs = $_.SourceCsprojs
-                TestCsproj    = $_.TestCsproj
-                QodanaConfig  = $_.QodanaConfig
-                SourceDir     = $_.SourceDir
+                TestCsproj = $_.TestCsproj
+                QodanaConfig = $_.QodanaConfig
+                SourceDir = $_.SourceDir
             }
         }
     )

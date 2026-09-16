@@ -149,7 +149,7 @@ try {
 
         if ($exitCode -ne 0) {
             $failedBuildTargets += [PSCustomObject]@{
-                Target   = $buildTarget
+                Target = $buildTarget
                 ExitCode = $exitCode
             }
         }
@@ -187,15 +187,15 @@ try {
             }
 
             $rawDiagnostics += [PSCustomObject]@{
-                File            = $file
-                Line            = $lineNumber
-                Column          = $column
-                Severity        = $severity
-                CodePrefix      = $codePrefix
-                CodeNumber      = $codeNumber
-                Code            = "$codePrefix$codeNumber"
-                Message         = $message
-                Project         = $projectPath
+                File = $file
+                Line = $lineNumber
+                Column = $column
+                Severity = $severity
+                CodePrefix = $codePrefix
+                CodeNumber = $codeNumber
+                Code = "$codePrefix$codeNumber"
+                Message = $message
+                Project = $projectPath
                 TargetFramework = $targetFramework
             }
         }
@@ -212,17 +212,17 @@ try {
         $severity = if ($items.Severity -contains 'error') { 'error' } else { 'warning' }
 
         [PSCustomObject]@{
-            File             = $first.File
-            Line             = $first.Line
-            Column           = $first.Column
-            Severity         = $severity
-            CodePrefix       = $first.CodePrefix
-            CodeNumber       = $first.CodeNumber
-            Code             = $first.Code
-            Message          = $first.Message
-            Project          = $first.Project
+            File = $first.File
+            Line = $first.Line
+            Column = $first.Column
+            Severity = $severity
+            CodePrefix = $first.CodePrefix
+            CodeNumber = $first.CodeNumber
+            Code = $first.Code
+            Message = $first.Message
+            Project = $first.Project
             TargetFrameworks = $targetFrameworks
-            Occurrences      = $items.Count
+            Occurrences = $items.Count
         }
     }
 
@@ -240,22 +240,22 @@ try {
 
     $jsonPath = Join-Path $outputDir 'diagnostics.json'
     $report = [PSCustomObject]@{
-        Scope              = $Scope
-        Configuration      = $Configuration
-        Code               = if ($Code) { $Code } else { $null }
-        Timestamp          = (Get-Date -Format 'o')
-        BuildSucceeded     = -not $anyBuildFailed
+        Scope = $Scope
+        Configuration = $Configuration
+        Code = if ($Code) { $Code } else { $null }
+        Timestamp = (Get-Date -Format 'o')
+        BuildSucceeded = -not $anyBuildFailed
         FailedBuildTargets = $failedBuildTargets
-        TotalWarnings      = $warningDiagnostics.Count
-        TotalErrors        = $errorDiagnostics.Count
-        ByCode             = ($warningDiagnostics | Group-Object Code | Sort-Object Count -Descending | ForEach-Object {
-            [PSCustomObject]@{ Code = $_.Name; Count = $_.Count }
-        })
-        ByFile             = ($warningDiagnostics | Group-Object File | Sort-Object Count -Descending | ForEach-Object {
-            [PSCustomObject]@{ File = $_.Name; Count = $_.Count }
-        })
-        Warnings           = $warningDiagnostics
-        Errors             = $errorDiagnostics
+        TotalWarnings = $warningDiagnostics.Count
+        TotalErrors = $errorDiagnostics.Count
+        ByCode = ($warningDiagnostics | Group-Object Code | Sort-Object Count -Descending | ForEach-Object {
+                [PSCustomObject]@{ Code = $_.Name; Count = $_.Count }
+            })
+        ByFile = ($warningDiagnostics | Group-Object File | Sort-Object Count -Descending | ForEach-Object {
+                [PSCustomObject]@{ File = $_.Name; Count = $_.Count }
+            })
+        Warnings = $warningDiagnostics
+        Errors = $errorDiagnostics
     }
 
     $report | ConvertTo-Json -Depth 6 | Set-Content -Path $jsonPath -Encoding UTF8

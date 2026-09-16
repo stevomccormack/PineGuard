@@ -30,7 +30,7 @@ $script:BomCandidates = @(
         ForEach-Object {
             @{
                 RelativePath = $_.FullName.Substring($script:RepoRootBom.Length).TrimStart('\', '/')
-                FullName     = $_.FullName
+                FullName = $_.FullName
             }
         }
 )
