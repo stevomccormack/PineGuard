@@ -19,7 +19,7 @@ public static class XmlSchemaSetBuilderTestData
         [
             new InvalidCase("Null", null, new ExpectedException(typeof(ArgumentNullException), "path")),
             new InvalidCase("Whitespace", "   ", new ExpectedException(typeof(ArgumentException), "path")),
-            new InvalidCase("Nonexistent", @"nonexistent-dir-xyz\schema.xsd", new ExpectedException(typeof(DirectoryNotFoundException)))
+            new InvalidCase("Nonexistent", "nonexistent-schema-xyz.xsd", new ExpectedException(typeof(FileNotFoundException)))
         ];
 
         public sealed record ValidCase(string Name, Func<XmlSchemaSet> Value, (bool containsDocument, bool containsOther, bool isCompiled) Expected)
