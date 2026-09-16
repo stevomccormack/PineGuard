@@ -22,13 +22,13 @@
       2   a required module is missing: PSScriptAnalyzer, or Pester >= 5.0.
       3   PSScriptAnalyzer reported an Error- or Warning-severity finding, or a Pester test failed.
 
-    As of Phase 3, this gate is still EXPECTED to exit 3. PSScriptAnalyzer reports 301 findings,
-    all cosmetic (273 PSUseConsistentWhitespace, 28 PSUseConsistentIndentation; 0 Error, 0
-    unapproved-verb hits), and the Pester suite carries 2 intentionally red tests
-    (Help-Placeholder only, on Run-CodeCoverage.ps1/Test-Coverage.ps1 — Windows-Isms and
-    Bom-Absence are now green after T3.09/T2.06) that Phase 5 clears. The plan's own CI wiring
-    (T2.05) runs this script with continue-on-error: true for exactly that reason — a non-zero
-    exit here today is correct, not a bug in this script.
+    This gate is now GREEN and enforcing. It was expected to exit 3 for the whole of Phase 3 —
+    290-odd cosmetic PSScriptAnalyzer findings plus 2 intentionally red Help-Placeholder tests
+    on Run-CodeCoverage.ps1/Test-Coverage.ps1, which is why CI ran it with continue-on-error.
+    Phase 5's work has since landed: the whitespace and indentation findings were cleared with
+    Invoke-Formatter under the repo's own PSScriptAnalyzerSettings.psd1, and both coverage
+    scripts carry real .PARAMETER documentation in place of the placeholder text. CI no longer
+    tolerates a non-zero exit from this script, so a failure here is now a real failure.
 
 .PARAMETER Path
     Root folder to scan with PSScriptAnalyzer, relative to the repository root (or an absolute
