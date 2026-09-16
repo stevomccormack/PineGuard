@@ -26,7 +26,7 @@
 . (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
 $script:RepoRootHP = Get-RepoRoot -StartDirectory $PSScriptRoot
 $script:PlaceholderCandidates = @(
-    Get-ChildItem -Path (Join-Path $script:RepoRootHP 'tools') -Recurse -File -Include '*.ps1', '*.psm1', '*.psd1' |
+    Get-ChildItem -Path (Join-Path $script:RepoRootHP 'tools') -Recurse -File -Force -Include '*.ps1', '*.psm1', '*.psd1' |
         Where-Object {
             $_.FullName -notmatch '[\\/]audit-cli[\\/]' -and
             $_.FullName -notmatch '[\\/]\.tests[\\/]'
@@ -45,7 +45,7 @@ Describe 'Placeholder help text absence (F-46)' {
         . (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
         $script:RepoRootHPRun = Get-RepoRoot -StartDirectory $PSScriptRoot
         $script:PlaceholderCandidatesRun = @(
-            Get-ChildItem -Path (Join-Path $script:RepoRootHPRun 'tools') -Recurse -File -Include '*.ps1', '*.psm1', '*.psd1' |
+            Get-ChildItem -Path (Join-Path $script:RepoRootHPRun 'tools') -Recurse -File -Force -Include '*.ps1', '*.psm1', '*.psd1' |
                 Where-Object {
                     $_.FullName -notmatch '[\\/]audit-cli[\\/]' -and
                     $_.FullName -notmatch '[\\/]\.tests[\\/]'

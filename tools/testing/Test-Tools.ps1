@@ -22,8 +22,8 @@
       2   a required module is missing: PSScriptAnalyzer, or Pester >= 5.0.
       3   PSScriptAnalyzer reported an Error- or Warning-severity finding, or a Pester test failed.
 
-    As of Phase 3, this gate is still EXPECTED to exit 3. PSScriptAnalyzer reports 290 findings,
-    all cosmetic (262 PSUseConsistentWhitespace, 28 PSUseConsistentIndentation; 0 Error, 0
+    As of Phase 3, this gate is still EXPECTED to exit 3. PSScriptAnalyzer reports 301 findings,
+    all cosmetic (273 PSUseConsistentWhitespace, 28 PSUseConsistentIndentation; 0 Error, 0
     unapproved-verb hits), and the Pester suite carries 2 intentionally red tests
     (Help-Placeholder only, on Run-CodeCoverage.ps1/Test-Coverage.ps1 — Windows-Isms and
     Bom-Absence are now green after T3.09/T2.06) that Phase 5 clears. The plan's own CI wiring
@@ -41,6 +41,13 @@
 .PARAMETER SkipPester
     Skip the Pester suite entirely.
 
+.PARAMETER SkipSlow
+    Exclude Pester tests tagged 'Slow' -- today, only DotCover-Snapshot.Tests.ps1, which shells
+    out to a real `dotnet dotCover cover -- test` run and so needs the full .NET toolchain. CI's
+    tools-lint job passes this: that job installs PowerShell modules only, and the cheap hygiene
+    tests (registry parity, BOM/Windows-ism/help-placeholder absence, the parsers) are what it is
+    there to enforce. Local runs should omit it and exercise the dotCover path too.
+
 .EXAMPLE
     ./tools/testing/Test-Tools.ps1
 
@@ -56,7 +63,8 @@
 param(
     [string] $Path = 'tools',
     [switch] $SkipLint,
-    [switch] $SkipPester
+    [switch] $SkipPester,
+    [switch] $SkipSlow
 )
 
 Set-StrictMode -Version Latest
@@ -115,7 +123,9 @@ try {
         $lintRoot = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $repoRoot $Path }
         $settingsPath = Join-Path $repoRoot 'PSScriptAnalyzerSettings.psd1'
 
-        $scriptFiles = Get-ChildItem -Path $lintRoot -Recurse -File -Include '*.ps1' |
+        # -Force: tools/.shared/ and tools/.tests/ are dot-prefixed, so PowerShell treats them as
+        # hidden on Linux and would otherwise drop all of their scripts from the scan on CI.
+        $scriptFiles = Get-ChildItem -Path $lintRoot -Recurse -File -Force -Include '*.ps1' |
             Where-Object { $_.FullName -notmatch '[\\/]audit-cli[\\/]' }
 
         Write-Host "Lint    : scanning $($scriptFiles.Count) file(s) under $Path (excluding audit-cli/)..." -ForegroundColor Cyan
@@ -153,10 +163,26 @@ try {
         $testsPath = Join-Path $repoRoot 'tools' '.tests'
         Write-Host "Pester  : running suite at tools/.tests/ (Pester $($pesterModule.Version))..." -ForegroundColor Cyan
 
+        # Hand Pester the test files rather than the folder: tools/.tests/ is hidden on Linux, and
+        # Pester's own directory discovery uses Get-Item without -Force, which cannot resolve it.
+        $testFiles = @(
+            Get-ChildItem -Path $testsPath -Recurse -File -Force -Filter '*.Tests.ps1' |
+                Select-Object -ExpandProperty FullName
+        )
+
+        if ($testFiles.Count -eq 0) {
+            throw "No Pester tests found under $testsPath."
+        }
+
         $pesterConfig = New-PesterConfiguration
-        $pesterConfig.Run.Path = $testsPath
+        $pesterConfig.Run.Path = $testFiles
         $pesterConfig.Run.PassThru = $true
         $pesterConfig.Output.Verbosity = 'Normal'
+
+        if ($SkipSlow) {
+            $pesterConfig.Filter.ExcludeTag = 'Slow'
+            Write-Host "Pester  : excluding tests tagged 'Slow' (-SkipSlow)" -ForegroundColor Yellow
+        }
 
         $pesterResult = Invoke-Pester -Configuration $pesterConfig
 

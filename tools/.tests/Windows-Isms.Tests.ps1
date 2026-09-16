@@ -45,7 +45,7 @@ Describe 'Windows-ism absence (F-30)' {
         . (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
         $script:RepoRootWIRun = Get-RepoRoot -StartDirectory $PSScriptRoot
         $script:WindowsIsmFiles = @(
-            Get-ChildItem -Path (Join-Path $script:RepoRootWIRun 'tools') -Recurse -File -Include '*.ps1', '*.psm1', '*.psd1' |
+            Get-ChildItem -Path (Join-Path $script:RepoRootWIRun 'tools') -Recurse -File -Force -Include '*.ps1', '*.psm1', '*.psd1' |
                 Where-Object {
                     $_.FullName -notmatch '[\\/]audit-cli[\\/]' -and
                     $_.FullName -notmatch '[\\/]\.tests[\\/]'

@@ -37,7 +37,7 @@ BeforeAll {
     $script:GateScript = Join-Path $script:RepoRootDC 'tools' 'code-coverage' 'Test-Coverage.ps1'
 }
 
-Describe 'dotCover engine (T3.10 snapshot-only fallback, T3.11)' {
+Describe 'dotCover engine (T3.10 snapshot-only fallback, T3.11)' -Tag 'Slow' {
 
     Context 'dotcover/New-CoverageReport.ps1 -Scope Core produces a real .dcvr snapshot' {
         BeforeAll {

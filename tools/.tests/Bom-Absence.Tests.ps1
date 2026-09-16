@@ -25,7 +25,7 @@
 . (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
 $script:RepoRootBom = Get-RepoRoot -StartDirectory $PSScriptRoot
 $script:BomCandidates = @(
-    Get-ChildItem -Path (Join-Path $script:RepoRootBom 'tools') -Recurse -File -Include '*.ps1', '*.psm1', '*.psd1' |
+    Get-ChildItem -Path (Join-Path $script:RepoRootBom 'tools') -Recurse -File -Force -Include '*.ps1', '*.psm1', '*.psd1' |
         Where-Object { $_.FullName -notmatch '[\\/]audit-cli[\\/]' } |
         ForEach-Object {
             @{
@@ -42,7 +42,7 @@ Describe 'UTF-8 BOM absence (F-47 / T2.06)' {
         . (Join-Path $PSScriptRoot '..' '.shared' 'path.ps1')
         $script:RepoRootBomRun = Get-RepoRoot -StartDirectory $PSScriptRoot
         $script:BomCandidatesRun = @(
-            Get-ChildItem -Path (Join-Path $script:RepoRootBomRun 'tools') -Recurse -File -Include '*.ps1', '*.psm1', '*.psd1' |
+            Get-ChildItem -Path (Join-Path $script:RepoRootBomRun 'tools') -Recurse -File -Force -Include '*.ps1', '*.psm1', '*.psd1' |
                 Where-Object { $_.FullName -notmatch '[\\/]audit-cli[\\/]' }
         )
 

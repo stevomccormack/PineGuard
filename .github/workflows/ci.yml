@@ -851,7 +851,7 @@ jobs:
         id: tools-lint
         continue-on-error: true
         shell: pwsh
-        run: ./tools/testing/Test-Tools.ps1
+        run: ./tools/testing/Test-Tools.ps1 -SkipSlow
 
       - name: Upload tools-lint summary
         if: always()

@@ -30,7 +30,7 @@
 $script:RepoRootSLO = Get-RepoRoot -StartDirectory $PSScriptRoot
 $script:SharedDirSLO = Join-Path $script:RepoRootSLO 'tools' '.shared'
 $script:SharedFilesSLO = @(
-    Get-ChildItem -LiteralPath $script:SharedDirSLO -Filter '*.ps1' -File |
+    Get-ChildItem -LiteralPath $script:SharedDirSLO -Filter '*.ps1' -File -Force |
         Sort-Object Name |
         ForEach-Object {
             @{
@@ -48,7 +48,7 @@ Describe 'tools/.shared load-order independence (D-2)' {
         $script:RepoRootSLORun = Get-RepoRoot -StartDirectory $PSScriptRoot
         $script:SharedDirSLORun = Join-Path $script:RepoRootSLORun 'tools' '.shared'
         $script:SharedFilesSLORun = @(
-            Get-ChildItem -LiteralPath $script:SharedDirSLORun -Filter '*.ps1' -File | Sort-Object Name
+            Get-ChildItem -LiteralPath $script:SharedDirSLORun -Filter '*.ps1' -File -Force | Sort-Object Name
         )
 
         function Test-StandaloneDotSource {
