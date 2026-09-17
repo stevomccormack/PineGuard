@@ -18,6 +18,12 @@ updates:
         patterns: ["Microsoft.Extensions.*"]
       result-libraries:
         patterns: ["ErrorOr", "FluentResults", "OneOf"]
+    ignore:
+      # MediatR 13+ moved to a commercial licence. 12.5.x is the last Apache-2.0 line and
+      # Directory.Packages.props pins it deliberately (see the comment there); a bump past it
+      # once merged unreviewed, broke 4 tests and had to be reverted (e17d1d6).
+      - dependency-name: "MediatR"
+        update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 10
     commit-message:
       prefix: "deps"

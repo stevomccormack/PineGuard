@@ -42,6 +42,7 @@ jobs:
       analyzers: ${{ steps.filter.outputs.analyzers }}
       testing: ${{ steps.filter.outputs.testing }}
       any-src: ${{ steps.filter.outputs.any-src }}
+      shared: ${{ steps.filter.outputs.shared }}
     steps:
       - uses: actions/checkout@v7
 
@@ -95,12 +96,28 @@ jobs:
             testing:
               - 'tests/PineGuard.Testing/**'
               - 'tests/PineGuard.Testing.UnitTests/**'
+            # Root build inputs every project consumes. A change here (a dependency bump, a
+            # shared MSBuild property, the pinned SDK tools) must run EVERY test job, not zero of
+            # them — a green PR that built but skipped all fifteen suites is how a MediatR bump
+            # once broke 4 tests on main (e17d1d6).
+            shared:
+              - 'Directory.Packages.props'
+              - 'Directory.Build.props'
+              - 'Directory.Build.targets'
+              - 'global.json'
+              - '*.slnx'
+              - '*.sln'
+              - '.config/dotnet-tools.json'
             any-src:
               - 'src/**'
               - 'tests/**'
               - '*.slnx'
               - '*.sln'
               - 'Directory.Packages.props'
+              - 'Directory.Build.props'
+              - 'Directory.Build.targets'
+              - 'global.json'
+              - '.config/dotnet-tools.json'
               - '.editorconfig'
 
   # ---------------------------------------------------------------------------
@@ -238,12 +255,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # Determine if this matrix entry should actually run
+      # Determine if this matrix entry should actually run. RUN_ALL forces every scope: on push
+      # to main, and on any PR that touches a shared root build input (the `shared` filter).
       - name: Should run
         id: should-run
         shell: bash
         run: |
-          IS_MAIN="${{ github.ref == 'refs/heads/main' }}"
+          RUN_ALL="${{ github.ref == 'refs/heads/main' || needs.changes.outputs.shared == 'true' }}"
           CORE="${{ needs.changes.outputs.core }}"
           MUST="${{ needs.changes.outputs.must-clauses }}"
           GUARD="${{ needs.changes.outputs.guard-clauses }}"
@@ -265,35 +283,35 @@ jobs:
 
           case "$RUN_IF" in
             core-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-guard-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-fluent-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$FLUENT" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$FLUENT" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-data-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DATA" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DATA" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-options-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$OPTIONS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$OPTIONS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-di-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$DI" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$DI" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-di-or-aspnetcore-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DI" == "true" || "$ASPNETCORE" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DI" == "true" || "$ASPNETCORE" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-di-or-mediatr-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$DI" == "true" || "$MEDIATR" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$DI" == "true" || "$MEDIATR" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-erroror-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ERROROR" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$ERROROR" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-fluentresults-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$FLUENTRESULTS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$FLUENTRESULTS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-oneof-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ONEOF" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$ONEOF" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-guard-or-data-or-xml-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$DATA" == "true" || "$XML" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$DATA" == "true" || "$XML" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             core-or-must-or-guard-or-analyzers-or-testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$ANALYZERS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$ANALYZERS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             testing-or-main)
-              [[ "$IS_MAIN" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+              [[ "$RUN_ALL" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
           esac
 
           echo "result=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
@@ -412,14 +430,15 @@ jobs:
       # silently pass with an artificially-lowered number — for reasons unrelated to the PR's
       # actual change. Restrict the merged report to only the assemblies whose OWN dedicated
       # matrix entry actually ran, using the exact same run-if logic as the "Should run" step
-      # above (test job, per matrix.run-if). On push to main every scope always runs, so the
-      # filter includes all ten assembly names (equivalent to no filtering).
+      # above (test job, per matrix.run-if). On push to main, or when a shared root build input
+      # changed, every scope runs, so the filter includes every assembly (equivalent to no
+      # filtering).
       - name: Compute coverage assembly filters
         id: assembly-filters
         if: steps.find-coverage.outputs.found == 'true'
         shell: bash
         run: |
-          IS_MAIN="${{ github.ref == 'refs/heads/main' }}"
+          RUN_ALL="${{ github.ref == 'refs/heads/main' || needs.changes.outputs.shared == 'true' }}"
           CORE="${{ needs.changes.outputs.core }}"
           MUST="${{ needs.changes.outputs.must-clauses }}"
           GUARD="${{ needs.changes.outputs.guard-clauses }}"
@@ -439,77 +458,77 @@ jobs:
           FILTERS=""
 
           # PineGuard.Core — same run-if as the Core matrix entry: core-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.Core;"
           fi
 
           # PineGuard.MustClauses — core-or-must-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.MustClauses;"
           fi
 
           # PineGuard.GuardClauses — core-or-must-or-guard-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.GuardClauses;"
           fi
 
           # PineGuard.FluentValidation — core-or-must-or-fluent-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$FLUENT" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$FLUENT" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.FluentValidation;"
           fi
 
           # PineGuard.DataAnnotations — core-or-must-or-data-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DATA" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DATA" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.DataAnnotations;"
           fi
 
           # PineGuard.Extensions.Options — core-or-must-or-options-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$OPTIONS" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$OPTIONS" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.Extensions.Options;"
           fi
 
           # PineGuard.Extensions.DependencyInjection — core-or-di-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$DI" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$DI" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.Extensions.DependencyInjection;"
           fi
 
           # PineGuard.AspNetCore — core-or-must-or-di-or-aspnetcore-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DI" == "true" || "$ASPNETCORE" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$DI" == "true" || "$ASPNETCORE" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.AspNetCore;"
           fi
 
           # PineGuard.MediatR — core-or-di-or-mediatr-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$DI" == "true" || "$MEDIATR" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$DI" == "true" || "$MEDIATR" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.MediatR;"
           fi
 
           # PineGuard.ErrorOr — core-or-erroror-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ERROROR" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$ERROROR" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.ErrorOr;"
           fi
 
           # PineGuard.FluentResults — core-or-fluentresults-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$FLUENTRESULTS" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$FLUENTRESULTS" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.FluentResults;"
           fi
 
           # PineGuard.OneOf — core-or-oneof-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$ONEOF" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$ONEOF" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.OneOf;"
           fi
 
           # PineGuard.Xml — core-or-must-or-guard-or-data-or-xml-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$DATA" == "true" || "$XML" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$DATA" == "true" || "$XML" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.Xml;"
           fi
 
           # PineGuard.Analyzers / PineGuard.Analyzers.CodeFixes — core-or-must-or-guard-or-analyzers-or-testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$ANALYZERS" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$ANALYZERS" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.Analyzers;+PineGuard.Analyzers.CodeFixes;"
           fi
 
           # PineGuard.Testing — testing-or-main
-          if [[ "$IS_MAIN" == "true" || "$TESTING" == "true" ]]; then
+          if [[ "$RUN_ALL" == "true" || "$TESTING" == "true" ]]; then
             FILTERS="${FILTERS}+PineGuard.Testing;"
           fi
 
