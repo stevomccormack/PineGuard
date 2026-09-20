@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Text.Json" />
     <ProjectReference Include="..\PineGuard.Core\PineGuard.Core.csproj" />
   </ItemGroup>
 
