@@ -98,3 +98,4 @@ Conventions: `docs/ai/rules/fixture-conventions.md`
 ## Topic Files
 - `fluent-audit.md` — Fluent layer v4 audit findings (Network/Uri/Csv/Dict/RODict/SqlDateTime batch + Date/Time batch)
 - `guard-audit.md` — Guard layer v2 audit findings (pre-migration drift cluster + all per-batch reviews)
+- [xml-audit](xml-audit.md) — XmlReader event timing, ReportValidationWarnings gating, Create(string) resolver gap, polyfill/IVT precedent, AGENTS.md baseline exemption
