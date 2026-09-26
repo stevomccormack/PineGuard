@@ -1,5 +1,11 @@
 # Astra integrated critical review
 
+## Mandatory maintenance amendment — plan v1.8
+
+The user added an essential completion requirement after initial publication: every workstream and major block/section/wave must save lessons, maintain BRAIN/all relevant Markdown and supporting scripts/tools, and complete a full review→feedback→fix→recheck loop. This amendment is accepted and implemented as a [shared closure contract](knowledge-and-tooling-closure.md), explicit inherited gates in all 26 child plans, master A–F gates and a [saved session ledger](closeout-ledger.md). It does not implement future scripts or create a parallel normative BRAIN hierarchy.
+
+Review acceptance requires stable block IDs, exact impact mappings, actual supporting-tool evidence or reasoned N/A, explicit no-new-lesson outcomes when appropriate, canonical promotion decisions, resolved/rechecked feedback and fresh-context handoffs. Publication QA must verify every inherited link and the separate effort reserve. Status remains Planned; prior implementation/council limitations remain unchanged.
+
 Review date:2026-09-26. Scope: planning/architecture review using Luna's source packets and official research plus genuine Sol comparative analysis. No implementation, new test run, coverage collection, benchmark result or formal council is claimed.
 
 ## Judgment and expanded scope

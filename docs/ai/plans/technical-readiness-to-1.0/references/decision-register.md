@@ -33,6 +33,12 @@ Current explicit user instructions override v1.6 and the proposed handoff where 
 
 ## Decision record schema
 
+### Mandatory maintenance decisions
+
+**D27 — ACCEPTED hard requirement:** every workstream, major block/section and wave passes the knowledge/BRAIN/docs/scripts/tools closure contract. Lessons and decisions are saved; required supporting machinery is maintained, tested and run; full Astra feedback is resolved/rechecked; missing closure prevents completion. See [contract](knowledge-and-tooling-closure.md) and [session ledger](closeout-ledger.md).
+
+**D28 — REQUIRED scoped promotion task:** at Wave A's first knowledge-closure review, Astra resolves PROMOTE-01: whether this project maintenance constraint warrants durable guidance in `docs/ai/specs/orchestration.md` (execution/closure scope) or genuinely cross-cutting root `docs/ai/specs/spec.md` under §9. Luna provides applicability/duplicate guidance evidence. If promoted, update affected child specs, Rule pointers, agent/skill/workflow/adapters and indexes through the existing cascade; if not, record the reason and retain the binding project contract. No invented generic memory agent or parallel global rule hierarchy is permitted. This is a future authorized-execution task, not a claim that those root files were edited during planning.
+
 ID; question; source/excerpt/hash/reproduction; alternatives including a simpler/no-new-abstraction option; new-contract consequences; privacy/security/resource impact; exact selected behavior/signatures and rationale; all affected files/surfaces; required evidence; review identity; council requirement/verdict; task IDs; rollback of implementation if needed.
 
 Greenfield does not mean agents guess semantics. It removes the obligation to preserve old contracts while requiring a better explicit new contract. Observed current behavior is evidence, not automatic normative truth.

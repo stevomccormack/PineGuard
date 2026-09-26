@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0
-version: 1.7
+version: 1.8
 status: planned
 last_updated: 2026-09-26
 -->
@@ -26,6 +26,8 @@ The historical rubric scores are independent: semantic/failure7; architecture/cr
 Read [Astra integrated critical review](references/astra-integrated-review.md), [handoff traceability](references/handoff-traceability.md), [competitor dispositions](references/competitor-integration.md), [Luna research](references/competitor-source-dossier.md) and [Sol analysis](references/sol-comparative-analysis.md). Research identifies ten purpose-selected comparators, not an objective popularity ranking. No unmeasured speed, correctness or unique-breadth claim is adopted.
 
 ## Mandatory quality and coverage
+
+**Mandatory knowledge/tooling closure:** every workstream, major task block, major section and wave must pass the [closure contract](references/knowledge-and-tooling-closure.md). Assign a block ID before dispatch; save lessons and decisions, align all relevant BRAIN/Markdown/indexes, maintain and test/run supporting scripts/tools, then complete Astra review → feedback → fix → recheck. Persist evidence in the [closeout ledger](references/closeout-ledger.md). A feature cannot close with missing supporting machinery, stale documentation or unresolved blocking feedback. This applies during work, not only at the final wave.
 
 The [quality constitution](references/quality-constitution.md) applies to every task: BRAIN precedents first; repository-wide root-cause and duplication review; coherent naming; DRY/SOLID without speculative abstractions; formatting/analyzer hygiene; no local hacks, hidden failures or diluted gates.
 
@@ -65,6 +67,17 @@ The largest late projects have separate plans: [W20A API](workstreams/20-samples
 
 ## Waves and dependency gates
 
+Every major block within A–F has its own closure record; the wave gate consolidates those records and performs a full integrated Astra review. The technical exits below are necessary but insufficient without these mandatory knowledge/tooling exits:
+
+| Wave | Required closure evidence |
+|---|---|
+| A | CI/coverage/context/tooling impact matrix, early decision lessons, all block reviews and corrected BRAIN/docs/tool instructions |
+| B | New structure/manifest/contract source→docs/spec/rule/tool/test/index cascade, saved decisions and closed reviewer feedback |
+| C | Correctness/security/environment/lifecycle harnesses built or updated, tested and run; lessons/corpus/tool instructions synchronized; all block findings resolved |
+| D | Package/deployment/API/dependency tools and support docs aligned, actual commands/artifacts saved, integrated review and rechecks |
+| E | Every lightweight/major sample block and each W20A/B/C closure accepted; relevant BRAIN/docs/scripts/tools/indexes and lessons current |
+| F | All earlier closure records reconciled with fresh context, remaining feedback resolved or validly rejected, final knowledge/tooling review and owned-commit evidence |
+
 **A — trust and early decisions.** W00 repairs routing/self-check/evidence gaps and enforces audited100% coverage. W22 inventories global naming/abstraction precedents; W01 reproduces OWASP and regex concerns; W19 characterizes lifecycle. W10 captures representative benchmarks immediately. Exit: trustworthy baseline, approved vocabulary and explicit decision docket.
 
 **B — new structure and manifest.** W22/W01 decisions feed W03 static executable structure and W02 manifest; W04 defines globally consistent failures. Pilot Email, bounded numeric and string-to-DateOnly. Reuse existing audits, not a second manual code/support list. Rebenchmark before broad rollout. Exit: reviewed pilot structure/manifest/contract plus independent outcomes.
@@ -81,11 +94,13 @@ Retain v1.6's semantic/trust/hostile/operational proof intent, but these waves s
 
 ## Effort and bounded execution
 
-[Estimates and waves](references/estimates-and-waves.md) gives every workstream, wave and role budget. Preliminary core/light-doc effort: 192–406 engineering-equivalent hours; 66–158 cumulative active agent/tool hours; 35–73 review hours. Including three major apps: 252–526 engineering-equivalent, 85–203 active agent/tool, 43–88 review hours. These are separate planning views, not additive or guaranteed elapsed time. Confidence is low to medium-low; re-estimate after each wave.
+[Estimates and waves](references/estimates-and-waves.md) gives every workstream, wave and role budget. Base core/light-doc effort remains 192–406 engineering-equivalent hours, 66–158 cumulative active agent/tool hours and 35–73 review hours. With the separate incremental knowledge/tooling closeout reserve, core becomes 204–430, 70–166 and 39–81 hours respectively; including all three major apps becomes 267–556, 90–214 and 48–98. Ordinary implementation review/docs work was already included and is not counted twice. These are separate planning views, not additive or guaranteed elapsed time. Confidence is low to medium-low; re-estimate after each wave.
 
 Use bounded packets, targeted cached source excerpts keyed by revision AND dirty-file hashes, two-minute checkpoints and explicit escalation. Requested time/token caps are not falsely described as tool-enforced. Full protocol and exact-file commit rules: [execution](references/execution-protocol.md). Regular coherent owned commits are reviewed; eventual squash covers only this task's approved commits.
 
 ## Decisions, deliverables and completion
+
+Closure records must identify exact source→affected .md/spec/rule/memory/tool/self-test/index relationships, actual script/tool build/update/test/run evidence or reasoned N/A, saved lessons (including an explicit none-found result), durable-rule promotion disposition and the accepted/rejected reviewer feedback log. Reopen a completed block when relevant inputs change. Current planning-session lessons are already saved in the [ledger](references/closeout-ledger.md); publication verification remains evidence-driven.
 
 The [decision register](references/decision-register.md) distinguishes approved design direction from unresolved concrete semantics, representation, budgets and support choices. Exact code/harness paths not established by intake require Luna inventory and Astra approval before coding. No execution agent invents a design to fill silence.
 

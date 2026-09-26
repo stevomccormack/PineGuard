@@ -1,5 +1,19 @@
 # Effort, waves and dispatch budgets
 
+## Incremental knowledge/tooling closeout allowance — v1.8
+
+The original per-workstream estimates below already include ordinary implementation review, relevant feature documentation and their named test/tool work. Do not charge that work twice. The user-added mandatory per-block knowledge capture, complete BRAIN/docs/tooling impact audit, recorded feedback/rechecks and wave consolidation receive a separate provisional coordination/maintenance reserve:
+
+| Scope | Additional engineering-equivalent h | Additional active agent/tool h | Additional review h |
+|---|---:|---:|---:|
+| Core and light documentation | 12–24 | 4–8 | 4–8 |
+| Three major applications, combined | 3–6 | 1–3 | 1–2 |
+| Total incremental reserve | 15–30 | 5–11 | 5–10 |
+
+Amended core/light totals: **204–430 engineering-equivalent, 70–166 active agent/tool and 39–81 review hours**. Amended totals including all major samples: **267–556, 90–214 and 48–98 hours** respectively. These remain separate effort views, not additive elapsed-time forecasts. Low confidence: replace reserve allocations with actual closure effort after each wave. Unexpected substantial supporting-tool implementation requires a scoped re-estimate; it must not be hidden inside a small documentation reserve or silently left undone.
+
+Allocate the incremental engineering reserve once: A 2–4 h, B 3–6 h, C 3–6 h, D 2–4 h, E 4–8 h (3–6 h for major apps; 1–2 h for light work), F 1–2 h. Amended wave envelopes therefore become A 26–52, B 47–94, C 79–170, D 30–66, E 78–160, F 7–14 hours, summing to 267–556. The base tables below remain visible for traceability; only the amended totals include this reserve.
+
 These are preliminary planning ranges, not promises. **Engineering-equivalent hours** estimate task complexity as hands-on engineering work. **Active agent/tool hours** estimate cumulative model/tool execution across role-separated packets, including measurement runs but excluding user waits. **Review hours** estimate Astra plus human decision/review attention. They are separate views, not quantities to add into a single completion date. Parallel elapsed time depends on tool/model availability, decisions, CI duration and exact scope.
 
 Confidence is medium-low for small source-backed CI/documentation work and low for new architecture, hostile harnesses, deployment targets and major applications. Re-estimate after each wave with actuals. Ranges assume existing source remains usable, no major external toolchain blocker, bounded pilot-first rollout, and no new feature catalog.
@@ -32,8 +46,8 @@ Confidence is medium-low for small source-backed CI/documentation work and low f
 | W20A | 16–32 | 5–12 | 2–4 |
 | W20B | 20–40 | 6–15 | 3–5 |
 | W20C | 24–48 | 8–18 | 3–6 |
-| Core + light docs subtotal | 192–406 | 66–158 | 35–73 |
-| Including all three major samples | 252–526 | 85–203 | 43–88 |
+| Base core + light docs subtotal | 192–406 | 66–158 | 35–73 |
+| Base including all three major samples | 252–526 | 85–203 | 43–88 |
 
 These totals are conservative sums of separately scoped work; shared discoveries may reduce work, unresolved design or broader scope may increase it. Do not claim the four-agent limit produces fourfold acceleration. Roles and dependencies often serialize the critical path.
 
@@ -51,6 +65,8 @@ These totals are conservative sums of separately scoped work; shared discoveries
 Allocate each child task once in the execution ledger; do not count full workstreams in multiple waves. Initial engineering-equivalent wave allocation: A24–48 hours; B44–88; C76–164; D28–62; E74–152 including major samples; F6–12. These sum to252–526 hours, matching the all-workstream envelope. They are preliminary task allocations, not phase-duration promises; reallocate with recorded actuals without silently changing the controlling total.
 
 ## Packet sizes and model budgets
+
+Every packet also names its stable major-block ID, parent wave and [knowledge/tooling closure outputs](knowledge-and-tooling-closure.md). Reserve a checkpoint for lessons, relevant Markdown/BRAIN/script/tool alignment, full Astra feedback and rechecks. Save this evidence before declaring the block complete and pass a hash-fresh accepted packet to the next owner. Existing time/token requests below remain requested bounds, not hard tool limits.
 
 | Role/task | Requested runtime | Requested token budget | Checkpoint/output |
 |---|---|---|---|

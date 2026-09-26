@@ -1,5 +1,13 @@
 # Execution protocol
 
+## Mandatory block and wave closure
+
+The [knowledge, documentation and tooling closure contract](knowledge-and-tooling-closure.md) is a hard completion gate for every workstream, major task block, section and wave. Before dispatch, assign a stable block ID (for example W03-B02), enumerate owned outputs and the exact source→docs/spec/rule/memory/tool/self-test/index impact matrix, and name the parent wave. Keep this packet targeted and hash-fresh; do not wait until the end of a large workstream to update knowledge.
+
+Luna refreshes relevant BRAIN/memory and inventories actual supporting scripts/tools; Sol builds/updates approved code/tooling and runs required checks; Astra resolves rule-placement and architecture decisions and performs the full feedback review. Save lessons or an explicit none-found outcome, decisions, open issues, commands/artifacts, feedback dispositions and rechecks in the [closeout ledger](closeout-ledger.md). Missing scripts, unrun checks, stale relevant Markdown or unresolved blocking feedback prevent feature completion. A reasoned N/A requires reviewed evidence, not omission.
+
+At each parent-wave exit, consolidate all block closure records, refresh changed inputs, perform an integrated Astra review and reopen affected blocks if drift appears. Commit exact owned artifacts only after this closure review; eventual squash retains the accepted evidence and durable lessons. The ready-to-use record and feedback table in the shared contract are required dispatch/closeout templates.
+
 This protocol applies to every child plan. It is a future execution contract; current scope is documentation/planning only.
 
 ## Roles and context

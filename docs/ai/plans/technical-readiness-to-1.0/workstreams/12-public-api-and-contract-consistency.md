@@ -1,11 +1,13 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w12
-version: 1.0
+version: 1.1
 status: planned
 last_updated: 2026-09-26
 -->
 # W12 — New public API and forward contract consistency
+
+> **Mandatory completion gate:** This workstream and every major block inherit the [knowledge, documentation and tooling closure contract](../references/knowledge-and-tooling-closure.md). Save evidence-linked lessons/decisions (or an explicit no-new-lesson outcome), synchronize all relevant BRAIN/Markdown/indexes, build or update required supporting scripts/tools and test/run them (or record reviewed N/A), then complete full Astra review → feedback → fix → recheck. Persist the impact matrix, feedback and owned commit evidence; reopen the unit when relevant context changes. Feature implementation alone cannot close this work.
 
 ## Purpose and explicit greenfield policy
 

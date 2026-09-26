@@ -1,5 +1,7 @@
 # Mandatory quality constitution
 
+**Essential maintenance rule:** every workstream, major block, major section and wave must keep BRAIN, all relevant Markdown/indexes and required scripts/tools aligned; save lessons/decisions; and complete full Astra review → feedback → fix → recheck before closure. The rationale is that working code without current execution knowledge or tested support machinery is incomplete. Apply the [closure contract](knowledge-and-tooling-closure.md), impact matrix and feedback log; record no-new-lesson and reasoned N/A outcomes explicitly. Promote reusable hard rules through existing canonical Specs and pointer/cascade rules, not a duplicate guidance hierarchy.
+
 This applies to every workstream/task, including children drafted before this reference. Current explicit user requirements supersede inherited v1.6 backward-compatibility and late-benchmark priorities.
 
 1. **Greenfield contract.** Choose the best new design. No old-release compatibility work, shims, migration scaffolding or preservation of redundant APIs is required.
@@ -14,6 +16,8 @@ This applies to every workstream/task, including children drafted before this re
 10. **Every technical rubric row10/10.** Demonstrate each agreed criterion in declared scope. No aggregate score may conceal a gap; no claim of mathematical perfection or unsupported superiority.
 
 ## Required review packet for each change
+
+Also require the stable block/wave ID, exact docs/BRAIN/tools impact matrix, script/tool inventory and build/update/test/run evidence, saved lesson destination/outcome, durable-rule promotion disposition, affected indexes/adapters, accepted/rejected feedback and recheck evidence. The [closeout ledger](closeout-ledger.md) records these outcomes. A material omission rejects closure even when feature tests pass.
 
 Include: relevant BRAIN/source hashes; exact task/decision IDs; all affected layers/files; duplicate/root-cause search findings; alternatives and chosen abstraction; code/test/docs/manifest consistency;100% coverage denominator/results; relevant conformance/bench/deployment proof; formatting/analyzer checks; limitations; exact owned diff and staged paths.
 

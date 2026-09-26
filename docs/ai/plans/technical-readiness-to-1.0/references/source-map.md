@@ -1,5 +1,23 @@
 # Authoritative source map
 
+## Canonical knowledge and tooling closure sources
+
+These Luna-verified sources govern the [closure contract](knowledge-and-tooling-closure.md) and [session lesson ledger](closeout-ledger.md):
+
+| Source | Exact reviewed section | Application |
+|---|---|---|
+| `docs/ai/meta/taxonomy.md` | Core Concepts / Memory, lines 93–99; Rules | Per-applicable-subagent memory observations; normative Spec promotion and rule pointers |
+| `docs/ai/README.md` | Memory adapter mapping, lines 223–228 | Portable memory versus adapter surfaces |
+| `docs/ai/specs/orchestration.md` | Learn from corrections, lines 153–158 | Save correction constraint+rationale in appropriate durable home |
+| `docs/ai/specs/spec.md` | §9, lines 443–456 | Child/root promotion and replacement of duplicate guidance with pointers |
+| `docs/ai/rules/global.md` | Lines 3–7 | Authoritative specification sources |
+| `docs/ai/rules/tools.md` | Lines 5–13 | Tool specification plus root/per-tool README obligations |
+| `tools/README.md` | Lines 30–32 | Pester registration and Test-Tools.ps1 |
+| `docs/ai/specs/tools/spec.md` | Header, §§1–2 | Scope tools/** and .etc/powershell/**; Test-/Sync- naming, structure/shared modules |
+| `docs/ai/meta/tooling.md` | Single Source of Truth, lines 13–20 | Reuse canonical tooling inventory rather than duplicate registry |
+| `docs/ai/meta/adapter-surfaces.md` | §5, lines 165–182 | Affected adapter cascade checklist |
+| `docs/ai/plans/tools-review-and-standardisation.md` | §3.4, lines 225–251; Phase 2 T2.03–T2.06, lines 343–353; Phases 5–6 | Precedent: registry/help/Pester/self-test evidence, docs/spec upkeep and independent feedback; special standing rules are not inherited |
+
 These references were supplied by Luna's read-only intake. Paths are repository-relative unless marked project workspace. Section references are used deliberately; line numbers can change during the planned work.
 
 | Source | Relevant sections | Use and limits |

@@ -1,5 +1,11 @@
 # Acceptance matrix for each 10/10 criterion
 
+## Mandatory closure across every criterion
+
+Every workstream, major block/section and wave must satisfy the [knowledge/tooling closure gate](knowledge-and-tooling-closure.md), in addition to its technical row below. Require a saved impact matrix, relevant BRAIN/Markdown/index updates, supporting scripts/tools built or updated and tested/run (or reviewed N/A), evidence-linked lessons or an explicit none-found outcome, canonical rule-promotion disposition and a complete Astra feedback→fix→recheck record. Parent waves reconcile all child records; changed evidence reopens affected units. Missing closure evidence blocks completion and the documentation/maintainability 10/10 claim.
+
+Closure artifact: [closeout ledger](closeout-ledger.md), with a stable ID and exact paths/artifacts for each unit. A generic claim that documentation is current is not acceptance evidence.
+
 The target is each technical row at10/10; no weights or aggregate. These are proposed observable exit requirements to be confirmed through formal review before activation. Completion is evidence-based within explicitly declared scope, not a claim that all possible bugs are impossible.
 
 | Rubric row / baseline | Required 10/10 evidence | Owners | Blocking condition |
