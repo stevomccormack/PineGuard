@@ -20,3 +20,6 @@ When implementing, follow:
 - CI enforces both through the `test-files` audit rule.
 
 Follow the spec EXACTLY. Do not improvise patterns.
+
+
+- Production-bound documentation examples are subject to the documentation/example conformance clause in docs/ai/specs/testing/unit-test.md and the applicable layer specifications; include that check in test review.

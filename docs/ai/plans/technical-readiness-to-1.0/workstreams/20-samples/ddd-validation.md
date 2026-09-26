@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20b
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -36,6 +36,10 @@ No persistence/event sourcing/CQRS framework or value-object generator is added 
 Engineering-equivalent20–40 hours; active model/tool work6–15 hours; review3–5 hours, low confidence until domain scope. Split by construction, invariant transitions, execution evidence and documentation. Apply [execution protocol](../../references/execution-protocol.md) and [quality constitution](../../references/quality-constitution.md).
 
 Stop for an unresolved core result/lifecycle contract or a domain rule duplicated in multiple layers. Fix the shared cause before extending the sample. Acceptance is separate from API and Clean Architecture projects.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. The small TP-CONSUMERS harness does not replace this final-phase application. Keep the large application late in the dependency sequence.
 
 ## Worked code example
 

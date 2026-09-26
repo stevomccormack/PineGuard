@@ -44,86 +44,324 @@ Final frozen source SHA-256:
 
 For reproduction, copy each complete source block below into a file with its displayed filename in the same empty scratch directory, then run the relative commands in that directory. No command depends on the original workspace path. The PowerShell governance self-test creates its own local fixtures; do not run production repository checks through it.
 
-## Current PineGuard examples
+## Repository test patterns
 
-**Current API**, numeric examples require net8.0 or net10.0, never netstandard2.1. Dependencies are the existing projects containing each adapter; preserve their existing usings. Exact cross-project namespaces have not been supplied, so these are explicit insertion units, not standalone consumers. Public API names and source locations came from Luna. The current failure types remain `MustResult<T>`, `MustFailure(PropertyPath,Code,Message,Value)` and `MustValidationResult`; Value existing in a result does not authorize logging it.
+# Source-grounded repository test excerpts
 
-Insert this complete data property into existing `MustNumberClausesTestData.cs` using existing xUnit imports (xUnit 2.9.3):
+This replaces production-test guidance that previously displayed the isolated console smoke harness. The complete Program.cs remains a separate mechanical demonstration. These snippets are documentation views inside the named existing files/classes, preserving their existing namespaces/imports/base classes; never paste a second copy of an existing group/test. Proposed additions must use the same canonical RuleScenario→typed case→TheoryData→MemberData→existing assertion pipeline. No new project/layout implementation occurs here. Numeric cases target net8/net10; all code is source-inspected through Luna, not newly executed.
+
+## W01 and canonical semantics: nullable Core fixture and paired test
+
+Exact current NumberRulesFixtures.IsPositive fixture excerpt; Null stays visible:
 
 ```csharp
-public static TheoryData<int?, bool> DocumentationPositiveCases => new()
+public static class IsPositive
 {
-    { null, false }, { int.MinValue, false }, { -1, false },
-    { 0, false }, { 1, true }, { int.MaxValue, true }
-};
+    public static readonly int? Positive = 1;
+    public static readonly int? Zero = 0;
+    public static readonly int? Negative = -1;
+    public static readonly int? Null = null;
+    public static RuleScenario<int?>[] ValidScenarios => [new(nameof(Positive), Positive, true)];
+    public static RuleScenario<int?>[] InvalidScenarios =>
+    [new(nameof(Zero), Zero, false), new(nameof(Negative), Negative, false), new(nameof(Null), Null, false)];
+    public static RuleScenario<int?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+}
 ```
 
-Insert this complete method into existing `MustNumberClausesTests.cs`, whose existing imports resolve Must/xUnit:
+Exact existing NumberRulesTestData.IsPositiveInt projection in its paired file:
+
+```csharp
+public static class IsPositiveInt
+{
+    public static TheoryData<RuleCase<int?>> Cases => F.IsPositive.AllScenarios.ToRuleCases();
+}
+```
+
+Existing NumberRulesTests method with proposed AAA comments; preserve its base AssertResult:
 
 ```csharp
 [Theory]
-[MemberData(nameof(MustNumberClausesTestData.DocumentationPositiveCases),
-    MemberType = typeof(MustNumberClausesTestData))]
-public void Documentation_positive_has_explicit_expected_outcomes(int? value, bool expected)
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
 {
-    var result = Must.Be.Positive<int>(value);
-    Assert.Equal(expected, result.Success);
+    // Arrange: tc comes from the independently authored shared fixture.
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert.
+    AssertResult(tc, result);
 }
 ```
 
-Expected outputs are the literal data rows. Status: source-grounded API, proposed test insertion, not executed. Test SDK 18.10.1 is the source pin. Do not infer every framework's null handling from these Must expectations.
+Inputs Positive1→true; Zero0/Negative-1/Null→false. Must's exact Positive group/test from manuscript.md remains a separate nonnullable MustCase<int> projection; it deliberately excludes Null because Must.Positive<T> takes T, not T?. This Core excerpt supplies actual nullable behavior evidence.
 
-**Current API**, complete insertion method in existing Guard tests with existing imports:
+## W04/W05: Guard complement pipeline
+
+Existing GuardNumberClausesTestData.ZeroOrNegative group, exact source projection:
 
 ```csharp
-private static void Documentation_positive_guard_accepts_one()
+public static class ZeroOrNegative
 {
-    Guard.Against.ZeroOrNegative(1);
+    public static TheoryData<GuardCase<int>> ValidCases => F.IsPositive.ValidScenarios
+        .Select(s => new RuleScenario<int>(s.Name, s.Inputs!.Value, s.IsValid))
+        .ToArray().ToGuardCases(_ => new GuardExpected(true));
+    public static TheoryData<GuardCase<int>> InvalidCases => F.IsPositive.InvalidScenarios
+        .Except(nameof(F.IsPositive.Null))
+        .Select(s => new RuleScenario<int>(s.Name, s.Inputs!.Value, s.IsValid))
+        .ToArray().ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
 }
 ```
 
-Input 1 → no exception. Status not executed. The complement is ZeroOrNegative; there is no claimed Guard.Against.Positive API.
-
-**Current API**, complete rule-registration statement inside an existing numeric FluentValidation validator constructor, model has existing int `Value`, FluentValidation 11.12.0:
+Focused view of the existing GuardNumberClausesTests group method. Keep the existing custom-message assertions in that file when integrating; this excerpt shows the default-exception/return contract and does not authorize deleting other assertions:
 
 ```csharp
-RuleFor(x => x.Value).Positive();
-```
-
-Input Value=1 → positive predicate accepted, Value=0 → positive predicate rejected; framework null/skip/object execution is a separate test contract, not inferred here. Status source-grounded, not executed.
-
-**Current API**, complete property declaration in existing DataAnnotations numeric model using existing imports:
-
-```csharp
-[PositiveNumber]
-public int Value { get; set; }
-```
-
-Input 1/0 → positive/nonpositive; invoke the actual DataAnnotations validation mechanism in its adapter tests before claiming parity. Status declaration source-grounded, not executed.
-
-**Current API**, complete insertion method in existing Must email tests:
-
-```csharp
-private static void Documentation_email_has_an_independent_example()
+[Theory]
+[MemberData(nameof(GuardNumberClausesTestData.ZeroOrNegative.ValidCases), MemberType = typeof(GuardNumberClausesTestData.ZeroOrNegative))]
+[MemberData(nameof(GuardNumberClausesTestData.ZeroOrNegative.InvalidCases), MemberType = typeof(GuardNumberClausesTestData.ZeroOrNegative))]
+public void ZeroOrNegative_BehavesAsExpected(GuardCase<int> tc)
 {
-    Assert.True(Must.Be.Email("person@example.com").Success);
-    Assert.False(Must.Be.Email("not an email").Success);
+    // Arrange.
+    var value = tc.Value;
+    // Act and assert the expected guard contract through the existing helper.
+    var result = AssertResult(tc, () => Guard.Against.ZeroOrNegative(value));
+    if (tc.Expected.IsValid) Assert.Equal(value, result);
 }
 ```
 
-Expected valid/invalid are explicit; stable existing failure code is `MustCodes.Email.Address.Invalid`. Status not executed. Existing complement is Guard.Against.NotEmail, Fluent `.Email()`, DataAnnotations `[Email]`. Do not invent a validation-manifest API from CLI layer-parity vocabulary.
+Positive1 returns1; Zero0/Negative-1 throw ArgumentException with parameter value. This nonnullable projection does not test Null.
 
-**Current API**, complete forwarding method inside an existing DateOnly test class with its existing imports:
+## W04/W05: FluentValidation pipeline with its actual null contract
+
+Exact FluentNumberExtensionsTestData.Positive group:
 
 ```csharp
-private static bool Documentation_past_with_explicit_policy(
-    DateOnly? value, Inclusion inclusion, TimeProvider clock)
+public static class Positive
 {
-    return DateOnlyRules.IsInPast(value, inclusion, clock);
+    public static TheoryData<FluentCase<int?>> Cases => F.IsPositive.AllScenarios.ToFluentCases(s => s.Name switch
+    {
+        nameof(F.IsPositive.Null) => new FluentExpected(true),
+        _ when s.IsValid => new FluentExpected(true),
+        _ => new FluentExpected(false, "Value must be positive.")
+    });
 }
 ```
 
-The caller must supply an existing verified Inclusion member and `FixedTimeProvider` fixture; the packet does not identify that enum member, so no boundary truth is fabricated. Purpose: show explicit clock/policy flow, not settle inclusive boundaries. Status exact signature source-grounded, semantic execution pending. `Program.cs` independently demonstrates UTC and raw string→DateOnly conversion, not DateOnlyRules conformance.
+Existing validator and test within FluentNumberExtensionsTests; do not duplicate them:
+
+```csharp
+private sealed class PositiveValidator : AbstractValidator<IntModel>
+{
+    public PositiveValidator() => RuleFor(x => x.Value).Positive();
+}
+[Theory]
+[MemberData(nameof(FluentNumberExtensionsTestData.Positive.Cases), MemberType = typeof(FluentNumberExtensionsTestData.Positive))]
+public void Positive_BehavesAsExpected(FluentCase<int?> tc)
+{
+    // Arrange.
+    var validator = new PositiveValidator();
+    var model = new IntModel { Value = tc.Value };
+    // Act.
+    var result = validator.Validate(model);
+    // Assert.
+    AssertResult(tc, result);
+}
+```
+
+Positive1 and Null→valid under this framework contract; Zero0/Negative-1→failure message Value must be positive. Null acceptance is independently explicit in FluentExpected and differs from nullable Core; no blanket adapter-parity claim is made.
+
+## W04/W05: normative DataAnnotations typed pipeline
+
+Use the actual conformant existing StringBoolAttributesTestData.TrueString example to show the normative DataAnnotations single-Cases shape, rather than presenting legacy NumberAttributes split streams as the standard. Context: its existing F.BoolIsTrue alias and implemented DataAnnotationCase/DataAnnotationExpected/scenario extensions:
+
+```csharp
+public static class TrueString
+{
+    public static TheoryData<DataAnnotationCase> Cases => F.BoolIsTrue.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+    {
+        nameof(F.BoolIsTrue.NullValue) => new DataAnnotationExpected(true),
+        _ when s.IsValid => new DataAnnotationExpected(true),
+        _ => new DataAnnotationExpected(false, "Value must be true.", Code: MustCodes.Boolean.Value.False)
+    });
+}
+```
+
+Existing StringBoolAttributesTests derives from BaseDataAnnotationUnitTest. Complete method view with proposed AAA comments:
+
+```csharp
+[Theory]
+[MemberData(nameof(StringBoolAttributesTestData.TrueString.Cases), MemberType = typeof(StringBoolAttributesTestData.TrueString))]
+public void TrueString_BehavesAsExpected(DataAnnotationCase tc)
+{
+    // Arrange.
+    var attr = new TrueStringAttribute();
+    var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+    // Act.
+    var result = attr.GetValidationResult(tc.Value, ctx);
+    // Assert.
+    AssertResult(tc, result, attr.Code);
+}
+```
+
+NullValue and independently valid true scenarios→ValidationResult.Success; invalid scenarios→message Value must be true and Boolean.Value.False code. PositiveNumber consumer invocation remains a distinct API ergonomics example, not a fabricated typed pipeline or evidence of numeric DA null handling.
+
+## W04/W05: current object aggregate pipeline
+
+Existing MustValidatorTestData.Validate.Case extends ValueCase<CreateOrder?>; existing Cases remains authoritative and unchanged. The packet did not supply its literal input rows, so they are referenced by exact MemberData rather than recreated or populated from production results. Existing type declarations in that group:
+
+```csharp
+public sealed record FailureExpectation(string PropertyPath, string Code, string? Message = null);
+public sealed record Case(string Name, CreateOrder? Order, bool ExpectedSuccess,
+    FailureExpectation[] ExpectedFailures) : ValueCase<CreateOrder?>(Name, Order);
+```
+
+Complete focused assertion method view in MustValidatorTests, using the existing dataset and CreateOrderValidator. Aggregate assertions are explicit because this is the supplied current composite precedent; this does not fabricate a universal new case/helper taxonomy:
+
+```csharp
+[Theory]
+[MemberData(nameof(MustValidatorTestData.Validate.Cases), MemberType = typeof(MustValidatorTestData.Validate))]
+public void Validate_CollectsFailuresInRegistrationOrder(MustValidatorTestData.Validate.Case testCase)
+{
+    // Arrange.
+    var validator = new CreateOrderValidator();
+    // Act.
+    var result = validator.Validate(testCase.Value!);
+    // Assert independently specified aggregate expectations in registration order.
+    Assert.Equal(testCase.ExpectedSuccess, result.Success);
+    var failures = result.Failures.ToArray();
+    Assert.Equal(testCase.ExpectedFailures.Length, failures.Length);
+    for (var i = 0; i < failures.Length; i++)
+    {
+        var expected = testCase.ExpectedFailures[i];
+        Assert.Equal(expected.PropertyPath, failures[i].PropertyPath);
+        Assert.Equal(expected.Code, failures[i].Code);
+        if (expected.Message is not null) Assert.Equal(expected.Message, failures[i].Message);
+    }
+}
+```
+
+Expected success, failure count/order/path/code/optional message come from the existing independently authored aggregate dataset. This preserves its actual composite naming precedent and does not create a duplicate group/test.
+
+## Repository-test guidance for the remaining test workstreams
+
+W06/W08 property/differential, W07/W09 replay/mutation and W14/W15/W17/W18/W19 security/regex/privacy/determinism/concurrency must use the applicable pipeline above for adopted repository tests. Program.cs's Check/Require loops are not substitutes. Proposed generated scenario additions belong in the shared fixture; their inputs/expected truth are independently generated, converted into approved typed Cases, bound by MemberData and checked with the existing base helper. Specialized tools/contracts stay unresolved where the plan says so; no unverified fixture classes, enum policies or adapter-null assumptions are selected by these examples.
+
+Normative source refs supplied by Luna: docs/ai/specs/must-clauses/unit-test.md TestData Pattern/Test Structure; docs/ai/specs/testing/unit-test.md §§4.1,4.5,5.1; docs/ai/specs/testing/fixture.md §§2,4,9,11. Preserve existing surface-specific conventions rather than forcing all adapters into Must's ValidCases/InvalidCases shape. New operational contracts require their approved typed expectation model before production test code is represented as ready to integrate.
+
+## Group 3: W06 property and W08 differential
+
+W06 fixture-sampled property assertion over the current four named canonical cases; nullable baseline and independently justified positive-successor property. This is a fixture-driven xUnit illustration, not generated/property-framework or exhaustive domain evidence:
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: tc is an independent canonical fixture row.
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert the baseline through the approved typed helper.
+    AssertResult(tc, result);
+    // Positive integers below MaxValue retain positive sign after adding one.
+    if (tc.Value is int value && Math.Sign(value) == 1 && value < int.MaxValue)
+        Assert.True(NumberRules.IsPositive<int>(value + 1));
+}
+```
+
+Scenario acceptance: Positive1→successor2 valid; Maximum edge→baseline valid with overflow operation skipped; Zero/Negative/Null retain canonical baseline expectations. Add Maximum to canonical ValidEdgeScenarios when extending the fixture. Program.cs's seed731 loop remains only the separately labeled mechanical generation example; production generated cases must originate in the approved fixture layer.
+
+W08 differential assertion over the identical nullable-int domain, using the independent BCL sign model:
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: reference semantics cover exactly int? and treat null as invalid.
+    var reference = tc.Value is int value && Math.Sign(value) == 1;
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert independent fixture truth and independent reference agreement.
+    AssertResult(tc, result);
+    Assert.Equal(reference, result);
+}
+```
+
+Scenario acceptance: Positive1→true; Zero/Negative/Null→false; canonical int.MinValue/int.MaxValue edge extensions→false/true. No email/date/reference-domain equivalence is inferred.
+
+## Group 4: W07 replay and W09 mutation
+
+W07 complete fixture-backed replay structure: MemberData enumerates the named canonical corpus and each row is evaluated once. It is not coverage-guided fuzzing, stress/repetition evidence, raw-input parser fuzzing or an adopted operational budget:
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: MemberData supplies one independently authored named corpus row.
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert.
+    AssertResult(tc, result);
+}
+```
+
+Scenario acceptance: MemberData supplies Positive/Zero/Negative/Null once each and the existing typed helper verifies independent truth. Repeating a deterministic row is not extra coverage. The raw-string/overflow/129-character corpus remains an explicitly separate mechanical Boundary example in Program.cs; an adopted hostile raw-input corpus/tool harness is a future prerequisite and must use its approved typed input/expectation contract before integration.
+
+W09 source-grounded fixture assertions distinguish one deliberately seeded boundary fault. The local mutant is intentionally wrong and never a second executable authority; no mutation-engine selection/score is claimed:
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: canonical Zero independently expects invalid.
+    static bool SeededBoundaryMutant(int? input) => input is not null && input.Value >= 0;
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert through the existing fixture-backed helper.
+    AssertResult(tc, result);
+    if (tc.Value == 0)
+    {
+        Assert.False(result);
+        Assert.True(SeededBoundaryMutant(tc.Value));
+    }
+}
+```
+
+Scenario acceptance: Zero0 fails canonical and passes the mutant; substituting that mutant into the actual evaluator would fail the existing zero case. This is one distinguishable seed, not an automated campaign.
+
+## Group 5: W14/W15/W17/W18/W19 operational test guidance
+
+Use the complete approved typed pipeline below as the structural repository-test reference, preserving the current operation name/type/MemberData/AssertResult. This numeric structural example does not verify security, regex, privacy, date determinism or concurrency. Those workstreams retain concrete relevant implementation illustrations separately, plus the acceptance rows below. Unselected operational expectation contracts must be approved before representing specialized production tests as ready to integrate; do not invent replacement case types or rebrand smoke loops as conformant tests.
+
+```csharp
+public static class IsPositiveInt
+{
+    public static TheoryData<RuleCase<int?>> Cases => F.IsPositive.AllScenarios.ToRuleCases();
+}
+```
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: independently authored canonical fixture and typed case.
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert.
+    AssertResult(tc, result);
+}
+```
+
+| Workstream | Independent named acceptance rows for its future canonical fixture | Concrete implementation illustration retained separately |
+|---|---|---|
+| W14 claim-specific security | Oversize129-character numeric input→rejected before parsing; overflow2147483648→rejected; no attempted numeric value in diagnostic event. These are candidate boundary claims, not general security proof. | Program.cs Boundary.TryCreate and Diagnostics.Event; claimed limits/operational responses remain provisional. |
+| W15 regex | InvalidPatternNonNegated and InvalidPatternNegated both→OperationalError; KnownMatch→Match; KnownNegatedMatch→NoMatch. Timeout requires deterministic injection/actual evidence and must never become negated success. | Complete PatternProbe.Evaluate try/catch/status body; candidate D05 semantics,20ms not selected. |
+| W17 privacy | DiagnosticsOff→no event; DiagnosticsOnFailed→exact fixed rule/code text; attempted value-987654321 absent. | Complete Diagnostics.Event allowlist body; D15 remains open. |
+| W18 determinism | Named fr-FR/invariant-culture cases restore previous culture in finally; FixedUtcClock→2030-01-02; ISO2030-01-02→same DateOnly. Actual DateOnlyRules use existing FixedTimeProvider fixture and selected Inclusion boundary. | Program.cs FixedClock and CultureAndTime conversion/restoration body; conversion does not establish past-date semantics. |
+| W19 concurrency | SharedStatelessPositive1000Calls→1000successes; bounded worker count recorded. Current mutable MustValidator lifecycle remains outside this claim until D17 chosen. | Program.cs ConcurrentReuse loop, explicitly mechanical static-function evidence only. |
+
+The canonical references show concrete relevant implementation code and the current compliant structural test chain side by side. Behavioral fixture/test implementations for these unresolved operational contracts are explicitly unimplemented; the structural numeric rows are not reported as technique evidence. This is the reviewed bounded correction, not a new architecture or production test suite.
 
 ## Direct workstream excerpts
 

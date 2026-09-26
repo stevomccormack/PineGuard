@@ -119,7 +119,7 @@ Speed rules:
 
 - Prefer `-SkipHtml` while iterating.
 - By default, generation runs each registry scope's own tightest test project (its `DefaultProjectFilter`) for speed — every registry scope carries one, not just `Core|Must|Guard`.
-- Use `-ProjectFilter "*.UnitTests.csproj"` only when you need broader execution.
+- All-project coverage uses the centralized ordinary-test project filter: `*.UnitTests.csproj;*.UnitTests.*.csproj;*.IntegrationTests.csproj`. A caller may still pass an explicit narrower `-ProjectFilter` such as `*.UnitTests.csproj` when that is intentional.
 
 ---
 

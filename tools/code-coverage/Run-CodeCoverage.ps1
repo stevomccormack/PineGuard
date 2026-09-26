@@ -12,7 +12,7 @@
     Its one piece of real behaviour is scope policy. Every scope in the registry
     (Get-PineGuardScope, tools/.shared/dotnet-projects.ps1) is held to 100% line and branch
     coverage automatically unless -Relaxed is passed, and an unbound -ProjectFilter resolves to
-    that scope's own DefaultProjectFilter rather than the generic '*.UnitTests.csproj'. Both are
+    that scope's own DefaultProjectFilter rather than the shared ordinary-test family filter. Both are
     derived from the registry rather than a literal list here, so a newly registered scope cannot
     silently opt out of the gate or drag unrelated test projects into the run.
 
@@ -32,7 +32,7 @@
 
 .PARAMETER Scope
     Registry coverage scope -- see Get-PineGuardScope in tools/.shared/dotnet-projects.ps1 for
-    the authoritative list -- or 'All' to run every *.UnitTests.csproj with no scope narrowing.
+    the authoritative list -- or 'All' to run every recognized ordinary test family with no scope narrowing.
     Every real (non-aggregate) scope is held to 100% automatically unless -Relaxed says
     otherwise; the list is derived from the registry so a newly registered scope cannot silently
     opt out of the gate.
@@ -56,7 +56,7 @@
 
 .PARAMETER ProjectFilter
     Glob used to discover test projects. Left unbound, each scope's own DefaultProjectFilter
-    from the registry is used instead ('*.UnitTests.csproj' for -Scope All), which keeps coverage
+    from the registry is used instead (the shared family filter for -Scope All), which keeps coverage
     loops fast by not running unrelated test projects.
 
 .PARAMETER Top
@@ -121,7 +121,7 @@ param(
     [switch] $Clean,
     [switch] $NoOpen,
     [switch] $SkipHtml,
-    [string] $ProjectFilter = '*.UnitTests.csproj',
+    [string] $ProjectFilter,
     [ValidateRange(1, 500)] [int] $Top = 30,
     [string] $IncludeFileRegex,
     [string] $ExcludeFileRegex,
@@ -160,7 +160,7 @@ $coverageGate = Join-Path $PSScriptRoot 'Test-Coverage.ps1'
 $effectiveProjectFilter = $ProjectFilter
 if (-not $PSBoundParameters.ContainsKey('ProjectFilter')) {
     if ($Scope -eq 'All') {
-        $effectiveProjectFilter = '*.UnitTests.csproj'
+        $effectiveProjectFilter = Get-DefaultTestProjectFilter
     }
     else {
         $effectiveProjectFilter = (Get-PineGuardScope -Name $Scope).DefaultProjectFilter

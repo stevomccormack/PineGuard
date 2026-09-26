@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w05
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -44,7 +44,13 @@ The pilot checkpoint proves only the pilot. Final W05 completion requires review
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
 
-## Worked code example
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
+
+### Mechanical illustration
+
+This package-free code is a mechanical teaching example only. It is not repository test guidance, a domain test, or evidence that the proposed technique is implemented. Complete source and reproduction scope are in [Code examples](../references/code-examples.md).
 
 This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
 
@@ -60,4 +66,82 @@ Checks.Require(Projections.ObjectErrors(0).SequenceEqual(
     new[] { "Value:illustration.number.not-positive" }), "object path/code");
 ```
 
-Purpose: independent literal expectations for candidate projections. Add actual adapter cases in their existing paired Tests/TestData files, including null/indexed children/sync-async semantics; do not assume identical framework null handling. Same 1/0 expectations as W04; candidate status pending, actual frameworks unverified.
+Purpose: independent literal expectations for candidate projections. Add actual adapter cases in their existing paired Tests/TestData files, including null/indexed children/sync-async semantics; do not assume identical framework null handling. Same 1/0 expectations as W04; candidate Status: mechanical illustration only; not repository-test evidence., actual frameworks unverified.
+
+### Repository test excerpt
+
+This documentation excerpt shows the canonical fixture-to-typed-case-to-TheoryData-to-MemberData-to-assertion chain. It does not implement PineGuard behavior; the full source-inspected patterns and scope limits are in [Code examples](../references/code-examples.md).
+
+#### W04/W05: FluentValidation pipeline with its actual null contract
+
+Exact FluentNumberExtensionsTestData.Positive group:
+
+```csharp
+public static class Positive
+{
+    public static TheoryData<FluentCase<int?>> Cases => F.IsPositive.AllScenarios.ToFluentCases(s => s.Name switch
+    {
+        nameof(F.IsPositive.Null) => new FluentExpected(true),
+        _ when s.IsValid => new FluentExpected(true),
+        _ => new FluentExpected(false, "Value must be positive.")
+    });
+}
+```
+
+Existing validator and test within FluentNumberExtensionsTests; do not duplicate them:
+
+```csharp
+private sealed class PositiveValidator : AbstractValidator<IntModel>
+{
+    public PositiveValidator() => RuleFor(x => x.Value).Positive();
+}
+[Theory]
+[MemberData(nameof(FluentNumberExtensionsTestData.Positive.Cases), MemberType = typeof(FluentNumberExtensionsTestData.Positive))]
+public void Positive_BehavesAsExpected(FluentCase<int?> tc)
+{
+    // Arrange.
+    var validator = new PositiveValidator();
+    var model = new IntModel { Value = tc.Value };
+    // Act.
+    var result = validator.Validate(model);
+    // Assert.
+    AssertResult(tc, result);
+}
+```
+
+Positive1 and Null→valid under this framework contract; Zero0/Negative-1→failure message Value must be positive. Null acceptance is independently explicit in FluentExpected and differs from nullable Core; no blanket adapter-parity claim is made.
+
+#### W04/W05: normative DataAnnotations typed pipeline
+
+Use the actual conformant existing StringBoolAttributesTestData.TrueString example to show the normative DataAnnotations single-Cases shape, rather than presenting legacy NumberAttributes split streams as the standard. Context: its existing F.BoolIsTrue alias and implemented DataAnnotationCase/DataAnnotationExpected/scenario extensions:
+
+```csharp
+public static class TrueString
+{
+    public static TheoryData<DataAnnotationCase> Cases => F.BoolIsTrue.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+    {
+        nameof(F.BoolIsTrue.NullValue) => new DataAnnotationExpected(true),
+        _ when s.IsValid => new DataAnnotationExpected(true),
+        _ => new DataAnnotationExpected(false, "Value must be true.", Code: MustCodes.Boolean.Value.False)
+    });
+}
+```
+
+Existing StringBoolAttributesTests derives from BaseDataAnnotationUnitTest. Complete method view with proposed AAA comments:
+
+```csharp
+[Theory]
+[MemberData(nameof(StringBoolAttributesTestData.TrueString.Cases), MemberType = typeof(StringBoolAttributesTestData.TrueString))]
+public void TrueString_BehavesAsExpected(DataAnnotationCase tc)
+{
+    // Arrange.
+    var attr = new TrueStringAttribute();
+    var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+    // Act.
+    var result = attr.GetValidationResult(tc.Value, ctx);
+    // Assert.
+    AssertResult(tc, result, attr.Code);
+}
+```
+
+NullValue and independently valid true scenarios→ValidationResult.Success; invalid scenarios→message Value must be true and Boolean.Value.False code. PositiveNumber consumer invocation remains a distinct API ergonomics example, not a fabricated typed pipeline or evidence of numeric DA null handling.

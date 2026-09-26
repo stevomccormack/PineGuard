@@ -80,3 +80,9 @@ go in that layer's folder — never in `Common/` unless genuinely shared by two 
 - Tests: `/test-testing` (runs `tests/PineGuard.Testing.UnitTests/`).
 - Coverage: `/coverage-testing` — 100% line and branch, like every other scope
   ([`coverage.md`](coverage.md)).
+
+## Approved crosscutting test organization
+
+PineGuard.Testing remains the shared fixture/case/projection library, and PineGuard.Testing.UnitTests tests that infrastructure. Added crosscutting rule and architecture checks have separately approved project boundaries; they do not move into these infrastructure tests or existing library unit suites. The authoritative planned names, folders and responsibilities are recorded in docs/ai/plans/technical-readiness-to-1.0/references/test-project-layout.md under decision TEST-LAYOUT-01. That decision groups techniques into responsibility-based projects and reuses this shared infrastructure rather than adding another fixture library.
+
+The approved projects remain planned until implemented. Their creation requires explicit solution membership, dependency/TFM review, correct test-versus-executable classification, applicable CI/evidence registration and documentation updates. Fuzz and consumer executables under tests/ must review shared Directory.Build.props inheritance before creation. Missing required projects or artifacts cannot satisfy an activated implementation gate; absence during planning is not a claim of successful execution.

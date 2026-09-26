@@ -19,7 +19,7 @@ version: 1.1
 - **Scope**: the primary target selector — one of the fourteen registry scopes, or `All` for the
   whole solution. Exactly one of `-Scope`, `-Project` or `-Solution` must be given; the script has
   no implicit default and exits `2` if none is supplied.
-- **Project** / **Solution**: (alternatives to `-Scope`) path to a specific `*.UnitTests.csproj`
+- **Project** / **Solution**: (alternatives to `-Scope`) path to a specific supported ordinary-test `.csproj` (a `*.UnitTests`, `*.UnitTests.*` or `*.IntegrationTests` project)
   or `.sln`/`.slnx` outside the registry.
 - **Filter**: (optional) filter expression for selective runs (e.g. `FullyQualifiedName~Tests`).
 - **Framework**: (optional) target framework moniker (e.g. `net10.0`).

@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w21
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -39,6 +39,10 @@ No broad rule expansion displaces early CI trust, taxonomy, new structure/manife
 Checkpoint each wave and before release decisions. Actual release/publication/deployment remains a separately authorized action. Luna gathers evidence, Sol executes approved code, Astra adjudicates/chairs review, and the orchestrator coordinates only.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
 
 ## Worked code example
 

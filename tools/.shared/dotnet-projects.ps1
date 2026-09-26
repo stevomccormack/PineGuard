@@ -3,12 +3,32 @@
     Shared .NET project discovery helpers for the PineGuard PowerShell toolchain.
 
 .DESCRIPTION
-    Dot-source this file to import Test-ProjectHasSources, Get-TestProjects,
+    Dot-source this file to import Get-DefaultTestProjectFilter, Test-ProjectHasSources, Get-TestProjects,
     Get-PineGuardScope and Get-PineGuardPackableProjects into the calling script's scope.
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+function Get-DefaultTestProjectFilter {
+    <#
+    .SYNOPSIS
+        Returns the ordinary unit/integration test project families used by discovery.
+    .DESCRIPTION
+        Specialized fuzz, benchmark and executable-consumer projects run through their own
+        harnesses and are not ordinary dotnet test discovery targets.
+    #>
+    return '*.UnitTests.csproj;*.UnitTests.*.csproj;*.IntegrationTests.csproj'
+}
+
+function Get-DefaultTestAssemblyFilter {
+    <#
+    .SYNOPSIS
+        Derives dotCover's comma-separated assembly filter from the shared project families.
+    #>
+    return (((Get-DefaultTestProjectFilter) -split ';' |
+        ForEach-Object { $_ -replace '\.csproj$', '' }) -join ',')
+}
 
 function Get-PineGuardScope {
     <#
@@ -261,10 +281,9 @@ function Get-PineGuardScope {
             SourceDir = 'tests/PineGuard.Testing'
             SourceCsprojs = @('tests/PineGuard.Testing/PineGuard.Testing.csproj')
             TestCsproj = 'tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj'
-            # NOTE: unlike the other five scopes, Testing's own coverage scripts default the
-            # test-project filter to the wildcard, not to its own test csproj filename — verified
-            # against Run-CodeCoverage.ps1 and tools/code-coverage/New-CoverageReport.ps1 before this refactor.
-            DefaultProjectFilter = '*.UnitTests.csproj'
+            # Testing coverage discovers the broad ordinary-test families that exercise the
+            # helper library. Run-Tests still selects only the helper's exact TestCsproj above.
+            DefaultProjectFilter = Get-DefaultTestProjectFilter
             CoverageIncludePatterns = @('[PineGuard.Testing]*')
             PathIncludeRegex = '^tests[/\\]+PineGuard\.Testing[/\\]+'
             DefaultSourcePrefix = 'tests/PineGuard.Testing'
@@ -358,10 +377,12 @@ function Test-ProjectHasSources {
 
     $projectDir = Split-Path -Parent $ProjectPath
 
-    $csFiles = Get-ChildItem -Path $projectDir -Recurse -File -Filter '*.cs' -ErrorAction SilentlyContinue |
-        Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
+    $csFiles = @(
+        Get-ChildItem -Path $projectDir -Recurse -File -Filter '*.cs' -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
+    )
 
-    return ($null -ne $csFiles -and $csFiles.Count -gt 0)
+    return ($csFiles.Count -gt 0)
 }
 
 function Get-TestProjects {
@@ -376,7 +397,7 @@ function Get-TestProjects {
 
         [string] $TestsDirectory = (Join-Path $RepoRoot 'tests'),
 
-        [string] $ProjectFilter = '*.UnitTests.csproj',
+        [string] $ProjectFilter = (Get-DefaultTestProjectFilter),
 
         [switch] $IncludeEmpty
     )

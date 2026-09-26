@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20c
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -36,6 +36,10 @@ All validation branches meet100% audited line/branch coverage. Unrelated infrast
 Engineering-equivalent24–48 hours; active model/tool work8–18 hours; review3–6 hours, low confidence until exact scope. Dispatch separate architecture, composition, end-to-end evidence and documentation packets with [execution protocol](../../references/execution-protocol.md) bounds.
 
 Stop for unjustified framework breadth, duplicated rules, unclear ownership or shared abstractions built for imagined future scenarios. W20C cannot be marked complete from a diagram/build alone.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. The small TP-CONSUMERS harness does not replace this final-phase application. Keep the large application late in the dependency sequence.
 
 ## Worked code example
 

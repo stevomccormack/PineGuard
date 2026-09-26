@@ -112,7 +112,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/New-Coverag
 
 Generates fresh coverage output by:
 
-- discovering runnable unit test projects under `tests/**/*.UnitTests.csproj` (or narrowed to that scope's own default test project, for speed, whenever `-Scope` names a single registry scope rather than `All`)
+- discovering runnable ordinary test projects under `tests/` using the centralized project filter (names ending `.UnitTests`, nested `.UnitTests.*` names, and names ending `.IntegrationTests`), or narrowing to a scope's `DefaultProjectFilter` for a single registry scope
 - running `dotnet test` with `--collect:"XPlat Code Coverage"`
 - generating a scope-specific runsettings file under `artifacts/code-coverage/coverlet/<scope>/coverlet.runsettings`
 - producing HTML (plus a merged Cobertura.xml) under `artifacts/code-coverage/coverlet/<scope>/report/`
@@ -162,7 +162,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/Ne
 
 Notes:
 
-- The script skips `*.UnitTests.csproj` projects that contain no `*.cs` files (outside `bin/`/`obj/`) to avoid misleading "No test is available" runs.
+- The script skips matching ordinary-test projects that contain no `*.cs` files outside `bin/` and `obj/` to avoid misleading "No test is available" runs.
 - Coverage collection is occasionally intermittent (empty/invalid Cobertura output). The script detects that and automatically retries once.
 - When not `-NoOpen`, the browser opens `artifacts/code-coverage/coverlet/<scope>/report/index.html` directly — there is no intermediate redirect page.
 

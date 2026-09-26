@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0
-version: 1.9
+version: 1.10
 status: planned
 last_updated: 2026-09-26
 -->
@@ -16,6 +16,10 @@ The proposed .NET 10 miniature and synthetic governance fixtures were built/run 
 This modular plan targets **10/10 in every technical rubric criterion** and **100% line and branch coverage for every declared validation surface within the audited Coverlet denominator**. It is a detailed plan and critical review, not implementation or a claim that readiness has been achieved.
 
 PineGuard is greenfield for this work. Choose the best globally consistent new design; no old-release compatibility, shims or migration work is required. Put small high-value CI/evidence repairs, naming/taxonomy decisions, the **new static rule structure and executable manifest**, and **benchmark baselines EARLY**. Put the largest API, DDD and Clean Architecture sample projects LAST. These current user instructions supersede contrary priorities in v1.6 and the original handoff.
+
+## Approved test-project organization
+
+The user-approved [testing project layout](references/test-project-layout.md) groups added crosscutting checks into Rules and Architecture test projects, hosted composition into IntegrationTests, and distinct Fuzz, Benchmarks and Consumers executables. Testing techniques use folders within those responsibilities. Existing library unit suites, the shared PineGuard.Testing fixture library and its own PineGuard.Testing.UnitTests retain their responsibilities. The layout's stable TP-* identities and workstream mapping are authoritative; implementation must align the solution, relevant discovery/routing/coverage scripts, BRAIN and documentation. The six projects remain planned and must not be reported as present or passing.
 
 ## Status, authority and preservation
 

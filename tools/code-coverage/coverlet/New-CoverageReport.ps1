@@ -20,7 +20,7 @@
 
 .PARAMETER Scope
     Registry coverage scope (see tools/.shared/dotnet-projects.ps1's Get-PineGuardScope), or
-    'All' to run every *.UnitTests.csproj project with no scope-specific narrowing.
+    'All' to run every recognized ordinary test family with no scope-specific narrowing.
 
 .PARAMETER Clean
     Delete this scope's own previous output (testresults/ and report/) before collecting.
@@ -33,7 +33,7 @@
 
 .PARAMETER ProjectFilter
     Glob used to discover test projects. Defaults to the scope's own DefaultProjectFilter when
-    left at the generic '*.UnitTests.csproj' value.
+    left unbound. Explicit caller filters are preserved unchanged.
 
 .PARAMETER Filter
     `dotnet test --filter` expression, forwarded as-is.
@@ -56,7 +56,7 @@ param(
     [switch] $Clean,
     [switch] $NoOpen,
     [switch] $SkipHtml,
-    [string] $ProjectFilter = '*.UnitTests.csproj',
+    [string] $ProjectFilter,
     [string] $Filter,
     [switch] $Isolated,
     [ValidateSet('cobertura', 'opencover')] [string] $Format = 'cobertura',
@@ -164,8 +164,8 @@ else {
 
 # For speed, default to the single most relevant test project for the selected scope.
 # (You can override by passing -ProjectFilter explicitly.)
-if ($ProjectFilter -eq '*.UnitTests.csproj') {
-    $ProjectFilter = if ($null -ne $generateScopeEntry) { $generateScopeEntry.DefaultProjectFilter } else { '*.UnitTests.csproj' }
+if (-not $PSBoundParameters.ContainsKey('ProjectFilter')) {
+    $ProjectFilter = if ($null -ne $generateScopeEntry) { $generateScopeEntry.DefaultProjectFilter } else { Get-DefaultTestProjectFilter }
 }
 
 $runSettingsPath = Join-Path $scopeRoot 'coverlet.runsettings'

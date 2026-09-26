@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w06
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -44,7 +44,13 @@ W06 owns semantic properties and generators; W07 owns hostile-input fuzz campaig
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
 
-## Worked code example
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
+
+### Mechanical illustration
+
+This package-free code is a mechanical teaching example only. It is not repository test guidance, a domain test, or evidence that the proposed technique is implemented. Complete source and reproduction scope are in [Code examples](../references/code-examples.md).
 
 This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
 
@@ -58,4 +64,28 @@ for (var i = 0; i < 1000; i++)
 }
 ```
 
-Purpose: repeatable seed731, 1,000 ints in [-10000,10000], independent Math.Sign oracle. Every comparison must agree. This bounded generated test is not a claim about a selected property-testing framework or all numeric types. D10 remains open. Status pending.
+Purpose: repeatable seed731, 1,000 ints in [-10000,10000], independent Math.Sign oracle. Every comparison must agree. This bounded generated test is not a claim about a selected property-testing framework or all numeric types. D10 remains open. Status: mechanical illustration only; not repository-test evidence.
+
+### Repository test excerpt
+
+This documentation excerpt shows the canonical fixture-to-typed-case-to-TheoryData-to-MemberData-to-assertion chain. It does not implement PineGuard behavior; the full source-inspected patterns and scope limits are in [Code examples](../references/code-examples.md).
+
+W06 fixture-sampled property assertion over the current four named canonical cases; nullable baseline and independently justified positive-successor property. This is a fixture-driven xUnit illustration, not generated/property-framework or exhaustive domain evidence:
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: tc is an independent canonical fixture row.
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert the baseline through the approved typed helper.
+    AssertResult(tc, result);
+    // Positive integers below MaxValue retain positive sign after adding one.
+    if (tc.Value is int value && Math.Sign(value) == 1 && value < int.MaxValue)
+        Assert.True(NumberRules.IsPositive<int>(value + 1));
+}
+```
+
+Scenario acceptance: Positive1→successor2 valid; Maximum edge→baseline valid with overflow operation skipped; Zero/Negative/Null retain canonical baseline expectations. Add Maximum to canonical ValidEdgeScenarios when extending the fixture. Program.cs's seed731 loop remains only the separately labeled mechanical generation example; production generated cases must originate in the approved fixture layer.

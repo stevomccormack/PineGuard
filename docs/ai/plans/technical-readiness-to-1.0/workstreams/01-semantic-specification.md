@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w01
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -45,7 +45,13 @@ Checkpoint after reproductions and after each rule's reviewed truth table. Sol c
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
 
-## Worked code example
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
+
+### Mechanical illustration
+
+This package-free code is a mechanical teaching example only. It is not repository test guidance, a domain test, or evidence that the proposed technique is implemented. Complete source and reproduction scope are in [Code examples](../references/code-examples.md).
 
 This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
 
@@ -62,4 +68,52 @@ foreach (var row in cases)
 }
 ```
 
-Purpose: literal null/boundary/valid truth rows, independent stable codes. Exact inputs/outputs are in the canonical contract and method; current paired TheoryData/MemberData insertion above supplies the actual Must example. Status pilot execution pending, current tests not run.
+Purpose: literal null/boundary/valid truth rows, independent stable codes. Exact inputs/outputs are in the canonical contract and method; current paired TheoryData/MemberData insertion above supplies the actual Must example. Status: mechanical illustration only; not repository-test evidence., current tests not run.
+
+### Repository test excerpt
+
+This documentation excerpt shows the canonical fixture-to-typed-case-to-TheoryData-to-MemberData-to-assertion chain. It does not implement PineGuard behavior; the full source-inspected patterns and scope limits are in [Code examples](../references/code-examples.md).
+
+#### W01 and canonical semantics: nullable Core fixture and paired test
+
+Exact current NumberRulesFixtures.IsPositive fixture excerpt; Null stays visible:
+
+```csharp
+public static class IsPositive
+{
+    public static readonly int? Positive = 1;
+    public static readonly int? Zero = 0;
+    public static readonly int? Negative = -1;
+    public static readonly int? Null = null;
+    public static RuleScenario<int?>[] ValidScenarios => [new(nameof(Positive), Positive, true)];
+    public static RuleScenario<int?>[] InvalidScenarios =>
+    [new(nameof(Zero), Zero, false), new(nameof(Negative), Negative, false), new(nameof(Null), Null, false)];
+    public static RuleScenario<int?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+}
+```
+
+Exact existing NumberRulesTestData.IsPositiveInt projection in its paired file:
+
+```csharp
+public static class IsPositiveInt
+{
+    public static TheoryData<RuleCase<int?>> Cases => F.IsPositive.AllScenarios.ToRuleCases();
+}
+```
+
+Existing NumberRulesTests method with proposed AAA comments; preserve its base AssertResult:
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: tc comes from the independently authored shared fixture.
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert.
+    AssertResult(tc, result);
+}
+```
+
+Inputs Positive1→true; Zero0/Negative-1/Null→false. Must's exact Positive group/test from manuscript.md remains a separate nonnullable MustCase<int> projection; it deliberately excludes Null because Must.Positive<T> takes T, not T?. This Core excerpt supplies actual nullable behavior evidence. Extend the canonical numeric fixture with int.MinValue, int.MaxValue and the reviewed boundary/edge scenarios, preserving independent expectations and layer-specific typed projections; do not reintroduce local hardcoded TestData tables.

@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20a
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -36,6 +36,10 @@ Do not add database/authentication/cloud deployment/UI machinery unless needed f
 Engineering-equivalent effort16–32 hours; active Sol/Luna tool-and-model work5–12 hours; Astra/user review2–4 hours, low confidence until exact scope is approved. Break into2–4-hour engineering-equivalent packets with10–20-minute requested agent bounds, checkpoints and role-specific tokens from the [execution protocol](../../references/execution-protocol.md). These estimates are not wall-clock promises or hard tool limits.
 
 Stop for core contract gaps, new API choices, scope growth or duplicate validation logic; return the issue to its owning workstream. W20A is accepted separately from W20B/W20C.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. The small TP-CONSUMERS harness does not replace this final-phase application. Keep the large application late in the dependency sequence.
 
 ## Worked code example
 

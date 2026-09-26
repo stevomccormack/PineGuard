@@ -820,3 +820,9 @@ Both are enforced by **audit-cli `test-files`** (`Unit Test File Normalization`)
 - Reproduce locally: `pnpm -C apps/cli exec tsx src/index.ts audit test-files`
 
 The remaining unit-test rules in this spec (§4, §5, §9) are reviewed by agents and humans, not gated.
+
+## Documentation and proposed test examples
+
+A test example intended to guide repository implementation must follow this specification and the applicable layer-specific fixture, TestData and assertion specifications before acceptance. Labeling an example proposed or source-inspected does not waive those requirements. Verify the complete relationship between the actual API signature and generic constraints, canonical fixture payload and independent expectations, approved typed projection, TheoryData payload, MemberData binding, operation-group method name and assertion helper. Preserve surface-specific null and framework behavior rather than assuming identical adapter contracts.
+
+Load the applicable specification clauses and a current precedent before drafting. Record the evidence and any source/specification discrepancy in the review packet; the governing specification remains authoritative until an explicit approved decision changes it. Missing applicable evidence or an unresolved mismatch blocks acceptance. A standalone mechanical smoke harness must be identified as such and must not be presented as the repository's fixture/test pattern or as evidence of conformance to it.
