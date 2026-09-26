@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-25",
+  "commit": "2aeac39b88effef5518741a9cf9b505a04f926f4",
+  "preflight": {
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/testing/Run-Tests.ps1 -Scope Analyzers -Framework net8.0 -OutputPath artifacts/testing/20260925-analyzers-net8-postrepair-terra",
+    "exitCode": 0,
+    "trx": "artifacts/testing/20260925-analyzers-net8-postrepair-terra/Analyzers_net8.0_20260925135543.trx",
+    "total": 118,
+    "passed": 118,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fullSuite": {
+    "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File ./tools/testing/Run-Tests.ps1 -Scope All -OutputPath artifacts/testing/20260925-full-suite-postrepair-terra",
+    "exitCode": 0,
+    "trxDirectory": "artifacts/testing/20260925-full-suite-postrepair-terra",
+    "trxFiles": 30,
+    "net8.0": {
+      "projects": 15,
+      "total": 18862,
+      "executed": 18862,
+      "passed": 18862,
+      "failed": 0,
+      "skipped": 0
+    },
+    "net10.0": {
+      "projects": 15,
+      "total": 18887,
+      "executed": 18887,
+      "passed": 18887,
+      "failed": 0,
+      "skipped": 0
+    },
+    "combined": {
+      "total": 37749,
+      "executed": 37749,
+      "passed": 37749,
+      "failed": 0,
+      "skipped": 0
+    }
+  }
+}

@@ -1,0 +1,43 @@
+<!-- metadata_header
+type: plan
+id: technical-readiness-to-1.0-w10
+version: 1.0
+status: planned
+last_updated: 2026-09-26
+-->
+# W10 — Early benchmarks, performance and allocation budgets
+
+## Purpose and new priority
+
+Benchmarks begin EARLY, alongside CI trust and naming/semantic inventory, by explicit user direction. This overrides v1.6 §9's later-phase placement. Baseline representative current behavior before the new rule structure, then measure each structural decision. The final budget gate remains dependent on approved semantics and measured evidence.
+
+Rubric performance/resource is4/10 with high confidence in the evidence gap. The handoff's numeric budgets are proposals, not measurements. No concrete benchmark project was verified; D11/D22 requires inventory and approval.
+
+Output: `docs/reports/readiness-performance.md`; benchmark source/config/result paths selected from inventory.
+
+## Tasks
+
+| Task | Action | Output |
+|---|---|---|
+| 10.1 | Inventory existing performance tooling and identify common/hot/risk-heavy validation usage | Approved early workload list and exact benchmark path/tool map |
+| 10.2 | Establish controlled baseline: static rule, Must, Guard, object/integration paths where applicable; valid/invalid and boundary/hostile inputs | Raw results with runtime/OS/CPU/configuration, warmup/statistics and allocations |
+| 10.3 | Compare proposed W03 rule structure and W02 manifest runtime consequences before broad rollout | Decision evidence for allocations, boxing, closures, construction/reuse and code-size tradeoffs |
+| 10.4 | Set per-workload budgets and regression policy from baseline and product intent | Astra D11 record: units, thresholds, tolerance, environment and exception process |
+| 10.5 | Add reliable regression checks and separate noisy scheduled benchmarking from deterministic checks where warranted | W00 routing/evidence integration with deliberate regression proof |
+| 10.6 | Rerun affected workloads after regex/resources/diagnostics/lifecycle changes and publish scoped claims | Final raw evidence, budget disposition and support limitations |
+
+## Required distinctions
+
+Measure cold construction versus steady-state execution, success versus failure, one rule versus composition, small versus representative large inputs, and callback/integration cost where applicable. Include per-operation allocations and relevant tail/worst-case behavior, not only mean throughput. Measure string conversions/date parsing and mutable validator construction/reuse if they matter.
+
+Do not claim zero allocations from static syntax alone, compare dissimilar semantics as equivalent workloads, or reuse publisher competitor benchmark ratios as PineGuard evidence. Comparative benchmarks require the genuine Sol analysis and independently controlled methodology.
+
+## Acceptance
+
+The early baseline is reproducible enough to inform W03 before broad implementation. Final claimed workloads meet approved quantitative budgets with variance and environment disclosed. A seeded performance/allocation regression is detected under the actual gate design. Flaky statistical checks cannot be silently waived; revise method or remove the unsupported claim through Astra review.
+
+## Controls
+
+Checkpoint after workload selection, baseline collection and budget decision. Do not wait for every hostile-testing workstream before obtaining the initial baseline. Conversely, an early benchmark is not final release evidence after structural changes. Required correctness and100% validation coverage must remain satisfied; performance changes may not hide failures or create local special cases.
+
+Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.

@@ -1,0 +1,1042 @@
+# PineGuard: Architecture and Engineering Hardening Handoff
+
+**Prepared:** 25 September 2026  
+**Audience:** Engineering lead, maintainers, and the project/engineering agent implementing the next milestone  
+**Status:** Proposed implementation brief; repository discovery and design decisions are required before changing public contracts  
+**Primary source:** [Summarise PineGuard Assessment](chatgpt-conversation://6ab6072f-2a00-83ec-9b9f-3746308131af)
+
+**Navigation:** [Mandate and source limits](#1-mandate-and-intended-outcome) · [Architecture](#3-target-architecture) · [Phased plan](#24-phased-implementation-plan) · [CI gates](#25-ci-gate-design) · [Risks](#27-risks-anti-patterns-and-mitigations) · [Checklist](#29-completion-criteria-and-concise-implementation-checklist) · [Source traceability](#appendix-a-source-traceability) · [Agent starting brief](#appendix-b-starting-brief-for-the-implementation-agent)
+
+## 1. Mandate and intended outcome
+
+PineGuard's next milestone is to establish **one authoritative validation specification, a canonical implementation kernel, and mechanically verified projections across every advertised validation surface**.
+
+Freeze expansion of the rule catalogue while this work proceeds. Prioritise proving the existing rules over adding more rules. The desired release claim is:
+
+> Every advertised PineGuard validation surface is mechanically verified against the same canonical specification, with measured resource behaviour and explicit compatibility boundaries.
+
+This is a claim to earn through evidence, not a description of the current repository. The receiving agent must inspect the actual code, packages, tests, and release history before deciding what already exists and what needs changing.
+
+The implementation must preserve the strengths identified in the assessment: inexpensive validation primitives, a shared semantic core, stable error codes, broad .NET integration, and extensive existing tests. It must address the gaps that test counts and coverage cannot settle: independent correctness evidence, cross-surface drift, hostile inputs, performance and allocations, deployment compatibility, and the accuracy of security claims.
+
+### 1.1 Source coverage and confidence
+
+The full available conversation was retrieved, including the initial assessment summary and both architectural critiques. The conversation records three uploads of ten images each. Retrieval exposed **ten image files**, which were inspected directly. They cover original assessment items 10–20, the target architecture, and the final priority recommendations. The other twenty images were not exposed by retrieval.
+
+Consequently:
+
+- This document incorporates all retrieved written analysis, all ten accessible screenshots, and every requirement in the current handoff request.
+- Earlier screenshot content is represented through the conversation's written summaries where available. This is not a verbatim transcription of all thirty images, and missing text has not been invented.
+- The numbered workstreams below are this handoff's organisation, not a reconstruction of the original items 1–9.
+- Proposed code, paths, thresholds, contract details, and work packages are implementation elaborations. They are not claims that these APIs or files already exist.
+- No PineGuard source repository was available in this local project mirror. The mirror also reports 23 unsynced project sources. No source-code audit, benchmark, compilation of examples, or implementation validation has been performed for this handoff.
+
+### 1.2 Assessment context, without treating scores as proof
+
+The written assessment summary reported approximately 9.4/10 engineering quality and 8.4/10 risk-adjusted production maturity. It cited testing/correctness at 9.8, validation/.NET integration at 9.7, C#/ASP.NET and architecture/DDD at 9.5, and code quality at 9.4. Performance evidence was reported as 7.0 and ecosystem maturity/adoption as 3.0. These are the assessor's opinions as relayed in the conversation, not independently verified measurements.
+
+The conversation also referred to hundreds of rules, roughly 18,000 tests, and 100% line/branch coverage. Treat these as historical reported figures. Establish actual counts during discovery. Neither a large test suite nor complete coverage demonstrates semantic correctness, resistance to adversarial inputs, or independent agreement with a specification.
+
+Ecosystem adoption is a separate concern from technical quality. This programme can improve the evidence for reliability; it cannot manufacture production history or adoption. Documentation should support progressive disclosure: a concise README, focused guides, generated rule references, and deeper architecture/security material.
+
+## 2. Architectural decisions to preserve
+
+| Decision | Rationale | Implementation consequence |
+|---|---|---|
+| Specification precedes implementation | Correctness must be defined independently of current code | Review semantic contracts and fixtures before migrating a rule |
+| One canonical kernel | Prevent separate implementations drifting across surfaces | Adapters call the same predicate/evaluator |
+| Preserve cheap static primitives | Canonical semantics do not require per-call polymorphic allocations | Avoid mandatory rule-object construction or reflective dispatch on hot paths |
+| Metadata describes the kernel | The manifest makes architecture machine-checkable | Generate/check documentation, support matrices, and conformance registrations |
+| Failures form a stable protocol | Consumers need machine-readable identity across integrations | Code, path, and severity survive projections; message text is presentation |
+| Do not capture attempted values by default | Sensitive input should not enter diagnostics accidentally | No default raw-value field, log tag, exception text, or telemetry payload |
+| Resource semantics are explicit | A valid value can still be too costly to inspect | Bound input, depth, enumeration, failures, and expensive operations |
+| Tests provide complementary evidence | Every technique finds different defect classes | Apply property, fuzz, differential, and mutation tests selectively |
+| Compatibility claims require execution | A successful library build does not prove consumer deployment | Pack, consume, publish, and execute trimmed/native applications |
+| Rule-count expansion remains frozen | The current priority is semantic authority | Additions need a documented exceptional justification until exit criteria pass |
+
+### 2.1 Changes to the original recommendations
+
+1. Move the specification suite, originally screenshot item 20, to the start of the programme.
+2. Adopt a canonical rule engine as a semantic boundary, without assuming an allocated `ValidationRule<T>` hierarchy is necessary.
+3. Introduce structured failures early, with a minimal default contract. Omit `AttemptedValue`; put diagnostic enrichment behind separate explicit opt-in.
+4. Prefer an immutable execution policy for operational limits over adding `maxLength` parameters everywhere. Keep actual domain constraints, such as a business maximum, in the rule itself.
+5. Add architectural dependency enforcement in Phase 1. It is a cheap guardrail for the refactor.
+6. Establish baseline performance and compatibility evidence before migration, even though the full operational gates mature in Phase 3.
+7. Apply mutation testing primarily to the canonical kernel and high-risk decision logic, not indiscriminately to every existing test or generated wrapper.
+8. Challenge broad security names and claims. Narrow, deprecate, or replace misleading APIs through an explicit compatibility plan.
+9. Add observability after semantics and budgets are established, while designing the failure protocol to avoid sensitive data from the outset.
+
+## 3. Target architecture
+
+### 3.1 Semantic architecture
+
+The specification defines validity, failure identity, boundaries, context, and execution limits. The kernel implements those decisions. Surfaces translate the result into the forms applications expect.
+
+```mermaid
+flowchart TB
+    SPEC[Reviewed rule specification]
+    SEM[Semantics and independent fixtures]
+    META[Rule metadata and manifest]
+    KERNEL[Canonical static kernel]
+    POLICY[Explicit execution policy]
+    MUST[Must projection]
+    GUARD[Guard projection]
+    OBJ[Object validation]
+    FV[FluentValidation adapter]
+    ATTR[DataAnnotations adapter]
+    WEB[ASP.NET integration]
+    FAILURE[Structured failure protocol]
+    OUT[API responses, MediatR, Options and result libraries]
+    SPEC --> SEM
+    SPEC --> META
+    SEM --> KERNEL
+    META -. describes .-> KERNEL
+    POLICY --> KERNEL
+    KERNEL --> MUST
+    KERNEL --> GUARD
+    KERNEL --> OBJ
+    KERNEL --> FV
+    KERNEL --> ATTR
+    OBJ --> WEB
+    MUST --> FAILURE
+    GUARD --> FAILURE
+    OBJ --> FAILURE
+    FV --> FAILURE
+    ATTR --> FAILURE
+    WEB --> FAILURE
+    FAILURE --> OUT
+```
+
+These arrows show semantic flow, not project references. FluentValidation and DataAnnotations may call the kernel directly; they need not traverse an object-validation pipeline if that adds overhead. The failure protocol belongs to the shared contracts and is available to every projection.
+
+```text
+Specification: What does this rule mean?
+    |
+    +-- Fixtures: What observable results are required?
+    +-- Manifest: Where is it available and what does it depend on?
+    |
+Canonical kernel: The single implementation of that meaning
+    |
+    +-- Must: return the existing value/result form
+    +-- Guard: throw the documented exception on failure
+    +-- Object validation: collect structured failures
+    +-- Framework adapters: preserve semantics in framework-native forms
+```
+
+### 3.2 Dependency boundaries
+
+Use the existing package layout where it satisfies these boundaries. The names below are illustrative; do not split packages merely to match a diagram.
+
+```mermaid
+flowchart LR
+    Must[Must] --> Core[Core: kernel and contracts]
+    Guard[Guard] --> Core
+    Objects[Object validation] --> Core
+    FVAdapter[FluentValidation adapter] --> Core
+    FVAdapter --> FV[FluentValidation]
+    DAAdapter[DataAnnotations adapter] --> Core
+    DAAdapter --> DA[DataAnnotations framework]
+    Web[ASP.NET adapter] --> Core
+    Web --> ASP[ASP.NET]
+    Results[Result and MediatR adapters] --> Core
+    Results --> External[Their external packages]
+```
+
+Core may depend on the approved .NET platform libraries required by its supported target frameworks. It must not acquire dependencies on ASP.NET, FluentValidation, MediatR, ErrorOr, FluentResults, OneOf, a telemetry exporter, or an application service container. Adapter packages own their respective integration dependencies. No cycles are permitted.
+
+### 3.3 Proof architecture
+
+```mermaid
+flowchart TB
+    SPEC[Reviewed specifications and fixture corpus] --> CONF[Cross-surface conformance]
+    SPEC --> PROP[Property tests]
+    SPEC --> FUZZ[Fuzzing and adversarial corpus]
+    SPEC --> DIFF[Differential comparisons]
+    KERNEL[Canonical kernel] --> MUT[Targeted mutation testing]
+    CONF --> GATE[Required CI gates]
+    PROP --> GATE
+    FUZZ --> GATE
+    DIFF --> GATE
+    MUT --> GATE
+    PERF[Performance and allocation budgets] --> GATE
+    AOT[Trimmed and NativeAOT consumer execution] --> GATE
+    API[API and semantic compatibility] --> GATE
+    ARCH[Dependency boundary enforcement] --> GATE
+    DET[Culture, time and concurrency checks] --> GATE
+    SEC[Threat model and security regression evidence] --> GATE
+```
+
+Conformance alone can show every surface agrees on the same mistake. Independent fixtures, carefully chosen reference implementations, and reviewed properties are necessary to test whether the shared meaning is correct.
+
+## 4. Workstream 1 — Specification-first rule contracts
+
+For each logical rule, define a reviewed specification before replacing its implementation. A specification must include:
+
+- Stable rule ID, semantic revision, and applicable standard/profile or product policy.
+- Input type, accepted representations, and whether the rule is syntactic, semantic, contextual, or externally dependent.
+- Null, empty, whitespace, malformed-input, and wrong-type behaviour.
+- Boundaries: inclusive/exclusive comparisons, numeric overflow, Unicode units, parser depth, and format limits as applicable.
+- Normalisation policy: none, comparison-only normalisation, or explicit transformation. Validation must not silently rewrite a caller's value unless that is an advertised contract.
+- Culture, case-comparison, timezone, clock, and other environmental dependencies.
+- Success behaviour and all failure codes; distinction between invalid input and inability to complete validation.
+- Operational limits, complexity expectations, cancellation support, and diagnostics policy.
+- Advertised projections and their intentional representation differences.
+- Valid, invalid, boundary, adversarial, and ambiguous fixture groups.
+
+Ambiguous fixtures are a decision queue. Record competing interpretations and the chosen profile. Resolve them before claiming conformance for that profile; do not silently skip them or derive their expected result from the current implementation.
+
+For email, decide whether the contract is an application-oriented address subset or a particular standards profile; explicitly address internationalised domains/local parts, display names, whitespace, and length units. A parser accepting an address does not establish deliverability. Apply equivalent precision to URI schemes, IP/CIDR notation, GUID variants, SemVer versions, money rounding, dates, and Unicode length.
+
+**Acceptance:** Every migrated rule has reviewed semantics, independent expected outcomes, all relevant boundary classes, and a linked decision for any intentional departure from a standard or previous release.
+
+## 5. Workstream 2 — Canonical kernel and inexpensive execution
+
+Extract or identify one authoritative predicate/evaluator for each rule. Preserve static methods, spans, value types, and existing low-cost implementations where useful. Metadata and object composition may allocate during setup; this does not justify allocations on every primitive validation call.
+
+The kernel should be deterministic under its explicit context and should not know about HTTP, dependency injection, framework validation classes, or result-library types. Keep formatting and localisation outside the validity decision.
+
+### 5.1 Concrete C# design example
+
+This deliberately simple **illustrative, standalone design** demonstrates the boundary using an integer range. It is not a proposed email algorithm or a replacement for PineGuard's existing public API. Validate against the actual repository before adopting any type names or exception changes.
+
+```csharp
+using System;
+
+public enum ValidationSeverity { Error, Warning, Information }
+
+public readonly record struct ValidationFailure(
+    string Code,
+    string? Path = null,
+    string? Message = null,
+    ValidationSeverity Severity = ValidationSeverity.Error);
+
+public static class Int32InclusiveRangeRule
+{
+    public const string Id = "number.int32.inclusive-range";
+    public const string FailureCode = "number.int32.out-of-range";
+
+    public static bool IsValid(int value, int minimum, int maximum)
+    {
+        if (minimum > maximum)
+            throw new ArgumentException("Minimum exceeds maximum.");
+
+        return value >= minimum && value <= maximum;
+    }
+}
+
+public sealed class RuleViolationException : ArgumentException
+{
+    public ValidationFailure Failure { get; }
+
+    public RuleViolationException(ValidationFailure failure, string? parameterName)
+        : base(failure.Message ?? failure.Code, parameterName)
+    {
+        Failure = failure;
+    }
+}
+
+public static class RangeProjections
+{
+    // Proposed result shape only; retain PineGuard's existing Must contract.
+    public static ValidationFailure? Check(
+        int value, int minimum, int maximum, string? path = null)
+        => Int32InclusiveRangeRule.IsValid(value, minimum, maximum)
+            ? null
+            : new ValidationFailure(Int32InclusiveRangeRule.FailureCode, path);
+
+    public static int Guard(
+        int value, int minimum, int maximum, string? parameterName = null)
+    {
+        var failure = Check(value, minimum, maximum);
+        if (failure is { } error)
+            throw new RuleViolationException(error, parameterName);
+
+        return value;
+    }
+}
+```
+
+The validity expression appears once. Normal invalid input becomes a structured failure; invalid rule configuration is a programming/configuration error. Guard's parameter name is separate from the canonical object path. The error message never interpolates the attempted value.
+
+For primitive rules, a Boolean predicate can be sufficient. For policy-limited or asynchronous rules, use an internal outcome that distinguishes valid, invalid, resource-limited, and cancelled execution as appropriate. Do not force all outcomes into `false`, catch every exception as invalid input, or introduce an all-purpose abstraction before the existing rule families justify it.
+
+**Acceptance:** Each migrated projection delegates to the canonical implementation; no copied regex/parser/comparison remains in adapters. Benchmarks show the extraction does not silently regress the success path. Configuration failures and input failures remain distinct.
+
+## 6. Workstream 3 — Rule metadata and machine-readable manifest
+
+The manifest is primarily an engineering control surface. It should make catalogue completeness and architectural promises inspectable by CI, documentation tools, and contributors.
+
+Recommended fields:
+
+| Field group | Required information |
+|---|---|
+| Identity | Stable ID, aliases, semantic revision, category, lifecycle/deprecation state |
+| Failure | Allowed stable codes, default severity, presentation message key if used |
+| Semantics | Specification reference, profile, input type, null policy, normalisation policy |
+| Execution | Sync/async, purity, culture/clock dependencies, resource-limit capabilities |
+| Surface support | Must, Guard, object validation, FV, DataAnnotations, ASP.NET; supported, unsupported, or planned with reason |
+| Evidence | Fixture corpus, properties, fuzz target where applicable, benchmark group, documentation |
+| Packaging | Canonical implementation symbol, owning package, adapter registration symbols, supported framework constraints |
+
+Use explicit support states rather than interpreting a missing Boolean as support. Not every rule must support every surface: synchronous attributes cannot honestly advertise arbitrary asynchronous execution. Unsupported combinations require a reason and must not appear as supported in marketing or generated reference pages.
+
+Illustrative manifest entry; paths and names are proposed:
+
+```json
+{
+  "schemaVersion": 1,
+  "id": "number.int32.inclusive-range",
+  "semanticRevision": 1,
+  "failureCodes": ["number.int32.out-of-range"],
+  "category": "numeric",
+  "inputType": "System.Int32",
+  "specification": "specs/numeric/int32-inclusive-range.md",
+  "isAsync": false,
+  "cultureMode": "invariant",
+  "usesTimeProvider": false,
+  "projections": {
+    "must": "supported",
+    "guard": "supported",
+    "objectValidation": "supported",
+    "fluentValidation": "supported",
+    "dataAnnotations": "supported",
+    "aspNet": "supported"
+  }
+}
+```
+
+This is a target-state example, not a declaration that those adapters currently exist.
+
+Choose one authoritative metadata representation: reviewed data plus generated C#, or reviewed descriptors plus a deterministic exported manifest. Avoid maintaining two editable copies. Generation can eliminate repetitive wrappers, but it must not generate expected test outcomes from the predicate under test.
+
+**Manifest gates:** Public rule inventory and manifest agree; IDs and codes are governed; aliases are intentional; every advertised projection exists and is registered in conformance; every rule links to documentation and fixtures; generated outputs are reproducible; stale entries fail CI. Public overloads and aliases map to logical rules explicitly so rule counts cannot hide surface gaps.
+
+## 7. Workstream 4 — Cross-surface projections
+
+Preserve the same rule meaning and failure identity across these boundaries:
+
+| Surface | Required behaviour | Important projection-specific checks |
+|---|---|---|
+| Must | Preserve current value/result contract using the kernel | Success value, code, fluent chaining, evaluation count |
+| Guard | Throw documented exception on failure | Exception type, parameter name, stable code channel; success must not throw |
+| Object validation | Collect canonical failures | Nested paths, collection indexes, ordering, maximum failures, cascade policy |
+| FluentValidation | Invoke the kernel and map failure fields | Explicit null handling, code, severity, property paths, cascade semantics |
+| DataAnnotations | Invoke the kernel from the attribute/adapter | Null and wrong-type semantics, member names, attribute parameter limits, code transport |
+| ASP.NET | Run supported validation and map its failures | Model binding versus rule failures, HTTP status policy, body shape, cancellation, no duplicate execution |
+| MediatR / Options / results | Translate shared failures | Startup versus request semantics, aggregation, lossless code/path mapping |
+
+Framework defaults are not automatically PineGuard semantics. A framework may skip a null value or expose only a human message; the adapter must make the difference explicit. Where a target has no native code field, define and test a typed PineGuard result/exception or documented side channel. Do not encode identity only in message strings or claim lossless preservation when the target drops data.
+
+A framework pipeline can reject malformed binding before a rule executes. Test binding failures separately; do not mislabel them as evidence that the rule's semantics differ. Compare equivalent typed values with identical rule parameters, policy, culture, clock, and cascade configuration.
+
+**Acceptance:** Every advertised rule/surface combination passes fixtures against independent expectations. Intentional differences concern representation and framework lifecycle, not unexplained validity changes. Integration tests exercise real entry points, including HTTP where claimed.
+
+## 8. Workstream 5 — Structured failure protocol
+
+Start with a restrained default:
+
+```csharp
+public readonly record struct ValidationFailure(
+    string Code,
+    string? Path = null,
+    string? Message = null,
+    ValidationSeverity Severity = ValidationSeverity.Error);
+```
+
+This repeats the illustrative shared contract for clarity. Adapt to existing API compatibility constraints. A `readonly record struct` can still have an invalid default value and can contain references; it does not by itself enforce a nonempty code or guarantee allocation-free end-to-end use. Enforce protocol invariants at construction/boundary points and avoid boxing it into generic metadata bags on the success path.
+
+Protocol decisions required before adoption:
+
+- **Code:** Stable machine identity. Govern renaming/removal/reassignment as a compatibility change. Do not rely on message text.
+- **Path:** Choose one canonical grammar and escaping rules. JSON Pointer is a candidate for object/wire paths; adopt it only after checking current contracts. Test nested properties, arrays, dictionaries, root failures, and names containing separator characters.
+- **Message:** Optional presentation. Localisation may change it without changing validity or code. Do not expose attempted values through interpolated messages.
+- **Severity:** Define whether warnings affect overall success; do not let adapters decide independently.
+- **Multiplicity/order:** Define short-circuit versus accumulate modes, deterministic ordering, duplicate handling, and failure caps.
+- **Rule identity:** Resolve code to manifest metadata where unambiguous. If one code can belong to multiple rules, provide an explicit rule ID in a separate enriched envelope rather than guessing.
+- **Transport versioning:** Version envelopes when necessary. Separate a transport schema revision from a rule's semantic revision and package version.
+
+Proposed API representation:
+
+```json
+{
+  "type": "https://example.invalid/problems/validation",
+  "title": "Validation failed",
+  "status": 400,
+  "errors": [
+    {
+      "code": "email.address.invalid",
+      "path": "/email",
+      "message": "Enter a valid email address.",
+      "severity": "error"
+    }
+  ]
+}
+```
+
+The URL is a placeholder, and the status/path format is a proposed application policy. Preserve existing application contracts or migrate them explicitly; do not silently impose this body on all consumers.
+
+**Privacy requirement:** No default `AttemptedValue`. Optional diagnostics need separate opt-in, redaction rules, bounded size, approved fields, and retention ownership. Do not stringify arbitrary objects. Test failures, exceptions, telemetry, framework results, and serialization with sentinel secrets to detect accidental disclosure. Third-party frameworks may retain attempted values internally; audit what PineGuard creates and exports rather than claiming control over the entire host application.
+
+**Acceptance:** Round-trip and projection tests preserve required fields, no standard path leaks sentinel input, and protocol changes receive compatibility review.
+
+## 9. Workstream 6 — Conformance and specification suite
+
+Organise fixtures by semantic family, for example `EmailSpec`, `UriSpec`, `Ipv4Spec`, `Ipv6Spec`, `SemVerSpec`, `MoneySpec`, and `UnicodeSpec`. Include valid, invalid, boundary, adversarial, and resolved ambiguous cases. Store expected codes as well as validity.
+
+Illustrative xUnit fixture and kernel check, using the range example:
+
+```csharp
+using System.Collections.Generic;
+using Xunit;
+
+public sealed class InclusiveRangeSpecificationTests
+{
+    public static IEnumerable<object[]> Cases()
+    {
+        yield return new object[] { -1, 0, 10, false };
+        yield return new object[] {  0, 0, 10, true  };
+        yield return new object[] { 10, 0, 10, true  };
+        yield return new object[] { 11, 0, 10, false };
+        yield return new object[] {  0, 0,  0, true  };
+        yield return new object[] { int.MinValue, int.MinValue, int.MaxValue, true };
+        yield return new object[] { int.MaxValue, int.MinValue, int.MaxValue, true };
+    }
+
+    [Theory]
+    [MemberData(nameof(Cases))]
+    public void Kernel_matches_reviewed_cases(int value, int min, int max, bool valid)
+        => Assert.Equal(valid, Int32InclusiveRangeRule.IsValid(value, min, max));
+}
+```
+
+The complete conformance harness must reuse these independent expected outcomes for **actual public APIs**, not just `IsValid`. Normalise observations into a test-only shape such as:
+
+```csharp
+// Test infrastructure only; no reflection requirement for the production kernel.
+public sealed record SurfaceObservation(
+    bool Succeeded,
+    string? Code,
+    string? CanonicalPath,
+    string? ExceptionType);
+```
+
+For each manifest rule and supported surface, execute each applicable fixture and compare validity, code, normalised path, severity, cardinality, and ordering. Check the documented exception type for Guard separately. Framework-specific formatting can differ; semantic identity cannot.
+
+Add integration fixtures for nested object graphs, collection indexes, null children, required-versus-format composition, conditional rules, multiple failures, cancellation, and repeated validation. Specify behaviour for cyclic graphs and failing property getters rather than allowing accidental recursion or blanket exception swallowing.
+
+**Acceptance:** Missing adapters/fixtures are failures, not skipped successes. The harness identifies the exact rule, surface, fixture, context, and difference. A deliberately defective test adapter must be caught, proving the harness can detect drift. Completion means 100% of *advertised* combinations, not merely 100% of a manually selected subset.
+
+## 10. Workstream 7 — Property-based testing
+
+Use generated inputs to test laws broader than curated examples. Choose a compatible maintained .NET property-testing tool during discovery; pin its version and persist replay seeds. Generators and shrinkers need review, especially where they share code with production parsers.
+
+High-value properties include:
+
+- Inclusive range: a value accepted by `[a,b]` stays accepted when the interval expands, provided arithmetic constructing the interval does not overflow.
+- IP/CIDR: parse/format round-trips under the chosen representation and containment rules at network/prefix boundaries.
+- GUID and SemVer: canonical format/parse agreement under the advertised profile, with intentional noncanonical syntax handled explicitly.
+- Unicode: correct distinctions among UTF-16 code units, scalar values, and grapheme clusters; malformed surrogate policy is tested.
+- Money/numbers: explicit decimal precision, rounding mode, overflow, extrema, and supported parsing culture.
+- Time rules: fixed clock and exact boundary behaviour; shifting both clock and input equally preserves the result where the semantics imply that law.
+- Cross-surface consistency: generated values still match independent properties and all advertised projections.
+
+Do not apply a convenient but false law. Case changes, whitespace trimming, Unicode normalisation, and URI normalisation are not universally semantics-preserving.
+
+**Acceptance:** Each high-risk family has reviewed properties, meaningful generator coverage, shrinking, and reproducible counterexamples. Minimized failures become permanent regression fixtures. The seed, tool version, specification profile, and execution context accompany reports.
+
+## 11. Workstream 8 — Fuzzing and adversarial corpora
+
+Target attacker-controlled parser and pattern surfaces: URI, JSON/XML, JWT structure, regex-backed validators, hostnames, IP/network formats, CSV and file/content validators where present. Select fuzz tooling appropriate to the repository; avoid claiming a tool is required before evaluating platform and runtime support.
+
+Each target must have a bounded entry point and a clear oracle:
+
+- No unexpected unhandled exception, crash, infinite loop, unbounded recursion, or uncontrolled allocation within the supported input/resource envelope.
+- Declared rejection and resource-limit outcomes remain reproducible and correctly classified.
+- Deterministic inputs/context yield deterministic semantic outputs; timeout outcomes are treated as execution-policy observations.
+- Accepted values satisfy independent invariants where available.
+
+Include empty/truncated data, embedded NULs, invalid encodings, deeply nested structures, near-matching regex strings, long repeated prefixes, delimiter storms, extreme numeric lengths, unusual Unicode, duplicate fields, and malformed network syntax. Separate string-level tests from decoder tests: a UTF-8 decoder and a UTF-16 validator have different responsibilities.
+
+Use isolated worker processes with external wall-time and memory limits for hostile workloads. Cooperative cancellation cannot stop an arbitrary stuck synchronous operation. Avoid uncontrolled 900 MB allocations on shared pull-request runners; use safe boundary construction, staged sizes, and isolated stress jobs.
+
+Persist a minimal, non-sensitive corpus and replay it on each change. Run a short deterministic corpus/smoke budget on pull requests, extended campaigns on scheduled builds, and focused campaigns before releases. Every discovered defect becomes a regression case with seed/provenance and a link to the fix.
+
+**Acceptance:** All selected targets run under explicit budgets; artifacts include crash/timeout classification and minimized inputs; no known untriaged crash, hang, or resource-exhaustion regression is accepted for release.
+
+## 12. Workstream 9 — Differential testing
+
+Compare PineGuard with an independent trusted implementation only where the semantic profiles match. Agreement with a permissive general parser does not prove compliance with a stricter validator; disagreement is evidence to investigate, not an automatic defect.
+
+Maintain a reference registry containing the rule/profile, chosen reference, version, provenance, known limitations, input normalisation, and approved divergence cases. Candidate references include platform parsers and authoritative test corpora, selected after verifying their actual contracts.
+
+For each disagreement:
+
+1. Minimise the input and capture both outputs and contexts.
+2. Classify it as a PineGuard bug, reference bug, profile mismatch, unspecified behaviour, or intentional documented difference.
+3. Resolve it against the written specification and authoritative source.
+4. Add a regression fixture and record the decision.
+
+Keep these comparisons out of the production hot path. Never copy reference internals into production and then claim the same code provides independent corroboration.
+
+**Acceptance:** Every chosen comparison has a justified oracle/profile pairing. There are no unexplained differences in the promoted corpus, and reference upgrades trigger controlled re-evaluation.
+
+## 13. Workstream 10 — Targeted mutation testing
+
+Run mutation analysis against the canonical kernel and critical policy/failure mapping logic after useful conformance and property tests exist. Prioritise boundary operators, null checks, short-circuit conditions, code assignments, resource checks, and security-sensitive decisions.
+
+Use a compatible .NET mutation tool chosen during discovery. Separate killed, survived, timed-out, excluded, and plausibly equivalent mutants. Review survivors; a high aggregate score can hide an important undetected boundary defect.
+
+Initial policy proposal: no unexplained survivor in designated critical decision sites, plus a non-regression baseline for the broader selected scope. Establish a numerical score target only after measuring mutation operators, exclusions, and equivalent-mutant prevalence. A universal 100% threshold is not the initial objective.
+
+**Acceptance:** Critical survivors are corrected or explicitly justified. Exceptions identify the exact mutant/site, reason, owner, and review date. Generated boilerplate exclusions do not conceal handwritten semantic logic. Run selected changes in PRs where practical and broader mutation suites on a scheduled lane.
+
+## 14. Workstream 11 — Performance and allocation budgets
+
+Create repeatable evidence for throughput, per-operation latency, allocations, and adversarial growth. BenchmarkDotNet's memory diagnoser can report allocation and GC metrics; use it with a pinned configuration. [BenchmarkDotNet diagnoser documentation](https://benchmarkdotnet.org/articles/configs/diagnosers.html)
+
+Benchmark the kernel and each important projection separately. Include successful validation, ordinary failure, Guard exceptions, first-use setup, warmed steady state, short/typical/large inputs, policy rejection, object graphs, collections, and adversarial near-matches. Keep fixture construction out of the measured operation unless setup is the scenario under test.
+
+Illustrative benchmark using the standalone range design:
+
+```csharp
+using BenchmarkDotNet.Attributes;
+
+[MemoryDiagnoser]
+public class InclusiveRangeBenchmarks
+{
+    [Params(0, 50, 100, 101)]
+    public int Value { get; set; }
+
+    [Benchmark(Baseline = true)]
+    public bool Kernel()
+        => Int32InclusiveRangeRule.IsValid(Value, 0, 100);
+
+    [Benchmark]
+    public ValidationFailure? ResultProjection()
+        => RangeProjections.Check(Value, 0, 100);
+}
+```
+
+Proposed budget policy, to ratify against measured baseline data:
+
+| Scenario | Initial budget approach |
+|---|---|
+| Designated primitive success paths | Target 0 B/op after initialization; prove each claimed case |
+| Primitive result projection | No new per-call allocation introduced by the architecture |
+| Guard success | Same semantic work as the kernel, with measured bounded wrapper overhead |
+| Failure/exception/aggregation | Explicit nonzero allocation budget appropriate to the result shape |
+| Parser and collection rules | Budget by input size and depth; check observed growth against the stated complexity |
+| Diagnostics disabled | No payload/tag construction; separately measure the branch/check cost |
+| Diagnostics enabled | Separate timing/allocation budget and bounded event volume |
+
+Do not invent nanosecond targets before measuring. A candidate steady-state regression gate could flag a repeatable change above 10% **and** a benchmark-specific absolute noise floor; this is a suggested starting policy, not a measured PineGuard threshold. Dedicated hardware or stable runners are preferable for blocking performance comparisons. Re-baselining needs a reviewed explanation and retained before/after artifacts.
+
+Record commit, package versions, runtime, OS, architecture, CPU, power configuration where relevant, parameters, warmup/iteration settings, environment, and raw reports. Use an end-to-end load harness for API p95/p99 claims; microbenchmark means are not application tail-latency evidence.
+
+**Acceptance:** Before/after reports exist for migrated hot paths, success allocations meet declared budgets, failures have explicit budgets, hostile inputs are bounded, and statistically/noise-aware regressions require review. Do not advertise zero allocation for the whole library based on one primitive benchmark.
+
+## 15. Workstream 12 — NativeAOT and trimming execution
+
+The release evidence must come from real consumers of the packed NuGet artifacts. NativeAOT compiles during publishing, targets a specific runtime environment, and constrains dynamic loading/code generation. Library annotations and a successful ordinary build are insufficient evidence. [Microsoft Native AOT documentation](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+
+Create a small consumer application, provisionally `PineGuard.NativeAot.Tests`, plus separate integration consumers where dependencies need distinct treatment. Select target frameworks and runtime identifiers from PineGuard's actual support policy.
+
+Example publish properties for a compatible consumer, subject to the selected SDK:
+
+```xml
+<PropertyGroup>
+  <PublishAot>true</PublishAot>
+  <PublishTrimmed>true</PublishTrimmed>
+  <TrimMode>full</TrimMode>
+</PropertyGroup>
+```
+
+Required pipeline:
+
+```text
+Build and pack release candidate
+    -> restore isolated consumer from local candidate package feed
+    -> publish trimmed managed consumer
+    -> execute and assert its output/exit status
+    -> publish NativeAOT consumer for a supported RID
+    -> execute the produced native binary
+    -> assert rule outcomes, structured failures and integration behaviour
+    -> retain logs, warnings and artifact identity
+```
+
+Use package references, not only project references. Prevent cached stable packages from replacing the candidate under test. Configure each consumer to exercise valid and invalid cases, relevant generic instantiations, failure serialization, registration, and supported discovery paths. Use an actual HTTP request for any ASP.NET scenario that is advertised as supported.
+
+Pay special attention to DataAnnotations, ASP.NET, reflection-based discovery, dependency-injection registration, FluentValidation adapters, and MediatR integration. Keep a per-package/per-feature support matrix; some third-party paths may require restrictions or may be unsupported. Offer explicit/static registration when it is the appropriate supported path.
+
+Treat warnings such as IL2026, IL2070, and IL3050, and newly introduced trimming/AOT diagnostics, as findings requiring resolution. Do not add blanket warning suppression. A narrowly documented exception must explain the affected path, rationale, mitigation, owner, and expiry/review condition. Rooting everything merely to silence warnings is not evidence of a good trimming design.
+
+**Acceptance:** Every claimed deployment combination publishes and executes successfully using the candidate packages. No unexplained relevant warnings remain. Unsupported features are accurately documented and excluded from compatibility claims. At release, the tested artifact identity matches what will be published.
+
+## 16. Workstream 13 — API and semantic compatibility gates
+
+Establish a baseline now; enforce the published compatibility policy rigorously at and after 1.0. Determine the actual release status during discovery rather than assuming PineGuard is pre-1.0.
+
+.NET package validation can compare a package with a baseline and check consistency across its framework/runtime assets. Use the repository's selected SDK tooling and a pinned last-stable baseline. [Microsoft package validation documentation](https://learn.microsoft.com/en-us/dotnet/fundamentals/apicompat/package-validation/overview)
+
+Maintain reviewed public API inventories such as `PublicAPI.Shipped.txt` and `PublicAPI.Unshipped.txt` where appropriate. Include extension methods, overloads, generic constraints, nullability annotations, attributes, parameter names where source compatibility depends on them, and public exception behaviour in the review process.
+
+Binary/API checks cannot establish full behavioural compatibility. Add:
+
+- Consumer compile fixtures for representative fluent chains, overload resolution, and named arguments.
+- Golden contracts for error codes, paths, exception types, and serialized failures.
+- Semantic fixture comparison against the supported release baseline.
+- A manifest/schema diff that highlights support changes, renamed codes, and altered resource policies.
+
+An additive overload can create source ambiguity. A stricter parser or new default resource cap can be behaviourally breaking even when signatures remain unchanged. Security fixes may legitimately change behaviour, but still require release notes, migration guidance, and the appropriate release decision.
+
+**Acceptance:** No unreviewed breaking API or semantic change merges. Baselines cannot be silently regenerated to clear failures. Intentional changes have a decision record, versioning treatment, migration notes, and reviewed consumer evidence.
+
+## 17. Workstream 14 — Architectural dependency tests
+
+Make package boundaries executable in Phase 1. Check both declared project/package references and emitted assembly/type dependencies. Where relevant, inspect transitive package dependencies and packed artifacts too; a direct-reference-only check can miss accidental coupling.
+
+Enforce:
+
+- Core has only its approved platform dependencies and no framework/result/telemetry-exporter integration dependencies.
+- Guard and Must depend inward on Core, not outward on ASP.NET or application infrastructure.
+- Each adapter depends only on Core/shared contracts and its approved integration stack.
+- No package cycles or production dependencies on test/benchmark projects.
+- Production projections resolve to canonical rule implementations through reviewed registrations or generated calls.
+
+Choose assembly inspection or an architecture-testing library based on the repository. Text search is useful for discovery but is not the only enforcement mechanism. Static checks alone cannot prove semantic delegation; combine them with conformance and review of adapter code.
+
+**Acceptance:** Tests reject a deliberately prohibited reference in a test fixture/sample graph. New adapter dependencies require explicit approval in the allowlist. Core can build and run without any optional integration package.
+
+## 18. Workstream 15 — Formal security threat model
+
+Maintain a reviewed threat model for the library and a per-rule security claim record. This is essential for APIs with security-oriented names and for parsers consuming hostile input. Start it in Phase 1; do not defer discovery of misleading claims until the final release gate.
+
+### 18.1 Scope and trust boundaries
+
+```text
+Untrusted external input
+    -> transport/decoder and host request limits
+    -> PineGuard input/resource policy
+    -> canonical validation
+    -> structured failure or accepted value
+    -> application logic
+    -> context-specific safe sink
+
+The accepted value is still untrusted at the sink.
+```
+
+Document assets such as CPU/memory availability, confidential input, stable validation decisions, and consumer trust. Identify attacker control over text, length, structure, encodings, repeated requests, configuration where exposed, and caller-supplied patterns. Identify boundaries between the host, parsers, validation, diagnostics, and downstream SQL/HTML/shell/network operations.
+
+Validation does not replace contextual output encoding, parameterised SQL, or other sink-specific protections. OWASP distinguishes input validation from the primary protections for injection flaws. [OWASP input validation guidance](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html)
+
+### 18.2 Per-rule security record
+
+For every security-related rule, record:
+
+| Required field | What the record must explain |
+|---|---|
+| Threat addressed | The exact condition detected or constrained |
+| Threat not addressed | Explicit non-goals, bypass classes, and downstream responsibilities |
+| False positives/negatives | Known trade-offs and evidence; do not invent numerical rates |
+| Complexity | Expected CPU/memory growth and expensive branches |
+| Input limits | Enforced/recommended limits and their units |
+| Encoding assumptions | Accepted representation and who performs decoding |
+| Canonicalisation | Ordering, repetition, and normalisation assumptions |
+| Context requirements | HTML/URL/SQL/shell/path context, if any, and why generic safety is not promised |
+| External effects | Whether DNS, network, filesystem, or other I/O can occur |
+| Evidence and owner | Corpus, review, known limitations, responsible maintainer |
+
+Audit names such as `XssSafe`, `SqlInjectionSafe`, and `CommandInjectionSafe` **if they exist**. Do not infer that PineGuard currently exposes them. If a rule detects a suspicious pattern, name/document the detection precisely; do not imply it proves contextual safety. Plan deprecation or renaming compatibly rather than silently changing existing APIs.
+
+JWT syntax validation must not be presented as signature, issuer, audience, or lifetime verification. URI syntax validation must not be presented as protection against SSRF. File/path shape validation must not be presented as a complete filesystem authorisation boundary. Include such distinctions when relevant to the actual catalogue.
+
+Require independent review for high-risk claims by a reviewer who did not author the rule, with security expertise appropriate to the claim. The implementing agent should prepare the review evidence; it cannot declare independent review completed by reviewing its own work again.
+
+**Acceptance:** Every security-related API has a bounded claim, adversarial corpus, limits, documented residual risks, and review evidence. Open high-severity findings block release or force removal/restriction of the affected claim through the documented release process.
+
+## 19. Workstream 16 — Regex governance
+
+Inventory every regex and its owning rules, pattern, options, timeout, creation/caching strategy, input limits, and test corpus. Prefer generated regexes where supported and suitable; consider a non-backtracking engine where its supported constructs preserve the intended semantics. Neither choice eliminates the need to govern patterns and input size.
+
+.NET regex guidance recommends handling hostile near-matches and bounding backtracking; it also distinguishes trusted patterns from untrusted patterns. Timeouts and non-backtracking options are not a security boundary for arbitrary attacker-supplied patterns. [Microsoft regex best practices](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-regex)
+
+Repository policy:
+
+> No new or materially changed regex enters PineGuard without documented semantics, complexity consideration, and adversarial tests.
+
+For each pattern:
+
+- Record valid, invalid, and almost-matching inputs over increasing lengths.
+- Set a finite timeout where applicable and document how timeout is mapped to an execution failure.
+- Check anchoring, multiline/newline behaviour, culture/case behaviour, and supported Unicode assumptions.
+- Evaluate simpler parsing or character checks where they give clearer semantics and bounds.
+- Bound regex caches; do not grow a process-wide cache with arbitrary user patterns or unbounded option combinations.
+- Verify source-generation/non-backtracking behaviour under the selected runtime rather than assuming every feature combination uses the same implementation.
+
+Do not report a regex timeout as proof that the input is semantically invalid. Represent inability to complete according to the execution-policy contract and ensure every surface handles it consistently.
+
+**Acceptance:** Every regex has an owner and adversarial evidence; no ungoverned infinite-timeout backtracking path accepts unbounded untrusted input; timeout and policy rejection have explicit tests and stable outcomes.
+
+## 20. Workstream 17 — Input and resource limits
+
+Define resource semantics for text, JSON/XML/CSV/JWT, URI/hostname parsing, regex, collections, object graphs, and files where supported. A semantic maximum belongs to the rule; an operational maximum belongs to the execution policy. Both can apply, and the result must identify which failed.
+
+Illustrative policy shape using modern .NET types; values are intentionally caller-supplied because no PineGuard baseline has been measured:
+
+```csharp
+using System;
+using System.Globalization;
+
+public sealed record ValidationExecutionPolicy(
+    int MaxTextCodeUnits,
+    long MaxInputBytes,
+    int MaxCollectionItems,
+    int MaxDepth,
+    int MaxFailures,
+    TimeSpan RegexTimeout,
+    TimeProvider TimeProvider,
+    CultureInfo Culture);
+```
+
+Validate the policy once at construction/registration: reject negative or inconsistent limits, invalid timeouts, and null dependencies. If targeting older frameworks, use the repository's compatibility strategy rather than adding a new minimum runtime incidentally. Snapshot or require read-only culture/configuration data; a record containing mutable references is not deeply immutable.
+
+Rules for enforcement:
+
+1. State units. `string.Length` is UTF-16 code units, not UTF-8 bytes or grapheme clusters.
+2. Check cheap length bounds before parsing, copying, decoding, or expensive regex work where possible.
+3. Enforce depth during traversal/parsing, not only after building the full object graph.
+4. Bound lazy enumeration as well as collections with a known count; define disposal, partial enumeration, exceptions, and infinite-sequence handling.
+5. Cap collected failures and define a deterministic truncation marker/code and ordering.
+6. Bound bytes read and decompressed output for stream/file operations if offered. Do not read an entire file before checking its limit.
+7. Define policy precedence. A proposal is: an explicit per-call policy overrides a configured default, while mandatory rule safety ceilings cannot be relaxed accidentally.
+8. Keep resource rejection distinct from rule-invalid input, configuration errors, cancellation, and unexpected implementation defects.
+9. Use stable work/input limits for deterministic guarantees. Wall-clock timeout outcomes can vary with scheduling and must be documented separately.
+10. Keep host request-body/concurrency/rate limits in the deployment guidance; library-level checks cannot prevent an upstream host from first buffering an enormous request.
+
+Proposed execution codes might include `validation.resource.input-limit`, `validation.resource.depth-limit`, and `validation.resource.regex-timeout`. Adopt names only after checking the existing code namespace. Do not make a resource-limited run look like successful validation with no failures.
+
+**Acceptance:** Boundary cases at limit-minus-one, limit, and limit-plus-one pass through all relevant surfaces. Oversized input is rejected before avoidable expensive work. Limits have documented defaults and migration implications; disabling them requires an explicit supported policy.
+
+## 21. Workstream 18 — Optional observability hooks
+
+Provide opt-in instrumentation without forcing an OpenTelemetry exporter or monitoring-system dependency into Core. Consider platform `DiagnosticSource`, `ActivitySource`, and metrics facilities supported by the selected frameworks, with integration-specific exporters outside the kernel.
+
+Candidate events and measurements:
+
+- Rule execution/failure counts, classified by bounded rule ID and failure code.
+- Rule and object-validator duration, distinguishing success, invalid input, and resource-limited execution.
+- Resource-limit hits and corpus-discovered operational regressions where appropriate.
+
+Prefer aggregate metrics or validator-level spans for high-throughput cases; a span per tiny predicate can cost more than validation. Instrument execution boundaries so one kernel invocation is not counted again at every adapter layer.
+
+Rules:
+
+- No attempted values, messages containing input, user-supplied path keys, tokens, or arbitrary object dumps in default tags/payloads.
+- Keep label cardinality bounded. Do not turn collection indexes or arbitrary property names into metric dimensions.
+- Construct tags/payloads only when enabled; benchmark both enabled and disabled modes.
+- Specify listener failure/re-entrancy behaviour. Instrumentation must not silently change validity results or create recursive validation loops.
+- Publish the event/metric schema and its compatibility policy.
+
+**Acceptance:** Disabled instrumentation meets its allocation/overhead budget; enabled instrumentation contains only approved fields, has bounded event volume, and preserves results. A host can consume diagnostics without Core depending on that host's monitoring vendor.
+
+## 22. Workstream 19 — Determinism, culture, time and platform tests
+
+Audit use of `CurrentCulture`, `CurrentUICulture`, local timezone, `DateTime.Now`, `DateTimeOffset.Now`, default parsing overloads, case conversion, Unicode classification, regex options, and runtime/OS-dependent behaviour.
+
+Rules intended to be invariant must use explicit invariant/ordinal semantics where appropriate. Culture-dependent or clock-dependent rules must expose their dependency. Do not use a culture argument merely to make an intrinsically invariant identifier behave differently.
+
+Run the specification suite under at least `en-US`, `en-AU`, `tr-TR`, `de-DE`, and `ja-JP`, as preserved from the conversation. Use isolated processes/jobs when tests mutate process-wide context so they do not race each other. Include supported OS/runtime combinations where parsing or Unicode behaviour may differ.
+
+For time rules, inject a controllable `TimeProvider` or compatible clock abstraction. Define UTC/offset handling, `DateTime.Kind`, inclusive/exclusive now-boundaries, ambiguous/invalid daylight-saving times where local time is supported, and whether a validation run captures one instant for all relevant rules. Avoid multiple implicit reads of now producing contradictory object-level results.
+
+Define determinism precisely:
+
+> For the same input, parameters, semantic profile, explicit context and relevant runtime assumptions, validation produces the same semantic result, codes and ordered paths.
+
+Localised messages may differ intentionally. Operational timeouts are separate from semantic determinism. If Unicode data versions or runtime parsing changes affect results, record the supported baseline and evaluate upgrades through differential/compatibility checks rather than making an unqualified cross-version promise.
+
+**Acceptance:** Invariant rules agree across the culture matrix; explicit culture/time rules match reviewed expectations; execution context is replayable; ambient-state leaks are caught by targeted tests.
+
+## 23. Workstream 20 — Concurrency and lifetime testing
+
+Exercise shared validator instances and caches under the lifetimes PineGuard advertises. Preserve the screenshot's stress dimensions: 1, 8, and 64 workers plus a scenario with 1,000 concurrent operations. These are workload dimensions, not a requirement to create 1,000 operating-system threads.
+
+Test simultaneous first use, repeated steady state, mixed valid/invalid inputs, different policies, independent cultures/clocks, cancelled calls, and shared diagnostics. Use bounded scheduling, timeouts, barriers where useful, and deterministic input generation so stress failures are diagnosable.
+
+Verify:
+
+- No race-induced validity drift or incorrect codes/paths.
+- No shared mutable per-request failure lists or context.
+- No cache corruption, unbounded cache growth, or cross-request policy leakage.
+- No leaking tenant/caller data through cached messages or diagnostics.
+- Correct clock abstraction behaviour and no concurrent-test races caused by mutating a shared fake clock unintentionally.
+- Thread-safe setup/publication and safe repeated disposal where an API promises it.
+
+If a component is intentionally not thread-safe, document and enforce its supported lifetime. Do not silently register a mutable per-call object as a singleton. Stress tests provide evidence; they do not mathematically prove the absence of every race.
+
+**Acceptance:** Advertised singleton/shared use is exercised repeatedly with reproducible workload details, no known races remain, and every stateful component has an explicit lifetime contract.
+
+## 24. Phased implementation plan
+
+Use these phases as dependency ordering, not calendar estimates. Size work after repository discovery. Security fixes and inexpensive guardrails need not wait for their final evidence phase.
+
+### Phase 0 — Establish the baseline and freeze expansion
+
+**Priority: P0. Suggested owner: implementing agent with maintainer review.**
+
+1. Locate the actual repository and read its contributor instructions. Inventory projects, packages, target frameworks, public APIs, rule families, integrations, CI, and released versions.
+2. Identify the existing semantic core and duplicated implementations. Record actual test/coverage data without equating it with correctness.
+3. Announce the rule-count freeze in contributor guidance. Permit critical fixes and narrowly justified compatibility/security exceptions with written rationale.
+4. Capture representative correctness, performance/allocation, API, dependency, and deployment baselines before refactoring.
+5. Map this document to existing work; reuse functioning infrastructure and avoid creating duplicate abstractions.
+6. Create a decision log and risk-ranked migration inventory. Start with a small representative pilot.
+
+**Deliverables:** Verified inventory, gap matrix, existing behaviour baseline, support matrix, migration backlog, and initial risk register.
+
+**Exit:** The agent can distinguish existing implementation from proposals, identify the release compatibility constraints, and name the pilot rules plus their advertised surfaces.
+
+### Phase 1 — Define truth
+
+**Priority: P0. Suggested owners: kernel/API maintainer and integration maintainer.**
+
+1. Review the specification schema and fixture conventions.
+2. Approve minimal failure protocol, code/path governance, and execution-outcome distinctions.
+3. Establish the manifest and completeness checks.
+4. Add dependency-boundary enforcement.
+5. Build a pilot canonical kernel extraction and cross-surface conformance harness.
+6. Start the threat model and regex/input-limit inventory; correct urgent claim or resource hazards.
+7. Migrate the existing catalogue in coherent families, adding fixture coverage before rerouting adapters.
+
+Recommended pilot: one primitive boundary rule, one null-sensitive string rule, one parser/regex rule, one time/culture-sensitive rule, and one nested object case. This reveals distinct design pressures before generalising the abstraction.
+
+**Deliverables:** Specifications, manifest, shared failure contract, conformance runner, dependency gates, pilot evidence, then catalogue-wide coverage.
+
+**Exit:** Every in-scope public rule has metadata and reviewed semantics; every advertised projection has conformance evidence; the kernel has no prohibited dependencies; intentional compatibility changes are documented. An incremental pilot can pass before the catalogue is complete, but must not be presented as programme completion.
+
+### Phase 2 — Challenge correctness under hostile conditions
+
+**Priority: P1, with discovered critical issues treated as P0. Suggested owners: correctness/security maintainers.**
+
+1. Add family-specific property generators and replayable failure capture.
+2. Create isolated fuzz targets and persistent adversarial corpora.
+3. Add justified differential comparisons and divergence records.
+4. Execute culture/time/platform and concurrency matrices.
+5. Enforce operational limits and regex governance with regression cases.
+6. Apply mutation analysis to the kernel and critical policy decisions.
+7. Obtain independent review of high-risk security claims and unresolved findings.
+
+**Deliverables:** Properties, fuzz harnesses/corpora, oracle registry, mutation reports, security threat model/review, deterministic and concurrent execution reports.
+
+**Exit:** Selected risk coverage is justified; known counterexamples are fixed or explicitly resolved; no untriaged critical security/resource failures remain; critical mutation survivors are accounted for; all failures can be replayed.
+
+### Phase 3 — Prove operational quality
+
+**Priority: P1; observability enrichment P2. Suggested owners: performance/release maintainer.**
+
+1. Expand BenchmarkDotNet and allocation suites; ratify stable regression budgets.
+2. Build package-consuming trimmed and NativeAOT applications and execute them in CI.
+3. Complete API, consumer-compilation, and semantic compatibility gates.
+4. Add optional diagnostics and prove disabled/enabled overhead and privacy behaviour.
+5. Publish concise onboarding docs, generated rule references, support matrices, performance methodology, and limitations.
+6. Run release-candidate evidence against the exact packages proposed for release.
+
+**Deliverables:** Measured budgets, operational CI lanes, executed deployment artifacts, compatibility reports, diagnostics schema, release evidence bundle, and migration guide.
+
+**Exit:** Claims match measured/tested scope, required gates are passing, no baseline or warning exception is unexplained, and release evidence is retained.
+
+### Freeze exit and subsequent rule admission
+
+Lift the rule-count freeze only after the agreed existing catalogue is specified and conformant, high-risk correctness/security work is resolved, and operational release gates are functioning. A maintainer records the exit decision against evidence, not against elapsed time or a test-count target.
+
+After the freeze, a new rule requires a specification/profile, manifest entry, stable codes, complete advertised projections, fixtures, documentation, appropriate independent/adversarial testing, and performance/resource classification. Unsupported projections must be declared explicitly.
+
+## 25. CI gate design
+
+Keep a fast, deterministic merge lane and separate expensive evidence lanes. Expensive jobs must still gate affected changes or releases; scheduling them at night is not permission to ignore failures.
+
+| Gate | Pull request | Scheduled/extended | Release requirement |
+|---|---|---|---|
+| Build, existing tests, analyzers | All supported relevant targets | Expanded matrix | All supported targets pass |
+| Manifest/docs/spec completeness | Required for every change | Full inventory audit | No uncovered advertised rule |
+| Conformance | Full fast corpus; affected integration cases | Full integrations/matrix | All advertised combinations pass |
+| Architecture dependencies | Required | Packed-artifact audit | No forbidden dependency |
+| Property tests | Fixed replay seeds plus bounded generated runs | Broader seeds and families | Known counterexamples replay cleanly |
+| Fuzzing | Persisted corpus and bounded smoke targets | Isolated long campaigns | No unresolved known crash/hang/resource defect |
+| Differential tests | Stable corpus and affected profile | Reference/version matrix | No unexplained divergence |
+| Mutation | Changed critical kernel scope where practical | Broader selected scope | Critical survivors resolved; baseline policy met |
+| Culture/time/concurrency | Targeted matrix and deterministic smoke | Full stress/platform matrix | Advertised lifetimes and invariance supported |
+| Performance/allocation | Reliable allocation checks; affected benchmark evidence | Stable-runner suite | Reviewed budgets met by candidate |
+| Trimmed/NativeAOT consumers | Affected supported smoke consumers | Full claimed deployment matrix | Pack, publish and execute exact candidate |
+| API/semantic compatibility | Required diff against pinned baseline | Representative consumers | Approved release classification/migration notes |
+| Security/privacy/regex/limits | Required regression and policy checks | Focused campaigns/review | No blocking unresolved findings |
+| Observability | Schema, redaction, disabled-path checks | Enabled-load measurements | Schema and budget contracts satisfied |
+
+Specify job timeouts, artifact retention, owners, and failure escalation. On shared runners, treat noisy performance observations as review signals until a stable blocking gate is validated. A confirmed regression cannot be dismissed indefinitely as noise.
+
+Every exception must be narrowly scoped and record the reason, affected rule/platform, evidence, owner, mitigation, and expiry/review condition. Avoid blanket `continue-on-error`, mass skips, unconditional warning suppression, and automatic baseline regeneration.
+
+The release evidence bundle should contain:
+
+- Commit/package identity, SDK/tool/dependency versions, and tested support matrix.
+- Manifest and specification revision, coverage of advertised rule/surface combinations.
+- Conformance results and known intentional differences.
+- Property/fuzz replay metadata, corpus revision, differential decisions, mutation summary.
+- Benchmark reports, budgets, and approved changes to baselines.
+- Trimmed/native publish logs and native execution results.
+- Public API/semantic diffs, dependency checks, threat-model review and open exceptions.
+
+## 26. Migration strategy and proposed repository artifacts
+
+Prefer incremental extraction behind existing public APIs. Do not undertake an all-at-once rewrite of hundreds of rules. Characterisation tests preserve knowledge of existing behaviour, while independent specification review determines whether that behaviour is correct; the two roles are distinct.
+
+For each family:
+
+1. Inventory all aliases, overloads, adapters, error codes, and documented promises.
+2. Write/review the intended specification and mark historical disagreements.
+3. Establish fixtures and baseline performance/compatibility evidence.
+4. Extract/reuse the canonical implementation and reroute one surface at a time.
+5. Run conformance, independent tests appropriate to the family, and operational checks.
+6. Remove duplicated semantic code only after coverage and mapping evidence are in place.
+7. Publish any migration notes and update the manifest/generated reference.
+
+Prefer reverting a contained migration if unexpected regressions appear. Avoid keeping permanent dual implementations selected by undocumented switches. Do not shadow-run expensive or sensitive validation in production merely to gather agreement evidence; compare offline on controlled fixtures unless separately justified.
+
+Suggested artifacts, adapting names to the real repository:
+
+```text
+docs/
+  architecture/specification-first.md
+  architecture/decisions/
+  security/threat-model.md
+  security/regex-inventory.md
+  compatibility/support-matrix.md
+  compatibility/migration-guide.md
+  performance/methodology-and-budgets.md
+  contributing/rule-admission.md
+specs/
+  rule-manifest.json
+  schema/
+  numeric/  strings/  parsing/  network/  time/  security/
+tests/
+  PineGuard.Specifications/
+  PineGuard.Conformance/
+  PineGuard.Properties/
+  PineGuard.Differential/
+  PineGuard.Architecture/
+  PineGuard.Concurrency/
+  PineGuard.NativeAot.Tests/
+fuzz/
+  targets/
+  corpus/
+benchmarks/
+  PineGuard.Benchmarks/
+  baselines/
+```
+
+These are proposed repository-relative paths, not files created by this handoff. Keep generated metadata reproducible; keep transient fuzz discoveries and benchmark noise out of permanent source unless curated.
+
+Documentation changes should make the README a concise entry point: purpose, a small quick start, supported packages/frameworks, and links. Put semantic profiles and caveats in rule references; operational policies in dedicated guides; compatibility exceptions in the support matrix. Compile examples in documentation CI once they are adapted to the real API.
+
+## 27. Risks, anti-patterns and mitigations
+
+| Risk or anti-pattern | Why it matters | Required mitigation |
+|---|---|---|
+| Specification generated from current predicate outputs | Freezes existing bugs as truth | Independent reviewed expected outcomes and external references where appropriate |
+| A new object hierarchy on every primitive call | May undermine the cheap success path | Static kernel, setup-time descriptors, measured abstraction costs |
+| Same flawed helper shared by implementation and test oracle | Creates false independent evidence | Independent generators/oracles and explicit dependency review |
+| All surfaces agree but share one semantic bug | Conformance is necessary but insufficient | Properties, differential evidence and adversarial fixtures |
+| Framework defaults silently change null/cascade behaviour | Creates cross-surface drift | Explicit adapter policies and real integration tests |
+| Codes reconstructed from message text | Breaks under wording/localisation changes | Typed code transport and compatibility tests |
+| Default attempted-value capture | Leaks credentials and personal data | Minimal failure protocol and sentinel-secret tests |
+| A validator named “safe” implies a security boundary | Encourages unsafe downstream usage | Narrow claims, threat model, compatible naming/deprecation plan |
+| Timeout treated as ordinary invalid input | Hides incomplete execution and environmental effects | Separate execution classification and code policy |
+| Unbounded input, failure lists or caches | Enables resource exhaustion | Early bounds, capped aggregation/caches and isolated stress tests |
+| AOT publish succeeds but binary is never run | Misses consumer/runtime failures | Execute candidate-package native consumers |
+| Blanket suppression/rooting to clear AOT warnings | Conceals unsupported behaviour | Narrow justified exceptions and support matrix |
+| API additions assumed automatically harmless | Overload/source/semantic behaviour can break | Consumer compilation and semantic compatibility checks |
+| Performance gates on unstable runners | Causes flaky blocks or ignored evidence | Calibrated noise floors, stable runners and reviewed re-baselines |
+| Mutation/coverage score treated as the objective | Encourages metric gaming | Risk-based scope and critical survivor review |
+| Instrumentation on every tiny rule by default | Can dominate work and leak/high-cardinality data | Optional bounded diagnostics and separate budgets |
+| Ambient mutable culture or fake clock shared by tests | Produces false race failures and hides actual leakage | Isolated context and controlled lifetimes |
+| Broad claims beyond tested combinations | Misleads consumers | Manifest-derived support/evidence matrix |
+| Attempting all workstreams simultaneously | Creates infrastructure without finished evidence | Pilot first, then staged family migration and phase exits |
+
+## 28. Decisions the receiving agent must resolve
+
+These questions are discovery/design tasks, not a reason to stop before inspecting the repository:
+
+1. What are the current public contracts, published versions, target frameworks and claimed integrations?
+2. How much of the canonical kernel, manifest, and structured failure model already exists?
+3. Which rules/profiles are highest risk and which advertised surfaces currently differ?
+4. What are the established null, path, code, exception, ordering, and cancellation conventions?
+5. Which security-oriented APIs exist, and what do their current names/documentation promise?
+6. Which operational limits are already enforced, and where would introducing defaults be breaking?
+7. Which integration paths genuinely support trimming/AOT, and which need explicit registration or restricted claims?
+8. Which benchmark environment and regression thresholds are supportable by the project's CI resources?
+9. Which independent reference implementations and test tools match the selected semantics and licences?
+10. Who owns security review, compatibility decisions, baseline changes, and freeze exit?
+
+Record decisions in short architecture decision records with context, options, choice, consequences, validation, and migration impact. Escalate actual product/compatibility choices after preparing concrete evidence; do not ask the user to answer questions the repository can resolve.
+
+## 29. Completion criteria and concise implementation checklist
+
+The programme is complete when the library can support its semantic and operational claims with repeatable evidence. The receiving agent must not report completion based only on creating test projects, adding badges, or increasing coverage.
+
+- [ ] Verify repository/package inventory, current claims, release state and existing evidence.
+- [ ] Freeze rule-count expansion and record justified exceptions.
+- [ ] Define independent rule specifications and resolve ambiguous semantic profiles.
+- [ ] Establish the manifest, stable IDs/codes and advertised-surface completeness gates.
+- [ ] Preserve a lightweight canonical kernel and remove duplicated adapter semantics.
+- [ ] Adopt a compatible minimal failure protocol; exclude attempted values by default.
+- [ ] Prove all advertised Must, Guard, object, FV, DataAnnotations and ASP.NET projections conform.
+- [ ] Cover MediatR, Options and result integrations where advertised.
+- [ ] Add risk-based properties, fuzz targets/corpora and justified differential comparisons.
+- [ ] Review critical mutation survivors and preserve replayable regression inputs.
+- [ ] Complete the threat model, security-claim review, regex inventory and adversarial tests.
+- [ ] Enforce explicit input/depth/enumeration/failure/cache limits and execution outcomes.
+- [ ] Verify culture, clock, platform and concurrency contracts.
+- [ ] Ratify performance/allocation budgets with before/after benchmark evidence.
+- [ ] Publish and execute trimmed and NativeAOT consumers of the candidate NuGet packages.
+- [ ] Enforce API, semantic and dependency compatibility gates.
+- [ ] Add optional, privacy-conscious observability within measured overhead budgets.
+- [ ] Publish focused documentation, support matrices and migration guidance.
+- [ ] Retain a release evidence bundle, resolve blocking findings, and record freeze-exit approval.
+
+## Appendix A. Source traceability
+
+### Conversation
+
+The primary source is [Summarise PineGuard Assessment](chatgpt-conversation://6ab6072f-2a00-83ec-9b9f-3746308131af). Its written responses supply the initial scoring/context summary, kernel/manifest/conformance critique, the specification-first revision, privacy restraint, resource-policy proposal, deterministic context, three-phase sequencing, and rule-count freeze.
+
+### Directly inspected screenshots
+
+The following source attachment names identify the ten retrieved images. Their content is incorporated into this document, so the handoff does not require temporary local image files to be useful.
+
+| Attachment | Visible source material | Handoff location |
+|---|---|---|
+| `IMG_D7918DE5-5162-4FE1-A792-5921AFB6A058.jpeg` | Original item 10: NativeAOT/trimming and actual native execution | Section 15 |
+| `IMG_BB66BEC5-A3C4-4FA1-BEF9-B8379F8C1E94.jpeg` | Original items 11–12: API compatibility and dependency gates | Sections 16–17 |
+| `IMG_8CDACF81-D176-4843-A282-89D3289344AD.jpeg` | Original item 13: formal security threat model and bounded claims | Section 18 |
+| `IMG_B9E3D657-1936-4109-A4A7-D25B2F991D37.jpeg` | Original items 14–15: regex governance and input/resource limits | Sections 19–20 |
+| `IMG_5275BC1E-6839-45FA-B223-A685CEFAE9BC.jpeg` | Original item 16: structured diagnostics/protocol | Section 8, modified by the written privacy critique |
+| `IMG_321208A6-9A0A-470F-BB79-8425707C2AEC.jpeg` | Original item 17: observability without exporter dependency in Core | Section 21 |
+| `IMG_46A07147-6A06-4829-A50A-A5A4FC08B917.jpeg` | Original item 18 and start of 19: determinism/concurrency | Sections 22–23 |
+| `IMG_313AF310-21F1-4CD7-A1D3-9B29D635A100.jpeg` | Original items 19–20: concurrency and specification suite | Sections 4, 9 and 23 |
+| `IMG_D522969F-8E1F-4A92-9662-2C5B8CBFE8D1.jpeg` | Target architecture and technical proof system | Section 3, revised to put specification first |
+| `IMG_95E73556-0353-47C2-90FA-3F57D93060D0.jpeg` | First-five priorities, selective sequencing, rule-count freeze | Sections 1, 24–25 and 29 |
+
+### Technical references checked for this handoff
+
+The linked primary documentation supports specific tool/platform statements in the relevant sections. The proposed architecture, sequencing, acceptance criteria and budgets are the handoff's engineering recommendations derived from the conversation, not claims that these references endorse PineGuard.
+
+- [Microsoft: Native AOT deployment](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+- [Microsoft: .NET package validation](https://learn.microsoft.com/en-us/dotnet/fundamentals/apicompat/package-validation/overview)
+- [Microsoft: Regular expression best practices](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-regex)
+- [BenchmarkDotNet: Diagnosers](https://benchmarkdotnet.org/articles/configs/diagnosers.html)
+- [OWASP: Input validation](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html)
+
+## Appendix B. Starting brief for the implementation agent
+
+Implement this programme incrementally in the actual PineGuard repository. Begin with repository discovery, baseline evidence, and the rule-count freeze. Preserve existing public contracts unless a reviewed compatibility decision authorises a change. Establish reviewed specifications, the manifest, minimal failure protocol, dependency gates, and a representative cross-surface pilot before generalising the architecture.
+
+Then migrate by rule family, adding independent/adversarial correctness evidence and explicit resource policies. Complete performance/allocation budgets, native/trimmed package-consumer execution, and compatibility gates before making strengthened release claims. Produce reviewable changes with the problem, resulting behaviour, validation evidence, and material limitations. Keep a decision log and report measured progress against advertised rule/surface coverage and phase acceptance criteria.
