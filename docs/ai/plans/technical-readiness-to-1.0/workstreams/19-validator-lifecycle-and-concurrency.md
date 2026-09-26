@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w19
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -39,3 +39,18 @@ User callbacks and externally mutable objects have explicit boundaries. Do not p
 Checkpoint after characterization and before selecting a lifecycle model. Sol implements approved architecture; Luna supplies readings and runs evidence collection; Astra decides and reviews. Stop for unverified race claims, blanket locking, undocumented singleton assumptions or flaky tests that rely only on sleep/timing. This workstream may start early independently, but final acceptance depends on new W03/W04 contracts and W10 measurements.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+var successCount = 0;
+Parallel.For(0, 1000, _ =>
+{
+    if (PositiveInt.Evaluate(1).Passed) Interlocked.Increment(ref successCount);
+});
+Checks.Require(successCount == 1000, "concurrent stateless calls");
+```
+
+Purpose: 1,000 concurrent calls of this stateless miniature→1,000 successes. This proves neither mutable current MustValidator sharing nor a selected validator reuse contract; D17 remains blocked. Framework lifecycle needs actual chosen-contract tests. Status pending.

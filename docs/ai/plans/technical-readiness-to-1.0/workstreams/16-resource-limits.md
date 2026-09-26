@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w16
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -41,3 +41,25 @@ For every declared costly operation, either bounded behavior is demonstrated or 
 Checkpoint after cost inventory and policy approval. Sol changes shared enforcement; Luna provides measurements/source reading; Astra decides tradeoffs. Stop for unmeasured arbitrary constants, hidden truncation, unbounded caches, limit bypass through another adapter or tests that hang without approved process bounds. W16 does not require a universal graph engine if the best architecture does not need one.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+internal static class Boundary
+{
+    internal const int InputLimit = 128;
+    internal static Response Invoke(string raw) =>
+        TryCreate(raw, out _) ? new(200, []) : new(400, ["illustration.invalid-input"]);
+    internal static bool TryCreate(string raw, out PositiveAmount? amount)
+    {
+        amount = null;
+        if (raw.Length > InputLimit || !int.TryParse(raw, NumberStyles.Integer,
+                CultureInfo.InvariantCulture, out var number)) return false;
+        return PositiveAmount.TryCreate(number, out amount);
+    }
+}
+```
+
+Purpose: provisional D11/D26 128-character raw-input budget, rejection before parsing. 129digits→400; this is not selected production size/error policy, and per-call allocations remain observable rather than budgeted. Status pending.

@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w07
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -43,3 +43,17 @@ Sensitive real user data is excluded from corpora and logs unless separately aut
 Checkpoint after target/tool selection, after corpus review and after each campaign. Sol executes approved harness work; Luna performs reads and evidence collection; Astra triages contract/security decisions. Stop on runaway resource use, unexpected network/process access, personal-data capture or unsupported tool/platform assumptions. W07 never expands supported public input limits by implication.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+(string Input, int Status)[] corpus =
+    [("1", 200), ("0", 400), ("-1", 400), ("", 400),
+     ("2147483648", 400), (new string('9', 129), 400)];
+foreach (var row in corpus)
+    Checks.Require(Boundary.Invoke(row.Input).Status == row.Status, "bounded replay row");
+```
+
+Purpose: bounded hostile replay corpus: `1`→200; `0`, `-1`, empty, int overflow and 129 digits→400. This is a replay harness, not coverage-guided fuzzing. Persist seed/corpus/tool evidence separately when a tool is selected. Status pending.

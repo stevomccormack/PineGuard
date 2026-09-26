@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w02
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -44,3 +44,22 @@ No parallel hand-maintained canonical inventory is accepted. Generated outputs m
 W02 owns completeness metadata and audit reconciliation, not semantic truth (W01), failure design (W04) or runtime implementation architecture (W03). Checkpoint after current extraction inventory, after schema decision and after seeded drift proof. Stop when the proposed manifest duplicates an existing authority, forces public API changes, or assumes all rules project to every surface. Gate activation belongs to W00 after W05 validates the expectation contract.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+internal sealed record Descriptor(string Id, string Code, Func<int?, Verdict> Evaluate);
+internal static class DerivedManifest
+{
+    internal static readonly Descriptor[] Rules =
+        [new(PositiveInt.Id, PositiveInt.FailureCode, PositiveInt.Evaluate)];
+    internal static string[] Differences(IEnumerable<string> expectedIds) =>
+        expectedIds.Except(Rules.Select(x => x.Id)).Select(x => "missing:" + x)
+            .Concat(Rules.Select(x => x.Id).Except(expectedIds)
+                .Select(x => "orphan:" + x)).Order(StringComparer.Ordinal).ToArray();
+}
+```
+
+Purpose: proposed D07 descriptor points to the single static implementation. Input expected ID `illustration.number.positive` → no differences; seeded expected `illustration.absent` → exactly missing:illustration.absent and orphan:illustration.number.positive. No current public manifest is claimed. Status pending.

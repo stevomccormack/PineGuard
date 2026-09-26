@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20c
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -36,3 +36,20 @@ All validation branches meet100% audited line/branch coverage. Unrelated infrast
 Engineering-equivalent24–48 hours; active model/tool work8–18 hours; review3–6 hours, low confidence until exact scope. Dispatch separate architecture, composition, end-to-end evidence and documentation packets with [execution protocol](../../references/execution-protocol.md) bounds.
 
 Stop for unjustified framework breadth, duplicated rules, unclear ownership or shared abstractions built for imagined future scenarios. W20C cannot be marked complete from a diagram/build alone.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../../references/code-examples.md).
+
+```csharp
+internal interface IAmountHandler
+{
+    Response Handle(string raw);
+}
+internal sealed class AmountHandler : IAmountHandler
+{
+    public Response Handle(string raw) => Boundary.Invoke(raw);
+}
+```
+
+Purpose: minimal candidate handler/interface adapter calls boundary; no additional rule runtime hierarchy or DI/layer allocation is implied. Inputs1/0→200/400. Existing PineGuard public adapters still require actual consumer evidence. Status pending.

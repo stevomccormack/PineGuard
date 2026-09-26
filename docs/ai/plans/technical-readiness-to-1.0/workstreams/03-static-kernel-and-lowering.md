@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w03
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -33,3 +33,22 @@ Every rule has one clear executable semantic authority and each projection only 
 Allocation, boxing, closure/reflection and exception costs are measured where relevant. No unsupported zero-allocation claim follows from static syntax. Formatting/analyzer/DRY/SOLID standards apply across the whole affected graph.100% coverage cannot be weakened to make restructuring easier.
 
 Checkpoint after inventory, approved structure, first vertical slice and each measured rollout. Stop for local patches, unexplained abstraction, missing source context, semantic uncertainty or regression without a decision. Use the [quality constitution](../references/quality-constitution.md), [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [estimates](../references/estimates-and-waves.md). Planned; no implementation performed.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+internal static class PositiveInt
+{
+    internal const string Id = "illustration.number.positive";
+    internal const string FailureCode = "illustration.number.not-positive";
+    internal static Verdict Evaluate(int? value)
+    {
+        var passed = value is not null && value.Value > 0;
+        return new(passed, passed ? null : FailureCode);
+    }
+}
+```
+
+Purpose: cheap complete evaluation by one static method without per-call descriptor allocation. Inputs 1/0 → true/false. Proposed miniature; source current NumberRules uses generic INumber under net8+; no runtime rule-object hierarchy proposed. Status pending.

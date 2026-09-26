@@ -1,11 +1,17 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0
-version: 1.8
+version: 1.9
 status: planned
 last_updated: 2026-09-26
 -->
 # PineGuard technical readiness to 1.0
+
+## Code examples
+
+The plan now includes [complete worked code examples](references/code-examples.md) and a substantive example directly in every workstream and major-app subplan. The reference contains a runnable, package-free teaching prototype, complete governance-example scripts, source-grounded current PineGuard insertion examples and reproduction instructions. Each example distinguishes **Current API, source-inspected**, **Proposed illustration** and any unexecuted configuration; it does not silently select an unresolved architecture decision.
+
+The proposed .NET 10 miniature and synthetic governance fixtures were built/run independently in a workspace scratch directory. That evidence applies only to those examples. Current PineGuard adapter insertions, real repository coverage, BenchmarkDotNet, NativeAOT and full-suite validation are not proved by those runs. The positive-integer miniature supplements rather than replaces the planned Email/bounded-numeric/string-to-DateOnly pilot. All roadmap priorities, hard coverage requirements and Planned activation gates remain unchanged.
 
 This modular plan targets **10/10 in every technical rubric criterion** and **100% line and branch coverage for every declared validation surface within the audited Coverlet denominator**. It is a detailed plan and critical review, not implementation or a claim that readiness has been achieved.
 

@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w21
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -39,3 +39,30 @@ No broad rule expansion displaces early CI trust, taxonomy, new structure/manife
 Checkpoint each wave and before release decisions. Actual release/publication/deployment remains a separately authorized action. Luna gathers evidence, Sol executes approved code, Astra adjudicates/chairs review, and the orchestrator coordinates only.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```powershell
+foreach ($item in $expected) {
+    $matches = @($index | Where-Object { $_.Project -ceq $item.Project -and $_.Tfm -ceq $item.Tfm })
+    if ($matches.Count -ne 1) { throw 'Missing or duplicate required readiness artifact.' }
+    $path = [string]$matches[0].Path
+    if (-not $path -or -not (Test-Path -LiteralPath $path -PathType Leaf)) { throw 'Missing artifact file.' }
+    $key = ConvertTo-Json -InputObject @($item.Project, $item.Tfm) -Compress
+    if (-not $keys.Add($key)) { throw 'Duplicate expected project/TFM.' }
+    $resolved = (Resolve-Path -LiteralPath $path).Path
+    if (-not $paths.Add($resolved)) { throw 'Artifact file reused across expected identities.' }
+    $artifact = Get-Content -LiteralPath $resolved -Raw | ConvertFrom-Json
+    if ($artifact.Project -cne $item.Project -or $artifact.Tfm -cne $item.Tfm -or
+        $artifact.Revision -cne $ExpectedRevision) { throw 'Artifact identity/revision mismatch.' }
+    foreach ($kind in @('Lines', 'Branches')) {
+        $total = Get-IntegralCount $artifact.$kind.Total
+        $covered = Get-IntegralCount $artifact.$kind.Covered
+        if ($total -le 0 -or $covered -gt $total -or $covered -ne $total) { throw 'Empty or below 100%.' }
+    }
+}
+```
+
+Purpose: same fail-closed artifact gate before readiness, with W00 missing/corrupt/empty/under100% rejection cases. A successful miniature console run cannot substitute for required project/TFM/coverage/bench/native/security artifacts. Normalized artifact schema is proposed; no release approval decision is made. Status not run.

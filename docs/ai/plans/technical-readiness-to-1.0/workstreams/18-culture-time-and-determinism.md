@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w18
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -39,3 +39,24 @@ No test depends accidentally on wall-clock date, developer locale or nondetermin
 Checkpoint after inventory and semantic decisions. Sol implements approved shared mechanisms; Luna reads and executes evidence collection under approved commands; Astra reviews. Stop for global test-state leakage, speculative clock abstractions unused by the chosen design, undocumented culture defaults or flaky assertions repaired through retries. W19 owns concurrency interaction with ambient state; coordinate exact file ownership rather than editing the same harness concurrently.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+var saved = CultureInfo.CurrentCulture;
+try
+{
+    CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("fr-FR");
+    Checks.Require(Boundary.Invoke("1").Status == 200, "invariant parse");
+    Checks.Require(DateOnly.FromDateTime(new FixedClock().GetUtcNow().UtcDateTime) ==
+        new DateOnly(2030, 1, 2), "fixed UTC day");
+    Checks.Require(DateOnly.TryParseExact("2030-01-02", "yyyy-MM-dd", CultureInfo.InvariantCulture,
+        DateTimeStyles.None, out var date) && date == new DateOnly(2030, 1, 2), "date conversion");
+}
+finally { CultureInfo.CurrentCulture = saved; }
+Checks.Require(ReferenceEquals(CultureInfo.CurrentCulture, saved), "culture restored");
+```
+
+Purpose: finally restores ambient culture, fixed TimeProvider provides UTC date, ISO string converts independently. fr-FR+`1`→200; fixed clock→2030-01-02; `2030-01-02`→same DateOnly; saved culture restored even on throw. Use existing FixedTimeProvider fixture for actual DateOnlyRules cases. Status pending.

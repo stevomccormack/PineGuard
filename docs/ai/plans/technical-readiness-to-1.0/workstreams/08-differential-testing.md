@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w08
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -37,3 +37,19 @@ A seeded discrepancy fails. A known justified divergence is recorded without bec
 Checkpoint after reference/domain review and after mismatch triage. Luna does all research/reading; Sol implements and runs the approved harness; Astra decides disputed semantics. Stop for unlicensed copied reference code, shared-implementation oracles, unsupported equivalence assumptions or uncontrolled dependency expansion. W08 does not create an obligation to copy competitor behavior or maintain historical PineGuard APIs.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+var random = new Random(731);
+for (var i = 0; i < 1000; i++)
+{
+    var input = random.Next(-10000, 10001);
+    var expected = Math.Sign(input) == 1;
+    Checks.Require(PositiveInt.Evaluate(input).Passed == expected, "independent sign oracle");
+}
+```
+
+Purpose: BCL Math.Sign is an independent reference over the identical bounded int domain. Expected positive sign only; nullable boundary expectations live in literal W01 rows. Do not compare email syntax or dates against a reference with different semantics. Status pending.

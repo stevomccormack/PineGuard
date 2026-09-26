@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w09
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -37,3 +37,15 @@ Record generated, executed, killed, survived, timed-out and excluded counts with
 Checkpoint after risk/target selection, after first results and before assertion changes. Use approved isolated mutation facilities so temporary production mutations never enter committed code. Sol owns harness/test changes, Luna supplies context/evidence, Astra reviews survivors. Stop for broad expensive campaigns without value, unexplained runner errors or exclusions hiding gaps. Do not impose an arbitrary universal mutation percentage before the target domain and meaningful fault set are approved.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+static bool SeededBoundaryMutant(int? value) => value is not null && value.Value >= 0;
+Checks.Require(SeededBoundaryMutant(0), "mutant accepts zero");
+Checks.Require(!PositiveInt.Evaluate(0).Passed, "explicit zero expectation kills mutant");
+```
+
+Purpose: explicit zero expectation kills seeded `>=0` boundary mutant; zero must fail canonical and pass mutant. This does not measure a selected mutation engine or score. Tool selection remains D10. Status pending.

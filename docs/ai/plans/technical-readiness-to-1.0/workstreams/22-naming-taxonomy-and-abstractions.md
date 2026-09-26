@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w22
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -41,3 +41,17 @@ Checkpoint after whole-repository inventory, taxonomy approval and each structur
 W01, W10 early benchmarks and W19 lifecycle characterization may proceed concurrently. W03/W02 depend on W22 approval. The new structure/manifest is an early committed design objective, not optional research.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+Purpose: concrete source mapping plus D07 candidate descriptor ID; D22 paths remain open. Current `IsPositive`→`NumberRules.IsPositive`→`Must.Be.Positive`→complement `Guard.Against.ZeroOrNegative`→`MustCodes.Number.Sign.NotPositive`; FV `.Positive()` and DA `[PositiveNumber]` are source-backed adapters. The candidate teaching descriptor is deliberately named illustration.number.positive and is not the selected manifest taxonomy.
+
+```csharp
+var descriptor = DerivedManifest.Rules.Single();
+Checks.Require(descriptor.Id == "illustration.number.positive" &&
+    descriptor.Code == "illustration.number.not-positive", "candidate name mapping");
+```
+
+Input descriptor→exact candidate literals; no CLI vocabulary file becomes an executable validation manifest. Status pending.

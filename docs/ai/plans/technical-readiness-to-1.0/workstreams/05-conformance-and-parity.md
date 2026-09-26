@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w05
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -43,3 +43,21 @@ Every pilot case runs through every applicable approved projection; gaps have a 
 The pilot checkpoint proves only the pilot. Final W05 completion requires reviewed family-by-family rollout across every declared validation rule and applicable surface, reconciled with the complete W01/W02 inventory and the hard coverage contract. Each rollout packet has independent expectations and explicit supported/not-applicable mappings. Checkpoint after oracle review, after the pilot, after each family and before global gate activation. Stop on an unresolved mismatch rather than modifying expected results to match production output.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+Checks.Require(Projections.Must(1).Passed, "Must positive");
+Checks.Require(!Projections.Must(0).Passed, "Must zero");
+Projections.Guard(1);
+var threw = false;
+try { Projections.Guard(0); }
+catch (ArgumentOutOfRangeException) { threw = true; }
+Checks.Require(threw, "Guard zero throws");
+Checks.Require(Projections.ObjectErrors(0).SequenceEqual(
+    new[] { "Value:illustration.number.not-positive" }), "object path/code");
+```
+
+Purpose: independent literal expectations for candidate projections. Add actual adapter cases in their existing paired Tests/TestData files, including null/indexed children/sync-async semantics; do not assume identical framework null handling. Same 1/0 expectations as W04; candidate status pending, actual frameworks unverified.

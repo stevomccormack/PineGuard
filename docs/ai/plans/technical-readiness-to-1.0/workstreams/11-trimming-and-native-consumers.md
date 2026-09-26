@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w11
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -41,3 +41,32 @@ Checkpoint after support selection, after package restore and after executed pub
 W11 tests the newly chosen product contract. There is no obligation to support old releases, retain old API shapes or build migration shims. W20's large sample projects reuse the established interfaces and evidence; they must not be used to postpone the minimal deployment proof.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+Purpose: compile and execute the complete proposed minimal consumer above, then separate native proof. Windows host commands below explicitly choose win-x64; host architecture/toolchain availability must be checked by Luna. No success claimed until publish and binary execution both succeed.
+
+Complete consumer project file `Pilot.csproj` (Program.cs is the canonical complete consumer source):
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>
+```
+
+```powershell
+dotnet publish ./Pilot.csproj -c Release -r win-x64 --self-contained true -p:PublishAot=true -o ./native-out
+if ($LASTEXITCODE -ne 0) { throw 'Native publish failed.' }
+& ./native-out/Pilot.exe
+if ($LASTEXITCODE -ne 0) { throw 'Native execution failed.' }
+```
+
+Expected same PASS checks and consumed=100000. Actual PineGuard adapter/native/trimming/reflection consumers require separate target-specific evidence. Status not run; D12 support/D26 sample design open.

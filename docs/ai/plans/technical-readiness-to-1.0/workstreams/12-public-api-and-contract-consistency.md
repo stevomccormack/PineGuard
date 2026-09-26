@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w12
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -39,3 +39,24 @@ The baseline is the newly approved contract. A seeded unreviewed public API chan
 Checkpoint after complete API map, after new API approval and after forward drift proof. Astra owns all API decisions; Sol implements; Luna supplies source context and package facts. Stop for a local rename that leaves repository-wide inconsistency, accidental public exposure, hidden redundant code or a proposal to spend effort on old-consumer migration.100% validation coverage applies throughout; baseline replacement is reviewed, never a mechanism to ignore an unexplained change.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+Purpose: review a new public API baseline then reject drift. Complete proposed `Verify-ApiBaseline.ps1` requires independently generated API text, not a handwritten production baseline or an assumed generator.
+
+```powershell
+$ErrorActionPreference = 'Stop'
+foreach ($path in @($Baseline, $GeneratedApi)) {
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Missing API artifact: $path" }
+    if ((Get-Item -LiteralPath $path).Length -eq 0) { throw "Empty API artifact: $path" }
+}
+$before = (Get-Content -LiteralPath $Baseline -Raw).Replace("`r`n", "`n")
+$after = (Get-Content -LiteralPath $GeneratedApi -Raw).Replace("`r`n", "`n")
+if ([string]::IsNullOrWhiteSpace($before) -or [string]::IsNullOrWhiteSpace($after)) { throw 'Whitespace-only API artifact.' }
+if ($before -cne $after) { throw 'Public API drift requires review.' }
+Write-Output 'PASS: generated API equals reviewed baseline.'
+```
+
+Input equal nonempty normalized texts→pass; missing/empty/different→throw. Existing target-specific APIs must produce separate reviewed artifacts. No current API generation tool selected; status not run.

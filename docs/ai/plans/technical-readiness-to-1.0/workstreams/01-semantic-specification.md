@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w01
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -44,3 +44,22 @@ C1 requires every pilot outcome to be explainable from the specification without
 Checkpoint after reproductions and after each rule's reviewed truth table. Sol changes implementation only after formal activation/authorization and contract approval. No rule expansion or wholesale rewrites occur in this workstream.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+(int? Input, bool Expected)[] cases =
+    [(null, false), (int.MinValue, false), (-1, false),
+     (0, false), (1, true), (int.MaxValue, true)];
+foreach (var row in cases)
+{
+    var result = PositiveInt.Evaluate(row.Input);
+    Checks.Require(result.Passed == row.Expected, "explicit semantic row");
+    Checks.Require(result.Code == (row.Expected ? null :
+        "illustration.number.not-positive"), "explicit code");
+}
+```
+
+Purpose: literal null/boundary/valid truth rows, independent stable codes. Exact inputs/outputs are in the canonical contract and method; current paired TheoryData/MemberData insertion above supplies the actual Must example. Status pilot execution pending, current tests not run.

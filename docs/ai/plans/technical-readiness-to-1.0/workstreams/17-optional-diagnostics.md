@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w17
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -39,3 +39,17 @@ Approved diagnostic questions can be answered without changing validation truth 
 Checkpoint after need/policy decision and after cost/privacy proof. Sol implements the smallest coherent approved mechanism; Luna inventories and gathers evidence; Astra reviews. Stop for speculative observability frameworks, duplicated events across projections, unbounded cardinality or unapproved payload fields. W17 is independently gateable: completion may be an approved absence of new instrumentation, but cannot be a silent skip of privacy/performance review.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+internal static class Diagnostics
+{
+    internal static string? Event(bool enabled, Verdict verdict) =>
+        enabled && !verdict.Passed ? "rule=" + PositiveInt.Id + ";code=" + verdict.Code : null;
+}
+```
+
+Purpose: candidate D15 opt-in defaults off, enabled output contains only fixed rule/code. Failed -987654321→null when off, exact safe event when on. No attempted value, free-form input, property value or sensitive parameter name in output. Current MustResult.Value is not logging consent. Status pending.

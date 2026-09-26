@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w00
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -41,3 +41,36 @@ Record revision/environment, selected jobs, expected/actual artifact counts, fai
 Sol may edit only Astra-approved workflow/CLI paths; Luna supplies all file reads. Checkpoint after routing inventory, after fail-closed fixtures, and before each gate activation. Astra reviews seeded-failure evidence before a coherent exact-file commit. Stop for unexplained missing matrix entries, unsupported no-coverage exceptions or broad unrelated CI changes. W00 owns routing/artifact trust; semantic expectations remain owned by W01/W05.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+Purpose: fail closed against independently enumerated project/TFM scope, retaining 100% line and branch targets. Complete proposed script is `Verify-Evidence.ps1`; mandatory inputs ExpectedMatrix rows `{Project,Tfm}`, ArtifactIndex rows `{Project,Tfm,Path}` and independent ExpectedRevision. Each normalized artifact has `{Project,Tfm,Revision,Lines:{Covered,Total},Branches:{Covered,Total}}`. Duplicate expected keys, reused resolved report paths and mismatched artifact identity/revision reject. Numeric finite nonnegative integral Int64-range counts are accepted without parser-specific integer assumptions. The real expected matrix/normalizer remain unselected. Identity checks do not authenticate the producer. Zero branch denominator currently rejects; legitimately branch-free scopes require a reviewed policy, not an implied exception.
+
+```powershell
+$expected = @(Get-Content -LiteralPath $ExpectedMatrix -Raw | ConvertFrom-Json)
+$index = @(Get-Content -LiteralPath $ArtifactIndex -Raw | ConvertFrom-Json)
+if ($expected.Count -eq 0) { throw 'Expected project/TFM scope is empty.' }
+foreach ($item in $expected) {
+    if (-not $item.Project -or -not $item.Tfm) { throw 'Invalid expected scope row.' }
+    $matches = @($index | Where-Object { $_.Project -ceq $item.Project -and $_.Tfm -ceq $item.Tfm })
+    if ($matches.Count -ne 1) { throw 'Missing or duplicate artifact.' }
+    $path = [string]$matches[0].Path
+    if (-not $path -or -not (Test-Path -LiteralPath $path -PathType Leaf)) { throw 'Missing artifact file.' }
+    $key = ConvertTo-Json -InputObject @($item.Project, $item.Tfm) -Compress
+    if (-not $keys.Add($key)) { throw 'Duplicate expected project/TFM.' }
+    $resolved = (Resolve-Path -LiteralPath $path).Path
+    if (-not $paths.Add($resolved)) { throw 'Artifact file reused across expected identities.' }
+    $artifact = Get-Content -LiteralPath $resolved -Raw | ConvertFrom-Json
+    if ($artifact.Project -cne $item.Project -or $artifact.Tfm -cne $item.Tfm -or
+        $artifact.Revision -cne $ExpectedRevision) { throw 'Artifact identity/revision mismatch.' }
+    foreach ($kind in @('Lines', 'Branches')) {
+        $total = Get-IntegralCount $artifact.$kind.Total
+        $covered = Get-IntegralCount $artifact.$kind.Covered
+        if ($total -le 0 -or $covered -gt $total -or $covered -ne $total) { throw 'Empty or below 100%.' }
+    }
+}
+```
+
+Independent outcomes: absent scope, missing/duplicate artifact, corrupt JSON, empty counts or Covered<Total throws; exact Covered=Total>0 for both metrics for every expected row passes. Inputs must use reviewed scope, not discovered successful artifacts. The synthetic governance self-test exercised this example against local fixtures; it does not prove hosted artifact routing or repository coverage. The ordinary pilot pass is not coverage evidence.

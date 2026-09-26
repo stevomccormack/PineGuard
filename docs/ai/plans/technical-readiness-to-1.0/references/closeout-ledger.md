@@ -1,5 +1,21 @@
 # Knowledge and tooling closeout ledger
 
+## CODEEX-01 — Code-example amendment, 2026-09-26
+
+**User correction and outcome:** the plan lacked actual code examples. The amendment supplies a complete canonical reference and substantive direct examples in all 23 workstreams and three app subplans. Current APIs are source-inspected insertion units; the separately compiled miniature is explicitly a proposed teaching design. Product implementation, roadmap decisions and readiness claims remain unchanged.
+
+**Saved lessons:** helper-only calls such as invoking a hidden check are not sufficiently actionable examples; include the relevant implementation/assertion/configuration with declared context and independent outcomes. Caveats do not excuse avoidable defects in an advertised invariant: use a real ordinary-construction boundary in the illustration. Separate instrumentation cost and evidence scope from performance claims. Gate examples must reject empty/stale/mislabeled evidence, not merely check that a file exists.
+
+**Model/route observation:** an external Sol-runner attempt was rejected before process start for unestablished disclosure handling. It was not retried or bypassed. A subsequently available, approved native Sol subagent produced the code under the user's role policy. Prefer the available approved native role channel; changing capacity or a past successful route is not authorization to repeat a rejected action. This is a session observation, not a new global rule hierarchy.
+
+**Roles and exact scope:** Sol authored Pilot.csproj, Program.cs and governance script examples; Luna read source/BRAIN and verified frozen artifacts; Astra reviewed design, code deltas and documentation classification. All runnable verification artifacts and bin/obj/fixtures stayed in the workspace. Published changes are documentation and fenced source examples only; no repository product/tool implementation is claimed.
+
+**Verified outcomes:** SDK 10.0.401; isolated net10.0 Release build exited 0 with zero warnings/errors; run exited 0 with the complete demonstration-check PASS line and consumed=100000. Timing/allocation numbers are observations, not performance acceptance. The PowerShell governance example self-test exited 0 with success cases and ten expected rejection probes: wrong identity, wrong revision, below-100% coverage, invalid count, duplicate expected identity, missing artifact, whitespace-only API, API drift, missing API and missing lock before restore/network. Final source hashes and reproducible source are recorded in [Code examples](code-examples.md).
+
+**Feedback closure:** accepted and corrected: helper-only excerpts; bypassable teaching value-object construction; measured instrumentation allocation; whitespace-only API input; evidence identity/count handling. Astra accepts the corrected design and scoped verification. Current PineGuard insertion snippets, real repository coverage, BenchmarkDotNet and NativeAOT remain unexecuted by this amendment and must not be reported as verified.
+
+**Publication checks pending publisher:** exact documentation manifest; master v1.9/child v1.2 Planned; 26 substantive direct examples and links; complete portable source fences; final frozen hash equality; current/proposed verification labels; links/fences/whitespace; protected-file/staging ownership and final commit. Record actual publication results before claiming this block fully closed. Existing PROMOTE-01 governs any later reusable-rule promotion; no unrelated agent-memory file is created.
+
 Project-specific closeout records live here because no applicable planner/execution memory home was established by the bounded BRAIN inspection. This is not a competing repository memory system. Promote reusable observations through the canonical taxonomy/spec process in [closure contract](knowledge-and-tooling-closure.md).
 
 ## Planning session record — 2026-09-26

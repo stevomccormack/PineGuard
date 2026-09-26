@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20b
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -36,3 +36,24 @@ No persistence/event sourcing/CQRS framework or value-object generator is added 
 Engineering-equivalent20–40 hours; active model/tool work6–15 hours; review3–5 hours, low confidence until domain scope. Split by construction, invariant transitions, execution evidence and documentation. Apply [execution protocol](../../references/execution-protocol.md) and [quality constitution](../../references/quality-constitution.md).
 
 Stop for an unresolved core result/lifecycle contract or a domain rule duplicated in multiple layers. Fix the shared cause before extending the sample. Acceptance is separate from API and Clean Architecture projects.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../../references/code-examples.md).
+
+```csharp
+internal sealed class PositiveAmount
+{
+    internal int Value { get; }
+    private PositiveAmount(int value) => Value = value;
+    internal static bool TryCreate(int value, out PositiveAmount? amount)
+    {
+        amount = null;
+        if (!PositiveInt.Evaluate(value).Passed) return false;
+        amount = new PositiveAmount(value);
+        return true;
+    }
+}
+```
+
+Purpose: raw input→invariant int conversion→factory→single authority→candidate amount. `1` creates an immutable amount with Value1; zero returns false with null. The sealed class/private constructor prevents ordinary construction bypass in this teaching sample; there is no claim about reflection or serialization. Choosing production constructor/failure shape stays D08/D26. Email and string→DateOnly roadmap examples use verified current APIs above rather than silently inventing semantic policy. Status pending.

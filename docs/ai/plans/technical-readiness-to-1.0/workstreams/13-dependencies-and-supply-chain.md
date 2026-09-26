@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w13
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -39,3 +39,19 @@ Security findings are evaluated against actual package/version/use/reachability 
 Checkpoint after inventory and policy decisions, then after package/gate proof. Luna performs external/database reading and gathers provenance; Sol implements approved tooling; Astra decides tradeoffs. Stop for unexplained package-source changes, speculative package upgrades, copied credentials or blanket suppressions. This workstream may remove dependencies when the best greenfield design warrants it; it does not maintain old package graphs for compatibility.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```powershell
+$resolved = (Resolve-Path -LiteralPath $Project).Path
+$directory = Split-Path -Parent $resolved
+$lock = Join-Path $directory 'packages.lock.json'
+if (-not (Test-Path -LiteralPath $lock -PathType Leaf)) { throw 'A reviewed lock file is required for this proposed gate.' }
+dotnet restore $resolved --locked-mode
+if ($LASTEXITCODE -ne 0) { throw 'Locked restore failed.' }
+Write-Output 'PASS: locked restore.'
+```
+
+Purpose: complete proposed lock gate requires a reviewed packages.lock.json then runs locked restore, failing if absent/drift. The package-free pilot currently has no reviewed lock and must fail this prerequisite; do not imply repository lock files exist. Actual pins supplied by Luna: xUnit2.9.3/FV11.12.0/ErrorOr2.1.1/TestSDK18.10.1; CLI Node>=22/TS6.0.3/Vitest4.2.2. Status not run.

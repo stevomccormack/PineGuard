@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w04
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -37,3 +37,24 @@ Messages are stable only if the new contract says so; diagnostic/display text an
 No surface is forced to expose nonexistent native information simply to fill a table. A new common mapping is permissible only as an explicit new design with documented semantics. New public contract drift is checked by W12, not against old releases.
 
 Checkpoint after inventory, model decision and first full pilot. Astra decides/reviews; Sol codes; Luna reads/evidence. Stop for guessed codes, duplicated adapter truth, information loss, hidden value leakage or arbitrary catches. Follow [quality constitution](../references/quality-constitution.md), [execution](../references/execution-protocol.md), [decisions](../references/decision-register.md) and [estimates](../references/estimates-and-waves.md). Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+internal static class Projections
+{
+    internal static Verdict Must(int? value) => PositiveInt.Evaluate(value);
+    internal static void Guard(int? value)
+    {
+        if (!PositiveInt.Evaluate(value).Passed)
+            throw new ArgumentOutOfRangeException(nameof(value));
+    }
+    internal static string[] ObjectErrors(int? value) =>
+        PositiveInt.Evaluate(value) is { Passed: false, Code: { } code }
+            ? ["Value:" + code] : [];
+}
+```
+
+Purpose: candidate D08 failure shape, safe object path and complement guard, all calling canonical authority. Input 1 → Must pass/no guard exception; input 0 → Must fail/guard exception/object `Value:illustration.number.not-positive`. Current Must/Guard/FV/DA excerpts above show verified names separately; they are not proved by this miniature. Existing MustFailure/MustValidationResult remain current object contract; protected RuleFor/RuleForEach and internal MustChildValidator are not invented public adapters. Status pending.

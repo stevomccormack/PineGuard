@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20a
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -36,3 +36,25 @@ Do not add database/authentication/cloud deployment/UI machinery unless needed f
 Engineering-equivalent effort16–32 hours; active Sol/Luna tool-and-model work5–12 hours; Astra/user review2–4 hours, low confidence until exact scope is approved. Break into2–4-hour engineering-equivalent packets with10–20-minute requested agent bounds, checkpoints and role-specific tokens from the [execution protocol](../../references/execution-protocol.md). These estimates are not wall-clock promises or hard tool limits.
 
 Stop for core contract gaps, new API choices, scope growth or duplicate validation logic; return the issue to its owning workstream. W20A is accepted separately from W20B/W20C.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../../references/code-examples.md).
+
+```csharp
+internal static class Boundary
+{
+    internal const int InputLimit = 128;
+    internal static Response Invoke(string raw) =>
+        TryCreate(raw, out _) ? new(200, []) : new(400, ["illustration.invalid-input"]);
+    internal static bool TryCreate(string raw, out PositiveAmount? amount)
+    {
+        amount = null;
+        if (raw.Length > InputLimit || !int.TryParse(raw, NumberStyles.Integer,
+                CultureInfo.InvariantCulture, out var number)) return false;
+        return PositiveAmount.TryCreate(number, out amount);
+    }
+}
+```
+
+Purpose: invoke candidate boundary then assert transport-neutral response. Input0→400+exact one code; no HTTP framework/endpoint API is claimed. Complete sample response record and method in Program.cs. Status pending.

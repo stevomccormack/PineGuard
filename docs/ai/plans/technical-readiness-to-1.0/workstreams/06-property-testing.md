@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w06
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -43,3 +43,19 @@ Seeded defects fail for the expected reason. Rerunning a captured failing seed r
 W06 owns semantic properties and generators; W07 owns hostile-input fuzz campaigns; W09 evaluates assertion sensitivity through mutation. Checkpoint after property review, then after the first reproducible counterexample exercise. Stop for unbounded generation, unstable time/culture, false properties, excessive runtime or unexplained seed-dependent failures. Any new package dependency goes through W13.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+var random = new Random(731);
+for (var i = 0; i < 1000; i++)
+{
+    var input = random.Next(-10000, 10001);
+    var expected = Math.Sign(input) == 1;
+    Checks.Require(PositiveInt.Evaluate(input).Passed == expected, "seeded sign oracle");
+}
+```
+
+Purpose: repeatable seed731, 1,000 ints in [-10000,10000], independent Math.Sign oracle. Every comparison must agree. This bounded generated test is not a claim about a selected property-testing framework or all numeric types. D10 remains open. Status pending.

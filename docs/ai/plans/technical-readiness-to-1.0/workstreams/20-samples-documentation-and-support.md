@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -45,3 +45,20 @@ Large samples demonstrate validation integration, not production certification o
 Checkpoint after inventory, lightweight examples and each major sample. Astra reviews architecture/docs; Sol codes; Luna reads/tests/looks up. Inventory and approve exact sample paths first. Stop for speculative scope, duplicated validation logic, undocumented package availability or using samples to hide missing core contracts.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+var invalid = Boundary.Invoke("0");
+Checks.Require(invalid.Status == 400 && invalid.ErrorCodes.SequenceEqual(
+    new[] { "illustration.invalid-input" }), "API response");
+Checks.Require(Boundary.TryCreate("1", out var amount) && amount is { Value: 1 }, "parse then invariant");
+Checks.Require(!Boundary.TryCreate("0", out var invalidAmount) && invalidAmount is null, "domain rejection");
+Checks.Require(!PositiveAmount.TryCreate(0, out var directInvalid) && directInvalid is null, "factory rejection");
+IAmountHandler handler = new AmountHandler();
+Checks.Require(handler.Handle("1").Status == 200 && handler.Handle("0").Status == 400, "handler boundary");
+```
+
+Purpose: executable teaching consumer, explicit response and construction boundary; not a support-matrix promise. Inputs1/0→200/400 with safe error code. Actual supported SDK/TFM/OS evidence, normal run, trim and native execution remain separate D12/D26 artifacts. Status pending.

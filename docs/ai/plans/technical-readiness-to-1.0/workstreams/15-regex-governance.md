@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w15
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -39,3 +39,26 @@ Engine changes, nonbacktracking choices, generated regex and caches require meas
 Checkpoint after inventory/reproduction, after semantic decision and before broad migration. Sol fixes the shared cause; Luna supplies source and official runtime documentation; Astra decides policy. Stop for arbitrary timeout constants, blanket exception catching, local special-case wrappers, unbounded pattern caches or claims extending beyond tested engine/target behavior. W16 owns cross-operation limits; W15 owns regex policy and contributes its measurements.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+internal static class PatternProbe
+{
+    internal static RegexOutcome Evaluate(string input, string pattern, bool negate)
+    {
+        try
+        {
+            var matched = Regex.IsMatch(input, pattern, RegexOptions.CultureInvariant,
+                TimeSpan.FromMilliseconds(20));
+            return matched != negate ? RegexOutcome.Match : RegexOutcome.NoMatch;
+        }
+        catch (ArgumentException) { return RegexOutcome.OperationalError; }
+        catch (RegexMatchTimeoutException) { return RegexOutcome.OperationalError; }
+    }
+}
+```
+
+Purpose: candidate D05 typed operational state keeps invalid pattern failure from becoming negated success. `[` on x→OperationalError under both negation settings; known match/nonmatch are explicit. Timeout catch uses same operational state, but deterministic timeout injection is not supplied, so timeout path is unverified. Candidate20ms is only miniature input; existing Email generated helper200ms must not be generalized to all StringRules. Status pending.

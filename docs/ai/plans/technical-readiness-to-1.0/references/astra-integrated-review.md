@@ -1,5 +1,13 @@
 # Astra integrated critical review
 
+## Code-example amendment — plan v1.9
+
+The user's review identified that the plan lacked code examples. The correction adds complete canonical source plus substantive direct examples in all 26 child plans, without implementing product changes or changing the roadmap. Sol authored the code; Luna supplied source/version evidence and performed bounded verification; Astra specified and reviewed the examples.
+
+Astra required fixes before acceptance: replace helper-only invocations with actual relevant implementations/assertions; enforce ordinary construction through the teaching domain object's private constructor/factory; keep timing instrumentation outside its allocation window; reject whitespace-only API artifacts; and bind example coverage artifacts to independent project/TFM/revision identities with duplicate/reuse checks. The final isolated Release build passed with zero warnings/errors, its checks passed, and synthetic governance success plus ten rejection probes passed. These results are scoped to the proposed examples, not current adapters or production gates.
+
+The [code reference](code-examples.md) preserves Current API versus Proposed illustration labels, source pins, exact reproduction context, pending decision IDs and verification limits. Timing remains a smoke observation, not a budget or BenchmarkDotNet result; normal compilation is not NativeAOT proof. No existing source/published API claim is inferred from the prototype. The [ledger](closeout-ledger.md) records the review corrections and verification.
+
 ## Mandatory maintenance amendment — plan v1.8
 
 The user added an essential completion requirement after initial publication: every workstream and major block/section/wave must save lessons, maintain BRAIN/all relevant Markdown and supporting scripts/tools, and complete a full review→feedback→fix→recheck loop. This amendment is accepted and implemented as a [shared closure contract](knowledge-and-tooling-closure.md), explicit inherited gates in all 26 child plans, master A–F gates and a [saved session ledger](closeout-ledger.md). It does not implement future scripts or create a parallel normative BRAIN hierarchy.

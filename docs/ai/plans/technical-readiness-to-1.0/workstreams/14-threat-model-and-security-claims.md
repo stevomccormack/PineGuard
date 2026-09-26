@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w14
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -41,3 +41,18 @@ Every security-relevant affirmative claim has explicit scope, threat assumptions
 Checkpoint after threat/claim inventory and before changing behavior or public claim language. Astra approves security semantics; Sol implements approved shared fixes; Luna gathers source/research evidence. Fix root causes across all impacted projections, not a single failing test path. New limits/regex policies belong to W15/W16 and must not be guessed inside a security test.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+Checks.Require(Boundary.Invoke(new string('9', 129)).Status == 400, "size rejection");
+Checks.Require(Boundary.Invoke("2147483648").Status == 400, "overflow rejection");
+var verdict = PositiveInt.Evaluate(-987654321);
+Checks.Require(Diagnostics.Event(false, verdict) is null, "diagnostics opt-in");
+Checks.Require(Diagnostics.Event(true, verdict) ==
+    "rule=illustration.number.positive;code=illustration.number.not-positive", "exact allowlist");
+```
+
+Purpose: claim-specific tests only: oversize raw numeric input rejected before parsing and diagnostic output has exact allowlist. Overflow/129 digits→400; attempted -987654321 never appears in event. No general security claim or adversarial regex-timeout proof follows. Status pending.

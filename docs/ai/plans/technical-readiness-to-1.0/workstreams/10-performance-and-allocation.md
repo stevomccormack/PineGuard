@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w10
-version: 1.1
+version: 1.2
 status: planned
 last_updated: 2026-09-26
 -->
@@ -43,3 +43,27 @@ The early baseline is reproducible enough to inform W03 before broad implementat
 Checkpoint after workload selection, baseline collection and budget decision. Do not wait for every hostile-testing workstream before obtaining the initial baseline. Conversely, an early benchmark is not final release evidence after structural changes. Required correctness and100% validation coverage must remain satisfied; performance changes may not hide failures or create local special cases.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Worked code example
+
+This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
+
+```csharp
+const int iterations = 100000;
+var timer = new Stopwatch();
+var warmupConsumed = 0;
+for (var i = 0; i < 1000; i++)
+    warmupConsumed += PositiveInt.Evaluate(1).Passed ? 1 : 0;
+Checks.Require(warmupConsumed == 1000, "warmup result consumed");
+var consumed = 0;
+timer.Start();
+var before = GC.GetAllocatedBytesForCurrentThread();
+for (var i = 0; i < iterations; i++)
+    consumed += PositiveInt.Evaluate(1).Passed ? 1 : 0;
+var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+timer.Stop();
+Checks.Require(consumed == iterations, "timing result consumed");
+Console.WriteLine($"TIMING illustration: consumed={consumed}; elapsedTicks={timer.ElapsedTicks}; allocatedBytes={allocated}");
+```
+
+Purpose: complete package-free timing probe consumes 100,000 static results after 1,000 consumed warmup calls. Stopwatch construction and warmup are outside the allocation-measurement window; no validator construction/reuse claim. Expected consumed=100000, elapsed/allocation observed, no threshold selected. Timer/counter overhead, JIT tiering and host noise remain uncontrolled; this is a smoke measurement, not BenchmarkDotNet, a regression budget or a publishable benchmark. BDN version/config remain unverified; D10/D11 open. Status pending.
