@@ -3,3 +3,46 @@ inherit = "core"
 
 [shell_environment_policy.set]
 CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
+
+[mcp_servers.github]
+url = "https://api.githubcopilot.com/mcp/"
+bearer_token_env_var = "GH_TOKEN"
+
+[mcp_servers.memory]
+command = "npx"
+args = [
+    "-y",
+    "@modelcontextprotocol/server-memory",
+]
+
+[mcp_servers.nuget]
+command = "dnx"
+args = [
+    "NuGet.Mcp.Server",
+    "--source",
+    "https://api.nuget.org/v3/index.json",
+    "--yes",
+]
+
+[mcp_servers.sequential-thinking]
+command = "npx"
+args = [
+    "-y",
+    "@modelcontextprotocol/server-sequential-thinking",
+]
+
+[mcp_servers.sonarqube]
+command = "docker"
+args = [
+    "run",
+    "--init",
+    "--pull=always",
+    "-i",
+    "--rm",
+    "-e",
+    "SONARQUBE_TOKEN",
+    "-e",
+    "SONARQUBE_URL",
+    "sonarsource/sonarqube-mcp",
+]
+env_vars = ["SONARQUBE_URL"]
