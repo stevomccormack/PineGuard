@@ -31,28 +31,28 @@ public static class GuardTimeSpanClausesTestData
             .ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
-    // Guard.Against.LessThan — throws when value IS less than threshold (delegates to Must.Be.GreaterThan)
-    public static class LessThan
+    // Guard.Against.ShorterThan — throws when value IS shorter than threshold (delegates to Must.Be.LongerThan)
+    public static class ShorterThan
     {
         public static TheoryData<GuardCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)>> ValidCases =>
-            F.IsGreaterThan.AllValid.Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.threshold!.Value, s.Inputs.inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive), s.IsValid)).ToArray()
+            F.IsLongerThan.AllValid.Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.threshold!.Value, s.Inputs.inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive), s.IsValid)).ToArray()
             .ToGuardCases(_ => new GuardExpected(true));
 
         public static TheoryData<GuardCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)>> InvalidCases =>
-            F.IsGreaterThan.AllInvalid.Where(s => s.Inputs is { value: not null, threshold: not null })
+            F.IsLongerThan.AllInvalid.Where(s => s.Inputs is { value: not null, threshold: not null })
             .Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.threshold!.Value, s.Inputs.inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive), s.IsValid)).ToArray()
             .ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
-    // Guard.Against.GreaterThan — throws when value IS greater than threshold (delegates to Must.Be.LessThan)
-    public static class GreaterThan
+    // Guard.Against.LongerThan — throws when value IS longer than threshold (delegates to Must.Be.ShorterThan)
+    public static class LongerThan
     {
         public static TheoryData<GuardCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)>> ValidCases =>
-            F.IsLessThan.AllValid.Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.threshold!.Value, s.Inputs.inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive), s.IsValid)).ToArray()
+            F.IsShorterThan.AllValid.Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.threshold!.Value, s.Inputs.inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive), s.IsValid)).ToArray()
             .ToGuardCases(_ => new GuardExpected(true));
 
         public static TheoryData<GuardCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)>> InvalidCases =>
-            F.IsLessThan.AllInvalid.Where(s => s.Inputs is { value: not null, threshold: not null })
+            F.IsShorterThan.AllInvalid.Where(s => s.Inputs is { value: not null, threshold: not null })
             .Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.threshold!.Value, s.Inputs.inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive), s.IsValid)).ToArray()
             .ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }

@@ -11,13 +11,13 @@ public static class TimeSpanRulesTestData
         public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan min, TimeSpan max, Inclusion inclusion)>> Cases => F.IsDurationBetween.AllScenarios.ToRuleCases();
     }
 
-    public static class IsGreaterThan
+    public static class IsLongerThan
     {
-        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>> Cases => F.IsGreaterThan.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>> Cases => F.IsLongerThan.AllScenarios.ToRuleCases();
     }
 
-    public static class IsLessThan
+    public static class IsShorterThan
     {
-        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>> Cases => F.IsLessThan.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>> Cases => F.IsShorterThan.AllScenarios.ToRuleCases();
     }
 }

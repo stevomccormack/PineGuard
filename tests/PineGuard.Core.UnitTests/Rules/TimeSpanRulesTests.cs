@@ -19,22 +19,22 @@ public sealed class TimeSpanRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     }
 
     [Theory]
-    [MemberData(nameof(TimeSpanRulesTestData.IsGreaterThan.Cases), MemberType = typeof(TimeSpanRulesTestData.IsGreaterThan))]
-    public void IsGreaterThan_BehavesAsExpected(RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)> tc)
+    [MemberData(nameof(TimeSpanRulesTestData.IsLongerThan.Cases), MemberType = typeof(TimeSpanRulesTestData.IsLongerThan))]
+    public void IsLongerThan_BehavesAsExpected(RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)> tc)
     {
         // Act
-        var result = TimeSpanRules.IsGreaterThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion);
+        var result = TimeSpanRules.IsLongerThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(TimeSpanRulesTestData.IsLessThan.Cases), MemberType = typeof(TimeSpanRulesTestData.IsLessThan))]
-    public void IsLessThan_BehavesAsExpected(RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)> tc)
+    [MemberData(nameof(TimeSpanRulesTestData.IsShorterThan.Cases), MemberType = typeof(TimeSpanRulesTestData.IsShorterThan))]
+    public void IsShorterThan_BehavesAsExpected(RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)> tc)
     {
         // Act
-        var result = TimeSpanRules.IsLessThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion);
+        var result = TimeSpanRules.IsShorterThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);

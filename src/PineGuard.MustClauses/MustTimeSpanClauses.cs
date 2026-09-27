@@ -107,7 +107,7 @@ public static class MustTimeSpanClauses
     }
 
     /// <summary>
-    /// Validates that the specified <see cref="TimeSpan"/> duration is greater than the given threshold.
+    /// Validates that the specified <see cref="TimeSpan"/> duration is longer than the given threshold.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The <see cref="TimeSpan"/> value to validate.</param>
@@ -123,32 +123,32 @@ public static class MustTimeSpanClauses
     /// descriptive <see cref="MustResult{T}.Message"/>.
     /// </returns>
     /// <remarks>
-    /// Delegates to <see cref="TimeSpanRules.IsGreaterThan"/>. The failure message follows the pattern
-    /// <c>"{paramName} must be greater than the threshold."</c>
+    /// Delegates to <see cref="TimeSpanRules.IsLongerThan"/>. The failure message follows the pattern
+    /// <c>"{paramName} must be longer than the threshold."</c>
     /// </remarks>
     /// <example>
     /// <code>
-    /// var result = Must.Be.GreaterThan(elapsed, TimeSpan.FromSeconds(1));
+    /// var result = Must.Be.LongerThan(elapsed, TimeSpan.FromSeconds(1));
     /// if (result.Failed)
     ///     Console.WriteLine(result.Message);
     /// </code>
     /// </example>
-    /// <seealso cref="TimeSpanRules.IsGreaterThan"/>
+    /// <seealso cref="TimeSpanRules.IsLongerThan"/>
     /// <seealso href="https://pineguard.ai/docs/must/timespan">TimeSpan Must Clauses documentation</seealso>
-    public static MustResult<TimeSpan> GreaterThan(this IMustClause _,
+    public static MustResult<TimeSpan> LongerThan(this IMustClause _,
         TimeSpan value,
         TimeSpan threshold,
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        const string messageTemplate = "{paramName} must be greater than the threshold.";
+        const string messageTemplate = "{paramName} must be longer than the threshold.";
 
-        var ok = TimeSpanRules.IsGreaterThan(value, threshold, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotGreater, messageTemplate, paramName, value, value);
+        var ok = TimeSpanRules.IsLongerThan(value, threshold, inclusion);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotLonger, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
-    /// Validates that the specified <see cref="TimeSpan"/> duration is less than the given threshold.
+    /// Validates that the specified <see cref="TimeSpan"/> duration is shorter than the given threshold.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The <see cref="TimeSpan"/> value to validate.</param>
@@ -160,31 +160,31 @@ public static class MustTimeSpanClauses
     /// </param>
     /// <returns>
     /// A <see cref="MustResult{T}"/> where <see cref="MustResult{T}.Success"/> is <see langword="true"/>
-    /// if <paramref name="value"/> is less than <paramref name="threshold"/>, or <see langword="false"/> with a
+    /// if <paramref name="value"/> is shorter than <paramref name="threshold"/>, or <see langword="false"/> with a
     /// descriptive <see cref="MustResult{T}.Message"/>.
     /// </returns>
     /// <remarks>
-    /// Delegates to <see cref="TimeSpanRules.IsLessThan"/>. The failure message follows the pattern
-    /// <c>"{paramName} must be less than the threshold."</c>
+    /// Delegates to <see cref="TimeSpanRules.IsShorterThan"/>. The failure message follows the pattern
+    /// <c>"{paramName} must be shorter than the threshold."</c>
     /// </remarks>
     /// <example>
     /// <code>
-    /// var result = Must.Be.LessThan(timeout, TimeSpan.FromMinutes(5));
+    /// var result = Must.Be.ShorterThan(timeout, TimeSpan.FromMinutes(5));
     /// if (result.Failed)
     ///     Console.WriteLine(result.Message);
     /// </code>
     /// </example>
-    /// <seealso cref="TimeSpanRules.IsLessThan"/>
+    /// <seealso cref="TimeSpanRules.IsShorterThan"/>
     /// <seealso href="https://pineguard.ai/docs/must/timespan">TimeSpan Must Clauses documentation</seealso>
-    public static MustResult<TimeSpan> LessThan(this IMustClause _,
+    public static MustResult<TimeSpan> ShorterThan(this IMustClause _,
         TimeSpan value,
         TimeSpan threshold,
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        const string messageTemplate = "{paramName} must be less than the threshold.";
+        const string messageTemplate = "{paramName} must be shorter than the threshold.";
 
-        var ok = TimeSpanRules.IsLessThan(value, threshold, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotLess, messageTemplate, paramName, value, value);
+        var ok = TimeSpanRules.IsShorterThan(value, threshold, inclusion);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotShorter, messageTemplate, paramName, value, value);
     }
 }

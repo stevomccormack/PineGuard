@@ -23,23 +23,23 @@ public static partial class StringRules
             StringUtility.TimeSpan.TryParse(value, out var parsed) && TimeSpanRules.IsDurationBetween(parsed, min, max, inclusion);
 
         /// <summary>
-        /// Determines whether the specified string parses to a duration greater than the given threshold.
+        /// Determines whether the specified string parses to a duration longer than the given threshold.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid duration string, returns <see langword="false"/>.</param>
         /// <param name="threshold">The threshold duration to compare against.</param>
         /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
         /// <returns><see langword="true"/> if the parsed duration exceeds the threshold; otherwise, <see langword="false"/>.</returns>
-        public static bool IsGreaterThan(string? value, System.TimeSpan threshold, Inclusion inclusion = Inclusion.Exclusive) =>
-            StringUtility.TimeSpan.TryParse(value, out var parsed) && TimeSpanRules.IsGreaterThan(parsed, threshold, inclusion);
+        public static bool IsLongerThan(string? value, System.TimeSpan threshold, Inclusion inclusion = Inclusion.Exclusive) =>
+            StringUtility.TimeSpan.TryParse(value, out var parsed) && TimeSpanRules.IsLongerThan(parsed, threshold, inclusion);
 
         /// <summary>
-        /// Determines whether the specified string parses to a duration less than the given threshold.
+        /// Determines whether the specified string parses to a duration shorter than the given threshold.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid duration string, returns <see langword="false"/>.</param>
         /// <param name="threshold">The threshold duration to compare against.</param>
         /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
         /// <returns><see langword="true"/> if the parsed duration is below the threshold; otherwise, <see langword="false"/>.</returns>
-        public static bool IsLessThan(string? value, System.TimeSpan threshold, Inclusion inclusion = Inclusion.Exclusive) =>
-            StringUtility.TimeSpan.TryParse(value, out var parsed) && TimeSpanRules.IsLessThan(parsed, threshold, inclusion);
+        public static bool IsShorterThan(string? value, System.TimeSpan threshold, Inclusion inclusion = Inclusion.Exclusive) =>
+            StringUtility.TimeSpan.TryParse(value, out var parsed) && TimeSpanRules.IsShorterThan(parsed, threshold, inclusion);
     }
 }

@@ -58,16 +58,16 @@ public sealed class DurationBetweenTimeSpanStringAttribute(string min, string ma
 
 /// <summary>
 /// Validates that the annotated <see cref="string"/> property or field represents a <see cref="TimeSpan"/>
-/// duration greater than (or equal to, depending on <see cref="Inclusion"/>) the specified threshold.
+/// duration longer than (or equal to, depending on <see cref="Inclusion"/>) the specified threshold.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringTimeSpanClauses.GreaterThan"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustStringTimeSpanClauses.LongerThan"/>. Supported on properties, fields, and
 /// parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <paramref name="threshold"/> constructor argument is parsed from <see cref="TimeSpan"/> string
-/// format using invariant culture. By default, uses <see cref="Inclusion.Exclusive"/> (strictly greater
+/// format using invariant culture. By default, uses <see cref="Inclusion.Exclusive"/> (strictly longer
 /// than). If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
 /// </remarks>
@@ -75,17 +75,17 @@ public sealed class DurationBetweenTimeSpanStringAttribute(string min, string ma
 /// <code>
 /// public class TimeoutModel
 /// {
-///     [GreaterThanTimeSpanString("00:00:00")]
+///     [LongerThanTimeSpanString("00:00:00")]
 ///     public string Timeout { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="LessThanTimeSpanStringAttribute"/>
-/// <seealso cref="MustStringTimeSpanClauses.GreaterThan"/>
+/// <seealso cref="ShorterThanTimeSpanStringAttribute"/>
+/// <seealso cref="MustStringTimeSpanClauses.LongerThan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class GreaterThanTimeSpanStringAttribute(string threshold, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Time.Duration.NotGreater)
+public sealed class LongerThanTimeSpanStringAttribute(string threshold, Inclusion inclusion = Inclusion.Exclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Time.Duration.NotLonger)
 {
     /// <summary>Gets the lower threshold that the duration must exceed.</summary>
     public TimeSpan Threshold { get; } = TimeSpan.Parse(threshold, CultureInfo.InvariantCulture);
@@ -97,23 +97,23 @@ public sealed class GreaterThanTimeSpanStringAttribute(string threshold, Inclusi
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.GreaterThan(strValue, Threshold, Inclusion, paramName: null);
+        var result = Must.Be.LongerThan(strValue, Threshold, Inclusion, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
 
 /// <summary>
 /// Validates that the annotated <see cref="string"/> property or field represents a <see cref="TimeSpan"/>
-/// duration less than (or equal to, depending on <see cref="Inclusion"/>) the specified threshold.
+/// duration shorter than (or equal to, depending on <see cref="Inclusion"/>) the specified threshold.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringTimeSpanClauses.LessThan"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustStringTimeSpanClauses.ShorterThan"/>. Supported on properties, fields, and
 /// parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <paramref name="threshold"/> constructor argument is parsed from <see cref="TimeSpan"/> string
-/// format using invariant culture. By default, uses <see cref="Inclusion.Exclusive"/> (strictly less than).
+/// format using invariant culture. By default, uses <see cref="Inclusion.Exclusive"/> (strictly shorter than).
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
 /// </remarks>
@@ -121,17 +121,17 @@ public sealed class GreaterThanTimeSpanStringAttribute(string threshold, Inclusi
 /// <code>
 /// public class TimeoutModel
 /// {
-///     [LessThanTimeSpanString("01:00:00")]
+///     [ShorterThanTimeSpanString("01:00:00")]
 ///     public string Duration { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="GreaterThanTimeSpanStringAttribute"/>
-/// <seealso cref="MustStringTimeSpanClauses.LessThan"/>
+/// <seealso cref="LongerThanTimeSpanStringAttribute"/>
+/// <seealso cref="MustStringTimeSpanClauses.ShorterThan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LessThanTimeSpanStringAttribute(string threshold, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Time.Duration.NotLess)
+public sealed class ShorterThanTimeSpanStringAttribute(string threshold, Inclusion inclusion = Inclusion.Exclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Time.Duration.NotShorter)
 {
     /// <summary>Gets the upper threshold that the duration must be below.</summary>
     public TimeSpan Threshold { get; } = TimeSpan.Parse(threshold, CultureInfo.InvariantCulture);
@@ -143,7 +143,7 @@ public sealed class LessThanTimeSpanStringAttribute(string threshold, Inclusion 
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.LessThan(strValue, Threshold, Inclusion, paramName: null);
+        var result = Must.Be.ShorterThan(strValue, Threshold, Inclusion, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }

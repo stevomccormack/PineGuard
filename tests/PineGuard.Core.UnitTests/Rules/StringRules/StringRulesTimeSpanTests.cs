@@ -22,28 +22,28 @@ public sealed class StringRulesTimeSpanTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesTimeSpanTestData.IsGreaterThan.Cases), MemberType = typeof(StringRulesTimeSpanTestData.IsGreaterThan))]
-    public void IsGreaterThan_BehavesAsExpected(RuleCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
+    [MemberData(nameof(StringRulesTimeSpanTestData.IsLongerThan.Cases), MemberType = typeof(StringRulesTimeSpanTestData.IsLongerThan))]
+    public void IsLongerThan_BehavesAsExpected(RuleCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, threshold, inclusion) = tc.Value;
 
         // Act
-        var result = PineGuard.Rules.StringRules.TimeSpan.IsGreaterThan(value, threshold, inclusion);
+        var result = PineGuard.Rules.StringRules.TimeSpan.IsLongerThan(value, threshold, inclusion);
 
         // Assert
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesTimeSpanTestData.IsLessThan.Cases), MemberType = typeof(StringRulesTimeSpanTestData.IsLessThan))]
-    public void IsLessThan_BehavesAsExpected(RuleCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
+    [MemberData(nameof(StringRulesTimeSpanTestData.IsShorterThan.Cases), MemberType = typeof(StringRulesTimeSpanTestData.IsShorterThan))]
+    public void IsShorterThan_BehavesAsExpected(RuleCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, threshold, inclusion) = tc.Value;
 
         // Act
-        var result = PineGuard.Rules.StringRules.TimeSpan.IsLessThan(value, threshold, inclusion);
+        var result = PineGuard.Rules.StringRules.TimeSpan.IsShorterThan(value, threshold, inclusion);
 
         // Assert
         AssertResult(tc, result);

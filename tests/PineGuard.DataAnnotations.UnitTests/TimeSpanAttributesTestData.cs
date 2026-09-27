@@ -31,18 +31,18 @@ public static class TimeSpanAttributesTestData
         ];
     }
 
-    public static class GreaterThanTimeSpan
+    public static class LongerThanTimeSpan
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [
             new("greater", TimeSpan.Parse("00:00:06"), new DataAnnotationExpected(true)),
             new("null",    null,                        new DataAnnotationExpected(true)),
-            new("equal",   TimeSpan.Parse("00:00:05"), new DataAnnotationExpected(false, Code: MustCodes.Time.Duration.NotGreater)),
+            new("equal",   TimeSpan.Parse("00:00:05"), new DataAnnotationExpected(false, Code: MustCodes.Time.Duration.NotLonger)),
             new("less",    TimeSpan.Parse("00:00:04"), new DataAnnotationExpected(false))
         ];
     }
 
-    public static class LessThanTimeSpan
+    public static class ShorterThanTimeSpan
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [

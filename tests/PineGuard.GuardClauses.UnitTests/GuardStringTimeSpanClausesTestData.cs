@@ -31,10 +31,10 @@ public static class GuardStringTimeSpanClausesTestData
         ];
     }
 
-    public static class LessThan
+    public static class ShorterThan
     {
         public static TheoryData<GuardCase<(string? value, TimeSpan threshold, Inclusion inclusion)>> Cases =>
-            F.TimeSpanIsGreaterThan.AllScenarios
+            F.TimeSpanIsLongerThan.AllScenarios
             .Select(s => new RuleScenario<(string?, TimeSpan, Inclusion)>(
                 s.Name,
                 (s.Inputs.value, s.Inputs.threshold, s.Inputs.inclusion == Inclusion.Inclusive
@@ -44,16 +44,16 @@ public static class GuardStringTimeSpanClausesTestData
             .ToArray()
             .ToGuardCases(s => s.Name switch
             {
-                nameof(F.TimeSpanIsGreaterThan.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+                nameof(F.TimeSpanIsLongerThan.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
                 _ when s.IsValid => new GuardExpected(true),
                 _ => new GuardExpected(false, typeof(ArgumentException), "value")
             });
     }
 
-    public static class GreaterThan
+    public static class LongerThan
     {
         public static TheoryData<GuardCase<(string? value, TimeSpan threshold, Inclusion inclusion)>> Cases =>
-            F.TimeSpanIsLessThan.AllScenarios
+            F.TimeSpanIsShorterThan.AllScenarios
             .Select(s => new RuleScenario<(string?, TimeSpan, Inclusion)>(
                 s.Name,
                 (s.Inputs.value, s.Inputs.threshold, s.Inputs.inclusion == Inclusion.Inclusive
@@ -63,7 +63,7 @@ public static class GuardStringTimeSpanClausesTestData
             .ToArray()
             .ToGuardCases(s => s.Name switch
             {
-                nameof(F.TimeSpanIsLessThan.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+                nameof(F.TimeSpanIsShorterThan.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
                 _ when s.IsValid => new GuardExpected(true),
                 _ => new GuardExpected(false, typeof(ArgumentException), "value")
             });

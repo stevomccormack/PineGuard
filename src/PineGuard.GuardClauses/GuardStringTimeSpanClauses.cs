@@ -83,7 +83,7 @@ public static class GuardStringTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the LessThan constraint.
+    /// Throws if <paramref name="value"/> violates the ShorterThan constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -100,8 +100,8 @@ public static class GuardStringTimeSpanClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringTimeSpanClauses.GreaterThan"/>
-    public static TimeSpan LessThan(this IGuardClause _,
+    /// <seealso cref="MustStringTimeSpanClauses.LongerThan"/>
+    public static TimeSpan ShorterThan(this IGuardClause _,
         string? value,
         TimeSpan threshold,
         Inclusion inclusion = Inclusion.Exclusive,
@@ -109,7 +109,7 @@ public static class GuardStringTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.GreaterThan(value, threshold, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive, paramName); // Guard.Against.LessThanOrEqual => Must.Be.GreaterThan (complement)
+        var result = Must.Be.LongerThan(value, threshold, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive, paramName); // Guard.Against.ShorterThan => Must.Be.LongerThan (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -117,7 +117,7 @@ public static class GuardStringTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the GreaterThan constraint.
+    /// Throws if <paramref name="value"/> violates the LongerThan constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -134,8 +134,8 @@ public static class GuardStringTimeSpanClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringTimeSpanClauses.LessThan"/>
-    public static TimeSpan GreaterThan(this IGuardClause _,
+    /// <seealso cref="MustStringTimeSpanClauses.ShorterThan"/>
+    public static TimeSpan LongerThan(this IGuardClause _,
         string? value,
         TimeSpan threshold,
         Inclusion inclusion = Inclusion.Exclusive,
@@ -143,7 +143,7 @@ public static class GuardStringTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.LessThan(value, threshold, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive, paramName);
+        var result = Must.Be.ShorterThan(value, threshold, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
