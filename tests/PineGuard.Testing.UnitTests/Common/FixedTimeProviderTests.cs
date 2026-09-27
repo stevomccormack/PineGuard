@@ -20,6 +20,7 @@ public sealed class FixedTimeProviderTests(ITestOutputHelper output)
         // Assert
         Assert.Equal(tc.Expected, first);
         Assert.Equal(tc.Expected, second);
+        Assert.Equal(TimeSpan.Zero, first.Offset);
     }
 
     [Theory]
@@ -31,5 +32,16 @@ public sealed class FixedTimeProviderTests(ITestOutputHelper output)
 
         // Assert
         Assert.Equal(tc.Expected, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FixedTimeProviderTestData.LocalTimeZone.ValidCases), MemberType = typeof(FixedTimeProviderTestData.LocalTimeZone))]
+    public void LocalTimeZone_BehavesAsExpected(FixedTimeProviderTestData.LocalTimeZone.Case tc)
+    {
+        // Act
+        var result = tc.Value.LocalTimeZone;
+
+        // Assert
+        Assert.Same(tc.Expected, result);
     }
 }
