@@ -44,4 +44,16 @@ public sealed class FixedTimeProviderTests(ITestOutputHelper output)
         // Assert
         Assert.Same(tc.Expected, result);
     }
+
+    [Theory]
+    [MemberData(nameof(FixedTimeProviderTestData.GetLocalNow.ValidCases), MemberType = typeof(FixedTimeProviderTestData.GetLocalNow))]
+    public void GetLocalNow_BehavesAsExpected(FixedTimeProviderTestData.GetLocalNow.Case tc)
+    {
+        // Act
+        var result = tc.Value.GetLocalNow();
+
+        // Assert
+        Assert.Equal(tc.Expected, result);
+        Assert.Equal(tc.Expected.Offset, result.Offset);
+    }
 }

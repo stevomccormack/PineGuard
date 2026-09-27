@@ -45,4 +45,17 @@ public static class FixedTimeProviderTestData
         public sealed record Case(string Name, FixedTimeProvider Value, TimeZoneInfo Expected)
             : ReturnCase<FixedTimeProvider, TimeZoneInfo>(Name, Value, Expected);
     }
+
+    public static class GetLocalNow
+    {
+        public static TheoryData<Case> ValidCases =>
+        [
+            new(nameof(FixedTimeProvider.DefaultAheadOfUtc), FixedTimeProvider.DefaultAheadOfUtc, new DateTimeOffset(2026, 06, 16, 6, 0, 0, TimeSpan.FromHours(10))),
+            new(nameof(FixedTimeProvider.DefaultBehindUtc), FixedTimeProvider.DefaultBehindUtc, new DateTimeOffset(2026, 06, 14, 20, 0, 0, TimeSpan.FromHours(-8))),
+            new(nameof(FixedTimeProvider.Default), FixedTimeProvider.Default, new DateTimeOffset(2026, 06, 15, 12, 0, 0, TimeSpan.Zero))
+        ];
+
+        public sealed record Case(string Name, FixedTimeProvider Value, DateTimeOffset Expected)
+            : ReturnCase<FixedTimeProvider, DateTimeOffset>(Name, Value, Expected);
+    }
 }
