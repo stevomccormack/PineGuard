@@ -1,5 +1,7 @@
 using PineGuard.Codes;
 using PineGuard.Common;
+using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.MustClauses;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
@@ -14,15 +16,57 @@ public static class MustStringDateOnlyClausesTestData
     private static readonly DateOnly RefMin = new(2020, 1, 1);
     private static readonly DateOnly RefMax = new(2020, 12, 31);
 
+    // Zones exactly at the ±14h boundary DateTimeOffsetUtility.TryGetDateAtOffset enforces, paired with an
+    // instant at the corresponding DateTimeOffset extreme, so the reference projection fails on tick range
+    // representability, not on the offset check.
+    private static readonly TimeZoneInfo PlusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.MustString.PlusFourteen", TimeSpan.FromHours(14), "PineGuard Test +14", "PineGuard Test +14");
+    private static readonly TimeZoneInfo MinusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.MustString.MinusFourteen", TimeSpan.FromHours(-14), "PineGuard Test -14", "PineGuard Test -14");
+    private static readonly TimeProvider MinValueProjectionFails = new FixedTimeProvider(DateTimeOffset.MinValue, MinusFourteen);
+    private static readonly TimeProvider MaxValueProjectionFails = new FixedTimeProvider(DateTimeOffset.MaxValue, PlusFourteen);
+
     public static class PastDateOnly
     {
         public static TheoryData<MustCase<string?>> Cases =>
         [
             new("past", "2000-01-01", new MustExpected(true)),
             new("future", "2999-01-01", new MustExpected(false, "value must be a date in the past.")),
+            new("present", "2026-06-15", new MustExpected(false, "value must be a date in the past.")),
             new("null-value", null, new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", "not-a-date", new MustExpected(false, "value must be a date in the past."))
         ];
+    }
+
+    public static class PastDateOnlyAcrossTimeZones
+    {
+        public static TheoryData<MustCase<(string? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new("ahead-of-utc", ("2026-06-15", FixedTimeProvider.DefaultAheadOfUtc), new MustExpected(true)),
+            new("behind-utc", ("2026-06-15", FixedTimeProvider.DefaultBehindUtc), new MustExpected(false, "value must be a date in the past."))
+        ];
+    }
+
+    public static class PastDateOnlyReferenceProjection
+    {
+        public static TheoryData<MustCase<(string? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new("MinValueUnderflow", ("2000-01-01", MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("MaxValueOverflow", ("2000-01-01", MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("NullValueBeforeProjection", (null, MinValueProjectionFails), new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Date.Relative.NotPast)),
+            new("UnparseableBeforeProjection", ("not-a-date", MinValueProjectionFails), new MustExpected(false, "value must be a date in the past.", Code: MustCodes.Date.Format.Invalid))
+        ];
+    }
+
+    public static class PastDateOnlyClockReads
+    {
+        public static TheoryData<ClockReadCase> Cases =>
+        [
+            new("parseable", "2000-01-01", 1),
+            new("null-value", null, 0),
+            new("unparseable", "not-a-date", 0)
+        ];
+
+        public sealed record ClockReadCase(string Name, string? Value, int Expected)
+            : ReturnCase<string?, int>(Name, Value, Expected);
     }
 
     public static class PastOrPresentDateOnly
@@ -31,9 +75,43 @@ public static class MustStringDateOnlyClausesTestData
         [
             new("past", "2000-01-01", new MustExpected(true)),
             new("future", "2999-01-01", new MustExpected(false, "value must be a date in the past or present.")),
+            new("present", "2026-06-15", new MustExpected(true)),
             new("null-value", null, new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", "not-a-date", new MustExpected(false, "value must be a date in the past or present."))
         ];
+    }
+
+    public static class PastOrPresentDateOnlyAcrossTimeZones
+    {
+        public static TheoryData<MustCase<(string? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new("ahead-of-utc", ("2026-06-15", FixedTimeProvider.DefaultAheadOfUtc), new MustExpected(true)),
+            new("behind-utc", ("2026-06-15", FixedTimeProvider.DefaultBehindUtc), new MustExpected(false, "value must be a date in the past or present."))
+        ];
+    }
+
+    public static class PastOrPresentDateOnlyReferenceProjection
+    {
+        public static TheoryData<MustCase<(string? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new("MinValueUnderflow", ("2000-01-01", MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("MaxValueOverflow", ("2000-01-01", MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("NullValueBeforeProjection", (null, MinValueProjectionFails), new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Date.Relative.Future)),
+            new("UnparseableBeforeProjection", ("not-a-date", MinValueProjectionFails), new MustExpected(false, "value must be a date in the past or present.", Code: MustCodes.Date.Format.Invalid))
+        ];
+    }
+
+    public static class PastOrPresentDateOnlyClockReads
+    {
+        public static TheoryData<ClockReadCase> Cases =>
+        [
+            new("parseable", "2000-01-01", 1),
+            new("null-value", null, 0),
+            new("unparseable", "not-a-date", 0)
+        ];
+
+        public sealed record ClockReadCase(string Name, string? Value, int Expected)
+            : ReturnCase<string?, int>(Name, Value, Expected);
     }
 
     public static class FutureDateOnly
@@ -42,9 +120,43 @@ public static class MustStringDateOnlyClausesTestData
         [
             new("future", "2999-01-01", new MustExpected(true)),
             new("past", "2000-01-01", new MustExpected(false, "value must be a date in the future.")),
+            new("present", "2026-06-15", new MustExpected(false, "value must be a date in the future.")),
             new("null-value", null, new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", "not-a-date", new MustExpected(false, "value must be a date in the future."))
         ];
+    }
+
+    public static class FutureDateOnlyAcrossTimeZones
+    {
+        public static TheoryData<MustCase<(string? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new("ahead-of-utc", ("2026-06-15", FixedTimeProvider.DefaultAheadOfUtc), new MustExpected(false, "value must be a date in the future.")),
+            new("behind-utc", ("2026-06-15", FixedTimeProvider.DefaultBehindUtc), new MustExpected(true))
+        ];
+    }
+
+    public static class FutureDateOnlyReferenceProjection
+    {
+        public static TheoryData<MustCase<(string? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new("MinValueUnderflow", ("2000-01-01", MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("MaxValueOverflow", ("2000-01-01", MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("NullValueBeforeProjection", (null, MinValueProjectionFails), new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Date.Relative.NotFuture)),
+            new("UnparseableBeforeProjection", ("not-a-date", MinValueProjectionFails), new MustExpected(false, "value must be a date in the future.", Code: MustCodes.Date.Format.Invalid))
+        ];
+    }
+
+    public static class FutureDateOnlyClockReads
+    {
+        public static TheoryData<ClockReadCase> Cases =>
+        [
+            new("parseable", "2000-01-01", 1),
+            new("null-value", null, 0),
+            new("unparseable", "not-a-date", 0)
+        ];
+
+        public sealed record ClockReadCase(string Name, string? Value, int Expected)
+            : ReturnCase<string?, int>(Name, Value, Expected);
     }
 
     public static class FutureOrPresentDateOnly
@@ -53,9 +165,43 @@ public static class MustStringDateOnlyClausesTestData
         [
             new("future", "2999-01-01", new MustExpected(true)),
             new("past", "2000-01-01", new MustExpected(false, "value must be a date in the future or present.")),
+            new("present", "2026-06-15", new MustExpected(true)),
             new("null-value", null, new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", "not-a-date", new MustExpected(false, "value must be a date in the future or present."))
         ];
+    }
+
+    public static class FutureOrPresentDateOnlyAcrossTimeZones
+    {
+        public static TheoryData<MustCase<(string? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new("ahead-of-utc", ("2026-06-15", FixedTimeProvider.DefaultAheadOfUtc), new MustExpected(false, "value must be a date in the future or present.")),
+            new("behind-utc", ("2026-06-15", FixedTimeProvider.DefaultBehindUtc), new MustExpected(true))
+        ];
+    }
+
+    public static class FutureOrPresentDateOnlyReferenceProjection
+    {
+        public static TheoryData<MustCase<(string? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new("MinValueUnderflow", ("2000-01-01", MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("MaxValueOverflow", ("2000-01-01", MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("NullValueBeforeProjection", (null, MinValueProjectionFails), new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Date.Relative.Past)),
+            new("UnparseableBeforeProjection", ("not-a-date", MinValueProjectionFails), new MustExpected(false, "value must be a date in the future or present.", Code: MustCodes.Date.Format.Invalid))
+        ];
+    }
+
+    public static class FutureOrPresentDateOnlyClockReads
+    {
+        public static TheoryData<ClockReadCase> Cases =>
+        [
+            new("parseable", "2000-01-01", 1),
+            new("null-value", null, 0),
+            new("unparseable", "not-a-date", 0)
+        ];
+
+        public sealed record ClockReadCase(string Name, string? Value, int Expected)
+            : ReturnCase<string?, int>(Name, Value, Expected);
     }
 
     public static class BetweenDateOnly
@@ -323,6 +469,31 @@ public static class MustStringDateOnlyClausesTestData
             nameof(F.DateOnlyHasMinimumAge.NegativeYears) => new MustExpected(false, "years requires a non-negative number of years.", "years", MustCodes.Date.Age.BelowMinimum),
             _ => new MustExpected(false, "value must meet the expected minimum age.", "value", MustCodes.Date.Age.BelowMinimum)
         });
+    }
+
+    public static class MinimumAgeReferenceProjection
+    {
+        public static TheoryData<MustCase<(string? value, int years, TimeProvider timeProvider)>> Cases =>
+        [
+            new("MinValueUnderflow", ("2000-01-01", 18, MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("MaxValueOverflow", ("2000-01-01", 18, MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new("NullValueBeforeProjection", (null, 18, MinValueProjectionFails), new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Date.Age.BelowMinimum)),
+            new("UnparseableBeforeProjection", ("not-a-date", 18, MinValueProjectionFails), new MustExpected(false, "value must meet the expected minimum age.", Code: MustCodes.Date.Format.Invalid)),
+            new("NegativeYearsBeforeProjection", ("2000-01-01", -1, MinValueProjectionFails), new MustExpected(false, "years requires a non-negative number of years.", "years", Code: MustCodes.Date.Age.BelowMinimum))
+        ];
+    }
+
+    public static class MinimumAgeClockReads
+    {
+        public static TheoryData<ClockReadCase> Cases =>
+        [
+            new("parseable", "2000-01-01", 1),
+            new("null-value", null, 0),
+            new("unparseable", "not-a-date", 0)
+        ];
+
+        public sealed record ClockReadCase(string Name, string? Value, int Expected)
+            : ReturnCase<string?, int>(Name, Value, Expected);
     }
 
     public static class MinimumAgeOnLeapDay
