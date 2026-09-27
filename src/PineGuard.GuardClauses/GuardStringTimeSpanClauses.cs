@@ -109,7 +109,7 @@ public static class GuardStringTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.GreaterThan(value, threshold, inclusion, paramName); // Guard.Against.LessThanOrEqual => Must.Be.GreaterThan (complement)
+        var result = Must.Be.GreaterThan(value, threshold, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive, paramName); // Guard.Against.LessThanOrEqual => Must.Be.GreaterThan (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -143,7 +143,7 @@ public static class GuardStringTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.LessThan(value, threshold, inclusion, paramName);
+        var result = Must.Be.LessThan(value, threshold, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
