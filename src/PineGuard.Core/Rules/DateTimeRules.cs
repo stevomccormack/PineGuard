@@ -294,20 +294,18 @@ public static class DateTimeRules
     }
 
     /// <summary>
-    /// Determines whether two date/times fall on the same calendar day in UTC (ignoring time components).
+    /// Determines whether two date/times fall on the same calendar day, compared by their own calendar
+    /// date; <see cref="DateTime.Kind"/> is ignored.
     /// </summary>
     /// <param name="value">The first date/time. If <see langword="null"/> and <paramref name="other"/> is also <see langword="null"/>, returns <see langword="true"/>.</param>
     /// <param name="other">The second date/time.</param>
-    /// <returns><see langword="true"/> if both values have the same UTC date component; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if both values have the same calendar date; otherwise, <see langword="false"/>.</returns>
     public static bool IsSameDay(DateTime? value, DateTime? other)
     {
         if (value is null && other is null) return true;
         if (value is null || other is null) return false;
 
-        var valueUtc = DateTimeUtility.ToUtc(value)!.Value;
-        var otherUtc = DateTimeUtility.ToUtc(other)!.Value;
-
-        return valueUtc.Date == otherUtc.Date;
+        return value.Value.Date == other.Value.Date;
     }
 
     /// <summary>
@@ -344,32 +342,29 @@ public static class DateTimeRules
     /// Determines whether the specified date of birth is at least <paramref name="years"/> whole years ago.
     /// </summary>
     /// <param name="value">The date of birth to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="years">
-    /// The minimum age in whole years. Negative, or large enough to place the boundary before year one,
-    /// returns <see langword="false"/>.
-    /// </param>
+    /// <param name="years">The minimum age in whole years. Negative returns <see langword="false"/>.</param>
     /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> meets the minimum age; otherwise, <see langword="false"/>.</returns>
     /// <remarks>
-    /// Age is measured against the boundary <c>today.AddYears(-years)</c>: a birth date on that boundary has
-    /// just reached the age, and any later one has not. A 29 February birth date therefore reaches its next
-    /// birthday on 1 March of a non-leap year, because shifting a 28 February back by whole years lands on a
-    /// 28th, which falls before the 29th the birth date carries.
-    /// Both sides are reduced to a UTC calendar date first — via the normalization
-    /// <see cref="DateTimeUtility.ToUtc(DateTime?)"/> applies throughout this class — so the time of day a
-    /// birth date happens to carry never decides the answer.
+    /// Age is the whole number of completed years between the birth date and today: the year difference,
+    /// minus one if the birthday's month and day have not yet occurred this year. A 29 February birth date
+    /// therefore reaches its next birthday on 1 March of a non-leap year, because that year has no 29th to
+    /// match against — this is PineGuard's calendar convention. The birth date is always its own
+    /// <see cref="DateTime.Date"/>, regardless of <see cref="DateTime.Kind"/> — it is never converted.
+    /// "Today" is the clock's local calendar date, derived from one sampled instant with checked
+    /// projection into the clock's <see cref="TimeProvider.LocalTimeZone"/>. A <see langword="null"/>
+    /// <paramref name="timeProvider"/> selects <see cref="TimeProvider.System"/>, so today follows the
+    /// host's local time zone; inject a provider to pin a stable reference zone. If the projection is
+    /// not representable, this method returns <see langword="false"/>.
     /// </remarks>
     public static bool HasMinimumAge(DateTime? value, int years, TimeProvider? timeProvider = null)
     {
         if (value is null || years < 0)
             return false;
 
-        var today = DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime.Date;
-
-        // Shifting today back that far would leave the boundary before year one, which no date can precede.
-        if (years >= today.Year)
+        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var today))
             return false;
 
-        return DateTimeUtility.ToUtc(value)!.Value.Date <= today.AddYears(-years);
+        return DateTimeUtility.TryGetAge(value.Value.Date, today, out var age) && age >= years;
     }
 }

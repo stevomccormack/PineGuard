@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
+using PineGuard.Utils;
 
 namespace PineGuard.MustClauses;
 
@@ -28,7 +29,10 @@ public static class MustDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be in the past."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be in the past."</c> "Today" is
+    /// sampled once from <paramref name="timeProvider"/> via the guarded reference derivation; if that
+    /// projection is not representable, the failure is attributed to <paramref name="timeProvider"/>
+    /// with code <c>date.reference.out-of-range</c> rather than reported as a value that is not past.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> Past(this IMustClause _,
@@ -36,9 +40,13 @@ public static class MustDateOnlyClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Reference.OutOfRange,
+                "{paramName} requires a reference date within the supported range.", nameof(timeProvider), timeProvider);
+
         const string messageTemplate = "{paramName} must be in the past.";
 
-        var ok = DateOnlyRules.IsInPast(value, timeProvider: timeProvider);
+        var ok = DateOnlyRules.IsBefore(value, DateOnly.FromDateTime(referenceDate), Inclusion.Exclusive);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, value);
     }
 
@@ -56,7 +64,10 @@ public static class MustDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be in the past or present."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be in the past or present."</c> "Today" is
+    /// sampled once from <paramref name="timeProvider"/> via the guarded reference derivation; if that
+    /// projection is not representable, the failure is attributed to <paramref name="timeProvider"/>
+    /// with code <c>date.reference.out-of-range</c> rather than reported as a value that is not past or present.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> PastOrPresent(this IMustClause _,
@@ -64,9 +75,13 @@ public static class MustDateOnlyClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Reference.OutOfRange,
+                "{paramName} requires a reference date within the supported range.", nameof(timeProvider), timeProvider);
+
         const string messageTemplate = "{paramName} must be in the past or present.";
 
-        var ok = DateOnlyRules.IsInPast(value, Inclusion.Inclusive, timeProvider);
+        var ok = DateOnlyRules.IsBefore(value, DateOnly.FromDateTime(referenceDate), Inclusion.Inclusive);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, value);
     }
 
@@ -84,7 +99,10 @@ public static class MustDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be in the future."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be in the future."</c> "Today" is
+    /// sampled once from <paramref name="timeProvider"/> via the guarded reference derivation; if that
+    /// projection is not representable, the failure is attributed to <paramref name="timeProvider"/>
+    /// with code <c>date.reference.out-of-range</c> rather than reported as a value that is not future.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> Future(this IMustClause _,
@@ -92,9 +110,13 @@ public static class MustDateOnlyClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Reference.OutOfRange,
+                "{paramName} requires a reference date within the supported range.", nameof(timeProvider), timeProvider);
+
         const string messageTemplate = "{paramName} must be in the future.";
 
-        var ok = DateOnlyRules.IsInFuture(value, timeProvider: timeProvider);
+        var ok = DateOnlyRules.IsAfter(value, DateOnly.FromDateTime(referenceDate), Inclusion.Exclusive);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, value);
     }
 
@@ -112,7 +134,10 @@ public static class MustDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be in the future or present."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be in the future or present."</c> "Today" is
+    /// sampled once from <paramref name="timeProvider"/> via the guarded reference derivation; if that
+    /// projection is not representable, the failure is attributed to <paramref name="timeProvider"/>
+    /// with code <c>date.reference.out-of-range</c> rather than reported as a value that is not future or present.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> FutureOrPresent(this IMustClause _,
@@ -120,9 +145,13 @@ public static class MustDateOnlyClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Reference.OutOfRange,
+                "{paramName} requires a reference date within the supported range.", nameof(timeProvider), timeProvider);
+
         const string messageTemplate = "{paramName} must be in the future or present.";
 
-        var ok = DateOnlyRules.IsInFuture(value, Inclusion.Inclusive, timeProvider);
+        var ok = DateOnlyRules.IsAfter(value, DateOnly.FromDateTime(referenceDate), Inclusion.Inclusive);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, value);
     }
 
@@ -793,7 +822,11 @@ public static class MustDateOnlyClauses
     /// </returns>
     /// <remarks>
     /// The failure message follows the pattern <c>"{paramName} must meet the expected minimum age."</c>
-    /// A negative <paramref name="years"/> is a configuration error, reported against that parameter.
+    /// A negative <paramref name="years"/> is a configuration error, reported against that parameter,
+    /// and is checked before the clock is read. "Today" is then sampled once from
+    /// <paramref name="timeProvider"/> via the guarded reference derivation; if that projection is not
+    /// representable, the failure is attributed to <paramref name="timeProvider"/> with code
+    /// <c>date.reference.out-of-range</c> rather than reported as a value that is not old enough.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> MinimumAge(this IMustClause _,
@@ -806,9 +839,13 @@ public static class MustDateOnlyClauses
             return MustResult<DateOnly>.Fail(MustCodes.Date.Age.BelowMinimum,
                 "{paramName} requires a non-negative number of years.", nameof(years), years);
 
+        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Reference.OutOfRange,
+                "{paramName} requires a reference date within the supported range.", nameof(timeProvider), timeProvider);
+
         const string messageTemplate = "{paramName} must meet the expected minimum age.";
 
-        var ok = DateOnlyRules.HasMinimumAge(value, years, timeProvider);
+        var ok = DateTimeUtility.TryGetAge(value, DateOnly.FromDateTime(referenceDate), out var age) && age >= years;
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Age.BelowMinimum, messageTemplate, paramName, value, value);
     }
 }

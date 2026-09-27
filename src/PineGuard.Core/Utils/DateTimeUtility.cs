@@ -24,6 +24,113 @@ public static class DateTimeUtility
         (timeProvider ?? TimeProvider.System).GetUtcNow();
 
     /// <summary>
+    /// Reads the current instant expressed in the clock's <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </summary>
+    /// <param name="timeProvider">The clock to read. If <see langword="null"/>, <see cref="TimeProvider.System"/> is used.</param>
+    /// <returns>The current instant reported by <paramref name="timeProvider"/>, expressed in its local time zone.</returns>
+    public static DateTimeOffset GetLocalNow(TimeProvider? timeProvider) =>
+        (timeProvider ?? TimeProvider.System).GetLocalNow();
+
+    /// <summary>
+    /// Attempts to derive today's calendar date from the supplied clock's <see cref="TimeProvider.LocalTimeZone"/>,
+    /// sampling the clock exactly once and guarding the projection against out-of-range results.
+    /// </summary>
+    /// <param name="timeProvider">The clock to read. If <see langword="null"/>, <see cref="TimeProvider.System"/> is used.</param>
+    /// <param name="today">
+    /// When this method returns <see langword="true"/>, contains the local calendar date, at midnight with
+    /// <see cref="DateTimeKind.Unspecified"/> kind. Otherwise, <see langword="default"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the projected date is representable as a <see cref="DateTime"/>; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// This is the single guarded reference every calendar-relative rule reads "today" through. It selects
+    /// the provider once, samples <see cref="TimeProvider.GetUtcNow"/> once, reads
+    /// <see cref="TimeProvider.LocalTimeZone"/> once, and obtains that zone's UTC offset at the sampled
+    /// instant once, before delegating to <see cref="DateTimeOffsetUtility.TryGetDateAtOffset"/>. There is
+    /// no public <c>GetTodayDate</c>/<c>GetToday</c> wrapper — new predicates call this method directly
+    /// rather than reading <see cref="TimeProvider.GetLocalNow"/> unchecked.
+    /// </remarks>
+    internal static bool TryGetTodayDate(TimeProvider? timeProvider, out DateTime today)
+    {
+        var provider = timeProvider ?? TimeProvider.System;
+        var utcNow = provider.GetUtcNow();
+        var offset = provider.LocalTimeZone.GetUtcOffset(utcNow);
+
+        return DateTimeOffsetUtility.TryGetDateAtOffset(utcNow, offset, out today);
+    }
+
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// Attempts to compute the whole number of completed years between a date of birth and a reference date.
+    /// </summary>
+    /// <param name="birthDate">The date of birth. If <see langword="null"/> or after <paramref name="asOf"/>, returns <see langword="false"/>.</param>
+    /// <param name="asOf">The reference date "today" is measured against. Reads no clock.</param>
+    /// <param name="years">
+    /// When this method returns <see langword="true"/>, contains the completed age in whole years; otherwise, <c>0</c>.
+    /// </param>
+    /// <returns><see langword="true"/> if the age could be computed; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Computes the calendar-year difference and subtracts one when the birthday's month/day has not yet
+    /// occurred in <paramref name="asOf"/>'s year, rather than applying <c>AddYears</c> to a threshold. A 29
+    /// February birth date therefore reaches its next birthday on 1 March of a non-leap year, because that
+    /// year has no 29th to match against — this is PineGuard's calendar convention.
+    /// </remarks>
+    internal static bool TryGetAge(DateOnly? birthDate, DateOnly asOf, out int years)
+    {
+        if (birthDate is null || birthDate.Value > asOf)
+        {
+            years = 0;
+            return false;
+        }
+
+        var birth = birthDate.Value;
+        var age = asOf.Year - birth.Year;
+        if (birth.Month > asOf.Month || (birth.Month == asOf.Month && birth.Day > asOf.Day))
+            age--;
+
+        years = age;
+        return true;
+    }
+#endif
+
+    /// <summary>
+    /// Attempts to compute the whole number of completed years between a date of birth and a reference date.
+    /// </summary>
+    /// <param name="birthDate">
+    /// The date of birth, compared by its own <see cref="DateTime.Date"/> regardless of <see cref="DateTime.Kind"/>.
+    /// If <see langword="null"/> or after <paramref name="asOf"/>'s date, returns <see langword="false"/>.
+    /// </param>
+    /// <param name="asOf">The reference date/time "today" is measured against. Reads no clock.</param>
+    /// <param name="years">
+    /// When this method returns <see langword="true"/>, contains the completed age in whole years; otherwise, <c>0</c>.
+    /// </param>
+    /// <returns><see langword="true"/> if the age could be computed; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Computes the calendar-year difference and subtracts one when the birthday's month/day has not yet
+    /// occurred in <paramref name="asOf"/>'s year, rather than applying <c>AddYears</c> to a threshold. A 29
+    /// February birth date therefore reaches its next birthday on 1 March of a non-leap year, because that
+    /// year has no 29th to match against — this is PineGuard's calendar convention.
+    /// </remarks>
+    internal static bool TryGetAge(DateTime? birthDate, DateTime asOf, out int years)
+    {
+        if (birthDate is null || birthDate.Value.Date > asOf.Date)
+        {
+            years = 0;
+            return false;
+        }
+
+        var birth = birthDate.Value.Date;
+        var today = asOf.Date;
+        var age = today.Year - birth.Year;
+        if (birth.Month > today.Month || (birth.Month == today.Month && birth.Day > today.Day))
+            age--;
+
+        years = age;
+        return true;
+    }
+
+    /// <summary>
     /// Attempts to convert the specified <see cref="DateTime"/> to UTC.
     /// </summary>
     /// <param name="value">The date/time to convert. If <see langword="null"/>, returns <see langword="null"/>.</param>

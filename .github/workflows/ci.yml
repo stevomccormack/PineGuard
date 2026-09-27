@@ -367,6 +367,56 @@ jobs:
         run: echo "Skipped — no relevant changes detected for ${{ matrix.name }}"
 
   # ---------------------------------------------------------------------------
+  # 3b. Core non-UTC system-provider integration check (T1-U2, D-1/A-03)
+  #     DateTimeUtility.TryGetTodayDate with a null TimeProvider falls back to
+  #     TimeProvider.System, whose LocalTimeZone follows the host OS zone. This
+  #     dedicated Linux process pins TZ=Pacific/Auckland (a real, non-UTC zone)
+  #     to prove that fallback actually reads the host zone, alongside — never
+  #     instead of — the normal UTC "Core" matrix entry above.
+  # ---------------------------------------------------------------------------
+  core-null-provider-timezone:
+    needs: [changes, build]
+    if: needs.changes.outputs.core == 'true' || needs.changes.outputs.testing == 'true' || needs.changes.outputs.shared == 'true' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TZ: Pacific/Auckland
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Download build output
+        uses: actions/download-artifact@v8
+        with:
+          name: build-output
+          path: .
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore NuGet packages
+        run: dotnet restore PineGuard.slnx
+
+      - name: Run non-UTC system-provider test
+        run: >
+          dotnet test tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj
+          -c Release
+          --no-build
+          --filter "FullyQualifiedName~DateTimeUtilityTests.TryGetTodayDate_NullProviderUsesSystemLocalTimeZone"
+          -- RunConfiguration.TreatNoTestsAsError=true
+
+  # ---------------------------------------------------------------------------
   # 4. Coverage — merge reports and enforce 100%
   # ---------------------------------------------------------------------------
   coverage:

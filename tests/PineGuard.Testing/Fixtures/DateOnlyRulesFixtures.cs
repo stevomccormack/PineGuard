@@ -387,4 +387,56 @@ public static class DateOnlyRulesFixtures
         ];
         public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
+
+    // D-1: "today" follows the clock's LocalTimeZone rather than the UTC date, so these scenarios pin a
+    // per-row clock (DefaultAheadOfUtc / DefaultBehindUtc) alongside the value under test.
+    public static class IsInPastAcrossTimeZones
+    {
+        public static readonly (DateOnly? value, TimeProvider timeProvider) LocalYesterdayAheadOfUtc = (new DateOnly(2026, 06, 15), FixedTimeProvider.DefaultAheadOfUtc);
+        public static readonly (DateOnly? value, TimeProvider timeProvider) LocalTodayAheadOfUtc = (new DateOnly(2026, 06, 16), FixedTimeProvider.DefaultAheadOfUtc);
+        public static readonly (DateOnly? value, TimeProvider timeProvider) LocalTodayBehindUtc = (new DateOnly(2026, 06, 14), FixedTimeProvider.DefaultBehindUtc);
+        public static readonly (DateOnly? value, TimeProvider timeProvider) UtcDateIsTomorrowBehindUtc = (new DateOnly(2026, 06, 15), FixedTimeProvider.DefaultBehindUtc);
+
+        public static RuleScenario<(DateOnly? value, TimeProvider timeProvider)>[] ValidScenarios => [new(nameof(LocalYesterdayAheadOfUtc), LocalYesterdayAheadOfUtc, true)];
+
+        public static RuleScenario<(DateOnly? value, TimeProvider timeProvider)>[] InvalidScenarios =>
+        [
+            new(nameof(LocalTodayAheadOfUtc), LocalTodayAheadOfUtc, false),
+            new(nameof(LocalTodayBehindUtc), LocalTodayBehindUtc, false),
+            new(nameof(UtcDateIsTomorrowBehindUtc), UtcDateIsTomorrowBehindUtc, false)
+        ];
+
+        public static RuleScenario<(DateOnly? value, TimeProvider timeProvider)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class IsInFutureAcrossTimeZones
+    {
+        public static readonly (DateOnly? value, TimeProvider timeProvider) LocalYesterdayAheadOfUtc = (new DateOnly(2026, 06, 15), FixedTimeProvider.DefaultAheadOfUtc);
+        public static readonly (DateOnly? value, TimeProvider timeProvider) LocalTodayAheadOfUtc = (new DateOnly(2026, 06, 16), FixedTimeProvider.DefaultAheadOfUtc);
+        public static readonly (DateOnly? value, TimeProvider timeProvider) LocalTodayBehindUtc = (new DateOnly(2026, 06, 14), FixedTimeProvider.DefaultBehindUtc);
+        public static readonly (DateOnly? value, TimeProvider timeProvider) UtcDateIsTomorrowBehindUtc = (new DateOnly(2026, 06, 15), FixedTimeProvider.DefaultBehindUtc);
+
+        public static RuleScenario<(DateOnly? value, TimeProvider timeProvider)>[] ValidScenarios => [new(nameof(UtcDateIsTomorrowBehindUtc), UtcDateIsTomorrowBehindUtc, true)];
+
+        public static RuleScenario<(DateOnly? value, TimeProvider timeProvider)>[] InvalidScenarios =>
+        [
+            new(nameof(LocalYesterdayAheadOfUtc), LocalYesterdayAheadOfUtc, false),
+            new(nameof(LocalTodayAheadOfUtc), LocalTodayAheadOfUtc, false),
+            new(nameof(LocalTodayBehindUtc), LocalTodayBehindUtc, false)
+        ];
+
+        public static RuleScenario<(DateOnly? value, TimeProvider timeProvider)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    // D-1: additional HasMinimumAge scenarios that require a non-Default clock. Kept separate from
+    // HasMinimumAge above because that group's tuple shape has no TimeProvider dimension.
+    public static class HasMinimumAgeAcrossTimeZones
+    {
+        public static readonly (DateOnly? value, int years, TimeProvider timeProvider) EighteenTodayAheadOfUtc = (new DateOnly(2008, 06, 16), 18, FixedTimeProvider.DefaultAheadOfUtc);
+        public static readonly (DateOnly? value, int years, TimeProvider timeProvider) EighteenTomorrowAheadOfUtc = (new DateOnly(2008, 06, 17), 18, FixedTimeProvider.DefaultAheadOfUtc);
+
+        public static RuleScenario<(DateOnly? value, int years, TimeProvider timeProvider)>[] ValidScenarios => [new(nameof(EighteenTodayAheadOfUtc), EighteenTodayAheadOfUtc, true)];
+        public static RuleScenario<(DateOnly? value, int years, TimeProvider timeProvider)>[] InvalidScenarios => [new(nameof(EighteenTomorrowAheadOfUtc), EighteenTomorrowAheadOfUtc, false)];
+        public static RuleScenario<(DateOnly? value, int years, TimeProvider timeProvider)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
 }
