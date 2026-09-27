@@ -8,7 +8,7 @@ public static class TimeOnlyRulesTestData
 {
     public static class IsBetween
     {
-        public static TheoryData<RuleCase<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases => F.IsBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>> Cases => F.IsBetween.AllScenarios.ToRuleCases();
     }
 
     public static class IsBefore

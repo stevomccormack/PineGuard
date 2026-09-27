@@ -8,13 +8,13 @@ public sealed class MustTimeOnlyClausesTests(ITestOutputHelper output) : BaseMus
 {
     [Theory]
     [MemberData(nameof(MustTimeOnlyClausesTestData.Between.Cases), MemberType = typeof(MustTimeOnlyClausesTestData.Between))]
-    public void Between_BehavesAsExpected(MustCase<(TimeOnly value, TimeOnly min, TimeOnly max)> tc)
-    { var value = tc.Value.value; var result = Must.Be.Between(value, tc.Value.min, tc.Value.max); AssertResult(tc, result); }
+    public void Between_BehavesAsExpected(MustCase<(TimeOnly value, TimeOnly start, TimeOnly end)> tc)
+    { var value = tc.Value.value; var result = Must.Be.Between(value, tc.Value.start, tc.Value.end); AssertResult(tc, result); }
 
     [Theory]
     [MemberData(nameof(MustTimeOnlyClausesTestData.NotBetween.Cases), MemberType = typeof(MustTimeOnlyClausesTestData.NotBetween))]
-    public void NotBetween_BehavesAsExpected(MustCase<(TimeOnly value, TimeOnly min, TimeOnly max)> tc)
-    { var value = tc.Value.value; var result = Must.Be.NotBetween(value, tc.Value.min, tc.Value.max); AssertResult(tc, result); }
+    public void NotBetween_BehavesAsExpected(MustCase<(TimeOnly value, TimeOnly start, TimeOnly end)> tc)
+    { var value = tc.Value.value; var result = Must.Be.NotBetween(value, tc.Value.start, tc.Value.end); AssertResult(tc, result); }
 
     [Theory]
     [MemberData(nameof(MustTimeOnlyClausesTestData.Before.Cases), MemberType = typeof(MustTimeOnlyClausesTestData.Before))]

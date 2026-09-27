@@ -18,8 +18,9 @@ namespace PineGuard.DataAnnotations;
 /// and parameters of type <see cref="TimeOnly"/>.
 /// </para>
 /// <para>
-/// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
-/// <see cref="TimeOnly"/> string format using invariant culture.
+/// The <paramref name="start"/> and <paramref name="end"/> constructor arguments are parsed from
+/// <see cref="TimeOnly"/> string format using invariant culture. When <paramref name="start"/> is
+/// later than <paramref name="end"/>, the range wraps across midnight.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
 /// </remarks>
@@ -36,14 +37,14 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustTimeOnlyClauses.Between"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BetweenTimeOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+public sealed class BetweenTimeOnlyAttribute(string start, string end, Inclusion inclusion = Inclusion.Inclusive)
     : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Range.OutOfRange)
 {
-    /// <summary>Gets the lower boundary of the valid time range.</summary>
-    public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
+    /// <summary>Gets the start of the valid time range.</summary>
+    public TimeOnly Start { get; } = TimeOnly.Parse(start, CultureInfo.InvariantCulture);
 
-    /// <summary>Gets the upper boundary of the valid time range.</summary>
-    public TimeOnly Max { get; } = TimeOnly.Parse(max, CultureInfo.InvariantCulture);
+    /// <summary>Gets the end of the valid time range.</summary>
+    public TimeOnly End { get; } = TimeOnly.Parse(end, CultureInfo.InvariantCulture);
 
     /// <summary>Gets whether the boundary values are included or excluded in the valid range.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -52,7 +53,7 @@ public sealed class BetweenTimeOnlyAttribute(string min, string max, Inclusion i
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var timeValue = (TimeOnly)value!;
-        var result = Must.Be.Between(timeValue, Min, Max, Inclusion, paramName: null);
+        var result = Must.Be.Between(timeValue, Start, End, Inclusion, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -67,8 +68,9 @@ public sealed class BetweenTimeOnlyAttribute(string min, string max, Inclusion i
 /// and parameters of type <see cref="TimeOnly"/>.
 /// </para>
 /// <para>
-/// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
-/// <see cref="TimeOnly"/> string format using invariant culture.
+/// The <paramref name="start"/> and <paramref name="end"/> constructor arguments are parsed from
+/// <see cref="TimeOnly"/> string format using invariant culture. When <paramref name="start"/> is
+/// later than <paramref name="end"/>, the excluded range wraps across midnight.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
 /// </remarks>
@@ -85,14 +87,14 @@ public sealed class BetweenTimeOnlyAttribute(string min, string max, Inclusion i
 /// <seealso cref="MustTimeOnlyClauses.NotBetween"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBetweenTimeOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+public sealed class NotBetweenTimeOnlyAttribute(string start, string end, Inclusion inclusion = Inclusion.Inclusive)
     : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Range.InRange)
 {
-    /// <summary>Gets the lower boundary of the excluded time range.</summary>
-    public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
+    /// <summary>Gets the start of the excluded time range.</summary>
+    public TimeOnly Start { get; } = TimeOnly.Parse(start, CultureInfo.InvariantCulture);
 
-    /// <summary>Gets the upper boundary of the excluded time range.</summary>
-    public TimeOnly Max { get; } = TimeOnly.Parse(max, CultureInfo.InvariantCulture);
+    /// <summary>Gets the end of the excluded time range.</summary>
+    public TimeOnly End { get; } = TimeOnly.Parse(end, CultureInfo.InvariantCulture);
 
     /// <summary>Gets whether the boundary values are included or excluded in the excluded range.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -101,7 +103,7 @@ public sealed class NotBetweenTimeOnlyAttribute(string min, string max, Inclusio
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var timeValue = (TimeOnly)value!;
-        var result = Must.Be.NotBetween(timeValue, Min, Max, Inclusion, paramName: null);
+        var result = Must.Be.NotBetween(timeValue, Start, End, Inclusion, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }

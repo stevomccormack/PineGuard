@@ -12,21 +12,25 @@ public static class GuardTimeOnlyClausesTestData
 
     public static class Between
     {
-        public static TheoryData<GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases =>
+        public static TheoryData<GuardCase<(TimeOnly value, TimeOnly start, TimeOnly end, Inclusion inclusion)>> Cases =>
         [
             new("out-of-range-low", (Morning.AddHours(-1), Morning, Evening, Inclusion.Inclusive), new GuardExpected(true)),
             new("out-of-range-high", (Evening.AddHours(1), Morning, Evening, Inclusion.Inclusive), new GuardExpected(true)),
-            new("in-range", (Noon, Morning, Evening, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value"))
+            new("in-range", (Noon, Morning, Evening, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value")),
+            new("wrap-outside", (Noon, Evening, Morning, Inclusion.Inclusive), new GuardExpected(true)),
+            new("wrap-inside", (Evening.AddHours(1), Evening, Morning, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 
     public static class NotBetween
     {
-        public static TheoryData<GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases =>
+        public static TheoryData<GuardCase<(TimeOnly value, TimeOnly start, TimeOnly end, Inclusion inclusion)>> Cases =>
         [
             new("in-range", (Noon, Morning, Evening, Inclusion.Inclusive), new GuardExpected(true)),
             new("out-of-range-low", (Morning.AddHours(-1), Morning, Evening, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value")),
-            new("out-of-range-high", (Evening.AddHours(1), Morning, Evening, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value"))
+            new("out-of-range-high", (Evening.AddHours(1), Morning, Evening, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value")),
+            new("wrap-inside", (Evening.AddHours(1), Evening, Morning, Inclusion.Inclusive), new GuardExpected(true)),
+            new("wrap-outside", (Noon, Evening, Morning, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 

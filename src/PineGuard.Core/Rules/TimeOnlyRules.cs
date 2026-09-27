@@ -11,15 +11,32 @@ namespace PineGuard.Rules;
 public static class TimeOnlyRules
 {
     /// <summary>
-    /// Determines whether the specified time falls within [<paramref name="min"/>, <paramref name="max"/>].
+    /// Determines whether the specified time falls within [<paramref name="start"/>, <paramref name="end"/>],
+    /// wrapping across midnight when <paramref name="start"/> is later than <paramref name="end"/>.
     /// </summary>
     /// <param name="value">The time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="min">The lower bound of the time range.</param>
-    /// <param name="max">The upper bound of the time range.</param>
+    /// <param name="start">The start of the time range.</param>
+    /// <param name="end">The end of the time range.</param>
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is within the range; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBetween(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion = Inclusion.Inclusive) =>
-        value is not null && RuleComparison.IsBetween(value.Value, min, max, inclusion);
+    /// <remarks>
+    /// When <paramref name="start"/> is later than <paramref name="end"/>, the interval crosses midnight.
+    /// Each endpoint follows the requested <paramref name="inclusion"/>. Equal endpoints mean one instant
+    /// under <see cref="Inclusion.Inclusive"/> and none under <see cref="Inclusion.Exclusive"/>; they never
+    /// mean a full-day interval.
+    /// </remarks>
+    public static bool IsBetween(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion = Inclusion.Inclusive)
+    {
+        if (value is null)
+            return false;
+
+        if (start <= end)
+            return RuleComparison.IsBetween(value.Value, start, end, inclusion);
+
+        return inclusion == Inclusion.Inclusive
+            ? value.Value >= start || value.Value <= end
+            : value.Value > start || value.Value < end;
+    }
 
     /// <summary>
     /// Determines whether the specified time is before the given reference time.

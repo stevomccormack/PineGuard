@@ -7,24 +7,48 @@ public static class TimeOnlyRulesFixtures
 {
     public static class IsBetween
     {
-        public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) MiddleInclusive = (new TimeOnly(12, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
-        public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) AtMinInclusive = (new TimeOnly(11, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
-        public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) AtMinExclusive = (new TimeOnly(11, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Exclusive);
-        public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) NullValue = (null, new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) MiddleInclusive = (new TimeOnly(12, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) AtStartInclusive = (new TimeOnly(11, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) AtStartExclusive = (new TimeOnly(11, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) NullValue = (null, new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapLateNightInside = (new TimeOnly(23, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapEarlyMorningInside = (new TimeOnly(1, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapLateNightInsideExclusive = (new TimeOnly(23, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapEarlyMorningInsideExclusive = (new TimeOnly(1, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapOutside = (new TimeOnly(12, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapAtStartInclusive = (new TimeOnly(22, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapAtStartExclusive = (new TimeOnly(22, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapAtEndInclusive = (new TimeOnly(2, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapAtEndExclusive = (new TimeOnly(2, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) EqualBoundsAtInstantInclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) EqualBoundsAtInstantExclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) EqualBoundsOffInstant = (new TimeOnly(11, 0), new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Inclusive);
 
-        public static RuleScenario<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>[] ValidScenarios =>
+        public static RuleScenario<(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>[] ValidScenarios =>
         [
             new(nameof(MiddleInclusive), MiddleInclusive, true),
-            new(nameof(AtMinInclusive), AtMinInclusive, true)
+            new(nameof(AtStartInclusive), AtStartInclusive, true),
+            new(nameof(WrapLateNightInside), WrapLateNightInside, true),
+            new(nameof(WrapEarlyMorningInside), WrapEarlyMorningInside, true),
+            new(nameof(WrapLateNightInsideExclusive), WrapLateNightInsideExclusive, true),
+            new(nameof(WrapEarlyMorningInsideExclusive), WrapEarlyMorningInsideExclusive, true),
+            new(nameof(WrapAtStartInclusive), WrapAtStartInclusive, true),
+            new(nameof(WrapAtEndInclusive), WrapAtEndInclusive, true),
+            new(nameof(EqualBoundsAtInstantInclusive), EqualBoundsAtInstantInclusive, true)
         ];
 
-        public static RuleScenario<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>[] InvalidScenarios =>
+        public static RuleScenario<(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>[] InvalidScenarios =>
         [
-            new(nameof(AtMinExclusive), AtMinExclusive, false),
-            new(nameof(NullValue), NullValue, false)
+            new(nameof(AtStartExclusive), AtStartExclusive, false),
+            new(nameof(NullValue), NullValue, false),
+            new(nameof(WrapOutside), WrapOutside, false),
+            new(nameof(WrapAtStartExclusive), WrapAtStartExclusive, false),
+            new(nameof(WrapAtEndExclusive), WrapAtEndExclusive, false),
+            new(nameof(EqualBoundsAtInstantExclusive), EqualBoundsAtInstantExclusive, false),
+            new(nameof(EqualBoundsOffInstant), EqualBoundsOffInstant, false)
         ];
 
-        public static RuleScenario<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+        public static RuleScenario<(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
     public static class IsBefore

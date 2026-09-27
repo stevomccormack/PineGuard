@@ -8,13 +8,13 @@ public sealed class GuardStringTimeOnlyClausesTests(ITestOutputHelper output) : 
 {
     [Theory]
     [MemberData(nameof(GuardStringTimeOnlyClausesTestData.NotBetweenTimeOnly.Cases), MemberType = typeof(GuardStringTimeOnlyClausesTestData.NotBetweenTimeOnly))]
-    public void NotBetweenTimeOnly_BehavesAsExpected(GuardCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
-    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.NotBetweenTimeOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.NotBetweenTimeOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid && value is not null) Assert.Equal(TimeOnly.Parse(value), result); }
+    public void NotBetweenTimeOnly_BehavesAsExpected(GuardCase<(string? value, TimeOnly start, TimeOnly end, Inclusion inclusion)> tc)
+    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.NotBetweenTimeOnly(value, tc.Value.start, tc.Value.end, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.NotBetweenTimeOnly(value, tc.Value.start, tc.Value.end, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid && value is not null) Assert.Equal(TimeOnly.Parse(value), result); }
 
     [Theory]
     [MemberData(nameof(GuardStringTimeOnlyClausesTestData.BetweenTimeOnly.Cases), MemberType = typeof(GuardStringTimeOnlyClausesTestData.BetweenTimeOnly))]
-    public void BetweenTimeOnly_BehavesAsExpected(GuardCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
-    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.BetweenTimeOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.BetweenTimeOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid && value is not null) Assert.Equal(TimeOnly.Parse(value), result); }
+    public void BetweenTimeOnly_BehavesAsExpected(GuardCase<(string? value, TimeOnly start, TimeOnly end, Inclusion inclusion)> tc)
+    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.BetweenTimeOnly(value, tc.Value.start, tc.Value.end, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.BetweenTimeOnly(value, tc.Value.start, tc.Value.end, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid && value is not null) Assert.Equal(TimeOnly.Parse(value), result); }
 
     [Theory]
     [MemberData(nameof(GuardStringTimeOnlyClausesTestData.NotWithinTimeOnly.Cases), MemberType = typeof(GuardStringTimeOnlyClausesTestData.NotWithinTimeOnly))]
