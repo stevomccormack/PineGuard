@@ -4,7 +4,8 @@
 
 .DESCRIPTION
     Dot-source this file to import Test-ProjectHasSources, Get-TestProjects,
-    Get-PineGuardScope and Get-PineGuardPackableProjects into the calling script's scope.
+    Get-PineGuardScope, Get-PineGuardPackableProjects and Get-PineGuardInspectCodeProjectNames
+    into the calling script's scope.
 #>
 
 Set-StrictMode -Version Latest
@@ -343,6 +344,95 @@ function Get-PineGuardPackableProjects {
     }
 
     return @($names)
+}
+
+function Get-PineGuardInspectCodeProjectNames {
+    <#
+    .SYNOPSIS
+        Returns the exact project-name stems (no extension) JetBrains InspectCode's --project mask
+        expects for one PineGuard scope: every registry SourceCsproj plus the scope's TestCsproj.
+
+    .DESCRIPTION
+        JetBrains InspectCode's --project option takes an exact, semicolon-separated list of
+        project names, not glob patterns (ReSharper_Command_Line_Tools.html). This derives that
+        list from the same registry Get-PineGuardScope already returns, rather than a second
+        hand-maintained InspectCode-specific list — a scope's project set is defined once, here
+        reused, never duplicated (mirrors the intent behind Get-PineGuardPackableProjects above).
+
+        Unlike Get-PineGuardPackableProjects, which walks every scope to build one repo-wide list,
+        this returns the set for exactly one named scope, since InspectCode is invoked once per
+        scope (against the root PineGuard.slnx with a --project filter), never once for the whole
+        registry.
+
+    .PARAMETER Name
+        One of the fifteen scope names (see Get-PineGuardScope). There is no 'All' entry here — a
+        caller scanning scope 'All' passes no --project filter at all, so it never calls this
+        function.
+
+    .EXAMPLE
+        Get-PineGuardInspectCodeProjectNames -Name 'Core'
+
+        Returns @('PineGuard.Core', 'PineGuard.Core.UnitTests').
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet('Core', 'MustClauses', 'GuardClauses', 'DataAnnotations', 'FluentValidation', 'Options', 'DependencyInjection', 'AspNetCore', 'ErrorOr', 'FluentResults', 'OneOf', 'MediatR', 'Xml', 'Analyzers', 'Testing')]
+        [string] $Name
+    )
+
+    $scope = Get-PineGuardScope -Name $Name
+    $names = New-Object System.Collections.Generic.List[string]
+
+    foreach ($csproj in $scope.SourceCsprojs) {
+        $names.Add([System.IO.Path]::GetFileNameWithoutExtension($csproj))
+    }
+    $names.Add([System.IO.Path]::GetFileNameWithoutExtension($scope.TestCsproj))
+
+    return @($names)
+}
+
+function Get-ProjectTargetFrameworks {
+    <#
+    .SYNOPSIS
+        Resolves the effective TargetFramework(s) a csproj actually builds.
+
+    .DESCRIPTION
+        Evaluated via `dotnet msbuild -getProperty`, not read as a literal XML element, because
+        every PineGuard test project inherits <TargetFrameworks> from tests/Directory.Build.props
+        (net8.0;net10.0 today) rather than declaring it in its own csproj -- a literal-element
+        read would find nothing. Falls back to the singular TargetFramework property for a
+        single-targeted project.
+
+        Project discovery logic (tools/spec.md §2.1), shared by both coverage engines: Coverlet's
+        -Isolated per-TFM publish loop (tools/.shared/coverage.ps1's Resolve-CoverageTestFrameworks)
+        and dotCover's own per-TFM snapshot loop (dotcover/New-CoverageReport.ps1). Moved here
+        verbatim from the dotCover engine script's former Resolve-DotCoverTargetFrameworks so
+        neither consumer has its own copy.
+
+    .PARAMETER CsprojPath
+        Path to the csproj file to evaluate.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $CsprojPath
+    )
+
+    $multi = & dotnet msbuild $CsprojPath '-getProperty:TargetFrameworks' '-nologo' 2>$null
+    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($multi)) {
+        $tfms = @(($multi -split ';') | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+        if ($tfms.Count -gt 0) {
+            return $tfms
+        }
+    }
+
+    $single = & dotnet msbuild $CsprojPath '-getProperty:TargetFramework' '-nologo' 2>$null
+    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($single)) {
+        return @($single.Trim())
+    }
+
+    throw "Could not resolve TargetFramework(s) for '$CsprojPath' via 'dotnet msbuild -getProperty'."
 }
 
 function Test-ProjectHasSources {

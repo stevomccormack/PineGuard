@@ -27,7 +27,10 @@ agent has actually hit:
 - `-Engine` exists (`Coverlet` | `DotCover`, default `Coverlet`) and is forwarded through the D-9 front door
   (`New-CoverageReport.ps1`). `-Engine DotCover` is snapshot-only — it collects a Rider `.dcvr` file and cannot be
   gated; do not strip a stored `-Engine` flag, translate it if the intent changes.
-- Drop `-Isolated` on multi-targeted projects (Core, MustClauses, GuardClauses); the non-isolated run is equally authoritative.
+- `-Isolated` publishes once per target framework when `-Framework` is left unbound (every test project
+  multi-targets net8.0;net10.0) — resolved via `Resolve-CoverageTestFrameworks` in `tools/.shared/coverage.ps1`.
+  Pass `-Framework` to restrict a run to one TFM. Do not drop `-Isolated` to work around a multi-target publish
+  failure; that failure was the NETSDK1129 bug this per-TFM resolution fixes.
 
 ## Known Constraints
 
