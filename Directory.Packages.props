@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Central package versions -->
-    <PackageVersion Include="coverlet.collector" Version="10.0.1" />
+    <PackageVersion Include="coverlet.collector" Version="10.1.0" />
     <!-- Result-pattern bridge targets: pinned to the lowest line carrying the API each bridge needs
          (Directory.Packages.props §4.3), so a consumer already on a newer line is never held back -->
     <PackageVersion Include="ErrorOr" Version="2.1.1" />
