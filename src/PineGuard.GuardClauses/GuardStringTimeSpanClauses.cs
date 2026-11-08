@@ -83,7 +83,8 @@ public static class GuardStringTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the ShorterThan constraint.
+    /// Throws if <paramref name="value"/> is shorter than <paramref name="threshold"/>.
+    /// <see cref="Inclusion.Inclusive"/> also throws when the two are equal.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -117,7 +118,8 @@ public static class GuardStringTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the LongerThan constraint.
+    /// Throws if <paramref name="value"/> is longer than <paramref name="threshold"/>.
+    /// <see cref="Inclusion.Inclusive"/> also throws when the two are equal.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
