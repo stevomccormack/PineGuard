@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 P3 explores hostile inputs at identified parsing/validation boundaries. The original handoff suggests fuzzing; v1.6 §8 permits risk-focused tooling without mandating a named tool. No exact fuzz harness was established by the bounded intake.
 
-Inputs: W01 contracts, W14 threat model, W15 regex semantics, W16 approved resource policy and existing test specifications. Output: `docs/reports/readiness-fuzzing.md`; approved corpus/harness paths are selected under D10/D22.
+Inputs: W01 contracts, W14 threat model, W15 regex semantics, W16 approved resource policy and existing test specifications. Output: `+ docs/reports/readiness-fuzzing.md`; approved corpus/harness paths are selected under D10/D22.
 
 ## Tasks
 

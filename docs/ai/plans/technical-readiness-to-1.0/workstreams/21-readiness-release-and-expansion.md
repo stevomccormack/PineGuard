@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 The user requires **10/10 for every technical rubric criterion**. No weighted average can conceal a weaker row. This is an evidence-based engineering acceptance target within declared support scope, not mathematical proof of perfect software.
 
-Inputs: docs/reports/technical-readiness-rubric-2026-09-25.md §§How to interpret, Rubric, R1–R7, Assessment decision; all child evidence; coverage contract; actual council verdict; current package facts. Preserve the historical rubric unchanged. Output: docs/reports/readiness-final-assessment.md.
+Inputs: docs/reports/technical-readiness-rubric-2026-09-25.md §§How to interpret, Rubric, R1–R7, Assessment decision; all child evidence; coverage contract; actual council verdict; current package facts. Preserve the historical rubric unchanged. Output: `+ docs/reports/readiness-final-assessment.md`.
 
 ## Tasks
 

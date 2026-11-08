@@ -30,7 +30,7 @@ one theory: `mode is { } m ? await ValidateAsync(value, m, ct) : await ValidateA
 outcome) — give it its own trivial single-case `sealed record Case(string Name, Type Expected) :
 BaseCase(Name);` rather than forcing it into the validation-result shape.
 
-**`MustValidatorCast.To<T>(object?)`** (internal, `PineGuard.Core/MustClauses/MustValidatorCast.cs`)
+**`MustValidatorCast.To<T>(object?)`** (internal, `src/PineGuard.Core/MustClauses/MustValidatorCast.cs`)
 returns `default!` for a `null` input when `default(T) is null` (true for `string`), so passing
 `null` through the non-generic surface does NOT throw — it forwards `null` into the generic
 `Validate(string value)` (bypassing the `notnull` constraint at runtime). A genuinely

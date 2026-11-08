@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W17 decides whether diagnostics provide sufficient value, then defines a coherent opt-in contract if adopted. The handoff proposes optional diagnostics and excluding attempted values by default. Neither a new diagnostics API nor a particular payload is assumed approved.
 
-Inputs: W04 failure fields, W14 privacy/threat model, W10 early cost baseline and W22 naming. Output: `docs/reports/readiness-diagnostics.md`. D15/D22 requires current instrumentation inventory and an Astra decision before adding infrastructure.
+Inputs: W04 failure fields, W14 privacy/threat model, W10 early cost baseline and W22 naming. Output: `+ docs/reports/readiness-diagnostics.md`. D15/D22 requires current instrumentation inventory and an Astra decision before adding infrastructure.
 
 ## Tasks
 

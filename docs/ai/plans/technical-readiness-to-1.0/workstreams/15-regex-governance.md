@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W15 resolves regex-specific correctness/resource behavior early where it blocks W01, then supplies P3 enforcement. Source-only observations: `src/PineGuard.Core/Rules/StringRules.cs` exposes raw regex timeout behavior and `src/PineGuard.MustClauses/MustStringClauses.cs` Match/NotMatch lack a verified mapping; built-in regex timeout behavior is anchored by `src/PineGuard.Core/Rules/Owasp/OwaspRegex.cs`. Reproduction remains necessary.
 
-Inputs: W01 contracts, W14 threat priorities, W10 early measurements and W16 general resource policy. Output: `docs/reports/readiness-regex.md`.
+Inputs: W01 contracts, W14 threat priorities, W10 early measurements and W16 general resource policy. Output: `+ docs/reports/readiness-regex.md`.
 
 ## Decisions and tasks
 

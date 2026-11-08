@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W09 demonstrates that important assertions detect realistic defects. v1.6 §8 supports targeted mutation. The substantial passing execution count and100% coverage requirement do not themselves prove assertions are strong; this workstream complements both.
 
-Inputs: W01 contracts, W05 conformance, W06–W08 tests and W14 risk priorities. No dedicated mutation configuration was established. D10/D22 requires tool/target/file approval. Output: `docs/reports/readiness-mutation.md`.
+Inputs: W01 contracts, W05 conformance, W06–W08 tests and W14 risk priorities. No dedicated mutation configuration was established. D10/D22 requires tool/target/file approval. Output: `+ docs/reports/readiness-mutation.md`.
 
 ## Tasks
 

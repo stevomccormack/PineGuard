@@ -15,7 +15,7 @@ W22 runs EARLY despite its numerical ID: dependencies, not filenames, determine 
 
 Existing APIs impose no backward-compatibility constraint. DRY/SOLID, clarity and formatting hygiene are mandatory. Avoid speculative abstractions: a shared mechanism must serve a demonstrated responsibility.
 
-Inputs: BRAIN specifications/precedents, repository-wide source/project/package/rule/surface inventory, W01 semantic questions and official-source comparisons. Output: docs/reports/readiness-taxonomy-abstractions.md, then the approved naming/structure specification at a path selected under repository conventions.
+Inputs: BRAIN specifications/precedents, repository-wide source/project/package/rule/surface inventory, W01 semantic questions and official-source comparisons. Output: `+ docs/reports/readiness-taxonomy-abstractions.md`, then the approved naming/structure specification at a path selected under repository conventions.
 
 ## Tasks
 

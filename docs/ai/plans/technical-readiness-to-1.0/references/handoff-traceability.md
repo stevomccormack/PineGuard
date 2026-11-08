@@ -8,7 +8,7 @@ Source: [byte-preserved original engineering handoff](snapshots/original-enginee
 | Canonical cheap kernel | ADAPT/APPROVED DIRECTION | Early new static structure W03, taxonomy W22; representation decisions explicit |
 | Avoid per-call polymorphic allocation hierarchy | ADOPT design criterion | W03/W10; measurable costs, no blanket unsupported zero-allocation claim |
 | Manifest/completeness | ADOPT EARLY | W02 executable provenance through existing audits; no duplicate manual lists |
-| Consistent Must/Guard/object/FV/DA/ASP.NET projections | ADOPT scoped conformance | W04/W05 actual applicable mapping; no universal DA code invention |
+| Consistent Must, Guard, object, FV, DA and ASP.NET projections | ADOPT scoped conformance | W04/W05 actual applicable mapping; no universal DA code invention |
 | Minimal code/path/message/severity protocol | EVALUATE AND DECIDE | W04 selects best new public/internal contract; fields alone are not a complete design |
 | Exclude AttemptedValue by default | ADOPT privacy preference for design review | W04/W17 must classify every field; exact new contract decided by Astra |
 | Independent conformance | ADOPT | W05; Must cannot produce expected truth |

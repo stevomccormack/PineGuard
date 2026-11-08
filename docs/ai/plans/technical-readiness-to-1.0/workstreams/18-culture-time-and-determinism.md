@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W18 establishes reproducible behavior across supported environmental conditions, particularly the early string-to-DateOnly past-date pilot. The handoff and v1.6 §§6–8 identify environment-sensitive correctness as a review dimension; specific clock/culture rules remain Astra decisions.
 
-Inputs: W01 semantics, W04 path/message/order policies and W05 scenarios. Luna inventories culture/time/date/randomness/environment dependencies and exact test paths. Output: `docs/reports/readiness-determinism.md`. D16/D22 must be resolved before normative expectations or abstractions are introduced.
+Inputs: W01 semantics, W04 path/message/order policies and W05 scenarios. Luna inventories culture/time/date/randomness/environment dependencies and exact test paths. Output: `+ docs/reports/readiness-determinism.md`. D16/D22 must be resolved before normative expectations or abstractions are introduced.
 
 ## Tasks
 

@@ -23,7 +23,7 @@ D04/D05 require runtime reproductions before a bug classification. D16 governs c
 
 | Task | Action | Output |
 |---|---|---|
-| 01.1 | Extract current public contracts, relevant source, fixtures and docs for each pilot | `docs/reports/readiness-semantic-contracts.md`: source-backed behavior inventory |
+| 01.1 | Extract current public contracts, relevant source, fixtures and docs for each pilot | `+ docs/reports/readiness-semantic-contracts.md`: source-backed behavior inventory |
 | 01.2 | Reproduce trimming/newline and regex timeout/negation concerns with minimal inputs across the specifically implicated paths | Reproduction command, input, actual result, environment and source-only/reproduced status |
 | 01.3 | Write decision packets for each ambiguity; compare the simplest coherent alternatives and repository-wide consequences | D04/D05/D16 records with explicit selected answers before edits |
 | 01.4 | Specify input domain, valid/invalid conditions, normalization/conversion, output, error classification and environmental dependencies for each pilot | Reviewed normative pilot specification at a path approved under governing spec conventions |

@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W16 defines intentional resource behavior for the supported validation model. The handoff proposes operational bounds; the new greenfield design may adopt the best policy, but numeric limits and APIs require evidence. W15 owns regex-specific engine/pattern/timeout choices; W16 owns general input, traversal, iteration, callback/cancellation and cache budgets where applicable.
 
-Inputs: W14 threat model, W10 early benchmarks, W01 contract domains, W19 lifecycle and W15 regex measurements. Output: `docs/reports/readiness-resource-limits.md`. D11/D14/D22 block arbitrary implementation choices.
+Inputs: W14 threat model, W10 early benchmarks, W01 contract domains, W19 lifecycle and W15 regex measurements. Output: `+ docs/reports/readiness-resource-limits.md`. D11/D14/D22 block arbitrary implementation choices.
 
 ## Tasks
 

@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W08 supplies independent comparative correctness evidence. It is not an old-release compatibility gate. Compare a selected implementation with an independently justified reference only where their semantic domains are equivalent. A competitor's behavior is evidence, not PineGuard's definition of truth.
 
-Inputs: W01 new contracts, W05 scenarios, official competitor dossiers and genuine Sol comparative synthesis where relevant. v1.6 §8 supports risk-focused differential testing. No exact harness was verified; D10/D22 requires inventory/tool/path approval. Output: `docs/reports/readiness-differential.md`.
+Inputs: W01 new contracts, W05 scenarios, official competitor dossiers and genuine Sol comparative synthesis where relevant. v1.6 §8 supports risk-focused differential testing. No exact harness was verified; D10/D22 requires inventory/tool/path approval. Output: `+ docs/reports/readiness-differential.md`.
 
 ## Tasks
 
@@ -81,4 +81,4 @@ public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
 }
 ```
 
-Scenario acceptance: Positive1→true; Zero/Negative/Null→false; canonical int.MinValue/int.MaxValue edge extensions→false/true. No email/date/reference-domain equivalence is inferred.
+Scenario acceptance: Positive1→true; Zero/Negative/Null→false; canonical `int.MinValue`/`int.MaxValue` edge extensions→false/true. No email/date/reference-domain equivalence is inferred.

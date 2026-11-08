@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W14 specifies what security-relevant validation does and does not establish, based on the actual new contracts and consumer boundaries. Rubric security/data is6/10 with medium confidence; v1.6 §8 and the handoff call for formalized claims and hostile evidence.
 
-Inputs: W01 OWASP reproduction and semantics, W03 call paths, W04 failure/privacy contract, W07 fuzz priorities, W15 regex and W16 resource policy. Verified anchors: `src/PineGuard.Core/Rules/OwaspRules.cs`, `src/PineGuard.MustClauses/MustOwaspClauses.cs`, `tests/PineGuard.Testing/Fixtures/OwaspRulesFixtures.cs`. Output: `docs/reports/readiness-threat-model.md`.
+Inputs: W01 OWASP reproduction and semantics, W03 call paths, W04 failure/privacy contract, W07 fuzz priorities, W15 regex and W16 resource policy. Verified anchors: `src/PineGuard.Core/Rules/OwaspRules.cs`, `src/PineGuard.MustClauses/MustOwaspClauses.cs`, `tests/PineGuard.Testing/Fixtures/OwaspRulesFixtures.cs`. Output: `+ docs/reports/readiness-threat-model.md`.
 
 ## Tasks
 

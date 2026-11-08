@@ -17,7 +17,7 @@ Inputs: W01/W04/W05 semantics/errors, W11 package/target support, W12 public con
 
 ## Tasks
 
-1. Luna inventories existing API samples and conventions. Output an exact source/project/test/doc path map and a decision packet at `docs/reports/readiness-sample-api.md`.
+1. Luna inventories existing API samples and conventions. Output an exact source/project/test/doc path map and a decision packet at `+ docs/reports/readiness-sample-api.md`.
 2. Astra approves a minimal but representative scenario covering valid input, field failures, conversion failures, nested/collection behavior if supported, and operational/cancellation outcomes. Select only approved package/target combinations.
 3. Sol builds the host and shared application boundary without duplicating rule truth or adding app-specific validation hacks. Every new validation path goes through the canonical rule structure.
 4. Exercise real requests through the selected HTTP pipeline; assert documented response status/body/error mapping, invocation actually occurring and no sensitive attempted-value disclosure.

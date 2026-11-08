@@ -17,7 +17,7 @@ Inputs: W01 pilot specifications, W02 inventory and W04 mapping decisions; exist
 
 ## Preconditions and outputs
 
-D07/D08 must be resolved for the pilot. Luna inventories exact fixture projects, adapters and test paths, then Astra approves D22's path map. Output: `docs/reports/readiness-conformance.md`, approved scenario/adapter fixtures and machine-readable evidence through W00's artifact contract.
+D07/D08 must be resolved for the pilot. Luna inventories exact fixture projects, adapters and test paths, then Astra approves D22's path map. Output: `+ docs/reports/readiness-conformance.md`, approved scenario/adapter fixtures and machine-readable evidence through W00's artifact contract.
 
 ## Tasks
 

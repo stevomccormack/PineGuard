@@ -17,7 +17,7 @@ Verified inputs: `apps/cli/src/audit/engine.ts`, `apps/cli/src/audit/rules/layer
 
 ## Decisions and outputs
 
-D07 blocks schema/lowering implementation until Astra approves provenance, representation and reconciliation rules. Output evidence: `docs/reports/readiness-manifest-completeness.md`. Exact manifest/generator/fixture file paths are selected from the Luna inventory under D22, not invented as existing files.
+D07 blocks schema/lowering implementation until Astra approves provenance, representation and reconciliation rules. Output evidence: `+ docs/reports/readiness-manifest-completeness.md`. Exact manifest/generator/fixture file paths are selected from the Luna inventory under D22, not invented as existing files.
 
 The design review must distinguish authoritative rule identity from public method aliases, overloads, code provenance, supported surface projections and test-case references. Absence/not-applicable/unsupported/unmapped must be unambiguous without a competing list of booleans.
 

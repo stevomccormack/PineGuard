@@ -23,11 +23,13 @@ Expected independent checks: null/minimum/-1/0 fail; 1/maximum pass; seeded miss
 
 Verified: the proposed package-free net10.0 Release miniature built with SDK 10.0.401, zero warnings/errors, and ran successfully; the synthetic governance self-test passed valid cases and ten expected rejection probes. These results verify only those examples. Current PineGuard API insertion snippets are source-inspected but not executed; real repository coverage/full suite, BenchmarkDotNet and NativeAOT were not run. No library implementation or selected architecture policy is changed.
 
-Observed commands from the workspace root:
+Observed commands from the workspace root (a scratch workspace outside this repository; these paths are not tracked here):
 
-    dotnet build planning-review/code-examples/Pilot.csproj --framework net10.0 --configuration Release
-    dotnet run --project planning-review/code-examples/Pilot.csproj --framework net10.0 --configuration Release --no-build
-    pwsh -NoProfile -File planning-review/code-examples/Verify-GovernanceExamples.ps1
+```text
+dotnet build planning-review/code-examples/Pilot.csproj --framework net10.0 --configuration Release
+dotnet run --project planning-review/code-examples/Pilot.csproj --framework net10.0 --configuration Release --no-build
+pwsh -NoProfile -File planning-review/code-examples/Verify-GovernanceExamples.ps1
+```
 
 The build and run exited 0. Build reported 0 warnings and 0 errors. The run printed the documented PASS line and the timing output consumed=100000, elapsedTicks=40333, allocatedBytes=0; timing is an observation, not a budget or benchmark result. The governance self-test exited 0 and reported its valid-case checks plus ten expected rejection probes. It writes only local synthetic fixtures in its scratch workspace.
 
@@ -285,7 +287,7 @@ public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
 }
 ```
 
-Scenario acceptance: Positive1→true; Zero/Negative/Null→false; canonical int.MinValue/int.MaxValue edge extensions→false/true. No email/date/reference-domain equivalence is inferred.
+Scenario acceptance: Positive1→true; Zero/Negative/Null→false; canonical `int.MinValue`/`int.MaxValue` edge extensions→false/true. No email/date/reference-domain equivalence is inferred.
 
 ## Group 4: W07 replay and W09 mutation
 

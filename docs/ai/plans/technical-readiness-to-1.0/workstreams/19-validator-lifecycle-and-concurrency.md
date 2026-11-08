@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 Characterize lifecycle EARLY because it affects new structure, construction costs and public contracts; complete concurrency proof after decisions. Source inspection identified mutable validator structures, not a reproduced race. Never state they are thread-safe or racy without evidence.
 
-Verified inputs: `src/PineGuard.Core/MustClauses/MustValidator.cs`, `InlineMustValidator.cs`, `MustPropertyRule.cs`, and `tests/PineGuard.Core.UnitTests/MustClauses/MustValidatorTests.cs`. Output: `docs/reports/readiness-lifecycle-concurrency.md`.
+Verified inputs: `src/PineGuard.Core/MustClauses/MustValidator.cs`, `InlineMustValidator.cs`, `MustPropertyRule.cs`, and `tests/PineGuard.Core.UnitTests/MustClauses/MustValidatorTests.cs`. Output: `+ docs/reports/readiness-lifecycle-concurrency.md`.
 
 ## Decisions and tasks
 

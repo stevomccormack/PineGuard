@@ -15,7 +15,7 @@ Choose the best globally consistent new failure model EARLY with W03/W02. Greenf
 
 The handoff's code/path/message/severity protocol is a candidate, not a complete approved design. Verified current facts: DataAnnotations has no universal code and Guard NotEmail maps Must Email; do not infer new codes from surface names.
 
-Inputs: W01 semantics, W22 terminology, W02 inventory, src/PineGuard.Core/Codes/MustCodes.Email.cs; Luna locates exact result/adapter/serialization paths. Output: docs/reports/readiness-failure-contracts.md. D08/D15/D22 precede implementation.
+Inputs: W01 semantics, W22 terminology, W02 inventory, src/PineGuard.Core/Codes/MustCodes.Email.cs; Luna locates exact result/adapter/serialization paths. Output: `+ docs/reports/readiness-failure-contracts.md`. D08/D15/D22 precede implementation.
 
 ## Tasks
 
@@ -24,7 +24,7 @@ Inputs: W01 semantics, W22 terminology, W02 inventory, src/PineGuard.Core/Codes/
 | 04.1 | Inventory actual failure/result/exception shapes and field provenance across every surface | Source-backed matrix incl absent/not-applicable information |
 | 04.2 | Specify normal invalid, conversion, invalid configuration, cancellation/timeout/resource and programmer-failure categories | Astra-approved new outcome taxonomy and negation/evaluability boundaries |
 | 04.3 | Choose code/path/message/severity/value/input-output/aggregation/order semantics, equality/serialization and privacy | Complete new contract, alternatives and global impact |
-| 04.4 | Map each actual applicable Must/Guard/object/FV/DA/ASP.NET projection to that contract | Intentional adaptation and representability limits |
+| 04.4 | Map each actual applicable Must, Guard, object, FV, DA and ASP.NET projection to that contract | Intentional adaptation and representability limits |
 | 04.5 | Implement shared model/mappings and remove redundant local patterns across the repo | Coherent diff with100% validation coverage |
 | 04.6 | Prove independent outcomes, ordering/path/code behavior, privacy and allocation cost | W05/W10/W14/W17 evidence |
 

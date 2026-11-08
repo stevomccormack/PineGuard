@@ -15,7 +15,7 @@ The user declares PineGuard greenfield for this work. There is **no backward-com
 
 This explicitly supersedes legacy compatibility requirements in v1.6 §10 and the original handoff. Naming and abstraction decisions begin in early W22; W12 finalizes the complete public contract after new structure/manifest/failure decisions.
 
-Inputs: W22 taxonomy, W01 semantics, W02 inventory, W03 structure, W04 failures and actual package boundaries. Output: `docs/reports/readiness-public-contract.md`. Exact API baseline/tool/config paths are selected under D13/D22.
+Inputs: W22 taxonomy, W01 semantics, W02 inventory, W03 structure, W04 failures and actual package boundaries. Output: `+ docs/reports/readiness-public-contract.md`. Exact API baseline/tool/config paths are selected under D13/D22.
 
 ## Tasks
 

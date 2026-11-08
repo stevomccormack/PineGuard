@@ -17,7 +17,7 @@ Inputs: W12 new public API/package boundaries, W04 error mapping, W19 lifetime p
 
 ## Tasks
 
-1. Luna inventories existing solution/project/sample conventions and supplies an exact project/file ownership map. Output `docs/reports/readiness-sample-clean-architecture.md`.
+1. Luna inventories existing solution/project/sample conventions and supplies an exact project/file ownership map. Output `+ docs/reports/readiness-sample-clean-architecture.md`.
 2. Astra specifies a small end-to-end use case, validation entry/exit boundaries, domain/application/adapter responsibilities and allowed dependencies.
 3. Sol creates only necessary projects/abstractions and composes canonical validation; adapters translate representation without reimplementing rules.
 4. Add architecture/dependency checks for the selected boundaries and seed a forbidden reference to prove detection.

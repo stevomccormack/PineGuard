@@ -15,7 +15,7 @@ W11 provides early, lightweight consumer evidence once the new contracts/package
 
 v1.6 §9 and the handoff call for actual consumer execution. A successful publish or analyzer warning suppression alone is not deployment proof. No exact existing consumer project was verified.
 
-Inputs: package inventory, W01/W03/W04 contracts, W00 evidence contract, W13 dependency facts. D12/D22 require exact target/package/project/path decisions. Output: `docs/reports/readiness-deployment-consumers.md`.
+Inputs: package inventory, W01/W03/W04 contracts, W00 evidence contract, W13 dependency facts. D12/D22 require exact target/package/project/path decisions. Output: `+ docs/reports/readiness-deployment-consumers.md`.
 
 ## Tasks
 

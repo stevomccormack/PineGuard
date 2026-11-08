@@ -17,7 +17,7 @@ Inputs: W01 input/output semantics, W03 structure, W04 failure contract, W12 pub
 
 ## Tasks
 
-1. Luna inventories existing domain examples/precedents and supplies exact owned paths. Produce `docs/reports/readiness-sample-ddd.md` with target scenario and dependencies.
+1. Luna inventories existing domain examples/precedents and supplies exact owned paths. Produce `+ docs/reports/readiness-sample-ddd.md` with target scenario and dependencies.
 2. Astra specifies raw input versus parsed/normalized output, construction validity, aggregate mutation invariants and where exceptions versus result failures belong.
 3. Sol implements the smallest coherent domain model and application use cases using canonical rules; prevent duplicate conditions across constructors/factories/handlers.
 4. Test construction, invalid transitions, repeated invocation and aggregate invariants with independently specified outcomes. Distinguish request-wide failures from domain impossibility.

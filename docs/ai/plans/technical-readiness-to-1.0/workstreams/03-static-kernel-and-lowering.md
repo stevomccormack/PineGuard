@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 Design and implement the NEW rule structure EARLY, after W22 taxonomy and W01 pilot semantics. Preserve cheap static executable truth as a design principle, not old API shapes. The user authorizes greenfield design without legacy compatibility/shims/migrations. Avoid per-call polymorphic allocation graphs and speculative abstractions unless concrete evidence justifies a specific choice.
 
-Inputs: W22 inventory/terminology; W01 truth; W02 manifest interface; W04 failures; W10 EARLY baseline. Verified source anchors: src/PineGuard.Core/Rules/OwaspRules.cs, StringRules.cs, src/PineGuard.MustClauses/MustOwaspClauses.cs and MustStringClauses.cs. Output: docs/reports/readiness-static-kernel.md. Luna inventories remaining exact paths; Astra approves D22.
+Inputs: W22 inventory/terminology; W01 truth; W02 manifest interface; W04 failures; W10 EARLY baseline. Verified source anchors: src/PineGuard.Core/Rules/OwaspRules.cs, StringRules.cs, src/PineGuard.MustClauses/MustOwaspClauses.cs and MustStringClauses.cs. Output: `+ docs/reports/readiness-static-kernel.md`. Luna inventories remaining exact paths; Astra approves D22.
 
 ## Tasks
 

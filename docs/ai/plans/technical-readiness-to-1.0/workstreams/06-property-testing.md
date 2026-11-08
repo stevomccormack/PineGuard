@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 P3 checks semantic invariants across generated inputs. v1.6 §8 and rubric assertion/adversarial findings support focused properties, but the bounded intake did not identify a dedicated property harness. Do not claim none exists globally or mandate a library merely by name.
 
-Inputs: W01 specifications, W05 independent oracle conventions, W14 risk priorities and scoped test specifications. Output: `docs/reports/readiness-properties.md`. D10/D22 require a Luna inventory and Astra approval of tool, exact project/files, input domains and reproducibility settings before implementation.
+Inputs: W01 specifications, W05 independent oracle conventions, W14 risk priorities and scoped test specifications. Output: `+ docs/reports/readiness-properties.md`. D10/D22 require a Luna inventory and Astra approval of tool, exact project/files, input domains and reproducibility settings before implementation.
 
 ## Tasks
 

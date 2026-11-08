@@ -23,7 +23,7 @@ Luna must load coordination and CLI/project testing specifications. Astra must a
 
 | Task | Action and inputs | Required output |
 |---|---|---|
-| 00.1 | Inventory event/path filters, change detection, job conditions, matrix expansion, package scripts, workspace manifests and lockfiles | `docs/reports/readiness-ci-evidence.md`: exact path/job/artifact matrix and current blind spots |
+| 00.1 | Inventory event/path filters, change detection, job conditions, matrix expansion, package scripts, workspace manifests and lockfiles | `+ docs/reports/readiness-ci-evidence.md`: exact path/job/artifact matrix and current blind spots |
 | 00.2 | Define representative changed-file fixtures for shared test props, CLI source/test/config/dependency inputs, docs-only and unrelated legitimate changes | Approved exact fixture path map and expected selected jobs; no filename guessed before inventory |
 | 00.3 | Implement only approved routing corrections and CLI self-check commands | Owned workflow/CLI diff; fixtures prove jobs execute or intentionally skip |
 | 00.4 | Define required artifacts from selected jobs/targets and distinguish no-applicable-test scope from missing/empty/malformed artifacts | Fail-closed artifact manifest/validator in approved existing mechanism |

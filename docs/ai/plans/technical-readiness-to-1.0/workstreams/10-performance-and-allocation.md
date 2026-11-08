@@ -15,7 +15,7 @@ Benchmarks begin EARLY, alongside CI trust and naming/semantic inventory, by exp
 
 Rubric performance/resource is4/10 with high confidence in the evidence gap. The handoff's numeric budgets are proposals, not measurements. No concrete benchmark project was verified; D11/D22 requires inventory and approval.
 
-Output: `docs/reports/readiness-performance.md`; benchmark source/config/result paths selected from inventory.
+Output: `+ docs/reports/readiness-performance.md`; benchmark source/config/result paths selected from inventory.
 
 ## Tasks
 

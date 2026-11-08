@@ -14,12 +14,12 @@ The existing infrastructure boundary is documented in `docs/ai/specs/testing/pro
 
 | Stable ID | Project and planned directory | Responsibility | Execution kind |
 | --- | --- | --- | --- |
-| TP-RULES | `tests/PineGuard.Testing.UnitTests.Rules/PineGuard.Testing.UnitTests.Rules.csproj` | Crosscutting rule semantics and in-process adapter contracts | Test project |
-| TP-ARCH | `tests/PineGuard.Testing.UnitTests.Architecture/PineGuard.Testing.UnitTests.Architecture.csproj` | Structural dependency, manifest and public-contract checks | Test project |
-| TP-INTEGRATION | `tests/PineGuard.Testing.IntegrationTests/PineGuard.Testing.IntegrationTests.csproj` | Real host, container and package composition | Test project; scenario-specific host requirements |
-| TP-FUZZ | `tests/PineGuard.Testing.Fuzz/PineGuard.Testing.Fuzz.csproj` | Instrumented hostile-input entrypoints and corpus lifecycle | Dedicated fuzz executable/harness |
-| TP-BENCH | `benchmarks/PineGuard.Benchmarks/PineGuard.Benchmarks.csproj` | Representative performance and allocation measurements | Benchmark executable |
-| TP-CONSUMERS | `tests/PineGuard.Testing.Consumers/PineGuard.Testing.Consumers.csproj` | Minimal consumers built and executed in normal, trimmed and native configurations | Consumer executable |
+| TP-RULES | `+ tests/PineGuard.Testing.UnitTests.Rules/PineGuard.Testing.UnitTests.Rules.csproj` | Crosscutting rule semantics and in-process adapter contracts | Test project |
+| TP-ARCH | `+ tests/PineGuard.Testing.UnitTests.Architecture/PineGuard.Testing.UnitTests.Architecture.csproj` | Structural dependency, manifest and public-contract checks | Test project |
+| TP-INTEGRATION | `+ tests/PineGuard.Testing.IntegrationTests/PineGuard.Testing.IntegrationTests.csproj` | Real host, container and package composition | Test project; scenario-specific host requirements |
+| TP-FUZZ | `+ tests/PineGuard.Testing.Fuzz/PineGuard.Testing.Fuzz.csproj` | Instrumented hostile-input entrypoints and corpus lifecycle | Dedicated fuzz executable/harness |
+| TP-BENCH | `+ benchmarks/PineGuard.Benchmarks/PineGuard.Benchmarks.csproj` | Representative performance and allocation measurements | Benchmark executable |
+| TP-CONSUMERS | `+ tests/PineGuard.Testing.Consumers/PineGuard.Testing.Consumers.csproj` | Minimal consumers built and executed in normal, trimmed and native configurations | Consumer executable |
 
 The project name and directory name must agree. `PropertyBased` is a folder within TP-RULES, not another project. Earlier suggested suffixes `.Conformance`, `.Properties`, `.PropertyBased` and `.Differential` are not approved project names. No new project uses those technique-based suffixes.
 

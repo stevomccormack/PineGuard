@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W20 aligns product claims and consumer guidance with executed evidence. Lightweight snippets/smoke consumers occur as soon as they clarify the new contract. The largest API, DDD and Clean Architecture sample projects occur LAST, as separately gated subplans. This explicit user direction supersedes any implication that broad application projects precede core readiness.
 
-Inputs: README.md §§Quality metrics, Packages, Where PineGuard fits, Built by AI; docs/reports/readme-verification-2026-09-25.md §Release and documentation checks; W11–W13, W22 and approved competitor dispositions. Output: docs/reports/readiness-documentation-support.md.
+Inputs: README.md §§Quality metrics, Packages, Where PineGuard fits, Built by AI; docs/reports/readme-verification-2026-09-25.md §Release and documentation checks; W11–W13, W22 and approved competitor dispositions. Output: `+ docs/reports/readiness-documentation-support.md`.
 
 ## Tasks
 

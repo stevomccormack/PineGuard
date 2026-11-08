@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W13 makes dependency and package composition intentional, reproducible and supportable. It evaluates the new product design; it does not preserve old dependency/API arrangements. v1.6 §10 and handoff dependency gates provide review inputs.
 
-Verified anchor: `apps/cli/package.json`. Luna must inventory actual .NET project/package-centralization files, npm workspace manifests, lockfiles, licensing/SBOM/security tooling, package generation and release workflows before choosing paths or commands. Output: `docs/reports/readiness-dependencies.md`.
+Verified anchor: `apps/cli/package.json`. Luna must inventory actual .NET project/package-centralization files, npm workspace manifests, lockfiles, licensing/SBOM/security tooling, package generation and release workflows before choosing paths or commands. Output: `+ docs/reports/readiness-dependencies.md`.
 
 ## Decisions and tasks
 
