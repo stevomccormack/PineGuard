@@ -3,7 +3,7 @@ type: plan
 id: temporal-02-timezone-core
 version: 1.0
 status: planned
-last_updated: 2026-09-22
+last_updated: 2026-11-08
 -->
 
 # Plan T-02 — Phase 2: Time-zone Core (utility, rules, offsets, zone-aware instants, five layers)

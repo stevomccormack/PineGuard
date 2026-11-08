@@ -3,7 +3,7 @@ type: plan
 id: temporal-00-program
 version: 1.1
 status: active
-last_updated: 2026-09-27
+last_updated: 2026-11-08
 final_acceptance_ref: docs/ai/plans/temporal-final-fable-acceptance-2.md
 council_verdict_ref: docs/ai/plans/temporal-00-program.fable-council-transcript.md
 historical_council_verdict_ref: docs/ai/plans/temporal-00-program.council-transcript.md
@@ -23,7 +23,7 @@ council_trigger: api
 > [temporal-orchestration.md](temporal-orchestration.md). **Nothing in the phase plans asks an
 > implementer to decide anything.** Where a choice exists, this charter has already made it, or §3
 > records the final Astra direction and mandatory Brain execution gates.
-> **Repos**: `stevomccormack/PineGuard` (this repo) and `+ stevomccormack/PineGuard.Standards` (sibling,
+> **Repos**: `stevomccormack/PineGuard` (this repo) and [PineGuard.Standards](https://github.com/stevomccormack/PineGuard.Standards) (sibling,
 > `D:\Steve McCormack\GitHub\@stevomccormack\PineGuard.Standards`). Both repos do all work in
 > `.claude/worktrees/<slug>` on `feature/<slug>`.
 

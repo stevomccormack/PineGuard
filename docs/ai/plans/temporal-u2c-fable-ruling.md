@@ -8,7 +8,7 @@ last_updated: 2026-09-27
 
 # T1-U2c — Fable Ruling Receipt (String DateOnly consumers of guarded calendar references)
 
-> Binding ruling: [`artifacts/reviews/T1-U2-U2b-string-followup-ruling.json`](../../artifacts/reviews/T1-U2-U2b-string-followup-ruling.json)
+> Binding ruling: [`artifacts/reviews/T1-U2-U2b-string-followup-ruling.json`](../../../artifacts/reviews/T1-U2-U2b-string-followup-ruling.json)
 > (Claude Fable 5.1, generated 2026-09-27T02:16:17Z). Full unit specification:
 > [temporal-01-foundation.md §3 "U2c"](temporal-01-foundation.md). Tracker row:
 > [temporal-orchestration.md §1](temporal-orchestration.md).
@@ -51,3 +51,5 @@ and before any T-04 string-DateOnly work.
 
 **Pending.** Implementation and acceptance are pending; nothing in this receipt or the linked
 plan/tracker sections marks any code done.
+
+> Supersession note (2026-11-08): U2c was subsequently committed on codex/temporal-foundation as 5215b65 and is recorded as Committed in temporal-orchestration.md.

@@ -40,7 +40,7 @@ It exited 0 and previewed the two owned project directories. It does not enumera
 
 - Failing-first focused tests on net10.0: 8 failed, 10 passed, 0 skipped (18 total); Fable adjudicated all eight equal-boundary twins as the expected red set.
 - After the four source complements, the same focused tests passed 18/18 on net10.0.
-- Full `GuardClauses` isolated coverage passed for both TFMs: 2,978/2,978 tests each, 3,566/3,566 lines, 1,196/1,196 branches, 57 classes. Archived reports and hashes are in [`+ t1-u4-guardclauses-coverage-20260927/manifest.json`](../../../artifacts/reviews/receipts/t1-u4-guardclauses-coverage-20260927/manifest.json).
+- Full `GuardClauses` isolated coverage passed for both TFMs: 2,978/2,978 tests each, 3,566/3,566 lines, 1,196/1,196 branches, 57 classes. Archived reports and hashes are in [`t1-u4-guardclauses-coverage-20260927/manifest.json`](../../../artifacts/reviews/receipts/t1-u4-guardclauses-coverage-20260927/manifest.json).
 - Research reports Format All passed, CompilerDiagnostics All passed with zero warnings, and Tests All passed.
 - The specialized `audit nullability` passed with Rule07=0 findings. The canonical shared `audit --gate` passed with Rule11, Rule12, and Rule50 all at zero findings.
 - Fable directly checked the live seven files against the binding scope and regression contract and returned U4 READY.

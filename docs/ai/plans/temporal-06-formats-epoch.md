@@ -3,7 +3,7 @@ type: plan
 id: temporal-06-formats-epoch
 version: 1.0
 status: planned
-last_updated: 2026-09-22
+last_updated: 2026-11-08
 -->
 
 # Plan T-06 — Phase 6: String formats (ISO 8601, RFC 3339, RFC 1123, ISO 8601 duration), `StringRules.DateTime`, Unix epoch

@@ -3,7 +3,7 @@ type: plan
 id: temporal-astra-decisions
 version: 1.0
 status: planned
-last_updated: 2026-09-26
+last_updated: 2026-11-08
 -->
 
 # Temporal program — Astra decision register

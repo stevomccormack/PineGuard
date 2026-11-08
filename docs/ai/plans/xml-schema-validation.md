@@ -1,3 +1,11 @@
+<!-- metadata_header
+type: plan
+id: xml-schema-validation
+version: 1.0
+status: completed
+last_updated: 2026-11-08
+-->
+
 # Plan — XML: Core fix and `PineGuard.Xml` schema validation
 
 **Status**: completed (merged to main 4a6e698, 2026-09-22)
