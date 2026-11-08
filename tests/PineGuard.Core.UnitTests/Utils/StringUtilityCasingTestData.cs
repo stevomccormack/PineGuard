@@ -23,10 +23,10 @@ public static class StringUtilityCasingTestData
             new("train title", ("Hello-World", StringCasing.TrainCase), true, ["Hello", "World"]),
             new("train acronym", ("NASA-Data", StringCasing.TrainCase), true, ["NASA", "Data"]),
             new("train digits", ("A1-B2", StringCasing.TrainCase), true, ["A1", "B2"]),
-            new("space", ("Hello World", StringCasing.SpaceCase), true, ["Hello", "World"]),
-            new("space leading (trimmed)", (" Hello", StringCasing.SpaceCase), true, ["Hello"]),
-            new("space trailing (trimmed)", ("Hello ", StringCasing.SpaceCase), true, ["Hello"]),
-            new("space digits", ("A1 B2", StringCasing.SpaceCase), true, ["A1", "B2"])
+            new("space", ("hello world", StringCasing.SpaceCase), true, ["hello", "world"]),
+            new("space leading (trimmed)", (" hello", StringCasing.SpaceCase), true, ["hello"]),
+            new("space trailing (trimmed)", ("hello ", StringCasing.SpaceCase), true, ["hello"]),
+            new("space digits", ("a1 b2", StringCasing.SpaceCase), true, ["a1", "b2"])
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>
@@ -49,8 +49,11 @@ public static class StringUtilityCasingTestData
             new("train not title", ("Hello-world", StringCasing.TrainCase), false, []),
             new("train lower", ("hello-World", StringCasing.TrainCase), false, []),
             new("train internal upper", ("HeLlo-World", StringCasing.TrainCase), false, []),
-            new("space double", ("Hello  World", StringCasing.SpaceCase), false, []),
-            new("space invalid char", ("Hello W@rld", StringCasing.SpaceCase), false, [])
+            new("space double", ("hello  world", StringCasing.SpaceCase), false, []),
+            new("space title rejected", ("Hello World", StringCasing.SpaceCase), false, []),
+            new("space mixed rejected", ("hELLo world", StringCasing.SpaceCase), false, []),
+            new("space tab rejected", ("hello\tworld", StringCasing.SpaceCase), false, []),
+            new("space invalid char", ("hello w@rld", StringCasing.SpaceCase), false, [])
         ];
 
         public sealed record ValidCase(string Name, (string? Value, StringCasing Style) Value, bool Expected, IReadOnlyList<string> ExpectedOutValue)
@@ -69,7 +72,7 @@ public static class StringUtilityCasingTestData
             new("kebab", (["Hello", "World"], StringCasing.KebabCase), true, "hello-world"),
             new("dot", (["Hello", "World"], StringCasing.DotCase), true, "hello.world"),
             new("train", (["hello", "world"], StringCasing.TrainCase), true, "Hello-World"),
-            new("space", (["hello", "world"], StringCasing.SpaceCase), true, "Hello World"),
+            new("space", (["Hello", "WORLD"], StringCasing.SpaceCase), true, "hello world"),
             new("camel single-char", (["x"], StringCasing.CamelCase), true, "x"),
             new("camel single-char first word with more words", (["x", "ray", "machine"], StringCasing.CamelCase), true, "xRayMachine")
         ];
@@ -94,6 +97,8 @@ public static class StringUtilityCasingTestData
             new("snake->pascal", ("hello_world", StringCasing.SnakeCase, StringCasing.PascalCase), true, "HelloWorld"),
             new("train->kebab", ("Hello-World", StringCasing.TrainCase, StringCasing.KebabCase), true, "hello-world"),
             new("camel->snake", ("helloWorld", StringCasing.CamelCase, StringCasing.SnakeCase), true, "hello_world"),
+            new("pascal->space", ("HelloWorld", StringCasing.PascalCase, StringCasing.SpaceCase), true, "hello world"),
+            new("space->pascal", ("hello world", StringCasing.SpaceCase, StringCasing.PascalCase), true, "HelloWorld"),
             new("dot->camel", ("hello.world", StringCasing.DotCase, StringCasing.CamelCase), true, "helloWorld")
         ];
 
@@ -108,11 +113,12 @@ public static class StringUtilityCasingTestData
             : TryCase<(string? Value, StringCasing InputStyle, StringCasing OutputStyle), string>(Name, Value, Expected, ExpectedOutValue);
     }
 
-    public static class ToCaseSingleStyle
+    public static class TryToCaseSingleStyle
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("snake", ("hello_world", StringCasing.SnakeCase), true, "hello_world"),
+            new("space", (" hello world ", StringCasing.SpaceCase), true, "hello world"),
             new("camel", ("helloWorld", StringCasing.CamelCase), true, "helloWorld")
         ];
 

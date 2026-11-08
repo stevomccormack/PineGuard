@@ -26,7 +26,7 @@ namespace PineGuard.Xml;
 /// way and falls back to <see cref="XmlSchemaValidationOptions.Default"/> when none is registered.
 /// </para>
 /// <para>
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// Required schema services are resolved before an optional <see langword="null"/> value is skipped.
 /// </para>
 /// </remarks>
 /// <example>
@@ -41,7 +41,7 @@ namespace PineGuard.Xml;
 /// <seealso cref="MustXmlSchemaClauses.ValidXml"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/xml-schema">XML Schema Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ValidXmlAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Xml.Schema.Mismatch)
+public sealed class ValidXmlAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Xml.Schema.Mismatch, allowNull: false)
 {
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">
@@ -55,6 +55,9 @@ public sealed class ValidXmlAttribute() : ValidationAttributeBase(typeof(string)
 
         var options = validationContext.GetService(typeof(XmlSchemaValidationOptions)) as XmlSchemaValidationOptions
             ?? XmlSchemaValidationOptions.Default;
+
+        if (value is null)
+            return ValidationResult.Success;
 
         var strValue = (string)value!;
         var result = Must.Be.ValidXml(strValue, schemas, options, paramName: null);

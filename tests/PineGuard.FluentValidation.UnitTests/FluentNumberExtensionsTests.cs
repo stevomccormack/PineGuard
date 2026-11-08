@@ -7,6 +7,27 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public sealed class FluentNumberExtensionsTests(ITestOutputHelper output) : BaseFluentUnitTest(output)
 {
+    [Theory]
+    [MemberData(nameof(FluentNumberExtensionsTestData.InvalidInclusions), MemberType = typeof(FluentNumberExtensionsTestData))]
+    public void NullValue_DoesNotHideNumericConfiguration(Inclusion inclusion)
+    {
+        // Arrange
+        var validator = new InlineValidator<DecimalModel>();
+        validator.RuleFor(x => x.Value).InRange(0m, 1m, inclusion);
+        validator.RuleFor(x => x.Value).OutOfRange(1m, 0m);
+        validator.RuleFor(x => x.Value).Approximately(0m, -1m);
+        validator.RuleFor(x => x.Value).NotApproximately(0m, null);
+        validator.RuleFor(x => x.Value).MultipleOf(0m);
+        validator.RuleFor(x => x.Value).NotMultipleOf(0m);
+
+        // Act
+        var result = validator.Validate(new DecimalModel());
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Equal(6, result.Errors.Count);
+    }
+
     private sealed record IntModel { public int? Value { get; init; } }
     private sealed record LongModel { public long? Value { get; init; } }
     private sealed record FloatModel { public float? Value { get; init; } }

@@ -13,7 +13,7 @@ public sealed class MustResultTests : BaseUnitTest
     public void Ok_SetsProperties_AndImplicitBoolConversion(MustResultTestData.Ok.IntValidCase testCase)
     {
         // Act
-        var mustResult = MustResult<int>.Ok(testCase.Result, testCase.InputValue, testCase.ParamName);
+        var mustResult = MustResult<int>.Ok(testCase.Result, value: testCase.InputValue, paramName: testCase.ParamName);
         bool asBool = mustResult;
 
         // Assert
@@ -33,10 +33,24 @@ public sealed class MustResultTests : BaseUnitTest
 
     [Theory]
     [MemberData(nameof(MustResultTestData.Ok.StringValidCases), MemberType = typeof(MustResultTestData.Ok))]
+    public void Ok_PositionalMetadataMatchesFactoryOrder(MustResultTestData.Ok.StringValidCase testCase)
+    {
+        // Act
+        var mustResult = MustResult<string?>.Ok(testCase.Result, testCase.ParamName, testCase.InputValue);
+
+        // Assert
+        Assert.True(mustResult.Success);
+        Assert.Equal(testCase.Result, mustResult.Result);
+        Assert.Equal(testCase.ParamName, mustResult.ParamName);
+        Assert.Equal(testCase.InputValue, mustResult.Value);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustResultTestData.Ok.StringValidCases), MemberType = typeof(MustResultTestData.Ok))]
     public void Ok_AllowsNullResults_ForReferenceTypes(MustResultTestData.Ok.StringValidCase testCase)
     {
         // Act
-        var mustResult = MustResult<string?>.Ok(testCase.Result, testCase.InputValue, testCase.ParamName);
+        var mustResult = MustResult<string?>.Ok(testCase.Result, value: testCase.InputValue, paramName: testCase.ParamName);
 
         // Assert
         Assert.True(mustResult.Success);

@@ -45,7 +45,7 @@ public static class StringNumberTypesAttributesTestData
         });
     }
 
-    public static class Int32InRangeStringInclusive
+    public static class InRangeInt32StringInclusive
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [
@@ -56,7 +56,7 @@ public static class StringNumberTypesAttributesTestData
         ];
     }
 
-    public static class Int32InRangeStringExclusive
+    public static class InRangeInt32StringExclusive
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [
@@ -65,7 +65,7 @@ public static class StringNumberTypesAttributesTestData
         ];
     }
 
-    public static class Int32OutOfRangeString
+    public static class OutOfRangeInt32String
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [
@@ -76,7 +76,7 @@ public static class StringNumberTypesAttributesTestData
         ];
     }
 
-    public static class Int64InRangeStringInclusive
+    public static class InRangeInt64StringInclusive
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [
@@ -87,7 +87,7 @@ public static class StringNumberTypesAttributesTestData
         ];
     }
 
-    public static class Int64InRangeStringExclusive
+    public static class InRangeInt64StringExclusive
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [
@@ -96,7 +96,7 @@ public static class StringNumberTypesAttributesTestData
         ];
     }
 
-    public static class Int64OutOfRangeString
+    public static class OutOfRangeInt64String
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [

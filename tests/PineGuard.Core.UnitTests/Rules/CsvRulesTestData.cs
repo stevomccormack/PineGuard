@@ -40,4 +40,18 @@ public static class CsvRulesTestData
             new("null header", ("1", null, new Dictionary<string, CsvColumnType> { ["a"] = CsvColumnType.Int32 }), new RuleExpected(false))
         ];
     }
+
+    public static class SchemaConfiguration
+    {
+        public static TheoryData<RuleCase<IReadOnlyList<PineGuard.Common.CsvColumnSchema>?>> Cases => F.SchemaConfiguration.InvalidScenarios.ToRuleCases();
+    }
+    public static class Separator
+    {
+        public static TheoryData<RuleCase<(string? value, char separator)>> Cases =>
+        [
+            new("semicolon quoted field", ("a;\"b;c\";d", ';'), new RuleExpected(true)),
+            new("pipe quoted field", ("a|\"b|c\"|d", '|'), new RuleExpected(true)),
+            new("wrong separator", ("a;\"b;c\";d", ','), new RuleExpected(false))
+        ];
+    }
 }

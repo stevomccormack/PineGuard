@@ -5,7 +5,7 @@ namespace PineGuard.Testing.Fixtures;
 
 public static class TimeSpanRulesFixtures
 {
-    public static class IsDurationBetween
+    public static class IsInRange
     {
         public static readonly (TimeSpan? value, TimeSpan min, TimeSpan max, Inclusion inclusion) MiddleInclusive = (TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive);
         public static readonly (TimeSpan? value, TimeSpan min, TimeSpan max, Inclusion inclusion) AtMinInclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(60), Inclusion.Inclusive);
@@ -45,73 +45,73 @@ public static class TimeSpanRulesFixtures
 
     public static class IsGreaterThan
     {
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) AboveExclusive = (TimeSpan.FromMinutes(11), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) EqualInclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Inclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) EqualExclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) BelowExclusive = (TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) NullValue = (null, TimeSpan.FromMinutes(10), Inclusion.Exclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) NullThreshold = (TimeSpan.FromMinutes(11), null, Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) AboveExclusive = (TimeSpan.FromMinutes(11), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) EqualInclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Inclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) EqualExclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) BelowExclusive = (TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) NullValue = (null, TimeSpan.FromMinutes(10), Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) NullThreshold = (TimeSpan.FromMinutes(11), null, Inclusion.Exclusive);
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] ValidScenarios =>
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] ValidScenarios =>
         [
             new(nameof(AboveExclusive), AboveExclusive, true),
             new(nameof(EqualInclusive), EqualInclusive, true)
         ];
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] ValidEdgeScenarios =>
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] ValidEdgeScenarios =>
         [
         ];
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] InvalidScenarios =>
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] InvalidScenarios =>
         [
             new(nameof(BelowExclusive), BelowExclusive, false),
             new(nameof(NullValue),      NullValue,      false),
             new(nameof(NullThreshold),  NullThreshold,  false)
         ];
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] InvalidEdgeScenarios =>
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] InvalidEdgeScenarios =>
         [
             new(nameof(EqualExclusive), EqualExclusive, false)
         ];
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
     public static class IsLessThan
     {
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) BelowExclusive = (TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) EqualInclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Inclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) EqualExclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) AboveExclusive = (TimeSpan.FromMinutes(11), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) NullValue = (null, TimeSpan.FromMinutes(10), Inclusion.Exclusive);
-        public static readonly (TimeSpan? value, TimeSpan? threshold, Inclusion inclusion) NullThreshold = (TimeSpan.FromMinutes(9), null, Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) BelowExclusive = (TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) EqualInclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Inclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) EqualExclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) AboveExclusive = (TimeSpan.FromMinutes(11), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) NullValue = (null, TimeSpan.FromMinutes(10), Inclusion.Exclusive);
+        public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) NullThreshold = (TimeSpan.FromMinutes(9), null, Inclusion.Exclusive);
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] ValidScenarios =>
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] ValidScenarios =>
         [
             new(nameof(BelowExclusive), BelowExclusive, true),
             new(nameof(EqualInclusive), EqualInclusive, true)
         ];
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] ValidEdgeScenarios =>
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] ValidEdgeScenarios =>
         [
         ];
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] InvalidScenarios =>
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] InvalidScenarios =>
         [
             new(nameof(AboveExclusive), AboveExclusive, false),
             new(nameof(NullValue),      NullValue,      false),
             new(nameof(NullThreshold),  NullThreshold,  false)
         ];
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] InvalidEdgeScenarios =>
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] InvalidEdgeScenarios =>
         [
             new(nameof(EqualExclusive), EqualExclusive, false)
         ];
 
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
-        public static RuleScenario<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
+        public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 }

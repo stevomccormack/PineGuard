@@ -17,7 +17,7 @@ public static partial class StringUtility
         /// <param name="end">The end date string. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
         /// <param name="range">
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="Common.DateOnlyRange"/>.
-        /// When <see langword="false"/>, contains <see langword="null"/>.
+        /// When <see langword="false"/>, contains the default value.
         /// </param>
         /// <returns><see langword="true"/> if both dates were parsed and form a valid range; otherwise, <see langword="false"/>.</returns>
         /// <example>
@@ -25,7 +25,7 @@ public static partial class StringUtility
         /// StringUtility.DateOnlyRange.TryParse("2024-01-01", "2024-12-31", out var range); // true
         /// </code>
         /// </example>
-        public static bool TryParse(string? start, string? end, out Common.DateOnlyRange? range)
+        public static bool TryParse(string? start, string? end, out Common.DateOnlyRange range)
             => TryParseRange(
                 start,
                 end,

@@ -52,46 +52,46 @@ public sealed class GuardStringNumberTypesClausesTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(TD.Int32OutOfRange.ValidCases), MemberType = typeof(TD.Int32OutOfRange))]
-    [MemberData(nameof(TD.Int32OutOfRange.InvalidCases), MemberType = typeof(TD.Int32OutOfRange))]
-    public void Int32OutOfRange_BehavesAsExpected(GuardCase<(string text, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.OutOfRangeInt32.ValidCases), MemberType = typeof(TD.OutOfRangeInt32))]
+    [MemberData(nameof(TD.OutOfRangeInt32.InvalidCases), MemberType = typeof(TD.OutOfRangeInt32))]
+    public void OutOfRangeInt32_BehavesAsExpected(GuardCase<(string text, int min, int max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.text;
-        var result = AssertResult(tc, () => Guard.Against.Int32OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.Int32OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.OutOfRangeInt32(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.OutOfRangeInt32(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
     [Theory]
-    [MemberData(nameof(TD.Int32InRange.ValidCases), MemberType = typeof(TD.Int32InRange))]
-    [MemberData(nameof(TD.Int32InRange.InvalidCases), MemberType = typeof(TD.Int32InRange))]
-    public void Int32InRange_BehavesAsExpected(GuardCase<(string text, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.InRangeInt32.ValidCases), MemberType = typeof(TD.InRangeInt32))]
+    [MemberData(nameof(TD.InRangeInt32.InvalidCases), MemberType = typeof(TD.InRangeInt32))]
+    public void InRangeInt32_BehavesAsExpected(GuardCase<(string text, int min, int max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.text;
-        var result = AssertResult(tc, () => Guard.Against.Int32InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.Int32InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.InRangeInt32(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.InRangeInt32(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
     [Theory]
-    [MemberData(nameof(TD.Int64OutOfRange.ValidCases), MemberType = typeof(TD.Int64OutOfRange))]
-    [MemberData(nameof(TD.Int64OutOfRange.InvalidCases), MemberType = typeof(TD.Int64OutOfRange))]
-    public void Int64OutOfRange_BehavesAsExpected(GuardCase<(string text, long min, long max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.OutOfRangeInt64.ValidCases), MemberType = typeof(TD.OutOfRangeInt64))]
+    [MemberData(nameof(TD.OutOfRangeInt64.InvalidCases), MemberType = typeof(TD.OutOfRangeInt64))]
+    public void OutOfRangeInt64_BehavesAsExpected(GuardCase<(string text, long min, long max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.text;
-        var result = AssertResult(tc, () => Guard.Against.Int64OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.Int64OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.OutOfRangeInt64(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.OutOfRangeInt64(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 
     [Theory]
-    [MemberData(nameof(TD.Int64InRange.ValidCases), MemberType = typeof(TD.Int64InRange))]
-    [MemberData(nameof(TD.Int64InRange.InvalidCases), MemberType = typeof(TD.Int64InRange))]
-    public void Int64InRange_BehavesAsExpected(GuardCase<(string text, long min, long max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.InRangeInt64.ValidCases), MemberType = typeof(TD.InRangeInt64))]
+    [MemberData(nameof(TD.InRangeInt64.InvalidCases), MemberType = typeof(TD.InRangeInt64))]
+    public void InRangeInt64_BehavesAsExpected(GuardCase<(string text, long min, long max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.text;
-        var result = AssertResult(tc, () => Guard.Against.Int64InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.Int64InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.InRangeInt64(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.InRangeInt64(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result.ToString());
     }
 }

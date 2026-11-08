@@ -1,4 +1,6 @@
+using System.Globalization;
 using PineGuard.Codes;
+using PineGuard.Common;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -255,4 +257,32 @@ public static class StringDateOnlyAttributesTestData
     }
 
     private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);
+    public static class InRangeDateOnlyStringConfiguration
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("inside", ("2024-06-01", "2024-01-01", "2024-12-31", Inclusion.Inclusive, DateTimeStyles.None), new(true, Code: MustCodes.Date.Range.OutOfRange)),
+            new("outside", ("2025-01-01", "2024-01-01", "2024-12-31", Inclusion.Inclusive, DateTimeStyles.None), new(false, Code: MustCodes.Date.Range.OutOfRange)),
+            new("boundary-exclusive", ("2024-01-01", "2024-01-01", "2024-12-31", Inclusion.Exclusive, DateTimeStyles.None), new(false, Code: MustCodes.Date.Range.OutOfRange)),
+            new("malformed", ("bad", "2024-01-01", "2024-12-31", Inclusion.Inclusive, DateTimeStyles.None), new(false, Code: MustCodes.Date.Range.OutOfRange)),
+            new("null", ((string?)null, "2024-01-01", "2024-12-31", Inclusion.Inclusive, DateTimeStyles.None), new(true, Code: MustCodes.Date.Range.OutOfRange)),
+            new("reversed", ("2024-06-01", "2024-12-31", "2024-01-01", Inclusion.Inclusive, DateTimeStyles.None), new(false, Code: MustCodes.Date.Range.OutOfRange)),
+            new("invalid-inclusion", ("bad", "2024-01-01", "2024-12-31", (Inclusion)999, DateTimeStyles.None), new(false, Code: MustCodes.Date.Range.OutOfRange)),
+            new("invalid-styles", ("bad", "2024-01-01", "2024-12-31", Inclusion.Inclusive, (DateTimeStyles)999), new(false, Code: MustCodes.Date.Range.OutOfRange))
+        ];
+    }
+    public static class OutOfRangeDateOnlyStringConfiguration
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("inside", ("2024-06-01", "2024-01-01", "2024-12-31", Inclusion.Inclusive, DateTimeStyles.None), new(false, Code: MustCodes.Date.Range.InRange)),
+            new("outside", ("2025-01-01", "2024-01-01", "2024-12-31", Inclusion.Inclusive, DateTimeStyles.None), new(true, Code: MustCodes.Date.Range.InRange)),
+            new("boundary-exclusive", ("2024-01-01", "2024-01-01", "2024-12-31", Inclusion.Exclusive, DateTimeStyles.None), new(true, Code: MustCodes.Date.Range.InRange)),
+            new("malformed", ("bad", "2024-01-01", "2024-12-31", Inclusion.Inclusive, DateTimeStyles.None), new(false, Code: MustCodes.Date.Range.InRange)),
+            new("null", ((string?)null, "2024-01-01", "2024-12-31", Inclusion.Inclusive, DateTimeStyles.None), new(true, Code: MustCodes.Date.Range.InRange)),
+            new("reversed", ("2024-06-01", "2024-12-31", "2024-01-01", Inclusion.Inclusive, DateTimeStyles.None), new(false, Code: MustCodes.Date.Range.InRange)),
+            new("invalid-inclusion", ("bad", "2024-01-01", "2024-12-31", (Inclusion)999, DateTimeStyles.None), new(false, Code: MustCodes.Date.Range.InRange)),
+            new("invalid-styles", ("bad", "2024-01-01", "2024-12-31", Inclusion.Inclusive, (DateTimeStyles)999), new(false, Code: MustCodes.Date.Range.InRange))
+        ];
+    }
 }

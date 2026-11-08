@@ -113,4 +113,25 @@ public static class CollectionUtilityTestData
         public sealed record ValidCase(string Name, (IEnumerable<int>? Collection, int Item) Value, bool Expected, int ExpectedOutValue)
             : TryCase<(IEnumerable<int>? Collection, int Item), int>(Name, Value, Expected, ExpectedOutValue);
     }
+
+    public sealed record NonNullItemsCase<T>(string Name, T?[]? Value, bool Expected, T[]? ExpectedOutValue)
+        : TryCase<T?[]?, T[]?>(Name, Value, Expected, ExpectedOutValue) where T : struct;
+
+    public static TheoryData<NonNullItemsCase<int>> NonNullValueItems =>
+    [
+        new("Null collection", null, false, null), new("Empty", [], true, []),
+        new("Values and duplicates", [1, 1, 2], true, [1, 1, 2]),
+        new("Null element", [null], false, null), new("Mixed elements", [1, null, 2], false, null),
+    ];
+
+    public sealed record NonNullReferenceItemsCase(string Name, string?[]? Value, bool Expected, string[]? ExpectedOutValue)
+        : TryCase<string?[]?, string[]?>(Name, Value, Expected, ExpectedOutValue);
+
+    public static TheoryData<NonNullReferenceItemsCase> NonNullReferenceItems =>
+    [
+        new("Null collection", null, false, null), new("Empty", [], true, []),
+        new("Values and duplicates", ["a", "a", "b"], true, ["a", "a", "b"]),
+        new("Null element", [null], false, null), new("Mixed elements", ["a", null, "b"], false, null),
+    ];
+
 }

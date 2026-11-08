@@ -102,7 +102,7 @@ public static class FluentDateTimeOffsetExtensionsTestData
         ];
     }
 
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<FluentCase<(DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max)>> Cases =>
         [
@@ -113,7 +113,7 @@ public static class FluentDateTimeOffsetExtensionsTestData
         ];
     }
 
-    public static class NotBetween
+    public static class OutOfRange
     {
         public static TheoryData<FluentCase<(DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max)>> Cases =>
         [
@@ -420,7 +420,7 @@ public static class FluentDateTimeOffsetExtensionsTestData
         ];
     }
 
-    public static class BetweenNonNullable
+    public static class InRangeNonNullable
     {
         public static TheoryData<FluentCase<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max)>> Cases =>
         [
@@ -429,7 +429,7 @@ public static class FluentDateTimeOffsetExtensionsTestData
         ];
     }
 
-    public static class NotBetweenNonNullable
+    public static class OutOfRangeNonNullable
     {
         public static TheoryData<FluentCase<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max)>> Cases =>
         [

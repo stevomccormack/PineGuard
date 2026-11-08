@@ -91,23 +91,23 @@ public static class FluentCollectionExtensionsTestData
         });
     }
 
-    public static class HasCountBetween
+    public static class HasCountInRange
     {
-        public static TheoryData<FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> Cases => F.HasCountBetween.AllScenarios.ToFluentCases(s => s.Name switch
+        public static TheoryData<FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> Cases => F.HasCountInRange.AllScenarios.ToFluentCases(s => s.Name switch
         {
             _ when s.IsValid => new FluentExpected(true),
-            nameof(F.HasCountBetween.NullTwoFourInclusive) => new FluentExpected(false, "Value must not be null."),
+            nameof(F.HasCountInRange.NullTwoFourInclusive) => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must have a count within the expected range.")
         });
     }
 
-    public static class NotHasCountBetween
+    public static class NotHasCountInRange
     {
-        public static TheoryData<FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> Cases => F.HasCountBetween.AllScenarios.ToFluentCases(s => s.Name switch
+        public static TheoryData<FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> Cases => F.HasCountInRange.AllScenarios.ToFluentCases(s => s.Name switch
         {
-            nameof(F.HasCountBetween.MultipleTwoFourInclusive) => new FluentExpected(false, "Value must not have a count within the expected range."),
-            nameof(F.HasCountBetween.MultipleThreeThreeInclusive) => new FluentExpected(false, "Value must not have a count within the expected range."),
-            nameof(F.HasCountBetween.NullTwoFourInclusive) => new FluentExpected(false, "Value must not be null."),
+            nameof(F.HasCountInRange.MultipleTwoFourInclusive) => new FluentExpected(false, "Value must not have a count within the expected range."),
+            nameof(F.HasCountInRange.MultipleThreeThreeInclusive) => new FluentExpected(false, "Value must not have a count within the expected range."),
+            nameof(F.HasCountInRange.NullTwoFourInclusive) => new FluentExpected(true),
             _ => new FluentExpected(true)
         });
     }
@@ -137,7 +137,7 @@ public static class FluentCollectionExtensionsTestData
         public static TheoryData<FluentCase<IEnumerable<string?>>> Cases => F.ContainsNullItems.AllScenarios.ToFluentCases(s => s.Name switch
         {
             "WithNull" => new FluentExpected(false, "Value must not contain any null items."),
-            "NullCollection" => new FluentExpected(false, "Value must not be null."),
+            "NullCollection" => new FluentExpected(true),
             _ => new FluentExpected(true)
         });
     }
@@ -147,7 +147,7 @@ public static class FluentCollectionExtensionsTestData
         public static TheoryData<FluentCase<(IEnumerable<string>? value, string item)>> Cases => F.Contains.AllScenarios.ToFluentCases(s => s.Name switch
         {
             _ when s.IsValid => new FluentExpected(true),
-            nameof(F.Contains.NullA) => new FluentExpected(false, "Value must not be null."),
+            nameof(F.Contains.NullA) => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must contain the specified item.")
         });
     }
@@ -157,7 +157,7 @@ public static class FluentCollectionExtensionsTestData
         public static TheoryData<FluentCase<(IEnumerable<string>? value, string item)>> Cases => F.Contains.AllScenarios.ToFluentCases(s => s.Name switch
         {
             nameof(F.Contains.MultipleA) => new FluentExpected(false, "Value must not contain the specified item."),
-            nameof(F.Contains.NullA) => new FluentExpected(false, "Value must not be null."),
+            nameof(F.Contains.NullA) => new FluentExpected(true),
             _ => new FluentExpected(true)
         });
     }
@@ -167,7 +167,7 @@ public static class FluentCollectionExtensionsTestData
         public static TheoryData<FluentCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> Cases => F.IsSubsetOf.AllScenarios.ToFluentCases(s => s.Name switch
         {
             _ when s.IsValid => new FluentExpected(true),
-            nameof(F.IsSubsetOf.NullMultiple) => new FluentExpected(false, "Value must not be null."),
+            nameof(F.IsSubsetOf.NullMultiple) => new FluentExpected(true),
             nameof(F.IsSubsetOf.MultipleNull) => new FluentExpected(false, "other must not be null."),
             _ => new FluentExpected(false, "Value must be a subset of the other collection.")
         });
@@ -178,7 +178,7 @@ public static class FluentCollectionExtensionsTestData
         public static TheoryData<FluentCase<(IEnumerable<string>? value, IEnumerable<string>? other)>> Cases => F.IsSubsetOf.AllScenarios.ToFluentCases(s => s.Name switch
         {
             nameof(F.IsSubsetOf.SingleMultiple) => new FluentExpected(false, "Value must not be a subset of the other collection."),
-            nameof(F.IsSubsetOf.NullMultiple) => new FluentExpected(false, "Value must not be null."),
+            nameof(F.IsSubsetOf.NullMultiple) => new FluentExpected(true),
             nameof(F.IsSubsetOf.MultipleNull) => new FluentExpected(false, "other must not be null."),
             _ => new FluentExpected(true)
         });
@@ -274,4 +274,18 @@ public static class FluentCollectionExtensionsTestData
             _ => new FluentExpected(false, "Value must not have all items match the predicate.")
         });
     }
+
+    public static TheoryData<FluentCase<int?[]?>> NullableValueItems => F.NonNullValueItems.AllScenarios.ToFluentCases(s => new(s.Inputs is null || s.IsValid));
+    public static TheoryData<FluentCase<string[]>> ComparerItems => [new("Explicit comparer", ["ABC"], new(true))];
+
+
+    public static TheoryData<FluentCase<(IEnumerable<string>? Other, int Min, int Max, Inclusion Inclusion)>> NullValueConfiguration =>
+    [
+        new("Valid configuration skips null", (["a"], 0, 2, Inclusion.Inclusive), new(true)),
+        new("Missing other remains invalid", (null, 0, 2, Inclusion.Inclusive), new(false)),
+        new("Undefined inclusion remains invalid", (["a"], 0, 2, (Inclusion)99), new(false)),
+        new("Negative minimum remains invalid", (["a"], -1, 2, Inclusion.Inclusive), new(false)),
+        new("Reversed bounds remain invalid", (["a"], 2, 1, Inclusion.Inclusive), new(false)),
+    ];
+
 }

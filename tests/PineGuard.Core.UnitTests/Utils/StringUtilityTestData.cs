@@ -121,14 +121,14 @@ public static class StringUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("null", null, false, null),
-            new("empty", "", false, null),
-            new("whitespace", "   ", false, null),
-            new("not a bool", "yes", false, null)
+            new("null", null, false, false),
+            new("empty", "", false, false),
+            new("whitespace", "   ", false, false),
+            new("not a bool", "yes", false, false)
         ];
 
-        public sealed record ValidCase(string Name, string? Value, bool Expected, bool? ExpectedOutValue)
-            : TryCase<string?, bool?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, string? Value, bool Expected, bool ExpectedOutValue)
+            : TryCase<string?, bool>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class TimeOnlyTryParse
@@ -141,15 +141,15 @@ public static class StringUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("null", null, false, null),
-            new("empty", string.Empty, false, null),
-            new("space", " ", false, null),
-            new("whitespace", "\t\r\n", false, null),
-            new("invalid", "not-a-time", false, null)
+            new("null", null, false, default),
+            new("empty", string.Empty, false, default),
+            new("space", " ", false, default),
+            new("whitespace", "\t\r\n", false, default),
+            new("invalid", "not-a-time", false, default)
         ];
 
-        public sealed record ValidCase(string Name, string? Value, bool Expected, TimeOnly? ExpectedOutValue)
-            : TryCase<string?, TimeOnly?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, string? Value, bool Expected, TimeOnly ExpectedOutValue)
+            : TryCase<string?, TimeOnly>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class TimeSpanTryParse
@@ -162,15 +162,15 @@ public static class StringUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("null", null, false, null),
-            new("empty", string.Empty, false, null),
-            new("space", " ", false, null),
-            new("whitespace", "\t\r\n", false, null),
-            new("invalid", "not-a-timespan", false, null)
+            new("null", null, false, default),
+            new("empty", string.Empty, false, default),
+            new("space", " ", false, default),
+            new("whitespace", "\t\r\n", false, default),
+            new("invalid", "not-a-timespan", false, default)
         ];
 
-        public sealed record ValidCase(string Name, string? Value, bool Expected, TimeSpan? ExpectedOutValue)
-            : TryCase<string?, TimeSpan?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, string? Value, bool Expected, TimeSpan ExpectedOutValue)
+            : TryCase<string?, TimeSpan>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class DateTimeOffsetTryParse
@@ -184,14 +184,14 @@ public static class StringUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("null", null, false, null),
-            new("empty", string.Empty, false, null),
-            new("whitespace", "\t\r\n", false, null),
-            new("invalid", "not-a-datetimeoffset", false, null)
+            new("null", null, false, default),
+            new("empty", string.Empty, false, default),
+            new("whitespace", "\t\r\n", false, default),
+            new("invalid", "not-a-datetimeoffset", false, default)
         ];
 
-        public sealed record ValidCase(string Name, string? Value, bool Expected, DateTimeOffset? ExpectedOutValue)
-            : TryCase<string?, DateTimeOffset?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, string? Value, bool Expected, DateTimeOffset ExpectedOutValue)
+            : TryCase<string?, DateTimeOffset>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class DateOnlyRangeTryParse
@@ -204,17 +204,17 @@ public static class StringUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("start null", (null, "2020-01-01"), false, null),
-            new("start whitespace", (" ", "2020-01-01"), false, null),
-            new("end null", ("2020-01-01", null), false, null),
-            new("end whitespace", ("2020-01-01", "\t\r\n"), false, null),
-            new("start invalid", ("not-a-date", "2020-01-01"), false, null),
-            new("end invalid", ("2020-01-01", "not-a-date"), false, null),
-            new("start after end", ("2020-01-02", "2020-01-01"), false, null)
+            new("start null", (null, "2020-01-01"), false, default),
+            new("start whitespace", (" ", "2020-01-01"), false, default),
+            new("end null", ("2020-01-01", null), false, default),
+            new("end whitespace", ("2020-01-01", "\t\r\n"), false, default),
+            new("start invalid", ("not-a-date", "2020-01-01"), false, default),
+            new("end invalid", ("2020-01-01", "not-a-date"), false, default),
+            new("start after end", ("2020-01-02", "2020-01-01"), false, default)
         ];
 
-        public sealed record ValidCase(string Name, (string? Start, string? End) Value, bool Expected, DateOnlyRange? ExpectedOutValue)
-            : TryCase<(string? Start, string? End), DateOnlyRange?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, (string? Start, string? End) Value, bool Expected, DateOnlyRange ExpectedOutValue)
+            : TryCase<(string? Start, string? End), DateOnlyRange>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class TimeOnlyRangeTryParse
@@ -227,17 +227,17 @@ public static class StringUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("start null", (null, "09:00:00"), false, null),
-            new("start whitespace", (" ", "09:00:00"), false, null),
-            new("end null", ("09:00:00", null), false, null),
-            new("end whitespace", ("09:00:00", "\t\r\n"), false, null),
-            new("start invalid", ("not-a-time", "09:00:00"), false, null),
-            new("end invalid", ("09:00:00", "not-a-time"), false, null),
-            new("start after end", ("10:00:00", "09:00:00"), false, null)
+            new("start null", (null, "09:00:00"), false, default),
+            new("start whitespace", (" ", "09:00:00"), false, default),
+            new("end null", ("09:00:00", null), false, default),
+            new("end whitespace", ("09:00:00", "\t\r\n"), false, default),
+            new("start invalid", ("not-a-time", "09:00:00"), false, default),
+            new("end invalid", ("09:00:00", "not-a-time"), false, default),
+            new("start after end", ("10:00:00", "09:00:00"), false, default)
         ];
 
-        public sealed record ValidCase(string Name, (string? Start, string? End) Value, bool Expected, TimeOnlyRange? ExpectedOutValue)
-            : TryCase<(string? Start, string? End), TimeOnlyRange?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, (string? Start, string? End) Value, bool Expected, TimeOnlyRange ExpectedOutValue)
+            : TryCase<(string? Start, string? End), TimeOnlyRange>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class DateTimeRangeTryParse
@@ -252,17 +252,17 @@ public static class StringUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("start null", (null, "2020-01-01T00:00:00.0000000Z"), false, null),
-            new("start whitespace", (" ", "2020-01-01T00:00:00.0000000Z"), false, null),
-            new("end null", ("2020-01-01T00:00:00.0000000Z", null), false, null),
-            new("end whitespace", ("2020-01-01T00:00:00.0000000Z", "\t\r\n"), false, null),
-            new("start invalid", ("not-a-datetime", "2020-01-01T00:00:00.0000000Z"), false, null),
-            new("end invalid", ("2020-01-01T00:00:00.0000000Z", "not-a-datetime"), false, null),
-            new("start after end", ("2020-01-01T00:00:01.0000000Z", "2020-01-01T00:00:00.0000000Z"), false, null)
+            new("start null", (null, "2020-01-01T00:00:00.0000000Z"), false, default),
+            new("start whitespace", (" ", "2020-01-01T00:00:00.0000000Z"), false, default),
+            new("end null", ("2020-01-01T00:00:00.0000000Z", null), false, default),
+            new("end whitespace", ("2020-01-01T00:00:00.0000000Z", "\t\r\n"), false, default),
+            new("start invalid", ("not-a-datetime", "2020-01-01T00:00:00.0000000Z"), false, default),
+            new("end invalid", ("2020-01-01T00:00:00.0000000Z", "not-a-datetime"), false, default),
+            new("start after end", ("2020-01-01T00:00:01.0000000Z", "2020-01-01T00:00:00.0000000Z"), false, default)
         ];
 
-        public sealed record ValidCase(string Name, (string? Start, string? End) Value, bool Expected, DateTimeRange? ExpectedOutValue)
-            : TryCase<(string? Start, string? End), DateTimeRange?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, (string? Start, string? End) Value, bool Expected, DateTimeRange ExpectedOutValue)
+            : TryCase<(string? Start, string? End), DateTimeRange>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class DateTimeOffsetRangeTryParse
@@ -276,17 +276,17 @@ public static class StringUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("start null", (null, "2020-01-01T00:00:00.0000000+00:00"), false, null),
-            new("start whitespace", (" ", "2020-01-01T00:00:00.0000000+00:00"), false, null),
-            new("end null", ("2020-01-01T00:00:00.0000000+00:00", null), false, null),
-            new("end whitespace", ("2020-01-01T00:00:00.0000000+00:00", "\t\r\n"), false, null),
-            new("start invalid", ("not-a-datetimeoffset", "2020-01-01T00:00:00.0000000+00:00"), false, null),
-            new("end invalid", ("2020-01-01T00:00:00.0000000+00:00", "not-a-datetimeoffset"), false, null),
-            new("start after end", ("2020-01-01T00:00:01.0000000+00:00", "2020-01-01T00:00:00.0000000+00:00"), false, null)
+            new("start null", (null, "2020-01-01T00:00:00.0000000+00:00"), false, default),
+            new("start whitespace", (" ", "2020-01-01T00:00:00.0000000+00:00"), false, default),
+            new("end null", ("2020-01-01T00:00:00.0000000+00:00", null), false, default),
+            new("end whitespace", ("2020-01-01T00:00:00.0000000+00:00", "\t\r\n"), false, default),
+            new("start invalid", ("not-a-datetimeoffset", "2020-01-01T00:00:00.0000000+00:00"), false, default),
+            new("end invalid", ("2020-01-01T00:00:00.0000000+00:00", "not-a-datetimeoffset"), false, default),
+            new("start after end", ("2020-01-01T00:00:01.0000000+00:00", "2020-01-01T00:00:00.0000000+00:00"), false, default)
         ];
 
-        public sealed record ValidCase(string Name, (string? Start, string? End) Value, bool Expected, DateTimeOffsetRange? ExpectedOutValue)
-            : TryCase<(string? Start, string? End), DateTimeOffsetRange?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, (string? Start, string? End) Value, bool Expected, DateTimeOffsetRange ExpectedOutValue)
+            : TryCase<(string? Start, string? End), DateTimeOffsetRange>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class TryCreateRegex

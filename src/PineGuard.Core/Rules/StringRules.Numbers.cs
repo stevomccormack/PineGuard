@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 using System.Globalization;
 using PineGuard.Common;
 using PineGuard.Utils;
@@ -26,7 +25,7 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed value is positive; otherwise, <see langword="false"/>.</returns>
         public static bool IsPositive(string? value, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsPositive<decimal>(parsed);
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsPositive(parsed);
 
         /// <summary>
         /// Determines whether the specified string parses to a negative number (less than zero).
@@ -35,7 +34,7 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed value is negative; otherwise, <see langword="false"/>.</returns>
         public static bool IsNegative(string? value, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsNegative<decimal>(parsed);
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsNegative(parsed);
 
         /// <summary>
         /// Determines whether the specified string parses to exactly zero.
@@ -44,7 +43,7 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed value is zero; otherwise, <see langword="false"/>.</returns>
         public static bool IsZero(string? value, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsZero<decimal>(parsed);
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsZero(parsed);
 
         /// <summary>
         /// Determines whether the specified string parses to a number that is not zero.
@@ -53,7 +52,7 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed value is not zero; otherwise, <see langword="false"/>.</returns>
         public static bool IsNotZero(string? value, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsNotZero<decimal>(parsed);
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsNotZero(parsed);
 
         /// <summary>
         /// Determines whether the specified string parses to zero or a positive number.
@@ -62,7 +61,7 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed value is &gt;= zero; otherwise, <see langword="false"/>.</returns>
         public static bool IsZeroOrPositive(string? value, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsZeroOrPositive<decimal>(parsed);
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsZeroOrPositive(parsed);
 
         /// <summary>
         /// Determines whether the specified string parses to zero or a negative number.
@@ -71,47 +70,47 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed value is &lt;= zero; otherwise, <see langword="false"/>.</returns>
         public static bool IsZeroOrNegative(string? value, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsZeroOrNegative<decimal>(parsed);
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsZeroOrNegative(parsed);
 
         /// <summary>
-        /// Determines whether the specified string parses to a number greater than <paramref name="min"/>.
+        /// Determines whether the specified string parses to a number greater than <paramref name="other"/>.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid number, returns <see langword="false"/>.</param>
-        /// <param name="min">The exclusive lower bound.</param>
+        /// <param name="other">The exclusive lower bound.</param>
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
-        /// <returns><see langword="true"/> if the parsed value &gt; <paramref name="min"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool IsGreaterThan(string? value, decimal min, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsGreaterThan(parsed, min);
+        /// <returns><see langword="true"/> if the parsed value &gt; <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+        public static bool IsGreaterThan(string? value, decimal other, NumberStyles styles = DefaultStyles) =>
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsGreaterThan(parsed, other);
 
         /// <summary>
-        /// Determines whether the specified string parses to a number greater than or equal to <paramref name="min"/>.
+        /// Determines whether the specified string parses to a number greater than or equal to <paramref name="other"/>.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid number, returns <see langword="false"/>.</param>
-        /// <param name="min">The inclusive lower bound.</param>
+        /// <param name="other">The inclusive lower bound.</param>
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
-        /// <returns><see langword="true"/> if the parsed value &gt;= <paramref name="min"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool IsGreaterThanOrEqual(string? value, decimal min, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsGreaterThanOrEqual(parsed, min);
+        /// <returns><see langword="true"/> if the parsed value &gt;= <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+        public static bool IsGreaterThanOrEqual(string? value, decimal other, NumberStyles styles = DefaultStyles) =>
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsGreaterThanOrEqual(parsed, other);
 
         /// <summary>
-        /// Determines whether the specified string parses to a number less than <paramref name="max"/>.
+        /// Determines whether the specified string parses to a number less than <paramref name="other"/>.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid number, returns <see langword="false"/>.</param>
-        /// <param name="max">The exclusive upper bound.</param>
+        /// <param name="other">The exclusive upper bound.</param>
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
-        /// <returns><see langword="true"/> if the parsed value &lt; <paramref name="max"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool IsLessThan(string? value, decimal max, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsLessThan(parsed, max);
+        /// <returns><see langword="true"/> if the parsed value &lt; <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+        public static bool IsLessThan(string? value, decimal other, NumberStyles styles = DefaultStyles) =>
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsLessThan(parsed, other);
 
         /// <summary>
-        /// Determines whether the specified string parses to a number less than or equal to <paramref name="max"/>.
+        /// Determines whether the specified string parses to a number less than or equal to <paramref name="other"/>.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid number, returns <see langword="false"/>.</param>
-        /// <param name="max">The inclusive upper bound.</param>
+        /// <param name="other">The inclusive upper bound.</param>
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
-        /// <returns><see langword="true"/> if the parsed value &lt;= <paramref name="max"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool IsLessThanOrEqual(string? value, decimal max, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsLessThanOrEqual(parsed, max);
+        /// <returns><see langword="true"/> if the parsed value &lt;= <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+        public static bool IsLessThanOrEqual(string? value, decimal other, NumberStyles styles = DefaultStyles) =>
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsLessThanOrEqual(parsed, other);
 
         /// <summary>
         /// Determines whether the specified string parses to a number within [<paramref name="min"/>, <paramref name="max"/>].
@@ -122,8 +121,14 @@ public static partial class StringRules
         /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed value is within the range; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInRange(string? value, decimal min, decimal max, Inclusion inclusion = Inclusion.Inclusive, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsInRange(parsed, min, max, inclusion);
+        /// <exception cref="ArgumentOutOfRangeException">The inclusion value is undefined, regardless of the input value.</exception>
+        public static bool IsInRange(string? value, decimal min, decimal max, Inclusion inclusion = Inclusion.Inclusive, NumberStyles styles = DefaultStyles)
+        {
+            if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+                throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null);
+
+            return StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsInRange(parsed, min, max, inclusion);
+        }
 
         /// <summary>
         /// Determines whether the specified string parses to a percentage — between
@@ -133,7 +138,7 @@ public static partial class StringRules
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed value is within 0–100; otherwise, <see langword="false"/>.</returns>
         public static bool IsPercentage(string? value, NumberStyles styles = DefaultStyles) =>
-            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsPercentage<decimal>(parsed);
+            StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture) && NumberRules.IsPercentage(parsed);
 
         /// <summary>
         /// Determines whether the specified string parses to a number approximately equal to <paramref name="target"/>.
@@ -218,4 +223,3 @@ public static partial class StringRules
             StringUtility.NumberTypes.TryParseDouble(value, out var d, styles, CultureInfo.InvariantCulture) && NumberRules.IsNaN(d);
     }
 }
-#endif

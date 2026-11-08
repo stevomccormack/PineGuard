@@ -53,11 +53,11 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
     }
 
     [Theory]
-    [MemberData(nameof(DateTimeOffsetRulesTestData.IsBetween.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(RuleCase<(DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
+    [MemberData(nameof(DateTimeOffsetRulesTestData.IsInRange.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsInRange))]
+    public void IsInRange_BehavesAsExpected(RuleCase<(DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = DateTimeOffsetRules.IsBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = DateTimeOffsetRules.IsInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);
@@ -65,7 +65,7 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
 
     [Theory]
     [MemberData(nameof(DateTimeOffsetRulesTestData.IsBefore.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsBefore))]
-    public void IsBefore_BehavesAsExpected(RuleCase<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)> tc)
+    public void IsBefore_BehavesAsExpected(RuleCase<(DateTimeOffset? value, DateTimeOffset other, Inclusion inclusion, DateTimePrecision? precision)> tc)
     {
         // Act
         var result = DateTimeOffsetRules.IsBefore(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
@@ -76,7 +76,7 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
 
     [Theory]
     [MemberData(nameof(DateTimeOffsetRulesTestData.IsBeforeDefaultInclusion.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsBeforeDefaultInclusion))]
-    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(DateTimeOffset? value, DateTimeOffset? other)> tc)
+    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(DateTimeOffset? value, DateTimeOffset other)> tc)
     {
         // Act
         var result = DateTimeOffsetRules.IsBefore(tc.Value.value, tc.Value.other);
@@ -87,7 +87,7 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
 
     [Theory]
     [MemberData(nameof(DateTimeOffsetRulesTestData.IsAfter.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsAfter))]
-    public void IsAfter_BehavesAsExpected(RuleCase<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)> tc)
+    public void IsAfter_BehavesAsExpected(RuleCase<(DateTimeOffset? value, DateTimeOffset other, Inclusion inclusion, DateTimePrecision? precision)> tc)
     {
         // Act
         var result = DateTimeOffsetRules.IsAfter(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
@@ -98,7 +98,7 @@ public sealed class DateTimeOffsetRulesTests(ITestOutputHelper output) : BaseRul
 
     [Theory]
     [MemberData(nameof(DateTimeOffsetRulesTestData.IsAfterDefaultInclusion.Cases), MemberType = typeof(DateTimeOffsetRulesTestData.IsAfterDefaultInclusion))]
-    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(DateTimeOffset? value, DateTimeOffset? other)> tc)
+    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(DateTimeOffset? value, DateTimeOffset other)> tc)
     {
         // Act
         var result = DateTimeOffsetRules.IsAfter(tc.Value.value, tc.Value.other);

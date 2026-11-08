@@ -12,7 +12,7 @@ public static class TimeOnlyAttributesTestData
     private static readonly TimeOnly T0830 = F.IsKnownTimes.T0830!.Value;
     private static readonly TimeOnly T0930 = F.IsKnownTimes.T0930!.Value;
 
-    public static class BetweenTimeOnly
+    public static class InRangeTimeOnly
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [
@@ -22,7 +22,7 @@ public static class TimeOnlyAttributesTestData
         ];
     }
 
-    public static class NotBetweenTimeOnly
+    public static class OutOfRangeTimeOnly
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [

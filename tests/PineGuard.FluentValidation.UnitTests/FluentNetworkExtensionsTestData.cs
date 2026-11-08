@@ -9,6 +9,8 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public static class FluentNetworkExtensionsTestData
 {
+    public static TheoryData<string> InvalidCidrConfiguration => ["", "invalid", "192.168.1.0/99"];
+
     public static class IpAddress
     {
         public static TheoryData<FluentCase<string?>> Cases => F.IsIpAddress.AllScenarios.ToFluentCases(s => s.Name switch
@@ -85,87 +87,11 @@ public static class FluentNetworkExtensionsTestData
         }
     }
 
-    public static class IpAddressString
-    {
-        public static TheoryData<FluentCase<string?>> Cases => F.IsIpAddress.AllScenarios.ToFluentCases(s => s.Name switch
-        {
-            nameof(F.IsIpAddress.Null) => new FluentExpected(false, "Value must not be null."),
-            _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a valid IP address.")
-        });
-    }
-
-    public static class NotIpAddressString
-    {
-        public static TheoryData<FluentCase<string?>> Cases => F.IsIpAddress.AllScenarios.ToFluentCases(s => s.Name switch
-        {
-            nameof(F.IsIpAddress.Null) => new FluentExpected(false, "Value must not be null."),
-            _ when s.IsValid => new FluentExpected(false, "Value must not be a valid IP address."),
-            _ => new FluentExpected(true)
-        });
-    }
-
-    public static class Ipv4String
-    {
-        public static TheoryData<FluentCase<string?>> Cases
-        {
-            get
-            {
-                var td = F.IsIpv4.AllScenarios.ToFluentCases(s =>
-                    s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be a valid IPv4 address."));
-                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(false, "Value must not be null.")));
-                return td;
-            }
-        }
-    }
-
-    public static class NotIpv4String
-    {
-        public static TheoryData<FluentCase<string?>> Cases
-        {
-            get
-            {
-                var td = F.IsIpv4.AllScenarios.ToFluentCases(s =>
-                    s.IsValid ? new FluentExpected(false, "Value must not be a valid IPv4 address.") : new FluentExpected(true));
-                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(false, "Value must not be null.")));
-                return td;
-            }
-        }
-    }
-
-    public static class Ipv6String
-    {
-        public static TheoryData<FluentCase<string?>> Cases
-        {
-            get
-            {
-                var td = F.IsIpv6.AllScenarios.ToFluentCases(s =>
-                    s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be a valid IPv6 address."));
-                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(false, "Value must not be null.")));
-                return td;
-            }
-        }
-    }
-
-    public static class NotIpv6String
-    {
-        public static TheoryData<FluentCase<string?>> Cases
-        {
-            get
-            {
-                var td = F.IsIpv6.AllScenarios.ToFluentCases(s =>
-                    s.IsValid ? new FluentExpected(false, "Value must not be a valid IPv6 address.") : new FluentExpected(true));
-                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(false, "Value must not be null.")));
-                return td;
-            }
-        }
-    }
-
     public static class Hostname
     {
-        public static TheoryData<FluentCase<string?>> Cases => F.IsValidHostname.AllScenarios.ToFluentCases(s => s.Name switch
+        public static TheoryData<FluentCase<string?>> Cases => F.IsHostname.AllScenarios.ToFluentCases(s => s.Name switch
         {
-            nameof(F.IsValidHostname.Null) => new FluentExpected(false, "Value must not be null."),
+            nameof(F.IsHostname.Null) => new FluentExpected(false, "Value must not be null."),
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must be a valid hostname.")
         });
@@ -173,9 +99,9 @@ public static class FluentNetworkExtensionsTestData
 
     public static class NotHostname
     {
-        public static TheoryData<FluentCase<string?>> Cases => F.IsValidHostname.AllScenarios.ToFluentCases(s => s.Name switch
+        public static TheoryData<FluentCase<string?>> Cases => F.IsHostname.AllScenarios.ToFluentCases(s => s.Name switch
         {
-            nameof(F.IsValidHostname.Null) => new FluentExpected(false, "Value must not be null."),
+            nameof(F.IsHostname.Null) => new FluentExpected(false, "Value must not be null."),
             _ when s.IsValid => new FluentExpected(false, "Value must not be a valid hostname."),
             _ => new FluentExpected(true)
         });
@@ -190,11 +116,11 @@ public static class FluentNetworkExtensionsTestData
             get
             {
                 var td = new TheoryData<FluentCase<string?>>();
-                foreach (var s in F.IsInCidr.AllScenarios.Except(nameof(F.IsInCidr.InvalidCidr)))
+                foreach (var s in F.IsInCidr.AllScenarios.Except(nameof(F.IsInCidr.InvalidCidr), nameof(F.IsInCidr.CidrPrefixWithSign)))
                 {
                     var expected = s.Name switch
                     {
-                        nameof(F.IsInCidr.NullIp) => new FluentExpected(false, "Value must not be null."),
+                        nameof(F.IsInCidr.NullIp) => new FluentExpected(true),
                         _ when s.IsValid => new FluentExpected(true),
                         _ => new FluentExpected(false, "Value must be within the specified CIDR range.")
                     };
@@ -214,12 +140,12 @@ public static class FluentNetworkExtensionsTestData
             get
             {
                 var td = new TheoryData<FluentCase<string?>>();
-                foreach (var s in F.IsInCidr.AllScenarios.Except(nameof(F.IsInCidr.InvalidCidr)))
+                foreach (var s in F.IsInCidr.AllScenarios.Except(nameof(F.IsInCidr.InvalidCidr), nameof(F.IsInCidr.CidrPrefixWithSign)))
                 {
                     var expected = s.Name switch
                     {
-                        nameof(F.IsInCidr.NullIp) => new FluentExpected(false, "Value must not be null."),
-                        _ when s.IsValid => new FluentExpected(false, "Value must not be within the specified CIDR range."),
+                        nameof(F.IsInCidr.NullIp) => new FluentExpected(true),
+                        _ when s.IsValid || s.Name == nameof(F.IsInCidr.InvalidIp) => new FluentExpected(false, "Value must not be within the specified CIDR range."),
                         _ => new FluentExpected(true)
                     };
                     td.Add(new FluentCase<string?>(s.Name, s.Inputs.ip, expected));

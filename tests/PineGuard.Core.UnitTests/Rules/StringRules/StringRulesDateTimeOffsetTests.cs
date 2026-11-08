@@ -53,14 +53,14 @@ public sealed class StringRulesDateTimeOffsetTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesDateTimeOffsetTestData.IsBetween.Cases), MemberType = typeof(StringRulesDateTimeOffsetTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(RuleCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
+    [MemberData(nameof(StringRulesDateTimeOffsetTestData.IsInRange.Cases), MemberType = typeof(StringRulesDateTimeOffsetTestData.IsInRange))]
+    public void IsInRange_BehavesAsExpected(RuleCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = PineGuard.Rules.StringRules.DateTimeOffset.IsBetween(value, min, max, inclusion);
+        var result = PineGuard.Rules.StringRules.DateTimeOffset.IsInRange(value, min, max, inclusion);
 
         // Assert
         AssertResult(tc, result);

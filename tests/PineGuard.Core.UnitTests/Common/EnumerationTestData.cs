@@ -6,6 +6,161 @@ namespace PineGuard.Core.UnitTests.Common;
 
 public static class EnumerationTestData
 {
+    public class CatalogueBase(int value, string name) : Enumeration<int>(value, name)
+    {
+        public static readonly CatalogueBase BaseMember = new(10, "Base");
+        public static readonly CatalogueDerived InheritedMember = new(20, "Inherited");
+        public static readonly object Unrelated = new();
+    }
+
+    public sealed class CatalogueDerived(int value, string name) : CatalogueBase(value, name)
+    {
+        public static readonly CatalogueDerived OwnMember = new(30, "Own");
+        public static CatalogueDerived MutableMember = new(40, "Mutable");
+        public static CatalogueDerived PropertyMember => new(50, "Property");
+    }
+
+    public sealed class DuplicateNameCatalogue(int value, string name) : Enumeration<int>(value, name)
+    {
+        public static readonly DuplicateNameCatalogue First = new(1, "Name");
+        public static readonly DuplicateNameCatalogue Second = new(2, "NAME");
+    }
+
+    public sealed class DuplicateValueCatalogue(int value, string name) : Enumeration<int>(value, name)
+    {
+        public static readonly DuplicateValueCatalogue First = new(1, "First");
+        public static readonly DuplicateValueCatalogue Second = new(1, "Second");
+    }
+
+    public sealed class NullCatalogue(int value, string name) : Enumeration<int>(value, name)
+    {
+        public static readonly NullCatalogue Missing = null!;
+    }
+
+    public sealed class ReentrantCatalogue : Enumeration<int>
+    {
+        public static readonly ReentrantCatalogue Member = new();
+
+        private ReentrantCatalogue() : base(1, "Member") => _ = GetAll<ReentrantCatalogue>();
+    }
+
+    public sealed class FailingStaticCatalogue : Enumeration<int>
+    {
+        public static readonly FailingStaticCatalogue Member = new();
+
+        private FailingStaticCatalogue() : base(1, "Member") => throw new InvalidOperationException("Construction failed");
+    }
+
+    public sealed class InitializingCatalogue(int value, string name) : Enumeration<int>(value, name)
+    {
+        public static readonly InitializingCatalogue First = new(1, "First");
+        public static readonly InitializingCatalogue Second = InitializeSecond();
+
+        private static InitializingCatalogue InitializeSecond()
+        {
+            _ = GetAll<InitializingCatalogue>();
+            return new InitializingCatalogue(2, "Second");
+        }
+    }
+
+    public sealed class RecoverableEnumeration : Enumeration<int>
+    {
+        public RecoverableEnumeration(int value, string name, bool fail) : base(value, name)
+        {
+            if (fail)
+                throw new InvalidOperationException("Construction failed");
+        }
+    }
+
+    public sealed class ConcurrentCatalogue(int value, string name) : Enumeration<int>(value, name)
+    {
+        public static readonly ConcurrentCatalogue Last = new(2, "Zulu");
+        public static readonly ConcurrentCatalogue First = new(1, "Alpha");
+    }
+
+    public sealed class StringIdentityCatalogue(string value, string name) : StringEnumeration(value, name)
+    {
+        public static readonly StringIdentityCatalogue Lower = new("abc", "Lower");
+        public static readonly StringIdentityCatalogue Upper = new("ABC", "Upper");
+    }
+
+    public static class CatalogueMembership
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("Inherited fields respect declared assignability", () => Enumeration<int>.GetAll<CatalogueDerived>(), ["Inherited", "Own"]),
+            new("Root includes declared subtype fields", () => Enumeration<int>.GetAll<CatalogueBase>(), ["Base", "Inherited"]),
+            new("Members sorted by ordinal name", () => Enumeration<int>.GetAll<TestColor>(), ["Blue", "Green", "Red"]),
+            new("Dynamic instances never become members", () => Enumeration<int>.GetAll<DynamicIntEnumeration>(), [])
+        ];
+
+        public sealed record Case(string Name, Func<IReadOnlyList<Enumeration<int>>> Query, string[] ExpectedNames)
+            : BaseCase(Name);
+    }
+
+    public static class CatalogueFailure
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("Duplicate names ignore case", () => Enumeration<int>.GetAll<DuplicateNameCatalogue>(), typeof(InvalidOperationException), "Name"),
+            new("Duplicate values rejected", () => Enumeration<int>.GetAll<DuplicateValueCatalogue>(), typeof(InvalidOperationException), "Value"),
+            new("Null members rejected", () => Enumeration<int>.GetAll<NullCatalogue>(), typeof(InvalidOperationException), "null"),
+            new("Reentrant build rejected", () => Enumeration<int>.GetAll<ReentrantCatalogue>(), typeof(TypeInitializationException), nameof(ReentrantCatalogue)),
+            new("Failed static construction rejected", () => Enumeration<int>.GetAll<FailingStaticCatalogue>(), typeof(TypeInitializationException), nameof(FailingStaticCatalogue))
+        ];
+
+        public sealed record Case(string Name, Action Query, Type ExceptionType, string MessageContains)
+            : BaseCase(Name);
+    }
+
+    public static class CatalogueConcurrency
+    {
+        public static TheoryData<Case> Cases => [new("Concurrent first lookup publishes one catalogue", 16, ["Alpha", "Zulu"])];
+
+        public sealed record Case(string Name, int ReaderCount, string[] ExpectedNames) : BaseCase(Name);
+    }
+
+    public static class InitializationQuery
+    {
+        public static TheoryData<Case> Cases => [new("First query during initialization cannot cache partial membership", nameof(InitializingCatalogue.Second))];
+
+        public sealed record Case(string Name, string MissingField) : BaseCase(Name);
+    }
+
+    public static class CatalogueImmutability
+    {
+        public static TheoryData<Case> Cases => [new("Returned list cannot mutate cached members", TestColor.Red)];
+
+        public sealed record Case(string Name, TestColor Replacement) : BaseCase(Name);
+    }
+
+    public static class ConstructionRecovery
+    {
+        public static TheoryData<Case> Cases => [new("Derived failure never reserves a name or value", 123, "Recoverable")];
+
+        public sealed record Case(string Name, int MemberValue, string MemberName) : BaseCase(Name);
+    }
+
+    public static class StringIdentity
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new("Lowercase value has its own identity", "abc", "LOWER", StringIdentityCatalogue.Lower),
+            new("Uppercase value has its own identity", "ABC", "upper", StringIdentityCatalogue.Upper),
+            new("Mixed-case value is absent", "Abc", "missing", null)
+        ];
+
+        public sealed record Case(string Name, string MemberValue, string MemberName, StringIdentityCatalogue? Expected)
+            : BaseCase(Name);
+    }
+
+    public static class NullValueLookup
+    {
+        public static TheoryData<Case> Cases => [new("Null reference value rejected", null)];
+
+        public sealed record Case(string Name, string? MemberValue) : BaseCase(Name);
+    }
+
     public sealed class DynamicIntEnumeration(int value, string name) : Enumeration<int>(value, name);
 
     public sealed class DynamicStringEnumeration(string value, string name) : StringEnumeration(value, name);
@@ -108,28 +263,6 @@ public static class EnumerationTestData
 
         public sealed record InvalidCase(string Name, string? EnumerationValue, string? EnumerationName, ExpectedException ExpectedException)
             : ThrowsCase<(string? EnumerationValue, string? EnumerationName)>(Name, (EnumerationValue, EnumerationName), ExpectedException);
-    }
-
-    public static class DuplicateName
-    {
-        public static TheoryData<Case> Cases =>
-        [
-            new("Duplicate Name Ignores Case", 1, "Alpha", 2, "ALPHA", new ExpectedException(typeof(ArgumentException), "name", "already exists"))
-        ];
-
-        public sealed record Case(string Name, int FirstValue, string FirstName, int SecondValue, string SecondName, ExpectedException ExpectedException)
-            : ThrowsCase<(int FirstValue, string FirstName, int SecondValue, string SecondName)>(Name, (FirstValue, FirstName, SecondValue, SecondName), ExpectedException);
-    }
-
-    public static class DuplicateValue
-    {
-        public static TheoryData<Case> Cases =>
-        [
-            new("Duplicate Value Rolls Back", 1, "Alpha", 1, "Bravo", new ExpectedException(typeof(ArgumentException), "value"))
-        ];
-
-        public sealed record Case(string Name, int FirstValue, string FirstName, int SecondValue, string SecondName, ExpectedException ExpectedException)
-            : ThrowsCase<(int FirstValue, string FirstName, int SecondValue, string SecondName)>(Name, (FirstValue, FirstName, SecondValue, SecondName), ExpectedException);
     }
 
     public static class GetAll

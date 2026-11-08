@@ -180,10 +180,10 @@ public static partial class StringUtility
         string? end,
         TryParseDelegate<T> tryParseValue,
         TryCreateRangeDelegate<T, TRange> tryCreateRange,
-        out TRange? range)
+        out TRange range)
         where TRange : struct
     {
-        range = null;
+        range = default;
 
         if (!TryGetTrimmed(start, out var startTrimmed))
             return false;

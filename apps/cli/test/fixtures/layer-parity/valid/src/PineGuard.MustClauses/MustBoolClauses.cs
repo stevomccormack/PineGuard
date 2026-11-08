@@ -7,4 +7,8 @@ public static class MustBoolClauses
     {
         return MustResult<bool>.FromBool(value);
     }
+
+    public static bool HasXmlRoot(this IMustClause _, string value) => true;
+    public static bool Positive(this IMustClause _, int value) => true;
+
 }

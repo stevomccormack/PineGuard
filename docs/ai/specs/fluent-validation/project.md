@@ -96,16 +96,20 @@ Rules:
   - `FluentNumberExtensions`
   - `FluentBitWiseExtensions`
 - Extension method names should match the corresponding Must clause name whenever practical.
+- Typed numeric comparisons use the whole collision-safe family `GreaterThanNumber`,
+  `GreaterThanOrEqualNumber`, `LessThanNumber`, `LessThanOrEqualNumber`. FluentValidation already
+  owns the native comparison vocabulary; the `Number` domain suffix makes PineGuard's Must-based
+  messages and codes explicit. String parsing keeps its parsed-type suffix (`GreaterThanDecimal`).
 - When a matching name would collide with or strongly mimic a FluentValidation built-in, prefer a clearer PineGuard-specific adapter name instead.
 - For URI/web adapters, prefer explicit names such as `WebUrl()` over ambiguous short names like `Url()` when collision or IntelliSense ambiguity is a concern.
-- A shorter alternate name may remain only as a thin facade when the explicit collision-safe method is documented as the preferred surface.
+- Keep one canonical collision-safe spelling; remove redundant convenience/compatibility aliases during the greenfield phase. Scalar string qualifiers and meaningful domain exceptions follow `../language/vocabulary.md` §5.3.
 - For null/presence adapters, prefer `Required()` / `NotRequired()` over `NotNull()` / `Null()` to avoid collisions with FluentValidation built-in validators while keeping PineGuard intent explicit.
 - Follow `docs/ai/specs/language/naming-collisions.md` for collision handling across adapter layers.
 
 Shared vocabulary map (required):
 
 - Naming alternatives and opposite-term relationships are defined in `docs/ai/specs/language/vocabulary.md`.
-- Audit scripts consume `docs/ai/specs/language/vocabulary.json` to normalize names to **concepts** (so Guard may prefer `Invalid*` / `Not*` while Fluent prefers the concept name).
+- Audit scripts consume `docs/ai/specs/language/vocabulary.json` to normalize names to **concepts**. Guard uses Must-derived forbidden states and curated opposites; `InvalidXml` is an explicit XML-validity exception, not a general `Invalid*` convention.
 
 ### 4.3 Chaining + return types (required)
 
@@ -152,10 +156,13 @@ This is intentionally different from Must/Guard behavior:
 Rules:
 
 - **Value type properties** (e.g., `DateOnly?`) must be supported.
+  - Validate configured bounds, flags, styles and tolerances before skipping an absent value.
+    Preserve a Must failure attributed to a configuration parameter; skip only the absent-input failure.
   - If `HasValue` is false: return `Ok` (skip).
   - If `HasValue` is true: call the corresponding MustClause with `val.Value`.
 
 - **Reference type properties** (e.g., `string?`) must be supported.
+  - Configuration validation precedes the null skip, exactly as for value types.
   - If `value is null`: return `Ok` (skip) unless the caller chains `Required()` (or another explicit presence validator such as `.NotNull()`).
   - If `value` is non-null: call the corresponding MustClause.
 
@@ -170,3 +177,11 @@ public static IRuleBuilderOptions<T, DateOnly?> Past<T>(
         : MustResult<DateOnly>.Ok(default),
         message, MustCodes.Date.Relative.NotPast);
 ```
+
+### Required comparison selectors
+
+A null model selector is an invalid rule-construction dependency. Selector overloads validate it
+at registration with `ThrowHelper.ThrowIfNull`, producing `ArgumentNullException` for `other`;
+this construction-time exception does not change Must runtime failure semantics. For an absent
+optional DateTime property, do not execute its selector. Still validate precision through Must
+before skipping the absent input, so an undefined precision remains a validation failure.

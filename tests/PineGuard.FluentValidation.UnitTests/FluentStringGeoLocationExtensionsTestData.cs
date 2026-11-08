@@ -1,3 +1,4 @@
+using System.Globalization;
 using PineGuard.Codes;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
@@ -6,6 +7,16 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public static class FluentStringGeoLocationExtensionsTestData
 {
+    public static class Styles
+    {
+        public static TheoryData<FluentCase<(string? value, NumberStyles styles, double parsed)>> Cases => F.GeoLocationStyles.AllScenarios.ToFluentCases();
+    }
+
+    public static class InvalidStyles
+    {
+        public static TheoryData<FluentCase<(string? value, NumberStyles styles)>> Cases => F.GeoLocationInvalidStyles.AllScenarios.ToFluentCases(_ => new FluentExpected(false));
+    }
+
     public static class Latitude
     {
         public static TheoryData<FluentCase<string?>> Cases => F.IsLatitude.AllScenarios.ToFluentCases(s => s.Name switch

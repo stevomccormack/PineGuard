@@ -23,8 +23,8 @@ public static class OneOfExtensionTestData
     {
         public static TheoryData<OneOfCase<MustResult<string>>> Cases =>
         [
-            new("success-carries-the-typed-result", MustResult<string>.Ok("user@example.com", "user@example.com", "email"), new OneOfExpected(true, "user@example.com")),
-            new("success-with-a-null-result-carries-default", MustResult<string>.Ok(null, null, "email"), new OneOfExpected(true)),
+            new("success-carries-the-typed-result", MustResult<string>.Ok("user@example.com", value: "user@example.com", paramName: "email"), new OneOfExpected(true, "user@example.com")),
+            new("success-with-a-null-result-carries-default", MustResult<string>.Ok(null, value: null, paramName: "email"), new OneOfExpected(true)),
             new("failure-carries-code-message-and-property-path", MustResult<string>.Fail(EmailCode, EmailTemplate, "email", "not-an-email"), new OneOfExpected(false, null, [(EmailCode, EmailMessage, "email")])),
             new("failure-without-a-param-name-lands-at-the-root", MustResult<string>.Fail(NullCode, RootMessage, null, null), new OneOfExpected(false, null, [(NullCode, RootMessage, "")]))
         ];

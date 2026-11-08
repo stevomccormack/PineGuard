@@ -1,8 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-#if NET8_0_OR_GREATER
-using System.Globalization;
-using PineGuard.Common;
-#endif
 using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -263,56 +259,6 @@ public sealed class FutureOrPresentAttribute() : ValidationAttributeBase(typeof(
 
 // Specific attributes that are non-ambiguous or require specific args
 
-#if NET8_0_OR_GREATER
-/// <summary>
-/// Validates that the annotated <c>DateOnly</c> property or field falls within the specified
-/// date range (inclusive or exclusive).
-/// </summary>
-/// <remarks>
-/// <para>
-/// Delegates to <c>MustDateOnlyClauses.Between</c>. Supported on properties, fields,
-/// and parameters of type <c>DateOnly</c>.
-/// </para>
-/// <para>
-/// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
-/// <c>DateOnly</c> string format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
-/// </para>
-/// </remarks>
-/// <example>
-/// <code>
-/// public class EventModel
-/// {
-///     [DateOnlyBetween("2024-01-01", "2024-12-31")]
-///     public DateOnly EventDate { get; set; }
-/// }
-/// </code>
-/// </example>
-/// <seealso cref="MustDateOnlyClauses.Between"/>
-/// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class DateOnlyBetweenAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Range.OutOfRange)
-{
-    /// <summary>Gets the lower boundary of the valid date range.</summary>
-    public DateOnly Min { get; } = DateOnly.Parse(min, CultureInfo.InvariantCulture);
-
-    /// <summary>Gets the upper boundary of the valid date range.</summary>
-    public DateOnly Max { get; } = DateOnly.Parse(max, CultureInfo.InvariantCulture);
-
-    /// <summary>Gets whether the boundary values are included or excluded in the valid range.</summary>
-    public Inclusion Inclusion { get; } = inclusion;
-
-    /// <inheritdoc/>
-    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
-    {
-        var dateValue = (DateOnly)value!;
-
-        var result = Must.Be.Between(dateValue, Min, Max, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
-    }
-}
-#endif
 
 /// <summary>
 /// Validates that the annotated <see cref="DateTime"/> property or field has a

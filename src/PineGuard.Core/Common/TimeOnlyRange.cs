@@ -68,24 +68,69 @@ public readonly struct TimeOnlyRange : IEquatable<TimeOnlyRange>
     public bool Contains(TimeOnly value) => value >= Start && value <= End;
 
     /// <summary>
-    /// Determines whether this range overlaps with another range (exclusive boundaries).
+    /// Determines whether this range shares at least one included value with another closed range.
     /// </summary>
     /// <param name="other">The other range to compare.</param>
     /// <returns><see langword="true"/> if the ranges overlap; otherwise, <see langword="false"/>.</returns>
-    public bool Overlaps(TimeOnlyRange other) => Start < other.End && other.Start < End;
+    public bool Overlaps(TimeOnlyRange other) => Overlaps(other, Inclusion.Inclusive);
 
     /// <summary>
     /// Determines whether this range overlaps with another range using the specified boundary inclusion.
     /// </summary>
     /// <param name="other">The other range to compare.</param>
-    /// <param name="inclusion">Whether the boundaries are inclusive or exclusive.</param>
+    /// <param name="inclusion">Whether to intersect the closed ranges or their open interiors. Open interiors exclude both endpoints; singleton and one-step ranges have empty interiors.</param>
     /// <returns><see langword="true"/> if the ranges overlap; otherwise, <see langword="false"/>.</returns>
-    public bool Overlaps(TimeOnlyRange other, Inclusion inclusion)
-    {
-        if (inclusion == Inclusion.Exclusive)
-            return Start < other.End && other.Start < End;
+    public bool Overlaps(TimeOnlyRange other, Inclusion inclusion) =>
+        TemporalRangeComparison.Overlaps(Start.Ticks, End.Ticks, other.Start.Ticks, other.End.Ticks, inclusion);
 
-        return Start <= other.End && other.Start <= End;
+    /// <summary>
+    /// Determines whether the ranges are disjoint with no representable tick between them.
+    /// </summary>
+    /// <param name="other">The other range.</param>
+    /// <returns>Whether the closed ranges are adjacent.</returns>
+    public bool IsAdjacentTo(TimeOnlyRange other) =>
+        TemporalRangeComparison.IsAdjacent(Start.Ticks, End.Ticks, other.Start.Ticks, other.End.Ticks);
+
+    /// <summary>
+    /// Computes the closed intersection; shared endpoints produce a singleton.
+    /// </summary>
+    /// <param name="other">The other range.</param>
+    /// <returns>The intersection, or null for disjoint ranges.</returns>
+    public TimeOnlyRange? Intersect(TimeOnlyRange other)
+    {
+        if (!Overlaps(other))
+            return null;
+
+        var start = Start > other.Start ? Start : other.Start;
+        var end = End < other.End ? End : other.End;
+        return new TimeOnlyRange(start, end);
+    }
+
+    /// <summary>
+    /// Computes the smallest closed linear range enclosing both operands, including any gap.
+    /// </summary>
+    /// <param name="other">The other range.</param>
+    /// <returns>The enclosing range. This operation never wraps across midnight.</returns>
+    public TimeOnlyRange Enclose(TimeOnlyRange other)
+    {
+        var start = Start < other.Start ? Start : other.Start;
+        var end = End > other.End ? End : other.End;
+        return new TimeOnlyRange(start, end);
+    }
+
+    /// <summary>
+    /// Computes the exact union as an ordered, read-only collection of closed ranges.
+    /// </summary>
+    /// <param name="other">The other range.</param>
+    /// <returns>One range when the operands overlap or are adjacent; otherwise two disjoint ranges in ascending order.</returns>
+    public IReadOnlyList<TimeOnlyRange> Union(TimeOnlyRange other)
+    {
+        if (Overlaps(other) || IsAdjacentTo(other))
+            return Array.AsReadOnly(new[] { Enclose(other) });
+
+        return Start < other.Start
+            ? Array.AsReadOnly(new[] { this, other })
+            : Array.AsReadOnly(new[] { other, this });
     }
 
     /// <inheritdoc />

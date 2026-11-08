@@ -150,7 +150,7 @@ public sealed class Ipv6Attribute() : ValidationAttributeBase(typeof(string), Mu
 /// <seealso cref="MustNetworkClauses.InCidrRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/network">Network Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class InCidrRangeAttribute(string cidr) : ValidationAttributeBase(typeof(string), MustCodes.Network.Cidr.OutOfRange)
+public sealed class InCidrRangeAttribute(string cidr) : ValidationAttributeBase(typeof(string), MustCodes.Network.Cidr.OutOfRange, allowNull: false)
 {
     /// <summary>Gets the CIDR notation string (e.g., <c>"192.168.0.0/24"</c>) used to validate the IP range.</summary>
     public string Cidr { get; } = cidr;
@@ -160,7 +160,7 @@ public sealed class InCidrRangeAttribute(string cidr) : ValidationAttributeBase(
     {
         var strValue = (string)value!;
         var result = Must.Be.InCidrRange(strValue, Cidr, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 

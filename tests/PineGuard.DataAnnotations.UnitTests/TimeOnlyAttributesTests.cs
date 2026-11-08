@@ -7,11 +7,11 @@ namespace PineGuard.DataAnnotations.UnitTests;
 public sealed class TimeOnlyAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(TimeOnlyAttributesTestData.BetweenTimeOnly.Cases), MemberType = typeof(TimeOnlyAttributesTestData.BetweenTimeOnly))]
-    public void BetweenTimeOnly_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(TimeOnlyAttributesTestData.InRangeTimeOnly.Cases), MemberType = typeof(TimeOnlyAttributesTestData.InRangeTimeOnly))]
+    public void InRangeTimeOnly_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new BetweenTimeOnlyAttribute("10:00", "12:00");
+        InRangeTimeOnlyAttribute attr = new InRangeTimeOnlyAttribute("10:00", "12:00");
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -22,11 +22,11 @@ public sealed class TimeOnlyAttributesTests(ITestOutputHelper output) : BaseData
     }
 
     [Theory]
-    [MemberData(nameof(TimeOnlyAttributesTestData.NotBetweenTimeOnly.Cases), MemberType = typeof(TimeOnlyAttributesTestData.NotBetweenTimeOnly))]
-    public void NotBetweenTimeOnly_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(TimeOnlyAttributesTestData.OutOfRangeTimeOnly.Cases), MemberType = typeof(TimeOnlyAttributesTestData.OutOfRangeTimeOnly))]
+    public void OutOfRangeTimeOnly_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new NotBetweenTimeOnlyAttribute("10:00", "12:00");
+        OutOfRangeTimeOnlyAttribute attr = new OutOfRangeTimeOnlyAttribute("10:00", "12:00");
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act

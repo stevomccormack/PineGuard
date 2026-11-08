@@ -109,7 +109,7 @@ public static class DateOnlyRangeTestData
             : ReturnCase<(DateOnlyRange Base, DateOnlyRange Other), DateOnlyRange?>(Name, (Base, Other), Expected);
     }
 
-    public static class Union
+    public static class Enclose
     {
         public static TheoryData<Case> Cases
         {

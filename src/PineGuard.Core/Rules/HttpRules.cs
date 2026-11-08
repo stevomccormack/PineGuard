@@ -110,13 +110,14 @@ public static partial class HttpRules
     }
 
     /// <summary>
-    /// Determines whether the specified header contains the expected value.
+    /// Determines whether any complete header value matches the expected value after trimming.
     /// </summary>
     /// <param name="headers">The HTTP headers to inspect. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="name">The header name to look for.</param>
     /// <param name="expectedValue">The expected header value. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="comparison">The string comparison type. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>.</param>
     /// <returns><see langword="true"/> if the header has the expected value; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>Each supplied value is compared as a whole. Comma-separated values are not split into tokens.</remarks>
     public static bool HasHeaderValue(
         IReadOnlyDictionary<string, IEnumerable<string>>? headers,
         string? name,

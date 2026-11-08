@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using PineGuard.Common;
@@ -147,7 +146,7 @@ public static class GuardStringNumberTypesClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the Int32OutOfRange constraint.
+    /// Throws if <paramref name="value"/> violates the OutOfRangeInt32 constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -166,8 +165,8 @@ public static class GuardStringNumberTypesClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumberTypesClauses.Int32InRange"/>
-    public static int Int32OutOfRange(this IGuardClause _,
+    /// <seealso cref="MustStringNumberTypesClauses.InRangeInt32"/>
+    public static int OutOfRangeInt32(this IGuardClause _,
         string? value,
         int min,
         int max,
@@ -177,7 +176,7 @@ public static class GuardStringNumberTypesClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Int32InRange(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.InRangeInt32(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -185,7 +184,7 @@ public static class GuardStringNumberTypesClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the Int32InRange constraint.
+    /// Throws if <paramref name="value"/> violates the InRangeInt32 constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -204,8 +203,8 @@ public static class GuardStringNumberTypesClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumberTypesClauses.Int32OutOfRange"/>
-    public static int Int32InRange(this IGuardClause _,
+    /// <seealso cref="MustStringNumberTypesClauses.OutOfRangeInt32"/>
+    public static int InRangeInt32(this IGuardClause _,
         string? value,
         int min,
         int max,
@@ -215,7 +214,7 @@ public static class GuardStringNumberTypesClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Int32OutOfRange(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.OutOfRangeInt32(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -223,7 +222,7 @@ public static class GuardStringNumberTypesClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the Int64OutOfRange constraint.
+    /// Throws if <paramref name="value"/> violates the OutOfRangeInt64 constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -242,8 +241,8 @@ public static class GuardStringNumberTypesClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumberTypesClauses.Int64InRange"/>
-    public static long Int64OutOfRange(this IGuardClause _,
+    /// <seealso cref="MustStringNumberTypesClauses.InRangeInt64"/>
+    public static long OutOfRangeInt64(this IGuardClause _,
         string? value,
         long min,
         long max,
@@ -253,7 +252,7 @@ public static class GuardStringNumberTypesClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Int64InRange(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.InRangeInt64(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -261,7 +260,7 @@ public static class GuardStringNumberTypesClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the Int64InRange constraint.
+    /// Throws if <paramref name="value"/> violates the InRangeInt64 constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -280,8 +279,8 @@ public static class GuardStringNumberTypesClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumberTypesClauses.Int64OutOfRange"/>
-    public static long Int64InRange(this IGuardClause _,
+    /// <seealso cref="MustStringNumberTypesClauses.OutOfRangeInt64"/>
+    public static long InRangeInt64(this IGuardClause _,
         string? value,
         long min,
         long max,
@@ -291,11 +290,10 @@ public static class GuardStringNumberTypesClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Int64OutOfRange(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.OutOfRangeInt64(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
 }
-#endif

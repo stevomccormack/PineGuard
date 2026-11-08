@@ -21,8 +21,8 @@ public static class StringRulesGraphemesTestData
         public static TheoryData<RuleCase<(string? value, int max)>> Cases => F.GraphemesHasMaxCount.AllScenarios.ToRuleCases();
     }
 
-    public static class HasCountBetween
+    public static class HasCountInRange
     {
-        public static TheoryData<RuleCase<(string? value, int min, int max, Inclusion inclusion)>> Cases => F.GraphemesHasCountBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(string? value, int min, int max, Inclusion inclusion)>> Cases => F.GraphemesHasCountInRange.AllScenarios.ToRuleCases();
     }
 }

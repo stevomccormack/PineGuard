@@ -7,6 +7,9 @@ public static class PhoneRulesFixtures
     public static class IsPhoneNumber
     {
         public static readonly string? Formatted = "+1(425)555-0123";
+        public static readonly string? FormattedWithSpaces = "+1 (555) 123-4567";
+        public static readonly string? InteriorTab = "425\t5550123";
+        public static readonly string? InteriorNonBreakingSpace = "425\u00a05550123";
         public static readonly string? DigitsOnly = "4255550123";
         public static readonly string? TooShort = "123";
         public static readonly string? ExtensionSuffix = "425-555-0123x";
@@ -15,6 +18,7 @@ public static class PhoneRulesFixtures
         public static RuleScenario<string?>[] ValidScenarios =>
         [
             new(nameof(Formatted),  Formatted,  true),
+            new(nameof(FormattedWithSpaces), FormattedWithSpaces, true),
             new(nameof(DigitsOnly), DigitsOnly, true)
         ];
 
@@ -22,6 +26,8 @@ public static class PhoneRulesFixtures
 
         public static RuleScenario<string?>[] InvalidScenarios =>
         [
+            new(nameof(InteriorTab), InteriorTab, false),
+            new(nameof(InteriorNonBreakingSpace), InteriorNonBreakingSpace, false),
             new(nameof(TooShort),        TooShort,        false),
             new(nameof(ExtensionSuffix), ExtensionSuffix, false)
         ];

@@ -11,7 +11,7 @@ namespace PineGuard.DataAnnotations;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringBoolClauses.True"/>. Supported on properties, fields, and parameters
+/// Delegates to <see cref="MustStringBoolClauses.TrueBoolean"/>. Supported on properties, fields, and parameters
 /// of type <see cref="string"/>.
 /// </para>
 /// <para>
@@ -28,7 +28,7 @@ namespace PineGuard.DataAnnotations;
 /// </code>
 /// </example>
 /// <seealso cref="FalseStringAttribute"/>
-/// <seealso cref="MustStringBoolClauses.True"/>
+/// <seealso cref="MustStringBoolClauses.TrueBoolean"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class TrueStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Boolean.Value.False)
@@ -37,7 +37,7 @@ public sealed class TrueStringAttribute() : ValidationAttributeBase(typeof(strin
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.True(strValue, paramName: null);
+        var result = Must.Be.TrueBoolean(strValue, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -48,7 +48,7 @@ public sealed class TrueStringAttribute() : ValidationAttributeBase(typeof(strin
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringBoolClauses.False"/>. Supported on properties, fields, and parameters
+/// Delegates to <see cref="MustStringBoolClauses.FalseBoolean"/>. Supported on properties, fields, and parameters
 /// of type <see cref="string"/>.
 /// </para>
 /// <para>
@@ -65,7 +65,7 @@ public sealed class TrueStringAttribute() : ValidationAttributeBase(typeof(strin
 /// </code>
 /// </example>
 /// <seealso cref="TrueStringAttribute"/>
-/// <seealso cref="MustStringBoolClauses.False"/>
+/// <seealso cref="MustStringBoolClauses.FalseBoolean"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class FalseStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Boolean.Value.True)
@@ -74,7 +74,7 @@ public sealed class FalseStringAttribute() : ValidationAttributeBase(typeof(stri
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.False(strValue, paramName: null);
+        var result = Must.Be.FalseBoolean(strValue, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }

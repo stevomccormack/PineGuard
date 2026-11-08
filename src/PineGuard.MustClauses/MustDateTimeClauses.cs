@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
+using PineGuard.Utils;
 
 namespace PineGuard.MustClauses;
 
@@ -144,16 +145,22 @@ public static class MustDateTimeClauses
     /// The failure message follows the pattern <c>"{paramName} must be within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-time">Date Time Must Clauses documentation</seealso>
-    public static MustResult<DateTime> Between(this IMustClause _,
+    public static MustResult<DateTime> InRange(this IMustClause _,
         DateTime value,
         DateTime min,
         DateTime max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTime>.Fail(MustCodes.Date.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
+        if (DateTimeUtility.ToUtc(min)!.Value > DateTimeUtility.ToUtc(max)!.Value)
+            return MustResult<DateTime>.Fail(MustCodes.Date.Range.OutOfRange, "{paramName} requires a valid range.", nameof(min), min);
+
         const string messageTemplate = "{paramName} must be within the expected range.";
 
-        var ok = DateTimeRules.IsBetween(value, min, max, inclusion);
+        var ok = DateTimeRules.IsInRange(value, min, max, inclusion);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Range.OutOfRange, messageTemplate, paramName, value, value);
     }
 
@@ -176,16 +183,22 @@ public static class MustDateTimeClauses
     /// The failure message follows the pattern <c>"{paramName} must not be within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-time">Date Time Must Clauses documentation</seealso>
-    public static MustResult<DateTime> NotBetween(this IMustClause _,
+    public static MustResult<DateTime> OutOfRange(this IMustClause _,
         DateTime value,
         DateTime min,
         DateTime max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTime>.Fail(MustCodes.Date.Range.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
+        if (DateTimeUtility.ToUtc(min)!.Value > DateTimeUtility.ToUtc(max)!.Value)
+            return MustResult<DateTime>.Fail(MustCodes.Date.Range.InRange, "{paramName} requires a valid range.", nameof(min), min);
+
         const string messageTemplate = "{paramName} must not be within the expected range.";
 
-        var ok = !DateTimeRules.IsBetween(value, min, max, inclusion);
+        var ok = !DateTimeRules.IsInRange(value, min, max, inclusion);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Range.InRange, messageTemplate, paramName, value, value);
     }
 
@@ -213,6 +226,9 @@ public static class MustDateTimeClauses
         DateTimePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DateTimePrecision>(precision.Value))
+            return MustResult<DateTime>.Fail(MustCodes.Date.Order.NotBefore, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be before the specified date/time.";
 
         var ok = DateTimeRules.IsBefore(value, other, Inclusion.Exclusive, precision);
@@ -243,6 +259,9 @@ public static class MustDateTimeClauses
         DateTimePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DateTimePrecision>(precision.Value))
+            return MustResult<DateTime>.Fail(MustCodes.Date.Order.After, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be on or before the specified date/time.";
 
         var ok = DateTimeRules.IsBefore(value, other, Inclusion.Inclusive, precision);
@@ -273,6 +292,9 @@ public static class MustDateTimeClauses
         DateTimePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DateTimePrecision>(precision.Value))
+            return MustResult<DateTime>.Fail(MustCodes.Date.Order.NotAfter, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be after the specified date/time.";
 
         var ok = DateTimeRules.IsAfter(value, other, Inclusion.Exclusive, precision);
@@ -303,6 +325,9 @@ public static class MustDateTimeClauses
         DateTimePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DateTimePrecision>(precision.Value))
+            return MustResult<DateTime>.Fail(MustCodes.Date.Order.Before, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be on or after the specified date/time.";
 
         var ok = DateTimeRules.IsAfter(value, other, Inclusion.Inclusive, precision);
@@ -333,6 +358,9 @@ public static class MustDateTimeClauses
         DateTimePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DateTimePrecision>(precision.Value))
+            return MustResult<DateTime>.Fail(MustCodes.Date.Equality.NotEqual, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be the same date/time.";
 
         var ok = DateTimeRules.IsSame(value, other, precision);
@@ -363,6 +391,9 @@ public static class MustDateTimeClauses
         DateTimePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DateTimePrecision>(precision.Value))
+            return MustResult<DateTime>.Fail(MustCodes.Date.Equality.Equal, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must not be the same date/time.";
 
         var ok = !DateTimeRules.IsSame(value, other, precision);
@@ -393,6 +424,9 @@ public static class MustDateTimeClauses
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(start))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTime>.Fail(MustCodes.Date.Order.NotChronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = DateTimeRules.IsChronological(start, end, inclusion);
@@ -424,9 +458,12 @@ public static class MustDateTimeClauses
         DateTime end1,
         DateTime start2,
         DateTime end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTime>.Fail(MustCodes.Date.Overlap.Missing, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be overlapping.";
 
         var range1Ok = DateTimeRange.TryCreate(start1, end1, out var _);
@@ -461,15 +498,18 @@ public static class MustDateTimeClauses
         DateTime end1,
         DateTime start2,
         DateTime end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTime>.Fail(MustCodes.Date.Overlap.Present, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must not be overlapping.";
 
         var range1Ok = DateTimeRange.TryCreate(start1, end1, out var _);
         var range2Ok = DateTimeRange.TryCreate(start2, end2, out var _);
 
-        var ok = !(range1Ok && range2Ok && DateTimeRules.IsOverlapping(start1, end1, start2, end2, inclusion));
+        var ok = range1Ok && range2Ok && !DateTimeRules.IsOverlapping(start1, end1, start2, end2, inclusion);
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Overlap.Present, messageTemplate, paramName, start1, start1);
     }
 

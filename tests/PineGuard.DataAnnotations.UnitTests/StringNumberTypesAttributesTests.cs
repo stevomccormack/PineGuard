@@ -68,11 +68,11 @@ public sealed class StringNumberTypesAttributesTests(ITestOutputHelper output) :
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypesAttributesTestData.Int32InRangeStringInclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int32InRangeStringInclusive))]
-    public void Int32InRangeString_Inclusive_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringNumberTypesAttributesTestData.InRangeInt32StringInclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.InRangeInt32StringInclusive))]
+    public void InRangeInt32String_Inclusive_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new Int32InRangeStringAttribute(1, 10);
+        InRangeInt32StringAttribute attr = new InRangeInt32StringAttribute(1, 10);
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -83,11 +83,11 @@ public sealed class StringNumberTypesAttributesTests(ITestOutputHelper output) :
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypesAttributesTestData.Int32InRangeStringExclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int32InRangeStringExclusive))]
-    public void Int32InRangeString_Exclusive_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringNumberTypesAttributesTestData.InRangeInt32StringExclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.InRangeInt32StringExclusive))]
+    public void InRangeInt32String_Exclusive_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new Int32InRangeStringAttribute(1, 10, Inclusion.Exclusive);
+        InRangeInt32StringAttribute attr = new InRangeInt32StringAttribute(1, 10, Inclusion.Exclusive);
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -98,11 +98,11 @@ public sealed class StringNumberTypesAttributesTests(ITestOutputHelper output) :
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypesAttributesTestData.Int32OutOfRangeString.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int32OutOfRangeString))]
-    public void Int32OutOfRangeString_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringNumberTypesAttributesTestData.OutOfRangeInt32String.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.OutOfRangeInt32String))]
+    public void OutOfRangeInt32String_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new Int32OutOfRangeStringAttribute(1, 10);
+        OutOfRangeInt32StringAttribute attr = new OutOfRangeInt32StringAttribute(1, 10);
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -113,11 +113,11 @@ public sealed class StringNumberTypesAttributesTests(ITestOutputHelper output) :
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypesAttributesTestData.Int64InRangeStringInclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int64InRangeStringInclusive))]
-    public void Int64InRangeString_Inclusive_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringNumberTypesAttributesTestData.InRangeInt64StringInclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.InRangeInt64StringInclusive))]
+    public void InRangeInt64String_Inclusive_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new Int64InRangeStringAttribute(1L, 10L);
+        InRangeInt64StringAttribute attr = new InRangeInt64StringAttribute(1L, 10L);
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -128,11 +128,11 @@ public sealed class StringNumberTypesAttributesTests(ITestOutputHelper output) :
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypesAttributesTestData.Int64InRangeStringExclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int64InRangeStringExclusive))]
-    public void Int64InRangeString_Exclusive_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringNumberTypesAttributesTestData.InRangeInt64StringExclusive.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.InRangeInt64StringExclusive))]
+    public void InRangeInt64String_Exclusive_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new Int64InRangeStringAttribute(1L, 10L, Inclusion.Exclusive);
+        InRangeInt64StringAttribute attr = new InRangeInt64StringAttribute(1L, 10L, Inclusion.Exclusive);
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -143,11 +143,11 @@ public sealed class StringNumberTypesAttributesTests(ITestOutputHelper output) :
     }
 
     [Theory]
-    [MemberData(nameof(StringNumberTypesAttributesTestData.Int64OutOfRangeString.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.Int64OutOfRangeString))]
-    public void Int64OutOfRangeString_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringNumberTypesAttributesTestData.OutOfRangeInt64String.Cases), MemberType = typeof(StringNumberTypesAttributesTestData.OutOfRangeInt64String))]
+    public void OutOfRangeInt64String_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new Int64OutOfRangeStringAttribute(1L, 10L);
+        OutOfRangeInt64StringAttribute attr = new OutOfRangeInt64StringAttribute(1L, 10L);
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act

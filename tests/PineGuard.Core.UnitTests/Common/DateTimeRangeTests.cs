@@ -39,11 +39,11 @@ public sealed class DateTimeRangeTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(DateTimeRangeTestData.Union.Cases), MemberType = typeof(DateTimeRangeTestData.Union))]
-    public void Union_ReturnsExpected(DateTimeRangeTestData.Union.Case testCase)
+    [MemberData(nameof(DateTimeRangeTestData.Enclose.Cases), MemberType = typeof(DateTimeRangeTestData.Enclose))]
+    public void Enclose_ReturnsExpected(DateTimeRangeTestData.Enclose.Case testCase)
     {
         // Act
-        var result = testCase.Base.Union(testCase.Other);
+        var result = testCase.Base.Enclose(testCase.Other);
 
         // Assert
         Assert.Equal(testCase.Expected.Start, result.Start);
@@ -142,11 +142,11 @@ public sealed class DateTimeRangeTests : BaseUnitTest
         var same = new DateTimeRange(testCase.Start, testCase.End);
 
         // Act
-        var overlapsExclusive = range.Overlaps(same);
+        var overlapsExclusive = range.Overlaps(same, Inclusion.Exclusive);
         var overlapsInclusive = range.Overlaps(same, Inclusion.Inclusive);
 
         // Assert
-        Assert.Equal(testCase.Start < testCase.End, overlapsExclusive);
+        Assert.Equal((testCase.End - testCase.Start).Ticks > 1, overlapsExclusive);
         Assert.True(overlapsInclusive);
         Assert.Equal(range.Overlaps(same, Inclusion.Exclusive), overlapsExclusive);
     }
@@ -217,7 +217,7 @@ public sealed class DateTimeRangeTests : BaseUnitTest
 
     [Theory]
     [MemberData(nameof(DateTimeRangeTestData.Constructor.ValidCases), MemberType = typeof(DateTimeRangeTestData.Constructor))]
-    public void Union_ReturnsMinStart_MaxEnd(DateTimeRangeTestData.Constructor.ValidCase testCase)
+    public void Enclose_ReturnsMinStart_MaxEnd(DateTimeRangeTestData.Constructor.ValidCase testCase)
     {
         // Arrange
         var range = new DateTimeRange(testCase.Start, testCase.End);
@@ -226,7 +226,7 @@ public sealed class DateTimeRangeTests : BaseUnitTest
             : new DateTimeRange(testCase.Start, testCase.Start);
 
         // Act
-        var union = range.Union(other);
+        var union = range.Enclose(other);
 
         // Assert
         Assert.Equal(testCase.Start < other.Start ? testCase.Start : other.Start, union.Start);
@@ -267,5 +267,15 @@ public sealed class DateTimeRangeTests : BaseUnitTest
         {
             Assert.False(range1.Equals((object)different));
         }
+    }
+    [Theory]
+    [MemberData(nameof(DateTimeRangeTestData.NormalizedDuration.Cases), MemberType = typeof(DateTimeRangeTestData.NormalizedDuration))]
+    public void NormalizedDuration_BehavesAsExpected(DateTimeRangeTestData.NormalizedDuration.Case tc)
+    {
+        // Act
+        var duration = tc.Value.Duration;
+
+        // Assert
+        Assert.Equal(tc.Expected, duration);
     }
 }

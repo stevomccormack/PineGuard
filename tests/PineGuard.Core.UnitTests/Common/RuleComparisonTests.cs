@@ -18,13 +18,13 @@ public sealed class RuleComparisonTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(RuleComparisonTestData.IsBetween.ValidCases), MemberType = typeof(RuleComparisonTestData.IsBetween))]
-    [MemberData(nameof(RuleComparisonTestData.IsBetween.EdgeCases), MemberType = typeof(RuleComparisonTestData.IsBetween))]
-    public void IsBetween_HandlesInclusiveAndExclusive(RuleComparisonTestData.IsBetween.ValidCase testCase)
+    [MemberData(nameof(RuleComparisonTestData.IsInRange.ValidCases), MemberType = typeof(RuleComparisonTestData.IsInRange))]
+    [MemberData(nameof(RuleComparisonTestData.IsInRange.EdgeCases), MemberType = typeof(RuleComparisonTestData.IsInRange))]
+    public void IsInRange_HandlesInclusiveAndExclusive(RuleComparisonTestData.IsInRange.ValidCase testCase)
     {
         // Act
         var result = InvokeGenericStatic<bool>(
-            "IsBetween",
+            "IsInRange",
             testCase.Value.Value,
             testCase.Value.Min,
             testCase.Value.Max,
@@ -35,12 +35,12 @@ public sealed class RuleComparisonTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(RuleComparisonTestData.IsBetween.EdgeCases), MemberType = typeof(RuleComparisonTestData.IsBetween))]
-    public void IsBetween_HandlesEdgeCases(RuleComparisonTestData.IsBetween.ValidCase testCase)
+    [MemberData(nameof(RuleComparisonTestData.IsInRange.EdgeCases), MemberType = typeof(RuleComparisonTestData.IsInRange))]
+    public void IsInRange_HandlesEdgeCases(RuleComparisonTestData.IsInRange.ValidCase testCase)
     {
         // Act
         var result = InvokeGenericStatic<bool>(
-            "IsBetween",
+            "IsInRange",
             testCase.Value.Value,
             testCase.Value.Min,
             testCase.Value.Max,
@@ -66,8 +66,8 @@ public sealed class RuleComparisonTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(RuleComparisonTestData.IsBetween.InvalidCases), MemberType = typeof(RuleComparisonTestData.IsBetween))]
-    public void IsBetween_Throws_ForInvalidInclusion(RuleComparisonTestData.IsBetween.InvalidCase testCase)
+    [MemberData(nameof(RuleComparisonTestData.IsInRange.InvalidCases), MemberType = typeof(RuleComparisonTestData.IsInRange))]
+    public void IsInRange_Throws_ForInvalidInclusion(RuleComparisonTestData.IsInRange.InvalidCase testCase)
     {
         // Arrange
         var invalidCase = testCase;
@@ -75,7 +75,7 @@ public sealed class RuleComparisonTests : BaseUnitTest
         // Act
         var ex = Assert.Throws<TargetInvocationException>(() =>
             InvokeGenericStatic<bool>(
-                "IsBetween",
+                "IsInRange",
                 invalidCase.Value.Value,
                 invalidCase.Value.Min,
                 invalidCase.Value.Max,

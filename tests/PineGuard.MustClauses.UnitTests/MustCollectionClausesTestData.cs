@@ -90,9 +90,9 @@ public static class MustCollectionClausesTestData
         }
     }
 
-    public static class HasCountBetween
+    public static class HasCountInRange
     {
-        public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases => F.HasCountBetween.ValidScenarios.ToMustCases();
+        public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases => F.HasCountInRange.ValidScenarios.ToMustCases();
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> EdgeCases =>
         [
@@ -103,9 +103,9 @@ public static class MustCollectionClausesTestData
         {
             get
             {
-                var data = F.HasCountBetween.InvalidScenarios.ToMustCases(s => s.Name switch
+                var data = F.HasCountInRange.InvalidScenarios.ToMustCases(s => s.Name switch
                 {
-                    nameof(F.HasCountBetween.NullTwoFourInclusive) => new MustExpected(false, "value must not be null.", "value"),
+                    nameof(F.HasCountInRange.NullTwoFourInclusive) => new MustExpected(false, "value must not be null.", "value"),
                     _ => new MustExpected(false, "value must have a count within the expected range.", Code: MustCodes.Collection.Count.OutOfRange)
                 });
                 data.Add(new MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>("NegativeMin", (["a"], -1, 3, Inclusion.Inclusive), new MustExpected(false, "min requires a non-negative minimum count.", "min")));
@@ -383,7 +383,7 @@ public static class MustCollectionClausesTestData
         ];
     }
 
-    public static class NotHasCountBetween
+    public static class NotHasCountInRange
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases =>
         [
@@ -397,11 +397,35 @@ public static class MustCollectionClausesTestData
 
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> InvalidCases =>
         [
-            new(nameof(F.HasCountBetween.NullTwoFourInclusive), (null, 2, 4, Inclusion.Inclusive), new MustExpected(false, "value must not be null.", "value")),
+            new(nameof(F.HasCountInRange.NullTwoFourInclusive), (null, 2, 4, Inclusion.Inclusive), new MustExpected(false, "value must not be null.", "value")),
             new("In range", (["a", "b", "c"], 2, 4, Inclusion.Inclusive), new MustExpected(false, "value must not have a count within the expected range.", Code: MustCodes.Collection.Count.InRange)),
             new("NegativeMin", (["a"], -1, 3, Inclusion.Inclusive), new MustExpected(false, "min requires a non-negative minimum count.", "min")),
             new("NegativeMax", (["a"], 0, -1, Inclusion.Inclusive), new MustExpected(false, "max requires a non-negative maximum count.", "max")),
             new("MinGtMax", (["a"], 4, 2, Inclusion.Inclusive), new MustExpected(false, "min requires a valid count range.", "min"))
         ];
     }
+
+    public static TheoryData<MustCase<int?[]?>> NullableValueItems => F.NonNullValueItems.AllScenarios.ToMustCases();
+    public static TheoryData<MustCase<string[]>> ComparerItems => [new("Explicit comparer and single enumeration", ["ABC"], new(true))];
+    public sealed class SinglePassEnumerable<T>(IEnumerable<T> source) : IEnumerable<T>
+    {
+        public int EnumerationCount { get; private set; }
+        public IEnumerator<T> GetEnumerator()
+        {
+            if (++EnumerationCount > 1)
+                throw new InvalidOperationException("Sequence was enumerated more than once.");
+            return source.GetEnumerator();
+        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+
+    public static TheoryData<MustCase<(IEnumerable<int>? Value, int Min, int Max, Inclusion Inclusion)>> InvalidRangeConfiguration =>
+    [
+        new("Undefined inclusion before null input", (null, 0, 1, (Inclusion)99), new(false, ParamName: "inclusion")),
+        new("Negative minimum before null input", (null, -1, 1, Inclusion.Inclusive), new(false, ParamName: "min")),
+        new("Negative maximum before null input", (null, 0, -1, Inclusion.Inclusive), new(false, ParamName: "max")),
+        new("Reversed range before null input", (null, 2, 1, Inclusion.Inclusive), new(false, ParamName: "min")),
+    ];
+
 }

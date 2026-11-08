@@ -179,7 +179,7 @@ public static class FluentNumberExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null)
         where T : struct, IComparable<T> =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.InRange(val.Value, min, max, inclusion, paramName: null) : MustResult<T>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.InRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
             message, MustCodes.Number.Range.OutOfRange);
 
     /// <summary>
@@ -209,7 +209,7 @@ public static class FluentNumberExtensions
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null)
         where T : struct, IComparable<T> =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.OutOfRange(val.Value, min, max, inclusion, paramName: null) : MustResult<T>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OutOfRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
             message, MustCodes.Number.Range.InRange);
 
     /// <summary>
@@ -260,7 +260,7 @@ public static class FluentNumberExtensions
         T? tolerance,
         string? message = null)
         where T : struct, INumber<T> =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Approximately(val.Value, target, tolerance, paramName: null) : MustResult<T>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Approximately(val.GetValueOrDefault(), target, tolerance, paramName: null)),
             message, MustCodes.Number.Proximity.NotApproximate);
 
     /// <summary>
@@ -288,7 +288,7 @@ public static class FluentNumberExtensions
         T? tolerance,
         string? message = null)
         where T : struct, INumber<T> =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotApproximately(val.Value, target, tolerance, paramName: null) : MustResult<T>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotApproximately(val.GetValueOrDefault(), target, tolerance, paramName: null)),
             message, MustCodes.Number.Proximity.Approximate);
 
     /// <summary>
@@ -314,7 +314,7 @@ public static class FluentNumberExtensions
         T factor,
         string? message = null)
         where T : struct, INumber<T> =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.MultipleOf(val.Value, factor, paramName: null) : MustResult<T>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.MultipleOf(val.GetValueOrDefault(), factor, paramName: null)),
             message, MustCodes.Number.Divisibility.NotMultiple);
 
     /// <summary>
@@ -340,7 +340,7 @@ public static class FluentNumberExtensions
         T factor,
         string? message = null)
         where T : struct, INumber<T> =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotMultipleOf(val.Value, factor, paramName: null) : MustResult<T>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotMultipleOf(val.GetValueOrDefault(), factor, paramName: null)),
             message, MustCodes.Number.Divisibility.Multiple);
 
     /// <summary>
@@ -866,5 +866,112 @@ public static class FluentNumberExtensions
     public static IRuleBuilderOptions<TModel, double> NaN<TModel>(this IRuleBuilder<TModel, double> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NaN(val, paramName: null),
             message, MustCodes.Number.Form.NotNan);
+
+    /// <summary>Validates the numeric GreaterThan relationship against another value.</summary>
+    /// <typeparam name="TModel">The validated model type.</typeparam>
+    /// <typeparam name="T">The numeric property type.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder.</param>
+    /// <param name="other">The value to compare against.</param>
+    /// <param name="message">An optional custom failure message.</param>
+    /// <returns>The rule builder for further chaining.</returns>
+    /// <remarks>The Number suffix distinguishes this clause from FluentValidation built-in comparisons. Absent nullable values are skipped.</remarks>
+    public static IRuleBuilderOptions<TModel, T?> GreaterThanNumber<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder,
+        T other, string? message = null) where T : struct, INumber<T> =>
+        ruleBuilder.MustBe(value => SkipAbsentValue(value, Must.Be.GreaterThan(value.GetValueOrDefault(), other, paramName: null)),
+            message, MustCodes.Number.Range.NotGreater);
+
+    /// <summary>Validates the numeric GreaterThan relationship against another value.</summary>
+    /// <typeparam name="TModel">The validated model type.</typeparam>
+    /// <typeparam name="T">The numeric property type.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder.</param>
+    /// <param name="other">The value to compare against.</param>
+    /// <param name="message">An optional custom failure message.</param>
+    /// <returns>The rule builder for further chaining.</returns>
+    /// <remarks>The Number suffix distinguishes this clause from FluentValidation built-in comparisons. Absent nullable values are skipped.</remarks>
+    public static IRuleBuilderOptions<TModel, T> GreaterThanNumber<TModel, T>(this IRuleBuilder<TModel, T> ruleBuilder,
+        T other, string? message = null) where T : struct, INumber<T> =>
+        ruleBuilder.MustBe(value => Must.Be.GreaterThan(value, other, paramName: null),
+            message, MustCodes.Number.Range.NotGreater);
+
+    /// <summary>Validates the numeric GreaterThanOrEqual relationship against another value.</summary>
+    /// <typeparam name="TModel">The validated model type.</typeparam>
+    /// <typeparam name="T">The numeric property type.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder.</param>
+    /// <param name="other">The value to compare against.</param>
+    /// <param name="message">An optional custom failure message.</param>
+    /// <returns>The rule builder for further chaining.</returns>
+    /// <remarks>The Number suffix distinguishes this clause from FluentValidation built-in comparisons. Absent nullable values are skipped.</remarks>
+    public static IRuleBuilderOptions<TModel, T?> GreaterThanOrEqualNumber<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder,
+        T other, string? message = null) where T : struct, INumber<T> =>
+        ruleBuilder.MustBe(value => SkipAbsentValue(value, Must.Be.GreaterThanOrEqual(value.GetValueOrDefault(), other, paramName: null)),
+            message, MustCodes.Number.Range.BelowMinimum);
+
+    /// <summary>Validates the numeric GreaterThanOrEqual relationship against another value.</summary>
+    /// <typeparam name="TModel">The validated model type.</typeparam>
+    /// <typeparam name="T">The numeric property type.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder.</param>
+    /// <param name="other">The value to compare against.</param>
+    /// <param name="message">An optional custom failure message.</param>
+    /// <returns>The rule builder for further chaining.</returns>
+    /// <remarks>The Number suffix distinguishes this clause from FluentValidation built-in comparisons. Absent nullable values are skipped.</remarks>
+    public static IRuleBuilderOptions<TModel, T> GreaterThanOrEqualNumber<TModel, T>(this IRuleBuilder<TModel, T> ruleBuilder,
+        T other, string? message = null) where T : struct, INumber<T> =>
+        ruleBuilder.MustBe(value => Must.Be.GreaterThanOrEqual(value, other, paramName: null),
+            message, MustCodes.Number.Range.BelowMinimum);
+
+    /// <summary>Validates the numeric LessThan relationship against another value.</summary>
+    /// <typeparam name="TModel">The validated model type.</typeparam>
+    /// <typeparam name="T">The numeric property type.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder.</param>
+    /// <param name="other">The value to compare against.</param>
+    /// <param name="message">An optional custom failure message.</param>
+    /// <returns>The rule builder for further chaining.</returns>
+    /// <remarks>The Number suffix distinguishes this clause from FluentValidation built-in comparisons. Absent nullable values are skipped.</remarks>
+    public static IRuleBuilderOptions<TModel, T?> LessThanNumber<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder,
+        T other, string? message = null) where T : struct, INumber<T> =>
+        ruleBuilder.MustBe(value => SkipAbsentValue(value, Must.Be.LessThan(value.GetValueOrDefault(), other, paramName: null)),
+            message, MustCodes.Number.Range.NotLess);
+
+    /// <summary>Validates the numeric LessThan relationship against another value.</summary>
+    /// <typeparam name="TModel">The validated model type.</typeparam>
+    /// <typeparam name="T">The numeric property type.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder.</param>
+    /// <param name="other">The value to compare against.</param>
+    /// <param name="message">An optional custom failure message.</param>
+    /// <returns>The rule builder for further chaining.</returns>
+    /// <remarks>The Number suffix distinguishes this clause from FluentValidation built-in comparisons. Absent nullable values are skipped.</remarks>
+    public static IRuleBuilderOptions<TModel, T> LessThanNumber<TModel, T>(this IRuleBuilder<TModel, T> ruleBuilder,
+        T other, string? message = null) where T : struct, INumber<T> =>
+        ruleBuilder.MustBe(value => Must.Be.LessThan(value, other, paramName: null),
+            message, MustCodes.Number.Range.NotLess);
+
+    /// <summary>Validates the numeric LessThanOrEqual relationship against another value.</summary>
+    /// <typeparam name="TModel">The validated model type.</typeparam>
+    /// <typeparam name="T">The numeric property type.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder.</param>
+    /// <param name="other">The value to compare against.</param>
+    /// <param name="message">An optional custom failure message.</param>
+    /// <returns>The rule builder for further chaining.</returns>
+    /// <remarks>The Number suffix distinguishes this clause from FluentValidation built-in comparisons. Absent nullable values are skipped.</remarks>
+    public static IRuleBuilderOptions<TModel, T?> LessThanOrEqualNumber<TModel, T>(this IRuleBuilder<TModel, T?> ruleBuilder,
+        T other, string? message = null) where T : struct, INumber<T> =>
+        ruleBuilder.MustBe(value => SkipAbsentValue(value, Must.Be.LessThanOrEqual(value.GetValueOrDefault(), other, paramName: null)),
+            message, MustCodes.Number.Range.Exceeded);
+
+    /// <summary>Validates the numeric LessThanOrEqual relationship against another value.</summary>
+    /// <typeparam name="TModel">The validated model type.</typeparam>
+    /// <typeparam name="T">The numeric property type.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder.</param>
+    /// <param name="other">The value to compare against.</param>
+    /// <param name="message">An optional custom failure message.</param>
+    /// <returns>The rule builder for further chaining.</returns>
+    /// <remarks>The Number suffix distinguishes this clause from FluentValidation built-in comparisons. Absent nullable values are skipped.</remarks>
+    public static IRuleBuilderOptions<TModel, T> LessThanOrEqualNumber<TModel, T>(this IRuleBuilder<TModel, T> ruleBuilder,
+        T other, string? message = null) where T : struct, INumber<T> =>
+        ruleBuilder.MustBe(value => Must.Be.LessThanOrEqual(value, other, paramName: null),
+            message, MustCodes.Number.Range.Exceeded);
+
+    private static MustResult<T> SkipAbsentValue<T>(T? value, MustResult<T> result) where T : struct =>
+        value is null && result.ParamName is null ? MustResult<T>.Ok(default, value: value) : result;
 }
 #endif

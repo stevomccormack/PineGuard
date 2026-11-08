@@ -151,7 +151,7 @@ public static class DateTimeRangeTestData
             : ReturnCase<(DateTimeRange Base, DateTimeRange Other), DateTimeRange?>(Name, (Base, Other), Expected);
     }
 
-    public static class Union
+    public static class Enclose
     {
         public static TheoryData<Case> Cases
         {
@@ -169,7 +169,7 @@ public static class DateTimeRangeTestData
                 [
                     new Case("Overlap Before", range, before, new DateTimeRange(start.AddDays(-9), start.AddDays(10))),
                     new Case("Overlap After", range, after, new DateTimeRange(start, start.AddDays(20))),
-                    new Case("Mixed Kind Union Normalizes To Utc", range, mixedLocalRange, new DateTimeRange(mixedLocalStartUtc, start.AddDays(10)))
+                    new Case("Mixed Kind Enclose Normalizes To Utc", range, mixedLocalRange, new DateTimeRange(mixedLocalStartUtc, start.AddDays(10)))
                 ];
             }
         }
@@ -222,15 +222,35 @@ public static class DateTimeRangeTestData
 
                 return
                 [
-                    new Case("Touches at End", range, touchesAtEnd, true),
-                    new Case("Touches at Start", range, touchesAtStart, true),
+                    new Case("Touches at End", range, touchesAtEnd, false),
+                    new Case("Touches at Start", range, touchesAtStart, false),
                     new Case("Self (Empty)", range, range, false), // range duration > 0, so not adjacent to self
-                    new Case("Utc Touches Local At Same Instant", utcRange, localTouchesAtEnd, true)
+                    new Case("Utc Touches Local At Same Instant", utcRange, localTouchesAtEnd, false)
                 ];
             }
         }
 
         public sealed record Case(string Name, DateTimeRange Base, DateTimeRange Other, bool Expected)
             : ReturnCase<(DateTimeRange Base, DateTimeRange Other), bool>(Name, (Base, Other), Expected);
+    }
+    public static class NormalizedDuration
+    {
+        public static TheoryData<Case> Cases
+        {
+            get
+            {
+                var spring = new DateTime(2024, 3, 9, 12, 0, 0, DateTimeKind.Utc);
+                var autumn = new DateTime(2024, 10, 5, 12, 0, 0, DateTimeKind.Utc);
+                return
+                [
+                    new("Utc", new DateTimeRange(spring, spring.AddDays(2)), TimeSpan.FromDays(2)),
+                    new("MixedUnspecifiedLocal", new DateTimeRange(DateTime.SpecifyKind(spring, DateTimeKind.Unspecified), spring.AddDays(2).ToLocalTime()), TimeSpan.FromDays(2)),
+                    new("LocalMarchEndpoints", new DateTimeRange(spring.ToLocalTime(), spring.AddDays(2).ToLocalTime()), TimeSpan.FromDays(2)),
+                    new("LocalOctoberEndpoints", new DateTimeRange(autumn.ToLocalTime(), autumn.AddDays(2).ToLocalTime()), TimeSpan.FromDays(2))
+                ];
+            }
+        }
+        public sealed record Case(string Name, DateTimeRange Value, TimeSpan Expected)
+            : ReturnCase<DateTimeRange, TimeSpan>(Name, Value, Expected);
     }
 }

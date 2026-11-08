@@ -37,9 +37,9 @@ public static class StringRulesDateOnlyTestData
         ];
     }
 
-    public static class IsBetween
+    public static class IsInRange
     {
-        public static TheoryData<RuleCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)>> Cases => F.DateOnlyIsBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)>> Cases => F.DateOnlyIsInRange.AllScenarios.ToRuleCases();
     }
 
     public static class HasMinimumAge

@@ -26,7 +26,7 @@ public static class RuleBuilderExtensionTestData
         public AddressMustValidator() =>
             RuleFor(x => x.City, city => string.IsNullOrWhiteSpace(city)
                 ? MustResult<string>.Fail(CityCode, CityMessage, nameof(city), city)
-                : MustResult<string>.Ok(city, city, nameof(city)));
+                : MustResult<string>.Ok(city, value: city, paramName: nameof(city)));
     }
 
     /// <summary>Fails on the object itself, so the failure arrives at <c>ShipTo</c>.</summary>
@@ -35,7 +35,7 @@ public static class RuleBuilderExtensionTestData
         public AddressRootMustValidator() =>
             RuleFor(x => x, address => string.IsNullOrWhiteSpace(address.PostalCode)
                 ? MustResult<Address>.Fail(AddressCode, AddressMessage, nameof(address), address)
-                : MustResult<Address>.Ok(address, address, nameof(address)));
+                : MustResult<Address>.Ok(address, value: address, paramName: nameof(address)));
     }
 
     /// <summary>The same nested rule, evaluated asynchronously.</summary>
@@ -44,7 +44,7 @@ public static class RuleBuilderExtensionTestData
         public AsyncAddressMustValidator() =>
             RuleForAsync(x => x.City, (city, _) => new ValueTask<MustResult<string>>(string.IsNullOrWhiteSpace(city)
                 ? MustResult<string>.Fail(CityCode, CityMessage, nameof(city), city)
-                : MustResult<string>.Ok(city, city, nameof(city))));
+                : MustResult<string>.Ok(city, value: city, paramName: nameof(city))));
     }
 
     public sealed class OrderValidator : AbstractValidator<Order>

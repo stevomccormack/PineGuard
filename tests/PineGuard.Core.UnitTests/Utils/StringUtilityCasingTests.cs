@@ -1,3 +1,4 @@
+using PineGuard.Common;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Utils;
 
@@ -29,18 +30,8 @@ public sealed class StringUtilityCasingTests : BaseUnitTest
         // Assert
         Assert.Equal(testCase.Expected, ok);
         Assert.Equal(testCase.ExpectedOutValue, cased);
-    }
-
-    [Theory]
-    [MemberData(nameof(StringUtilityCasingTestData.TryToCaseFromWords.ValidCases), MemberType = typeof(StringUtilityCasingTestData.TryToCaseFromWords))]
-    public void ToCase_FromWords_ReturnsExpected(StringUtilityCasingTestData.TryToCaseFromWords.ValidCase testCase)
-    {
-        // Act
-        var ok = StringUtility.ToCase(testCase.Value.Words!, testCase.Value.OutputStyle, out var cased);
-
-        // Assert
-        Assert.Equal(testCase.Expected, ok);
-        Assert.Equal(testCase.ExpectedOutValue, cased);
+        if (ok && testCase.Value.OutputStyle == StringCasing.SpaceCase)
+            Assert.True(StringUtility.TryCreateWords(cased, StringCasing.SpaceCase, out _));
     }
 
     [Theory]
@@ -57,24 +48,12 @@ public sealed class StringUtilityCasingTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(StringUtilityCasingTestData.TryToCaseFromValue.ValidCases), MemberType = typeof(StringUtilityCasingTestData.TryToCaseFromValue))]
-    public void ToCase_FromValue_ReturnsExpected(StringUtilityCasingTestData.TryToCaseFromValue.ValidCase testCase)
+    [MemberData(nameof(StringUtilityCasingTestData.TryToCaseSingleStyle.ValidCases), MemberType = typeof(StringUtilityCasingTestData.TryToCaseSingleStyle))]
+    [MemberData(nameof(StringUtilityCasingTestData.TryToCaseSingleStyle.EdgeCases), MemberType = typeof(StringUtilityCasingTestData.TryToCaseSingleStyle))]
+    public void TryToCase_SingleStyle_ReturnsExpected(StringUtilityCasingTestData.TryToCaseSingleStyle.ValidCase testCase)
     {
         // Act
-        var ok = StringUtility.ToCase(testCase.Value.Value, testCase.Value.InputStyle, testCase.Value.OutputStyle, out var cased);
-
-        // Assert
-        Assert.Equal(testCase.Expected, ok);
-        Assert.Equal(testCase.ExpectedOutValue, cased);
-    }
-
-    [Theory]
-    [MemberData(nameof(StringUtilityCasingTestData.ToCaseSingleStyle.ValidCases), MemberType = typeof(StringUtilityCasingTestData.ToCaseSingleStyle))]
-    [MemberData(nameof(StringUtilityCasingTestData.ToCaseSingleStyle.EdgeCases), MemberType = typeof(StringUtilityCasingTestData.ToCaseSingleStyle))]
-    public void ToCase_SingleStyle_ReturnsExpected(StringUtilityCasingTestData.ToCaseSingleStyle.ValidCase testCase)
-    {
-        // Act
-        var ok = StringUtility.ToCase(testCase.Value.Value, testCase.Value.Style, out var cased);
+        var ok = StringUtility.TryToCase(testCase.Value.Value, testCase.Value.Style, out var cased);
 
         // Assert
         Assert.Equal(testCase.Expected, ok);

@@ -1,6 +1,6 @@
 namespace PineGuard.Codes;
 
-// Serves: MustStringClauses.cs, MustStringCasingClauses.cs
+// Serves: MustStringClauses.cs, MustStringCasingClauses.cs, MustStringGraphemesClauses.cs
 public static partial class MustCodes
 {
     /// <summary>The <c>text</c> domain: string content, length, casing, character set, and pattern checks.</summary>

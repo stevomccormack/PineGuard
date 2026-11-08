@@ -40,20 +40,20 @@ public sealed class MustStringDateOnlyClausesTests(ITestOutputHelper output) : B
     }
 
     [Theory]
-    [MemberData(nameof(MustStringDateOnlyClausesTestData.BetweenDateOnly.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.BetweenDateOnly))]
-    public void BetweenDateOnly_BehavesAsExpected(MustCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.InRangeDateOnly.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.InRangeDateOnly))]
+    public void InRangeDateOnly_BehavesAsExpected(MustCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        var result = Must.Be.BetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = Must.Be.InRangeDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringDateOnlyClausesTestData.NotBetweenDateOnly.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.NotBetweenDateOnly))]
-    public void NotBetweenDateOnly_BehavesAsExpected(MustCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.OutOfRangeDateOnly.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.OutOfRangeDateOnly))]
+    public void OutOfRangeDateOnly_BehavesAsExpected(MustCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        var result = Must.Be.NotBetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = Must.Be.OutOfRangeDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
         AssertResult(tc, result);
     }
 
@@ -228,7 +228,7 @@ public sealed class MustStringDateOnlyClausesTests(ITestOutputHelper output) : B
         var (value, years) = tc.Value;
 
         // Act
-        var result = Must.Be.MinimumAge(value, years, timeProvider: FixedTimeProvider.Default, paramName: "value");
+        var result = Must.Be.MinimumAgeDateOnly(value, years, timeProvider: FixedTimeProvider.Default, paramName: "value");
 
         // Assert
         AssertResult(tc, result);
@@ -242,7 +242,7 @@ public sealed class MustStringDateOnlyClausesTests(ITestOutputHelper output) : B
         var (value, years, utcNow) = tc.Value;
 
         // Act
-        var result = Must.Be.MinimumAge(value, years, timeProvider: new FixedTimeProvider(utcNow), paramName: "value");
+        var result = Must.Be.MinimumAgeDateOnly(value, years, timeProvider: new FixedTimeProvider(utcNow), paramName: "value");
 
         // Assert
         AssertResult(tc, result);

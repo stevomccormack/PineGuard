@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 #if !NET8_0_OR_GREATER
 using System.Buffers;
 #endif
@@ -21,7 +22,7 @@ public static class BufferUtility
     /// Leading and trailing whitespace is trimmed before validation; the original, untrimmed
     /// <paramref name="value"/> should not be assumed to be directly decodable.
     /// </remarks>
-    public static bool IsHexString(string? value) =>
+    public static bool IsHex(string? value) =>
         StringUtility.TryGetTrimmed(value, out var trimmed) && trimmed.All(ch => CharRules.IsHexDigit(ch));
 
     /// <summary>
@@ -34,7 +35,7 @@ public static class BufferUtility
     /// within the value is ignored (matching <see cref="Convert.TryFromBase64String(string, Span{byte}, out int)"/>
     /// semantics); the original, untrimmed <paramref name="value"/> should not be assumed to be directly decodable.
     /// </remarks>
-    public static bool IsBase64String(string? value)
+    public static bool IsBase64(string? value)
     {
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
@@ -76,10 +77,10 @@ public static class BufferUtility
     /// <returns><see langword="true"/> if the value is valid Base64Url; otherwise, <see langword="false"/>.</returns>
     /// <remarks>
     /// Trailing padding is optional, but a padded value must still be a whole number of quanta. Embedded
-    /// whitespace is rejected rather than ignored, unlike <see cref="IsBase64String(string?)"/>. Leading and
+    /// whitespace is rejected rather than ignored, unlike <see cref="IsBase64(string?)"/>. Leading and
     /// trailing whitespace is trimmed before validation.
     /// </remarks>
-    public static bool IsBase64UrlString(string? value)
+    public static bool IsBase64Url(string? value)
     {
         if (!StringUtility.TryGetTrimmed(value, out var trimmed))
             return false;
@@ -127,7 +128,7 @@ public static class BufferUtility
     /// The decoder never substitutes U+FFFD for a malformed sequence, so a successful decode means the bytes
     /// round-trip. A leading byte-order mark is retained in <paramref name="text"/> rather than stripped.
     /// </remarks>
-    public static bool TryDecodeUtf8(byte[]? value, out string? text)
+    public static bool TryDecodeUtf8(byte[]? value, [NotNullWhen(true)] out string? text)
     {
         text = null;
 

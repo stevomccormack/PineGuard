@@ -38,34 +38,34 @@ public static class GuardStringDateOnlyClausesTestData
         public static TheoryData<GuardCase<string?>> InvalidCases => F.DateOnlyIsInFuture.InvalidScenarios.ToGuardCases("value");
     }
 
-    // Guard.Against.NotBetween — calls Must.Be.BetweenDateOnly; throws when NOT between (null/not-parseable/outside range)
+    // Guard.Against.OutOfRange — calls Must.Be.InRangeDateOnly; throws when NOT between (null/not-parseable/outside range)
     // ToGuardCases("value") cannot detect null inside tuple inputs; use explicit mapping so NullValue → ANE
-    public static class NotBetween
+    public static class OutOfRange
     {
         public static TheoryData<GuardCase<(string? value, DateOnly min, DateOnly max, Common.Inclusion inclusion)>> ValidCases =>
-            F.DateOnlyIsBetween.AllValid.ToGuardCases(_ => new GuardExpected(true));
+            F.DateOnlyIsInRange.AllValid.ToGuardCases(_ => new GuardExpected(true));
 
         public static TheoryData<GuardCase<(string? value, DateOnly min, DateOnly max, Common.Inclusion inclusion)>> InvalidCases =>
-            F.DateOnlyIsBetween.AllInvalid.ToGuardCases(s => s.Name switch
+            F.DateOnlyIsInRange.AllInvalid.ToGuardCases(s => s.Name switch
             {
-                nameof(F.DateOnlyIsBetween.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+                nameof(F.DateOnlyIsInRange.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
                 _ => new GuardExpected(false, typeof(ArgumentException), "value")
             });
     }
 
-    // Guard.Against.Between — calls Must.Be.NotBetweenDateOnly; throws when IS between or null/not-parseable
+    // Guard.Against.InRange — calls Must.Be.OutOfRangeDateOnly; throws when IS between or null/not-parseable
     // Valid only for true outside-range scenarios: InvalidEdgeScenarios (OnMinExclusive = at min with exclusive = outside)
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<GuardCase<(string? value, DateOnly min, DateOnly max, Common.Inclusion inclusion)>> ValidCases =>
-            F.DateOnlyIsBetween.InvalidEdgeScenarios.ToGuardCases(_ => new GuardExpected(true));
+            F.DateOnlyIsInRange.InvalidEdgeScenarios.ToGuardCases(_ => new GuardExpected(true));
 
         public static TheoryData<GuardCase<(string? value, DateOnly min, DateOnly max, Common.Inclusion inclusion)>> InvalidCases =>
             [
-                .. F.DateOnlyIsBetween.AllValid.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
-                .. F.DateOnlyIsBetween.InvalidScenarios.ToGuardCases(s => s.Name switch
+                .. F.DateOnlyIsInRange.AllValid.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
+                .. F.DateOnlyIsInRange.InvalidScenarios.ToGuardCases(s => s.Name switch
                 {
-                    nameof(F.DateOnlyIsBetween.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+                    nameof(F.DateOnlyIsInRange.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
                     _ => new GuardExpected(false, typeof(ArgumentException), "value")
                 })
             ];

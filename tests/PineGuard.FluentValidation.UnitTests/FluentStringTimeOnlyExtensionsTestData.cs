@@ -7,11 +7,11 @@ namespace PineGuard.FluentValidation.UnitTests;
 public static class FluentStringTimeOnlyExtensionsTestData
 {
     private static readonly string S1000 = F.StringTimeOnly.IsChronological.BeforeExclusive.start!;
-    private static readonly string S1100 = F.StringTimeOnly.IsBetween.InRangeInclusive.value!;
+    private static readonly string S1100 = F.StringTimeOnly.IsInRange.InRangeInclusive.value!;
     private static readonly string S1200 = F.StringTimeOnly.IsSame.ExactMatch.value!;
     private static readonly string S1300 = F.StringTimeOnly.IsAfter.AfterExclusive.value!;
 
-    public static class BetweenTimeOnly
+    public static class InRangeTimeOnly
     {
         public static TheoryData<FluentCase<string?>> Cases =>
         [
@@ -21,7 +21,7 @@ public static class FluentStringTimeOnlyExtensionsTestData
         ];
     }
 
-    public static class NotBetweenTimeOnly
+    public static class OutOfRangeTimeOnly
     {
         public static TheoryData<FluentCase<string?>> Cases =>
         [

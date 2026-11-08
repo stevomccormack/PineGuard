@@ -59,6 +59,7 @@ public static class CsvColumnSchemaTestData
             new("type null", ("name", null), new ExpectedException(typeof(ArgumentException), "type")),
             new("type empty", ("name", ""), new ExpectedException(typeof(ArgumentException), "type")),
             new("type whitespace", ("name", "  "), new ExpectedException(typeof(ArgumentException), "type")),
+            new("datetime is intentionally ambiguous", ("name", "datetime"), new ExpectedException(typeof(ArgumentException), "type")),
             new("type unsupported", ("name", "wat"), new ExpectedException(typeof(ArgumentException), "type"))
         ];
 
@@ -67,5 +68,16 @@ public static class CsvColumnSchemaTestData
 
         public sealed record InvalidCase(string Name, (string Name, string? Type) Value, ExpectedException ExpectedException)
             : ThrowsCase<(string Name, string? Type)>(Name, Value, ExpectedException);
+    }
+
+    public static class InvalidMetadata
+    {
+        public static TheoryData<(string? name, int maxLength, Type exceptionType, string paramName)> Cases =>
+        [
+            (null, 1, typeof(ArgumentException), "name"),
+            (" ", 1, typeof(ArgumentException), "name"),
+            ("a", 0, typeof(ArgumentOutOfRangeException), "maxLength"),
+            ("a", -1, typeof(ArgumentOutOfRangeException), "maxLength")
+        ];
     }
 }

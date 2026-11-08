@@ -53,11 +53,11 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     }
 
     [Theory]
-    [MemberData(nameof(DateOnlyRulesTestData.IsBetween.Cases), MemberType = typeof(DateOnlyRulesTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(RuleCase<(DateOnly? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(DateOnlyRulesTestData.IsInRange.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInRange))]
+    public void IsInRange_BehavesAsExpected(RuleCase<(DateOnly? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = DateOnlyRules.IsBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = DateOnlyRules.IsInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);
@@ -65,7 +65,7 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
     [Theory]
     [MemberData(nameof(DateOnlyRulesTestData.IsBefore.Cases), MemberType = typeof(DateOnlyRulesTestData.IsBefore))]
-    public void IsBefore_BehavesAsExpected(RuleCase<(DateOnly? value, DateOnly? other, Inclusion inclusion, DatePrecision? precision)> tc)
+    public void IsBefore_BehavesAsExpected(RuleCase<(DateOnly? value, DateOnly other, Inclusion inclusion, DatePrecision? precision)> tc)
     {
         // Act
         var result = DateOnlyRules.IsBefore(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
@@ -76,7 +76,7 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
     [Theory]
     [MemberData(nameof(DateOnlyRulesTestData.IsBeforeDefaultInclusion.Cases), MemberType = typeof(DateOnlyRulesTestData.IsBeforeDefaultInclusion))]
-    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(DateOnly? value, DateOnly? other)> tc)
+    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(DateOnly? value, DateOnly other)> tc)
     {
         // Act
         var result = DateOnlyRules.IsBefore(tc.Value.value, tc.Value.other);
@@ -87,7 +87,7 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
     [Theory]
     [MemberData(nameof(DateOnlyRulesTestData.IsAfter.Cases), MemberType = typeof(DateOnlyRulesTestData.IsAfter))]
-    public void IsAfter_BehavesAsExpected(RuleCase<(DateOnly? value, DateOnly? other, Inclusion inclusion, DatePrecision? precision)> tc)
+    public void IsAfter_BehavesAsExpected(RuleCase<(DateOnly? value, DateOnly other, Inclusion inclusion, DatePrecision? precision)> tc)
     {
         // Act
         var result = DateOnlyRules.IsAfter(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
@@ -98,7 +98,7 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
     [Theory]
     [MemberData(nameof(DateOnlyRulesTestData.IsAfterDefaultInclusion.Cases), MemberType = typeof(DateOnlyRulesTestData.IsAfterDefaultInclusion))]
-    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(DateOnly? value, DateOnly? other)> tc)
+    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(DateOnly? value, DateOnly other)> tc)
     {
         // Act
         var result = DateOnlyRules.IsAfter(tc.Value.value, tc.Value.other);

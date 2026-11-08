@@ -104,93 +104,6 @@ public static class MustNetworkClauses
     }
 
     /// <summary>
-    /// Validates that the specified value must be a valid IP address.
-    /// </summary>
-    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="paramName">
-    /// The name of the calling parameter. Automatically captured via
-    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
-    /// </param>
-    /// <returns>
-    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
-    /// </returns>
-    /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be a valid IP address."</c>
-    /// </remarks>
-    /// <seealso href="https://pineguard.ai/docs/must/network">Network Must Clauses documentation</seealso>
-    public static MustResult<string> IpAddressString(this IMustClause _,
-        string? value,
-        [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Network.Address.Invalid, NullMessage, paramName, value);
-
-        const string messageTemplate = "{paramName} must be a valid IP address.";
-
-        var ok = NetworkRules.IsIpAddress(value);
-        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.Invalid, messageTemplate, paramName, value, result: value);
-    }
-
-    /// <summary>
-    /// Validates that the specified value must be a valid IPv4 address.
-    /// </summary>
-    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="paramName">
-    /// The name of the calling parameter. Automatically captured via
-    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
-    /// </param>
-    /// <returns>
-    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
-    /// </returns>
-    /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be a valid IPv4 address."</c>
-    /// </remarks>
-    /// <seealso href="https://pineguard.ai/docs/must/network">Network Must Clauses documentation</seealso>
-    public static MustResult<string> Ipv4String(this IMustClause _,
-        string? value,
-        [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Network.Address.NotIpv4, NullMessage, paramName, value);
-
-        const string messageTemplate = "{paramName} must be a valid IPv4 address.";
-
-        var ok = NetworkRules.IsIpv4(value);
-        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.NotIpv4, messageTemplate, paramName, value, result: value);
-    }
-
-    /// <summary>
-    /// Validates that the specified value must be a valid IPv6 address.
-    /// </summary>
-    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="paramName">
-    /// The name of the calling parameter. Automatically captured via
-    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
-    /// </param>
-    /// <returns>
-    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
-    /// </returns>
-    /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be a valid IPv6 address."</c>
-    /// </remarks>
-    /// <seealso href="https://pineguard.ai/docs/must/network">Network Must Clauses documentation</seealso>
-    public static MustResult<string> Ipv6String(this IMustClause _,
-        string? value,
-        [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Network.Address.NotIpv6, NullMessage, paramName, value);
-
-        const string messageTemplate = "{paramName} must be a valid IPv6 address.";
-
-        var ok = NetworkRules.IsIpv6(value);
-        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.NotIpv6, messageTemplate, paramName, value, result: value);
-    }
-
-    /// <summary>
     /// Validates that the specified value must not be null or whitespace.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
@@ -212,18 +125,15 @@ public static class MustNetworkClauses
         string cidr,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!NetworkUtility.TryParseCidr(cidr, out var network, out var prefixLength) || network is null)
+            return MustResult<IPAddress>.Fail(MustCodes.Network.Cidr.OutOfRange, "{paramName} must be a valid CIDR range.", nameof(cidr), cidr);
+
         if (value is null)
             return MustResult<IPAddress>.Fail(MustCodes.Network.Cidr.OutOfRange, NullMessage, paramName, value);
-
-        if (string.IsNullOrWhiteSpace(cidr))
-            return MustResult<IPAddress>.Fail(MustCodes.Network.Cidr.OutOfRange, "{paramName} must not be null or whitespace.", nameof(cidr), cidr);
 
         const string messageTemplate = "{paramName} must be within the specified CIDR range.";
 
         if (!NetworkUtility.TryParseIpAddress(value, out var address) || address is null)
-            return MustResult<IPAddress>.FromBool(false, MustCodes.Network.Cidr.OutOfRange, messageTemplate, paramName, value, result: default);
-
-        if (!NetworkUtility.TryParseCidr(cidr, out var network, out var prefixLength) || network is null)
             return MustResult<IPAddress>.FromBool(false, MustCodes.Network.Cidr.OutOfRange, messageTemplate, paramName, value, result: default);
 
         var ok = NetworkUtility.IsInCidr(address, network, prefixLength);
@@ -255,7 +165,7 @@ public static class MustNetworkClauses
 
         const string messageTemplate = "{paramName} must be a valid hostname.";
 
-        var ok = NetworkUtility.TryGetAsciiHostname(value, out var ascii) && NetworkRules.IsValidHostname(value);
+        var ok = NetworkUtility.TryGetAsciiHostname(value, out var ascii) && NetworkUtility.ValidateHostnameLabels(ascii!);
         return MustResult<string>.FromBool(ok, MustCodes.Network.Hostname.Invalid, messageTemplate, paramName, value, result: ascii!);
     }
 
@@ -413,93 +323,6 @@ public static class MustNetworkClauses
     }
 
     /// <summary>
-    /// Validates that the specified value must not be a valid IP address.
-    /// </summary>
-    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="paramName">
-    /// The name of the calling parameter. Automatically captured via
-    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
-    /// </param>
-    /// <returns>
-    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
-    /// </returns>
-    /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must not be a valid IP address."</c>
-    /// </remarks>
-    /// <seealso href="https://pineguard.ai/docs/must/network">Network Must Clauses documentation</seealso>
-    public static MustResult<string> NotIpAddressString(this IMustClause _,
-        string? value,
-        [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Network.Address.WellFormed, NullMessage, paramName, value);
-
-        const string messageTemplate = "{paramName} must not be a valid IP address.";
-
-        var ok = !NetworkRules.IsIpAddress(value);
-        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.WellFormed, messageTemplate, paramName, value, result: value);
-    }
-
-    /// <summary>
-    /// Validates that the specified value must not be a valid IPv4 address.
-    /// </summary>
-    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="paramName">
-    /// The name of the calling parameter. Automatically captured via
-    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
-    /// </param>
-    /// <returns>
-    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
-    /// </returns>
-    /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must not be a valid IPv4 address."</c>
-    /// </remarks>
-    /// <seealso href="https://pineguard.ai/docs/must/network">Network Must Clauses documentation</seealso>
-    public static MustResult<string> NotIpv4String(this IMustClause _,
-        string? value,
-        [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Network.Address.Ipv4, NullMessage, paramName, value);
-
-        const string messageTemplate = "{paramName} must not be a valid IPv4 address.";
-
-        var ok = !NetworkRules.IsIpv4(value);
-        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.Ipv4, messageTemplate, paramName, value, result: value);
-    }
-
-    /// <summary>
-    /// Validates that the specified value must not be a valid IPv6 address.
-    /// </summary>
-    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="paramName">
-    /// The name of the calling parameter. Automatically captured via
-    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
-    /// </param>
-    /// <returns>
-    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
-    /// </returns>
-    /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must not be a valid IPv6 address."</c>
-    /// </remarks>
-    /// <seealso href="https://pineguard.ai/docs/must/network">Network Must Clauses documentation</seealso>
-    public static MustResult<string> NotIpv6String(this IMustClause _,
-        string? value,
-        [CallerArgumentExpression(nameof(value))] string? paramName = null)
-    {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Network.Address.Ipv6, NullMessage, paramName, value);
-
-        const string messageTemplate = "{paramName} must not be a valid IPv6 address.";
-
-        var ok = !NetworkRules.IsIpv6(value);
-        return MustResult<string>.FromBool(ok, MustCodes.Network.Address.Ipv6, messageTemplate, paramName, value, result: value);
-    }
-
-    /// <summary>
     /// Validates that the specified value must not be null or whitespace.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
@@ -516,21 +339,22 @@ public static class MustNetworkClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null or whitespace."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/network">Network Must Clauses documentation</seealso>
-    public static MustResult<string> NotInCidrRange(this IMustClause _,
+    public static MustResult<IPAddress> NotInCidrRange(this IMustClause _,
         string? value,
         string cidr,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Network.Cidr.InRange, NullMessage, paramName, value);
+        if (!NetworkUtility.TryParseCidr(cidr, out var network, out var prefixLength) || network is null)
+            return MustResult<IPAddress>.Fail(MustCodes.Network.Cidr.InRange, "{paramName} must be a valid CIDR range.", nameof(cidr), cidr);
 
-        if (string.IsNullOrWhiteSpace(cidr))
-            return MustResult<string>.Fail(MustCodes.Network.Cidr.InRange, "{paramName} must not be null or whitespace.", nameof(cidr), cidr);
+        if (value is null)
+            return MustResult<IPAddress>.Fail(MustCodes.Network.Cidr.InRange, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be within the specified CIDR range.";
 
-        var ok = !NetworkRules.IsInCidr(value, cidr);
-        return MustResult<string>.FromBool(ok, MustCodes.Network.Cidr.InRange, messageTemplate, paramName, value, result: value);
+        var ok = NetworkUtility.TryParseIpAddress(value, out var address) && address is not null
+            && !NetworkUtility.IsInCidr(address, network, prefixLength);
+        return MustResult<IPAddress>.FromBool(ok, MustCodes.Network.Cidr.InRange, messageTemplate, paramName, value, result: address);
     }
 
     /// <summary>
@@ -558,7 +382,7 @@ public static class MustNetworkClauses
 
         const string messageTemplate = "{paramName} must not be a valid hostname.";
 
-        var ok = !NetworkRules.IsValidHostname(value);
+        var ok = !NetworkRules.IsHostname(value);
         return MustResult<string>.FromBool(ok, MustCodes.Network.Hostname.WellFormed, messageTemplate, paramName, value, result: value);
     }
 

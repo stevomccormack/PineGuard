@@ -139,7 +139,7 @@ public static class GuardDateTimeClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the NotBetween constraint.
+    /// Throws if <paramref name="value"/> violates the OutOfRange constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -157,8 +157,8 @@ public static class GuardDateTimeClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustDateTimeClauses.Between"/>
-    public static DateTime NotBetween(this IGuardClause _,
+    /// <seealso cref="MustDateTimeClauses.InRange"/>
+    public static DateTime OutOfRange(this IGuardClause _,
         DateTime value,
         DateTime min,
         DateTime max,
@@ -167,7 +167,7 @@ public static class GuardDateTimeClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Between(value, min, max, inclusion, paramName);
+        var result = Must.Be.InRange(value, min, max, inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -175,7 +175,7 @@ public static class GuardDateTimeClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the Between constraint.
+    /// Throws if <paramref name="value"/> violates the InRange constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -193,8 +193,8 @@ public static class GuardDateTimeClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustDateTimeClauses.NotBetween"/>
-    public static DateTime Between(this IGuardClause _,
+    /// <seealso cref="MustDateTimeClauses.OutOfRange"/>
+    public static DateTime InRange(this IGuardClause _,
         DateTime value,
         DateTime min,
         DateTime max,
@@ -203,7 +203,7 @@ public static class GuardDateTimeClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotBetween(value, min, max, inclusion, paramName); // Guard.Against.Between => Must.Be.NotBetween (complement)
+        var result = Must.Be.OutOfRange(value, min, max, inclusion, paramName); // Guard.Against.InRange => Must.Be.OutOfRange (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -462,7 +462,7 @@ public static class GuardDateTimeClauses
         DateTime end1,
         DateTime start2,
         DateTime end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
@@ -500,7 +500,7 @@ public static class GuardDateTimeClauses
         DateTime end1,
         DateTime start2,
         DateTime end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)

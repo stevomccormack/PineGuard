@@ -58,7 +58,7 @@ public static class MustStringDateOnlyClausesTestData
         ];
     }
 
-    public static class BetweenDateOnly
+    public static class InRangeDateOnly
     {
         public static TheoryData<MustCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)>> Cases =>
         [
@@ -72,7 +72,7 @@ public static class MustStringDateOnlyClausesTestData
         ];
     }
 
-    public static class NotBetweenDateOnly
+    public static class OutOfRangeDateOnly
     {
         public static TheoryData<MustCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)>> Cases =>
         [

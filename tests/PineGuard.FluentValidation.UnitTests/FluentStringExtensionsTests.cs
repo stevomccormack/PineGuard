@@ -8,6 +8,27 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : BaseFluentUnitTest(output)
 {
+    [Theory]
+    [MemberData(nameof(FluentStringExtensionsTestData.InvalidComparisons), MemberType = typeof(FluentStringExtensionsTestData))]
+    public void ComparisonConfiguration_IsCheckedBeforeInput(string? value, StringComparison comparison)
+    {
+        // Arrange
+        var validator = new InlineValidator<StringModel>();
+        validator.RuleFor(x => x.Value).Contains("x", comparison);
+        validator.RuleFor(x => x.Value).NotContains("x", comparison);
+        validator.RuleFor(x => x.Value).StartsWith("x", comparison);
+        validator.RuleFor(x => x.Value).NotStartsWith("x", comparison);
+        validator.RuleFor(x => x.Value).EndsWith("x", comparison);
+        validator.RuleFor(x => x.Value).NotEndsWith("x", comparison);
+
+        // Act
+        var result = validator.Validate(new StringModel { Value = value });
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Equal(6, result.Errors.Count);
+    }
+
     private sealed record StringModel { public string? Value { get; init; } }
 
     private sealed class NotNullOrEmptyValidator : AbstractValidator<StringModel>
@@ -35,9 +56,9 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
         public ExactLengthValidator(int length) => RuleFor(x => x.Value).ExactLength(length);
     }
 
-    private sealed class LengthBetweenValidator : AbstractValidator<StringModel>
+    private sealed class LengthInRangeValidator : AbstractValidator<StringModel>
     {
-        public LengthBetweenValidator(int min, int max) => RuleFor(x => x.Value).LengthBetween(min, max);
+        public LengthInRangeValidator(int min, int max) => RuleFor(x => x.Value).LengthInRange(min, max);
     }
 
     private sealed class LongerThanValidator : AbstractValidator<StringModel>
@@ -316,10 +337,10 @@ public sealed class FluentStringExtensionsTests(ITestOutputHelper output) : Base
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringExtensionsTestData.LengthBetween.Cases), MemberType = typeof(FluentStringExtensionsTestData.LengthBetween))]
-    public void LengthBetween_BehavesAsExpected(FluentCase<(string? value, int min, int max)> tc)
+    [MemberData(nameof(FluentStringExtensionsTestData.LengthInRange.Cases), MemberType = typeof(FluentStringExtensionsTestData.LengthInRange))]
+    public void LengthInRange_BehavesAsExpected(FluentCase<(string? value, int min, int max)> tc)
     {
-        var result = new LengthBetweenValidator(tc.Value.min, tc.Value.max).Validate(new StringModel { Value = tc.Value.value });
+        var result = new LengthInRangeValidator(tc.Value.min, tc.Value.max).Validate(new StringModel { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 

@@ -266,4 +266,14 @@ public sealed class MustNumberClausesTests(ITestOutputHelper output) : BaseMustU
         var result = Must.Be.NaN(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
+    [Theory]
+    [MemberData(nameof(MustNumberClausesTestData.ConfigurationPrecedence.Cases), MemberType = typeof(MustNumberClausesTestData.ConfigurationPrecedence))]
+    public void ConfigurationPrecedence_RejectsInvalidConfiguration(MustCase<Func<MustResult<int>>> tc)
+    {
+        // Act
+        var result = tc.Value();
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

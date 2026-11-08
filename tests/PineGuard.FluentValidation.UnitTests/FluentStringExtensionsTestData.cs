@@ -9,8 +9,15 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public static partial class FluentStringExtensionsTestData
 {
+    public static TheoryData<string?, StringComparison> InvalidComparisons => new()
+    {
+        { null, (StringComparison)42 },
+        { "value", (StringComparison)(-1) }
+    };
+
     public static class NotNullOrEmpty
     {
+
         public static TheoryData<FluentCase<string?>> Cases => F.IsNotNullOrEmpty.AllScenarios.ToFluentCases(s => s.Name switch
         {
             nameof(F.IsNotNullOrEmpty.NullValue) => new FluentExpected(true),
@@ -57,11 +64,11 @@ public static partial class FluentStringExtensionsTestData
         });
     }
 
-    public static class LengthBetween
+    public static class LengthInRange
     {
-        public static TheoryData<FluentCase<(string? value, int min, int max)>> Cases => F.IsLengthBetween.AllScenarios.ToFluentCases(s => s.Name switch
+        public static TheoryData<FluentCase<(string? value, int min, int max)>> Cases => F.IsLengthInRange.AllScenarios.ToFluentCases(s => s.Name switch
         {
-            nameof(F.IsLengthBetween.NullValue) => new FluentExpected(true),
+            nameof(F.IsLengthInRange.NullValue) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must have a length within the expected range.")
         });

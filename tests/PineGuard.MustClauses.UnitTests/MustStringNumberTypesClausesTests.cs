@@ -61,110 +61,142 @@ public sealed class MustStringNumberTypesClausesTests(ITestOutputHelper output) 
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int32InRange.ValidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int32InRange))]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int32InRange.InvalidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int32InRange))]
-    public void Int32InRange_BehavesAsExpected(MustCase<(string text, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.InRangeInt32.ValidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.InRangeInt32))]
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.InRangeInt32.InvalidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.InRangeInt32))]
+    public void InRangeInt32_BehavesAsExpected(MustCase<(string text, int min, int max, Inclusion inclusion)> tc)
     {
-        var result = Must.Be.Int32InRange(tc.Value.text, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.InRangeInt32(tc.Value.text, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int32InRange.NullCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int32InRange))]
-    public void Int32InRange_Null_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int32InRange.NullCase tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.InRangeInt32.NullCases), MemberType = typeof(MustStringNumberTypesClausesTestData.InRangeInt32))]
+    public void InRangeInt32_Null_BehavesAsExpected(MustStringNumberTypesClausesTestData.InRangeInt32.NullCase tc)
     {
-        var result = Must.Be.Int32InRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        var result = Must.Be.InRangeInt32(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
         Assert.Equal(tc.Expected, result.Success);
         Assert.Equal(tc.ParamName, result.ParamName);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int32InRange.RangeCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int32InRange))]
-    public void Int32InRange_InvalidRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int32InRange.RangeCase tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.InRangeInt32.RangeCases), MemberType = typeof(MustStringNumberTypesClausesTestData.InRangeInt32))]
+    public void InRangeInt32_InvalidRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.InRangeInt32.RangeCase tc)
     {
-        var result = Must.Be.Int32InRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        var result = Must.Be.InRangeInt32(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
         Assert.Equal(tc.Expected, result.Success);
         Assert.Equal(tc.ParamName, result.ParamName);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int32OutOfRange.ValidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int32OutOfRange))]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int32OutOfRange.InvalidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int32OutOfRange))]
-    public void Int32OutOfRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int32OutOfRange.ValidCase tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.OutOfRangeInt32.ValidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.OutOfRangeInt32))]
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.OutOfRangeInt32.InvalidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.OutOfRangeInt32))]
+    public void OutOfRangeInt32_BehavesAsExpected(MustStringNumberTypesClausesTestData.OutOfRangeInt32.ValidCase tc)
     {
-        var result = Must.Be.Int32OutOfRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        var result = Must.Be.OutOfRangeInt32(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
         Assert.Equal(tc.Expected, result.Success);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int32OutOfRange.NullCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int32OutOfRange))]
-    public void Int32OutOfRange_Null_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int32OutOfRange.NullCase tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.OutOfRangeInt32.NullCases), MemberType = typeof(MustStringNumberTypesClausesTestData.OutOfRangeInt32))]
+    public void OutOfRangeInt32_Null_BehavesAsExpected(MustStringNumberTypesClausesTestData.OutOfRangeInt32.NullCase tc)
     {
-        var result = Must.Be.Int32OutOfRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
-        Assert.Equal(tc.Expected, result.Success);
-        Assert.Equal(tc.ParamName, result.ParamName);
-    }
-
-    [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int32OutOfRange.RangeCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int32OutOfRange))]
-    public void Int32OutOfRange_InvalidRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int32OutOfRange.RangeCase tc)
-    {
-        var result = Must.Be.Int32OutOfRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        var result = Must.Be.OutOfRangeInt32(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
         Assert.Equal(tc.Expected, result.Success);
         Assert.Equal(tc.ParamName, result.ParamName);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int64InRange.ValidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int64InRange))]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int64InRange.InvalidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int64InRange))]
-    public void Int64InRange_BehavesAsExpected(MustCase<(string text, long min, long max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.OutOfRangeInt32.RangeCases), MemberType = typeof(MustStringNumberTypesClausesTestData.OutOfRangeInt32))]
+    public void OutOfRangeInt32_InvalidRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.OutOfRangeInt32.RangeCase tc)
     {
-        var result = Must.Be.Int64InRange(tc.Value.text, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.OutOfRangeInt32(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        Assert.Equal(tc.Expected, result.Success);
+        Assert.Equal(tc.ParamName, result.ParamName);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.InRangeInt64.ValidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.InRangeInt64))]
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.InRangeInt64.InvalidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.InRangeInt64))]
+    public void InRangeInt64_BehavesAsExpected(MustCase<(string text, long min, long max, Inclusion inclusion)> tc)
+    {
+        var result = Must.Be.InRangeInt64(tc.Value.text, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int64InRange.NullCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int64InRange))]
-    public void Int64InRange_Null_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int64InRange.NullCase tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.InRangeInt64.NullCases), MemberType = typeof(MustStringNumberTypesClausesTestData.InRangeInt64))]
+    public void InRangeInt64_Null_BehavesAsExpected(MustStringNumberTypesClausesTestData.InRangeInt64.NullCase tc)
     {
-        var result = Must.Be.Int64InRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        var result = Must.Be.InRangeInt64(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
         Assert.Equal(tc.Expected, result.Success);
         Assert.Equal(tc.ParamName, result.ParamName);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int64InRange.RangeCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int64InRange))]
-    public void Int64InRange_InvalidRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int64InRange.RangeCase tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.InRangeInt64.RangeCases), MemberType = typeof(MustStringNumberTypesClausesTestData.InRangeInt64))]
+    public void InRangeInt64_InvalidRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.InRangeInt64.RangeCase tc)
     {
-        var result = Must.Be.Int64InRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        var result = Must.Be.InRangeInt64(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
         Assert.Equal(tc.Expected, result.Success);
         Assert.Equal(tc.ParamName, result.ParamName);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int64OutOfRange.ValidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int64OutOfRange))]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int64OutOfRange.InvalidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int64OutOfRange))]
-    public void Int64OutOfRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int64OutOfRange.ValidCase tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.OutOfRangeInt64.ValidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.OutOfRangeInt64))]
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.OutOfRangeInt64.InvalidCases), MemberType = typeof(MustStringNumberTypesClausesTestData.OutOfRangeInt64))]
+    public void OutOfRangeInt64_BehavesAsExpected(MustStringNumberTypesClausesTestData.OutOfRangeInt64.ValidCase tc)
     {
-        var result = Must.Be.Int64OutOfRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        var result = Must.Be.OutOfRangeInt64(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
         Assert.Equal(tc.Expected, result.Success);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int64OutOfRange.NullCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int64OutOfRange))]
-    public void Int64OutOfRange_Null_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int64OutOfRange.NullCase tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.OutOfRangeInt64.NullCases), MemberType = typeof(MustStringNumberTypesClausesTestData.OutOfRangeInt64))]
+    public void OutOfRangeInt64_Null_BehavesAsExpected(MustStringNumberTypesClausesTestData.OutOfRangeInt64.NullCase tc)
     {
-        var result = Must.Be.Int64OutOfRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        var result = Must.Be.OutOfRangeInt64(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
         Assert.Equal(tc.Expected, result.Success);
         Assert.Equal(tc.ParamName, result.ParamName);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringNumberTypesClausesTestData.Int64OutOfRange.RangeCases), MemberType = typeof(MustStringNumberTypesClausesTestData.Int64OutOfRange))]
-    public void Int64OutOfRange_InvalidRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.Int64OutOfRange.RangeCase tc)
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.OutOfRangeInt64.RangeCases), MemberType = typeof(MustStringNumberTypesClausesTestData.OutOfRangeInt64))]
+    public void OutOfRangeInt64_InvalidRange_BehavesAsExpected(MustStringNumberTypesClausesTestData.OutOfRangeInt64.RangeCase tc)
     {
-        var result = Must.Be.Int64OutOfRange(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
+        var result = Must.Be.OutOfRangeInt64(tc.Value.text, tc.Value.min, tc.Value.max, paramName: "value");
         Assert.Equal(tc.Expected, result.Success);
         Assert.Equal(tc.ParamName, result.ParamName);
+    }
+    [Theory]
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.ConfigurationPrecedence.Cases), MemberType = typeof(MustStringNumberTypesClausesTestData.ConfigurationPrecedence))]
+    public void ConfigurationPrecedence_RejectsInvalidConfiguration(MustCase<Func<MustResult<int>>> tc)
+    {
+        // Act
+        var result = tc.Value();
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.ConfigurationPrecedence.Int64Cases), MemberType = typeof(MustStringNumberTypesClausesTestData.ConfigurationPrecedence))]
+    public void Int64ConfigurationPrecedence_RejectsInvalidConfiguration(MustCase<Func<MustResult<long>>> tc)
+    {
+        // Act
+        var result = tc.Value();
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringNumberTypesClausesTestData.ConfigurationPrecedence.DecimalCases), MemberType = typeof(MustStringNumberTypesClausesTestData.ConfigurationPrecedence))]
+    public void DecimalConfigurationPrecedence_RejectsInvalidConfiguration(MustCase<Func<MustResult<decimal>>> tc)
+    {
+        // Act
+        var result = tc.Value();
+
+        // Assert
+        AssertResult(tc, result);
     }
 }

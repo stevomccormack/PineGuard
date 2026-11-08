@@ -57,7 +57,7 @@ public static partial class StringRulesFixtures
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
-    public static class IsInt32InRange
+    public static class IsInRangeInt32
     {
         public static readonly (string text, int min, int max, Inclusion inclusion) BetweenInclusive = ("5", 1, 10, Inclusion.Inclusive);
         public static readonly (string text, int min, int max, Inclusion inclusion) AtMinInclusive = ("1", 1, 10, Inclusion.Inclusive);
@@ -73,7 +73,7 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string text, int min, int max, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
-    public static class IsInt64InRange
+    public static class IsInRangeInt64
     {
         public static readonly (string text, long min, long max, Inclusion inclusion) BetweenInclusive = ("5", 1L, 10L, Inclusion.Inclusive);
         public static readonly (string text, long min, long max, Inclusion inclusion) AtMinInclusive = ("1", 1L, 10L, Inclusion.Inclusive);

@@ -3,6 +3,13 @@
   "stripPrefixes": ["Not", "Has", "Is"],
   "ignoreMethods": ["MustBe"],
   "aliases": {
+    "InvalidXml": "ValidXml",
+    "BelowMinimumAge": "MinimumAge",
+    "BelowMinimumAgeDateOnly": "MinimumAgeDateOnly",
+    "GreaterThanNumber": "GreaterThan",
+    "GreaterThanOrEqualNumber": "GreaterThanOrEqual",
+    "LessThanNumber": "LessThan",
+    "LessThanOrEqualNumber": "LessThanOrEqual",
     "OwaspSafe": "Owasp",
     "OwaspUnsafe": "Owasp",
 

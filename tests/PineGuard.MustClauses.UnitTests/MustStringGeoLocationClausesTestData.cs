@@ -1,3 +1,4 @@
+using System.Globalization;
 using PineGuard.Testing.UnitTests.MustClauses;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -5,6 +6,17 @@ namespace PineGuard.MustClauses.UnitTests;
 
 public static class MustStringGeoLocationClausesTestData
 {
+    public static class Styles
+    {
+        public static TheoryData<MustCase<(string? value, NumberStyles styles, double parsed)>> ValidCases => F.GeoLocationStyles.ValidScenarios.ToMustCases();
+        public static TheoryData<MustCase<(string? value, NumberStyles styles, double parsed)>> InvalidCases => F.GeoLocationStyles.InvalidScenarios.ToMustCases();
+    }
+
+    public static class InvalidStyles
+    {
+        public static TheoryData<MustCase<(string? value, NumberStyles styles)>> InvalidCases => F.GeoLocationInvalidStyles.AllScenarios.ToMustCases(_ => new MustExpected(false, "styles must contain supported floating-point parsing flags.", "styles"));
+    }
+
     public static class Latitude
     {
         public static TheoryData<MustCase<string?>> ValidCases => F.IsLatitude.ValidScenarios.ToMustCases();

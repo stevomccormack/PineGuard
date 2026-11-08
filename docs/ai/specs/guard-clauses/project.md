@@ -202,7 +202,7 @@ Concretely:
 - Prefer **`Not*` complements** when the forbidden state is the complement of a positive Must clause:
   - `Guard.Against.NotX(...)` is the complement of `Must.Be.X(...)`.
   - `Guard.Against.NotHasX(...)` / `NotHasAnyX(...)` are complements of `Must.Be.HasX(...)` / `HasAnyX(...)`.
-- Do not introduce `Non*` or `Invalid*` naming. Standardize on `Not*` plus explicit semantic opposites (see §5.4.9 and the shared vocabulary map).
+- Do not introduce general `Non*` or `Invalid*` naming. Standardize on `Not*` plus explicit semantic opposites (see §5.4.9 and the shared vocabulary map). Exact exceptions are `InvalidXml` for XSD validity and `Invalid` for the object-validator entry point (§11.6); their rationale is in the shared vocabulary, not a blanket prefix waiver.
 
 Shared vocabulary map (required):
 
@@ -304,7 +304,7 @@ Core time/date rules may expose boundary inclusion via `PineGuard.Common.Inclusi
 
 Guard methods for *relative-to-now* temporal comparisons (`Past`/`PastOrPresent`/`Future`/`FutureOrPresent`) and for string-length comparisons (§5.4.8) must not accept an `Inclusion` parameter; they are split into explicit names per inclusion case.
 
-- Range, chronology and overlap clauses (`Between`/`NotBetween`, `Chronological`/`NotChronological`, `Overlapping`, `OutOfRange`, `InRange`) DO forward an `Inclusion inclusion = Inclusion.Inclusive|Exclusive` parameter to the corresponding Must clause, because the boundary set is caller-supplied rather than fixed.
+- Range, chronology and overlap clauses (`InRange`/`OutOfRange`, `Chronological`/`NotChronological`, `Overlapping`) DO forward an `Inclusion inclusion = Inclusion.Inclusive|Exclusive` parameter to the corresponding Must clause, because the boundary set is caller-supplied rather than fixed.
 
 Required vocabulary:
 

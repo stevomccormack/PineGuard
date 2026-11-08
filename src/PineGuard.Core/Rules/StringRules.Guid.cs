@@ -22,7 +22,15 @@ public static partial class StringRules
         /// </code>
         /// </example>
         public static bool IsGuid(string? value)
-            => StringUtility.Guid.TryParse(value, out System.Guid _);
+            => StringUtility.Guid.TryParse(value, out _);
+
+        /// <summary>
+        /// Determines whether the specified string parses to <see cref="System.Guid.Empty"/>.
+        /// </summary>
+        /// <param name="value">The value to validate. If null, whitespace, or malformed, returns false.</param>
+        /// <returns><see langword="true"/> only when the value parses successfully to the empty GUID.</returns>
+        public static bool IsEmpty(string? value) =>
+            StringUtility.Guid.TryParse(value, out var parsed) && GuidRules.IsEmpty(parsed);
 
         /// <summary>
         /// Determines whether the specified string parses to a non-empty GUID (not <see cref="System.Guid.Empty"/>).
@@ -30,7 +38,7 @@ public static partial class StringRules
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid GUID string, returns <see langword="false"/>.</param>
         /// <returns><see langword="true"/> if <paramref name="value"/> parses to a GUID that is not <see cref="System.Guid.Empty"/>; otherwise, <see langword="false"/>.</returns>
         public static bool IsNotEmpty(string? value) =>
-            StringUtility.Guid.TryParse(value, out System.Guid? parsed) && GuidRules.IsNotEmpty(parsed);
+            StringUtility.Guid.TryParse(value, out var parsed) && GuidRules.IsNotEmpty(parsed);
 
         /// <summary>
         /// Determines whether the specified string parses to a GUID carrying the given UUID version.
@@ -50,6 +58,6 @@ public static partial class StringRules
         /// </code>
         /// </example>
         public static bool HasVersion(string? value, int version) =>
-            StringUtility.Guid.TryParse(value, out System.Guid? parsed) && GuidRules.HasVersion(parsed, version);
+            StringUtility.Guid.TryParse(value, out var parsed) && GuidRules.HasVersion(parsed, version);
     }
 }

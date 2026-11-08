@@ -30,7 +30,7 @@ public static class DateTimeOffsetRangeTestData
             : ValueCase<Action>(Name, Value);
     }
 
-    public static class IntersectAndUnion
+    public static class IntersectAndEnclose
     {
         public static TheoryData<ValidCase> EdgeCases =>
         [
@@ -44,7 +44,7 @@ public static class DateTimeOffsetRangeTestData
                 Assert.Equal(start, intersect1.Value.Start);
                 Assert.Equal(start.AddDays(5), intersect1.Value.End);
 
-                var union1 = range.Union(otherStartsBefore);
+                var union1 = range.Enclose(otherStartsBefore);
                 Assert.Equal(start.AddDays(-9), union1.Start);
                 Assert.Equal(start.AddDays(10), union1.End);
             }),
@@ -58,7 +58,7 @@ public static class DateTimeOffsetRangeTestData
                 Assert.Equal(start.AddDays(5), intersect2.Value.Start);
                 Assert.Equal(start.AddDays(10), intersect2.Value.End);
 
-                var union2 = range.Union(otherStartsAfter);
+                var union2 = range.Enclose(otherStartsAfter);
                 Assert.Equal(start, union2.Start);
                 Assert.Equal(start.AddDays(20), union2.End);
             }),
@@ -92,7 +92,7 @@ public static class DateTimeOffsetRangeTestData
             {
                 var range = new DateTimeOffsetRange(new DateTimeOffset(2024, 01, 10, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 20, 0, 0, 0, TimeSpan.Zero));
                 var beforeTouching = new DateTimeOffsetRange(new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 10, 0, 0, 0, TimeSpan.Zero));
-                Assert.False(range.Overlaps(beforeTouching));
+                Assert.True(range.Overlaps(beforeTouching));
                 Assert.True(range.Overlaps(beforeTouching, Inclusion.Inclusive));
 
                 var strictlyBefore = new DateTimeOffsetRange(new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 09, 0, 0, 0, TimeSpan.Zero));
@@ -102,7 +102,7 @@ public static class DateTimeOffsetRangeTestData
             {
                 var range = new DateTimeOffsetRange(new DateTimeOffset(2024, 01, 10, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 20, 0, 0, 0, TimeSpan.Zero));
                 var afterTouching = new DateTimeOffsetRange(new DateTimeOffset(2024, 01, 20, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 30, 0, 0, 0, TimeSpan.Zero));
-                Assert.False(range.Overlaps(afterTouching));
+                Assert.True(range.Overlaps(afterTouching));
                 Assert.True(range.Overlaps(afterTouching, Inclusion.Inclusive));
 
                 var strictlyAfter = new DateTimeOffsetRange(new DateTimeOffset(2024, 01, 21, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 30, 0, 0, 0, TimeSpan.Zero));
@@ -232,5 +232,29 @@ public static class DateTimeOffsetRangeTestData
 
         public sealed record ValidCase(string Name, (DateTimeOffset? Start, DateTimeOffset? End) Input, bool Expected, DateTimeOffsetRange ExpectedOutValue)
             : TryCase<(DateTimeOffset? Start, DateTimeOffset? End), DateTimeOffsetRange>(Name, Input, Expected, ExpectedOutValue);
+    }
+    public static class DaylightSavingDuration
+    {
+        public static TheoryData<Case> Cases
+        {
+            get
+            {
+                var rule = TimeZoneInfo.AdjustmentRule.CreateAdjustmentRule(
+                    new DateTime(2024, 1, 1), new DateTime(2024, 12, 31), TimeSpan.FromHours(1),
+                    TimeZoneInfo.TransitionTime.CreateFixedDateRule(new DateTime(1, 1, 1, 2, 0, 0), 3, 10),
+                    TimeZoneInfo.TransitionTime.CreateFixedDateRule(new DateTime(1, 1, 1, 2, 0, 0), 11, 3));
+                var zone = TimeZoneInfo.CreateCustomTimeZone("DeterministicDst", TimeSpan.FromHours(-5), "Test", "Standard", "Daylight", [rule]);
+                var spring = new DateTime(2024, 3, 10);
+                var autumn = new DateTime(2024, 11, 3);
+                return
+                [
+                    new("spring-forward", new DateTimeOffsetRange(new DateTimeOffset(spring, zone.GetUtcOffset(spring)), new DateTimeOffset(spring.AddDays(1), zone.GetUtcOffset(spring.AddDays(1)))), TimeSpan.FromHours(23)),
+                    new("fall-back", new DateTimeOffsetRange(new DateTimeOffset(autumn, zone.GetUtcOffset(autumn)), new DateTimeOffset(autumn.AddDays(1), zone.GetUtcOffset(autumn.AddDays(1)))), TimeSpan.FromHours(25))
+                ];
+            }
+        }
+
+        public sealed record Case(string Name, DateTimeOffsetRange Value, TimeSpan Expected)
+            : ReturnCase<DateTimeOffsetRange, TimeSpan>(Name, Value, Expected);
     }
 }

@@ -8,11 +8,11 @@ public sealed class TimeSpanAttributesTests(ITestOutputHelper output)
     : BaseDataAnnotationUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(TimeSpanAttributesTestData.DurationBetweenTimeSpan.Cases), MemberType = typeof(TimeSpanAttributesTestData.DurationBetweenTimeSpan))]
-    public void DurationBetweenTimeSpan_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(TimeSpanAttributesTestData.InRangeTimeSpan.Cases), MemberType = typeof(TimeSpanAttributesTestData.InRangeTimeSpan))]
+    public void InRangeTimeSpan_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new DurationBetweenTimeSpanAttribute("00:00:01", "00:00:10");
+        InRangeTimeSpanAttribute attr = new InRangeTimeSpanAttribute("00:00:01", "00:00:10");
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -23,11 +23,11 @@ public sealed class TimeSpanAttributesTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(TimeSpanAttributesTestData.NotDurationBetweenTimeSpan.Cases), MemberType = typeof(TimeSpanAttributesTestData.NotDurationBetweenTimeSpan))]
-    public void NotDurationBetweenTimeSpan_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(TimeSpanAttributesTestData.OutOfRangeTimeSpan.Cases), MemberType = typeof(TimeSpanAttributesTestData.OutOfRangeTimeSpan))]
+    public void OutOfRangeTimeSpan_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new NotDurationBetweenTimeSpanAttribute("00:00:01", "00:00:10");
+        OutOfRangeTimeSpanAttribute attr = new OutOfRangeTimeSpanAttribute("00:00:01", "00:00:10");
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act

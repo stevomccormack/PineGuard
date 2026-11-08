@@ -19,17 +19,17 @@ public static class FluentStringBoolExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustStringBoolClauses.True"/>. If the value is <see langword="null"/>,
+    /// Delegates to <see cref="MustStringBoolClauses.TrueBoolean"/>. If the value is <see langword="null"/>,
     /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.IsActiveString).True();
+    /// RuleFor(x => x.IsActiveString).TrueBoolean();
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringBoolClauses.True"/>
-    public static IRuleBuilderOptions<TModel, string?> True<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.True(val, paramName: null) : MustResult<bool>.Ok(false),
+    /// <seealso cref="MustStringBoolClauses.TrueBoolean"/>
+    public static IRuleBuilderOptions<TModel, string?> TrueBoolean<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.TrueBoolean(val, paramName: null) : MustResult<bool>.Ok(false),
             message, MustCodes.Boolean.Value.False);
 
     /// <summary>
@@ -40,16 +40,16 @@ public static class FluentStringBoolExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustStringBoolClauses.False"/>. If the value is <see langword="null"/>,
+    /// Delegates to <see cref="MustStringBoolClauses.FalseBoolean"/>. If the value is <see langword="null"/>,
     /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.IsDeletedString).False();
+    /// RuleFor(x => x.IsDeletedString).FalseBoolean();
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringBoolClauses.False"/>
-    public static IRuleBuilderOptions<TModel, string?> False<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.False(val, paramName: null) : MustResult<bool>.Ok(false),
+    /// <seealso cref="MustStringBoolClauses.FalseBoolean"/>
+    public static IRuleBuilderOptions<TModel, string?> FalseBoolean<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.FalseBoolean(val, paramName: null) : MustResult<bool>.Ok(false),
             message, MustCodes.Boolean.Value.True);
 }

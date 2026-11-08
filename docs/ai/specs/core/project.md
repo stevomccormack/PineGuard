@@ -135,6 +135,7 @@ Rules should overwhelmingly be **positive**:
 
 - `IsX(...)`
 - `HasX(...)`
+- `ContainsX(...)` for affirmative membership/containment predicates, shared with the collection and range clause vocabulary.
 
 Avoid `NotX(...)` in Rules.
 
@@ -158,27 +159,19 @@ Rules must be explicit and consistent:
 - If a rule accepts nullable inputs (`string?`, `T?`), then **null must return `false`** unless the method name explicitly represents null handling.
 - If a Rule is generic over `T : struct`, expose `IsX(T value)` and rely on callers to handle nulls/unwrapping.
 
-> [!CAUTION]
-> **Why `T` (non-nullable) is required for struct validated values — do NOT change to `T?`.**
->
-> MustClauses and GuardClauses expose **parallel typed and string overloads** with the **same method name** on the **same extension receiver** in the **same namespace**:
->
-> - `MustNumberClauses.Positive(this IMustClause _, T value, ...)` (struct)
-> - `MustStringNumbersClauses.Positive(this IMustClause _, string? value, ...)` (string parse+validate)
->
-> C# overload resolution disambiguates these by the first positional argument: `T value` (non-nullable struct) vs `string? value` (nullable reference).
->
-> If the struct overload were `T? value`, the compiler would produce **CS0121 ambiguous method call** errors when callers pass nullable values, because both `T?` and `string?` accept `null`. This pattern applies identically to GuardClauses (`IGuardClause` receiver).
->
-> The same applies to every domain that has both typed and string overloads: Numbers, DateTime, DateOnly, TimeOnly, DateTimeOffset, Guid, Bool, GeoLocation, TimeSpan, etc.
->
-> **Rules are the exception**: Rules are standalone static methods on separate classes (`NumberRules`, `StringRules`), not competing extension methods. Rules may use `T?` to absorb null internally, but the Must/Guard public surface must use `T` for struct validated values.
->
-> See also: `docs/ai/specs/must-clauses/project.md §Nullability` (hybrid strategy).
+Must and Guard accept non-nullable structs as validated inputs; callers handle optional values explicitly.
+Core Rules may accept nullable structs where null has a documented predicate meaning. Required bounds remain
+non-nullable configuration in every layer. Do not infer input nullability from a parser's tolerant input contract.
+
+Flattened string scalar operations carry their parsed type: `Must.Be.PositiveDecimal(text)` and
+`Must.Be.Positive(number)` are distinct declarations. Do not use a hypothetical typed/string name collision
+to justify nullable-policy decisions after applying the canonical naming rule. Domain names such as
+`Latitude` remain intentionally shared where overloads are unambiguous for their supported inputs.
+See [shared vocabulary](../language/vocabulary.md) and [Must nullability](../must-clauses/project.md).
 
 #### 3.3.1 Permitted negation methods in Rules
 
-The spec §3.2 says "Avoid `NotX(...)` in Rules." The following are **explicit permitted exceptions** in the Rules layer because they are direct, zero-ambiguity boolean complements of fundamental primitives:
+The spec §3.2 says "Avoid `NotX(...)` in Rules." The following are **explicit permitted exceptions** in the Rules layer. Parsed predicates are complements within their successfully parsed domain; both polarities reject malformed input:
 
 | Method | Location | Rationale |
 |---|---|---|
@@ -193,6 +186,11 @@ The spec §3.2 says "Avoid `NotX(...)` in Rules." The following are **explicit p
 | `NotContainsControlChars` | `StringRules` | Complement of `ContainsControlChars`; common input sanitization |
 
 All other negation methods in Rules require an explicit spec exemption entry in this table.
+
+The authoritative cross-layer range spelling, parsed-type qualifiers, domain-name exemptions and
+XML validity exception are in `../language/vocabulary.md` §§5.3–5.5. XML schema `IsValidXml`
+means schema conformance, distinct from Core `XmlRules.IsXml` well-formedness. Configuration
+style predicates validate permitted flag combinations, not an input-domain name.
 
 ---
 

@@ -6,7 +6,7 @@ namespace PineGuard.Testing.Fixtures;
 
 public static class DateOnlyRulesFixtures
 {
-    public static class IsBetween
+    public static class IsInRange
     {
         public static readonly (DateOnly? value, DateOnly min, DateOnly max, Inclusion inclusion) MiddleInclusive = (new DateOnly(2024, 01, 02), new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 03), Inclusion.Inclusive);
         public static readonly (DateOnly? value, DateOnly min, DateOnly max, Inclusion inclusion) AtMinInclusive = (new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 03), Inclusion.Inclusive);

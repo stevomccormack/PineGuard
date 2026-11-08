@@ -27,7 +27,7 @@ public static class GuardCsvClausesTestData
         public static TheoryData<GuardCase<(string? line, IReadOnlyList<string>? expectedHeader)>> InvalidCases =>
         [
             new(nameof(F.IsCsvHeaderLine.Mismatch), F.IsCsvHeaderLine.Mismatch, new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.IsCsvHeaderLine.NullExpected), F.IsCsvHeaderLine.NullExpected, new GuardExpected(false, typeof(ArgumentException), "value"))
+            new(nameof(F.IsCsvHeaderLine.NullExpected), F.IsCsvHeaderLine.NullExpected, new GuardExpected(false, typeof(ArgumentNullException), "expectedHeader"))
         ];
     }
 
@@ -54,8 +54,22 @@ public static class GuardCsvClausesTestData
 
         public static TheoryData<GuardCase<(string? line, IReadOnlyList<string>? header, IReadOnlyDictionary<string, CsvColumnType>? types)>> InvalidCases =>
         [
-            new("NullLine", (null, ["Col1", "Col2"], null), new GuardExpected(false, typeof(ArgumentNullException), "value")),
+            new("NullLine", (null, ["Col1", "Col2"], null), new GuardExpected(false, typeof(ArgumentNullException), "types")),
             new("InvalidRow", ("foo,abc", ["Col1", "Col2"], new Dictionary<string, CsvColumnType> { { "Col2", CsvColumnType.Int32 } }), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
+    }
+
+    public static class Separator
+    {
+        public static TheoryData<char> Cases => ['"', '\r', '\n'];
+    }
+    public static class SchemaConfiguration
+    {
+        public static TheoryData<GuardCase<IReadOnlyList<CsvColumnSchema>?>> Cases => F.SchemaConfiguration.InvalidScenarios.ToGuardCases(s => new GuardExpected(false, s.Inputs is null ? typeof(ArgumentNullException) : typeof(ArgumentException), "schema"));
+    }
+
+    public static class ConfiguredSeparator
+    {
+        public static TheoryData<char> Cases => [';', '|', '\t'];
     }
 }

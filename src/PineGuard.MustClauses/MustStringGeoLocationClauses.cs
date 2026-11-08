@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using PineGuard.Codes;
@@ -15,6 +14,7 @@ namespace PineGuard.MustClauses;
 /// <seealso href="https://pineguard.ai/docs/must/string-geo-location">String Geo Location Must Clauses documentation</seealso>
 public static class MustStringGeoLocationClauses
 {
+    private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
     private const string NullMessage = "{paramName} must not be null.";
 
     /// <summary>
@@ -22,6 +22,7 @@ public static class MustStringGeoLocationClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="styles">Numeric parsing flags; defaults to sign, decimal point and surrounding whitespace.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -35,14 +36,18 @@ public static class MustStringGeoLocationClauses
     /// <seealso href="https://pineguard.ai/docs/must/string-geo-location">String Geo Location Must Clauses documentation</seealso>
     public static MustResult<double> Latitude(this IMustClause _,
         string? value,
+        NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<double>.Fail(MustCodes.Geo.Latitude.Invalid, "{paramName} must contain supported floating-point parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<double>.Fail(MustCodes.Geo.Latitude.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid latitude.";
 
-        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, provider: CultureInfo.InvariantCulture))
+        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles, provider: CultureInfo.InvariantCulture))
             return MustResult<double>.FromBool(false, MustCodes.Geo.Latitude.Invalid, messageTemplate, paramName, value, result: default);
 
         var ok = GeoLocationRules.IsLatitude(parsed);
@@ -54,6 +59,7 @@ public static class MustStringGeoLocationClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
+    /// <param name="styles">Numeric parsing flags; defaults to sign, decimal point and surrounding whitespace.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -67,14 +73,18 @@ public static class MustStringGeoLocationClauses
     /// <seealso href="https://pineguard.ai/docs/must/string-geo-location">String Geo Location Must Clauses documentation</seealso>
     public static MustResult<double> Longitude(this IMustClause _,
         string? value,
+        NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<double>.Fail(MustCodes.Geo.Longitude.Invalid, "{paramName} must contain supported floating-point parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<double>.Fail(MustCodes.Geo.Longitude.Invalid, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a valid longitude.";
 
-        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, provider: CultureInfo.InvariantCulture))
+        if (!StringUtility.NumberTypes.TryParseDouble(value, out var parsed, styles, provider: CultureInfo.InvariantCulture))
             return MustResult<double>.FromBool(false, MustCodes.Geo.Longitude.Invalid, messageTemplate, paramName, value, result: default);
 
         var ok = GeoLocationRules.IsLongitude(parsed);
@@ -84,6 +94,12 @@ public static class MustStringGeoLocationClauses
     /// <summary>
     /// Validates that the specified value must be a valid geo location.
     /// </summary>
+    /// <param name="_">The Must entry point.</param>
+    /// <param name="latitude">The latitude string to parse.</param>
+    /// <param name="longitude">The longitude string to parse.</param>
+    /// <param name="styles">Numeric parsing flags; defaults to sign, decimal point and surrounding whitespace.</param>
+    /// <param name="paramName">The automatically captured latitude parameter name.</param>
+    /// <returns>The parsed coordinate pair on success, or an attributed failure.</returns>
     /// <remarks>
     /// The failure message follows the pattern <c>"{paramName} must be a valid geo location."</c>
     /// </remarks>
@@ -91,8 +107,12 @@ public static class MustStringGeoLocationClauses
     public static MustResult<(double Latitude, double Longitude)> GeoLocation(this IMustClause _,
         string? latitude,
         string? longitude,
+        NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(latitude))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<(double Latitude, double Longitude)>.Fail(MustCodes.Geo.Coordinate.Invalid, "{paramName} must contain supported floating-point parsing flags.", nameof(styles), styles);
+
         if (latitude is null)
             return MustResult<(double Latitude, double Longitude)>.Fail(MustCodes.Geo.Coordinate.Invalid, NullMessage, paramName, latitude);
 
@@ -101,14 +121,13 @@ public static class MustStringGeoLocationClauses
 
         const string messageTemplate = "{paramName} must be a valid geo location.";
 
-        if (!StringUtility.NumberTypes.TryParseDouble(latitude, out var parsedLat, provider: CultureInfo.InvariantCulture))
+        if (!StringUtility.NumberTypes.TryParseDouble(latitude, out var parsedLat, styles, provider: CultureInfo.InvariantCulture))
             return MustResult<(double Latitude, double Longitude)>.FromBool(false, MustCodes.Geo.Coordinate.Invalid, messageTemplate, paramName, (latitude, longitude), result: default);
 
-        if (!StringUtility.NumberTypes.TryParseDouble(longitude, out var parsedLon, provider: CultureInfo.InvariantCulture))
+        if (!StringUtility.NumberTypes.TryParseDouble(longitude, out var parsedLon, styles, provider: CultureInfo.InvariantCulture))
             return MustResult<(double Latitude, double Longitude)>.FromBool(false, MustCodes.Geo.Coordinate.Invalid, messageTemplate, nameof(longitude), (latitude, longitude), result: default);
 
         var ok = GeoLocationRules.IsGeoLocation(parsedLat, parsedLon);
         return MustResult<(double Latitude, double Longitude)>.FromBool(ok, MustCodes.Geo.Coordinate.Invalid, messageTemplate, paramName, (latitude, longitude), (parsedLat, parsedLon));
     }
 }
-#endif

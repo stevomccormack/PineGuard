@@ -75,7 +75,7 @@ public sealed class StringUtilityTests : BaseUnitTest
     public void BoolTryParse_ReturnsExpected(StringUtilityTestData.Bool.ValidCase testCase)
     {
         // Act
-        var ok = StringUtility.Bool.TryParse(testCase.Value, out var boolean);
+        var ok = StringUtility.Bool.TryParse(testCase.Value, out bool boolean);
 
         // Assert
         Assert.Equal(testCase.Expected, ok);

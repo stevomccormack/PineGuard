@@ -83,29 +83,29 @@ public static class DateTimeRulesTestData
         ];
     }
 
-    public static class IsBetween
+    public static class IsInRange
     {
-        public static TheoryData<RuleCase<(DateTime? value, DateTime min, DateTime max, Inclusion inclusion)>> Cases => F.IsBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTime? value, DateTime min, DateTime max, Inclusion inclusion)>> Cases => F.IsInRange.AllScenarios.ToRuleCases();
     }
 
     public static class IsBefore
     {
-        public static TheoryData<RuleCase<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsBefore.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTime? value, DateTime other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsBefore.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(DateTime? value, DateTime other, Inclusion inclusion, DateTimePrecision? precision)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault(), scenario.Inputs.inclusion, scenario.Inputs.precision), scenario.IsValid)).ToArray().ToRuleCases();
     }
 
     public static class IsBeforeDefaultInclusion
     {
-        public static TheoryData<RuleCase<(DateTime? value, DateTime? other)>> Cases => F.IsBeforeDefaultInclusion.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTime? value, DateTime other)>> Cases => F.IsBeforeDefaultInclusion.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(DateTime? value, DateTime other)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault()), scenario.IsValid)).ToArray().ToRuleCases();
     }
 
     public static class IsAfter
     {
-        public static TheoryData<RuleCase<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsAfter.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTime? value, DateTime other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsAfter.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(DateTime? value, DateTime other, Inclusion inclusion, DateTimePrecision? precision)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault(), scenario.Inputs.inclusion, scenario.Inputs.precision), scenario.IsValid)).ToArray().ToRuleCases();
     }
 
     public static class IsAfterDefaultInclusion
     {
-        public static TheoryData<RuleCase<(DateTime? value, DateTime? other)>> Cases => F.IsAfterDefaultInclusion.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTime? value, DateTime other)>> Cases => F.IsAfterDefaultInclusion.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(DateTime? value, DateTime other)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault()), scenario.IsValid)).ToArray().ToRuleCases();
     }
 
     public static class IsSame

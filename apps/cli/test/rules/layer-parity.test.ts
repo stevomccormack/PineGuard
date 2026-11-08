@@ -27,7 +27,7 @@ describe("layer-parity", () => {
         expect(rule.gate).toBe(false);
     });
 
-    it("passes when all four layers implement the same concept", async () => {
+    it("passes for direct and reflective dispatch with repeated word-boundary prefixes", async () => {
         await expectValid(rule, "layer-parity");
     });
 
@@ -56,7 +56,13 @@ describe("layer-parity", () => {
         // "NullOrEmpty"/"NotBlank" (alias) and "Null"/"NotNull" (stripPrefixes)
         // both resolve across Must <-> Guard via this fixture's own
         // vocabulary.json, so neither produces a finding.
-        expect(findings).toHaveLength(1);
+        expect(findings).toHaveLength(4);
+        expect(findings.map((finding) => finding.key).sort()).toEqual([
+            "layer-parity:Extra:Guard",
+            "layer-parity:Hash:Guard",
+            "layer-parity:Island:Guard",
+            "layer-parity:Notable:Guard",
+        ]);
 
         const [finding] = findings;
         expect(finding?.message).toContain("'Extra'");

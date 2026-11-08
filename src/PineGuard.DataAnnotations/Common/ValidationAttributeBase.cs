@@ -68,9 +68,10 @@ public abstract class ValidationAttributeBase(Type expectedType, string code, bo
     }
 
     /// <summary>
-    /// When overridden in a derived class, validates the non-<see langword="null"/>, type-checked value.
+    /// When overridden in a derived class, validates a type-checked value, or a
+    /// <see langword="null"/> value forwarded when null skipping is disabled.
     /// </summary>
-    /// <param name="value">The value to validate (already verified as an instance of the expected type).</param>
+    /// <param name="value">The value to validate; every non-null value has the expected type.</param>
     /// <param name="validationContext">The validation context for the current member.</param>
     /// <returns>
     /// <see langword="null"/> on success, or a <see cref="ValidationResult"/> describing the failure.

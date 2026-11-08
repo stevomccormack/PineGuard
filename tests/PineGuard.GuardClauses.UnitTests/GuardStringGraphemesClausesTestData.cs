@@ -50,18 +50,18 @@ public static class GuardStringGraphemesClausesTestData
         public static TheoryData<GuardCase<(string? value, int max)>> InvalidCases => [.. F.GraphemesHasMaxCount.AllValid.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Graphemes.TooFew)), .. F.GraphemesHasMaxCount.AllInvalid.Only(nameof(F.GraphemesHasMaxCount.NullValue), nameof(F.GraphemesHasMaxCount.NegativeMax)).ToGuardCases(s => s.Inputs.value is null ? new GuardExpected(false, typeof(ArgumentNullException), "value", Code: MustCodes.Text.Graphemes.TooFew) : new GuardExpected(false, typeof(ArgumentException), "max", Code: MustCodes.Text.Graphemes.TooFew))];
     }
 
-    // Guard.Against.NotHasGraphemeCountBetween — throws when the character count is outside the range (calls Must.Be.HasGraphemeCountBetween)
-    public static class NotHasGraphemeCountBetween
+    // Guard.Against.NotHasGraphemeCountInRange — throws when the character count is outside the range (calls Must.Be.HasGraphemeCountInRange)
+    public static class NotHasGraphemeCountInRange
     {
-        public static TheoryData<GuardCase<(string? value, int min, int max, Inclusion inclusion)>> ValidCases => F.GraphemesHasCountBetween.AllValid.ToGuardCases(_ => new GuardExpected(true));
-        public static TheoryData<GuardCase<(string? value, int min, int max, Inclusion inclusion)>> InvalidCases => F.GraphemesHasCountBetween.AllInvalid.ToGuardCases(s => Expected(s.Inputs, MustCodes.Text.Graphemes.OutOfRange));
+        public static TheoryData<GuardCase<(string? value, int min, int max, Inclusion inclusion)>> ValidCases => F.GraphemesHasCountInRange.AllValid.ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, int min, int max, Inclusion inclusion)>> InvalidCases => F.GraphemesHasCountInRange.AllInvalid.ToGuardCases(s => Expected(s.Inputs, MustCodes.Text.Graphemes.OutOfRange));
     }
 
-    // Guard.Against.HasGraphemeCountBetween — throws when the character count is inside the range (calls Must.Be.NotHasGraphemeCountBetween)
-    public static class HasGraphemeCountBetween
+    // Guard.Against.HasGraphemeCountInRange — throws when the character count is inside the range (calls Must.Be.NotHasGraphemeCountInRange)
+    public static class HasGraphemeCountInRange
     {
-        public static TheoryData<GuardCase<(string? value, int min, int max, Inclusion inclusion)>> ValidCases => F.GraphemesHasCountBetween.AllInvalid.Except(nameof(F.GraphemesHasCountBetween.NullValue), nameof(F.GraphemesHasCountBetween.NegativeMin), nameof(F.GraphemesHasCountBetween.NegativeMax), nameof(F.GraphemesHasCountBetween.MinAboveMax)).ToGuardCases(_ => new GuardExpected(true));
-        public static TheoryData<GuardCase<(string? value, int min, int max, Inclusion inclusion)>> InvalidCases => [.. F.GraphemesHasCountBetween.AllValid.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Graphemes.InRange)), .. F.GraphemesHasCountBetween.AllInvalid.Only(nameof(F.GraphemesHasCountBetween.NullValue), nameof(F.GraphemesHasCountBetween.NegativeMin), nameof(F.GraphemesHasCountBetween.NegativeMax), nameof(F.GraphemesHasCountBetween.MinAboveMax)).ToGuardCases(s => Expected(s.Inputs, MustCodes.Text.Graphemes.InRange))];
+        public static TheoryData<GuardCase<(string? value, int min, int max, Inclusion inclusion)>> ValidCases => F.GraphemesHasCountInRange.AllInvalid.Except(nameof(F.GraphemesHasCountInRange.NullValue), nameof(F.GraphemesHasCountInRange.NegativeMin), nameof(F.GraphemesHasCountInRange.NegativeMax), nameof(F.GraphemesHasCountInRange.MinAboveMax)).ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(string? value, int min, int max, Inclusion inclusion)>> InvalidCases => [.. F.GraphemesHasCountInRange.AllValid.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value", Code: MustCodes.Text.Graphemes.InRange)), .. F.GraphemesHasCountInRange.AllInvalid.Only(nameof(F.GraphemesHasCountInRange.NullValue), nameof(F.GraphemesHasCountInRange.NegativeMin), nameof(F.GraphemesHasCountInRange.NegativeMax), nameof(F.GraphemesHasCountInRange.MinAboveMax)).ToGuardCases(s => Expected(s.Inputs, MustCodes.Text.Graphemes.InRange))];
     }
 
     private static GuardExpected Expected((string? value, int min, int max, Inclusion inclusion) inputs, string code) =>

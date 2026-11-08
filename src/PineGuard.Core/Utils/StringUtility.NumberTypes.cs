@@ -10,6 +10,23 @@ public static partial class StringUtility
     public static class NumberTypes
     {
         /// <summary>
+        /// Determines whether numeric parsing flags are supported for floating-point and decimal values.
+        /// </summary>
+        /// <param name="value">The parsing flags to validate.</param>
+        /// <returns>True for combinations contained in <see cref="NumberStyles.Any"/>; false for hexadecimal, binary, or undefined flags.</returns>
+        public static bool IsValidFloatingPointStyles(NumberStyles value) => (value & ~NumberStyles.Any) == 0;
+
+        /// <summary>Determines whether parsing flags form a supported integer style.</summary>
+        /// <param name="value">The parsing flags to validate.</param>
+        /// <returns>True for decimal flags, or hexadecimal flags combined only with surrounding whitespace. Binary flags follow the same restriction on .NET 8 and later.</returns>
+        public static bool IsValidIntegerStyles(NumberStyles value) =>
+            IsValidFloatingPointStyles(value) || (value & ~NumberStyles.HexNumber) == 0
+#if NET8_0_OR_GREATER
+            || (value & ~NumberStyles.BinaryNumber) == 0
+#endif
+            ;
+
+        /// <summary>
         /// Attempts to parse the specified string as an <see cref="int"/> (Int32).
         /// </summary>
         /// <param name="value">The string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>

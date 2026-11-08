@@ -86,6 +86,10 @@ Required pattern:
 - **Method Ordering**: Within an aggregated attribute file, the positive attribute precedes its `Not*` complement — matching `docs/ai/specs/must-clauses/project.md` ("Method ordering").
 - **Comments**: XML documentation comments (`<summary>`, `<remarks>`, `<example>`, `<seealso>`) are REQUIRED on every public attribute — `<GenerateDocumentationFile>` is on in `Directory.Build.props` and the templates live in `docs/ai/skills/document/SKILL.md` §5.6. Inline `//` implementation comments are not allowed unless they carry exceptional value.
 - **Structure**: Clean, minimal implementations.
+- **Usable attribute arguments**: Verify attributes on actual decorated declarations. Decimal and
+  nullable numeric types are not legal C# attribute argument types. Decimal-parsing attributes take
+  invariant decimal strings for exact configuration; approximation requires an explicit tolerance
+  constructor argument. Typed numeric attributes use their documented double configuration.
 
 ## 3) Structure & Naming (New Requirements)
 
@@ -107,7 +111,7 @@ Rationale:
 ### 3.2 Naming Conventions
 
 - **String Validators**: Prefer the shortest collision-safe public name. Add `String` only when it materially improves clarity or resolves ambiguity.
-  - Example: `Must.Be.True(string)` -> `[TrueStringAttribute]`.
+  - Example: `Must.Be.TrueBoolean(string)` -> `[TrueStringAttribute]`; the attribute suffix describes the input representation, while the Must suffix describes the parsed type.
   - Example: `Must.Be.Url(string)` -> `[WebUrlAttribute]` to avoid colliding with framework-native `[Url]`.
 - **General**: `[MustClauseName]Attribute` unless the naming-collision spec requires a clearer adapter-specific name.
 - **Collision Handling**: Follow `docs/ai/specs/language/naming-collisions.md` when a framework-native attribute name would create ambiguity or collision.
@@ -125,6 +129,9 @@ Rationale:
 
 DataAnnotations follows the standard "skip on null" behavior:
 
+- Validate required configuration before skipping a null property. Missing or malformed bounds,
+  undefined flags and invalid styles/tolerances remain failures even when the property is absent.
+  Delegate those checks to Must; skip only a failure attributed to the absent value, never configuration.
 - By default, DataAnnotations attributes should **not** fail on `null` values.
 - Presence/required checks are expressed using `[Required]` (or by constructing PineGuard attributes with `allowNull: false` when that is explicitly intended).
 

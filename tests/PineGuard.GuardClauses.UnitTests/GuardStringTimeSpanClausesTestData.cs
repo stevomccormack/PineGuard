@@ -6,18 +6,18 @@ namespace PineGuard.GuardClauses.UnitTests;
 
 public static class GuardStringTimeSpanClausesTestData
 {
-    public static class NotDurationBetween
+    public static class OutOfRange
     {
         public static TheoryData<GuardCase<(string? value, TimeSpan min, TimeSpan max, Inclusion inclusion)>> Cases =>
-            F.TimeSpanIsDurationBetween.AllScenarios.ToGuardCases(s => s.Name switch
+            F.TimeSpanIsInRange.AllScenarios.ToGuardCases(s => s.Name switch
             {
-                nameof(F.TimeSpanIsDurationBetween.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+                nameof(F.TimeSpanIsInRange.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
                 _ when s.IsValid => new GuardExpected(true),
                 _ => new GuardExpected(false, typeof(ArgumentException), "value")
             });
     }
 
-    public static class DurationBetween
+    public static class InRange
     {
         public static TheoryData<GuardCase<(string? value, TimeSpan min, TimeSpan max, Inclusion inclusion)>> Cases =>
         [
@@ -31,7 +31,7 @@ public static class GuardStringTimeSpanClausesTestData
 
     public static class LessThan
     {
-        public static TheoryData<GuardCase<(string? value, TimeSpan threshold, Inclusion inclusion)>> Cases =>
+        public static TheoryData<GuardCase<(string? value, TimeSpan other, Inclusion inclusion)>> Cases =>
             F.TimeSpanIsGreaterThan.AllScenarios.ToGuardCases(s => s.Name switch
             {
                 nameof(F.TimeSpanIsGreaterThan.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
@@ -42,7 +42,7 @@ public static class GuardStringTimeSpanClausesTestData
 
     public static class GreaterThan
     {
-        public static TheoryData<GuardCase<(string? value, TimeSpan threshold, Inclusion inclusion)>> Cases =>
+        public static TheoryData<GuardCase<(string? value, TimeSpan other, Inclusion inclusion)>> Cases =>
             F.TimeSpanIsLessThan.AllScenarios.ToGuardCases(s => s.Name switch
             {
                 nameof(F.TimeSpanIsLessThan.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),

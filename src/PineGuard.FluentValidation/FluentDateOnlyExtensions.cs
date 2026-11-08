@@ -39,7 +39,7 @@ public static class FluentDateOnlyExtensions
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
         TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Past(val.Value, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Past(val.GetValueOrDefault(), timeProvider, paramName: null)),
             message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is in the past or is today.</summary>
@@ -67,7 +67,7 @@ public static class FluentDateOnlyExtensions
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
         TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.PastOrPresent(val.Value, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.PastOrPresent(val.GetValueOrDefault(), timeProvider, paramName: null)),
             message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is in the future.</summary>
@@ -95,7 +95,7 @@ public static class FluentDateOnlyExtensions
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
         TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Future(val.Value, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Future(val.GetValueOrDefault(), timeProvider, paramName: null)),
             message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is in the future or is today.</summary>
@@ -123,7 +123,7 @@ public static class FluentDateOnlyExtensions
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
         TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FutureOrPresent(val.Value, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.FutureOrPresent(val.GetValueOrDefault(), timeProvider, paramName: null)),
             message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value falls between the specified bounds.</summary>
@@ -134,14 +134,14 @@ public static class FluentDateOnlyExtensions
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <example><code>RuleFor(x => x.EventDate).Between(min, max);</code></example>
-    public static IRuleBuilderOptions<TModel, DateOnly> Between<TModel>(
+    /// <example><code>RuleFor(x => x.EventDate).InRange(min, max);</code></example>
+    public static IRuleBuilderOptions<TModel, DateOnly> InRange<TModel>(
         this IRuleBuilder<TModel, DateOnly> ruleBuilder,
         DateOnly min,
         DateOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Between(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.InRange(val, min, max, inclusion, paramName: null),
             message, MustCodes.Date.Range.OutOfRange);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value falls between the specified bounds.</summary>
@@ -153,13 +153,13 @@ public static class FluentDateOnlyExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, DateOnly?> Between<TModel>(
+    public static IRuleBuilderOptions<TModel, DateOnly?> InRange<TModel>(
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
         DateOnly min,
         DateOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Between(val.Value, min, max, inclusion, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.InRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
             message, MustCodes.Date.Range.OutOfRange);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value does not fall between the specified bounds.</summary>
@@ -170,13 +170,13 @@ public static class FluentDateOnlyExtensions
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    public static IRuleBuilderOptions<TModel, DateOnly> NotBetween<TModel>(
+    public static IRuleBuilderOptions<TModel, DateOnly> OutOfRange<TModel>(
         this IRuleBuilder<TModel, DateOnly> ruleBuilder,
         DateOnly min,
         DateOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotBetween(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.OutOfRange(val, min, max, inclusion, paramName: null),
             message, MustCodes.Date.Range.InRange);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value does not fall between the specified bounds.</summary>
@@ -188,13 +188,13 @@ public static class FluentDateOnlyExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, DateOnly?> NotBetween<TModel>(
+    public static IRuleBuilderOptions<TModel, DateOnly?> OutOfRange<TModel>(
         this IRuleBuilder<TModel, DateOnly?> ruleBuilder,
         DateOnly min,
         DateOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotBetween(val.Value, min, max, inclusion, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OutOfRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
             message, MustCodes.Date.Range.InRange);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is before the specified date.</summary>
@@ -242,7 +242,7 @@ public static class FluentDateOnlyExtensions
         DateOnly other,
         DatePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Before(val.Value, other, precision, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Before(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Order.NotBefore);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value is before the date returned by <paramref name="other"/>.</summary>
@@ -305,7 +305,7 @@ public static class FluentDateOnlyExtensions
         DateOnly other,
         DatePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.OnOrBefore(val.Value, other, precision, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OnOrBefore(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Order.After);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value is on or before the date returned by <paramref name="other"/>.</summary>
@@ -369,7 +369,7 @@ public static class FluentDateOnlyExtensions
         DateOnly other,
         DatePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.After(val.Value, other, precision, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.After(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Order.NotAfter);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value is after the date returned by <paramref name="other"/>.</summary>
@@ -432,7 +432,7 @@ public static class FluentDateOnlyExtensions
         DateOnly other,
         DatePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.OnOrAfter(val.Value, other, precision, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OnOrAfter(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Order.Before);
 
     /// <summary>Validates that the nullable <see cref="DateOnly"/> value is on or after the date returned by <paramref name="other"/>.</summary>
@@ -479,7 +479,7 @@ public static class FluentDateOnlyExtensions
         DateOnly other,
         DatePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Same(val.Value, other, precision, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Same(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Equality.NotEqual);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is not the same as the specified date.</summary>
@@ -510,7 +510,7 @@ public static class FluentDateOnlyExtensions
         DateOnly other,
         DatePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotSame(val.Value, other, precision, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotSame(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Equality.Equal);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is chronologically before the end date.</summary>
@@ -541,7 +541,7 @@ public static class FluentDateOnlyExtensions
         DateOnly end,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Chronological(val.Value, end, inclusion, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Chronological(val.GetValueOrDefault(), end, inclusion, paramName: null)),
             message, MustCodes.Date.Order.NotChronological);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is not chronologically before the end date.</summary>
@@ -572,7 +572,7 @@ public static class FluentDateOnlyExtensions
         DateOnly end,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotChronological(val.Value, end, inclusion, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotChronological(val.GetValueOrDefault(), end, inclusion, paramName: null)),
             message, MustCodes.Date.Order.Chronological);
 
     /// <summary>Validates that the date range <c>[value..end1]</c> overlaps with <c>[start2..end2]</c>.</summary>
@@ -589,7 +589,7 @@ public static class FluentDateOnlyExtensions
         DateOnly end1,
         DateOnly start2,
         DateOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Overlapping(val, end1, start2, end2, inclusion, paramName: null),
             message, MustCodes.Date.Overlap.Missing);
@@ -609,9 +609,9 @@ public static class FluentDateOnlyExtensions
         DateOnly end1,
         DateOnly start2,
         DateOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Overlapping(val.Value, end1, start2, end2, inclusion, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Overlapping(val.GetValueOrDefault(), end1, start2, end2, inclusion, paramName: null)),
             message, MustCodes.Date.Overlap.Missing);
 
     /// <summary>Validates that the date range <c>[value..end1]</c> does not overlap with <c>[start2..end2]</c>.</summary>
@@ -628,7 +628,7 @@ public static class FluentDateOnlyExtensions
         DateOnly end1,
         DateOnly start2,
         DateOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotOverlapping(val, end1, start2, end2, inclusion, paramName: null),
             message, MustCodes.Date.Overlap.Present);
@@ -648,9 +648,9 @@ public static class FluentDateOnlyExtensions
         DateOnly end1,
         DateOnly start2,
         DateOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotOverlapping(val.Value, end1, start2, end2, inclusion, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotOverlapping(val.GetValueOrDefault(), end1, start2, end2, inclusion, paramName: null)),
             message, MustCodes.Date.Overlap.Present);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is within the specified number of days from the reference date.</summary>
@@ -681,7 +681,7 @@ public static class FluentDateOnlyExtensions
         DateOnly reference,
         int days,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.WithinDays(val.Value, reference, days, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.WithinDays(val.GetValueOrDefault(), reference, days, paramName: null)),
             message, MustCodes.Date.Proximity.NotWithin);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is not within the specified number of days from the reference date.</summary>
@@ -712,7 +712,7 @@ public static class FluentDateOnlyExtensions
         DateOnly reference,
         int days,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotWithinDays(val.Value, reference, days, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotWithinDays(val.GetValueOrDefault(), reference, days, paramName: null)),
             message, MustCodes.Date.Proximity.Within);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is within the specified number of calendar months from the reference date.</summary>
@@ -743,7 +743,7 @@ public static class FluentDateOnlyExtensions
         DateOnly reference,
         int months,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.WithinCalendarMonths(val.Value, reference, months, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.WithinCalendarMonths(val.GetValueOrDefault(), reference, months, paramName: null)),
             message, MustCodes.Date.Proximity.NotWithinCalendarMonths);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is not within the specified number of calendar months from the reference date.</summary>
@@ -774,7 +774,7 @@ public static class FluentDateOnlyExtensions
         DateOnly reference,
         int months,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotWithinCalendarMonths(val.Value, reference, months, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotWithinCalendarMonths(val.GetValueOrDefault(), reference, months, paramName: null)),
             message, MustCodes.Date.Proximity.WithinCalendarMonths);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value falls on a weekday (Monday through Friday).</summary>
@@ -793,7 +793,7 @@ public static class FluentDateOnlyExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> Weekday<TModel>(this IRuleBuilder<TModel, DateOnly?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Weekday(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Weekday(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.NotWeekday);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value falls on a weekend (Saturday or Sunday).</summary>
@@ -812,7 +812,7 @@ public static class FluentDateOnlyExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> Weekend<TModel>(this IRuleBuilder<TModel, DateOnly?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Weekend(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Weekend(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.NotWeekend);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is the first day of its month.</summary>
@@ -831,7 +831,7 @@ public static class FluentDateOnlyExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> FirstDayOfMonth<TModel>(this IRuleBuilder<TModel, DateOnly?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FirstDayOfMonth(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.FirstDayOfMonth(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.NotFirstDayOfMonth);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is not the first day of its month.</summary>
@@ -850,7 +850,7 @@ public static class FluentDateOnlyExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> NotFirstDayOfMonth<TModel>(this IRuleBuilder<TModel, DateOnly?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotFirstDayOfMonth(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotFirstDayOfMonth(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.FirstDayOfMonth);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is the last day of its month.</summary>
@@ -869,7 +869,7 @@ public static class FluentDateOnlyExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> LastDayOfMonth<TModel>(this IRuleBuilder<TModel, DateOnly?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.LastDayOfMonth(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.LastDayOfMonth(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.NotLastDayOfMonth);
 
     /// <summary>Validates that the <see cref="DateOnly"/> value is not the last day of its month.</summary>
@@ -888,7 +888,7 @@ public static class FluentDateOnlyExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateOnly?> NotLastDayOfMonth<TModel>(this IRuleBuilder<TModel, DateOnly?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotLastDayOfMonth(val.Value, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotLastDayOfMonth(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.LastDayOfMonth);
 
     /// <summary>Validates that the <see cref="DateOnly"/> date of birth meets the expected minimum age.</summary>
@@ -921,7 +921,9 @@ public static class FluentDateOnlyExtensions
         int years,
         TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.MinimumAge(val.Value, years, timeProvider, paramName: null) : MustResult<DateOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.MinimumAge(val.GetValueOrDefault(), years, timeProvider, paramName: null)),
             message, MustCodes.Date.Age.BelowMinimum);
+    private static MustResult<T> SkipAbsentValue<T>(T? value, MustResult<T> result) where T : struct =>
+        value is null && result.ParamName is null ? MustResult<T>.Ok(default) : result;
 }
 #endif

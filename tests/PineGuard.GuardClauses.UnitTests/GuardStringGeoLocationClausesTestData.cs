@@ -1,3 +1,4 @@
+using System.Globalization;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -5,6 +6,16 @@ namespace PineGuard.GuardClauses.UnitTests;
 
 public static class GuardStringGeoLocationClausesTestData
 {
+    public static class Styles
+    {
+        public static TheoryData<GuardCase<(string? value, NumberStyles styles, double parsed)>> ValidCases => F.GeoLocationStyles.ValidScenarios.ToGuardCases();
+    }
+
+    public static class InvalidStyles
+    {
+        public static TheoryData<GuardCase<(string? value, NumberStyles styles)>> InvalidCases => F.GeoLocationInvalidStyles.AllScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "styles", "styles must contain supported floating-point parsing flags."));
+    }
+
     public static class NotLatitude
     {
         public static TheoryData<GuardCase<string?>> ValidCases => F.IsLatitude.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));

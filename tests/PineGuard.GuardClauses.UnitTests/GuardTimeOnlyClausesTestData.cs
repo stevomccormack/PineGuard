@@ -10,7 +10,7 @@ public static class GuardTimeOnlyClausesTestData
     private static readonly TimeOnly Noon = F.IsKnownTimes.T1200!.Value;
     private static readonly TimeOnly Evening = F.IsKnownTimes.T2000!.Value;
 
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases =>
         [
@@ -20,7 +20,7 @@ public static class GuardTimeOnlyClausesTestData
         ];
     }
 
-    public static class NotBetween
+    public static class OutOfRange
     {
         public static TheoryData<GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases =>
         [

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 namespace PineGuard.Utils;
 
 /// <summary>
@@ -83,7 +84,7 @@ public static class FileSignatureUtility
     /// <c>.jpeg</c>. Use <see cref="PineGuard.Rules.FileSignatureRules.HasSignature"/> to test a
     /// header against one specific extension instead.
     /// </remarks>
-    public static bool TryDetectExtension(byte[]? header, out string? extension)
+    public static bool TryDetectExtension(byte[]? header, [NotNullWhen(true)] out string? extension)
     {
         extension = null;
 

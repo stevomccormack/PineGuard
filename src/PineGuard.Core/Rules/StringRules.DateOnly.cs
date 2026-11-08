@@ -28,8 +28,11 @@ public static partial class StringRules
         /// </param>
         /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
         /// <returns><see langword="true"/> if the parsed date is in the past; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInPast(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null) =>
-            StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInPast(parsed, inclusion, timeProvider);
+        public static bool IsInPast(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null)
+        {
+            TemporalRangeComparison.ValidateInclusion(inclusion);
+            return StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInPast(parsed, inclusion, timeProvider);
+        }
 
         /// <summary>
         /// Determines whether the specified string parses to a date in the future.
@@ -44,8 +47,11 @@ public static partial class StringRules
         /// </param>
         /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
         /// <returns><see langword="true"/> if the parsed date is in the future; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInFuture(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null) =>
-            StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInFuture(parsed, inclusion, timeProvider);
+        public static bool IsInFuture(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null)
+        {
+            TemporalRangeComparison.ValidateInclusion(inclusion);
+            return StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInFuture(parsed, inclusion, timeProvider);
+        }
 
         /// <summary>
         /// Determines whether the specified string parses to a date within [<paramref name="min"/>, <paramref name="max"/>].
@@ -61,8 +67,11 @@ public static partial class StringRules
         /// passing any other flag causes parsing to fail for every input.
         /// </param>
         /// <returns><see langword="true"/> if the parsed date falls within the specified range; otherwise, <see langword="false"/>.</returns>
-        public static bool IsBetween(string? value, System.DateOnly min, System.DateOnly max, Inclusion inclusion = Inclusion.Inclusive, DateTimeStyles styles = DefaultStyles) =>
-            StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsBetween(parsed, min, max, inclusion);
+        public static bool IsInRange(string? value, System.DateOnly min, System.DateOnly max, Inclusion inclusion = Inclusion.Inclusive, DateTimeStyles styles = DefaultStyles)
+        {
+            TemporalRangeComparison.ValidateInclusion(inclusion);
+            return StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInRange(parsed, min, max, inclusion);
+        }
 
         /// <summary>
         /// Determines whether the specified string parses to a date of birth at least <paramref name="years"/> whole years ago.

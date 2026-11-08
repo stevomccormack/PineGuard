@@ -90,23 +90,23 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     }
 
     [Theory]
-    [MemberData(nameof(TD.NotHasCountBetween.ValidCases), MemberType = typeof(TD.NotHasCountBetween))]
-    [MemberData(nameof(TD.NotHasCountBetween.InvalidCases), MemberType = typeof(TD.NotHasCountBetween))]
-    public void NotHasCountBetween_BehavesAsExpected(GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.NotHasCountInRange.ValidCases), MemberType = typeof(TD.NotHasCountInRange))]
+    [MemberData(nameof(TD.NotHasCountInRange.InvalidCases), MemberType = typeof(TD.NotHasCountInRange))]
+    public void NotHasCountInRange_BehavesAsExpected(GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        AssertResult(tc, () => Guard.Against.NotHasCountBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.NotHasCountBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.NotHasCountInRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasCountInRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]
-    [MemberData(nameof(TD.HasCountBetween.ValidCases), MemberType = typeof(TD.HasCountBetween))]
-    [MemberData(nameof(TD.HasCountBetween.InvalidCases), MemberType = typeof(TD.HasCountBetween))]
-    public void HasCountBetween_BehavesAsExpected(GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.HasCountInRange.ValidCases), MemberType = typeof(TD.HasCountInRange))]
+    [MemberData(nameof(TD.HasCountInRange.InvalidCases), MemberType = typeof(TD.HasCountInRange))]
+    public void HasCountInRange_BehavesAsExpected(GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        AssertResult(tc, () => Guard.Against.HasCountBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.HasCountBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.HasCountInRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.HasCountInRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]
@@ -245,4 +245,32 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
         AssertCustomMessage(tc, () => Guard.Against.HasAll(value, TD.HasAll.Predicate, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
+
+    [Theory]
+    [MemberData(nameof(GuardCollectionClausesTestData.NullableValueItems), MemberType = typeof(GuardCollectionClausesTestData))]
+    public void ContainsNullItems_ValueTypes_ReturnsProjection(GuardCase<int?[]?> testCase)
+    {
+        // Arrange
+        var value = testCase.Value;
+
+        // Act and Assert
+        var result = AssertResult(testCase, () => Guard.Against.ContainsNullItems(value));
+        if (testCase.Expected.IsValid)
+            Assert.Equal(value!.Select(item => item.GetValueOrDefault()), result);
+    }
+
+    [Theory]
+    [MemberData(nameof(GuardCollectionClausesTestData.ComparerItems), MemberType = typeof(GuardCollectionClausesTestData))]
+    public void Membership_ForwardsExplicitComparer(GuardCase<string[]> testCase)
+    {
+        // Arrange
+        var value = testCase.Value;
+
+        // Act and Assert
+        Assert.Equal(value, Guard.Against.NotContains(value, "abc", StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(value, Guard.Against.Contains(value, "abc", StringComparer.Ordinal));
+        Assert.Equal(value, Guard.Against.NotSubsetOf(value, new[] { "abc" }, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(value, Guard.Against.SubsetOf(value, new[] { "abc" }, StringComparer.Ordinal));
+    }
+
 }

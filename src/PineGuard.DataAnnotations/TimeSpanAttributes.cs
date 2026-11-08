@@ -13,7 +13,7 @@ namespace PineGuard.DataAnnotations;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustTimeSpanClauses.DurationBetween"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustTimeSpanClauses.InRange"/>. Supported on properties, fields, and
 /// parameters of type <see cref="TimeSpan"/>.
 /// </para>
 /// <para>
@@ -25,17 +25,17 @@ namespace PineGuard.DataAnnotations;
 /// <code>
 /// public class SessionModel
 /// {
-///     [DurationBetweenTimeSpan("00:05:00", "02:00:00")]
+///     [InRangeTimeSpan("00:05:00", "02:00:00")]
 ///     public TimeSpan Duration { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="NotDurationBetweenTimeSpanAttribute"/>
-/// <seealso cref="MustTimeSpanClauses.DurationBetween"/>
+/// <seealso cref="OutOfRangeTimeSpanAttribute"/>
+/// <seealso cref="MustTimeSpanClauses.InRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/timespan">TimeSpan Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class DurationBetweenTimeSpanAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.OutOfRange)
+public sealed class InRangeTimeSpanAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.OutOfRange, allowNull: false)
 {
     /// <summary>Gets the lower duration boundary.</summary>
     public TimeSpan Min { get; } = TimeSpan.Parse(min, CultureInfo.InvariantCulture);
@@ -49,9 +49,9 @@ public sealed class DurationBetweenTimeSpanAttribute(string min, string max, Inc
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var timeSpanValue = (TimeSpan)value!;
-        var result = Must.Be.DurationBetween(timeSpanValue, Min, Max, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        var timeSpanValue = ((TimeSpan?)value).GetValueOrDefault();
+        var result = Must.Be.InRange(timeSpanValue, Min, Max, Inclusion, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -61,7 +61,7 @@ public sealed class DurationBetweenTimeSpanAttribute(string min, string max, Inc
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustTimeSpanClauses.NotDurationBetween"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustTimeSpanClauses.OutOfRange"/>. Supported on properties, fields, and
 /// parameters of type <see cref="TimeSpan"/>.
 /// </para>
 /// <para>
@@ -73,20 +73,20 @@ public sealed class DurationBetweenTimeSpanAttribute(string min, string max, Inc
 /// <code>
 /// public class SessionModel
 /// {
-///     [NotDurationBetweenTimeSpan("00:00:00", "00:00:01")]
+///     [OutOfRangeTimeSpan("00:00:00", "00:00:01")]
 ///     public TimeSpan IdleTime { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="DurationBetweenTimeSpanAttribute"/>
-/// <seealso cref="MustTimeSpanClauses.NotDurationBetween"/>
+/// <seealso cref="InRangeTimeSpanAttribute"/>
+/// <seealso cref="MustTimeSpanClauses.OutOfRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/timespan">TimeSpan Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotDurationBetweenTimeSpanAttribute(
+public sealed class OutOfRangeTimeSpanAttribute(
     string min,
     string max,
     Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.InRange)
+    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.InRange, allowNull: false)
 {
     /// <summary>Gets the lower duration boundary of the excluded range.</summary>
     public TimeSpan Min { get; } = TimeSpan.Parse(min, CultureInfo.InvariantCulture);
@@ -100,15 +100,15 @@ public sealed class NotDurationBetweenTimeSpanAttribute(
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var timeSpanValue = (TimeSpan)value!;
-        var result = Must.Be.NotDurationBetween(timeSpanValue, Min, Max, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        var timeSpanValue = ((TimeSpan?)value).GetValueOrDefault();
+        var result = Must.Be.OutOfRange(timeSpanValue, Min, Max, Inclusion, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
 /// <summary>
 /// Validates that the annotated <see cref="TimeSpan"/> property or field represents a duration greater
-/// than (or equal to, depending on <see cref="Inclusion"/>) the specified threshold.
+/// than (or equal to, depending on <see cref="Inclusion"/>) the specified other.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -116,7 +116,7 @@ public sealed class NotDurationBetweenTimeSpanAttribute(
 /// parameters of type <see cref="TimeSpan"/>.
 /// </para>
 /// <para>
-/// The <paramref name="threshold"/> constructor argument is parsed from <see cref="TimeSpan"/> string
+/// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeSpan"/> string
 /// format using invariant culture. By default, uses <see cref="Inclusion.Exclusive"/> (strictly greater than).
 /// </para>
 /// </remarks>
@@ -133,27 +133,27 @@ public sealed class NotDurationBetweenTimeSpanAttribute(
 /// <seealso cref="MustTimeSpanClauses.GreaterThan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/timespan">TimeSpan Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class GreaterThanTimeSpanAttribute(string threshold, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.NotGreater)
+public sealed class GreaterThanTimeSpanAttribute(string other, Inclusion inclusion = Inclusion.Exclusive)
+    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.NotGreater, allowNull: false)
 {
-    /// <summary>Gets the lower threshold that the duration must exceed.</summary>
-    public TimeSpan Threshold { get; } = TimeSpan.Parse(threshold, CultureInfo.InvariantCulture);
+    /// <summary>Gets the lower other that the duration must exceed.</summary>
+    public TimeSpan Other { get; } = TimeSpan.Parse(other, CultureInfo.InvariantCulture);
 
-    /// <summary>Gets whether the threshold boundary is inclusive or exclusive.</summary>
+    /// <summary>Gets whether the other boundary is inclusive or exclusive.</summary>
     public Inclusion Inclusion { get; } = inclusion;
 
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var timeSpanValue = (TimeSpan)value!;
-        var result = Must.Be.GreaterThan(timeSpanValue, Threshold, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        var timeSpanValue = ((TimeSpan?)value).GetValueOrDefault();
+        var result = Must.Be.GreaterThan(timeSpanValue, Other, Inclusion, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
 /// <summary>
 /// Validates that the annotated <see cref="TimeSpan"/> property or field represents a duration less than
-/// (or equal to, depending on <see cref="Inclusion"/>) the specified threshold.
+/// (or equal to, depending on <see cref="Inclusion"/>) the specified other.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -161,7 +161,7 @@ public sealed class GreaterThanTimeSpanAttribute(string threshold, Inclusion inc
 /// parameters of type <see cref="TimeSpan"/>.
 /// </para>
 /// <para>
-/// The <paramref name="threshold"/> constructor argument is parsed from <see cref="TimeSpan"/> string
+/// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeSpan"/> string
 /// format using invariant culture. By default, uses <see cref="Inclusion.Exclusive"/> (strictly less than).
 /// </para>
 /// </remarks>
@@ -178,20 +178,20 @@ public sealed class GreaterThanTimeSpanAttribute(string threshold, Inclusion inc
 /// <seealso cref="MustTimeSpanClauses.LessThan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/timespan">TimeSpan Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LessThanTimeSpanAttribute(string threshold, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.NotLess)
+public sealed class LessThanTimeSpanAttribute(string other, Inclusion inclusion = Inclusion.Exclusive)
+    : ValidationAttributeBase(typeof(TimeSpan), MustCodes.Time.Duration.NotLess, allowNull: false)
 {
-    /// <summary>Gets the upper threshold that the duration must be below.</summary>
-    public TimeSpan Threshold { get; } = TimeSpan.Parse(threshold, CultureInfo.InvariantCulture);
+    /// <summary>Gets the upper other that the duration must be below.</summary>
+    public TimeSpan Other { get; } = TimeSpan.Parse(other, CultureInfo.InvariantCulture);
 
-    /// <summary>Gets whether the threshold boundary is inclusive or exclusive.</summary>
+    /// <summary>Gets whether the other boundary is inclusive or exclusive.</summary>
     public Inclusion Inclusion { get; } = inclusion;
 
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var timeSpanValue = (TimeSpan)value!;
-        var result = Must.Be.LessThan(timeSpanValue, Threshold, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        var timeSpanValue = ((TimeSpan?)value).GetValueOrDefault();
+        var result = Must.Be.LessThan(timeSpanValue, Other, Inclusion, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }

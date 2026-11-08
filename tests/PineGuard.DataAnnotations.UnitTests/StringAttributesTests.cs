@@ -8,6 +8,38 @@ namespace PineGuard.DataAnnotations.UnitTests;
 
 public sealed class StringAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.NullConfigurationCases), MemberType = typeof(StringAttributesTestData))]
+    public void NullConfiguration_ValidatesConfigurationBeforeSkippingNull(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attribute = (ValidationAttribute)tc.Value!;
+        var context = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attribute.GetValidationResult(null, context);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringAttributesTestData.InvalidComparisons), MemberType = typeof(StringAttributesTestData))]
+    public void ComparisonConfiguration_IsCheckedBeforeInput(string? value, StringComparison comparison)
+    {
+        // Arrange
+        ValidationAttribute[] attributes =
+        [
+            new ContainsAttribute("x") { Comparison = comparison }, new NotContainsAttribute("x") { Comparison = comparison },
+            new StartsWithAttribute("x") { Comparison = comparison }, new NotStartsWithAttribute("x") { Comparison = comparison },
+            new EndsWithAttribute("x") { Comparison = comparison }, new NotEndsWithAttribute("x") { Comparison = comparison }
+        ];
+        var context = new ValidationContext(new object());
+
+        // Act / Assert
+        Assert.All(attributes, attribute => Assert.NotNull(attribute.GetValidationResult(value, context)));
+    }
+
     private static void Verify<TAttribute>(TAttribute attribute, StringAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
     {
@@ -27,12 +59,12 @@ public sealed class StringAttributesTests(ITestOutputHelper output) : BaseDataAn
     }
 
     [Theory]
-    [MemberData(nameof(StringAttributesTestData.LengthBetween.ValidCases), MemberType = typeof(StringAttributesTestData.LengthBetween))]
-    [MemberData(nameof(StringAttributesTestData.LengthBetween.EdgeCases), MemberType = typeof(StringAttributesTestData.LengthBetween))]
-    [MemberData(nameof(StringAttributesTestData.LengthBetween.InvalidCases), MemberType = typeof(StringAttributesTestData.LengthBetween))]
-    public void LengthBetween_ShouldReturnExpected(StringAttributesTestData.ValidCase testCase)
+    [MemberData(nameof(StringAttributesTestData.LengthInRange.ValidCases), MemberType = typeof(StringAttributesTestData.LengthInRange))]
+    [MemberData(nameof(StringAttributesTestData.LengthInRange.EdgeCases), MemberType = typeof(StringAttributesTestData.LengthInRange))]
+    [MemberData(nameof(StringAttributesTestData.LengthInRange.InvalidCases), MemberType = typeof(StringAttributesTestData.LengthInRange))]
+    public void LengthInRange_ShouldReturnExpected(StringAttributesTestData.ValidCase testCase)
     {
-        var attribute = new LengthBetweenAttribute(3, 5);
+        LengthInRangeAttribute attribute = new LengthInRangeAttribute(3, 5);
         Assert.Equal(MustCodes.Text.Length.OutOfRange, attribute.Code);
         Verify(attribute, testCase);
     }

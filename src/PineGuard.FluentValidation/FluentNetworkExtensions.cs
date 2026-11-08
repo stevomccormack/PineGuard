@@ -17,7 +17,7 @@ public static class FluentNetworkExtensions
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>Null input fails validation.</remarks>
     /// <example><code>RuleFor(x => x.ServerIp).IpAddress();</code></example>
     public static IRuleBuilderOptions<TModel, string?> IpAddress<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.IpAddress(val, paramName: null),
@@ -28,7 +28,7 @@ public static class FluentNetworkExtensions
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>Null input fails validation.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotIpAddress<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotIpAddress(val, paramName: null),
             message, MustCodes.Network.Address.WellFormed);
@@ -38,7 +38,7 @@ public static class FluentNetworkExtensions
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>Null input fails validation.</remarks>
     /// <example><code>RuleFor(x => x.Ipv4).Ipv4();</code></example>
     public static IRuleBuilderOptions<TModel, string?> Ipv4<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Ipv4(val, paramName: null),
@@ -49,7 +49,7 @@ public static class FluentNetworkExtensions
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>Null input fails validation.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotIpv4<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotIpv4(val, paramName: null),
             message, MustCodes.Network.Address.Ipv4);
@@ -59,7 +59,7 @@ public static class FluentNetworkExtensions
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>Null input fails validation.</remarks>
     /// <example><code>RuleFor(x => x.Ipv6Addr).Ipv6();</code></example>
     public static IRuleBuilderOptions<TModel, string?> Ipv6<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Ipv6(val, paramName: null),
@@ -70,69 +70,9 @@ public static class FluentNetworkExtensions
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>Null input fails validation.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotIpv6<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotIpv6(val, paramName: null),
-            message, MustCodes.Network.Address.Ipv6);
-
-    /// <summary>Validates that the string value is a valid IP address string representation.</summary>
-    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
-    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
-    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, string?> IpAddressString<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.IpAddressString(val, paramName: null),
-            message, MustCodes.Network.Address.Invalid);
-
-    /// <summary>Validates that the string value is not a valid IP address string representation.</summary>
-    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
-    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
-    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, string?> NotIpAddressString<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotIpAddressString(val, paramName: null),
-            message, MustCodes.Network.Address.WellFormed);
-
-    /// <summary>Validates that the string value is a valid IPv4 string representation.</summary>
-    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
-    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
-    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, string?> Ipv4String<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Ipv4String(val, paramName: null),
-            message, MustCodes.Network.Address.NotIpv4);
-
-    /// <summary>Validates that the string value is not a valid IPv4 string representation.</summary>
-    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
-    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
-    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, string?> NotIpv4String<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotIpv4String(val, paramName: null),
-            message, MustCodes.Network.Address.Ipv4);
-
-    /// <summary>Validates that the string value is a valid IPv6 string representation.</summary>
-    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
-    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
-    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, string?> Ipv6String<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Ipv6String(val, paramName: null),
-            message, MustCodes.Network.Address.NotIpv6);
-
-    /// <summary>Validates that the string value is not a valid IPv6 string representation.</summary>
-    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
-    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
-    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, string?> NotIpv6String<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotIpv6String(val, paramName: null),
             message, MustCodes.Network.Address.Ipv6);
 
     /// <summary>Validates that the IP address string falls within the specified CIDR range.</summary>
@@ -141,12 +81,12 @@ public static class FluentNetworkExtensions
     /// <param name="cidr">The CIDR notation range (e.g., "192.168.1.0/24").</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>A null value passes only when the CIDR configuration is valid.</remarks>
     /// <example><code>RuleFor(x => x.ClientIp).InCidrRange("10.0.0.0/8");</code></example>
     public static IRuleBuilderOptions<TModel, string?> InCidrRange<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         string cidr,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.InCidrRange(val, cidr, paramName: null),
+        ruleBuilder.MustBe(val => SkipAbsentAddress(val, Must.Be.InCidrRange(val, cidr, paramName: null)),
             message, MustCodes.Network.Cidr.OutOfRange);
 
     /// <summary>Validates that the IP address string does not fall within the specified CIDR range.</summary>
@@ -155,11 +95,11 @@ public static class FluentNetworkExtensions
     /// <param name="cidr">The CIDR notation range to exclude.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>A null value passes only when the CIDR configuration is valid.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotInCidrRange<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         string cidr,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotInCidrRange(val, cidr, paramName: null),
+        ruleBuilder.MustBe(val => SkipAbsentAddress(val, Must.Be.NotInCidrRange(val, cidr, paramName: null)),
             message, MustCodes.Network.Cidr.InRange);
 
     /// <summary>Validates that the string value is a valid hostname.</summary>
@@ -167,7 +107,7 @@ public static class FluentNetworkExtensions
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>Null input fails validation.</remarks>
     /// <example><code>RuleFor(x => x.Host).Hostname();</code></example>
     public static IRuleBuilderOptions<TModel, string?> Hostname<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Hostname(val, paramName: null),
@@ -178,7 +118,7 @@ public static class FluentNetworkExtensions
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>Null input fails validation.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotHostname<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHostname(val, paramName: null),
             message, MustCodes.Network.Hostname.WellFormed);
@@ -237,4 +177,6 @@ public static class FluentNetworkExtensions
     public static IRuleBuilderOptions<TModel, string?> MacAddress<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.MacAddress(val, paramName: null) : MustResult<string>.Ok(null!),
             message, MustCodes.Network.Mac.Invalid);
+    private static MustResult<System.Net.IPAddress> SkipAbsentAddress(string? value, MustResult<System.Net.IPAddress> result) =>
+        value is null && result.ParamName is null ? MustResult<System.Net.IPAddress>.Ok(default) : result;
 }

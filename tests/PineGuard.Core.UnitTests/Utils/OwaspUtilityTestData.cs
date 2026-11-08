@@ -1,9 +1,19 @@
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
+using F = PineGuard.Testing.Fixtures.OwaspRulesFixtures;
 
 namespace PineGuard.Core.UnitTests.Utils;
 
 public static class OwaspUtilityTestData
 {
+    public static class ContainsXssRisk
+    {
+        public static TheoryData<RuleCase<string?>> Cases =>
+        [
+            .. F.IsXssSafe.AllScenarios.Select(s => new RuleCase<string?>(s.Name, s.Inputs, new RuleExpected(!string.IsNullOrWhiteSpace(s.Inputs) && !s.IsValid)))
+        ];
+    }
+
     public static class ContainsSqlInjectionRisk
     {
         public static TheoryData<ValidCase> ValidCases =>

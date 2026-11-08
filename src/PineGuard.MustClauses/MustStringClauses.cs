@@ -214,11 +214,11 @@ public static class MustStringClauses
         int length,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Length.Mismatch, NullMessage, paramName, value);
-
         if (length < 0)
             return MustResult<string>.Fail(MustCodes.Text.Length.Mismatch, NonNegativeLengthMessage, nameof(length), length);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Length.Mismatch, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be the expected length.";
 
@@ -244,19 +244,16 @@ public static class MustStringClauses
     /// </returns>
     /// <remarks>
     /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>.
-    /// Delegates to <see cref="StringRules.IsLengthBetween"/>.
+    /// Delegates to <see cref="StringRules.IsLengthInRange"/>.
     /// The failure message follows the pattern <c>"{paramName} must have a length within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string">String Must Clauses documentation</seealso>
-    public static MustResult<string> LengthBetween(this IMustClause _,
+    public static MustResult<string> LengthInRange(this IMustClause _,
         string? value,
         int min,
         int max,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Length.OutOfRange, NullMessage, paramName, value);
-
         if (min < 0)
             return MustResult<string>.Fail(MustCodes.Text.Length.OutOfRange, "{paramName} requires a non-negative min.", nameof(min), min);
 
@@ -266,9 +263,12 @@ public static class MustStringClauses
         if (min > max)
             return MustResult<string>.Fail(MustCodes.Text.Length.OutOfRange, "{paramName} requires a valid length range.", nameof(min), min);
 
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Length.OutOfRange, NullMessage, paramName, value);
+
         const string messageTemplate = "{paramName} must have a length within the expected range.";
 
-        var ok = StringRules.IsLengthBetween(value, min, max);
+        var ok = StringRules.IsLengthInRange(value, min, max);
         return MustResult<string>.FromBool(ok, MustCodes.Text.Length.OutOfRange, messageTemplate, paramName, value, value);
     }
 
@@ -298,11 +298,11 @@ public static class MustStringClauses
         int length,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NullMessage, paramName, value);
-
         if (length < 0)
             return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NonNegativeLengthMessage, nameof(length), length);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be longer than the specified length.";
 
@@ -336,11 +336,11 @@ public static class MustStringClauses
         int length,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NullMessage, paramName, value);
-
         if (length < 0)
             return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NonNegativeLengthMessage, nameof(length), length);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooShort, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be longer than or equal to the specified length.";
 
@@ -374,11 +374,11 @@ public static class MustStringClauses
         int length,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NullMessage, paramName, value);
-
         if (length < 0)
             return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NonNegativeLengthMessage, nameof(length), length);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be shorter than the specified length.";
 
@@ -412,11 +412,11 @@ public static class MustStringClauses
         int length,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NullMessage, paramName, value);
-
         if (length < 0)
             return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NonNegativeLengthMessage, nameof(length), length);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Length.TooLong, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be shorter than or equal to the specified length.";
 
@@ -1543,11 +1543,14 @@ public static class MustStringClauses
         StringComparison comparison = StringComparison.Ordinal,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Content.NotContains, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<StringComparison>(comparison))
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotContains, "{paramName} must be a defined string comparison value.", nameof(comparison), comparison);
 
         if (substring is null)
             return MustResult<string>.Fail(MustCodes.Text.Content.NotContains, NullMessage, nameof(substring), substring);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotContains, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must contain the specified substring.";
 
@@ -1583,11 +1586,14 @@ public static class MustStringClauses
         StringComparison comparison = StringComparison.Ordinal,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Content.Contains, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<StringComparison>(comparison))
+            return MustResult<string>.Fail(MustCodes.Text.Content.Contains, "{paramName} must be a defined string comparison value.", nameof(comparison), comparison);
 
         if (substring is null)
             return MustResult<string>.Fail(MustCodes.Text.Content.Contains, NullMessage, nameof(substring), substring);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.Contains, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not contain the specified substring.";
 
@@ -1623,11 +1629,14 @@ public static class MustStringClauses
         StringComparison comparison = StringComparison.Ordinal,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Content.NotStartsWith, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<StringComparison>(comparison))
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotStartsWith, "{paramName} must be a defined string comparison value.", nameof(comparison), comparison);
 
         if (prefix is null)
             return MustResult<string>.Fail(MustCodes.Text.Content.NotStartsWith, NullMessage, nameof(prefix), prefix);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotStartsWith, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must start with the specified prefix.";
 
@@ -1663,11 +1672,14 @@ public static class MustStringClauses
         StringComparison comparison = StringComparison.Ordinal,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Content.StartsWith, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<StringComparison>(comparison))
+            return MustResult<string>.Fail(MustCodes.Text.Content.StartsWith, "{paramName} must be a defined string comparison value.", nameof(comparison), comparison);
 
         if (prefix is null)
             return MustResult<string>.Fail(MustCodes.Text.Content.StartsWith, NullMessage, nameof(prefix), prefix);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.StartsWith, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not start with the specified prefix.";
 
@@ -1703,11 +1715,14 @@ public static class MustStringClauses
         StringComparison comparison = StringComparison.Ordinal,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Content.NotEndsWith, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<StringComparison>(comparison))
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotEndsWith, "{paramName} must be a defined string comparison value.", nameof(comparison), comparison);
 
         if (suffix is null)
             return MustResult<string>.Fail(MustCodes.Text.Content.NotEndsWith, NullMessage, nameof(suffix), suffix);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.NotEndsWith, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must end with the specified suffix.";
 
@@ -1743,11 +1758,14 @@ public static class MustStringClauses
         StringComparison comparison = StringComparison.Ordinal,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Content.EndsWith, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<StringComparison>(comparison))
+            return MustResult<string>.Fail(MustCodes.Text.Content.EndsWith, "{paramName} must be a defined string comparison value.", nameof(comparison), comparison);
 
         if (suffix is null)
             return MustResult<string>.Fail(MustCodes.Text.Content.EndsWith, NullMessage, nameof(suffix), suffix);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Content.EndsWith, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not end with the specified suffix.";
 

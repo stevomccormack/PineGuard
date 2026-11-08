@@ -162,6 +162,7 @@ public static class GuardStringNumbersClausesTestData
         public static TheoryData<GuardCase<(string? text, decimal target, decimal? tolerance)>> InvalidCases => F.NumbersIsApproximately.AllInvalid.ToGuardCases(s => s.Name switch
         {
             nameof(F.NumbersIsApproximately.NullValue) => new GuardExpected(false, typeof(ArgumentNullException), "value"),
+            nameof(F.NumbersIsApproximately.NegativeTolerance) => new GuardExpected(false, typeof(ArgumentException), "tolerance"),
             nameof(F.NumbersIsApproximately.NullTolerance) => new GuardExpected(false, typeof(ArgumentNullException), "tolerance"),
             _ => new GuardExpected(false, typeof(ArgumentException), "value")
         });
@@ -202,11 +203,11 @@ public static class GuardStringNumbersClausesTestData
     {
         public static TheoryData<GuardCase<(string? text, decimal target, decimal? tolerance)>> ValidCases =>
         [
-            new(nameof(F.NumbersIsApproximately.OutsideTolerance), F.NumbersIsApproximately.OutsideTolerance, new GuardExpected(true)),
-            new(nameof(F.NumbersIsApproximately.NegativeTolerance), F.NumbersIsApproximately.NegativeTolerance, new GuardExpected(true))
+            new(nameof(F.NumbersIsApproximately.OutsideTolerance), F.NumbersIsApproximately.OutsideTolerance, new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(string? text, decimal target, decimal? tolerance)>> InvalidCases =>
         [
+            new(nameof(F.NumbersIsApproximately.NegativeTolerance), F.NumbersIsApproximately.NegativeTolerance, new GuardExpected(false, typeof(ArgumentException), "tolerance")),
             new(nameof(F.NumbersIsApproximately.WithinTolerance), F.NumbersIsApproximately.WithinTolerance, new GuardExpected(false, typeof(ArgumentException), "value")),
             new(nameof(F.NumbersIsApproximately.Letters), F.NumbersIsApproximately.Letters, new GuardExpected(false, typeof(ArgumentException), "value")),
             new(nameof(F.NumbersIsApproximately.NullTolerance), F.NumbersIsApproximately.NullTolerance, new GuardExpected(false, typeof(ArgumentNullException), "tolerance"))

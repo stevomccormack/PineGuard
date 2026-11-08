@@ -85,7 +85,7 @@ public static class MustDateTimeClausesTestData
         public sealed record EdgeCase(string Name, DateTime Value, bool Expected) : IsCase<DateTime>(Name, Value, Expected);
     }
 
-    public static class Between
+    public static class InRange
     {
         private static readonly DateTime D1 = new(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static readonly DateTime D2 = new(2023, 6, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -110,7 +110,7 @@ public static class MustDateTimeClausesTestData
             : IsCase<(DateTime value, DateTime min, DateTime max)>(Name, Value, Expected);
     }
 
-    public static class NotBetween
+    public static class OutOfRange
     {
         private static readonly DateTime D1 = new(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static readonly DateTime D2 = new(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -305,8 +305,8 @@ public static class MustDateTimeClausesTestData
 
         public static TheoryData<EdgeCase> EdgeCases =>
         [
-            new("invalid range1", (BaseTime.AddHours(2), BaseTime, BaseTime.AddHours(1), BaseTime.AddHours(3)), true),
-            new("invalid range2", (BaseTime, BaseTime.AddHours(2), BaseTime.AddHours(3), BaseTime.AddHours(1)), true)
+            new("invalid range1", (BaseTime.AddHours(2), BaseTime, BaseTime.AddHours(1), BaseTime.AddHours(3)), false),
+            new("invalid range2", (BaseTime, BaseTime.AddHours(2), BaseTime.AddHours(3), BaseTime.AddHours(1)), false)
         ];
 
         public sealed record ValidCase(string Name, (DateTime start1, DateTime end1, DateTime start2, DateTime end2) Value, bool Expected)

@@ -36,7 +36,7 @@ public static partial class StringRulesFixtures
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
-    public static class DateTimeOffsetIsBetween
+    public static class DateTimeOffsetIsInRange
     {
         public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) InsideRange = ("2020-01-01T12:00:00Z", DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Inclusive);
         public static readonly (string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) MinExclusive = ("2020-01-01T00:00:00Z", DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture), DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture), Inclusion.Exclusive);
@@ -53,7 +53,7 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
-    public static class DateTimeOffsetIsNotBetween
+    public static class DateTimeOffsetIsOutOfRange
     {
         private static readonly DateTimeOffset DtMin = DateTimeOffset.Parse("2020-01-01T00:00:00Z", CultureInfo.InvariantCulture);
         private static readonly DateTimeOffset DtMax = DateTimeOffset.Parse("2020-01-02T00:00:00Z", CultureInfo.InvariantCulture);

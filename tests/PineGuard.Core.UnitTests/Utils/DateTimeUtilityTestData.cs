@@ -76,12 +76,12 @@ public static class DateTimeUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("Null", (null, DateTimePrecision.Second), false, null),
-            new("Unknown precision", (new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), (DateTimePrecision)999), false, null)
+            new("Null", (null, DateTimePrecision.Second), false, default),
+            new("Unknown precision", (new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), (DateTimePrecision)999), false, default)
         ];
 
-        public sealed record ValidCase(string Name, (DateTime? Value, DateTimePrecision Precision) Value, bool Expected, DateTime? ExpectedOutValue)
-            : TryCase<(DateTime? Value, DateTimePrecision Precision), DateTime?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, (DateTime? Value, DateTimePrecision Precision) Value, bool Expected, DateTime ExpectedOutValue)
+            : TryCase<(DateTime? Value, DateTimePrecision Precision), DateTime>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class TryTruncateToPrecisionUtcOffset
@@ -93,12 +93,12 @@ public static class DateTimeUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("Null", (null, DateTimePrecision.Second), false, null),
-            new("Unknown precision", (new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero), (DateTimePrecision)999), false, null)
+            new("Null", (null, DateTimePrecision.Second), false, default),
+            new("Unknown precision", (new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero), (DateTimePrecision)999), false, default)
         ];
 
-        public sealed record ValidCase(string Name, (DateTimeOffset? Value, DateTimePrecision Precision) Value, bool Expected, DateTimeOffset? ExpectedOutValue)
-            : TryCase<(DateTimeOffset? Value, DateTimePrecision Precision), DateTimeOffset?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, (DateTimeOffset? Value, DateTimePrecision Precision) Value, bool Expected, DateTimeOffset ExpectedOutValue)
+            : TryCase<(DateTimeOffset? Value, DateTimePrecision Precision), DateTimeOffset>(Name, Value, Expected, ExpectedOutValue);
     }
 
     public static class TryTruncateToPrecision
@@ -112,11 +112,11 @@ public static class DateTimeUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("Null", (null, DatePrecision.Day), false, null),
-            new("Unknown precision", (new DateOnly(2020, 2, 3), (DatePrecision)999), false, null)
+            new("Null", (null, DatePrecision.Day), false, default),
+            new("Unknown precision", (new DateOnly(2020, 2, 3), (DatePrecision)999), false, default)
         ];
 
-        public sealed record ValidCase(string Name, (DateOnly? Value, DatePrecision Precision) Value, bool Expected, DateOnly? ExpectedOutValue)
-            : TryCase<(DateOnly? Value, DatePrecision Precision), DateOnly?>(Name, Value, Expected, ExpectedOutValue);
+        public sealed record ValidCase(string Name, (DateOnly? Value, DatePrecision Precision) Value, bool Expected, DateOnly ExpectedOutValue)
+            : TryCase<(DateOnly? Value, DatePrecision Precision), DateOnly>(Name, Value, Expected, ExpectedOutValue);
     }
 }

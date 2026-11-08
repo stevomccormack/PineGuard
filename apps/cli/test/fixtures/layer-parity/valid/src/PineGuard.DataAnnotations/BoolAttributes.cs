@@ -13,4 +13,11 @@ public sealed class TrueAttribute : ValidationAttributeBase
         var result = Must.Be.True((bool)value!, paramName: null);
         return FromMustResult(result, validationContext);
     }
+
+    protected object CheckRoot(object value) => InvokeCollectionMust(nameof(MustXmlClauses.HasXmlRoot), value);
+    protected object CheckNumber(object value) => InvokeAndMap(nameof(MustNumberClauses.Positive), value);
+    protected object NotADispatch(object value) => Describe(nameof(MustNumberClauses.NotImplemented), value);
+    protected object WrongOwner(object value) => InvokeAndMap(nameof(OtherClauses.NotImplemented), value);
+    protected object QuotedText(object value) => InvokeAndMap("nameof(MustNumberClauses.NotImplemented)", value);
+
 }

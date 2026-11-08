@@ -150,7 +150,7 @@ public static class GuardStringDateTimeOffsetClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the NotBetweenDateTimeOffset constraint.
+    /// Throws if <paramref name="value"/> violates the OutOfRangeDateTimeOffset constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -169,8 +169,8 @@ public static class GuardStringDateTimeOffsetClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringDateTimeOffsetClauses.BetweenDateTimeOffset"/>
-    public static DateTimeOffset NotBetweenDateTimeOffset(this IGuardClause _,
+    /// <seealso cref="MustStringDateTimeOffsetClauses.InRangeDateTimeOffset"/>
+    public static DateTimeOffset OutOfRangeDateTimeOffset(this IGuardClause _,
         string? value,
         DateTimeOffset min,
         DateTimeOffset max,
@@ -180,7 +180,7 @@ public static class GuardStringDateTimeOffsetClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.BetweenDateTimeOffset(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.InRangeDateTimeOffset(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -188,7 +188,7 @@ public static class GuardStringDateTimeOffsetClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the BetweenDateTimeOffset constraint.
+    /// Throws if <paramref name="value"/> violates the InRangeDateTimeOffset constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -207,8 +207,8 @@ public static class GuardStringDateTimeOffsetClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringDateTimeOffsetClauses.NotBetweenDateTimeOffset"/>
-    public static DateTimeOffset BetweenDateTimeOffset(this IGuardClause _,
+    /// <seealso cref="MustStringDateTimeOffsetClauses.OutOfRangeDateTimeOffset"/>
+    public static DateTimeOffset InRangeDateTimeOffset(this IGuardClause _,
         string? value,
         DateTimeOffset min,
         DateTimeOffset max,
@@ -218,7 +218,7 @@ public static class GuardStringDateTimeOffsetClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotBetweenDateTimeOffset(value, min, max, inclusion, styles, paramName); // Guard.Against.BetweenDateTimeOffset => Must.Be.NotBetweenDateTimeOffset (complement)
+        var result = Must.Be.OutOfRangeDateTimeOffset(value, min, max, inclusion, styles, paramName); // Guard.Against.InRangeDateTimeOffset => Must.Be.OutOfRangeDateTimeOffset (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

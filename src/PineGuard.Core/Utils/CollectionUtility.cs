@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PineGuard.Utils;
 
 /// <summary>
@@ -140,5 +142,51 @@ public static class CollectionUtility
         }
 
         return false;
+    }
+
+    /// <summary>Validates that every element is non-null and creates a replayable, non-null-element snapshot.</summary>
+    /// <typeparam name="T">The reference element type.</typeparam>
+    /// <param name="value">The sequence to validate, enumerated at most once.</param>
+    /// <param name="items">The validated snapshot on success, or null on failure. No null elements are filtered out.</param>
+    /// <returns>False for a null sequence or any null element; true otherwise, including an empty sequence.</returns>
+    public static bool TryValidateNonNullItems<T>(IEnumerable<T?>? value, [NotNullWhen(true)] out IReadOnlyList<T>? items) where T : class
+    {
+        items = null;
+        if (value is null)
+            return false;
+
+        var result = new List<T>();
+        foreach (var item in value)
+        {
+            if (item is null)
+                return false;
+            result.Add(item);
+        }
+
+        items = result;
+        return true;
+    }
+
+    /// <summary>Validates that every element is non-null and creates a replayable, non-null-element snapshot.</summary>
+    /// <typeparam name="T">The value element type.</typeparam>
+    /// <param name="value">The sequence to validate, enumerated at most once.</param>
+    /// <param name="items">The validated snapshot on success, or null on failure. No null elements are filtered out.</param>
+    /// <returns>False for a null sequence or any null element; true otherwise, including an empty sequence.</returns>
+    public static bool TryValidateNonNullItems<T>(IEnumerable<T?>? value, [NotNullWhen(true)] out IReadOnlyList<T>? items) where T : struct
+    {
+        items = null;
+        if (value is null)
+            return false;
+
+        var result = new List<T>();
+        foreach (var item in value)
+        {
+            if (!item.HasValue)
+                return false;
+            result.Add(item.GetValueOrDefault());
+        }
+
+        items = result;
+        return true;
     }
 }

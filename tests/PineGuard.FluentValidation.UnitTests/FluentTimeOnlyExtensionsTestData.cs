@@ -11,7 +11,7 @@ public static class FluentTimeOnlyExtensionsTestData
     private static readonly TimeOnly RefMinus2 = F.IsKnownTimes.T1000!.Value;
     private static readonly TimeOnly RefPlus1 = F.IsKnownTimes.T1300!.Value;
 
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<FluentCase<TimeOnly?>> Cases =>
         [
@@ -21,7 +21,7 @@ public static class FluentTimeOnlyExtensionsTestData
         ];
     }
 
-    public static class NotBetween
+    public static class OutOfRange
     {
         public static TheoryData<FluentCase<TimeOnly?>> Cases =>
         [
@@ -203,7 +203,7 @@ public static class FluentTimeOnlyExtensionsTestData
 
     // ── Non-nullable overloads ─────────────────────────────────────────────
 
-    public static class BetweenNonNullable
+    public static class InRangeNonNullable
     {
         public static TheoryData<FluentCase<TimeOnly>> Cases =>
         [
@@ -212,7 +212,7 @@ public static class FluentTimeOnlyExtensionsTestData
         ];
     }
 
-    public static class NotBetweenNonNullable
+    public static class OutOfRangeNonNullable
     {
         public static TheoryData<FluentCase<TimeOnly>> Cases =>
         [

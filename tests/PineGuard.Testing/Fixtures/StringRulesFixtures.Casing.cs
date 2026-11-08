@@ -16,7 +16,7 @@ public static partial class StringRulesFixtures
         public static readonly (string? value, StringCasing style) KebabCase = ("hello-world", StringCasing.KebabCase);
         public static readonly (string? value, StringCasing style) TrainCase = ("Hello-World", StringCasing.TrainCase);
         public static readonly (string? value, StringCasing style) DotCase = ("hello.world", StringCasing.DotCase);
-        public static readonly (string? value, StringCasing style) SpaceCase = ("Hello World", StringCasing.SpaceCase);
+        public static readonly (string? value, StringCasing style) SpaceCase = ("hello world", StringCasing.SpaceCase);
         public static readonly (string? value, StringCasing style) InvalidStyle = ("Hello_world", StringCasing.SnakeCase);
         public static readonly (string? value, StringCasing style) NullValue = (null, StringCasing.CamelCase);
         public static readonly (string? value, StringCasing style) UnknownStyle = ("hello", (StringCasing)999);
@@ -100,10 +100,14 @@ public static partial class StringRulesFixtures
     public static class IsSpaceCase
     {
         public static readonly string ValidSpaceCase = "hello world";
+        public static readonly string InvalidTitleCase = "Hello World";
+        public static readonly string InvalidMixedCase = "hELLo WoRLD";
+        public static readonly string InvalidDoubleSpace = "hello  world";
+        public static readonly string ValidDigits = "hello 123";
         public static readonly string InvalidSnakeCase = "hello_world";
 
-        public static RuleScenario<string>[] ValidScenarios => [new(nameof(ValidSpaceCase), ValidSpaceCase, true)];
-        public static RuleScenario<string>[] InvalidScenarios => [new(nameof(InvalidSnakeCase), InvalidSnakeCase, false)];
+        public static RuleScenario<string>[] ValidScenarios => [new(nameof(ValidSpaceCase), ValidSpaceCase, true), new(nameof(ValidDigits), ValidDigits, true)];
+        public static RuleScenario<string>[] InvalidScenarios => [new(nameof(InvalidSnakeCase), InvalidSnakeCase, false), new(nameof(InvalidTitleCase), InvalidTitleCase, false), new(nameof(InvalidMixedCase), InvalidMixedCase, false), new(nameof(InvalidDoubleSpace), InvalidDoubleSpace, false)];
         public static RuleScenario<string>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 

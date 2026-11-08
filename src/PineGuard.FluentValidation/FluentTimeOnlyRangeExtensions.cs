@@ -25,7 +25,7 @@ public static class FluentTimeOnlyRangeExtensions
         this IRuleBuilder<TModel, TimeOnlyRange?> ruleBuilder,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Chronological(val.Value, inclusion, paramName: null) : MustResult<TimeOnlyRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Chronological(val.GetValueOrDefault(), inclusion, paramName: null)),
             message, MustCodes.Range.Order.NotChronological);
 
     /// <summary>Validates that the <see cref="TimeOnlyRange"/> is chronologically ordered.</summary>
@@ -53,9 +53,9 @@ public static class FluentTimeOnlyRangeExtensions
     public static IRuleBuilderOptions<TModel, TimeOnlyRange?> Overlapping<TModel>(
         this IRuleBuilder<TModel, TimeOnlyRange?> ruleBuilder,
         TimeOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Overlapping(val.Value, range2, inclusion, paramName: null) : MustResult<TimeOnlyRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Overlapping(val.GetValueOrDefault(), range2, inclusion, paramName: null)),
             message, MustCodes.Range.Overlap.Missing);
 
     /// <summary>Validates that the <see cref="TimeOnlyRange"/> overlaps with the specified range.</summary>
@@ -68,7 +68,7 @@ public static class FluentTimeOnlyRangeExtensions
     public static IRuleBuilderOptions<TModel, TimeOnlyRange> Overlapping<TModel>(
         this IRuleBuilder<TModel, TimeOnlyRange> ruleBuilder,
         TimeOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Overlapping(val, range2, inclusion, paramName: null),
             message, MustCodes.Range.Overlap.Missing);
@@ -84,9 +84,9 @@ public static class FluentTimeOnlyRangeExtensions
     public static IRuleBuilderOptions<TModel, TimeOnlyRange?> NotOverlapping<TModel>(
         this IRuleBuilder<TModel, TimeOnlyRange?> ruleBuilder,
         TimeOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotOverlapping(val.Value, range2, inclusion, paramName: null) : MustResult<TimeOnlyRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotOverlapping(val.GetValueOrDefault(), range2, inclusion, paramName: null)),
             message, MustCodes.Range.Overlap.Present);
 
     /// <summary>Validates that the <see cref="TimeOnlyRange"/> does not overlap with the specified range.</summary>
@@ -99,7 +99,7 @@ public static class FluentTimeOnlyRangeExtensions
     public static IRuleBuilderOptions<TModel, TimeOnlyRange> NotOverlapping<TModel>(
         this IRuleBuilder<TModel, TimeOnlyRange> ruleBuilder,
         TimeOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotOverlapping(val, range2, inclusion, paramName: null),
             message, MustCodes.Range.Overlap.Present);
@@ -117,7 +117,7 @@ public static class FluentTimeOnlyRangeExtensions
         TimeOnly value,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Contains(val.Value, value, inclusion, paramName: null) : MustResult<TimeOnlyRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Contains(val.GetValueOrDefault(), value, inclusion, paramName: null)),
             message, MustCodes.Range.Bounds.NotContains);
 
     /// <summary>Validates that the <see cref="TimeOnlyRange"/> contains the specified time.</summary>
@@ -149,7 +149,7 @@ public static class FluentTimeOnlyRangeExtensions
         TimeOnly value,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotContains(val.Value, value, inclusion, paramName: null) : MustResult<TimeOnlyRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotContains(val.GetValueOrDefault(), value, inclusion, paramName: null)),
             message, MustCodes.Range.Bounds.Contains);
 
     /// <summary>Validates that the <see cref="TimeOnlyRange"/> does not contain the specified time.</summary>
@@ -166,5 +166,7 @@ public static class FluentTimeOnlyRangeExtensions
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotContains(val, value, inclusion, paramName: null),
             message, MustCodes.Range.Bounds.Contains);
+    private static MustResult<T> SkipAbsentValue<T>(T? value, MustResult<T> result) where T : struct =>
+        value is null && result.ParamName is null ? MustResult<T>.Ok(default) : result;
 }
 #endif

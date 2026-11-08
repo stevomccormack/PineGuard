@@ -1,11 +1,34 @@
 using System.Globalization;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
 using PineGuard.Utils;
 
 namespace PineGuard.Core.UnitTests.Utils;
 
 public sealed class StringUtilityNumberTypesTests : BaseUnitTest
 {
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.IsValidIntegerStyles.Cases), MemberType = typeof(StringUtilityNumberTypesTestData.IsValidIntegerStyles))]
+    public void IsValidIntegerStyles_BehavesAsExpected(RuleCase<NumberStyles> tc)
+    {
+        // Act
+        var result = StringUtility.NumberTypes.IsValidIntegerStyles(tc.Value);
+
+        // Assert
+        Assert.Equal(tc.Expected.IsValid, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringUtilityNumberTypesTestData.IsValidFloatingPointStyles.Cases), MemberType = typeof(StringUtilityNumberTypesTestData.IsValidFloatingPointStyles))]
+    public void IsValidFloatingPointStyles_BehavesAsExpected(RuleCase<NumberStyles> tc)
+    {
+        // Act
+        var result = StringUtility.NumberTypes.IsValidFloatingPointStyles(tc.Value);
+
+        // Assert
+        Assert.Equal(tc.Expected.IsValid, result);
+    }
+
     [Theory]
     [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseInt32.ValidCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseInt32))]
     [MemberData(nameof(StringUtilityNumberTypesTestData.TryParseInt32.EdgeCases), MemberType = typeof(StringUtilityNumberTypesTestData.TryParseInt32))]

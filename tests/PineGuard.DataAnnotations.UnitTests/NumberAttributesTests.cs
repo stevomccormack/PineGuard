@@ -221,7 +221,7 @@ public sealed class NumberAttributesTests(ITestOutputHelper output) : BaseDataAn
     [MemberData(nameof(NumberAttributesTestData.Approximately.InvalidCases), MemberType = typeof(NumberAttributesTestData.Approximately))]
     public void ApproximatelyNumber_BehavesAsExpected(NumberAttributesTestData.ValidCase testCase)
     {
-        var attribute = new ApproximatelyNumberAttribute(10) { Tolerance = 1 };
+        var attribute = new ApproximatelyNumberAttribute(10, 1);
         Assert.Equal(MustCodes.Number.Proximity.NotApproximate, attribute.Code);
         Verify(attribute, testCase);
     }
@@ -232,20 +232,20 @@ public sealed class NumberAttributesTests(ITestOutputHelper output) : BaseDataAn
     [MemberData(nameof(NumberAttributesTestData.NotApproximately.InvalidCases), MemberType = typeof(NumberAttributesTestData.NotApproximately))]
     public void NotApproximatelyNumber_BehavesAsExpected(NumberAttributesTestData.ValidCase testCase)
     {
-        var attribute = new NotApproximatelyNumberAttribute(10) { Tolerance = 1 };
+        var attribute = new NotApproximatelyNumberAttribute(10, 1);
         Assert.Equal(MustCodes.Number.Proximity.Approximate, attribute.Code);
         Verify(attribute, testCase);
     }
 
     [Theory]
-    [MemberData(nameof(NumberAttributesTestData.ApproximatelyNoTolerance.InvalidCases), MemberType = typeof(NumberAttributesTestData.ApproximatelyNoTolerance))]
-    public void ApproximatelyNumber_NoTolerance_BehavesAsExpected(NumberAttributesTestData.ValidCase testCase)
-        => Verify(new ApproximatelyNumberAttribute(10), testCase);
+    [MemberData(nameof(NumberAttributesTestData.ApproximatelyNegativeTolerance.InvalidCases), MemberType = typeof(NumberAttributesTestData.ApproximatelyNegativeTolerance))]
+    public void ApproximatelyNumber_NegativeTolerance_BehavesAsExpected(NumberAttributesTestData.ValidCase testCase)
+        => Verify(new ApproximatelyNumberAttribute(10, -1), testCase);
 
     [Theory]
-    [MemberData(nameof(NumberAttributesTestData.NotApproximatelyNoTolerance.InvalidCases), MemberType = typeof(NumberAttributesTestData.NotApproximatelyNoTolerance))]
-    public void NotApproximatelyNumber_NoTolerance_BehavesAsExpected(NumberAttributesTestData.ValidCase testCase)
-        => Verify(new NotApproximatelyNumberAttribute(10), testCase);
+    [MemberData(nameof(NumberAttributesTestData.NotApproximatelyNegativeTolerance.InvalidCases), MemberType = typeof(NumberAttributesTestData.NotApproximatelyNegativeTolerance))]
+    public void NotApproximatelyNumber_NegativeTolerance_BehavesAsExpected(NumberAttributesTestData.ValidCase testCase)
+        => Verify(new NotApproximatelyNumberAttribute(10, -1), testCase);
 
     [Theory]
     [InlineData(typeof(PositiveNumberAttribute))]

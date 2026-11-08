@@ -11,7 +11,7 @@ namespace PineGuard.DataAnnotations;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustPhoneClauses.PhoneNumberString"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustPhoneClauses.PhoneNumber"/>. Supported on properties, fields, and
 /// parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
@@ -29,7 +29,7 @@ namespace PineGuard.DataAnnotations;
 /// </code>
 /// </example>
 /// <seealso cref="CustomPhoneNumberAttribute"/>
-/// <seealso cref="MustPhoneClauses.PhoneNumberString"/>
+/// <seealso cref="MustPhoneClauses.PhoneNumber"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/phone">Phone Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class PhoneNumberAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Phone.Number.Invalid)
@@ -38,7 +38,7 @@ public sealed class PhoneNumberAttribute() : ValidationAttributeBase(typeof(stri
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.PhoneNumberString(strValue, minDigits: 7, maxDigits: 25, allowedNonDigitCharacters: null, paramName: null);
+        var result = Must.Be.PhoneNumber(strValue, minDigits: 7, maxDigits: 25, allowedNonDigitCharacters: null, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }
@@ -49,7 +49,7 @@ public sealed class PhoneNumberAttribute() : ValidationAttributeBase(typeof(stri
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustPhoneClauses.PhoneNumberString"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustPhoneClauses.PhoneNumber"/>. Supported on properties, fields, and
 /// parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
@@ -66,7 +66,7 @@ public sealed class PhoneNumberAttribute() : ValidationAttributeBase(typeof(stri
 /// </code>
 /// </example>
 /// <seealso cref="PhoneNumberAttribute"/>
-/// <seealso cref="MustPhoneClauses.PhoneNumberString"/>
+/// <seealso cref="MustPhoneClauses.PhoneNumber"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/phone">Phone Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class CustomPhoneNumberAttribute(int minDigits, int maxDigits) : ValidationAttributeBase(typeof(string), MustCodes.Phone.Number.Invalid)
@@ -81,7 +81,7 @@ public sealed class CustomPhoneNumberAttribute(int minDigits, int maxDigits) : V
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string)value!;
-        var result = Must.Be.PhoneNumberString(strValue, MinDigits, MaxDigits, allowedNonDigitCharacters: null, paramName: null);
+        var result = Must.Be.PhoneNumber(strValue, MinDigits, MaxDigits, allowedNonDigitCharacters: null, paramName: null);
         return FromMustResult(result, validationContext);
     }
 }

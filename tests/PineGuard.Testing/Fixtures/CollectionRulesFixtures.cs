@@ -115,7 +115,7 @@ public static class CollectionRulesFixtures
         public static RuleScenario<(IEnumerable<string>? value, int max)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
-    public static class HasCountBetween
+    public static class HasCountInRange
     {
         public static readonly (IEnumerable<string>? value, int min, int max, Inclusion inclusion) MultipleTwoFourInclusive = (Multiple, 2, 4, Inclusion.Inclusive);
         public static readonly (IEnumerable<string>? value, int min, int max, Inclusion inclusion) MultipleThreeThreeInclusive = (Multiple, 3, 3, Inclusion.Inclusive);
@@ -258,4 +258,22 @@ public static class CollectionRulesFixtures
 
         public static RuleScenario<(IEnumerable<string>? value, int index)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
+
+    public static class NonNullValueItems
+    {
+        public static readonly int?[]? NullCollection = null;
+        public static readonly int?[] EmptyCollection = [];
+        public static readonly int?[] ValuesWithDuplicates = [1, 1, 2];
+        public static readonly int?[] NullElement = [null];
+        public static readonly int?[] MixedElements = [1, null, 2];
+        public static RuleScenario<int?[]?>[] AllScenarios =>
+        [
+            new(nameof(NullCollection), NullCollection, false),
+            new(nameof(EmptyCollection), EmptyCollection, true),
+            new(nameof(ValuesWithDuplicates), ValuesWithDuplicates, true),
+            new(nameof(NullElement), NullElement, false),
+            new(nameof(MixedElements), MixedElements, false),
+        ];
+    }
+
 }

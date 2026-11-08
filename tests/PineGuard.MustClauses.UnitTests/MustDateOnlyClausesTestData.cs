@@ -94,7 +94,7 @@ public static class MustDateOnlyClausesTestData
         public sealed record EdgeCase(string Name, DateOnly Value, bool Expected) : IsCase<DateOnly>(Name, Value, Expected);
     }
 
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
@@ -116,7 +116,7 @@ public static class MustDateOnlyClausesTestData
              : IsCase<(DateOnly value, DateOnly min, DateOnly max)>(Name, Value, Expected);
     }
 
-    public static class NotBetween
+    public static class OutOfRange
     {
         private static readonly DateOnly D1 = new(2023, 1, 1);
         private static readonly DateOnly D2 = new(2025, 1, 1);
@@ -340,8 +340,8 @@ public static class MustDateOnlyClausesTestData
 
         public static TheoryData<EdgeCase> EdgeCases =>
         [
-             new("invalid range1", (D2, D1, D3, D4), true),
-               new("invalid range2", (D1, D2, D4, D3), true)
+             new("invalid range1", (D2, D1, D3, D4), false),
+               new("invalid range2", (D1, D2, D4, D3), false)
         ];
 
         public sealed record ValidCase(string Name, (DateOnly start1, DateOnly end1, DateOnly start2, DateOnly end2) Value, bool Expected)

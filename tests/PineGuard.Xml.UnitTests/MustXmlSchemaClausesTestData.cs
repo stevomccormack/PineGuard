@@ -1,7 +1,4 @@
-using System.Xml.Schema;
 using PineGuard.Codes;
-using PineGuard.Testing.Common;
-using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.MustClauses;
 using PineGuard.Xml.UnitTests.Schemas;
 
@@ -40,13 +37,10 @@ public static class MustXmlSchemaClausesTestData
 
     public static class ValidXmlNullSchemas
     {
-        public sealed record InvalidCase(string Name, string? Value, ExpectedException ExpectedException)
-            : ThrowsCase<string?>(Name, Value, ExpectedException);
-
-        public static TheoryData<IThrowsCase> InvalidCases =>
+        public static TheoryData<MustCase<string?>> InvalidCases =>
         [
-            new InvalidCase(nameof(TestSchemas.ValidMessage), TestSchemas.ValidMessage, new ExpectedException(typeof(ArgumentNullException))),
-            new InvalidCase("NullValueAndNullSchemas", null, new ExpectedException(typeof(ArgumentNullException)))
+            new(nameof(TestSchemas.ValidMessage), TestSchemas.ValidMessage, new(false, "schemas must not be null.", "schemas", MustCodes.Xml.Schema.Mismatch)),
+            new("NullValueAndNullSchemas", null, new(false, "schemas must not be null.", "schemas", MustCodes.Xml.Schema.Mismatch))
         ];
     }
 }

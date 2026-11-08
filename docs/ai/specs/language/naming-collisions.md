@@ -43,14 +43,18 @@ Examples:
 
 - Prefer an explicit collision-safe name such as `WebUrl()` when a shorter name like `Url()` would be ambiguous in IntelliSense.
 - Prefer `Required()` / `NotRequired()` over `NotNull()` / `Null()` when PineGuard adapts null semantics into FluentValidation, because the built-in validators already own the shorter names.
+- Typed numeric Fluent comparisons use `GreaterThanNumber`, `GreaterThanOrEqualNumber`,
+  `LessThanNumber` and `LessThanOrEqualNumber`. This whole family is distinguished from native
+  FluentValidation comparisons and consistently delegates to Must for PineGuard messages/codes.
 - Adapter method names may intentionally diverge from Must naming when collision avoidance materially improves clarity.
-- When explicitly chosen for ergonomics, a short alias may remain as a thin facade that forwards to the clearer preferred method.
+- Keep one canonical collision-safe spelling. Do not retain a second public alias solely for ergonomics or compatibility.
 
 ## Family rule
 
 Rename the whole adapter family only when that materially improves clarity. Otherwise, a targeted rename for the collided adapter surface is acceptable.
 
-When both names exist, document one explicit name as preferred and keep any alternate name as a thin forwarder only.
+If two operations need different names, document the actual semantic or framework boundary;
+redundant spellings of the same operation are removed during the greenfield phase.
 
 ## Type names vs vocabulary
 

@@ -5,7 +5,7 @@ namespace PineGuard.Testing.Fixtures;
 
 public static class TimeOnlyRulesFixtures
 {
-    public static class IsBetween
+    public static class IsInRange
     {
         public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) MiddleInclusive = (new TimeOnly(12, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
         public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) AtMinInclusive = (new TimeOnly(11, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);

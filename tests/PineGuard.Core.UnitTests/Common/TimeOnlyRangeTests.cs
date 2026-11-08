@@ -98,11 +98,11 @@ public sealed class TimeOnlyRangeTests : BaseUnitTest
         var same = new TimeOnlyRange(testCase.Start, testCase.End);
 
         // Act
-        var overlapsExclusive = range.Overlaps(same);
+        var overlapsExclusive = range.Overlaps(same, Inclusion.Exclusive);
         var overlapsInclusive = range.Overlaps(same, Inclusion.Inclusive);
 
         // Assert
-        Assert.Equal(testCase.Start < testCase.End, overlapsExclusive);
+        Assert.Equal(testCase.End.Ticks - testCase.Start.Ticks > 1, overlapsExclusive);
         Assert.True(overlapsInclusive);
         Assert.Equal(range.Overlaps(same, Inclusion.Exclusive), overlapsExclusive);
     }

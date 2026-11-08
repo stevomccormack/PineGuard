@@ -74,12 +74,15 @@ public static partial class StringRules
         /// <param name="max">The upper bound of the acceptable count range. If negative, returns <see langword="false"/>.</param>
         /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
         /// <returns><see langword="true"/> if the grapheme-cluster count is within [<paramref name="min"/>, <paramref name="max"/>]; otherwise, <see langword="false"/>.</returns>
-        public static bool HasCountBetween(string? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive)
+        public static bool HasCountInRange(string? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive)
         {
+            if (!EnumRules.IsDefined<Inclusion>(inclusion))
+                throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null);
+
             if (min < 0 || max < 0 || min > max)
                 return false;
 
-            return StringUtility.Graphemes.TryGetCount(value, out var actual) && RuleComparison.IsBetween(actual, min, max, inclusion);
+            return StringUtility.Graphemes.TryGetCount(value, out var actual) && RuleComparison.IsInRange(actual, min, max, inclusion);
         }
     }
 }

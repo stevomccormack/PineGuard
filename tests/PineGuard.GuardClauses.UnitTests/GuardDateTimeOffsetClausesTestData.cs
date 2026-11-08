@@ -72,37 +72,37 @@ public static class GuardDateTimeOffsetClausesTestData
             }.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
-    // Guard.Against.NotBetween — calls Must.Be.Between — passes when between, throws when not between
-    public static class NotBetween
+    // Guard.Against.OutOfRange — calls Must.Be.InRange — passes when between, throws when not between
+    public static class OutOfRange
     {
         public static TheoryData<GuardCase<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> ValidCases =>
             new RuleScenario<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[]
             {
-                new(nameof(F.IsBetween.MiddleInclusive), (F.IsBetween.MiddleInclusive.value!.Value, F.IsBetween.MiddleInclusive.min, F.IsBetween.MiddleInclusive.max, F.IsBetween.MiddleInclusive.inclusion), true),
-                new(nameof(F.IsBetween.AtMinInclusive), (F.IsBetween.AtMinInclusive.value!.Value, F.IsBetween.AtMinInclusive.min, F.IsBetween.AtMinInclusive.max, F.IsBetween.AtMinInclusive.inclusion), true)
+                new(nameof(F.IsInRange.MiddleInclusive), (F.IsInRange.MiddleInclusive.value!.Value, F.IsInRange.MiddleInclusive.min, F.IsInRange.MiddleInclusive.max, F.IsInRange.MiddleInclusive.inclusion), true),
+                new(nameof(F.IsInRange.AtMinInclusive), (F.IsInRange.AtMinInclusive.value!.Value, F.IsInRange.AtMinInclusive.min, F.IsInRange.AtMinInclusive.max, F.IsInRange.AtMinInclusive.inclusion), true)
             }.ToGuardCases(_ => new GuardExpected(true));
 
         public static TheoryData<GuardCase<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> InvalidCases =>
             new RuleScenario<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[]
             {
-                new(nameof(F.IsBetween.AtMinExclusive), (F.IsBetween.AtMinExclusive.value!.Value, F.IsBetween.AtMinExclusive.min, F.IsBetween.AtMinExclusive.max, F.IsBetween.AtMinExclusive.inclusion), false)
+                new(nameof(F.IsInRange.AtMinExclusive), (F.IsInRange.AtMinExclusive.value!.Value, F.IsInRange.AtMinExclusive.min, F.IsInRange.AtMinExclusive.max, F.IsInRange.AtMinExclusive.inclusion), false)
             }.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
-    // Guard.Against.Between — calls Must.Be.NotBetween — passes when not between, throws when between
-    public static class Between
+    // Guard.Against.InRange — calls Must.Be.OutOfRange — passes when not between, throws when between
+    public static class InRange
     {
         public static TheoryData<GuardCase<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> ValidCases =>
             new RuleScenario<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[]
             {
-                new(nameof(F.IsBetween.AtMinExclusive), (F.IsBetween.AtMinExclusive.value!.Value, F.IsBetween.AtMinExclusive.min, F.IsBetween.AtMinExclusive.max, F.IsBetween.AtMinExclusive.inclusion), true)
+                new(nameof(F.IsInRange.AtMinExclusive), (F.IsInRange.AtMinExclusive.value!.Value, F.IsInRange.AtMinExclusive.min, F.IsInRange.AtMinExclusive.max, F.IsInRange.AtMinExclusive.inclusion), true)
             }.ToGuardCases(_ => new GuardExpected(true));
 
         public static TheoryData<GuardCase<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> InvalidCases =>
             new RuleScenario<(DateTimeOffset value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>[]
             {
-                new(nameof(F.IsBetween.MiddleInclusive), (F.IsBetween.MiddleInclusive.value!.Value, F.IsBetween.MiddleInclusive.min, F.IsBetween.MiddleInclusive.max, F.IsBetween.MiddleInclusive.inclusion), false),
-                new(nameof(F.IsBetween.AtMinInclusive), (F.IsBetween.AtMinInclusive.value!.Value, F.IsBetween.AtMinInclusive.min, F.IsBetween.AtMinInclusive.max, F.IsBetween.AtMinInclusive.inclusion), false)
+                new(nameof(F.IsInRange.MiddleInclusive), (F.IsInRange.MiddleInclusive.value!.Value, F.IsInRange.MiddleInclusive.min, F.IsInRange.MiddleInclusive.max, F.IsInRange.MiddleInclusive.inclusion), false),
+                new(nameof(F.IsInRange.AtMinInclusive), (F.IsInRange.AtMinInclusive.value!.Value, F.IsInRange.AtMinInclusive.min, F.IsInRange.AtMinInclusive.max, F.IsInRange.AtMinInclusive.inclusion), false)
             }.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 

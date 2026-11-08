@@ -49,14 +49,14 @@ public sealed class StringRulesGraphemesTests(ITestOutputHelper output) : BaseRu
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesGraphemesTestData.HasCountBetween.Cases), MemberType = typeof(StringRulesGraphemesTestData.HasCountBetween))]
-    public void HasCountBetween_BehavesAsExpected(RuleCase<(string? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(StringRulesGraphemesTestData.HasCountInRange.Cases), MemberType = typeof(StringRulesGraphemesTestData.HasCountInRange))]
+    public void HasCountInRange_BehavesAsExpected(RuleCase<(string? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = PineGuard.Rules.StringRules.Graphemes.HasCountBetween(value, min, max, inclusion);
+        var result = PineGuard.Rules.StringRules.Graphemes.HasCountInRange(value, min, max, inclusion);
 
         // Assert
         AssertResult(tc, result);

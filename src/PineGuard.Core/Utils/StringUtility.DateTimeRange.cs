@@ -16,7 +16,7 @@ public static partial class StringUtility
         /// <param name="end">The end date-time string. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
         /// <param name="range">
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="Common.DateTimeRange"/>.
-        /// When <see langword="false"/>, contains <see langword="null"/>.
+        /// When <see langword="false"/>, contains the default value.
         /// </param>
         /// <returns><see langword="true"/> if both date-times were parsed and form a valid range; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
@@ -29,7 +29,7 @@ public static partial class StringUtility
         /// StringUtility.DateTimeRange.TryParse("2024-01-01T00:00:00Z", "2024-12-31T23:59:59Z", out var range); // true
         /// </code>
         /// </example>
-        public static bool TryParse(string? start, string? end, out Common.DateTimeRange? range)
+        public static bool TryParse(string? start, string? end, out Common.DateTimeRange range)
             => TryParseRange(
                 start,
                 end,

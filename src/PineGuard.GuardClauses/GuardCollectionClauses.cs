@@ -257,7 +257,7 @@ public static class GuardCollectionClauses
     /// <param name="inclusion">Specifies whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
-    /// from <see cref="MustCollectionClauses.HasCountBetween{T}"/>.
+    /// from <see cref="MustCollectionClauses.HasCountInRange{T}"/>.
     /// </param>
     /// <param name="exceptionCreator">
     /// An optional factory to create a custom exception. If <see langword="null"/>,
@@ -273,16 +273,16 @@ public static class GuardCollectionClauses
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <remarks>
-    /// This guard is the complement of <see cref="MustCollectionClauses.HasCountBetween{T}"/>:
-    /// <c>Guard.Against.NotHasCountBetween</c> passes when the count is within the range.
+    /// This guard is the complement of <see cref="MustCollectionClauses.HasCountInRange{T}"/>:
+    /// <c>Guard.Against.NotHasCountInRange</c> passes when the count is within the range.
     /// </remarks>
     /// <example>
     /// <code>
-    /// Guard.Against.NotHasCountBetween(items, min: 1, max: 5);
+    /// Guard.Against.NotHasCountInRange(items, min: 1, max: 5);
     /// </code>
     /// </example>
-    /// <seealso cref="MustCollectionClauses.HasCountBetween{T}"/>
-    public static IEnumerable<T> NotHasCountBetween<T>(this IGuardClause _,
+    /// <seealso cref="MustCollectionClauses.HasCountInRange{T}"/>
+    public static IEnumerable<T> NotHasCountInRange<T>(this IGuardClause _,
         IEnumerable<T>? value,
         int min,
         int max,
@@ -291,7 +291,7 @@ public static class GuardCollectionClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.HasCountBetween(value, min, max, inclusion, paramName);
+        var result = Must.Be.HasCountInRange(value, min, max, inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -594,7 +594,7 @@ public static class GuardCollectionClauses
     /// <param name="value">The collection to guard.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
-    /// from <see cref="MustCollectionClauses.NotContainsNullItems{T}"/>.
+    /// from <see cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T}, string)"/>.
     /// </param>
     /// <param name="exceptionCreator">
     /// An optional factory to create a custom exception. If <see langword="null"/>,
@@ -604,13 +604,13 @@ public static class GuardCollectionClauses
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
     /// </param>
-    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
+    /// <returns>A replayable snapshot containing all elements as non-null values, in their original order.</returns>
     /// <exception cref="ArgumentException">
     /// Thrown when <paramref name="value"/> has <see langword="null"/> elements and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <remarks>
-    /// This guard is the complement of <see cref="MustCollectionClauses.NotContainsNullItems{T}"/>:
+    /// This guard is the complement of <see cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T}, string)"/>:
     /// <c>Guard.Against.ContainsNullItems</c> passes when no element is <see langword="null"/>.
     /// </remarks>
     /// <example>
@@ -618,7 +618,7 @@ public static class GuardCollectionClauses
     /// Guard.Against.ContainsNullItems(names);
     /// </code>
     /// </example>
-    /// <seealso cref="MustCollectionClauses.NotContainsNullItems{T}"/>
+    /// <seealso cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T}, string)"/>
     public static IEnumerable<T> ContainsNullItems<T>(this IGuardClause _,
         IEnumerable<T?>? value,
         string? message = null,
@@ -634,12 +634,61 @@ public static class GuardCollectionClauses
     }
 
     /// <summary>
+    /// Throws if <paramref name="value"/> contains any <see langword="null"/> elements.
+    /// </summary>
+    /// <typeparam name="T">The underlying value element type of the collection.</typeparam>
+    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
+    /// <param name="value">The collection to guard.</param>
+    /// <param name="message">
+    /// An optional custom error message. If <see langword="null"/>, uses the default message
+    /// from <see cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T?}, string)"/>.
+    /// </param>
+    /// <param name="exceptionCreator">
+    /// An optional factory to create a custom exception. If <see langword="null"/>,
+    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>A replayable snapshot containing all elements as non-null values, in their original order.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="value"/> has <see langword="null"/> elements and no
+    /// <paramref name="exceptionCreator"/> is provided.
+    /// </exception>
+    /// <remarks>
+    /// This guard is the complement of <see cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T?}, string)"/>:
+    /// <c>Guard.Against.ContainsNullItems</c> passes when no element is <see langword="null"/>.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// int?[] counts = [1, 2, 3];
+    /// IEnumerable&lt;int&gt; validated = Guard.Against.ContainsNullItems(counts);
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T?}, string)"/>
+    public static IEnumerable<T> ContainsNullItems<T>(this IGuardClause _,
+        IEnumerable<T?>? value,
+        string? message = null,
+        Func<Exception>? exceptionCreator = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        where T : struct
+    {
+        var result = Must.Be.NotContainsNullItems(value, paramName);
+        if (result.Failed)
+            GuardFailure.Throw(result, message, exceptionCreator);
+
+        return result.Result!;
+    }
+
+    /// <summary>
     /// Throws if <paramref name="value"/> does not contain <paramref name="item"/>.
     /// </summary>
     /// <typeparam name="T">The element type of the collection.</typeparam>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The collection to guard.</param>
     /// <param name="item">The item that must be present in the collection.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
     /// from <see cref="MustCollectionClauses.Contains{T}"/>.
@@ -670,11 +719,12 @@ public static class GuardCollectionClauses
     public static IEnumerable<T> NotContains<T>(this IGuardClause _,
         IEnumerable<T>? value,
         T item,
+        IEqualityComparer<T>? comparer = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Contains(value, item, paramName);
+        var result = Must.Be.Contains(value, item, comparer, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -688,6 +738,7 @@ public static class GuardCollectionClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The collection to guard.</param>
     /// <param name="item">The item that must not be present in the collection.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
     /// from <see cref="MustCollectionClauses.NotContains{T}"/>.
@@ -718,11 +769,12 @@ public static class GuardCollectionClauses
     public static IEnumerable<T> Contains<T>(this IGuardClause _,
         IEnumerable<T>? value,
         T item,
+        IEqualityComparer<T>? comparer = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotContains(value, item, paramName);
+        var result = Must.Be.NotContains(value, item, comparer, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -736,6 +788,7 @@ public static class GuardCollectionClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The collection to guard.</param>
     /// <param name="other">The superset collection.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
     /// from <see cref="MustCollectionClauses.SubsetOf{T}"/>.
@@ -766,11 +819,12 @@ public static class GuardCollectionClauses
     public static IEnumerable<T> NotSubsetOf<T>(this IGuardClause _,
         IEnumerable<T>? value,
         IEnumerable<T>? other,
+        IEqualityComparer<T>? comparer = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.SubsetOf(value, other, paramName);
+        var result = Must.Be.SubsetOf(value, other, comparer, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -784,6 +838,7 @@ public static class GuardCollectionClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The collection to guard.</param>
     /// <param name="other">The superset to check against.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
     /// from <see cref="MustCollectionClauses.NotSubsetOf{T}"/>.
@@ -814,11 +869,12 @@ public static class GuardCollectionClauses
     public static IEnumerable<T> SubsetOf<T>(this IGuardClause _,
         IEnumerable<T>? value,
         IEnumerable<T>? other,
+        IEqualityComparer<T>? comparer = null,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotSubsetOf(value, other, paramName);
+        var result = Must.Be.NotSubsetOf(value, other, comparer, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -1076,7 +1132,7 @@ public static class GuardCollectionClauses
     /// <param name="inclusion">Specifies whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
-    /// from <see cref="MustCollectionClauses.NotHasCountBetween{T}"/>.
+    /// from <see cref="MustCollectionClauses.NotHasCountInRange{T}"/>.
     /// </param>
     /// <param name="exceptionCreator">
     /// An optional factory to create a custom exception. If <see langword="null"/>,
@@ -1092,16 +1148,16 @@ public static class GuardCollectionClauses
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <remarks>
-    /// This guard is the complement of <see cref="MustCollectionClauses.NotHasCountBetween{T}"/>:
-    /// <c>Guard.Against.HasCountBetween</c> passes when the count is outside the range.
+    /// This guard is the complement of <see cref="MustCollectionClauses.NotHasCountInRange{T}"/>:
+    /// <c>Guard.Against.HasCountInRange</c> passes when the count is outside the range.
     /// </remarks>
     /// <example>
     /// <code>
-    /// Guard.Against.HasCountBetween(items, min: 0, max: 5);
+    /// Guard.Against.HasCountInRange(items, min: 0, max: 5);
     /// </code>
     /// </example>
-    /// <seealso cref="MustCollectionClauses.NotHasCountBetween{T}"/>
-    public static IEnumerable<T> HasCountBetween<T>(this IGuardClause _,
+    /// <seealso cref="MustCollectionClauses.NotHasCountInRange{T}"/>
+    public static IEnumerable<T> HasCountInRange<T>(this IGuardClause _,
         IEnumerable<T>? value,
         int min,
         int max,
@@ -1110,7 +1166,7 @@ public static class GuardCollectionClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotHasCountBetween(value, min, max, inclusion, paramName);
+        var result = Must.Be.NotHasCountInRange(value, min, max, inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

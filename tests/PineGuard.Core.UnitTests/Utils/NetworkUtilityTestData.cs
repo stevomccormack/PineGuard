@@ -177,11 +177,11 @@ public static class NetworkUtilityTestData
     }
 
     /// <summary>
-    /// Exercises <see cref="NetworkUtility.IsValidHostnameLabel"/> directly. The empty-label case is
+    /// Exercises <see cref="NetworkUtility.IsHostnameLabel"/> directly. The empty-label case is
     /// unreachable via <see cref="NetworkUtility.ValidateHostnameLabels"/>, which splits with
     /// <see cref="StringSplitOptions.RemoveEmptyEntries"/>.
     /// </summary>
-    public static class IsValidHostnameLabel
+    public static class IsHostnameLabel
     {
         public static TheoryData<ValidCase> ValidCases =>
         [

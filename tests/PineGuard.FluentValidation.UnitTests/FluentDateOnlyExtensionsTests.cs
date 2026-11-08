@@ -14,8 +14,8 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class PastOrPresentValidator : AbstractValidator<Model> { public PastOrPresentValidator() => RuleFor(x => x.Value).PastOrPresent(); }
     private sealed class FutureValidator : AbstractValidator<Model> { public FutureValidator() => RuleFor(x => x.Value).Future(); }
     private sealed class FutureOrPresentValidator : AbstractValidator<Model> { public FutureOrPresentValidator() => RuleFor(x => x.Value).FutureOrPresent(); }
-    private sealed class BetweenValidator : AbstractValidator<Model> { public BetweenValidator(DateOnly min, DateOnly max) => RuleFor(x => x.Value).Between(min, max); }
-    private sealed class NotBetweenValidator : AbstractValidator<Model> { public NotBetweenValidator(DateOnly min, DateOnly max) => RuleFor(x => x.Value).NotBetween(min, max); }
+    private sealed class InRangeValidator : AbstractValidator<Model> { public InRangeValidator(DateOnly min, DateOnly max) => RuleFor(x => x.Value).InRange(min, max); }
+    private sealed class OutOfRangeValidator : AbstractValidator<Model> { public OutOfRangeValidator(DateOnly min, DateOnly max) => RuleFor(x => x.Value).OutOfRange(min, max); }
     private sealed class BeforeValidator : AbstractValidator<Model> { public BeforeValidator(DateOnly other) => RuleFor(x => x.Value).Before(other); }
     private sealed class OnOrBeforeValidator : AbstractValidator<Model> { public OnOrBeforeValidator(DateOnly other) => RuleFor(x => x.Value).OnOrBefore(other); }
     private sealed class AfterValidator : AbstractValidator<Model> { public AfterValidator(DateOnly other) => RuleFor(x => x.Value).After(other); }
@@ -71,18 +71,18 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     }
 
     [Theory]
-    [MemberData(nameof(FluentDateOnlyExtensionsTestData.Between.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.Between))]
-    public void Between_BehavesAsExpected(FluentCase<(DateOnly? value, DateOnly min, DateOnly max)> tc)
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.InRange.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.InRange))]
+    public void InRange_BehavesAsExpected(FluentCase<(DateOnly? value, DateOnly min, DateOnly max)> tc)
     {
-        var result = new BetweenValidator(tc.Value.min, tc.Value.max).Validate(new Model { Value = tc.Value.value });
+        var result = new InRangeValidator(tc.Value.min, tc.Value.max).Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(FluentDateOnlyExtensionsTestData.NotBetween.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.NotBetween))]
-    public void NotBetween_BehavesAsExpected(FluentCase<(DateOnly? value, DateOnly min, DateOnly max)> tc)
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.OutOfRange.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.OutOfRange))]
+    public void OutOfRange_BehavesAsExpected(FluentCase<(DateOnly? value, DateOnly min, DateOnly max)> tc)
     {
-        var result = new NotBetweenValidator(tc.Value.min, tc.Value.max).Validate(new Model { Value = tc.Value.value });
+        var result = new OutOfRangeValidator(tc.Value.min, tc.Value.max).Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 
@@ -260,8 +260,8 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class PastOrPresentNonNullableValidator : AbstractValidator<NonNullableModel> { public PastOrPresentNonNullableValidator() => RuleFor(x => x.Value).PastOrPresent(); }
     private sealed class FutureNonNullableValidator : AbstractValidator<NonNullableModel> { public FutureNonNullableValidator() => RuleFor(x => x.Value).Future(); }
     private sealed class FutureOrPresentNonNullableValidator : AbstractValidator<NonNullableModel> { public FutureOrPresentNonNullableValidator() => RuleFor(x => x.Value).FutureOrPresent(); }
-    private sealed class BetweenNonNullableValidator : AbstractValidator<NonNullableModel> { public BetweenNonNullableValidator(DateOnly min, DateOnly max) => RuleFor(x => x.Value).Between(min, max); }
-    private sealed class NotBetweenNonNullableValidator : AbstractValidator<NonNullableModel> { public NotBetweenNonNullableValidator(DateOnly min, DateOnly max) => RuleFor(x => x.Value).NotBetween(min, max); }
+    private sealed class InRangeNonNullableValidator : AbstractValidator<NonNullableModel> { public InRangeNonNullableValidator(DateOnly min, DateOnly max) => RuleFor(x => x.Value).InRange(min, max); }
+    private sealed class OutOfRangeNonNullableValidator : AbstractValidator<NonNullableModel> { public OutOfRangeNonNullableValidator(DateOnly min, DateOnly max) => RuleFor(x => x.Value).OutOfRange(min, max); }
     private sealed class BeforeNonNullableValidator : AbstractValidator<NonNullableModel> { public BeforeNonNullableValidator(DateOnly other) => RuleFor(x => x.Value).Before(other); }
     private sealed class OnOrBeforeNonNullableValidator : AbstractValidator<NonNullableModel> { public OnOrBeforeNonNullableValidator(DateOnly other) => RuleFor(x => x.Value).OnOrBefore(other); }
     private sealed class AfterNonNullableValidator : AbstractValidator<NonNullableModel> { public AfterNonNullableValidator(DateOnly other) => RuleFor(x => x.Value).After(other); }
@@ -317,18 +317,18 @@ public sealed class FluentDateOnlyExtensionsTests(ITestOutputHelper output) : Ba
     }
 
     [Theory]
-    [MemberData(nameof(FluentDateOnlyExtensionsTestData.BetweenNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.BetweenNonNullable))]
-    public void BetweenNonNullable_BehavesAsExpected(FluentCase<(DateOnly value, DateOnly min, DateOnly max)> tc)
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.InRangeNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.InRangeNonNullable))]
+    public void InRangeNonNullable_BehavesAsExpected(FluentCase<(DateOnly value, DateOnly min, DateOnly max)> tc)
     {
-        var result = new BetweenNonNullableValidator(tc.Value.min, tc.Value.max).Validate(new NonNullableModel { Value = tc.Value.value });
+        var result = new InRangeNonNullableValidator(tc.Value.min, tc.Value.max).Validate(new NonNullableModel { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(FluentDateOnlyExtensionsTestData.NotBetweenNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.NotBetweenNonNullable))]
-    public void NotBetweenNonNullable_BehavesAsExpected(FluentCase<(DateOnly value, DateOnly min, DateOnly max)> tc)
+    [MemberData(nameof(FluentDateOnlyExtensionsTestData.OutOfRangeNonNullable.Cases), MemberType = typeof(FluentDateOnlyExtensionsTestData.OutOfRangeNonNullable))]
+    public void OutOfRangeNonNullable_BehavesAsExpected(FluentCase<(DateOnly value, DateOnly min, DateOnly max)> tc)
     {
-        var result = new NotBetweenNonNullableValidator(tc.Value.min, tc.Value.max).Validate(new NonNullableModel { Value = tc.Value.value });
+        var result = new OutOfRangeNonNullableValidator(tc.Value.min, tc.Value.max).Validate(new NonNullableModel { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 

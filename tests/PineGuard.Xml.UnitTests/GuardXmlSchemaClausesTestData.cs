@@ -6,6 +6,15 @@ namespace PineGuard.Xml.UnitTests;
 
 public static class GuardXmlSchemaClausesTestData
 {
+    public static class InvalidXmlNullSchemas
+    {
+        public static TheoryData<GuardCase<string?>> InvalidCases =>
+        [
+            new(nameof(TestSchemas.ValidMessage), TestSchemas.ValidMessage, new(false, typeof(ArgumentNullException), "schemas", Code: MustCodes.Xml.Schema.Mismatch)),
+            new("NullValueAndNullSchemas", null, new(false, typeof(ArgumentNullException), "schemas", Code: MustCodes.Xml.Schema.Mismatch))
+        ];
+    }
+
     public static class InvalidXml
     {
         public static TheoryData<GuardCase<string?>> ValidCases =>

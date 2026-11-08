@@ -47,29 +47,29 @@ public static class FluentDateOnlyExtensionsTestData
         });
     }
 
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<FluentCase<(DateOnly? value, DateOnly min, DateOnly max)>> Cases =>
-            F.IsBetween.AllScenarios
+            F.IsInRange.AllScenarios
             .Select(s => new RuleScenario<(DateOnly? value, DateOnly min, DateOnly max)>(s.Name, (s.Inputs.value, s.Inputs.min, s.Inputs.max), s.IsValid)).ToArray()
             .ToFluentCases(s => s.Name switch
             {
-                nameof(F.IsBetween.NullValue) => new FluentExpected(true),
-                nameof(F.IsBetween.AtMinExclusive) => new FluentExpected(true),
+                nameof(F.IsInRange.NullValue) => new FluentExpected(true),
+                nameof(F.IsInRange.AtMinExclusive) => new FluentExpected(true),
                 _ when s.IsValid => new FluentExpected(true),
                 _ => new FluentExpected(false, "Value must be within the expected range.")
             });
     }
 
-    public static class NotBetween
+    public static class OutOfRange
     {
         public static TheoryData<FluentCase<(DateOnly? value, DateOnly min, DateOnly max)>> Cases =>
-            F.IsBetween.AllScenarios
+            F.IsInRange.AllScenarios
             .Select(s => new RuleScenario<(DateOnly? value, DateOnly min, DateOnly max)>(s.Name, (s.Inputs.value, s.Inputs.min, s.Inputs.max), s.IsValid)).ToArray()
             .ToFluentCases(s => s.Name switch
             {
-                nameof(F.IsBetween.NullValue) => new FluentExpected(true),
-                nameof(F.IsBetween.AtMinExclusive) => new FluentExpected(false, "Value must not be within the expected range."),
+                nameof(F.IsInRange.NullValue) => new FluentExpected(true),
+                nameof(F.IsInRange.AtMinExclusive) => new FluentExpected(false, "Value must not be within the expected range."),
                 _ when s.IsValid => new FluentExpected(false, "Value must not be within the expected range."),
                 _ => new FluentExpected(true)
             });
@@ -208,7 +208,7 @@ public static class FluentDateOnlyExtensionsTestData
                 .Select(s => new RuleScenario<(DateOnly? value, DateOnly end1, DateOnly start2, DateOnly end2)>(s.Name, (s.Inputs.start1, s.Inputs.end1!.Value, s.Inputs.start2!.Value, s.Inputs.end2!.Value), s.IsValid)).ToArray()
                 .ToFluentCases(s => s.Name switch
                 {
-                    nameof(F.IsOverlapping.TouchingInclusive) => new FluentExpected(false, "Value must be overlapping."),
+                    "TouchingInclusive" or "TouchingExclusive" => new FluentExpected(true),
                     _ when s.IsValid => new FluentExpected(true),
                     _ => new FluentExpected(false, "Value must be overlapping.")
                 }),
@@ -229,7 +229,8 @@ public static class FluentDateOnlyExtensionsTestData
                 .Select(s => new RuleScenario<(DateOnly? value, DateOnly end1, DateOnly start2, DateOnly end2)>(s.Name, (s.Inputs.start1, s.Inputs.end1!.Value, s.Inputs.start2!.Value, s.Inputs.end2!.Value), s.IsValid)).ToArray()
                 .ToFluentCases(s => s.Name switch
                 {
-                    nameof(F.IsOverlapping.TouchingInclusive) => new FluentExpected(true),
+                    "TouchingInclusive" or "TouchingExclusive" => new FluentExpected(false, "Value must not be overlapping."),
+                    "FirstRangeInverted" => new FluentExpected(false, "Value must not be overlapping."),
                     _ when s.IsValid => new FluentExpected(false, "Value must not be overlapping."),
                     _ => new FluentExpected(true)
                 }),
@@ -428,7 +429,7 @@ public static class FluentDateOnlyExtensionsTestData
         });
     }
 
-    public static class BetweenNonNullable
+    public static class InRangeNonNullable
     {
         private static RuleScenario<(DateOnly value, DateOnly min, DateOnly max)>[] AllScenarios =>
         [
@@ -443,7 +444,7 @@ public static class FluentDateOnlyExtensionsTestData
         });
     }
 
-    public static class NotBetweenNonNullable
+    public static class OutOfRangeNonNullable
     {
         private static RuleScenario<(DateOnly value, DateOnly min, DateOnly max)>[] AllScenarios =>
         [

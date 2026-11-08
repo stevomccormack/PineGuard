@@ -17,7 +17,7 @@ public static partial class StringUtility
         /// <param name="end">The end time string. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
         /// <param name="range">
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="Common.TimeOnlyRange"/>.
-        /// When <see langword="false"/>, contains <see langword="null"/>.
+        /// When <see langword="false"/>, contains the default value.
         /// </param>
         /// <returns><see langword="true"/> if both times were parsed and form a valid range; otherwise, <see langword="false"/>.</returns>
         /// <example>
@@ -25,7 +25,7 @@ public static partial class StringUtility
         /// StringUtility.TimeOnlyRange.TryParse("09:00", "17:00", out var range); // true
         /// </code>
         /// </example>
-        public static bool TryParse(string? start, string? end, out Common.TimeOnlyRange? range)
+        public static bool TryParse(string? start, string? end, out Common.TimeOnlyRange range)
             => TryParseRange(
                 start,
                 end,

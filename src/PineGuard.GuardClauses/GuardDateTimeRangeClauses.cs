@@ -64,7 +64,7 @@ public static class GuardDateTimeRangeClauses
     public static DateTimeRange Overlapping(this IGuardClause _,
         DateTimeRange range1,
         DateTimeRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)
@@ -98,7 +98,7 @@ public static class GuardDateTimeRangeClauses
     public static DateTimeRange NotOverlapping(this IGuardClause _,
         DateTimeRange range1,
         DateTimeRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)

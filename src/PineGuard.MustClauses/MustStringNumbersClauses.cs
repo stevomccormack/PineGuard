@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using PineGuard.Codes;
@@ -40,22 +39,23 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> Positive(this IMustClause _,
+    public static MustResult<decimal> PositiveDecimal(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.NotPositive, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Sign.NotPositive, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be positive.";
 
-
-
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.NotPositive, messageTemplate, paramName, value, result: default);
 
-        var ok = NumberRules.IsPositive<decimal>(parsed);
+        var ok = NumberRules.IsPositive(parsed);
         return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.NotPositive, messageTemplate, paramName, value, parsed);
     }
 
@@ -76,22 +76,23 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> Negative(this IMustClause _,
+    public static MustResult<decimal> NegativeDecimal(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.NotNegative, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Sign.NotNegative, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be negative.";
 
-
-
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.NotNegative, messageTemplate, paramName, value, result: default);
 
-        var ok = NumberRules.IsNegative<decimal>(parsed);
+        var ok = NumberRules.IsNegative(parsed);
         return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.NotNegative, messageTemplate, paramName, value, parsed);
     }
 
@@ -112,22 +113,23 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> Zero(this IMustClause _,
+    public static MustResult<decimal> ZeroDecimal(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.NotZero, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Sign.NotZero, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be zero.";
 
-
-
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.NotZero, messageTemplate, paramName, value, result: default);
 
-        var ok = NumberRules.IsZero<decimal>(parsed);
+        var ok = NumberRules.IsZero(parsed);
         return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.NotZero, messageTemplate, paramName, value, parsed);
     }
 
@@ -148,22 +150,23 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> ZeroOrPositive(this IMustClause _,
+    public static MustResult<decimal> ZeroOrPositiveDecimal(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.Negative, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Sign.Negative, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be zero or positive.";
 
-
-
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.Negative, messageTemplate, paramName, value, result: default);
 
-        var ok = NumberRules.IsZeroOrPositive<decimal>(parsed);
+        var ok = NumberRules.IsZeroOrPositive(parsed);
         return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.Negative, messageTemplate, paramName, value, parsed);
     }
 
@@ -184,22 +187,23 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> ZeroOrNegative(this IMustClause _,
+    public static MustResult<decimal> ZeroOrNegativeDecimal(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.Positive, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Sign.Positive, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be zero or negative.";
 
-
-
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.Positive, messageTemplate, paramName, value, result: default);
 
-        var ok = NumberRules.IsZeroOrNegative<decimal>(parsed);
+        var ok = NumberRules.IsZeroOrNegative(parsed);
         return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.Positive, messageTemplate, paramName, value, parsed);
     }
 
@@ -208,7 +212,7 @@ public static class MustStringNumbersClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="min">The minimum bound.</param>
+    /// <param name="other">The minimum bound.</param>
     /// <param name="styles">The value to validate.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
@@ -221,24 +225,25 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> GreaterThan(this IMustClause _,
+    public static MustResult<decimal> GreaterThanDecimal(this IMustClause _,
         string? value,
-        decimal min,
+        decimal other,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.NotGreater, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Range.NotGreater, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be greater than '{Min}'.";
 
-
-
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.NotGreater, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.NotGreater, messageTemplate.Replace(MinToken, other.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
-        var ok = NumberRules.IsGreaterThan(parsed, min);
-        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.NotGreater, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        var ok = NumberRules.IsGreaterThan(parsed, other);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.NotGreater, messageTemplate.Replace(MinToken, other.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -246,7 +251,7 @@ public static class MustStringNumbersClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="min">The minimum bound.</param>
+    /// <param name="other">The minimum bound.</param>
     /// <param name="styles">The value to validate.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
@@ -259,24 +264,25 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> GreaterThanOrEqual(this IMustClause _,
+    public static MustResult<decimal> GreaterThanOrEqualDecimal(this IMustClause _,
         string? value,
-        decimal min,
+        decimal other,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.BelowMinimum, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Range.BelowMinimum, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be greater than or equal to '{Min}'.";
 
-
-
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.BelowMinimum, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.BelowMinimum, messageTemplate.Replace(MinToken, other.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
-        var ok = NumberRules.IsGreaterThanOrEqual(parsed, min);
-        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.BelowMinimum, messageTemplate.Replace(MinToken, min.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        var ok = NumberRules.IsGreaterThanOrEqual(parsed, other);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.BelowMinimum, messageTemplate.Replace(MinToken, other.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -284,7 +290,7 @@ public static class MustStringNumbersClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="other">The maximum bound.</param>
     /// <param name="styles">The value to validate.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
@@ -297,24 +303,25 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> LessThan(this IMustClause _,
+    public static MustResult<decimal> LessThanDecimal(this IMustClause _,
         string? value,
-        decimal max,
+        decimal other,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.NotLess, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Range.NotLess, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be less than '{Max}'.";
 
-
-
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.NotLess, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.NotLess, messageTemplate.Replace(MaxToken, other.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
-        var ok = NumberRules.IsLessThan(parsed, max);
-        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.NotLess, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        var ok = NumberRules.IsLessThan(parsed, other);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.NotLess, messageTemplate.Replace(MaxToken, other.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -322,7 +329,7 @@ public static class MustStringNumbersClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="other">The maximum bound.</param>
     /// <param name="styles">The value to validate.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
@@ -335,24 +342,25 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> LessThanOrEqual(this IMustClause _,
+    public static MustResult<decimal> LessThanOrEqualDecimal(this IMustClause _,
         string? value,
-        decimal max,
+        decimal other,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.Exceeded, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Range.Exceeded, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be less than or equal to '{Max}'.";
 
-
-
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
-            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.Exceeded, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
+            return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.Exceeded, messageTemplate.Replace(MaxToken, other.ToString(CultureInfo.InvariantCulture)), paramName, value, result: default);
 
-        var ok = NumberRules.IsLessThanOrEqual(parsed, max);
-        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.Exceeded, messageTemplate.Replace(MaxToken, max.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
+        var ok = NumberRules.IsLessThanOrEqual(parsed, other);
+        return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.Exceeded, messageTemplate.Replace(MaxToken, other.ToString(CultureInfo.InvariantCulture)), paramName, value, parsed);
     }
 
     /// <summary>
@@ -375,7 +383,7 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> InRange(this IMustClause _,
+    public static MustResult<decimal> InRangeDecimal(this IMustClause _,
         string? value,
         decimal min,
         decimal max,
@@ -383,15 +391,19 @@ public static class MustStringNumbersClauses
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<decimal>.Fail(MustCodes.Number.Range.OutOfRange, "{paramName} must not be null.", paramName, value);
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.OutOfRange, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min > max)
             return MustResult<decimal>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
 
+        if (value is null)
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.OutOfRange, "{paramName} must not be null.", paramName, value);
+
         const string messageTemplate = "{paramName} must be within the expected range.";
-
-
 
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.OutOfRange, messageTemplate, paramName, value, result: default);
@@ -420,7 +432,7 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> OutOfRange(this IMustClause _,
+    public static MustResult<decimal> OutOfRangeDecimal(this IMustClause _,
         string? value,
         decimal min,
         decimal max,
@@ -428,11 +440,17 @@ public static class MustStringNumbersClauses
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<decimal>.Fail(MustCodes.Number.Range.InRange, "{paramName} must not be null.", paramName, value);
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.InRange, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min > max)
             return MustResult<decimal>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
+
+        if (value is null)
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.InRange, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must not be between '{Min}' and '{Max}'.";
 
@@ -460,11 +478,14 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> Percentage(this IMustClause _,
+    public static MustResult<decimal> PercentageDecimal(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Range.NotPercentage, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Range.NotPercentage, "{paramName} must not be null.", paramName, value);
 
@@ -473,7 +494,7 @@ public static class MustStringNumbersClauses
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, MustCodes.Number.Range.NotPercentage, messageTemplate, paramName, value, result: default);
 
-        var ok = NumberRules.IsPercentage<decimal>(parsed);
+        var ok = NumberRules.IsPercentage(parsed);
         return MustResult<decimal>.FromBool(ok, MustCodes.Number.Range.NotPercentage, messageTemplate, paramName, value, parsed);
     }
 
@@ -496,18 +517,24 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> Approximately(this IMustClause _,
+    public static MustResult<decimal> ApproximatelyDecimal(this IMustClause _,
         string? value,
         decimal target,
         decimal? tolerance,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.NotApproximate, "{paramName} must not be null.", paramName, value);
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.NotApproximate, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
 
         if (tolerance is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Tolerance.Null, "{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
+
+        if (tolerance < 0)
+            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.NotApproximate, "{paramName} must be non-negative.", nameof(tolerance), tolerance);
+
+        if (value is null)
+            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.NotApproximate, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be approximately '{Target}'.";
 
@@ -536,17 +563,20 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> MultipleOf(this IMustClause _,
+    public static MustResult<decimal> MultipleOfDecimal(this IMustClause _,
         string? value,
         decimal factor,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<decimal>.Fail(MustCodes.Number.Divisibility.NotMultiple, "{paramName} must not be null.", paramName, value);
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Divisibility.NotMultiple, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
 
         if (factor == 0)
             return MustResult<decimal>.Fail(MustCodes.Number.Factor.Zero, "{paramName} requires a non-zero factor.", nameof(factor), factor);
+
+        if (value is null)
+            return MustResult<decimal>.Fail(MustCodes.Number.Divisibility.NotMultiple, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must be a multiple of '{Factor}'.";
 
@@ -577,11 +607,14 @@ public static class MustStringNumbersClauses
     /// <see cref="StringRules.Numbers.IsEven"/> rule accepts them.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<int> Even(this IMustClause _,
+    public static MustResult<int> EvenInt32(this IMustClause _,
         string? value,
         NumberStyles styles = NumberStyles.Integer,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidIntegerStyles(styles))
+            return MustResult<int>.Fail(MustCodes.Number.Parity.Odd, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<int>.Fail(MustCodes.Number.Parity.Odd, "{paramName} must not be null.", paramName, value);
 
@@ -614,11 +647,14 @@ public static class MustStringNumbersClauses
     /// <see cref="StringRules.Numbers.IsOdd"/> rule accepts them.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<int> Odd(this IMustClause _,
+    public static MustResult<int> OddInt32(this IMustClause _,
         string? value,
         NumberStyles styles = NumberStyles.Integer,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidIntegerStyles(styles))
+            return MustResult<int>.Fail(MustCodes.Number.Parity.Even, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<int>.Fail(MustCodes.Number.Parity.Even, "{paramName} must not be null.", paramName, value);
 
@@ -648,11 +684,14 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<double> Finite(this IMustClause _,
+    public static MustResult<double> FiniteDouble(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<double>.Fail(MustCodes.Number.Form.NotFinite, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<double>.Fail(MustCodes.Number.Form.NotFinite, "{paramName} must not be null.", paramName, value);
 
@@ -682,11 +721,14 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> NotZero(this IMustClause _,
+    public static MustResult<decimal> NotZeroDecimal(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Sign.Zero, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Sign.Zero, "{paramName} must not be null.", paramName, value);
 
@@ -695,7 +737,7 @@ public static class MustStringNumbersClauses
         if (!StringUtility.NumberTypes.TryParseDecimal(value, out var parsed, styles, CultureInfo.InvariantCulture))
             return MustResult<decimal>.FromBool(false, MustCodes.Number.Sign.Zero, messageTemplate, paramName, value, result: default);
 
-        var ok = NumberRules.IsNotZero<decimal>(parsed);
+        var ok = NumberRules.IsNotZero(parsed);
         return MustResult<decimal>.FromBool(ok, MustCodes.Number.Sign.Zero, messageTemplate, paramName, value, parsed);
     }
 
@@ -718,18 +760,24 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> NotApproximately(this IMustClause _,
+    public static MustResult<decimal> NotApproximatelyDecimal(this IMustClause _,
         string? value,
         decimal target,
         decimal? tolerance,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.Approximate, "{paramName} must not be null.", paramName, value);
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.Approximate, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
 
         if (tolerance is null)
             return MustResult<decimal>.Fail(MustCodes.Number.Tolerance.Null, "{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
+
+        if (tolerance < 0)
+            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.Approximate, "{paramName} must be non-negative.", nameof(tolerance), tolerance);
+
+        if (value is null)
+            return MustResult<decimal>.Fail(MustCodes.Number.Proximity.Approximate, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must not be approximately '{Target}'.";
 
@@ -758,17 +806,20 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<decimal> NotMultipleOf(this IMustClause _,
+    public static MustResult<decimal> NotMultipleOfDecimal(this IMustClause _,
         string? value,
         decimal factor,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<decimal>.Fail(MustCodes.Number.Divisibility.Multiple, "{paramName} must not be null.", paramName, value);
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<decimal>.Fail(MustCodes.Number.Divisibility.Multiple, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
 
         if (factor == 0)
             return MustResult<decimal>.Fail(MustCodes.Number.Factor.Zero, "{paramName} requires a non-zero factor.", nameof(factor), factor);
+
+        if (value is null)
+            return MustResult<decimal>.Fail(MustCodes.Number.Divisibility.Multiple, "{paramName} must not be null.", paramName, value);
 
         const string messageTemplate = "{paramName} must not be a multiple of '{Factor}'.";
 
@@ -796,11 +847,14 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<double> NotFinite(this IMustClause _,
+    public static MustResult<double> NotFiniteDouble(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<double>.Fail(MustCodes.Number.Form.Finite, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<double>.Fail(MustCodes.Number.Form.Finite, "{paramName} must not be null.", paramName, value);
 
@@ -830,11 +884,14 @@ public static class MustStringNumbersClauses
     /// The failure message follows the pattern <c>"{paramName} must not be null."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-numbers">String Numbers Must Clauses documentation</seealso>
-    public static MustResult<double> NotNaN(this IMustClause _,
+    public static MustResult<double> NotNaNDouble(this IMustClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.NumberTypes.IsValidFloatingPointStyles(styles))
+            return MustResult<double>.Fail(MustCodes.Number.Form.Nan, "{paramName} must contain supported numeric parsing flags.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<double>.Fail(MustCodes.Number.Form.Nan, "{paramName} must not be null.", paramName, value);
 
@@ -847,4 +904,3 @@ public static class MustStringNumbersClauses
         return MustResult<double>.FromBool(ok, MustCodes.Number.Form.Nan, messageTemplate, paramName, value, parsed);
     }
 }
-#endif

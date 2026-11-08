@@ -15,12 +15,12 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
             => testCase.Value.Invoke();
     }
 
-    public static class IntersectAndUnion
+    public static class IntersectAndEnclose
     {
         [Theory]
-        [MemberData(nameof(DateTimeOffsetRangeTestData.IntersectAndUnion.EdgeCases), MemberType = typeof(DateTimeOffsetRangeTestData.IntersectAndUnion))]
+        [MemberData(nameof(DateTimeOffsetRangeTestData.IntersectAndEnclose.EdgeCases), MemberType = typeof(DateTimeOffsetRangeTestData.IntersectAndEnclose))]
         [SuppressMessage("Assertion", "S2699:Tests should include assertions", Justification = "Assertions are inside the delegate invoked by testCase.Value")]
-        public static void CoverBothTernaryBranches(DateTimeOffsetRangeTestData.IntersectAndUnion.ValidCase testCase)
+        public static void CoverBothTernaryBranches(DateTimeOffsetRangeTestData.IntersectAndEnclose.ValidCase testCase)
             => testCase.Value.Invoke();
     }
 
@@ -121,11 +121,11 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
             var same = new DateTimeOffsetRange(testCase.Start, testCase.End);
 
             // Act
-            var overlapsExclusive = range.Overlaps(same);
+            var overlapsExclusive = range.Overlaps(same, Inclusion.Exclusive);
             var overlapsInclusive = range.Overlaps(same, Inclusion.Inclusive);
 
             // Assert
-            Assert.Equal(testCase.Start < testCase.End, overlapsExclusive);
+            Assert.Equal((testCase.End - testCase.Start).Ticks > 1, overlapsExclusive);
             Assert.True(overlapsInclusive);
             Assert.Equal(range.Overlaps(same, Inclusion.Exclusive), overlapsExclusive);
         }
@@ -141,7 +141,7 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
     {
         [Theory]
         [MemberData(nameof(DateTimeOffsetRangeTestData.Constructor.ValidCases), MemberType = typeof(DateTimeOffsetRangeTestData.Constructor))]
-        public static void True_WhenTouching(DateTimeOffsetRangeTestData.Constructor.ValidCase testCase)
+        public static void False_WhenSharingEndpoint(DateTimeOffsetRangeTestData.Constructor.ValidCase testCase)
         {
             // Arrange
             var range = new DateTimeOffsetRange(testCase.Start, testCase.End);
@@ -153,9 +153,9 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
             var adjacentAtStart = range.IsAdjacentTo(touchesAtStart);
 
             // Assert
-            Assert.True(adjacentAtEnd);
-            Assert.True(adjacentAtStart);
-            Assert.Equal(testCase.Start == testCase.End, range.IsAdjacentTo(range));
+            Assert.False(adjacentAtEnd);
+            Assert.False(adjacentAtStart);
+            Assert.False(range.IsAdjacentTo(range));
         }
     }
 
@@ -204,7 +204,7 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
         }
     }
 
-    public static class Union
+    public static class Enclose
     {
         [Theory]
         [MemberData(nameof(DateTimeOffsetRangeTestData.Constructor.ValidCases), MemberType = typeof(DateTimeOffsetRangeTestData.Constructor))]
@@ -217,7 +217,7 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
                 : new DateTimeOffsetRange(testCase.Start, testCase.Start);
 
             // Act
-            var union = range.Union(other);
+            var union = range.Enclose(other);
 
             // Assert
             Assert.Equal(testCase.Start < other.Start ? testCase.Start : other.Start, union.Start);
@@ -262,5 +262,17 @@ public sealed class DateTimeOffsetRangeTests : BaseUnitTest
                 Assert.False(range1.Equals((object)different));
             }
         }
+    }
+    [Theory]
+    [MemberData(nameof(DateTimeOffsetRangeTestData.DaylightSavingDuration.Cases), MemberType = typeof(DateTimeOffsetRangeTestData.DaylightSavingDuration))]
+    public void Duration_UsesElapsedTimeAcrossDeterministicDaylightTransitions(DateTimeOffsetRangeTestData.DaylightSavingDuration.Case tc)
+    {
+        // Act
+        var duration = tc.Value.Duration;
+
+        // Assert
+        Assert.Equal(tc.Expected, duration);
+        Assert.Equal(TimeSpan.FromHours(24), tc.Value.End.DateTime - tc.Value.Start.DateTime);
+        Assert.NotEqual(tc.Value.Start.Offset, tc.Value.End.Offset);
     }
 }

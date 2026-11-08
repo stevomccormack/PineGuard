@@ -1,5 +1,5 @@
-#if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using PineGuard.Codes;
 using PineGuard.DataAnnotations.Common;
 using PineGuard.MustClauses;
@@ -37,14 +37,17 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringGeoLocationClauses.Latitude"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LatitudeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Geo.Latitude.Invalid)
+public sealed class LatitudeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Geo.Latitude.Invalid, allowNull: false)
 {
+    /// <summary>Gets or sets the numeric parsing flags used with invariant culture.</summary>
+    public NumberStyles Styles { get; set; } = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
+
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Latitude(strValue, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.Latitude(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -73,14 +76,16 @@ public sealed class LatitudeStringAttribute() : ValidationAttributeBase(typeof(s
 /// <seealso cref="MustStringGeoLocationClauses.Longitude"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LongitudeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Geo.Longitude.Invalid)
+public sealed class LongitudeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Geo.Longitude.Invalid, allowNull: false)
 {
+    /// <summary>Gets or sets the numeric parsing flags used with invariant culture.</summary>
+    public NumberStyles Styles { get; set; } = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
+
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Longitude(strValue, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.Longitude(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
-#endif

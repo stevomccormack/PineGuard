@@ -5,7 +5,7 @@ namespace PineGuard.Testing.Fixtures;
 
 public static class DateTimeOffsetRulesFixtures
 {
-    public static class IsBetween
+    public static class IsInRange
     {
         public static readonly (DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) MiddleInclusive = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive);
         public static readonly (DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) AtMinInclusive = (new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive);

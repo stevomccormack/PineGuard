@@ -34,6 +34,8 @@ public static class OwaspRulesFixtures
     public static class IsXssSafe
     {
         public static readonly string? Safe = "hello";
+        public static readonly string? PaddedSafe = "  hello  ";
+        public static readonly string? Empty = "";
         public static readonly string? ScriptTag = "<script>alert(1)</script>";
         public static readonly string? ScriptProtocol = "javascript:alert(1)";
         public static readonly string? EventHandler = "x onload=alert(1)";
@@ -45,7 +47,8 @@ public static class OwaspRulesFixtures
 
         public static RuleScenario<string?>[] ValidScenarios =>
         [
-            new(nameof(Safe), Safe, true)
+            new(nameof(Safe), Safe, true),
+            new(nameof(PaddedSafe), PaddedSafe, true)
         ];
 
         public static RuleScenario<string?>[] InvalidScenarios =>
@@ -56,6 +59,7 @@ public static class OwaspRulesFixtures
             new(nameof(EntityEncoded),          EntityEncoded,          false),
             new(nameof(PercentEncoded),         PercentEncoded,         false),
             new(nameof(PercentEncodedLowerCase),PercentEncodedLowerCase,false),
+            new(nameof(Empty),                  Empty,                  false),
             new(nameof(Null),                   Null,                   false),
             new(nameof(Space),                  Space,                  false)
         ];

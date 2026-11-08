@@ -15,7 +15,7 @@ public static class GuardStringTimeOnlyClauses
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the NotBetweenTimeOnly constraint.
+    /// Throws if <paramref name="value"/> violates the OutOfRangeTimeOnly constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -34,8 +34,8 @@ public static class GuardStringTimeOnlyClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringTimeOnlyClauses.BetweenTimeOnly"/>
-    public static TimeOnly NotBetweenTimeOnly(this IGuardClause _,
+    /// <seealso cref="MustStringTimeOnlyClauses.InRangeTimeOnly"/>
+    public static TimeOnly OutOfRangeTimeOnly(this IGuardClause _,
         string? value,
         TimeOnly min,
         TimeOnly max,
@@ -45,7 +45,7 @@ public static class GuardStringTimeOnlyClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.BetweenTimeOnly(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.InRangeTimeOnly(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -53,7 +53,7 @@ public static class GuardStringTimeOnlyClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the BetweenTimeOnly constraint.
+    /// Throws if <paramref name="value"/> violates the InRangeTimeOnly constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -72,8 +72,8 @@ public static class GuardStringTimeOnlyClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringTimeOnlyClauses.NotBetweenTimeOnly"/>
-    public static TimeOnly BetweenTimeOnly(this IGuardClause _,
+    /// <seealso cref="MustStringTimeOnlyClauses.OutOfRangeTimeOnly"/>
+    public static TimeOnly InRangeTimeOnly(this IGuardClause _,
         string? value,
         TimeOnly min,
         TimeOnly max,
@@ -83,7 +83,7 @@ public static class GuardStringTimeOnlyClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotBetweenTimeOnly(value, min, max, inclusion, styles, paramName); // Guard.Against.BetweenTimeOnly => Must.Be.NotBetweenTimeOnly (complement)
+        var result = Must.Be.OutOfRangeTimeOnly(value, min, max, inclusion, styles, paramName); // Guard.Against.InRangeTimeOnly => Must.Be.OutOfRangeTimeOnly (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -543,7 +543,7 @@ public static class GuardStringTimeOnlyClauses
     /// </exception>
     /// <seealso cref="MustStringTimeOnlyClauses.ChronologicalTimeOnly"/>
     public static TimeOnly NotChronologicalTimeOnly(this IGuardClause _,
-        string start,
+        string? start,
         string end,
         Inclusion inclusion = Inclusion.Exclusive,
         DateTimeStyles styles = DefaultStyles,
@@ -579,7 +579,7 @@ public static class GuardStringTimeOnlyClauses
     /// </exception>
     /// <seealso cref="MustStringTimeOnlyClauses.NotChronologicalTimeOnly"/>
     public static TimeOnly ChronologicalTimeOnly(this IGuardClause _,
-        string start,
+        string? start,
         string end,
         Inclusion inclusion = Inclusion.Exclusive,
         DateTimeStyles styles = DefaultStyles,
@@ -617,11 +617,11 @@ public static class GuardStringTimeOnlyClauses
     /// </exception>
     /// <seealso cref="MustStringTimeOnlyClauses.NotOverlappingTimeOnly"/>
     public static TimeOnly OverlappingTimeOnly(this IGuardClause _,
-        string start1,
+        string? start1,
         string end1,
         string start2,
         string end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
@@ -657,11 +657,11 @@ public static class GuardStringTimeOnlyClauses
     /// </exception>
     /// <seealso cref="MustStringTimeOnlyClauses.OverlappingTimeOnly"/>
     public static TimeOnly NotOverlappingTimeOnly(this IGuardClause _,
-        string start1,
+        string? start1,
         string end1,
         string start2,
         string end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,

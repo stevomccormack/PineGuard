@@ -11,7 +11,7 @@ public static class MustTimeOnlyClausesTestData
     private static readonly TimeOnly T2 = F.IsKnownTimes.T1200!.Value;
     private static readonly TimeOnly T3 = F.IsKnownTimes.T1400!.Value;
 
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<MustCase<(TimeOnly value, TimeOnly min, TimeOnly max)>> Cases =>
         [
@@ -21,7 +21,7 @@ public static class MustTimeOnlyClausesTestData
         ];
     }
 
-    public static class NotBetween
+    public static class OutOfRange
     {
         public static TheoryData<MustCase<(TimeOnly value, TimeOnly min, TimeOnly max)>> Cases =>
         [
@@ -155,8 +155,8 @@ public static class MustTimeOnlyClausesTestData
         public static TheoryData<MustCase<(TimeOnly start1, TimeOnly end1, TimeOnly start2, TimeOnly end2)>> Cases =>
         [
             new("not-overlapping", (T1, T2, T3, new TimeOnly(16, 0)), new MustExpected(true)),
-            new("invalid-range1", (T3, T1, new TimeOnly(11, 0), T3), new MustExpected(true)),
-            new("invalid-range2", (T1, T2, T3, T1), new MustExpected(true)),
+            new("invalid-range1", (T3, T1, new TimeOnly(11, 0), T3), new MustExpected(false)),
+            new("invalid-range2", (T1, T2, T3, T1), new MustExpected(false)),
             new("overlapping", (T1, T2, new TimeOnly(11, 0), T3), new MustExpected(false, "start1 must not be overlapping.", Code: MustCodes.Time.Overlap.Present))
         ];
     }

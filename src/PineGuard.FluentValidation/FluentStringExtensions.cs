@@ -118,7 +118,7 @@ public static class FluentStringExtensions
     public static IRuleBuilderOptions<TModel, string?> ExactLength<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int length,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.ExactLength(val, length, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.ExactLength(val, length, paramName: null)),
             message, MustCodes.Text.Length.Mismatch);
 
     /// <summary>
@@ -131,20 +131,20 @@ public static class FluentStringExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustStringClauses.LengthBetween"/>. If the value is <see langword="null"/>,
+    /// Delegates to <see cref="MustStringClauses.LengthInRange"/>. If the value is <see langword="null"/>,
     /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.Username).LengthBetween(3, 20);
+    /// RuleFor(x => x.Username).LengthInRange(3, 20);
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringClauses.LengthBetween"/>
-    public static IRuleBuilderOptions<TModel, string?> LengthBetween<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+    /// <seealso cref="MustStringClauses.LengthInRange"/>
+    public static IRuleBuilderOptions<TModel, string?> LengthInRange<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int min,
         int max,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.LengthBetween(val, min, max, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.LengthInRange(val, min, max, paramName: null)),
             message, MustCodes.Text.Length.OutOfRange);
 
     /// <summary>
@@ -168,7 +168,7 @@ public static class FluentStringExtensions
     public static IRuleBuilderOptions<TModel, string?> LongerThan<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int length,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.LongerThan(val, length, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.LongerThan(val, length, paramName: null)),
             message, MustCodes.Text.Length.TooShort);
 
     /// <summary>
@@ -192,7 +192,7 @@ public static class FluentStringExtensions
     public static IRuleBuilderOptions<TModel, string?> LongerThanOrEqual<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int length,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.LongerThanOrEqual(val, length, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.LongerThanOrEqual(val, length, paramName: null)),
             message, MustCodes.Text.Length.TooShort);
 
     /// <summary>
@@ -216,7 +216,7 @@ public static class FluentStringExtensions
     public static IRuleBuilderOptions<TModel, string?> ShorterThan<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int length,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.ShorterThan(val, length, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.ShorterThan(val, length, paramName: null)),
             message, MustCodes.Text.Length.TooLong);
 
     /// <summary>
@@ -240,7 +240,7 @@ public static class FluentStringExtensions
     public static IRuleBuilderOptions<TModel, string?> ShorterThanOrEqual<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int length,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.ShorterThanOrEqual(val, length, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.ShorterThanOrEqual(val, length, paramName: null)),
             message, MustCodes.Text.Length.TooLong);
 
     /// <summary>
@@ -985,7 +985,7 @@ public static class FluentStringExtensions
         string substring,
         StringComparison comparison = StringComparison.Ordinal,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.Contains(val, substring, comparison, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Contains(val, substring, comparison, paramName: null)),
             message, MustCodes.Text.Content.NotContains);
 
     /// <summary>
@@ -1011,7 +1011,7 @@ public static class FluentStringExtensions
         string substring,
         StringComparison comparison = StringComparison.Ordinal,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotContains(val, substring, comparison, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotContains(val, substring, comparison, paramName: null)),
             message, MustCodes.Text.Content.Contains);
 
     /// <summary>
@@ -1037,7 +1037,7 @@ public static class FluentStringExtensions
         string prefix,
         StringComparison comparison = StringComparison.Ordinal,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.StartsWith(val, prefix, comparison, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.StartsWith(val, prefix, comparison, paramName: null)),
             message, MustCodes.Text.Content.NotStartsWith);
 
     /// <summary>
@@ -1063,7 +1063,7 @@ public static class FluentStringExtensions
         string prefix,
         StringComparison comparison = StringComparison.Ordinal,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotStartsWith(val, prefix, comparison, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotStartsWith(val, prefix, comparison, paramName: null)),
             message, MustCodes.Text.Content.StartsWith);
 
     /// <summary>
@@ -1089,7 +1089,7 @@ public static class FluentStringExtensions
         string suffix,
         StringComparison comparison = StringComparison.Ordinal,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.EndsWith(val, suffix, comparison, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.EndsWith(val, suffix, comparison, paramName: null)),
             message, MustCodes.Text.Content.NotEndsWith);
 
     /// <summary>
@@ -1115,7 +1115,7 @@ public static class FluentStringExtensions
         string suffix,
         StringComparison comparison = StringComparison.Ordinal,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotEndsWith(val, suffix, comparison, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotEndsWith(val, suffix, comparison, paramName: null)),
             message, MustCodes.Text.Content.EndsWith);
 
     /// <summary>
@@ -1263,4 +1263,6 @@ public static class FluentStringExtensions
         string? message = null) =>
         ruleBuilder.MustBe(val => val is not null ? Must.Be.NotNormalized(val, form, paramName: null) : MustResult<string>.Ok(null!),
             message, MustCodes.Text.Unicode.Normalized);
+    private static MustResult<string> SkipAbsentValue(string? value, MustResult<string> result) =>
+        value is null && result.ParamName is null ? MustResult<string>.Ok(default) : result;
 }

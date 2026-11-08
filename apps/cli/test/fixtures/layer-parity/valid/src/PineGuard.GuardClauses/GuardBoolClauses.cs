@@ -7,4 +7,8 @@ public static class GuardBoolClauses
     {
         return value;
     }
+
+    public static string NotHasXmlRoot(this IGuardClause _, string value) => value;
+    public static int Positive(this IGuardClause _, int value) => value;
+
 }

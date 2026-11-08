@@ -14,31 +14,31 @@ namespace PineGuard.DataAnnotations;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringTimeOnlyClauses.BetweenTimeOnly"/>. Supported on properties,
+/// Delegates to <see cref="MustStringTimeOnlyClauses.InRangeTimeOnly"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
 /// <see cref="TimeOnly"/> string format using invariant culture. The <see cref="Styles"/> property
 /// controls how the annotated value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class ShiftModel
 /// {
-///     [BetweenTimeOnlyString("08:00", "17:00")]
+///     [InRangeTimeOnlyString("08:00", "17:00")]
 ///     public string StartTime { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="NotBetweenTimeOnlyStringAttribute"/>
-/// <seealso cref="MustStringTimeOnlyClauses.BetweenTimeOnly"/>
+/// <seealso cref="OutOfRangeTimeOnlyStringAttribute"/>
+/// <seealso cref="MustStringTimeOnlyClauses.InRangeTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BetweenTimeOnlyStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Time.Range.OutOfRange)
+public sealed class InRangeTimeOnlyStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Time.Range.OutOfRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the valid time range.</summary>
     public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
@@ -57,9 +57,9 @@ public sealed class BetweenTimeOnlyStringAttribute(string min, string max, Inclu
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.BetweenTimeOnly(strValue, Min, Max, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.InRangeTimeOnly(strValue, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -76,7 +76,7 @@ public sealed class BetweenTimeOnlyStringAttribute(string min, string max, Inclu
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -92,7 +92,7 @@ public sealed class BetweenTimeOnlyStringAttribute(string min, string max, Inclu
 /// <seealso cref="MustStringTimeOnlyClauses.BeforeTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BeforeTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.NotBefore)
+public sealed class BeforeTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.NotBefore, allowNull: false)
 {
     /// <summary>Gets the time boundary that the parsed value must precede.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -105,9 +105,9 @@ public sealed class BeforeTimeOnlyStringAttribute(string other) : ValidationAttr
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.BeforeTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -117,31 +117,31 @@ public sealed class BeforeTimeOnlyStringAttribute(string other) : ValidationAttr
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringTimeOnlyClauses.NotBetweenTimeOnly"/>. Supported on properties,
+/// Delegates to <see cref="MustStringTimeOnlyClauses.OutOfRangeTimeOnly"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
 /// <see cref="TimeOnly"/> string format using invariant culture. The <see cref="Styles"/> property
 /// controls how the annotated value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class QuietHoursModel
 /// {
-///     [NotBetweenTimeOnlyString("22:00", "06:00")]
+///     [OutOfRangeTimeOnlyString("09:00", "17:00")]
 ///     public string AlertTime { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="BetweenTimeOnlyStringAttribute"/>
-/// <seealso cref="MustStringTimeOnlyClauses.NotBetweenTimeOnly"/>
+/// <seealso cref="InRangeTimeOnlyStringAttribute"/>
+/// <seealso cref="MustStringTimeOnlyClauses.OutOfRangeTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBetweenTimeOnlyStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Time.Range.InRange)
+public sealed class OutOfRangeTimeOnlyStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Time.Range.InRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the excluded time range.</summary>
     public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
@@ -160,9 +160,9 @@ public sealed class NotBetweenTimeOnlyStringAttribute(string min, string max, In
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.NotBetweenTimeOnly(strValue, Min, Max, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.OutOfRangeTimeOnly(strValue, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -179,7 +179,7 @@ public sealed class NotBetweenTimeOnlyStringAttribute(string min, string max, In
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -195,7 +195,7 @@ public sealed class NotBetweenTimeOnlyStringAttribute(string min, string max, In
 /// <seealso cref="MustStringTimeOnlyClauses.AfterTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class AfterTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.NotAfter)
+public sealed class AfterTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.NotAfter, allowNull: false)
 {
     /// <summary>Gets the time boundary that the parsed value must follow.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -208,9 +208,9 @@ public sealed class AfterTimeOnlyStringAttribute(string other) : ValidationAttri
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.AfterTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -227,7 +227,7 @@ public sealed class AfterTimeOnlyStringAttribute(string other) : ValidationAttri
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -243,7 +243,7 @@ public sealed class AfterTimeOnlyStringAttribute(string other) : ValidationAttri
 /// <seealso cref="MustStringTimeOnlyClauses.NotBeforeTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBeforeTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.Before)
+public sealed class NotBeforeTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.Before, allowNull: false)
 {
     /// <summary>Gets the time boundary that the parsed value must not precede.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -256,9 +256,9 @@ public sealed class NotBeforeTimeOnlyStringAttribute(string other) : ValidationA
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotBeforeTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -275,7 +275,7 @@ public sealed class NotBeforeTimeOnlyStringAttribute(string other) : ValidationA
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -291,7 +291,7 @@ public sealed class NotBeforeTimeOnlyStringAttribute(string other) : ValidationA
 /// <seealso cref="MustStringTimeOnlyClauses.OnOrBeforeTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OnOrBeforeTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.After)
+public sealed class OnOrBeforeTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.After, allowNull: false)
 {
     /// <summary>Gets the time boundary that the parsed value must be on or before.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -304,9 +304,9 @@ public sealed class OnOrBeforeTimeOnlyStringAttribute(string other) : Validation
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.OnOrBeforeTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -323,7 +323,7 @@ public sealed class OnOrBeforeTimeOnlyStringAttribute(string other) : Validation
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -339,7 +339,7 @@ public sealed class OnOrBeforeTimeOnlyStringAttribute(string other) : Validation
 /// <seealso cref="MustStringTimeOnlyClauses.NotOnOrBeforeTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOnOrBeforeTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.NotAfter)
+public sealed class NotOnOrBeforeTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.NotAfter, allowNull: false)
 {
     /// <summary>Gets the time boundary that the parsed value must not be on or before.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -352,9 +352,9 @@ public sealed class NotOnOrBeforeTimeOnlyStringAttribute(string other) : Validat
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotOnOrBeforeTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -371,7 +371,7 @@ public sealed class NotOnOrBeforeTimeOnlyStringAttribute(string other) : Validat
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -387,7 +387,7 @@ public sealed class NotOnOrBeforeTimeOnlyStringAttribute(string other) : Validat
 /// <seealso cref="MustStringTimeOnlyClauses.NotAfterTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotAfterTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.After)
+public sealed class NotAfterTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.After, allowNull: false)
 {
     /// <summary>Gets the time boundary that the parsed value must not exceed.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -400,9 +400,9 @@ public sealed class NotAfterTimeOnlyStringAttribute(string other) : ValidationAt
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotAfterTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -419,7 +419,7 @@ public sealed class NotAfterTimeOnlyStringAttribute(string other) : ValidationAt
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -435,7 +435,7 @@ public sealed class NotAfterTimeOnlyStringAttribute(string other) : ValidationAt
 /// <seealso cref="MustStringTimeOnlyClauses.OnOrAfterTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OnOrAfterTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.Before)
+public sealed class OnOrAfterTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.Before, allowNull: false)
 {
     /// <summary>Gets the time boundary that the parsed value must be on or after.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -448,9 +448,9 @@ public sealed class OnOrAfterTimeOnlyStringAttribute(string other) : ValidationA
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.OnOrAfterTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -467,7 +467,7 @@ public sealed class OnOrAfterTimeOnlyStringAttribute(string other) : ValidationA
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -483,7 +483,7 @@ public sealed class OnOrAfterTimeOnlyStringAttribute(string other) : ValidationA
 /// <seealso cref="MustStringTimeOnlyClauses.NotOnOrAfterTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOnOrAfterTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.NotBefore)
+public sealed class NotOnOrAfterTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.NotBefore, allowNull: false)
 {
     /// <summary>Gets the time boundary that the parsed value must not be on or after.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -496,9 +496,9 @@ public sealed class NotOnOrAfterTimeOnlyStringAttribute(string other) : Validati
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotOnOrAfterTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -515,7 +515,7 @@ public sealed class NotOnOrAfterTimeOnlyStringAttribute(string other) : Validati
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -531,7 +531,7 @@ public sealed class NotOnOrAfterTimeOnlyStringAttribute(string other) : Validati
 /// <seealso cref="MustStringTimeOnlyClauses.SameTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class SameTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Equality.NotEqual)
+public sealed class SameTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Equality.NotEqual, allowNull: false)
 {
     /// <summary>Gets the time that the parsed value must equal.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -544,9 +544,9 @@ public sealed class SameTimeOnlyStringAttribute(string other) : ValidationAttrib
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.SameTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -563,7 +563,7 @@ public sealed class SameTimeOnlyStringAttribute(string other) : ValidationAttrib
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The <see cref="Styles"/> property controls how the annotated
 /// value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -579,7 +579,7 @@ public sealed class SameTimeOnlyStringAttribute(string other) : ValidationAttrib
 /// <seealso cref="MustStringTimeOnlyClauses.NotSameTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotSameTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Equality.Equal)
+public sealed class NotSameTimeOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Time.Equality.Equal, allowNull: false)
 {
     /// <summary>Gets the time that the parsed value must not equal.</summary>
     public TimeOnly Other { get; } = TimeOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -592,9 +592,9 @@ public sealed class NotSameTimeOnlyStringAttribute(string other) : ValidationAtt
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotSameTimeOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -610,7 +610,7 @@ public sealed class NotSameTimeOnlyStringAttribute(string other) : ValidationAtt
 /// <para>
 /// The <see cref="Styles"/> property controls how the annotated value is parsed; defaults to
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -626,7 +626,7 @@ public sealed class NotSameTimeOnlyStringAttribute(string other) : ValidationAtt
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotChronologicalTimeOnlyStringAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.Chronological)
+    : ValidationAttributeBase(typeof(string), MustCodes.Time.Order.Chronological, allowNull: false)
 {
     /// <summary>Gets the end time string used for the chronological comparison.</summary>
     public string End { get; } = end;
@@ -642,9 +642,9 @@ public sealed class NotChronologicalTimeOnlyStringAttribute(string end, Inclusio
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotChronologicalTimeOnly(strValue, End, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 #endif

@@ -14,13 +14,4 @@ public static class FluentPhoneExtensionsTestData
             _ => new FluentExpected(false, "Value must be a valid phone number.", Code: MustCodes.Phone.Number.Invalid)
         });
     }
-
-    public static class PhoneNumberString
-    {
-        public static TheoryData<FluentCase<string?>> Cases => F.IsPhoneNumber.AllScenarios.ToFluentCases(s => s.Name switch
-        {
-            _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must be a valid phone number.")
-        });
-    }
 }

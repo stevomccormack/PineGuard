@@ -37,11 +37,11 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(DateOnlyRangeTestData.Union.Cases), MemberType = typeof(DateOnlyRangeTestData.Union))]
-    public void Union_ReturnsExpected(DateOnlyRangeTestData.Union.Case testCase)
+    [MemberData(nameof(DateOnlyRangeTestData.Enclose.Cases), MemberType = typeof(DateOnlyRangeTestData.Enclose))]
+    public void Enclose_ReturnsExpected(DateOnlyRangeTestData.Enclose.Case testCase)
     {
         // Act
-        var result = testCase.Base.Union(testCase.Other);
+        var result = testCase.Base.Enclose(testCase.Other);
 
         // Assert
         Assert.Equal(testCase.Expected.Start, result.Start);
@@ -59,7 +59,7 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
         Assert.Equal(testCase.Start, range.Start);
         Assert.Equal(testCase.End, range.End);
         Assert.Equal(testCase.ExpectedDayCount, range.DayCount);
-        Assert.Equal(TimeSpan.FromDays(testCase.ExpectedDayCount), range.Duration);
+        Assert.Equal(TimeSpan.FromDays(testCase.ExpectedDayCount - 1), range.Duration);
         Assert.True(range.Contains(testCase.Start));
     }
 
@@ -74,7 +74,7 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
         Assert.Equal(testCase.Start, range.Start);
         Assert.Equal(testCase.End, range.End);
         Assert.Equal(testCase.ExpectedDayCount, range.DayCount);
-        Assert.Equal(TimeSpan.FromDays(testCase.ExpectedDayCount), range.Duration);
+        Assert.Equal(TimeSpan.FromDays(testCase.ExpectedDayCount - 1), range.Duration);
         Assert.True(range.Contains(testCase.End));
     }
 
@@ -145,11 +145,11 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
         var same = new DateOnlyRange(testCase.Start, testCase.End);
 
         // Act
-        var overlapsExclusive = range.Overlaps(same);
+        var overlapsExclusive = range.Overlaps(same, Inclusion.Exclusive);
         var overlapsInclusive = range.Overlaps(same, Inclusion.Inclusive);
 
         // Assert
-        Assert.Equal(testCase.Start < testCase.End, overlapsExclusive);
+        Assert.Equal(testCase.End.DayNumber - testCase.Start.DayNumber > 1, overlapsExclusive);
         Assert.True(overlapsInclusive);
         Assert.Equal(range.Overlaps(same, Inclusion.Exclusive), overlapsExclusive);
     }
@@ -220,7 +220,7 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
 
     [Theory]
     [MemberData(nameof(DateOnlyRangeTestData.Constructor.ValidCases), MemberType = typeof(DateOnlyRangeTestData.Constructor))]
-    public void Union_ReturnsMinStart_MaxEnd(DateOnlyRangeTestData.Constructor.ValidCase testCase)
+    public void Enclose_ReturnsMinStart_MaxEnd(DateOnlyRangeTestData.Constructor.ValidCase testCase)
     {
         // Arrange
         var range = new DateOnlyRange(testCase.Start, testCase.End);
@@ -229,7 +229,7 @@ public sealed class DateOnlyRangeTests : BaseUnitTest
             : new DateOnlyRange(testCase.Start, testCase.Start);
 
         // Act
-        var union = range.Union(other);
+        var union = range.Enclose(other);
 
         // Assert
         Assert.Equal(testCase.Start < other.Start ? testCase.Start : other.Start, union.Start);

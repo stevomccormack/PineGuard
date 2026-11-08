@@ -47,23 +47,23 @@ public sealed class GuardStringDateTimeOffsetClausesTests(ITestOutputHelper outp
     }
 
     [Theory]
-    [MemberData(nameof(TD.NotBetween.ValidCases), MemberType = typeof(TD.NotBetween))]
-    [MemberData(nameof(TD.NotBetween.InvalidCases), MemberType = typeof(TD.NotBetween))]
-    public void NotBetweenDateTimeOffset_BehavesAsExpected(GuardCase<(string? value, DateTimeOffset min, DateTimeOffset max, Common.Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.OutOfRange.ValidCases), MemberType = typeof(TD.OutOfRange))]
+    [MemberData(nameof(TD.OutOfRange.InvalidCases), MemberType = typeof(TD.OutOfRange))]
+    public void OutOfRangeDateTimeOffset_BehavesAsExpected(GuardCase<(string? value, DateTimeOffset min, DateTimeOffset max, Common.Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        AssertResult(tc, () => Guard.Against.NotBetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.NotBetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.OutOfRangeDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.OutOfRangeDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]
-    [MemberData(nameof(TD.Between.ValidCases), MemberType = typeof(TD.Between))]
-    [MemberData(nameof(TD.Between.InvalidCases), MemberType = typeof(TD.Between))]
-    public void BetweenDateTimeOffset_BehavesAsExpected(GuardCase<(string? value, DateTimeOffset min, DateTimeOffset max, Common.Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.InRange.ValidCases), MemberType = typeof(TD.InRange))]
+    [MemberData(nameof(TD.InRange.InvalidCases), MemberType = typeof(TD.InRange))]
+    public void InRangeDateTimeOffset_BehavesAsExpected(GuardCase<(string? value, DateTimeOffset min, DateTimeOffset max, Common.Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        AssertResult(tc, () => Guard.Against.BetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.BetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.InRangeDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.InRangeDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]

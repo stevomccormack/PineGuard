@@ -228,23 +228,21 @@ public static class FluentCollectionExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustCollectionClauses.HasCountBetween"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// Delegates to <see cref="MustCollectionClauses.HasCountInRange"/>. A null property value is skipped; configuration failures remain validation failures.
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.Tags).HasCountBetween(1, 5);
+    /// RuleFor(x => x.Tags).HasCountInRange(1, 5);
     /// </code>
     /// </example>
-    /// <seealso cref="MustCollectionClauses.HasCountBetween"/>
-    public static IRuleBuilderOptions<TModel, IEnumerable<T>?> HasCountBetween<TModel, T>(
+    /// <seealso cref="MustCollectionClauses.HasCountInRange"/>
+    public static IRuleBuilderOptions<TModel, IEnumerable<T>?> HasCountInRange<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.HasCountBetween(val, min, max, inclusion, paramName: null), message, MustCodes.Collection.Count.OutOfRange);
+        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.HasCountInRange(val, min, max, inclusion, paramName: null)), message, MustCodes.Collection.Count.OutOfRange);
 
     /// <summary>
     /// Validates that the property value has an element count outside the specified range.
@@ -258,23 +256,21 @@ public static class FluentCollectionExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustCollectionClauses.NotHasCountBetween"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// Delegates to <see cref="MustCollectionClauses.NotHasCountInRange"/>. A null property value is skipped; configuration failures remain validation failures.
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.Tags).NotHasCountBetween(0, 0);
+    /// RuleFor(x => x.Tags).NotHasCountInRange(0, 0);
     /// </code>
     /// </example>
-    /// <seealso cref="MustCollectionClauses.NotHasCountBetween"/>
-    public static IRuleBuilderOptions<TModel, IEnumerable<T>?> NotHasCountBetween<TModel, T>(
+    /// <seealso cref="MustCollectionClauses.NotHasCountInRange"/>
+    public static IRuleBuilderOptions<TModel, IEnumerable<T>?> NotHasCountInRange<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotHasCountBetween(val, min, max, inclusion, paramName: null), message, MustCodes.Collection.Count.InRange);
+        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.NotHasCountInRange(val, min, max, inclusion, paramName: null)), message, MustCodes.Collection.Count.InRange);
 
     /// <summary>
     /// Validates that the property value contains at least one element matching the specified predicate.
@@ -441,21 +437,42 @@ public static class FluentCollectionExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustCollectionClauses.NotContainsNullItems"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// Delegates to <see cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T}, string)"/>. A null property value is skipped; configuration failures remain validation failures.
     /// </remarks>
     /// <example>
     /// <code>
     /// RuleFor(x => x.Names).NotContainsNullItems();
     /// </code>
     /// </example>
-    /// <seealso cref="MustCollectionClauses.NotContainsNullItems"/>
+    /// <seealso cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T}, string)"/>
     public static IRuleBuilderOptions<TModel, IEnumerable<T?>?> NotContainsNullItems<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T?>?> ruleBuilder,
         string? message = null)
         where T : class =>
-        ruleBuilder.MustBe(val => Must.Be.NotContainsNullItems(val, paramName: null), message, MustCodes.Collection.Items.ContainsNull);
+        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.NotContainsNullItems(val, paramName: null)), message, MustCodes.Collection.Items.ContainsNull);
+
+    /// <summary>
+    /// Validates that the property value does not contain any <see langword="null"/> elements.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model being validated.</typeparam>
+    /// <typeparam name="T">The underlying value element type of the collection.</typeparam>
+    /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
+    /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T?}, string)"/>. A null property value is skipped; configuration failures remain validation failures.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// RuleFor(x => x.Counts).NotContainsNullItems();
+    /// </code>
+    /// </example>
+    /// <seealso cref="MustCollectionClauses.NotContainsNullItems{T}(IMustClause, IEnumerable{T?}, string)"/>
+    public static IRuleBuilderOptions<TModel, IEnumerable<T?>?> NotContainsNullItems<TModel, T>(
+        this IRuleBuilder<TModel, IEnumerable<T?>?> ruleBuilder,
+        string? message = null)
+        where T : struct =>
+        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.NotContainsNullItems(val, paramName: null)), message, MustCodes.Collection.Items.ContainsNull);
 
     /// <summary>
     /// Validates that the property value contains the specified item.
@@ -464,12 +481,11 @@ public static class FluentCollectionExtensions
     /// <typeparam name="T">The element type of the collection.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="item">The item that must be present in the collection.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustCollectionClauses.Contains"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// Delegates to <see cref="MustCollectionClauses.Contains"/>. A null property value is skipped; configuration failures remain validation failures.
     /// </remarks>
     /// <example>
     /// <code>
@@ -480,8 +496,9 @@ public static class FluentCollectionExtensions
     public static IRuleBuilderOptions<TModel, IEnumerable<T>?> Contains<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         T item,
+        IEqualityComparer<T>? comparer = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Contains(val, item, paramName: null), message, MustCodes.Collection.Items.Missing);
+        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.Contains(val, item, comparer, paramName: null)), message, MustCodes.Collection.Items.Missing);
 
     /// <summary>
     /// Validates that the property value does not contain the specified item.
@@ -490,12 +507,11 @@ public static class FluentCollectionExtensions
     /// <typeparam name="T">The element type of the collection.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="item">The item that must not be present in the collection.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustCollectionClauses.NotContains"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// Delegates to <see cref="MustCollectionClauses.NotContains"/>. A null property value is skipped; configuration failures remain validation failures.
     /// </remarks>
     /// <example>
     /// <code>
@@ -506,8 +522,9 @@ public static class FluentCollectionExtensions
     public static IRuleBuilderOptions<TModel, IEnumerable<T>?> NotContains<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         T item,
+        IEqualityComparer<T>? comparer = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotContains(val, item, paramName: null), message, MustCodes.Collection.Items.Present);
+        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.NotContains(val, item, comparer, paramName: null)), message, MustCodes.Collection.Items.Present);
 
     /// <summary>
     /// Validates that the property value is a subset of the specified collection.
@@ -516,12 +533,11 @@ public static class FluentCollectionExtensions
     /// <typeparam name="T">The element type of the collection.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="other">The superset collection to validate against.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustCollectionClauses.SubsetOf"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// Delegates to <see cref="MustCollectionClauses.SubsetOf"/>. A null property value is skipped; configuration failures remain validation failures.
     /// </remarks>
     /// <example>
     /// <code>
@@ -532,8 +548,9 @@ public static class FluentCollectionExtensions
     public static IRuleBuilderOptions<TModel, IEnumerable<T>?> SubsetOf<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         IEnumerable<T>? other,
+        IEqualityComparer<T>? comparer = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.SubsetOf(val, other, paramName: null), message, MustCodes.Collection.Items.NotSubset);
+        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.SubsetOf(val, other, comparer, paramName: null)), message, MustCodes.Collection.Items.NotSubset);
 
     /// <summary>
     /// Validates that the property value is not a subset of the specified collection.
@@ -542,12 +559,11 @@ public static class FluentCollectionExtensions
     /// <typeparam name="T">The element type of the collection.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="other">The collection to compare against.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustCollectionClauses.NotSubsetOf"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// Delegates to <see cref="MustCollectionClauses.NotSubsetOf"/>. A null property value is skipped; configuration failures remain validation failures.
     /// </remarks>
     /// <example>
     /// <code>
@@ -558,8 +574,9 @@ public static class FluentCollectionExtensions
     public static IRuleBuilderOptions<TModel, IEnumerable<T>?> NotSubsetOf<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         IEnumerable<T>? other,
+        IEqualityComparer<T>? comparer = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotSubsetOf(val, other, paramName: null), message, MustCodes.Collection.Items.Subset);
+        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.NotSubsetOf(val, other, comparer, paramName: null)), message, MustCodes.Collection.Items.Subset);
 
     /// <summary>
     /// Validates that the property value has an element at the specified index.
@@ -612,4 +629,6 @@ public static class FluentCollectionExtensions
         int index,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotHasIndex(val, index, paramName: null), message, MustCodes.Collection.Index.InRange);
+    private static MustResult<TResult> SkipAbsentCollectionValue<TResult>(object? value, MustResult<TResult> result) =>
+        value is null && result.ParamName is null ? MustResult<TResult>.Ok(default) : result;
 }

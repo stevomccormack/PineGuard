@@ -10,7 +10,7 @@ public static class StringTimeOnlyAttributesTestData
     private static readonly string Past = F.StringTimeOnly.IsBefore.BeforeExclusive.value!;
     private static readonly string Future = F.StringTimeOnly.IsAfter.AfterExclusive.value!;
 
-    public static class BetweenTimeOnlyString
+    public static class InRangeTimeOnlyString
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [
@@ -43,7 +43,7 @@ public static class StringTimeOnlyAttributesTestData
         ];
     }
 
-    public static class NotBetweenTimeOnlyString
+    public static class OutOfRangeTimeOnlyString
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [

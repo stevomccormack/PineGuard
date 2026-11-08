@@ -58,8 +58,8 @@ public static partial class GuardStringClausesTestData
         ];
     }
 
-    // Guard.Against.NotLengthBetween — throws when length is NOT between min and max (inline: fixture has simple 3-tuple)
-    public static class NotLengthBetween
+    // Guard.Against.NotLengthInRange — throws when length is NOT between min and max (inline: fixture has simple 3-tuple)
+    public static class NotLengthInRange
     {
         private static readonly (string? value, int min, int max) WithinBounds = ("abc", 2, 4);
         private static readonly (string? value, int min, int max) TooShort = ("a", 2, 4);
@@ -436,13 +436,6 @@ public static partial class GuardStringClausesTestData
             new(nameof(Printable), Printable, new GuardExpected(false, typeof(ArgumentException), "value")),
             new(nameof(NullValue), NullValue, new GuardExpected(false, typeof(ArgumentNullException), "value"))
         ];
-    }
-
-    // Guard.Against.IsWhitespace — throws when value IS whitespace (calls Must.Be.NotWhitespace)
-    public static class IsWhitespace
-    {
-        public static TheoryData<GuardCase<string?>> ValidCases => F.IsWhitespace.InvalidScenarios.Where(s => s.Inputs is not null).ToArray().ToGuardCases(_ => new GuardExpected(true));
-        public static TheoryData<GuardCase<string?>> InvalidCases => [.. F.IsWhitespace.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")), .. F.IsWhitespace.InvalidScenarios.Where(s => s.Inputs is null).ToArray().ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentNullException), "value"))];
     }
 
     // Guard.Against.Whitespace — throws when value IS whitespace (calls Must.Be.NotWhitespace)

@@ -279,7 +279,7 @@ public sealed class UnspecifiedDateTimeAttribute() : ValidationAttributeBase(typ
 /// <seealso cref="MustDateTimeClauses.MinimumAge"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/datetime">DateTime Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class MinimumAgeDateTimeAttribute(int years) : ValidationAttributeBase(typeof(DateTime), MustCodes.Date.Age.BelowMinimum)
+public sealed class MinimumAgeDateTimeAttribute(int years) : ValidationAttributeBase(typeof(DateTime), MustCodes.Date.Age.BelowMinimum, allowNull: false)
 {
     /// <summary>Gets the minimum age, in whole years, the date of birth must satisfy.</summary>
     public int Years { get; } = years;
@@ -287,9 +287,9 @@ public sealed class MinimumAgeDateTimeAttribute(int years) : ValidationAttribute
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var dateValue = (DateTime)value!;
+        var dateValue = ((DateTime?)value).GetValueOrDefault();
 
         var result = Must.Be.MinimumAge(dateValue, Years, ResolveTimeProvider(validationContext), paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }

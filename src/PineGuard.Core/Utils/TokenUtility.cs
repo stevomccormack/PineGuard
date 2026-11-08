@@ -73,13 +73,13 @@ public static class TokenUtility
     {
         foreach (var ch in value)
         {
-            // BufferUtility.IsBase64UrlString tolerates padding and surrounding whitespace; the compact
+            // BufferUtility.IsBase64Url tolerates padding and surrounding whitespace; the compact
             // serialization allows neither, so they are ruled out before delegating to it.
             if (ch == BufferRules.Base64PaddingChar || char.IsWhiteSpace(ch))
                 return false;
         }
 
-        return BufferUtility.IsBase64UrlString(value);
+        return BufferUtility.IsBase64Url(value);
     }
 
     private static bool IsJsonObjectSegment(string value) =>

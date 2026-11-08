@@ -18,7 +18,7 @@ public static class MustFailureTestData
         public static TheoryData<IThrowsCase> InvalidCases =>
         [
             new InvalidCase("null result", null!, new ExpectedException(typeof(ArgumentNullException), "result")),
-            new InvalidCase("successful result", MustResult<string>.Ok("value", "original", "paramName"), new ExpectedException(typeof(ArgumentException), "result"))
+            new InvalidCase("successful result", MustResult<string>.Ok("value", value: "original", paramName: "paramName"), new ExpectedException(typeof(ArgumentException), "result"))
         ];
 
         public sealed record ValidCase(string Name, IMustResult Result, string? PropertyPath, string ExpectedPropertyPath, string ExpectedMessage)

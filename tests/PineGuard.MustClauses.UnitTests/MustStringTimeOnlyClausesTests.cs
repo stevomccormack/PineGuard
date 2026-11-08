@@ -7,14 +7,14 @@ namespace PineGuard.MustClauses.UnitTests;
 public sealed class MustStringTimeOnlyClausesTests(ITestOutputHelper output) : BaseMustUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(MustStringTimeOnlyClausesTestData.BetweenTimeOnly.Cases), MemberType = typeof(MustStringTimeOnlyClausesTestData.BetweenTimeOnly))]
-    public void BetweenTimeOnly_BehavesAsExpected(MustCase<(string? value, TimeOnly min, TimeOnly max)> tc)
-    { var value = tc.Value.value; var result = Must.Be.BetweenTimeOnly(value, tc.Value.min, tc.Value.max); AssertResult(tc, result); }
+    [MemberData(nameof(MustStringTimeOnlyClausesTestData.InRangeTimeOnly.Cases), MemberType = typeof(MustStringTimeOnlyClausesTestData.InRangeTimeOnly))]
+    public void InRangeTimeOnly_BehavesAsExpected(MustCase<(string? value, TimeOnly min, TimeOnly max)> tc)
+    { var value = tc.Value.value; var result = Must.Be.InRangeTimeOnly(value, tc.Value.min, tc.Value.max); AssertResult(tc, result); }
 
     [Theory]
-    [MemberData(nameof(MustStringTimeOnlyClausesTestData.NotBetweenTimeOnly.Cases), MemberType = typeof(MustStringTimeOnlyClausesTestData.NotBetweenTimeOnly))]
-    public void NotBetweenTimeOnly_BehavesAsExpected(MustCase<(string? value, TimeOnly min, TimeOnly max)> tc)
-    { var value = tc.Value.value; var result = Must.Be.NotBetweenTimeOnly(value, tc.Value.min, tc.Value.max); AssertResult(tc, result); }
+    [MemberData(nameof(MustStringTimeOnlyClausesTestData.OutOfRangeTimeOnly.Cases), MemberType = typeof(MustStringTimeOnlyClausesTestData.OutOfRangeTimeOnly))]
+    public void OutOfRangeTimeOnly_BehavesAsExpected(MustCase<(string? value, TimeOnly min, TimeOnly max)> tc)
+    { var value = tc.Value.value; var result = Must.Be.OutOfRangeTimeOnly(value, tc.Value.min, tc.Value.max); AssertResult(tc, result); }
 
     [Theory]
     [MemberData(nameof(MustStringTimeOnlyClausesTestData.WithinTimeOnly.Cases), MemberType = typeof(MustStringTimeOnlyClausesTestData.WithinTimeOnly))]

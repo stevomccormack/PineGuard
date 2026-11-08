@@ -11,7 +11,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.Positive.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.Positive))]
     public void Positive_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.Positive(tc.Value, paramName: "value");
+        var result = Must.Be.PositiveDecimal(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -20,7 +20,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.Negative.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.Negative))]
     public void Negative_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.Negative(tc.Value, paramName: "value");
+        var result = Must.Be.NegativeDecimal(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -29,7 +29,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.Zero.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.Zero))]
     public void Zero_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.Zero(tc.Value, paramName: "value");
+        var result = Must.Be.ZeroDecimal(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -38,7 +38,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.NotZero.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.NotZero))]
     public void NotZero_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.NotZero(tc.Value, paramName: "value");
+        var result = Must.Be.NotZeroDecimal(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -47,7 +47,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.ZeroOrPositive.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.ZeroOrPositive))]
     public void ZeroOrPositive_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.ZeroOrPositive(tc.Value, paramName: "value");
+        var result = Must.Be.ZeroOrPositiveDecimal(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -56,7 +56,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.ZeroOrNegative.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.ZeroOrNegative))]
     public void ZeroOrNegative_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.ZeroOrNegative(tc.Value, paramName: "value");
+        var result = Must.Be.ZeroOrNegativeDecimal(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -65,7 +65,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.GreaterThan.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.GreaterThan))]
     public void GreaterThan_BehavesAsExpected(MustCase<(string? text, decimal min)> tc)
     {
-        var result = Must.Be.GreaterThan(tc.Value.text, tc.Value.min, paramName: "value");
+        var result = Must.Be.GreaterThanDecimal(tc.Value.text, tc.Value.min, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -74,7 +74,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.GreaterThanOrEqual.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.GreaterThanOrEqual))]
     public void GreaterThanOrEqual_BehavesAsExpected(MustCase<(string? text, decimal min)> tc)
     {
-        var result = Must.Be.GreaterThanOrEqual(tc.Value.text, tc.Value.min, paramName: "value");
+        var result = Must.Be.GreaterThanOrEqualDecimal(tc.Value.text, tc.Value.min, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -83,7 +83,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.LessThan.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.LessThan))]
     public void LessThan_BehavesAsExpected(MustCase<(string? text, decimal max)> tc)
     {
-        var result = Must.Be.LessThan(tc.Value.text, tc.Value.max, paramName: "value");
+        var result = Must.Be.LessThanDecimal(tc.Value.text, tc.Value.max, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -92,7 +92,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.LessThanOrEqual.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.LessThanOrEqual))]
     public void LessThanOrEqual_BehavesAsExpected(MustCase<(string? text, decimal max)> tc)
     {
-        var result = Must.Be.LessThanOrEqual(tc.Value.text, tc.Value.max, paramName: "value");
+        var result = Must.Be.LessThanOrEqualDecimal(tc.Value.text, tc.Value.max, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -101,7 +101,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.InRange.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.InRange))]
     public void InRange_BehavesAsExpected(MustCase<(string? text, decimal min, decimal max, Inclusion inclusion)> tc)
     {
-        var result = Must.Be.InRange(tc.Value.text, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.InRangeDecimal(tc.Value.text, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -110,7 +110,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.Approximately.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.Approximately))]
     public void Approximately_BehavesAsExpected(MustCase<(string? text, decimal target, decimal? tolerance)> tc)
     {
-        var result = Must.Be.Approximately(tc.Value.text, tc.Value.target, tc.Value.tolerance, paramName: "value");
+        var result = Must.Be.ApproximatelyDecimal(tc.Value.text, tc.Value.target, tc.Value.tolerance, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -119,7 +119,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.MultipleOf.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.MultipleOf))]
     public void MultipleOf_BehavesAsExpected(MustCase<(string? text, decimal factor)> tc)
     {
-        var result = Must.Be.MultipleOf(tc.Value.text, tc.Value.factor, paramName: "value");
+        var result = Must.Be.MultipleOfDecimal(tc.Value.text, tc.Value.factor, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -128,7 +128,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.Even.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.Even))]
     public void Even_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.Even(tc.Value, paramName: "value");
+        var result = Must.Be.EvenInt32(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -137,7 +137,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.Odd.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.Odd))]
     public void Odd_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.Odd(tc.Value, paramName: "value");
+        var result = Must.Be.OddInt32(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -146,7 +146,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.Finite.InvalidCases), MemberType = typeof(MustStringNumberClausesTestData.Finite))]
     public void Finite_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.Finite(tc.Value, paramName: "value");
+        var result = Must.Be.FiniteDouble(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -157,7 +157,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.IsNaN.LettersCases), MemberType = typeof(MustStringNumberClausesTestData.IsNaN))]
     public void IsNaN_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.NotNaN(tc.Value, paramName: "value");
+        var result = Must.Be.NotNaNDouble(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -169,7 +169,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.OutOfRange.LettersCases), MemberType = typeof(MustStringNumberClausesTestData.OutOfRange))]
     public void OutOfRange_BehavesAsExpected(MustCase<(string? text, decimal min, decimal max, Inclusion inclusion)> tc)
     {
-        var result = Must.Be.OutOfRange(tc.Value.text, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.OutOfRangeDecimal(tc.Value.text, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -179,7 +179,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.Percentage.NullCases), MemberType = typeof(MustStringNumberClausesTestData.Percentage))]
     public void Percentage_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.Percentage(tc.Value, paramName: "value");
+        var result = Must.Be.PercentageDecimal(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -191,7 +191,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.NotApproximately.LettersCases), MemberType = typeof(MustStringNumberClausesTestData.NotApproximately))]
     public void NotApproximately_BehavesAsExpected(MustCase<(string? text, decimal target, decimal? tolerance)> tc)
     {
-        var result = Must.Be.NotApproximately(tc.Value.text, tc.Value.target, tc.Value.tolerance, paramName: "value");
+        var result = Must.Be.NotApproximatelyDecimal(tc.Value.text, tc.Value.target, tc.Value.tolerance, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -203,7 +203,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.NotMultipleOf.LettersCases), MemberType = typeof(MustStringNumberClausesTestData.NotMultipleOf))]
     public void NotMultipleOf_BehavesAsExpected(MustCase<(string? text, decimal factor)> tc)
     {
-        var result = Must.Be.NotMultipleOf(tc.Value.text, tc.Value.factor, paramName: "value");
+        var result = Must.Be.NotMultipleOfDecimal(tc.Value.text, tc.Value.factor, paramName: "value");
         AssertResult(tc, result);
     }
 
@@ -214,7 +214,7 @@ public sealed class MustStringNumberClausesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(MustStringNumberClausesTestData.NotFinite.LettersCases), MemberType = typeof(MustStringNumberClausesTestData.NotFinite))]
     public void NotFinite_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.NotFinite(tc.Value, paramName: "value");
+        var result = Must.Be.NotFiniteDouble(tc.Value, paramName: "value");
         AssertResult(tc, result);
     }
 }

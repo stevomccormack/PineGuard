@@ -8,7 +8,7 @@ public static class MustValidationResultTestData
 {
     private static readonly MustFailure RootFailure = new(string.Empty, "must.validation.a", "message a", "value-a");
     private static readonly MustFailure NestedFailure = new("Email", "must.validation.b", "message b", "value-b");
-    private static readonly IMustResult SuccessResult = MustResult<int>.Ok(1, "v", "p1");
+    private static readonly IMustResult SuccessResult = MustResult<int>.Ok(1, value: "v", paramName: "p1");
     private static readonly IMustResult FailureWithParam = MustResult<int>.Fail("must.validation.c", "{paramName} must be valid.", "age", -1);
     private static readonly IMustResult FailureWithoutParam = MustResult<int>.Fail("must.validation.d", "{paramName} must not be empty.", null, "");
     private static readonly MustValidationResult SuccessValidation = MustValidationResult.Ok();

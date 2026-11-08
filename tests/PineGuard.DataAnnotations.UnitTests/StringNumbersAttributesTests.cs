@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using PineGuard.Common;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using Xunit.Abstractions;
 
@@ -6,6 +8,25 @@ namespace PineGuard.DataAnnotations.UnitTests;
 
 public sealed class StringNumbersAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
+    [Theory]
+    [MemberData(nameof(StringNumbersAttributesTestData.ConfigurationInputs), MemberType = typeof(StringNumbersAttributesTestData))]
+    public void Value_DoesNotHideNumericConfigurationFailures(string? value)
+    {
+        // Arrange
+        ValidationAttribute[] attributes =
+        [
+            new PositiveStringAttribute { Styles = NumberStyles.HexNumber },
+            new InRangeStringAttribute("0", "1", (Inclusion)42),
+            new NotApproximatelyStringAttribute("0", "-1"),
+            new DecimalStringAttribute(-1),
+            new Int32StringAttribute { Styles = (NumberStyles)4096 }
+        ];
+        var context = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act / Assert
+        Assert.All(attributes, attribute => Assert.NotNull(attribute.GetValidationResult(value, context)));
+    }
+
     private static void Verify<TAttribute>(TAttribute attribute, StringNumbersAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
     {
@@ -74,56 +95,56 @@ public sealed class StringNumbersAttributesTests(ITestOutputHelper output) : Bas
     [MemberData(nameof(StringNumbersAttributesTestData.GreaterThanOrEqualString.EdgeCases), MemberType = typeof(StringNumbersAttributesTestData.GreaterThanOrEqualString))]
     [MemberData(nameof(StringNumbersAttributesTestData.GreaterThanOrEqualString.InvalidCases), MemberType = typeof(StringNumbersAttributesTestData.GreaterThanOrEqualString))]
     public void GreaterThanOrEqualString_ShouldReturnExpected(StringNumbersAttributesTestData.ValidCase testCase)
-        => Verify(new GreaterThanOrEqualStringAttribute(10), testCase);
+        => Verify(new GreaterThanOrEqualStringAttribute("10"), testCase);
 
     [Theory]
     [MemberData(nameof(StringNumbersAttributesTestData.LessThanOrEqualString.ValidCases), MemberType = typeof(StringNumbersAttributesTestData.LessThanOrEqualString))]
     [MemberData(nameof(StringNumbersAttributesTestData.LessThanOrEqualString.EdgeCases), MemberType = typeof(StringNumbersAttributesTestData.LessThanOrEqualString))]
     [MemberData(nameof(StringNumbersAttributesTestData.LessThanOrEqualString.InvalidCases), MemberType = typeof(StringNumbersAttributesTestData.LessThanOrEqualString))]
     public void LessThanOrEqualString_ShouldReturnExpected(StringNumbersAttributesTestData.ValidCase testCase)
-        => Verify(new LessThanOrEqualStringAttribute(10), testCase);
+        => Verify(new LessThanOrEqualStringAttribute("10"), testCase);
 
     [Theory]
     [MemberData(nameof(StringNumbersAttributesTestData.InRangeString.ValidCases), MemberType = typeof(StringNumbersAttributesTestData.InRangeString))]
     [MemberData(nameof(StringNumbersAttributesTestData.InRangeString.EdgeCases), MemberType = typeof(StringNumbersAttributesTestData.InRangeString))]
     [MemberData(nameof(StringNumbersAttributesTestData.InRangeString.InvalidCases), MemberType = typeof(StringNumbersAttributesTestData.InRangeString))]
     public void InRangeString_ShouldReturnExpected(StringNumbersAttributesTestData.ValidCase testCase)
-        => Verify(new InRangeStringAttribute(10, 20), testCase);
+        => Verify(new InRangeStringAttribute("10", "20"), testCase);
 
     [Theory]
     [MemberData(nameof(StringNumbersAttributesTestData.OutOfRangeString.ValidCases), MemberType = typeof(StringNumbersAttributesTestData.OutOfRangeString))]
     [MemberData(nameof(StringNumbersAttributesTestData.OutOfRangeString.EdgeCases), MemberType = typeof(StringNumbersAttributesTestData.OutOfRangeString))]
     [MemberData(nameof(StringNumbersAttributesTestData.OutOfRangeString.InvalidCases), MemberType = typeof(StringNumbersAttributesTestData.OutOfRangeString))]
     public void OutOfRangeString_ShouldReturnExpected(StringNumbersAttributesTestData.ValidCase testCase)
-        => Verify(new OutOfRangeStringAttribute(10, 20), testCase);
+        => Verify(new OutOfRangeStringAttribute("10", "20"), testCase);
 
     [Theory]
     [MemberData(nameof(StringNumbersAttributesTestData.MultipleOfString.ValidCases), MemberType = typeof(StringNumbersAttributesTestData.MultipleOfString))]
     [MemberData(nameof(StringNumbersAttributesTestData.MultipleOfString.EdgeCases), MemberType = typeof(StringNumbersAttributesTestData.MultipleOfString))]
     [MemberData(nameof(StringNumbersAttributesTestData.MultipleOfString.InvalidCases), MemberType = typeof(StringNumbersAttributesTestData.MultipleOfString))]
     public void MultipleOfString_ShouldReturnExpected(StringNumbersAttributesTestData.ValidCase testCase)
-        => Verify(new MultipleOfStringAttribute(5), testCase);
+        => Verify(new MultipleOfStringAttribute("5"), testCase);
 
     [Theory]
     [MemberData(nameof(StringNumbersAttributesTestData.NotMultipleOfString.ValidCases), MemberType = typeof(StringNumbersAttributesTestData.NotMultipleOfString))]
     [MemberData(nameof(StringNumbersAttributesTestData.NotMultipleOfString.EdgeCases), MemberType = typeof(StringNumbersAttributesTestData.NotMultipleOfString))]
     [MemberData(nameof(StringNumbersAttributesTestData.NotMultipleOfString.InvalidCases), MemberType = typeof(StringNumbersAttributesTestData.NotMultipleOfString))]
     public void NotMultipleOfString_ShouldReturnExpected(StringNumbersAttributesTestData.ValidCase testCase)
-        => Verify(new NotMultipleOfStringAttribute(5), testCase);
+        => Verify(new NotMultipleOfStringAttribute("5"), testCase);
 
     [Theory]
     [MemberData(nameof(StringNumbersAttributesTestData.ApproximatelyString.ValidCases), MemberType = typeof(StringNumbersAttributesTestData.ApproximatelyString))]
     [MemberData(nameof(StringNumbersAttributesTestData.ApproximatelyString.EdgeCases), MemberType = typeof(StringNumbersAttributesTestData.ApproximatelyString))]
     [MemberData(nameof(StringNumbersAttributesTestData.ApproximatelyString.InvalidCases), MemberType = typeof(StringNumbersAttributesTestData.ApproximatelyString))]
     public void ApproximatelyString_ShouldReturnExpected(StringNumbersAttributesTestData.ValidCase testCase)
-        => Verify(new ApproximatelyStringAttribute(10) { Tolerance = 1 }, testCase);
+        => Verify(new ApproximatelyStringAttribute("10", "1"), testCase);
 
     [Theory]
     [MemberData(nameof(StringNumbersAttributesTestData.NotApproximatelyString.ValidCases), MemberType = typeof(StringNumbersAttributesTestData.NotApproximatelyString))]
     [MemberData(nameof(StringNumbersAttributesTestData.NotApproximatelyString.EdgeCases), MemberType = typeof(StringNumbersAttributesTestData.NotApproximatelyString))]
     [MemberData(nameof(StringNumbersAttributesTestData.NotApproximatelyString.InvalidCases), MemberType = typeof(StringNumbersAttributesTestData.NotApproximatelyString))]
     public void NotApproximatelyString_ShouldReturnExpected(StringNumbersAttributesTestData.ValidCase testCase)
-        => Verify(new NotApproximatelyStringAttribute(10) { Tolerance = 1 }, testCase);
+        => Verify(new NotApproximatelyStringAttribute("10", "1"), testCase);
 
     [Theory]
     [MemberData(nameof(StringNumbersAttributesTestData.FiniteString.ValidCases), MemberType = typeof(StringNumbersAttributesTestData.FiniteString))]

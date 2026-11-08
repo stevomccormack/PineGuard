@@ -14,30 +14,30 @@ namespace PineGuard.DataAnnotations;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustTimeOnlyClauses.Between"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustTimeOnlyClauses.InRange"/>. Supported on properties, fields,
 /// and parameters of type <see cref="TimeOnly"/>.
 /// </para>
 /// <para>
 /// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
 /// <see cref="TimeOnly"/> string format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class ShiftModel
 /// {
-///     [BetweenTimeOnly("08:00", "17:00")]
+///     [InRangeTimeOnly("08:00", "17:00")]
 ///     public TimeOnly StartTime { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="NotBetweenTimeOnlyAttribute"/>
-/// <seealso cref="MustTimeOnlyClauses.Between"/>
+/// <seealso cref="OutOfRangeTimeOnlyAttribute"/>
+/// <seealso cref="MustTimeOnlyClauses.InRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BetweenTimeOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Range.OutOfRange)
+public sealed class InRangeTimeOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Range.OutOfRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the valid time range.</summary>
     public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
@@ -51,9 +51,9 @@ public sealed class BetweenTimeOnlyAttribute(string min, string max, Inclusion i
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var timeValue = (TimeOnly)value!;
-        var result = Must.Be.Between(timeValue, Min, Max, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        var timeValue = ((TimeOnly?)value).GetValueOrDefault();
+        var result = Must.Be.InRange(timeValue, Min, Max, Inclusion, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -63,30 +63,30 @@ public sealed class BetweenTimeOnlyAttribute(string min, string max, Inclusion i
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustTimeOnlyClauses.NotBetween"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustTimeOnlyClauses.OutOfRange"/>. Supported on properties, fields,
 /// and parameters of type <see cref="TimeOnly"/>.
 /// </para>
 /// <para>
 /// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
 /// <see cref="TimeOnly"/> string format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class QuietHoursModel
 /// {
-///     [NotBetweenTimeOnly("22:00", "06:00")]
+///     [OutOfRangeTimeOnly("09:00", "17:00")]
 ///     public TimeOnly AlertTime { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="BetweenTimeOnlyAttribute"/>
-/// <seealso cref="MustTimeOnlyClauses.NotBetween"/>
+/// <seealso cref="InRangeTimeOnlyAttribute"/>
+/// <seealso cref="MustTimeOnlyClauses.OutOfRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBetweenTimeOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Range.InRange)
+public sealed class OutOfRangeTimeOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Range.InRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the excluded time range.</summary>
     public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
@@ -100,9 +100,9 @@ public sealed class NotBetweenTimeOnlyAttribute(string min, string max, Inclusio
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var timeValue = (TimeOnly)value!;
-        var result = Must.Be.NotBetween(timeValue, Min, Max, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        var timeValue = ((TimeOnly?)value).GetValueOrDefault();
+        var result = Must.Be.OutOfRange(timeValue, Min, Max, Inclusion, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -117,7 +117,7 @@ public sealed class NotBetweenTimeOnlyAttribute(string min, string max, Inclusio
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -158,7 +158,7 @@ public sealed class BeforeTimeOnlyAttribute(string other) : ValidationAttributeB
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -199,7 +199,7 @@ public sealed class AfterTimeOnlyAttribute(string other) : ValidationAttributeBa
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -241,7 +241,7 @@ public sealed class NotBeforeTimeOnlyAttribute(string other) : ValidationAttribu
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -283,7 +283,7 @@ public sealed class OnOrBeforeTimeOnlyAttribute(string other) : ValidationAttrib
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -324,7 +324,7 @@ public sealed class NotOnOrBeforeTimeOnlyAttribute(string other) : ValidationAtt
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -366,7 +366,7 @@ public sealed class NotAfterTimeOnlyAttribute(string other) : ValidationAttribut
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -408,7 +408,7 @@ public sealed class OnOrAfterTimeOnlyAttribute(string other) : ValidationAttribu
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -450,7 +450,7 @@ public sealed class NotOnOrAfterTimeOnlyAttribute(string other) : ValidationAttr
 /// <para>
 /// The <paramref name="end"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The annotated value represents the start time.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -467,7 +467,7 @@ public sealed class NotOnOrAfterTimeOnlyAttribute(string other) : ValidationAttr
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalTimeOnlyAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.NotChronological)
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.NotChronological, allowNull: false)
 {
     /// <summary>Gets the end time that the annotated start time must precede.</summary>
     public TimeOnly End { get; } = TimeOnly.Parse(end, CultureInfo.InvariantCulture);
@@ -478,9 +478,9 @@ public sealed class ChronologicalTimeOnlyAttribute(string end, Inclusion inclusi
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var start = (TimeOnly)value!;
+        var start = ((TimeOnly?)value).GetValueOrDefault();
         var result = Must.Be.Chronological(start, End, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -496,7 +496,7 @@ public sealed class ChronologicalTimeOnlyAttribute(string end, Inclusion inclusi
 /// <para>
 /// The <paramref name="end"/> constructor argument is parsed from <see cref="TimeOnly"/> string
 /// format using invariant culture. The annotated value represents the start time.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -513,7 +513,7 @@ public sealed class ChronologicalTimeOnlyAttribute(string end, Inclusion inclusi
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotChronologicalTimeOnlyAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.Chronological)
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Order.Chronological, allowNull: false)
 {
     /// <summary>Gets the end time that the annotated start time must not precede.</summary>
     public TimeOnly End { get; } = TimeOnly.Parse(end, CultureInfo.InvariantCulture);
@@ -524,9 +524,9 @@ public sealed class NotChronologicalTimeOnlyAttribute(string end, Inclusion incl
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var start = (TimeOnly)value!;
+        var start = ((TimeOnly?)value).GetValueOrDefault();
         var result = Must.Be.NotChronological(start, End, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -543,7 +543,7 @@ public sealed class NotChronologicalTimeOnlyAttribute(string end, Inclusion incl
 /// The annotated value is treated as <c>start1</c>. The <paramref name="end1"/>,
 /// <paramref name="start2"/>, and <paramref name="end2"/> constructor arguments are parsed from
 /// <see cref="TimeOnly"/> string format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -559,8 +559,8 @@ public sealed class NotChronologicalTimeOnlyAttribute(string end, Inclusion incl
 /// <seealso cref="MustTimeOnlyClauses.Overlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OverlappingTimeOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Overlap.Missing)
+public sealed class OverlappingTimeOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Overlap.Missing, allowNull: false)
 {
     /// <summary>Gets the end of the first time interval.</summary>
     public TimeOnly End1 { get; } = TimeOnly.Parse(end1, CultureInfo.InvariantCulture);
@@ -577,9 +577,9 @@ public sealed class OverlappingTimeOnlyAttribute(string end1, string start2, str
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var start1 = (TimeOnly)value!;
+        var start1 = ((TimeOnly?)value).GetValueOrDefault();
         var result = Must.Be.Overlapping(start1, End1, Start2, End2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -596,7 +596,7 @@ public sealed class OverlappingTimeOnlyAttribute(string end1, string start2, str
 /// The annotated value is treated as <c>start1</c>. The <paramref name="end1"/>,
 /// <paramref name="start2"/>, and <paramref name="end2"/> constructor arguments are parsed from
 /// <see cref="TimeOnly"/> string format using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -612,8 +612,8 @@ public sealed class OverlappingTimeOnlyAttribute(string end1, string start2, str
 /// <seealso cref="MustTimeOnlyClauses.NotOverlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/time">Time Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOverlappingTimeOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Overlap.Present)
+public sealed class NotOverlappingTimeOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(TimeOnly), MustCodes.Time.Overlap.Present, allowNull: false)
 {
     /// <summary>Gets the end of the first time interval.</summary>
     public TimeOnly End1 { get; } = TimeOnly.Parse(end1, CultureInfo.InvariantCulture);
@@ -630,9 +630,9 @@ public sealed class NotOverlappingTimeOnlyAttribute(string end1, string start2, 
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var start1 = (TimeOnly)value!;
+        var start1 = ((TimeOnly?)value).GetValueOrDefault();
         var result = Must.Be.NotOverlapping(start1, End1, Start2, End2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 #endif

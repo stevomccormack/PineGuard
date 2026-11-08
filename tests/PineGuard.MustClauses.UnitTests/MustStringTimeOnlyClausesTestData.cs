@@ -7,11 +7,11 @@ namespace PineGuard.MustClauses.UnitTests;
 
 public static class MustStringTimeOnlyClausesTestData
 {
-    private static readonly TimeOnly T1000 = F.StringTimeOnly.IsBetween.InRangeInclusive.min;
-    private static readonly TimeOnly T1200 = F.StringTimeOnly.IsBetween.InRangeInclusive.max;
+    private static readonly TimeOnly T1000 = F.StringTimeOnly.IsInRange.InRangeInclusive.min;
+    private static readonly TimeOnly T1200 = F.StringTimeOnly.IsInRange.InRangeInclusive.max;
     private static readonly TimeSpan Win = F.StringTimeOnly.IsWithin.WithinWindow.window;
 
-    public static class BetweenTimeOnly
+    public static class InRangeTimeOnly
     {
         public static TheoryData<MustCase<(string? value, TimeOnly min, TimeOnly max)>> Cases =>
         [
@@ -23,7 +23,7 @@ public static class MustStringTimeOnlyClausesTestData
         ];
     }
 
-    public static class NotBetweenTimeOnly
+    public static class OutOfRangeTimeOnly
     {
         public static TheoryData<MustCase<(string? value, TimeOnly min, TimeOnly max)>> Cases =>
         [

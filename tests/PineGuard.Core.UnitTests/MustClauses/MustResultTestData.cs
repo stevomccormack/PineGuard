@@ -119,13 +119,13 @@ public static class MustResultTestData
 
         public static TheoryData<ValidCase> ValidCases =>
         [
-            new("ok with param", MustResult<int>.Ok(1, "original", "value")),
+            new("ok with param", MustResult<int>.Ok(1, value: "original", paramName: "value")),
             new("ok with nulls", MustResult<int>.Ok(0))
         ];
 
         public static TheoryData<ValidCase> NullFactoryCases =>
         [
-            new("successful result", MustResult<int>.Ok(1, "original", "value")),
+            new("successful result", MustResult<int>.Ok(1, value: "original", paramName: "value")),
             new("failed result", MustResult<int>.Fail("test.code", "{paramName} must be valid.", "value", 123))
         ];
 
@@ -153,13 +153,13 @@ public static class MustResultTestData
 
         public static TheoryData<FallbackValidCase> FallbackValidCases =>
         [
-            new("result null returns fallback", (MustResult<string?>.Ok(null, "original", "value"), "fallback"), "fallback"),
-            new("result not null returns result", (MustResult<string?>.Ok("result", "original", "value"), "fallback"), "result")
+            new("result null returns fallback", (MustResult<string?>.Ok(null, value: "original", paramName: "value"), "fallback"), "fallback"),
+            new("result not null returns result", (MustResult<string?>.Ok("result", value: "original", paramName: "value"), "fallback"), "result")
         ];
 
         public static TheoryData<NullResultCase> NullResultCases =>
         [
-            new("successful with null result returns null", MustResult<string?>.Ok(null, "original", "value"))
+            new("successful with null result returns null", MustResult<string?>.Ok(null, value: "original", paramName: "value"))
         ];
 
         public sealed record ValidCase(string Name, MustResult<int> Value, int Expected)
@@ -279,7 +279,7 @@ public static class MustResultTestData
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
-            new("success chains to next", MustResult<int>.Ok(3, "v", "p"), (true, "6", "", "", null, null)),
+            new("success chains to next", MustResult<int>.Ok(3, value: "v", paramName: "p"), (true, "6", "", "", null, null)),
             new("failure propagates without calling next", MustResult<int>.Fail("source.code", "{paramName} failed.", "p", 1), (false, null, "source.code", "{paramName} failed.", "p", 1))
         ];
 

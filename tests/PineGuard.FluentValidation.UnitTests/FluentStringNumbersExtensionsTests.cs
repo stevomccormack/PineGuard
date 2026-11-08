@@ -1,4 +1,6 @@
+using System.Globalization;
 using FluentValidation;
+using PineGuard.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
 using Xunit.Abstractions;
 
@@ -6,11 +8,31 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output) : BaseFluentUnitTest(output)
 {
+    [Theory]
+    [MemberData(nameof(FluentStringNumbersExtensionsTestData.ConfigurationInputs), MemberType = typeof(FluentStringNumbersExtensionsTestData))]
+    public void Value_DoesNotHideNumericConfigurationFailures(string? value)
+    {
+        // Arrange
+        var validator = new InlineValidator<Model>();
+        validator.RuleFor(x => x.Value).PositiveDecimal(styles: NumberStyles.HexNumber);
+        validator.RuleFor(x => x.Value).InRangeDecimal(0, 1, (Inclusion)42);
+        validator.RuleFor(x => x.Value).NotApproximatelyDecimal(0, -1);
+        validator.RuleFor(x => x.Value).Decimal(decimalPlaces: -1);
+        validator.RuleFor(x => x.Value).Int32(styles: (NumberStyles)4096);
+
+        // Act
+        var result = validator.Validate(new Model { Value = value });
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Equal(5, result.Errors.Count);
+    }
+
     private sealed record Model { public string? Value { get; init; } }
 
     private sealed class PositiveValidator : AbstractValidator<Model>
     {
-        public PositiveValidator() => RuleFor(x => x.Value).Positive();
+        public PositiveValidator() => RuleFor(x => x.Value).PositiveDecimal();
     }
 
     [Theory]
@@ -26,7 +48,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class NegativeValidator : AbstractValidator<Model>
     {
-        public NegativeValidator() => RuleFor(x => x.Value).Negative();
+        public NegativeValidator() => RuleFor(x => x.Value).NegativeDecimal();
     }
 
     [Theory]
@@ -42,7 +64,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class ZeroValidator : AbstractValidator<Model>
     {
-        public ZeroValidator() => RuleFor(x => x.Value).Zero();
+        public ZeroValidator() => RuleFor(x => x.Value).ZeroDecimal();
     }
 
     [Theory]
@@ -58,7 +80,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class NotZeroValidator : AbstractValidator<Model>
     {
-        public NotZeroValidator() => RuleFor(x => x.Value).NotZero();
+        public NotZeroValidator() => RuleFor(x => x.Value).NotZeroDecimal();
     }
 
     [Theory]
@@ -74,7 +96,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class ZeroOrPositiveValidator : AbstractValidator<Model>
     {
-        public ZeroOrPositiveValidator() => RuleFor(x => x.Value).ZeroOrPositive();
+        public ZeroOrPositiveValidator() => RuleFor(x => x.Value).ZeroOrPositiveDecimal();
     }
 
     [Theory]
@@ -90,7 +112,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class ZeroOrNegativeValidator : AbstractValidator<Model>
     {
-        public ZeroOrNegativeValidator() => RuleFor(x => x.Value).ZeroOrNegative();
+        public ZeroOrNegativeValidator() => RuleFor(x => x.Value).ZeroOrNegativeDecimal();
     }
 
     [Theory]
@@ -106,7 +128,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class GreaterThanValidator : AbstractValidator<Model>
     {
-        public GreaterThanValidator(decimal min) => RuleFor(x => x.Value).GreaterThan(min);
+        public GreaterThanValidator(decimal min) => RuleFor(x => x.Value).GreaterThanDecimal(min);
     }
 
     [Theory]
@@ -125,7 +147,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class GreaterThanOrEqualValidator : AbstractValidator<Model>
     {
-        public GreaterThanOrEqualValidator(decimal min) => RuleFor(x => x.Value).GreaterThanOrEqual(min);
+        public GreaterThanOrEqualValidator(decimal min) => RuleFor(x => x.Value).GreaterThanOrEqualDecimal(min);
     }
 
     [Theory]
@@ -144,7 +166,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class LessThanValidator : AbstractValidator<Model>
     {
-        public LessThanValidator(decimal max) => RuleFor(x => x.Value).LessThan(max);
+        public LessThanValidator(decimal max) => RuleFor(x => x.Value).LessThanDecimal(max);
     }
 
     [Theory]
@@ -163,7 +185,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class LessThanOrEqualValidator : AbstractValidator<Model>
     {
-        public LessThanOrEqualValidator(decimal max) => RuleFor(x => x.Value).LessThanOrEqual(max);
+        public LessThanOrEqualValidator(decimal max) => RuleFor(x => x.Value).LessThanOrEqualDecimal(max);
     }
 
     [Theory]
@@ -182,7 +204,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class InRangeValidator : AbstractValidator<Model>
     {
-        public InRangeValidator(decimal min, decimal max, PineGuard.Common.Inclusion inclusion) => RuleFor(x => x.Value).InRange(min, max, inclusion);
+        public InRangeValidator(decimal min, decimal max, PineGuard.Common.Inclusion inclusion) => RuleFor(x => x.Value).InRangeDecimal(min, max, inclusion);
     }
 
     [Theory]
@@ -201,7 +223,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class OutOfRangeValidator : AbstractValidator<Model>
     {
-        public OutOfRangeValidator() => RuleFor(x => x.Value).OutOfRange(10m, 20m);
+        public OutOfRangeValidator() => RuleFor(x => x.Value).OutOfRangeDecimal(10m, 20m);
     }
 
     [Theory]
@@ -217,7 +239,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class PercentageValidator : AbstractValidator<Model>
     {
-        public PercentageValidator() => RuleFor(x => x.Value).Percentage();
+        public PercentageValidator() => RuleFor(x => x.Value).PercentageDecimal();
     }
 
     [Theory]
@@ -233,7 +255,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class ApproximatelyValidator : AbstractValidator<Model>
     {
-        public ApproximatelyValidator(decimal target, decimal? tolerance) => RuleFor(x => x.Value).Approximately(target, tolerance);
+        public ApproximatelyValidator(decimal target, decimal? tolerance) => RuleFor(x => x.Value).ApproximatelyDecimal(target, tolerance);
     }
 
     [Theory]
@@ -252,7 +274,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class NotApproximatelyValidator : AbstractValidator<Model>
     {
-        public NotApproximatelyValidator() => RuleFor(x => x.Value).NotApproximately(10.0m, 0.2m);
+        public NotApproximatelyValidator() => RuleFor(x => x.Value).NotApproximatelyDecimal(10.0m, 0.2m);
     }
 
     [Theory]
@@ -268,7 +290,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class MultipleOfValidator : AbstractValidator<Model>
     {
-        public MultipleOfValidator(decimal factor) => RuleFor(x => x.Value).MultipleOf(factor);
+        public MultipleOfValidator(decimal factor) => RuleFor(x => x.Value).MultipleOfDecimal(factor);
     }
 
     [Theory]
@@ -287,7 +309,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class NotMultipleOfValidator : AbstractValidator<Model>
     {
-        public NotMultipleOfValidator() => RuleFor(x => x.Value).NotMultipleOf(2m);
+        public NotMultipleOfValidator() => RuleFor(x => x.Value).NotMultipleOfDecimal(2m);
     }
 
     [Theory]
@@ -303,7 +325,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class EvenValidator : AbstractValidator<Model>
     {
-        public EvenValidator() => RuleFor(x => x.Value).Even();
+        public EvenValidator() => RuleFor(x => x.Value).EvenInt32();
     }
 
     [Theory]
@@ -319,7 +341,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class OddValidator : AbstractValidator<Model>
     {
-        public OddValidator() => RuleFor(x => x.Value).Odd();
+        public OddValidator() => RuleFor(x => x.Value).OddInt32();
     }
 
     [Theory]
@@ -335,7 +357,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class FiniteValidator : AbstractValidator<Model>
     {
-        public FiniteValidator() => RuleFor(x => x.Value).Finite();
+        public FiniteValidator() => RuleFor(x => x.Value).FiniteDouble();
     }
 
     [Theory]
@@ -351,7 +373,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class NotFiniteValidator : AbstractValidator<Model>
     {
-        public NotFiniteValidator() => RuleFor(x => x.Value).NotFinite();
+        public NotFiniteValidator() => RuleFor(x => x.Value).NotFiniteDouble();
     }
 
     [Theory]
@@ -367,7 +389,7 @@ public sealed class FluentStringNumbersExtensionsTests(ITestOutputHelper output)
 
     private sealed class NotNaNValidator : AbstractValidator<Model>
     {
-        public NotNaNValidator() => RuleFor(x => x.Value).NotNaN();
+        public NotNaNValidator() => RuleFor(x => x.Value).NotNaNDouble();
     }
 
     [Theory]

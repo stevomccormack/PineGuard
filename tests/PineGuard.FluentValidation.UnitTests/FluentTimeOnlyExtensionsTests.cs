@@ -13,8 +13,8 @@ public sealed class FluentTimeOnlyExtensionsTests(ITestOutputHelper output) : Ba
     private static readonly TimeOnly RefMinus1 = Ref.AddHours(-1);
     private static readonly TimeOnly RefPlus1 = Ref.AddHours(1);
 
-    private sealed class BetweenValidator : AbstractValidator<Model> { public BetweenValidator() => RuleFor(x => x.Value).Between(RefMinus1, RefPlus1); }
-    private sealed class NotBetweenValidator : AbstractValidator<Model> { public NotBetweenValidator() => RuleFor(x => x.Value).NotBetween(RefMinus1, RefPlus1); }
+    private sealed class InRangeValidator : AbstractValidator<Model> { public InRangeValidator() => RuleFor(x => x.Value).InRange(RefMinus1, RefPlus1); }
+    private sealed class OutOfRangeValidator : AbstractValidator<Model> { public OutOfRangeValidator() => RuleFor(x => x.Value).OutOfRange(RefMinus1, RefPlus1); }
     private sealed class BeforeValidator : AbstractValidator<Model> { public BeforeValidator() => RuleFor(x => x.Value).Before(Ref); }
     private sealed class NotBeforeValidator : AbstractValidator<Model> { public NotBeforeValidator() => RuleFor(x => x.Value).NotBefore(Ref); }
     private sealed class OnOrBeforeValidator : AbstractValidator<Model> { public OnOrBeforeValidator() => RuleFor(x => x.Value).OnOrBefore(Ref); }
@@ -33,14 +33,14 @@ public sealed class FluentTimeOnlyExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class NotOverlappingValidator : AbstractValidator<Model> { public NotOverlappingValidator() => RuleFor(x => x.Value).NotOverlapping(new TimeOnly(12, 0), new TimeOnly(8, 0), new TimeOnly(9, 0)); }
 
     [Theory]
-    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.Between.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.Between))]
-    public void Between_BehavesAsExpected(FluentCase<TimeOnly?> tc)
-    { AssertResult(tc, new BetweenValidator().Validate(new Model { Value = tc.Value })); }
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.InRange.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.InRange))]
+    public void InRange_BehavesAsExpected(FluentCase<TimeOnly?> tc)
+    { AssertResult(tc, new InRangeValidator().Validate(new Model { Value = tc.Value })); }
 
     [Theory]
-    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.NotBetween.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.NotBetween))]
-    public void NotBetween_BehavesAsExpected(FluentCase<TimeOnly?> tc)
-    { AssertResult(tc, new NotBetweenValidator().Validate(new Model { Value = tc.Value })); }
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.OutOfRange.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.OutOfRange))]
+    public void OutOfRange_BehavesAsExpected(FluentCase<TimeOnly?> tc)
+    { AssertResult(tc, new OutOfRangeValidator().Validate(new Model { Value = tc.Value })); }
 
     [Theory]
     [MemberData(nameof(FluentTimeOnlyExtensionsTestData.Before.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.Before))]
@@ -124,8 +124,8 @@ public sealed class FluentTimeOnlyExtensionsTests(ITestOutputHelper output) : Ba
 
     // ── Non-nullable validators ────────────────────────────────────────────
 
-    private sealed class BetweenNonNullableValidator : AbstractValidator<NonNullableModel> { public BetweenNonNullableValidator() => RuleFor(x => x.Value).Between(RefMinus1, RefPlus1); }
-    private sealed class NotBetweenNonNullableValidator : AbstractValidator<NonNullableModel> { public NotBetweenNonNullableValidator() => RuleFor(x => x.Value).NotBetween(RefMinus1, RefPlus1); }
+    private sealed class InRangeNonNullableValidator : AbstractValidator<NonNullableModel> { public InRangeNonNullableValidator() => RuleFor(x => x.Value).InRange(RefMinus1, RefPlus1); }
+    private sealed class OutOfRangeNonNullableValidator : AbstractValidator<NonNullableModel> { public OutOfRangeNonNullableValidator() => RuleFor(x => x.Value).OutOfRange(RefMinus1, RefPlus1); }
     private sealed class BeforeNonNullableValidator : AbstractValidator<NonNullableModel> { public BeforeNonNullableValidator() => RuleFor(x => x.Value).Before(Ref); }
     private sealed class NotBeforeNonNullableValidator : AbstractValidator<NonNullableModel> { public NotBeforeNonNullableValidator() => RuleFor(x => x.Value).NotBefore(Ref); }
     private sealed class OnOrBeforeNonNullableValidator : AbstractValidator<NonNullableModel> { public OnOrBeforeNonNullableValidator() => RuleFor(x => x.Value).OnOrBefore(Ref); }
@@ -144,14 +144,14 @@ public sealed class FluentTimeOnlyExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class NotOverlappingNonNullableValidator : AbstractValidator<NonNullableModel> { public NotOverlappingNonNullableValidator() => RuleFor(x => x.Value).NotOverlapping(new TimeOnly(12, 0), new TimeOnly(8, 0), new TimeOnly(9, 0)); }
 
     [Theory]
-    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.BetweenNonNullable.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.BetweenNonNullable))]
-    public void BetweenNonNullable_BehavesAsExpected(FluentCase<TimeOnly> tc)
-    { AssertResult(tc, new BetweenNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value })); }
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.InRangeNonNullable.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.InRangeNonNullable))]
+    public void InRangeNonNullable_BehavesAsExpected(FluentCase<TimeOnly> tc)
+    { AssertResult(tc, new InRangeNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value })); }
 
     [Theory]
-    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.NotBetweenNonNullable.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.NotBetweenNonNullable))]
-    public void NotBetweenNonNullable_BehavesAsExpected(FluentCase<TimeOnly> tc)
-    { AssertResult(tc, new NotBetweenNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value })); }
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.OutOfRangeNonNullable.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.OutOfRangeNonNullable))]
+    public void OutOfRangeNonNullable_BehavesAsExpected(FluentCase<TimeOnly> tc)
+    { AssertResult(tc, new OutOfRangeNonNullableValidator().Validate(new NonNullableModel { Value = tc.Value })); }
 
     [Theory]
     [MemberData(nameof(FluentTimeOnlyExtensionsTestData.BeforeNonNullable.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.BeforeNonNullable))]

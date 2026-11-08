@@ -70,7 +70,7 @@ public static class MustResultTestData
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
-            new("ok", MustResult<int>.Ok(1, "val", "param"), true)
+            new("ok", MustResult<int>.Ok(1, value: "val", paramName: "param"), true)
         ];
         public sealed record ValidCase(string Name, MustResult<int> Value, bool Expected) : IsCase<MustResult<int>>(Name, Value, Expected);
     }
@@ -147,8 +147,8 @@ public static class MustResultTestData
         // T is string?
         public static TheoryData<ValidCaseNullable> ValidCasesNullable =>
         [
-            new("ok", (MustResult<string?>.Ok("ok", "val"), "fallback"), true), // Returns "ok"
-            new("ok null result", (MustResult<string?>.Ok(null, "val"), "fallback"), false) // Returns "fallback" (expected "false" logic in test interpretation or custom expected value)
+            new("ok", (MustResult<string?>.Ok("ok", value: "val"), "fallback"), true), // Returns "ok"
+            new("ok null result", (MustResult<string?>.Ok(null, value: "val"), "fallback"), false) // Returns "fallback" (expected "false" logic in test interpretation or custom expected value)
         ];
 
         public sealed record ValidCase(string Name, (MustResult<int> Result, int Fallback) Value, bool Expected) : IsCase<(MustResult<int> Result, int Fallback)>(Name, Value, Expected);

@@ -24,7 +24,7 @@ public static class FluentDateTimeRangeExtensions
         this IRuleBuilder<TModel, DateTimeRange?> ruleBuilder,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Chronological(val.Value, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Chronological(val.GetValueOrDefault(), inclusion, paramName: null)),
             message, MustCodes.Range.Order.NotChronological);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> is chronologically ordered.</summary>
@@ -52,9 +52,9 @@ public static class FluentDateTimeRangeExtensions
     public static IRuleBuilderOptions<TModel, DateTimeRange?> Overlapping<TModel>(
         this IRuleBuilder<TModel, DateTimeRange?> ruleBuilder,
         DateTimeRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Overlapping(val.Value, range2, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Overlapping(val.GetValueOrDefault(), range2, inclusion, paramName: null)),
             message, MustCodes.Range.Overlap.Missing);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> overlaps with the specified range.</summary>
@@ -67,7 +67,7 @@ public static class FluentDateTimeRangeExtensions
     public static IRuleBuilderOptions<TModel, DateTimeRange> Overlapping<TModel>(
         this IRuleBuilder<TModel, DateTimeRange> ruleBuilder,
         DateTimeRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Overlapping(val, range2, inclusion, paramName: null),
             message, MustCodes.Range.Overlap.Missing);
@@ -83,9 +83,9 @@ public static class FluentDateTimeRangeExtensions
     public static IRuleBuilderOptions<TModel, DateTimeRange?> NotOverlapping<TModel>(
         this IRuleBuilder<TModel, DateTimeRange?> ruleBuilder,
         DateTimeRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotOverlapping(val.Value, range2, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotOverlapping(val.GetValueOrDefault(), range2, inclusion, paramName: null)),
             message, MustCodes.Range.Overlap.Present);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> does not overlap with the specified range.</summary>
@@ -98,7 +98,7 @@ public static class FluentDateTimeRangeExtensions
     public static IRuleBuilderOptions<TModel, DateTimeRange> NotOverlapping<TModel>(
         this IRuleBuilder<TModel, DateTimeRange> ruleBuilder,
         DateTimeRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotOverlapping(val, range2, inclusion, paramName: null),
             message, MustCodes.Range.Overlap.Present);
@@ -116,7 +116,7 @@ public static class FluentDateTimeRangeExtensions
         DateTime value,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Contains(val.Value, value, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Contains(val.GetValueOrDefault(), value, inclusion, paramName: null)),
             message, MustCodes.Range.Bounds.NotContains);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> contains the specified value.</summary>
@@ -147,7 +147,7 @@ public static class FluentDateTimeRangeExtensions
         DateTime value,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotContains(val.Value, value, inclusion, paramName: null) : MustResult<DateTimeRange>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotContains(val.GetValueOrDefault(), value, inclusion, paramName: null)),
             message, MustCodes.Range.Bounds.Contains);
 
     /// <summary>Validates that the <see cref="DateTimeRange"/> does not contain the specified value.</summary>
@@ -164,4 +164,6 @@ public static class FluentDateTimeRangeExtensions
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotContains(val, value, inclusion, paramName: null),
             message, MustCodes.Range.Bounds.Contains);
+    private static MustResult<T> SkipAbsentValue<T>(T? value, MustResult<T> result) where T : struct =>
+        value is null && result.ParamName is null ? MustResult<T>.Ok(default) : result;
 }

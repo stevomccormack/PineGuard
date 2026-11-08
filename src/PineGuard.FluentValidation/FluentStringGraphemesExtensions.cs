@@ -29,7 +29,7 @@ public static class FluentStringGraphemesExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustStringGraphemesClauses.HasExactGraphemeCount"/>. Validation fails if
-    /// <paramref name="count"/> is negative. If the value is <see langword="null"/>, validation passes
+    /// <paramref name="count"/> is negative. If configuration is valid and the value is <see langword="null"/>, validation passes
     /// (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
@@ -41,7 +41,7 @@ public static class FluentStringGraphemesExtensions
     public static IRuleBuilderOptions<TModel, string?> HasExactGraphemeCount<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int count,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.HasExactGraphemeCount(val, count, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.HasExactGraphemeCount(val, count, paramName: null)),
             message, MustCodes.Text.Graphemes.Mismatch);
 
     /// <summary>
@@ -54,7 +54,7 @@ public static class FluentStringGraphemesExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustStringGraphemesClauses.NotHasExactGraphemeCount"/>. Validation fails if
-    /// <paramref name="count"/> is negative. If the value is <see langword="null"/>, validation passes
+    /// <paramref name="count"/> is negative. If configuration is valid and the value is <see langword="null"/>, validation passes
     /// (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
@@ -66,7 +66,7 @@ public static class FluentStringGraphemesExtensions
     public static IRuleBuilderOptions<TModel, string?> NotHasExactGraphemeCount<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int count,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotHasExactGraphemeCount(val, count, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotHasExactGraphemeCount(val, count, paramName: null)),
             message, MustCodes.Text.Graphemes.Match);
 
     /// <summary>
@@ -79,7 +79,7 @@ public static class FluentStringGraphemesExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustStringGraphemesClauses.HasMinGraphemeCount"/>. Validation fails if
-    /// <paramref name="min"/> is negative. If the value is <see langword="null"/>, validation passes
+    /// <paramref name="min"/> is negative. If configuration is valid and the value is <see langword="null"/>, validation passes
     /// (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
@@ -91,7 +91,7 @@ public static class FluentStringGraphemesExtensions
     public static IRuleBuilderOptions<TModel, string?> HasMinGraphemeCount<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int min,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.HasMinGraphemeCount(val, min, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.HasMinGraphemeCount(val, min, paramName: null)),
             message, MustCodes.Text.Graphemes.TooFew);
 
     /// <summary>
@@ -104,7 +104,7 @@ public static class FluentStringGraphemesExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustStringGraphemesClauses.NotHasMinGraphemeCount"/>. Validation fails if
-    /// <paramref name="min"/> is negative. If the value is <see langword="null"/>, validation passes
+    /// <paramref name="min"/> is negative. If configuration is valid and the value is <see langword="null"/>, validation passes
     /// (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
@@ -116,7 +116,7 @@ public static class FluentStringGraphemesExtensions
     public static IRuleBuilderOptions<TModel, string?> NotHasMinGraphemeCount<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int min,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotHasMinGraphemeCount(val, min, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotHasMinGraphemeCount(val, min, paramName: null)),
             message, MustCodes.Text.Graphemes.TooMany);
 
     /// <summary>
@@ -142,7 +142,7 @@ public static class FluentStringGraphemesExtensions
     public static IRuleBuilderOptions<TModel, string?> HasMaxGraphemeCount<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int max,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.HasMaxGraphemeCount(val, max, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.HasMaxGraphemeCount(val, max, paramName: null)),
             message, MustCodes.Text.Graphemes.TooMany);
 
     /// <summary>
@@ -155,7 +155,7 @@ public static class FluentStringGraphemesExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustStringGraphemesClauses.NotHasMaxGraphemeCount"/>. Validation fails if
-    /// <paramref name="max"/> is negative. If the value is <see langword="null"/>, validation passes
+    /// <paramref name="max"/> is negative. If configuration is valid and the value is <see langword="null"/>, validation passes
     /// (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
@@ -167,7 +167,7 @@ public static class FluentStringGraphemesExtensions
     public static IRuleBuilderOptions<TModel, string?> NotHasMaxGraphemeCount<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int max,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotHasMaxGraphemeCount(val, max, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotHasMaxGraphemeCount(val, max, paramName: null)),
             message, MustCodes.Text.Graphemes.TooFew);
 
     /// <summary>
@@ -181,22 +181,22 @@ public static class FluentStringGraphemesExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustStringGraphemesClauses.HasGraphemeCountBetween"/>. Validation fails if
+    /// Delegates to <see cref="MustStringGraphemesClauses.HasGraphemeCountInRange"/>. Validation fails if
     /// either bound is negative or the range is inverted. If the value is <see langword="null"/>,
     /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.DisplayName).HasGraphemeCountBetween(3, 50);
+    /// RuleFor(x => x.DisplayName).HasGraphemeCountInRange(3, 50);
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringGraphemesClauses.HasGraphemeCountBetween"/>
-    public static IRuleBuilderOptions<TModel, string?> HasGraphemeCountBetween<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+    /// <seealso cref="MustStringGraphemesClauses.HasGraphemeCountInRange"/>
+    public static IRuleBuilderOptions<TModel, string?> HasGraphemeCountInRange<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.HasGraphemeCountBetween(val, min, max, inclusion, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.HasGraphemeCountInRange(val, min, max, inclusion, paramName: null)),
             message, MustCodes.Text.Graphemes.OutOfRange);
 
     /// <summary>
@@ -210,21 +210,23 @@ public static class FluentStringGraphemesExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustStringGraphemesClauses.NotHasGraphemeCountBetween"/>. Validation fails if
+    /// Delegates to <see cref="MustStringGraphemesClauses.NotHasGraphemeCountInRange"/>. Validation fails if
     /// either bound is negative or the range is inverted. If the value is <see langword="null"/>,
     /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.Handle).NotHasGraphemeCountBetween(1, 2);
+    /// RuleFor(x => x.Handle).NotHasGraphemeCountInRange(1, 2);
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringGraphemesClauses.NotHasGraphemeCountBetween"/>
-    public static IRuleBuilderOptions<TModel, string?> NotHasGraphemeCountBetween<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+    /// <seealso cref="MustStringGraphemesClauses.NotHasGraphemeCountInRange"/>
+    public static IRuleBuilderOptions<TModel, string?> NotHasGraphemeCountInRange<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.NotHasGraphemeCountBetween(val, min, max, inclusion, paramName: null) : MustResult<string>.Ok(null!),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotHasGraphemeCountInRange(val, min, max, inclusion, paramName: null)),
             message, MustCodes.Text.Graphemes.InRange);
+    private static MustResult<string> SkipAbsentValue(string? value, MustResult<string> result) =>
+        value is null && result.ParamName is null ? MustResult<string>.Ok(default) : result;
 }

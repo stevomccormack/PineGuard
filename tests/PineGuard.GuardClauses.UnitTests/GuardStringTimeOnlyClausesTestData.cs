@@ -6,10 +6,10 @@ namespace PineGuard.GuardClauses.UnitTests;
 
 public static class GuardStringTimeOnlyClausesTestData
 {
-    private static readonly TimeOnly T1000 = F.StringTimeOnly.IsBetween.InRangeInclusive.min;
-    private static readonly TimeOnly T1200 = F.StringTimeOnly.IsBetween.InRangeInclusive.max;
+    private static readonly TimeOnly T1000 = F.StringTimeOnly.IsInRange.InRangeInclusive.min;
+    private static readonly TimeOnly T1200 = F.StringTimeOnly.IsInRange.InRangeInclusive.max;
 
-    public static class NotBetweenTimeOnly
+    public static class OutOfRangeTimeOnly
     {
         public static TheoryData<GuardCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases =>
         [
@@ -19,7 +19,7 @@ public static class GuardStringTimeOnlyClausesTestData
         ];
     }
 
-    public static class BetweenTimeOnly
+    public static class InRangeTimeOnly
     {
         public static TheoryData<GuardCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases =>
         [

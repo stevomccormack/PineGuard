@@ -58,4 +58,22 @@ public static class CsvRulesFixtures
         public static readonly (string? line, IReadOnlyList<string>? expectedHeader) Mismatch = ("a,b", ["a", "c"]);
         public static readonly (string? line, IReadOnlyList<string>? expectedHeader) NullExpected = ("a,b", null);
     }
+
+    public static class SchemaConfiguration
+    {
+        public static readonly IReadOnlyList<PineGuard.Common.CsvColumnSchema>? Null = null;
+        public static readonly IReadOnlyList<PineGuard.Common.CsvColumnSchema> Empty = [];
+        public static readonly IReadOnlyList<PineGuard.Common.CsvColumnSchema> DefaultColumn = [default];
+        public static readonly IReadOnlyList<PineGuard.Common.CsvColumnSchema> BlankName = [new(" ", PineGuard.Common.CsvColumnType.String)];
+        public static readonly IReadOnlyList<PineGuard.Common.CsvColumnSchema> UndefinedType = [new("a", (PineGuard.Common.CsvColumnType)99, IsRequired: false)];
+        public static readonly IReadOnlyList<PineGuard.Common.CsvColumnSchema> ZeroLength = [new("a", PineGuard.Common.CsvColumnType.String, MaxLength: 0)];
+        public static readonly IReadOnlyList<PineGuard.Common.CsvColumnSchema> WithInvalidName = [new PineGuard.Common.CsvColumnSchema("a", PineGuard.Common.CsvColumnType.String) with { Name = null! }];
+        public static readonly IReadOnlyList<PineGuard.Common.CsvColumnSchema> WithNegativeLength = [new PineGuard.Common.CsvColumnSchema("a", PineGuard.Common.CsvColumnType.String) with { MaxLength = -1 }];
+        public static RuleScenario<IReadOnlyList<PineGuard.Common.CsvColumnSchema>?>[] InvalidScenarios =>
+        [
+            new(nameof(Null), Null, false), new(nameof(Empty), Empty, false), new(nameof(DefaultColumn), DefaultColumn, false),
+            new(nameof(BlankName), BlankName, false), new(nameof(UndefinedType), UndefinedType, false), new(nameof(ZeroLength), ZeroLength, false),
+            new(nameof(WithInvalidName), WithInvalidName, false), new(nameof(WithNegativeLength), WithNegativeLength, false)
+        ];
+    }
 }

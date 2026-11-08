@@ -566,7 +566,7 @@ Must.Be.CronExpression(schedule);     Must.Be.Slug(value);                  Must
 Must.Be.Percentage(ratio);            Must.Be.ScaleAtMost(amount, 2);       Must.Be.InRange(qty, 1, 100);
 Must.Be.MinimumAge(dob, 18);          Must.Be.WithinDaysFromNow(due, 30);   Must.Be.Weekday(date);
 Must.Be.KnownFileSignature(bytes);    Must.Be.Utf8(bytes);                  Must.Be.WellFormedUtf16(text);
-Must.Be.HasMinGraphemeCount(name, 2); Must.Be.KebabCase(value);             Must.Be.LengthBetween(value, 3, 64);
+Must.Be.HasMinGraphemeCount(name, 2); Must.Be.KebabCase(value);             Must.Be.LengthInRange(value, 3, 64);
 Must.Be.Json(payload);                Must.Be.Xml(document);                Must.Be.CsvLine(row);
 Must.Be.XssSafe(input);               Must.Be.PathTraversalSafe(path);      Must.Be.OwaspSafe(input);
 ```

@@ -70,4 +70,15 @@ public sealed class CsvColumnSchemaTests : BaseUnitTest
         var ex = Assert.Throws(testCase.ExpectedException.Type, () => new CsvColumnSchema(testCase.Value.Name, testCase.Value.Type!));
         ThrowsCaseAssert.Expected(ex, testCase);
     }
+
+    [Theory]
+    [MemberData(nameof(CsvColumnSchemaTestData.InvalidMetadata.Cases), MemberType = typeof(CsvColumnSchemaTestData.InvalidMetadata))]
+    public void StringConstructor_RejectsInvalidMetadata((string? name, int maxLength, Type exceptionType, string paramName) tc)
+    {
+        // Act
+        var exception = Assert.Throws(tc.exceptionType, () => new CsvColumnSchema(tc.name!, "string", maxLength: tc.maxLength));
+
+        // Assert
+        Assert.Equal(tc.paramName, ((ArgumentException)exception).ParamName);
+    }
 }

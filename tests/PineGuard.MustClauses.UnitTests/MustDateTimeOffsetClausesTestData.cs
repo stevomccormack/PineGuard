@@ -57,7 +57,7 @@ public static class MustDateTimeOffsetClausesTestData
         public sealed record ValidCase(string Name, DateTimeOffset Value, bool Expected) : IsCase<DateTimeOffset>(Name, Value, Expected);
     }
 
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
@@ -68,7 +68,7 @@ public static class MustDateTimeOffsetClausesTestData
         public sealed record ValidCase(string Name, (DateTimeOffset Value, DateTimeOffset Min, DateTimeOffset Max) Value, bool Expected) : IsCase<(DateTimeOffset Value, DateTimeOffset Min, DateTimeOffset Max)>(Name, Value, Expected);
     }
 
-    public static class NotBetween
+    public static class OutOfRange
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
@@ -203,8 +203,8 @@ public static class MustDateTimeOffsetClausesTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
-            new("invalid range 1", (E1, S1, S2, E2), true), // Start1 > End1 -> !false -> true
-            new("invalid range 2", (S1, E1, E2, S2), true) // Start2 > End2 -> !false -> true
+            new("invalid range 1", (E1, S1, S2, E2), false),
+            new("invalid range 2", (S1, E1, E2, S2), false)
         ];
 
         public sealed record ValidCase(string Name, (DateTimeOffset Start1, DateTimeOffset End1, DateTimeOffset Start2, DateTimeOffset End2) Value, bool Expected) : IsCase<(DateTimeOffset S1, DateTimeOffset E1, DateTimeOffset S2, DateTimeOffset E2)>(Name, Value, Expected);

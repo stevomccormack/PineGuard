@@ -1,3 +1,6 @@
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { getRule } from "../../src/audit/catalog.js";
@@ -21,6 +24,62 @@ if (!rule) {
 }
 
 describe("nullability", () => {
+    it("resolves source-declared value types across projects without exempting reference records", async () => {
+        const rootDir = mkdtempSync(join(tmpdir(), "nullability-types-"));
+        try {
+            mkdirSync(join(rootDir, "src/PineGuard.Core"), { recursive: true });
+            mkdirSync(join(rootDir, "src/PineGuard.MustClauses"), {
+                recursive: true,
+            });
+            const types = "src/PineGuard.Core/Types.cs";
+            const clauses = "src/PineGuard.MustClauses/Clauses.cs";
+            writeFileSync(
+                join(rootDir, types),
+                `namespace Domain;
+public readonly struct Interval { }
+public readonly record struct Value<T>(T Item);
+public enum Mode { First }
+public record Reference(string Text);
+public class Container { public struct Nested { } public class DateOnly { } }
+`,
+            );
+            writeFileSync(
+                join(rootDir, clauses),
+                `using Domain;
+public static class Clauses {
+ public static void Range(this IMustClause _, Interval value) { }
+ public static void BclDate(this IMustClause _, DateOnly value) { }
+ public static void Record(this IMustClause _, Value<int> value) { }
+ public static void Enum(this IMustClause _, Mode value) { }
+ public static void Qualified(this IMustClause _, global::Domain.Container.Nested value) { }
+ public static void NullableRange(this IMustClause _, Interval? value) { }
+ public static void NullableEnum(this IMustClause _, Mode? value) { }
+ public static void NonNullableRecord(this IMustClause _, Reference value) { }
+ public static void NullableRecord(this IMustClause _, Reference? value) { }
+ public static void Array(this IMustClause _, Value<int>[]? value) { }
+ public static void NullableQualified(this IMustClause _, System.Nullable<Domain.Interval> value) { }
+}
+`,
+            );
+            const findings = await rule.run({
+                rootDir,
+                trackedFiles: [types, clauses],
+            });
+            expect(findings).toHaveLength(4);
+            expect(
+                findings
+                    .map((finding) => finding.message.split("'s")[0])
+                    .sort(),
+            ).toEqual([
+                "NonNullableRecord",
+                "NullableEnum",
+                "NullableQualified",
+                "NullableRange",
+            ]);
+        } finally {
+            rmSync(rootDir, { recursive: true, force: true });
+        }
+    });
     it("is registered under its slug and the shared legacy id Rule07", () => {
         expect(rule.slug).toBe("nullability");
         expect(rule.legacyId).toBe("Rule07");

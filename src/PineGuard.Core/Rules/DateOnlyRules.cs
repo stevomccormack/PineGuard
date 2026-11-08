@@ -17,8 +17,11 @@ public static class DateOnlyRules
     /// <param name="inclusion">Whether today is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the past; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInPast(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
-        value is not null && IsBefore(value, DateOnly.FromDateTime(DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime), inclusion);
+    public static bool IsInPast(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return value is not null && IsBefore(value, DateOnly.FromDateTime(DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime), inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date is in the future relative to UTC now.
@@ -27,8 +30,11 @@ public static class DateOnlyRules
     /// <param name="inclusion">Whether today is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the future; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInFuture(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
-        value is not null && IsAfter(value, DateOnly.FromDateTime(DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime), inclusion);
+    public static bool IsInFuture(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return value is not null && IsAfter(value, DateOnly.FromDateTime(DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime), inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date falls within [<paramref name="min"/>, <paramref name="max"/>].
@@ -38,34 +44,40 @@ public static class DateOnlyRules
     /// <param name="max">The upper bound of the date range.</param>
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is within the range; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBetween(DateOnly? value, DateOnly min, DateOnly max, Inclusion inclusion = Inclusion.Inclusive) =>
-        value is not null && RuleComparison.IsBetween(value.Value, min, max, inclusion);
+    public static bool IsInRange(DateOnly? value, DateOnly min, DateOnly max, Inclusion inclusion = Inclusion.Inclusive)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return value is not null && RuleComparison.IsInRange(value.Value, min, max, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date is before the given reference date.
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="other">The reference date. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="other">The reference date.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is before <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBefore(DateOnly? value, DateOnly? other, Inclusion inclusion = Inclusion.Exclusive, DatePrecision? precision = null)
+    public static bool IsBefore(DateOnly? value, DateOnly other, Inclusion inclusion = Inclusion.Exclusive, DatePrecision? precision = null)
     {
-        if (value is null || other is null)
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return false;
+
+        if (value is null)
             return false;
 
         var v = value.Value;
-        var o = other.Value;
+        var o = other;
 
         if (precision is null)
             return RuleComparison.IsLessThan(v, o, inclusion);
 
-        if (!DateTimeUtility.TryTruncateToPrecision(v, precision.Value, out var tV) ||
-            !DateTimeUtility.TryTruncateToPrecision(o, precision.Value, out var tO))
-            return false;
+        _ = DateTimeUtility.TryTruncateToPrecision(v, precision.Value, out var tV);
+        _ = DateTimeUtility.TryTruncateToPrecision(o, precision.Value, out var tO);
 
-        v = tV!.Value;
-        o = tO!.Value;
+        v = tV;
+        o = tO;
 
         return RuleComparison.IsLessThan(v, o, inclusion);
     }
@@ -74,27 +86,30 @@ public static class DateOnlyRules
     /// Determines whether the specified date is after the given reference date.
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="other">The reference date. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="other">The reference date.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is after <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsAfter(DateOnly? value, DateOnly? other, Inclusion inclusion = Inclusion.Exclusive, DatePrecision? precision = null)
+    public static bool IsAfter(DateOnly? value, DateOnly other, Inclusion inclusion = Inclusion.Exclusive, DatePrecision? precision = null)
     {
-        if (value is null || other is null)
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return false;
+
+        if (value is null)
             return false;
 
         var v = value.Value;
-        var o = other.Value;
+        var o = other;
 
         if (precision is null)
             return RuleComparison.IsGreaterThan(v, o, inclusion);
 
-        if (!DateTimeUtility.TryTruncateToPrecision(v, precision.Value, out var tV) ||
-            !DateTimeUtility.TryTruncateToPrecision(o, precision.Value, out var tO))
-            return false;
+        _ = DateTimeUtility.TryTruncateToPrecision(v, precision.Value, out var tV);
+        _ = DateTimeUtility.TryTruncateToPrecision(o, precision.Value, out var tO);
 
-        v = tV!.Value;
-        o = tO!.Value;
+        v = tV;
+        o = tO;
 
         return RuleComparison.IsGreaterThan(v, o, inclusion);
     }
@@ -108,6 +123,9 @@ public static class DateOnlyRules
     /// <returns><see langword="true"/> if the dates are equal at the given precision; otherwise, <see langword="false"/>.</returns>
     public static bool IsSame(DateOnly? value, DateOnly? other, DatePrecision? precision = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return false;
+
         if (value is null && other is null)
             return true;
 
@@ -120,12 +138,11 @@ public static class DateOnlyRules
         if (precision is null)
             return RuleComparison.Equals(v, o);
 
-        if (!DateTimeUtility.TryTruncateToPrecision(v, precision.Value, out var tV) ||
-            !DateTimeUtility.TryTruncateToPrecision(o, precision.Value, out var tO))
-            return false;
+        _ = DateTimeUtility.TryTruncateToPrecision(v, precision.Value, out var tV);
+        _ = DateTimeUtility.TryTruncateToPrecision(o, precision.Value, out var tO);
 
-        v = tV!.Value;
-        o = tO!.Value;
+        v = tV;
+        o = tO;
 
         return RuleComparison.Equals(v, o);
     }
@@ -137,8 +154,11 @@ public static class DateOnlyRules
     /// <param name="end">The end date. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="start"/> precedes <paramref name="end"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsChronological(DateOnly? start, DateOnly? end, Inclusion inclusion = Inclusion.Exclusive) =>
-        RangeRules.IsChronological(start, end, inclusion);
+    public static bool IsChronological(DateOnly? start, DateOnly? end, Inclusion inclusion = Inclusion.Exclusive)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return RangeRules.IsChronological(start, end, inclusion);
+    }
 
     /// <summary>
     /// Determines whether two date ranges overlap.
@@ -147,12 +167,13 @@ public static class DateOnlyRules
     /// <param name="end1">The end of the first range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="start2">The start of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end2">The end of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundaries are inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="inclusion">Whether to intersect closed ranges or open interiors. Singleton and one-step interiors are empty. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if the two ranges overlap; otherwise, <see langword="false"/>. Returns <see langword="false"/> if either range is inverted (start after end).</returns>
-    public static bool IsOverlapping(DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, Inclusion inclusion = Inclusion.Exclusive) =>
-        RangeRules.IsChronological(start1, end1, Inclusion.Inclusive) &&
-        RangeRules.IsChronological(start2, end2, Inclusion.Inclusive) &&
-        RangeRules.IsOverlapping(start1, end1, start2, end2, inclusion);
+    public static bool IsOverlapping(DateOnly? start1, DateOnly? end1, DateOnly? start2, DateOnly? end2, Inclusion inclusion = Inclusion.Inclusive)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return RangeRules.IsOverlapping(start1?.DayNumber, end1?.DayNumber, start2?.DayNumber, end2?.DayNumber, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date is within the given number of calendar months from a reference date.

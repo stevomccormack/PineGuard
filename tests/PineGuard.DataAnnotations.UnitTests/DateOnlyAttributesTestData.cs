@@ -44,8 +44,8 @@ public static class DateOnlyAttributesTestData
         public static TheoryData<ValidCase> InvalidCases => [new("past", F.IsPast.PastDate!.Value, false)];
     }
 
-    // Between("2020-01-01", "2020-01-31")
-    public static class BetweenDateOnly
+    // InRange("2020-01-01", "2020-01-31")
+    public static class InRangeDateOnly
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
@@ -61,8 +61,8 @@ public static class DateOnlyAttributesTestData
         ];
     }
 
-    // NotBetween("2020-01-01", "2020-01-31")
-    public static class NotBetweenDateOnly
+    // OutOfRange("2020-01-01", "2020-01-31")
+    public static class OutOfRangeDateOnly
     {
         public static TheoryData<ValidCase> ValidCases =>
         [

@@ -247,7 +247,7 @@ public static class GuardStringClauses
     /// <param name="max">The maximum allowed length (inclusive).</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
-    /// from <see cref="MustStringClauses.LengthBetween"/>.
+    /// from <see cref="MustStringClauses.LengthInRange"/>.
     /// </param>
     /// <param name="exceptionCreator">
     /// An optional factory to create a custom exception. If <see langword="null"/>,
@@ -263,16 +263,16 @@ public static class GuardStringClauses
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <remarks>
-    /// This guard is the complement of <see cref="MustStringClauses.LengthBetween"/>:
-    /// <c>Guard.Against.NotLengthBetween</c> passes when the length is within the range.
+    /// This guard is the complement of <see cref="MustStringClauses.LengthInRange"/>:
+    /// <c>Guard.Against.NotLengthInRange</c> passes when the length is within the range.
     /// </remarks>
     /// <example>
     /// <code>
-    /// Guard.Against.NotLengthBetween(username, 3, 50);
+    /// Guard.Against.NotLengthInRange(username, 3, 50);
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringClauses.LengthBetween"/>
-    public static string NotLengthBetween(this IGuardClause _,
+    /// <seealso cref="MustStringClauses.LengthInRange"/>
+    public static string NotLengthInRange(this IGuardClause _,
         string? value,
         int min,
         int max,
@@ -280,7 +280,7 @@ public static class GuardStringClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.LengthBetween(value, min, max, paramName);
+        var result = Must.Be.LengthInRange(value, min, max, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -1240,7 +1240,7 @@ public static class GuardStringClauses
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <seealso cref="MustStringClauses.NotWhitespace"/>
-    public static string IsWhitespace(this IGuardClause _,
+    public static string Whitespace(this IGuardClause _,
         string? value,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
@@ -1360,35 +1360,6 @@ public static class GuardStringClauses
 
         return result.Result!;
     }
-
-    /// <summary>
-    /// Throws if <paramref name="value"/> is entirely whitespace. Alias for <see cref="IsWhitespace"/>.
-    /// </summary>
-    /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
-    /// <param name="value">The string value to guard.</param>
-    /// <param name="message">
-    /// An optional custom error message. If <see langword="null"/>, uses the default message.
-    /// </param>
-    /// <param name="exceptionCreator">
-    /// An optional factory to create a custom exception. If <see langword="null"/>,
-    /// throws <see cref="ArgumentException"/> via <see cref="GuardFailure.Throw"/>.
-    /// </param>
-    /// <param name="paramName">
-    /// The name of the calling parameter. Automatically captured via
-    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
-    /// </param>
-    /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is entirely whitespace and no
-    /// <paramref name="exceptionCreator"/> is provided.
-    /// </exception>
-    /// <seealso cref="IsWhitespace"/>
-    public static string Whitespace(this IGuardClause _,
-        string? value,
-        string? message = null,
-        Func<Exception>? exceptionCreator = null,
-        [CallerArgumentExpression(nameof(value))] string? paramName = null) =>
-        _.IsWhitespace(value, message, exceptionCreator, paramName);
 
     /// <summary>
     /// Throws if <paramref name="value"/> contains any control characters.

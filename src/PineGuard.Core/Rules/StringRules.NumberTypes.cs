@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.RegularExpressions;
 using PineGuard.Common;
 using PineGuard.Utils;
 
@@ -13,27 +12,13 @@ public static partial class StringRules
     /// <seealso href="https://pineguard.ai/docs/rules/string/numbertypes">String Number Types Rules documentation</seealso>
     public static partial class NumberTypes
     {
-        /// <summary>
-        /// A regular expression pattern matching an optional sign followed by one or more digits.
-        /// </summary>
-        public const string SignedIntegerPattern = @"^[\+\-]?\d+$";
-
-        /// <summary>
-        /// Returns a compiled <see cref="Regex"/> for matching signed integer strings.
-        /// </summary>
-        /// <returns>A culture-invariant regex matching <see cref="SignedIntegerPattern"/>.</returns>
-#if NET8_0_OR_GREATER
-        [GeneratedRegex(SignedIntegerPattern, RegexOptions.CultureInvariant)]
-        public static partial Regex SignedIntegerRegex();
-#else
-        public static Regex SignedIntegerRegex() => CompiledSignedIntegerRegex;
-        private static readonly Regex CompiledSignedIntegerRegex = new(SignedIntegerPattern, RegexOptions.CultureInvariant | RegexOptions.Compiled, System.TimeSpan.FromMilliseconds(250));
-#endif
+        private static readonly char[] DefaultAllowedDigitSeparatorsSource = [' ', '-'];
 
         /// <summary>
         /// The default set of allowed digit separator characters: space and hyphen.
         /// </summary>
-        public static readonly char[] DefaultAllowedDigitSeparators = [' ', '-'];
+        /// <remarks>Returns a fresh copy so callers cannot change the defaults used by later validations.</remarks>
+        public static char[] DefaultAllowedDigitSeparators => [.. DefaultAllowedDigitSeparatorsSource];
 
         /// <summary>
         /// Determines whether the specified string parses to a decimal with at most <paramref name="decimalPlaces"/> fractional digits.
@@ -96,8 +81,13 @@ public static partial class StringRules
         /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed integer is within the range; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInt32InRange(string? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive, NumberStyles styles = NumberStyles.Integer) =>
-            StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture) && RuleComparison.IsBetween(parsed, min, max, inclusion);
+        public static bool IsInRangeInt32(string? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive, NumberStyles styles = NumberStyles.Integer)
+        {
+            if (!EnumRules.IsDefined<Inclusion>(inclusion))
+                throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null);
+
+            return StringUtility.NumberTypes.TryParseInt32(value, out var parsed, styles, CultureInfo.InvariantCulture) && RuleComparison.IsInRange(parsed, min, max, inclusion);
+        }
 
         /// <summary>
         /// Determines whether the specified string parses to a 64-bit integer within [<paramref name="min"/>, <paramref name="max"/>].
@@ -108,7 +98,12 @@ public static partial class StringRules
         /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
         /// <param name="styles">The <see cref="NumberStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed integer is within the range; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInt64InRange(string? value, long min, long max, Inclusion inclusion = Inclusion.Inclusive, NumberStyles styles = NumberStyles.Integer) =>
-            StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles, CultureInfo.InvariantCulture) && RuleComparison.IsBetween(parsed, min, max, inclusion);
+        public static bool IsInRangeInt64(string? value, long min, long max, Inclusion inclusion = Inclusion.Inclusive, NumberStyles styles = NumberStyles.Integer)
+        {
+            if (!EnumRules.IsDefined<Inclusion>(inclusion))
+                throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null);
+
+            return StringUtility.NumberTypes.TryParseInt64(value, out var parsed, styles, CultureInfo.InvariantCulture) && RuleComparison.IsInRange(parsed, min, max, inclusion);
+        }
     }
 }

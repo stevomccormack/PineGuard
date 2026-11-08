@@ -70,6 +70,7 @@ public static class CsvUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
+            new("undefined comparison", ("a", ["a"], (StringComparison)99), false),
             new("null expected", ("a,b", null, StringComparison.OrdinalIgnoreCase), false),
             new("empty expected", ("a,b", [], StringComparison.OrdinalIgnoreCase), false),
             new("invalid header line", ("\"a", ["a"], StringComparison.OrdinalIgnoreCase), false),
@@ -152,6 +153,8 @@ public static class CsvUtilityTestData
 
         public static TheoryData<ValidCase> EdgeCases =>
         [
+            new("undefined comparison", ("1", ["a"], new Dictionary<string, CsvColumnType> { ["a"] = CsvColumnType.Int32 }, (StringComparison)99), false),
+            new("undefined mapped type", ("1", ["a"], new Dictionary<string, CsvColumnType> { ["a"] = (CsvColumnType)99 }, StringComparison.Ordinal), false),
             new("null header", ("1", null, new Dictionary<string, CsvColumnType> { ["a"] = CsvColumnType.Int32 }, StringComparison.OrdinalIgnoreCase), false),
             new("empty header", ("1", [], new Dictionary<string, CsvColumnType> { ["a"] = CsvColumnType.Int32 }, StringComparison.OrdinalIgnoreCase), false),
             new("header name whitespace", ("1", ["  "], new Dictionary<string, CsvColumnType> { ["a"] = CsvColumnType.Int32 }, StringComparison.OrdinalIgnoreCase), false),

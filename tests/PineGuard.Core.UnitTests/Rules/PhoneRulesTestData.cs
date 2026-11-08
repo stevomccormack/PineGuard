@@ -15,7 +15,8 @@ public static class PhoneRulesTestData
             new("index 2", 2, ')'),
             new("index 3", 3, '-'),
             new("index 4", 4, '.'),
-            new("index 5", 5, '/')
+            new("index 5", 5, '/'),
+            new("index 6", 6, ' ')
         ];
 
         public sealed record Case(string Name, int Value, char Expected)

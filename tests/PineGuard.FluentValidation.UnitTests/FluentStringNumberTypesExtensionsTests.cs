@@ -73,93 +73,93 @@ public sealed class FluentStringNumberTypesExtensionsTests(ITestOutputHelper out
         AssertResult(tc, result);
     }
 
-    private sealed class Int32InRangeValidator : AbstractValidator<Model>
+    private sealed class InRangeInt32Validator : AbstractValidator<Model>
     {
-        public Int32InRangeValidator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).Int32InRange(min, max, inclusion);
+        public InRangeInt32Validator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).InRangeInt32(min, max, inclusion);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.Int32InRange.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.Int32InRange))]
-    public void Int32InRange_BehavesAsExpected(FluentCase<(string text, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.InRangeInt32.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.InRangeInt32))]
+    public void InRangeInt32_BehavesAsExpected(FluentCase<(string text, int min, int max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (text, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = new Int32InRangeValidator(min, max, inclusion).Validate(new Model { Value = text });
+        var result = new InRangeInt32Validator(min, max, inclusion).Validate(new Model { Value = text });
 
         // Assert
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.Int32InRangeNull.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.Int32InRangeNull))]
-    public void Int32InRange_NullText_IsValid(FluentCase<string?> tc)
+    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.InRangeInt32Null.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.InRangeInt32Null))]
+    public void InRangeInt32_NullText_IsValid(FluentCase<string?> tc)
     {
         // Act
-        var result = new Int32InRangeValidator(1, 10, Inclusion.Inclusive).Validate(new Model { Value = tc.Value });
+        var result = new InRangeInt32Validator(1, 10, Inclusion.Inclusive).Validate(new Model { Value = tc.Value });
 
         // Assert
         AssertResult(tc, result);
     }
 
-    private sealed class Int32OutOfRangeValidator : AbstractValidator<Model>
+    private sealed class OutOfRangeInt32Validator : AbstractValidator<Model>
     {
-        public Int32OutOfRangeValidator() => RuleFor(x => x.Value).Int32OutOfRange(1, 10);
+        public OutOfRangeInt32Validator() => RuleFor(x => x.Value).OutOfRangeInt32(1, 10);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.Int32OutOfRange.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.Int32OutOfRange))]
-    public void Int32OutOfRange_BehavesAsExpected(FluentCase<string?> tc)
+    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.OutOfRangeInt32.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.OutOfRangeInt32))]
+    public void OutOfRangeInt32_BehavesAsExpected(FluentCase<string?> tc)
     {
         // Act
-        var result = new Int32OutOfRangeValidator().Validate(new Model { Value = tc.Value });
+        var result = new OutOfRangeInt32Validator().Validate(new Model { Value = tc.Value });
 
         // Assert
         AssertResult(tc, result);
     }
 
-    private sealed class Int64InRangeValidator : AbstractValidator<Model>
+    private sealed class InRangeInt64Validator : AbstractValidator<Model>
     {
-        public Int64InRangeValidator(long min, long max, Inclusion inclusion) => RuleFor(x => x.Value).Int64InRange(min, max, inclusion);
+        public InRangeInt64Validator(long min, long max, Inclusion inclusion) => RuleFor(x => x.Value).InRangeInt64(min, max, inclusion);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.Int64InRange.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.Int64InRange))]
-    public void Int64InRange_BehavesAsExpected(FluentCase<(string text, long min, long max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.InRangeInt64.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.InRangeInt64))]
+    public void InRangeInt64_BehavesAsExpected(FluentCase<(string text, long min, long max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (text, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = new Int64InRangeValidator(min, max, inclusion).Validate(new Model { Value = text });
+        var result = new InRangeInt64Validator(min, max, inclusion).Validate(new Model { Value = text });
 
         // Assert
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.Int64InRangeNull.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.Int64InRangeNull))]
-    public void Int64InRange_NullText_IsValid(FluentCase<string?> tc)
+    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.InRangeInt64Null.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.InRangeInt64Null))]
+    public void InRangeInt64_NullText_IsValid(FluentCase<string?> tc)
     {
         // Act
-        var result = new Int64InRangeValidator(1L, 10L, Inclusion.Inclusive).Validate(new Model { Value = tc.Value });
+        var result = new InRangeInt64Validator(1L, 10L, Inclusion.Inclusive).Validate(new Model { Value = tc.Value });
 
         // Assert
         AssertResult(tc, result);
     }
 
-    private sealed class Int64OutOfRangeValidator : AbstractValidator<Model>
+    private sealed class OutOfRangeInt64Validator : AbstractValidator<Model>
     {
-        public Int64OutOfRangeValidator() => RuleFor(x => x.Value).Int64OutOfRange(1L, 10L);
+        public OutOfRangeInt64Validator() => RuleFor(x => x.Value).OutOfRangeInt64(1L, 10L);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.Int64OutOfRange.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.Int64OutOfRange))]
-    public void Int64OutOfRange_BehavesAsExpected(FluentCase<string?> tc)
+    [MemberData(nameof(FluentStringNumberTypesExtensionsTestData.OutOfRangeInt64.Cases), MemberType = typeof(FluentStringNumberTypesExtensionsTestData.OutOfRangeInt64))]
+    public void OutOfRangeInt64_BehavesAsExpected(FluentCase<string?> tc)
     {
         // Act
-        var result = new Int64OutOfRangeValidator().Validate(new Model { Value = tc.Value });
+        var result = new OutOfRangeInt64Validator().Validate(new Model { Value = tc.Value });
 
         // Assert
         AssertResult(tc, result);

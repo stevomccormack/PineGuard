@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace PineGuard.Utils;
@@ -145,7 +146,7 @@ public static class CultureInfoUtility
     /// CultureInfoUtility.TryGetCultureInfo("en", out var cultureInfo); // true, cultureInfo.Name = "en"
     /// </code>
     /// </example>
-    public static bool TryGetCultureInfo(string? isoLanguageAlpha2Code, out CultureInfo? cultureInfo) =>
+    public static bool TryGetCultureInfo(string? isoLanguageAlpha2Code, [NotNullWhen(true)] out CultureInfo? cultureInfo) =>
         TryGetCultureInfo(isoLanguageAlpha2Code, regionCode: null, out cultureInfo);
 
     /// <summary>
@@ -172,7 +173,7 @@ public static class CultureInfoUtility
     /// CultureInfoUtility.TryGetCultureInfo("en", "US", out var cultureInfo); // true, cultureInfo.Name = "en-US"
     /// </code>
     /// </example>
-    public static bool TryGetCultureInfo(string? isoLanguageAlpha2Code, string? regionCode, out CultureInfo? cultureInfo)
+    public static bool TryGetCultureInfo(string? isoLanguageAlpha2Code, string? regionCode, [NotNullWhen(true)] out CultureInfo? cultureInfo)
     {
         cultureInfo = null;
 

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 namespace PineGuard.Utils;
 
 /// <summary>
@@ -12,7 +13,7 @@ public static class UriUtility
     /// <param name="value">The URI string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="uri">When this method returns, contains the parsed URI if successful; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the URI was parsed successfully; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseAbsolute(string? value, out Uri? uri)
+    public static bool TryParseAbsolute(string? value, [NotNullWhen(true)] out Uri? uri)
     {
         uri = null;
 
@@ -33,7 +34,7 @@ public static class UriUtility
     /// <param name="value">The URI string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="uri">When this method returns, contains the parsed URI if successful; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the URI was parsed successfully; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseRelative(string? value, out Uri? uri)
+    public static bool TryParseRelative(string? value, [NotNullWhen(true)] out Uri? uri)
     {
         uri = null;
 
@@ -46,9 +47,9 @@ public static class UriUtility
     /// <param name="value">The URL string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="uri">When this method returns, contains the parsed URI if successful; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the URL was parsed and uses HTTP or HTTPS; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseUrl(string? value, out Uri? uri)
+    public static bool TryParseUrl(string? value, [NotNullWhen(true)] out Uri? uri)
     {
-        if (!TryParseAbsolute(value, out uri) || uri is null)
+        if (!TryParseAbsolute(value, out uri))
             return false;
 
         return IsHttpOrHttps(uri);
@@ -60,9 +61,9 @@ public static class UriUtility
     /// <param name="value">The URL string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="uri">When this method returns, contains the parsed URI if successful; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the URL was parsed and uses HTTPS; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseHttpsUrl(string? value, out Uri? uri)
+    public static bool TryParseHttpsUrl(string? value, [NotNullWhen(true)] out Uri? uri)
     {
-        if (!TryParseAbsolute(value, out uri) || uri is null)
+        if (!TryParseAbsolute(value, out uri))
             return false;
 
         return IsHttps(uri);
@@ -74,9 +75,9 @@ public static class UriUtility
     /// <param name="value">The URL string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="uri">When this method returns, contains the parsed URI if successful; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the URL was parsed and uses HTTP; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseHttpUrl(string? value, out Uri? uri)
+    public static bool TryParseHttpUrl(string? value, [NotNullWhen(true)] out Uri? uri)
     {
-        if (!TryParseAbsolute(value, out uri) || uri is null)
+        if (!TryParseAbsolute(value, out uri))
             return false;
 
         return IsHttp(uri);
@@ -88,9 +89,9 @@ public static class UriUtility
     /// <param name="value">The URI string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <param name="uri">When this method returns, contains the parsed URI if successful; otherwise, <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the URI was parsed and is a file URI; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseFileUri(string? value, out Uri? uri)
+    public static bool TryParseFileUri(string? value, [NotNullWhen(true)] out Uri? uri)
     {
-        if (!TryParseAbsolute(value, out uri) || uri is null)
+        if (!TryParseAbsolute(value, out uri))
             return false;
 
         return uri.IsFile;
@@ -149,7 +150,7 @@ public static class UriUtility
     {
         scheme = string.Empty;
 
-        if (!TryParseAbsolute(value, out var uri) || uri is null)
+        if (!TryParseAbsolute(value, out var uri))
             return false;
 
         scheme = uri.Scheme;

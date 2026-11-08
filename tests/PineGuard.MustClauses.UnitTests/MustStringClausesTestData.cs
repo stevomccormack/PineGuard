@@ -10,8 +10,15 @@ namespace PineGuard.MustClauses.UnitTests;
 
 public static partial class MustStringClausesTestData
 {
+    public static TheoryData<string?, StringComparison> InvalidComparisons => new()
+    {
+        { null, (StringComparison)42 },
+        { "value", (StringComparison)(-1) }
+    };
+
     public static class NullOrEmpty
     {
+
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("null", null, true),
@@ -108,7 +115,7 @@ public static partial class MustStringClausesTestData
             : IsCase<(string? Value, int Length)>(Name, Value, Expected);
     }
 
-    public static class LengthBetween
+    public static class LengthInRange
     {
         public static TheoryData<ValidCase> ValidCases =>
         [

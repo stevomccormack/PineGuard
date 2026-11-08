@@ -151,7 +151,7 @@ public static class GuardStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the NotBetweenDateOnly constraint.
+    /// Throws if <paramref name="value"/> violates the OutOfRangeDateOnly constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -170,8 +170,8 @@ public static class GuardStringDateOnlyClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringDateOnlyClauses.BetweenDateOnly"/>
-    public static DateOnly NotBetweenDateOnly(this IGuardClause _,
+    /// <seealso cref="MustStringDateOnlyClauses.InRangeDateOnly"/>
+    public static DateOnly OutOfRangeDateOnly(this IGuardClause _,
         string? value,
         DateOnly min,
         DateOnly max,
@@ -181,7 +181,7 @@ public static class GuardStringDateOnlyClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.BetweenDateOnly(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.InRangeDateOnly(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -189,7 +189,7 @@ public static class GuardStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the BetweenDateOnly constraint.
+    /// Throws if <paramref name="value"/> violates the InRangeDateOnly constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -208,8 +208,8 @@ public static class GuardStringDateOnlyClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringDateOnlyClauses.NotBetweenDateOnly"/>
-    public static DateOnly BetweenDateOnly(this IGuardClause _,
+    /// <seealso cref="MustStringDateOnlyClauses.OutOfRangeDateOnly"/>
+    public static DateOnly InRangeDateOnly(this IGuardClause _,
         string? value,
         DateOnly min,
         DateOnly max,
@@ -219,7 +219,7 @@ public static class GuardStringDateOnlyClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotBetweenDateOnly(value, min, max, inclusion, styles, paramName); // Guard.Against.BetweenDateOnly => Must.Be.NotBetweenDateOnly (complement)
+        var result = Must.Be.OutOfRangeDateOnly(value, min, max, inclusion, styles, paramName); // Guard.Against.InRangeDateOnly => Must.Be.OutOfRangeDateOnly (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -607,7 +607,7 @@ public static class GuardStringDateOnlyClauses
     /// </exception>
     /// <seealso cref="MustStringDateOnlyClauses.NotChronologicalDateOnly"/>
     public static DateOnly ChronologicalDateOnly(this IGuardClause _,
-        string start,
+        string? start,
         string end,
         Inclusion inclusion = Inclusion.Exclusive,
         DateTimeStyles styles = DefaultStyles,
@@ -645,11 +645,11 @@ public static class GuardStringDateOnlyClauses
     /// </exception>
     /// <seealso cref="MustStringDateOnlyClauses.NotOverlappingDateOnly"/>
     public static DateOnly OverlappingDateOnly(this IGuardClause _,
-        string start1,
+        string? start1,
         string end1,
         string start2,
         string end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
@@ -685,11 +685,11 @@ public static class GuardStringDateOnlyClauses
     /// </exception>
     /// <seealso cref="MustStringDateOnlyClauses.OverlappingDateOnly"/>
     public static DateOnly NotOverlappingDateOnly(this IGuardClause _,
-        string start1,
+        string? start1,
         string end1,
         string start2,
         string end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
@@ -721,8 +721,8 @@ public static class GuardStringDateOnlyClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringDateOnlyClauses.MinimumAge"/>
-    public static DateOnly BelowMinimumAge(this IGuardClause _,
+    /// <seealso cref="MustStringDateOnlyClauses.MinimumAgeDateOnly"/>
+    public static DateOnly BelowMinimumAgeDateOnly(this IGuardClause _,
         string? value,
         int years,
         DateTimeStyles styles = DefaultStyles,
@@ -731,7 +731,7 @@ public static class GuardStringDateOnlyClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.MinimumAge(value, years, styles, timeProvider, paramName: paramName); // Guard.Against.BelowMinimumAge => Must.Be.MinimumAge (complement)
+        var result = Must.Be.MinimumAgeDateOnly(value, years, styles, timeProvider, paramName: paramName); // Guard.Against.BelowMinimumAge => Must.Be.MinimumAge (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

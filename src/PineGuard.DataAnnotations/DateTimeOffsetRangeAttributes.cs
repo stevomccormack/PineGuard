@@ -33,7 +33,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalDateTimeOffsetRangeAttribute(Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Order.NotChronological)
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Order.NotChronological, allowNull: false)
 {
     /// <summary>Gets whether the range boundaries are included or excluded when evaluating the constraint.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -41,9 +41,9 @@ public sealed class ChronologicalDateTimeOffsetRangeAttribute(Inclusion inclusio
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range = (DateTimeOffsetRange)value!;
+        var range = ((DateTimeOffsetRange?)value).GetValueOrDefault();
         var result = Must.Be.Chronological(range, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -59,7 +59,7 @@ public sealed class ChronologicalDateTimeOffsetRangeAttribute(Inclusion inclusio
 /// <para>
 /// The <paramref name="start2"/> and <paramref name="end2"/> constructor arguments are parsed from
 /// <see cref="DateTimeOffset"/> string format (e.g., <c>"2024-01-01T00:00:00+00:00"</c>) using invariant
-/// culture. Defaults to <see cref="Inclusion.Exclusive"/> boundaries.
+/// culture. Defaults to <see cref="Inclusion.Inclusive"/> boundaries.
 /// </para>
 /// </remarks>
 /// <example>
@@ -75,8 +75,8 @@ public sealed class ChronologicalDateTimeOffsetRangeAttribute(Inclusion inclusio
 /// <seealso cref="MustDateTimeOffsetRangeClauses.Overlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OverlappingDateTimeOffsetRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Overlap.Missing)
+public sealed class OverlappingDateTimeOffsetRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Overlap.Missing, allowNull: false)
 {
     /// <summary>Gets the reference range that the annotated range must overlap.</summary>
     public DateTimeOffsetRange Range2 { get; } = new(
@@ -89,9 +89,9 @@ public sealed class OverlappingDateTimeOffsetRangeAttribute(string start2, strin
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range1 = (DateTimeOffsetRange)value!;
+        var range1 = ((DateTimeOffsetRange?)value).GetValueOrDefault();
         var result = Must.Be.Overlapping(range1, Range2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -107,7 +107,7 @@ public sealed class OverlappingDateTimeOffsetRangeAttribute(string start2, strin
 /// <para>
 /// The <paramref name="start2"/> and <paramref name="end2"/> constructor arguments are parsed from
 /// <see cref="DateTimeOffset"/> string format using invariant culture. Defaults to
-/// <see cref="Inclusion.Exclusive"/> boundaries.
+/// <see cref="Inclusion.Inclusive"/> boundaries.
 /// </para>
 /// </remarks>
 /// <example>
@@ -123,8 +123,8 @@ public sealed class OverlappingDateTimeOffsetRangeAttribute(string start2, strin
 /// <seealso cref="MustDateTimeOffsetRangeClauses.NotOverlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOverlappingDateTimeOffsetRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Overlap.Present)
+public sealed class NotOverlappingDateTimeOffsetRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Overlap.Present, allowNull: false)
 {
     /// <summary>Gets the reference range that the annotated range must not overlap.</summary>
     public DateTimeOffsetRange Range2 { get; } = new(
@@ -137,9 +137,9 @@ public sealed class NotOverlappingDateTimeOffsetRangeAttribute(string start2, st
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range1 = (DateTimeOffsetRange)value!;
+        var range1 = ((DateTimeOffsetRange?)value).GetValueOrDefault();
         var result = Must.Be.NotOverlapping(range1, Range2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -171,7 +171,7 @@ public sealed class NotOverlappingDateTimeOffsetRangeAttribute(string start2, st
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ContainsDateTimeOffsetRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Bounds.NotContains)
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Bounds.NotContains, allowNull: false)
 {
     /// <summary>Gets the date/time that the annotated range must contain.</summary>
     public DateTimeOffset Value { get; } = DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
@@ -182,9 +182,9 @@ public sealed class ContainsDateTimeOffsetRangeAttribute(string value, Inclusion
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range = (DateTimeOffsetRange)value!;
+        var range = ((DateTimeOffsetRange?)value).GetValueOrDefault();
         var result = Must.Be.Contains(range, Value, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -216,7 +216,7 @@ public sealed class ContainsDateTimeOffsetRangeAttribute(string value, Inclusion
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimeoffsetrange">DateTimeOffsetRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotContainsDateTimeOffsetRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Bounds.Contains)
+    : ValidationAttributeBase(typeof(DateTimeOffsetRange), MustCodes.Range.Bounds.Contains, allowNull: false)
 {
     /// <summary>Gets the date/time that the annotated range must not contain.</summary>
     public DateTimeOffset Value { get; } = DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
@@ -227,8 +227,8 @@ public sealed class NotContainsDateTimeOffsetRangeAttribute(string value, Inclus
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range = (DateTimeOffsetRange)value!;
+        var range = ((DateTimeOffsetRange?)value).GetValueOrDefault();
         var result = Must.Be.NotContains(range, Value, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }

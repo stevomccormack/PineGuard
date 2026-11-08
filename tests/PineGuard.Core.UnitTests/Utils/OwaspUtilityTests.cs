@@ -1,10 +1,22 @@
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
 using PineGuard.Utils;
 
 namespace PineGuard.Core.UnitTests.Utils;
 
 public sealed class OwaspUtilityTests : BaseUnitTest
 {
+    [Theory]
+    [MemberData(nameof(OwaspUtilityTestData.ContainsXssRisk.Cases), MemberType = typeof(OwaspUtilityTestData.ContainsXssRisk))]
+    public void ContainsXssRisk_ReturnsExpected(RuleCase<string?> testCase)
+    {
+        // Act
+        var result = OwaspUtility.ContainsXssRisk(testCase.Value);
+
+        // Assert
+        Assert.Equal(testCase.Expected.IsValid, result);
+    }
+
     [Theory]
     [MemberData(nameof(OwaspUtilityTestData.ContainsSqlInjectionRisk.ValidCases), MemberType = typeof(OwaspUtilityTestData.ContainsSqlInjectionRisk))]
     [MemberData(nameof(OwaspUtilityTestData.ContainsSqlInjectionRisk.EdgeCases), MemberType = typeof(OwaspUtilityTestData.ContainsSqlInjectionRisk))]

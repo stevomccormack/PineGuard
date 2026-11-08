@@ -65,7 +65,7 @@ public static class GuardDateOnlyRangeClauses
     public static DateOnlyRange Overlapping(this IGuardClause _,
         DateOnlyRange range1,
         DateOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)
@@ -99,7 +99,7 @@ public static class GuardDateOnlyRangeClauses
     public static DateOnlyRange NotOverlapping(this IGuardClause _,
         DateOnlyRange range1,
         DateOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)

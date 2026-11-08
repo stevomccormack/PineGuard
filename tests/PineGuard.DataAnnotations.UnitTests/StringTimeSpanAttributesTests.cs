@@ -14,12 +14,12 @@ public sealed class StringTimeSpanAttributesTests
     }
 
     [Theory]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString))]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString.EdgeCases), MemberType = typeof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString))]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString.InvalidCases), MemberType = typeof(StringTimeSpanAttributesTestData.DurationBetweenTimeSpanString))]
-    public void DurationBetweenTimeSpanString_ShouldReturnExpected(StringTimeSpanAttributesTestData.ValidCase testCase)
+    [MemberData(nameof(StringTimeSpanAttributesTestData.InRangeTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.InRangeTimeSpanString))]
+    [MemberData(nameof(StringTimeSpanAttributesTestData.InRangeTimeSpanString.EdgeCases), MemberType = typeof(StringTimeSpanAttributesTestData.InRangeTimeSpanString))]
+    [MemberData(nameof(StringTimeSpanAttributesTestData.InRangeTimeSpanString.InvalidCases), MemberType = typeof(StringTimeSpanAttributesTestData.InRangeTimeSpanString))]
+    public void InRangeTimeSpanString_ShouldReturnExpected(StringTimeSpanAttributesTestData.ValidCase testCase)
     {
-        var attribute = new DurationBetweenTimeSpanStringAttribute("00:05:00", "02:00:00");
+        InRangeTimeSpanStringAttribute attribute = new InRangeTimeSpanStringAttribute("00:05:00", "02:00:00");
         Assert.Equal(MustCodes.Time.Duration.OutOfRange, attribute.Code);
         Verify(attribute, testCase);
     }
@@ -39,9 +39,9 @@ public sealed class StringTimeSpanAttributesTests
         => Verify(new LessThanTimeSpanStringAttribute("02:00:00"), testCase);
 
     [Theory]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.NotDurationBetweenTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.NotDurationBetweenTimeSpanString))]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.NotDurationBetweenTimeSpanString.EdgeCases), MemberType = typeof(StringTimeSpanAttributesTestData.NotDurationBetweenTimeSpanString))]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.NotDurationBetweenTimeSpanString.InvalidCases), MemberType = typeof(StringTimeSpanAttributesTestData.NotDurationBetweenTimeSpanString))]
-    public void NotDurationBetweenTimeSpanString_ShouldReturnExpected(StringTimeSpanAttributesTestData.ValidCase testCase)
-        => Verify(new NotDurationBetweenTimeSpanStringAttribute("00:05:00", "02:00:00"), testCase);
+    [MemberData(nameof(StringTimeSpanAttributesTestData.OutOfRangeTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.OutOfRangeTimeSpanString))]
+    [MemberData(nameof(StringTimeSpanAttributesTestData.OutOfRangeTimeSpanString.EdgeCases), MemberType = typeof(StringTimeSpanAttributesTestData.OutOfRangeTimeSpanString))]
+    [MemberData(nameof(StringTimeSpanAttributesTestData.OutOfRangeTimeSpanString.InvalidCases), MemberType = typeof(StringTimeSpanAttributesTestData.OutOfRangeTimeSpanString))]
+    public void OutOfRangeTimeSpanString_ShouldReturnExpected(StringTimeSpanAttributesTestData.ValidCase testCase)
+        => Verify(new OutOfRangeTimeSpanStringAttribute("00:05:00", "02:00:00"), testCase);
 }

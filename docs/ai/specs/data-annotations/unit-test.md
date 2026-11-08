@@ -334,13 +334,13 @@ public void InCidrRange_BehavesAsExpected(DataAnnotationCase tc)
 ## Pattern D — Temporal / Range Attribute
 
 For attributes parameterised with reference date/time/timespan values
-(e.g., `BetweenTimeOnlyAttribute(min, max)`, `BeforeDateOnlyAttribute(cutoff)`).
+(e.g., `InRangeTimeOnlyAttribute(min, max)`, `BeforeDateOnlyAttribute(cutoff)`).
 Use `private static readonly` fields sourced from fixture named fields or stable hardcoded values.
 
 **TestData:**
 
 ```csharp
-public static class BetweenTimeOnly
+public static class InRangeTimeOnly
 {
     private static readonly TimeOnly Min = F.IsKnownTimes.T1000!.Value;
     private static readonly TimeOnly Max = F.IsKnownTimes.T1200!.Value;
@@ -361,13 +361,13 @@ public static class BetweenTimeOnly
 
 ```csharp
 [Theory]
-[MemberData(nameof(TimeOnlyAttributesTestData.BetweenTimeOnly.Cases), MemberType = typeof(TimeOnlyAttributesTestData.BetweenTimeOnly))]
-public void BetweenTimeOnly_BehavesAsExpected(DataAnnotationCase tc)
+[MemberData(nameof(TimeOnlyAttributesTestData.InRangeTimeOnly.Cases), MemberType = typeof(TimeOnlyAttributesTestData.InRangeTimeOnly))]
+public void InRangeTimeOnly_BehavesAsExpected(DataAnnotationCase tc)
 {
     // Arrange
-    var attr = new BetweenTimeOnlyAttribute(
-        TimeOnlyAttributesTestData.BetweenTimeOnly.MinParam,
-        TimeOnlyAttributesTestData.BetweenTimeOnly.MaxParam);
+    var attr = new InRangeTimeOnlyAttribute(
+        TimeOnlyAttributesTestData.InRangeTimeOnly.MinParam,
+        TimeOnlyAttributesTestData.InRangeTimeOnly.MaxParam);
     var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
     // Act

@@ -42,20 +42,20 @@ public class MustDateTimeOffsetClausesTests(ITestOutputHelper output) : BaseMust
     }
 
     [Theory]
-    [MemberData(nameof(MustDateTimeOffsetClausesTestData.Between.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.Between))]
-    public void Between_Checks(MustDateTimeOffsetClausesTestData.Between.ValidCase testCase)
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.InRange.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.InRange))]
+    public void InRange_Checks(MustDateTimeOffsetClausesTestData.InRange.ValidCase testCase)
     {
         var (input, min, max) = testCase.Value;
-        var result = Must.Be.Between(input, min, max);
+        var result = Must.Be.InRange(input, min, max);
         Assert.Equal(testCase.Expected, result.Success);
     }
 
     [Theory]
-    [MemberData(nameof(MustDateTimeOffsetClausesTestData.NotBetween.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.NotBetween))]
-    public void NotBetween_Checks(MustDateTimeOffsetClausesTestData.NotBetween.ValidCase testCase)
+    [MemberData(nameof(MustDateTimeOffsetClausesTestData.OutOfRange.ValidCases), MemberType = typeof(MustDateTimeOffsetClausesTestData.OutOfRange))]
+    public void OutOfRange_Checks(MustDateTimeOffsetClausesTestData.OutOfRange.ValidCase testCase)
     {
         var (input, min, max) = testCase.Value;
-        var result = Must.Be.NotBetween(input, min, max);
+        var result = Must.Be.OutOfRange(input, min, max);
         Assert.Equal(testCase.Expected, result.Success);
     }
 

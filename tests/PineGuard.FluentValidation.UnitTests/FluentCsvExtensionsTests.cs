@@ -60,4 +60,34 @@ public sealed class FluentCsvExtensionsTests(ITestOutputHelper output) : BaseFlu
         var result = new CsvRowLineHeaderValidator(FluentCsvExtensionsTestData.CsvRowLineWithHeader.Header, FluentCsvExtensionsTestData.CsvRowLineWithHeader.Types).Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(FluentCsvExtensionsTestData.ConfiguredSeparator.Cases), MemberType = typeof(FluentCsvExtensionsTestData.ConfiguredSeparator))]
+    public void CsvLine_UsesConfiguredSeparator(FluentCase<(string? value, char separator)> tc)
+    {
+        // Arrange
+        var validator = new InlineValidator<Model>();
+        validator.RuleFor(x => x.Value).CsvLine(tc.Value.separator);
+
+        // Act
+        var result = validator.Validate(new Model { Value = tc.Value.value });
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentCsvExtensionsTestData.OptionalValue.Cases), MemberType = typeof(FluentCsvExtensionsTestData.OptionalValue))]
+    public void CsvFamily_SkipsAbsentValuesWithValidConfiguration(FluentCase<string?> tc)
+    {
+        // Act
+        var header = new CsvHeaderLineValidator(["a"]).Validate(new Model { Value = tc.Value });
+        var row = new CsvRowLineSchemaValidator([new CsvColumnSchema("a", CsvColumnType.String)]).Validate(new Model { Value = tc.Value });
+        var mapped = new CsvRowLineHeaderValidator(["a"], new Dictionary<string, CsvColumnType> { ["a"] = CsvColumnType.String }).Validate(new Model { Value = tc.Value });
+
+        // Assert
+        AssertResult(tc, header);
+        AssertResult(tc, row);
+        AssertResult(tc, mapped);
+    }
 }

@@ -98,24 +98,24 @@ public sealed class FluentCollectionExtensionsTests(ITestOutputHelper output) : 
         AssertResult(tc, result);
     }
 
-    // FluentCollectionExtensions.HasCountBetween
+    // FluentCollectionExtensions.HasCountInRange
     [Theory]
-    [MemberData(nameof(FluentCollectionExtensionsTestData.HasCountBetween.Cases), MemberType = typeof(FluentCollectionExtensionsTestData.HasCountBetween))]
-    public void HasCountBetween_BehavesAsExpected(FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentCollectionExtensionsTestData.HasCountInRange.Cases), MemberType = typeof(FluentCollectionExtensionsTestData.HasCountInRange))]
+    public void HasCountInRange_BehavesAsExpected(FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         var validator = new InlineValidator<Model>();
-        validator.RuleFor(x => x.Value).HasCountBetween(tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        validator.RuleFor(x => x.Value).HasCountInRange(tc.Value.min, tc.Value.max, tc.Value.inclusion);
         var result = validator.Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 
-    // FluentCollectionExtensions.NotHasCountBetween
+    // FluentCollectionExtensions.NotHasCountInRange
     [Theory]
-    [MemberData(nameof(FluentCollectionExtensionsTestData.NotHasCountBetween.Cases), MemberType = typeof(FluentCollectionExtensionsTestData.NotHasCountBetween))]
-    public void NotHasCountBetween_BehavesAsExpected(FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentCollectionExtensionsTestData.NotHasCountInRange.Cases), MemberType = typeof(FluentCollectionExtensionsTestData.NotHasCountInRange))]
+    public void NotHasCountInRange_BehavesAsExpected(FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         var validator = new InlineValidator<Model>();
-        validator.RuleFor(x => x.Value).NotHasCountBetween(tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        validator.RuleFor(x => x.Value).NotHasCountInRange(tc.Value.min, tc.Value.max, tc.Value.inclusion);
         var result = validator.Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
@@ -262,4 +262,55 @@ public sealed class FluentCollectionExtensionsTests(ITestOutputHelper output) : 
         var result = validator.Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
+
+    private sealed record NullableValueModel
+    {
+        public IEnumerable<int?>? Value { get; init; }
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentCollectionExtensionsTestData.NullableValueItems), MemberType = typeof(FluentCollectionExtensionsTestData))]
+    public void NotContainsNullItems_ValueTypes_ValidatesElements(FluentCase<int?[]?> testCase)
+    {
+        var validator = new InlineValidator<NullableValueModel>();
+        validator.RuleFor(x => x.Value).NotContainsNullItems();
+        AssertResult(testCase, validator.Validate(new NullableValueModel { Value = testCase.Value }));
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentCollectionExtensionsTestData.ComparerItems), MemberType = typeof(FluentCollectionExtensionsTestData))]
+    public void Membership_ForwardsExplicitComparer(FluentCase<string[]> testCase)
+    {
+        // Arrange
+        var value = testCase.Value;
+        var validator = new InlineValidator<Model>();
+        validator.RuleFor(x => x.Value).Contains("abc", StringComparer.OrdinalIgnoreCase);
+        validator.RuleFor(x => x.Value).NotContains("abc", StringComparer.Ordinal);
+        validator.RuleFor(x => x.Value).SubsetOf(new[] { "abc" }, StringComparer.OrdinalIgnoreCase);
+        validator.RuleFor(x => x.Value).NotSubsetOf(new[] { "abc" }, StringComparer.Ordinal);
+        Assert.True(validator.Validate(new Model { Value = value }).IsValid);
+    }
+
+
+    [Theory]
+    [MemberData(nameof(FluentCollectionExtensionsTestData.NullValueConfiguration), MemberType = typeof(FluentCollectionExtensionsTestData))]
+    public void NullCollection_SkipsValueValidationButRetainsConfigurationFailures(FluentCase<(IEnumerable<string>? Other, int Min, int Max, Inclusion Inclusion)> testCase)
+    {
+        // Arrange
+        var (other, min, max, inclusion) = testCase.Value;
+        var validator = new InlineValidator<Model>();
+        validator.RuleFor(x => x.Value).Contains("a");
+        validator.RuleFor(x => x.Value).NotContains("a");
+        validator.RuleFor(x => x.Value).SubsetOf(other);
+        validator.RuleFor(x => x.Value).NotSubsetOf(other);
+        validator.RuleFor(x => x.Value).HasCountInRange(min, max, inclusion);
+        validator.RuleFor(x => x.Value).NotHasCountInRange(min, max, inclusion);
+
+        // Act
+        var result = validator.Validate(new Model { Value = null });
+
+        // Assert
+        AssertResult(testCase, result);
+    }
+
 }

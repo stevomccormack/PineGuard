@@ -7,14 +7,14 @@ namespace PineGuard.GuardClauses.UnitTests;
 public sealed class GuardTimeOnlyClausesTests(ITestOutputHelper output) : BaseGuardUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(GuardTimeOnlyClausesTestData.Between.Cases), MemberType = typeof(GuardTimeOnlyClausesTestData.Between))]
-    public void Between_BehavesAsExpected(GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
-    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.Between(value, tc.Value.min, tc.Value.max, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.Between(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
+    [MemberData(nameof(GuardTimeOnlyClausesTestData.InRange.Cases), MemberType = typeof(GuardTimeOnlyClausesTestData.InRange))]
+    public void InRange_BehavesAsExpected(GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
+    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
 
     [Theory]
-    [MemberData(nameof(GuardTimeOnlyClausesTestData.NotBetween.Cases), MemberType = typeof(GuardTimeOnlyClausesTestData.NotBetween))]
-    public void NotBetween_BehavesAsExpected(GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
-    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.NotBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.NotBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
+    [MemberData(nameof(GuardTimeOnlyClausesTestData.OutOfRange.Cases), MemberType = typeof(GuardTimeOnlyClausesTestData.OutOfRange))]
+    public void OutOfRange_BehavesAsExpected(GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
+    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
 
     [Theory]
     [MemberData(nameof(GuardTimeOnlyClausesTestData.Before.Cases), MemberType = typeof(GuardTimeOnlyClausesTestData.Before))]

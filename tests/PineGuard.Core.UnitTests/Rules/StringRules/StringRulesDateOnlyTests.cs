@@ -53,14 +53,14 @@ public sealed class StringRulesDateOnlyTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesDateOnlyTestData.IsBetween.Cases), MemberType = typeof(StringRulesDateOnlyTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(RuleCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(StringRulesDateOnlyTestData.IsInRange.Cases), MemberType = typeof(StringRulesDateOnlyTestData.IsInRange))]
+    public void IsInRange_BehavesAsExpected(RuleCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = PineGuard.Rules.StringRules.DateOnly.IsBetween(value, min, max, inclusion);
+        var result = PineGuard.Rules.StringRules.DateOnly.IsInRange(value, min, max, inclusion);
 
         // Assert
         AssertResult(tc, result);

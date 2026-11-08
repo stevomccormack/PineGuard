@@ -30,11 +30,11 @@ namespace PineGuard.DataAnnotations;
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="LengthBetweenAttribute"/>
+/// <seealso cref="LengthInRangeAttribute"/>
 /// <seealso cref="MustStringClauses.ExactLength"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.Mismatch)
+public sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.Mismatch, allowNull: false)
 {
     /// <summary>Gets the exact character length required.</summary>
     public int Length { get; } = length;
@@ -42,9 +42,9 @@ public sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(t
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.ExactLength(strValue, Length, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -54,7 +54,7 @@ public sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(t
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringClauses.LengthBetween"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustStringClauses.LengthInRange"/>. Supported on properties, fields, and
 /// parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
@@ -65,16 +65,16 @@ public sealed class ExactLengthAttribute(int length) : ValidationAttributeBase(t
 /// <code>
 /// public class UsernameModel
 /// {
-///     [LengthBetween(3, 20)]
+///     [LengthInRange(3, 20)]
 ///     public string Username { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="ExactLengthAttribute"/>
-/// <seealso cref="MustStringClauses.LengthBetween"/>
+/// <seealso cref="MustStringClauses.LengthInRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LengthBetweenAttribute(int min, int max) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.OutOfRange)
+public sealed class LengthInRangeAttribute(int min, int max) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.OutOfRange, allowNull: false)
 {
     /// <summary>Gets the minimum character length (inclusive).</summary>
     public int Min { get; } = min;
@@ -85,9 +85,9 @@ public sealed class LengthBetweenAttribute(int min, int max) : ValidationAttribu
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.LengthBetween(strValue, Min, Max, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.LengthInRange(strValue, Min, Max, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -117,7 +117,7 @@ public sealed class LengthBetweenAttribute(int min, int max) : ValidationAttribu
 /// <seealso cref="MustStringClauses.LongerThan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LongerThanAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooShort)
+public sealed class LongerThanAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooShort, allowNull: false)
 {
     /// <summary>Gets the minimum character count that the value must exceed (exclusive).</summary>
     public int Length { get; } = length;
@@ -125,9 +125,9 @@ public sealed class LongerThanAttribute(int length) : ValidationAttributeBase(ty
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.LongerThan(strValue, Length, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -157,7 +157,7 @@ public sealed class LongerThanAttribute(int length) : ValidationAttributeBase(ty
 /// <seealso cref="MustStringClauses.ShorterThan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ShorterThanAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooLong)
+public sealed class ShorterThanAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooLong, allowNull: false)
 {
     /// <summary>Gets the maximum character count that the value must stay below (exclusive).</summary>
     public int Length { get; } = length;
@@ -165,9 +165,9 @@ public sealed class ShorterThanAttribute(int length) : ValidationAttributeBase(t
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.ShorterThan(strValue, Length, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -622,7 +622,7 @@ public sealed class NotNullOrWhiteSpaceStringAttribute() : ValidationAttributeBa
 /// <seealso cref="MustStringClauses.LongerThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LongerThanOrEqualAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooShort)
+public sealed class LongerThanOrEqualAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooShort, allowNull: false)
 {
     /// <summary>Gets the minimum character length (inclusive).</summary>
     public int Length { get; } = length;
@@ -630,9 +630,9 @@ public sealed class LongerThanOrEqualAttribute(int length) : ValidationAttribute
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.LongerThanOrEqual(strValue, Length, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -662,7 +662,7 @@ public sealed class LongerThanOrEqualAttribute(int length) : ValidationAttribute
 /// <seealso cref="MustStringClauses.ShorterThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ShorterThanOrEqualAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooLong)
+public sealed class ShorterThanOrEqualAttribute(int length) : ValidationAttributeBase(typeof(string), MustCodes.Text.Length.TooLong, allowNull: false)
 {
     /// <summary>Gets the maximum character length (inclusive).</summary>
     public int Length { get; } = length;
@@ -670,9 +670,9 @@ public sealed class ShorterThanOrEqualAttribute(int length) : ValidationAttribut
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.ShorterThanOrEqual(strValue, Length, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -1461,7 +1461,7 @@ public sealed class ContainsAnyAttribute(char[] characters) : ValidationAttribut
 /// <seealso cref="MustStringClauses.Contains"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ContainsAttribute(string substring) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotContains)
+public sealed class ContainsAttribute(string substring) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotContains, allowNull: false)
 {
     /// <summary>Gets the substring the value must contain.</summary>
     public string Substring { get; } = substring;
@@ -1472,9 +1472,9 @@ public sealed class ContainsAttribute(string substring) : ValidationAttributeBas
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.Contains(strValue, Substring, Comparison, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -1504,7 +1504,7 @@ public sealed class ContainsAttribute(string substring) : ValidationAttributeBas
 /// <seealso cref="MustStringClauses.NotContains"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotContainsAttribute(string substring) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.Contains)
+public sealed class NotContainsAttribute(string substring) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.Contains, allowNull: false)
 {
     /// <summary>Gets the substring that must not appear in the value.</summary>
     public string Substring { get; } = substring;
@@ -1515,9 +1515,9 @@ public sealed class NotContainsAttribute(string substring) : ValidationAttribute
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotContains(strValue, Substring, Comparison, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -1547,7 +1547,7 @@ public sealed class NotContainsAttribute(string substring) : ValidationAttribute
 /// <seealso cref="MustStringClauses.StartsWith"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class StartsWithAttribute(string prefix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotStartsWith)
+public sealed class StartsWithAttribute(string prefix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotStartsWith, allowNull: false)
 {
     /// <summary>Gets the prefix the value must start with.</summary>
     public string Prefix { get; } = prefix;
@@ -1558,9 +1558,9 @@ public sealed class StartsWithAttribute(string prefix) : ValidationAttributeBase
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.StartsWith(strValue, Prefix, Comparison, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -1590,7 +1590,7 @@ public sealed class StartsWithAttribute(string prefix) : ValidationAttributeBase
 /// <seealso cref="MustStringClauses.NotStartsWith"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotStartsWithAttribute(string prefix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.StartsWith)
+public sealed class NotStartsWithAttribute(string prefix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.StartsWith, allowNull: false)
 {
     /// <summary>Gets the prefix the value must not start with.</summary>
     public string Prefix { get; } = prefix;
@@ -1601,9 +1601,9 @@ public sealed class NotStartsWithAttribute(string prefix) : ValidationAttributeB
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotStartsWith(strValue, Prefix, Comparison, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -1633,7 +1633,7 @@ public sealed class NotStartsWithAttribute(string prefix) : ValidationAttributeB
 /// <seealso cref="MustStringClauses.EndsWith"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EndsWithAttribute(string suffix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotEndsWith)
+public sealed class EndsWithAttribute(string suffix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.NotEndsWith, allowNull: false)
 {
     /// <summary>Gets the suffix the value must end with.</summary>
     public string Suffix { get; } = suffix;
@@ -1644,9 +1644,9 @@ public sealed class EndsWithAttribute(string suffix) : ValidationAttributeBase(t
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.EndsWith(strValue, Suffix, Comparison, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -1676,7 +1676,7 @@ public sealed class EndsWithAttribute(string suffix) : ValidationAttributeBase(t
 /// <seealso cref="MustStringClauses.NotEndsWith"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotEndsWithAttribute(string suffix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.EndsWith)
+public sealed class NotEndsWithAttribute(string suffix) : ValidationAttributeBase(typeof(string), MustCodes.Text.Content.EndsWith, allowNull: false)
 {
     /// <summary>Gets the suffix the value must not end with.</summary>
     public string Suffix { get; } = suffix;
@@ -1687,9 +1687,9 @@ public sealed class NotEndsWithAttribute(string suffix) : ValidationAttributeBas
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotEndsWith(strValue, Suffix, Comparison, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 

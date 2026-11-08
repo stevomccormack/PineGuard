@@ -6,6 +6,8 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public static class FluentStringNumbersExtensionsTestData
 {
+    public static TheoryData<string?> ConfigurationInputs => [null, "bad"];
+
     public static class Positive
     {
         public static TheoryData<FluentCase<string?>> Cases => F.NumbersIsPositive.AllScenarios.ToFluentCases(s => s.Name switch

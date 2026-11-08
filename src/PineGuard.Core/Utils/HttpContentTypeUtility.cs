@@ -31,7 +31,7 @@ public static class HttpContentTypeUtility
     /// </example>
     public static bool TryGetContentTypeMediaTypes(
         IReadOnlyDictionary<string, IEnumerable<string>>? headers,
-        out IReadOnlyList<string>? mediaTypes)
+        [NotNullWhen(true)] out IReadOnlyList<string>? mediaTypes)
     {
         mediaTypes = null;
 

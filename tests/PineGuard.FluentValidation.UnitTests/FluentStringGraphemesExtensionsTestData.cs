@@ -74,29 +74,47 @@ public static class FluentStringGraphemesExtensionsTestData
         });
     }
 
-    public static class HasGraphemeCountBetween
+    public static class HasGraphemeCountInRange
     {
-        public static TheoryData<FluentCase<(string? value, int min, int max, Inclusion inclusion)>> Cases => F.GraphemesHasCountBetween.AllScenarios.ToFluentCases(s => s.Name switch
+        public static TheoryData<FluentCase<(string? value, int min, int max, Inclusion inclusion)>> Cases
         {
-            nameof(F.GraphemesHasCountBetween.NullValue) => new FluentExpected(true),
-            nameof(F.GraphemesHasCountBetween.NegativeMin) => new FluentExpected(false, "min requires a non-negative minimum count.", Code: MustCodes.Text.Graphemes.OutOfRange),
-            nameof(F.GraphemesHasCountBetween.NegativeMax) => new FluentExpected(false, "max requires a non-negative maximum count.", Code: MustCodes.Text.Graphemes.OutOfRange),
-            nameof(F.GraphemesHasCountBetween.MinAboveMax) => new FluentExpected(false, "min requires a valid count range.", Code: MustCodes.Text.Graphemes.OutOfRange),
-            _ when s.IsValid => new FluentExpected(true),
-            _ => new FluentExpected(false, "Value must have a number of characters within the expected range.", Code: MustCodes.Text.Graphemes.OutOfRange)
-        });
+            get
+            {
+                var data = F.GraphemesHasCountInRange.AllScenarios.ToFluentCases(s => s.Name switch
+                {
+                    nameof(F.GraphemesHasCountInRange.NullValue) => new FluentExpected(true),
+                    nameof(F.GraphemesHasCountInRange.NegativeMin) => new FluentExpected(false, "min requires a non-negative minimum count.", Code: MustCodes.Text.Graphemes.OutOfRange),
+                    nameof(F.GraphemesHasCountInRange.NegativeMax) => new FluentExpected(false, "max requires a non-negative maximum count.", Code: MustCodes.Text.Graphemes.OutOfRange),
+                    nameof(F.GraphemesHasCountInRange.MinAboveMax) => new FluentExpected(false, "min requires a valid count range.", Code: MustCodes.Text.Graphemes.OutOfRange),
+                    _ when s.IsValid => new FluentExpected(true),
+                    _ => new FluentExpected(false, "Value must have a number of characters within the expected range.", Code: MustCodes.Text.Graphemes.OutOfRange)
+                });
+                data.Add(new("NullInvalidInclusion", (null, 0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.")));
+                data.Add(new("NullReversedBounds", (null, 2, 1, Inclusion.Inclusive), new(false, "min requires a valid count range.")));
+                return data;
+            }
+        }
     }
 
-    public static class NotHasGraphemeCountBetween
+    public static class NotHasGraphemeCountInRange
     {
-        public static TheoryData<FluentCase<(string? value, int min, int max, Inclusion inclusion)>> Cases => F.GraphemesHasCountBetween.AllScenarios.ToFluentCases(s => s.Name switch
+        public static TheoryData<FluentCase<(string? value, int min, int max, Inclusion inclusion)>> Cases
         {
-            nameof(F.GraphemesHasCountBetween.NullValue) => new FluentExpected(true),
-            nameof(F.GraphemesHasCountBetween.NegativeMin) => new FluentExpected(false, "min requires a non-negative minimum count.", Code: MustCodes.Text.Graphemes.InRange),
-            nameof(F.GraphemesHasCountBetween.NegativeMax) => new FluentExpected(false, "max requires a non-negative maximum count.", Code: MustCodes.Text.Graphemes.InRange),
-            nameof(F.GraphemesHasCountBetween.MinAboveMax) => new FluentExpected(false, "min requires a valid count range.", Code: MustCodes.Text.Graphemes.InRange),
-            _ when s.IsValid => new FluentExpected(false, "Value must not have a number of characters within the expected range.", Code: MustCodes.Text.Graphemes.InRange),
-            _ => new FluentExpected(true)
-        });
+            get
+            {
+                var data = F.GraphemesHasCountInRange.AllScenarios.ToFluentCases(s => s.Name switch
+                {
+                    nameof(F.GraphemesHasCountInRange.NullValue) => new FluentExpected(true),
+                    nameof(F.GraphemesHasCountInRange.NegativeMin) => new FluentExpected(false, "min requires a non-negative minimum count.", Code: MustCodes.Text.Graphemes.InRange),
+                    nameof(F.GraphemesHasCountInRange.NegativeMax) => new FluentExpected(false, "max requires a non-negative maximum count.", Code: MustCodes.Text.Graphemes.InRange),
+                    nameof(F.GraphemesHasCountInRange.MinAboveMax) => new FluentExpected(false, "min requires a valid count range.", Code: MustCodes.Text.Graphemes.InRange),
+                    _ when s.IsValid => new FluentExpected(false, "Value must not have a number of characters within the expected range.", Code: MustCodes.Text.Graphemes.InRange),
+                    _ => new FluentExpected(true)
+                });
+                data.Add(new("NullInvalidInclusion", (null, 0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.")));
+                data.Add(new("NullReversedBounds", (null, 2, 1, Inclusion.Inclusive), new(false, "min requires a valid count range.")));
+                return data;
+            }
+        }
     }
 }

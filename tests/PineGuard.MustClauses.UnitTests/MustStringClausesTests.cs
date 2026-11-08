@@ -8,6 +8,27 @@ namespace PineGuard.MustClauses.UnitTests;
 public class MustStringClausesTests(ITestOutputHelper output) : BaseMustUnitTest(output)
 {
     [Theory]
+    [MemberData(nameof(MustStringClausesTestData.InvalidComparisons), MemberType = typeof(MustStringClausesTestData))]
+    public void ComparisonConfiguration_IsCheckedBeforeInput(string? value, StringComparison comparison)
+    {
+        // Act
+        var results = new[]
+        {
+            Must.Be.Contains(value, "x", comparison), Must.Be.NotContains(value, "x", comparison),
+            Must.Be.StartsWith(value, "x", comparison), Must.Be.NotStartsWith(value, "x", comparison),
+            Must.Be.EndsWith(value, "x", comparison), Must.Be.NotEndsWith(value, "x", comparison)
+        };
+
+        // Assert
+        Assert.All(results, result =>
+        {
+            Assert.False(result.Success);
+            Assert.Equal("comparison", result.ParamName);
+            Assert.Equal(comparison, result.Value);
+        });
+    }
+
+    [Theory]
     [MemberData(nameof(MustStringClausesTestData.NullOrEmpty.ValidCases), MemberType = typeof(MustStringClausesTestData.NullOrEmpty))]
     public void NullOrEmpty_Checks(MustStringClausesTestData.NullOrEmpty.ValidCase testCase)
     {
@@ -84,23 +105,23 @@ public class MustStringClausesTests(ITestOutputHelper output) : BaseMustUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(MustStringClausesTestData.LengthBetween.ValidCases), MemberType = typeof(MustStringClausesTestData.LengthBetween))]
-    public void LengthBetween_Checks(MustStringClausesTestData.LengthBetween.ValidCase testCase)
+    [MemberData(nameof(MustStringClausesTestData.LengthInRange.ValidCases), MemberType = typeof(MustStringClausesTestData.LengthInRange))]
+    public void LengthInRange_Checks(MustStringClausesTestData.LengthInRange.ValidCase testCase)
     {
         var input = testCase.Value.Value;
 
-        var result = Must.Be.LengthBetween(input, testCase.Value.Min, testCase.Value.Max);
+        var result = Must.Be.LengthInRange(input, testCase.Value.Min, testCase.Value.Max);
         Assert.Equal(testCase.Expected, result.Success);
         AssertCode(MustCodes.Text.Length.OutOfRange, result);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringClausesTestData.LengthBetween.EdgeCases), MemberType = typeof(MustStringClausesTestData.LengthBetween))]
-    public void LengthBetween_EdgeChecks(MustStringClausesTestData.LengthBetween.EdgeCase testCase)
+    [MemberData(nameof(MustStringClausesTestData.LengthInRange.EdgeCases), MemberType = typeof(MustStringClausesTestData.LengthInRange))]
+    public void LengthInRange_EdgeChecks(MustStringClausesTestData.LengthInRange.EdgeCase testCase)
     {
         var input = testCase.Value.Value;
 
-        var result = Must.Be.LengthBetween(input, testCase.Value.Min, testCase.Value.Max);
+        var result = Must.Be.LengthInRange(input, testCase.Value.Min, testCase.Value.Max);
         Assert.Equal(testCase.Expected, result.Success);
         Assert.Equal(testCase.ExpectedMessage, result.Message);
     }
@@ -827,7 +848,6 @@ public class MustStringClausesTests(ITestOutputHelper output) : BaseMustUnitTest
         Assert.Equal(testCase.Expected, result.Success);
         Assert.Equal(testCase.ExpectedMessage, result.Message);
     }
-
 
     // ContainsAny
     [Theory]

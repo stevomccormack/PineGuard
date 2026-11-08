@@ -35,6 +35,9 @@ public static class MustDateTimeOffsetRangeClauses
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(range))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTimeOffsetRange>.Fail(MustCodes.Range.Order.NotChronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = DateTimeOffsetRangeRules.IsChronological(range, inclusion);
@@ -62,9 +65,12 @@ public static class MustDateTimeOffsetRangeClauses
     public static MustResult<DateTimeOffsetRange> Overlapping(this IMustClause _,
         DateTimeOffsetRange range1,
         DateTimeOffsetRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTimeOffsetRange>.Fail(MustCodes.Range.Overlap.Missing, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be overlapping.";
 
         var ok = DateTimeOffsetRangeRules.IsOverlapping(range1, range2, inclusion);
@@ -92,9 +98,12 @@ public static class MustDateTimeOffsetRangeClauses
     public static MustResult<DateTimeOffsetRange> NotOverlapping(this IMustClause _,
         DateTimeOffsetRange range1,
         DateTimeOffsetRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTimeOffsetRange>.Fail(MustCodes.Range.Overlap.Present, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must not be overlapping.";
 
         var ok = !DateTimeOffsetRangeRules.IsOverlapping(range1, range2, inclusion);
@@ -125,6 +134,9 @@ public static class MustDateTimeOffsetRangeClauses
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTimeOffsetRange>.Fail(MustCodes.Range.Bounds.NotContains, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must contain the specified date/time.";
 
         var ok = DateTimeOffsetRangeRules.Contains(range, value, inclusion);
@@ -155,6 +167,9 @@ public static class MustDateTimeOffsetRangeClauses
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTimeOffsetRange>.Fail(MustCodes.Range.Bounds.Contains, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must not contain the specified date/time.";
 
         var ok = !DateTimeOffsetRangeRules.Contains(range, value, inclusion);

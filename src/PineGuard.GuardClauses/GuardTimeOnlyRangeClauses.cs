@@ -65,7 +65,7 @@ public static class GuardTimeOnlyRangeClauses
     public static TimeOnlyRange Overlapping(this IGuardClause _,
         TimeOnlyRange range1,
         TimeOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)
@@ -99,7 +99,7 @@ public static class GuardTimeOnlyRangeClauses
     public static TimeOnlyRange NotOverlapping(this IGuardClause _,
         TimeOnlyRange range1,
         TimeOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)

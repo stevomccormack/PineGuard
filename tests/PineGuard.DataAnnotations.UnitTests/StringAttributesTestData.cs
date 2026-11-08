@@ -7,6 +7,22 @@ namespace PineGuard.DataAnnotations.UnitTests;
 
 public static class StringAttributesTestData
 {
+    public static TheoryData<DataAnnotationCase> NullConfigurationCases =>
+    [
+        new("NegativeExactLength", new ExactLengthAttribute(-1), new(false, "length requires a non-negative length.")),
+        new("NegativeMinimumLength", new LengthInRangeAttribute(-1, 1), new(false, "min requires a non-negative min.")),
+        new("NegativeLongerThanLength", new LongerThanAttribute(-1), new(false, "length requires a non-negative length.")),
+        new("NegativeLongerThanOrEqualLength", new LongerThanOrEqualAttribute(-1), new(false, "length requires a non-negative length.")),
+        new("NegativeShorterThanLength", new ShorterThanAttribute(-1), new(false, "length requires a non-negative length.")),
+        new("NegativeShorterThanOrEqualLength", new ShorterThanOrEqualAttribute(-1), new(false, "length requires a non-negative length."))
+    ];
+
+    public static TheoryData<string?, StringComparison> InvalidComparisons => new()
+    {
+        { null, (StringComparison)42 },
+        { "value", (StringComparison)(-1) }
+    };
+
     public sealed record ValidCase(string Name, object? Value, bool Expected) : ReturnCase<object?, bool>(Name, Value, Expected);
 
     private static TheoryData<ValidCase> CommonEdgeCases() =>
@@ -21,7 +37,7 @@ public static class StringAttributesTestData
         public static TheoryData<ValidCase> InvalidCases => [new("short", "ab", false), new("long", "abcd", false)];
     }
 
-    public static class LengthBetween
+    public static class LengthInRange
     {
         public static TheoryData<ValidCase> ValidCases => [new("min", "abc", true), new("max", "abcde", true), new("mid", "abcd", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();

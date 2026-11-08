@@ -1,7 +1,5 @@
 using System.Xml.Schema;
 using PineGuard.MustClauses;
-using PineGuard.Testing.Common;
-using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.MustClauses;
 using PineGuard.Xml.UnitTests.Schemas;
 using Xunit.Abstractions;
@@ -39,13 +37,12 @@ public sealed class MustXmlSchemaClausesTests(ITestOutputHelper output)
 
     [Theory]
     [MemberData(nameof(MustXmlSchemaClausesTestData.ValidXmlNullSchemas.InvalidCases), MemberType = typeof(MustXmlSchemaClausesTestData.ValidXmlNullSchemas))]
-    public void ValidXmlNullSchemas_ThrowsAsExpected(IThrowsCase tc)
+    public void ValidXmlNullSchemas_RejectsConfigurationBeforeInput(MustCase<string?> tc)
     {
-        // Arrange
-        var t = (MustXmlSchemaClausesTestData.ValidXmlNullSchemas.InvalidCase)tc;
+        // Act
+        var result = Must.Be.ValidXml(tc.Value, null!, paramName: "value");
 
-        // Act & Assert
-        var ex = Assert.Throws(tc.ExpectedException.Type, () => Must.Be.ValidXml(t.Value, null!, paramName: "value"));
-        ThrowsCaseAssert.Expected(ex, tc);
+        // Assert
+        AssertResult(tc, result);
     }
 }

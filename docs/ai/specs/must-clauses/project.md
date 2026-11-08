@@ -236,7 +236,7 @@ Failure attribution for secondary parameters (required):
 Example:
 
 ```csharp
-public static MustResult<int> Between(
+public static MustResult<int> InRange(
     this IMustClause _,
     int value,
     int min,
@@ -244,12 +244,15 @@ public static MustResult<int> Between(
     Inclusion inclusion = Inclusion.Inclusive,
     [CallerArgumentExpression(nameof(value))] string? paramName = null)
 {
+    if (!EnumRules.IsDefined<Inclusion>(inclusion))
+        return MustResult<int>.Fail(MustCodes.Number.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
     if (min > max)
         return MustResult<int>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
 
     const string messageTemplate = "{paramName} must be within the expected range.";
 
-    var ok = NumberRules.IsBetween(value, min, max, inclusion);
+    var ok = NumberRules.IsInRange(value, min, max, inclusion);
     return MustResult<int>.FromBool(ok, MustCodes.Number.Range.OutOfRange, messageTemplate, paramName, value, value);
 }
 ```
@@ -285,7 +288,7 @@ map, and controlled condition vocabulary.
 Every `Fail(...)`/`FromBool(...)` call inside a public clause method passes exactly one `MustCodes`
 constant — never a string literal, never zero, never more than one. A clause with multiple failure
 paths (e.g. a guarded-parameter check before the main rule) picks the code that matches *that specific*
-failure, as in the `Between` example above where the range-guard and the range-check each carry their
+failure, as in the `InRange` example above where the range-guard and the range-check each carry their
 own code. Type-variant clauses of the same rule (e.g. `MustGuidClauses.NotEmpty(Guid)` and
 `MustStringGuidClauses.NotEmptyGuid(string)`) share one code — the rule is the same regardless of input
 type.
@@ -326,24 +329,25 @@ MustString clauses must follow this exact flow:
 1. Parse exactly once using a `PineGuard.Utils.StringUtility.*` method.
 2. If parsing fails, return failure with the method’s canonical message.
 3. If parsing succeeds, validate using typed `PineGuard.Rules.*Rules` methods.
-4. Return `MustResult<TParsed>.FromBool(ok, messageTemplate, paramName, value, parsedValue)`.
+4. Return `MustResult<TParsed>.FromBool(ok, code, messageTemplate, paramName, value, parsedValue)`.
 
 Canonical structure:
 
 ```csharp
-const string messageTemplate = "{paramName} must ... .";
+const string messageTemplate = "{paramName} must be in the past.";
 
 if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed))
-    return MustResult<DateTimeOffset>.FromBool(false, messageTemplate, paramName, value);
+    return MustResult<DateTimeOffset>.FromBool(false, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, default);
 
-var parsedValue = parsed.GetValueOrDefault();
-var ok = DateTimeOffsetRules.IsInPast(parsedValue);
-return MustResult<DateTimeOffset>.FromBool(ok, messageTemplate, paramName, value, parsedValue);
+var ok = DateTimeOffsetRules.IsInPast(parsed);
+return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, parsed);
 ```
 
 Notes:
 
-- Many `StringUtility.*.TryParse` methods use nullable out parameters (e.g., `DateTimeOffset?`). After a successful parse, convert to non-null via `parsed.GetValueOrDefault()`.
+- Concrete value-type Try outputs use `out T`; failure writes `default(T)`. Check the Boolean result
+  before using the parsed output. Reference outputs use accurate conditional nullability annotations;
+  preserve existing non-null empty-output contracts. Never treat a default output alone as success.
 
 ### Null-handling for MustString methods
 
@@ -355,10 +359,11 @@ If a MustString method explicitly allows null as valid, it must use the `NullOrX
 
 Some numeric rules are generic and accept nullable `T?` (e.g. `NumberRules.IsPositive<T>(T? value)`).
 
-When calling these from MustString numeric clauses, always provide an explicit type argument:
+Use concrete overloads for shared decimal behavior so string numeric clauses work on every target.
+Provide explicit generic type arguments only when selecting generic-math overloads on supported targets:
 
 ```csharp
-var ok = NumberRules.IsPositive<decimal>(parsed);
+var ok = NumberRules.IsPositive(parsed); // concrete decimal overload, every target
 ```
 
 ---

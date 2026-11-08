@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Rules;
+using PineGuard.Utils;
 
 namespace PineGuard.MustClauses;
 
@@ -201,15 +202,15 @@ public static class MustCollectionClauses
     /// The failure message follows the pattern <c>"{paramName} requires a valid count range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/collection">Collection Must Clauses documentation</seealso>
-    public static MustResult<IEnumerable<T>> HasCountBetween<T>(this IMustClause _,
+    public static MustResult<IEnumerable<T>> HasCountInRange<T>(this IMustClause _,
         IEnumerable<T>? value,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.OutOfRange, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<Inclusion>(inclusion))
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.OutOfRange, "{paramName} must be a defined inclusion mode.", nameof(inclusion), inclusion);
 
         if (min < 0)
             return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.OutOfRange, NonNegativeMinMessage, nameof(min), min);
@@ -220,10 +221,13 @@ public static class MustCollectionClauses
         if (min > max)
             return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.OutOfRange, "{paramName} requires a valid count range.", nameof(min), min);
 
+        if (value is null)
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.OutOfRange, NullMessage, paramName, value);
+
         const string messageTemplate = "{paramName} must have a count within the expected range.";
 
         var enumerable = value as T[] ?? [.. value];
-        var ok = CollectionRules.HasCountBetween(enumerable, min, max, inclusion);
+        var ok = CollectionRules.HasCountInRange(enumerable, min, max, inclusion);
         return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.OutOfRange, messageTemplate, paramName, enumerable, enumerable);
     }
 
@@ -441,7 +445,7 @@ public static class MustCollectionClauses
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
     /// </param>
     /// <returns>
-    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// A result preserving the original input in <c>Value</c> and, on success, a replayable non-null-element snapshot in <c>Result</c>.
     /// </returns>
     /// <remarks>
     /// The failure message follows the pattern <c>"{paramName} must not contain any null items."</c>
@@ -457,9 +461,38 @@ public static class MustCollectionClauses
 
         const string messageTemplate = "{paramName} must not contain any null items.";
 
-        var enumerable = value as T?[] ?? [.. value];
-        var ok = !CollectionRules.ContainsNullItems(enumerable);
-        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.ContainsNull, messageTemplate, paramName, enumerable, enumerable!);
+        var ok = CollectionUtility.TryValidateNonNullItems(value, out var items);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.ContainsNull, messageTemplate, paramName, value, items);
+    }
+
+    /// <summary>
+    /// Validates that the specified value must not contain any null items.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Automatically captured via
+    /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
+    /// </param>
+    /// <returns>
+    /// A result preserving the original input in <c>Value</c> and, on success, a replayable non-null-element snapshot in <c>Result</c>.
+    /// </returns>
+    /// <remarks>
+    /// The failure message follows the pattern <c>"{paramName} must not contain any null items."</c>
+    /// </remarks>
+    /// <seealso href="https://pineguard.ai/docs/must/collection">Collection Must Clauses documentation</seealso>
+    public static MustResult<IEnumerable<T>> NotContainsNullItems<T>(this IMustClause _,
+        IEnumerable<T?>? value,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        where T : struct
+    {
+        if (value is null)
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.ContainsNull, NullMessage, paramName, value);
+
+        const string messageTemplate = "{paramName} must not contain any null items.";
+
+        var ok = CollectionUtility.TryValidateNonNullItems(value, out var items);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.ContainsNull, messageTemplate, paramName, value, items);
     }
 
     /// <summary>
@@ -468,6 +501,7 @@ public static class MustCollectionClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="item">The item to search for.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -482,6 +516,7 @@ public static class MustCollectionClauses
     public static MustResult<IEnumerable<T>> Contains<T>(this IMustClause _,
         IEnumerable<T>? value,
         T item,
+        IEqualityComparer<T>? comparer = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -490,8 +525,8 @@ public static class MustCollectionClauses
         const string messageTemplate = "{paramName} must contain the specified item.";
 
         var enumerable = value as T[] ?? [.. value];
-        var ok = CollectionRules.Contains(enumerable, item);
-        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Missing, messageTemplate, paramName, enumerable, enumerable);
+        var ok = CollectionRules.Contains(enumerable, item, comparer);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Missing, messageTemplate, paramName, value, enumerable);
     }
 
     /// <summary>
@@ -500,6 +535,7 @@ public static class MustCollectionClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="item">The item to search for.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -514,6 +550,7 @@ public static class MustCollectionClauses
     public static MustResult<IEnumerable<T>> NotContains<T>(this IMustClause _,
         IEnumerable<T>? value,
         T item,
+        IEqualityComparer<T>? comparer = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (value is null)
@@ -522,8 +559,8 @@ public static class MustCollectionClauses
         const string messageTemplate = "{paramName} must not contain the specified item.";
 
         var enumerable = value as T[] ?? [.. value];
-        var ok = !CollectionRules.Contains(enumerable, item);
-        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Present, messageTemplate, paramName, enumerable, enumerable);
+        var ok = !CollectionRules.Contains(enumerable, item, comparer);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Present, messageTemplate, paramName, value, enumerable);
     }
 
     /// <summary>
@@ -532,6 +569,7 @@ public static class MustCollectionClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -546,20 +584,21 @@ public static class MustCollectionClauses
     public static MustResult<IEnumerable<T>> SubsetOf<T>(this IMustClause _,
         IEnumerable<T>? value,
         IEnumerable<T>? other,
+        IEqualityComparer<T>? comparer = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NotSubset, NullMessage, paramName, value);
-
         if (other is null)
             return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NotSubset, NullMessage, nameof(other), other);
+
+        if (value is null)
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.NotSubset, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a subset of the other collection.";
 
         var enumerable = value as T[] ?? [.. value];
-        var otherEnumerable = other as T[] ?? [.. other];
-        var ok = CollectionRules.IsSubsetOf(enumerable, otherEnumerable);
-        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.NotSubset, messageTemplate, paramName, enumerable, enumerable);
+        var otherEnumerable = ReferenceEquals(value, other) ? enumerable : other as T[] ?? [.. other];
+        var ok = CollectionRules.IsSubsetOf(enumerable, otherEnumerable, comparer);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.NotSubset, messageTemplate, paramName, value, enumerable);
     }
 
     /// <summary>
@@ -568,6 +607,7 @@ public static class MustCollectionClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
+    /// <param name="comparer">The equality comparer; null uses the default comparer.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -582,20 +622,21 @@ public static class MustCollectionClauses
     public static MustResult<IEnumerable<T>> NotSubsetOf<T>(this IMustClause _,
         IEnumerable<T>? value,
         IEnumerable<T>? other,
+        IEqualityComparer<T>? comparer = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Subset, NullMessage, paramName, value);
-
         if (other is null)
             return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Subset, NullMessage, nameof(other), other);
+
+        if (value is null)
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Items.Subset, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not be a subset of the other collection.";
 
         var enumerable = value as T[] ?? [.. value];
-        var otherEnumerable = other as T[] ?? [.. other];
-        var ok = !CollectionRules.IsSubsetOf(enumerable, otherEnumerable);
-        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Subset, messageTemplate, paramName, enumerable, enumerable);
+        var otherEnumerable = ReferenceEquals(value, other) ? enumerable : other as T[] ?? [.. other];
+        var ok = !CollectionRules.IsSubsetOf(enumerable, otherEnumerable, comparer);
+        return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Items.Subset, messageTemplate, paramName, value, enumerable);
     }
 
     /// <summary>
@@ -792,15 +833,15 @@ public static class MustCollectionClauses
     /// The failure message follows the pattern <c>"{paramName} requires a valid count range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/collection">Collection Must Clauses documentation</seealso>
-    public static MustResult<IEnumerable<T>> NotHasCountBetween<T>(this IMustClause _,
+    public static MustResult<IEnumerable<T>> NotHasCountInRange<T>(this IMustClause _,
         IEnumerable<T>? value,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.InRange, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<Inclusion>(inclusion))
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.InRange, "{paramName} must be a defined inclusion mode.", nameof(inclusion), inclusion);
 
         if (min < 0)
             return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.InRange, NonNegativeMinMessage, nameof(min), min);
@@ -811,10 +852,13 @@ public static class MustCollectionClauses
         if (min > max)
             return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.InRange, "{paramName} requires a valid count range.", nameof(min), min);
 
+        if (value is null)
+            return MustResult<IEnumerable<T>>.Fail(MustCodes.Collection.Count.InRange, NullMessage, paramName, value);
+
         const string messageTemplate = "{paramName} must not have a count within the expected range.";
 
         var enumerable = value as T[] ?? [.. value];
-        var ok = !CollectionRules.HasCountBetween(enumerable, min, max, inclusion);
+        var ok = !CollectionRules.HasCountInRange(enumerable, min, max, inclusion);
         return MustResult<IEnumerable<T>>.FromBool(ok, MustCodes.Collection.Count.InRange, messageTemplate, paramName, enumerable, enumerable);
     }
 }

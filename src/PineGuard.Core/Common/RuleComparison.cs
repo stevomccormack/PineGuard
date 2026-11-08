@@ -30,18 +30,18 @@ public static class RuleComparison
     /// <see langword="true"/> if <paramref name="value"/> falls within the range; <see langword="false"/> if it falls outside the range,
     /// or if <paramref name="min"/> is greater than <paramref name="max"/>.
     /// </returns>
-    public static bool IsBetween<T>(T value, T min, T max, Inclusion inclusion = Inclusion.Inclusive)
+    public static bool IsInRange<T>(T value, T min, T max, Inclusion inclusion = Inclusion.Inclusive)
         where T : IComparable<T>
     {
-        if (min.CompareTo(max) > 0)
-            return false;
-
         var inclusive = inclusion switch
         {
             Inclusion.Inclusive => true,
             Inclusion.Exclusive => false,
             _ => throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null)
         };
+
+        if (min.CompareTo(max) > 0)
+            return false;
 
         var minOk = inclusive
             ? value.CompareTo(min) >= 0
@@ -55,46 +55,46 @@ public static class RuleComparison
     }
 
     /// <summary>
-    /// Determines whether <paramref name="value"/> is greater than (or, when inclusive, equal to) <paramref name="min"/>.
+    /// Determines whether <paramref name="value"/> is greater than (or, when inclusive, equal to) <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">The comparable type being compared.</typeparam>
     /// <param name="value">The value to test.</param>
-    /// <param name="min">The lower bound to compare against.</param>
+    /// <param name="other">The lower bound to compare against.</param>
     /// <param name="inclusion">
-    /// Whether <paramref name="min"/> itself satisfies the comparison. Defaults to <see cref="Inclusion.Inclusive"/>.
+    /// Whether <paramref name="other"/> itself satisfies the comparison. Defaults to <see cref="Inclusion.Inclusive"/>.
     /// </param>
     /// <returns>
-    /// <see langword="true"/> if <paramref name="value"/> is greater than <paramref name="min"/> (or equal to it, when <paramref name="inclusion"/>
+    /// <see langword="true"/> if <paramref name="value"/> is greater than <paramref name="other"/> (or equal to it, when <paramref name="inclusion"/>
     /// is <see cref="Inclusion.Inclusive"/>); otherwise, <see langword="false"/>.
     /// </returns>
-    public static bool IsGreaterThan<T>(T value, T min, Inclusion inclusion = Inclusion.Inclusive)
+    public static bool IsGreaterThan<T>(T value, T other, Inclusion inclusion = Inclusion.Inclusive)
         where T : IComparable<T> =>
         inclusion switch
         {
-            Inclusion.Inclusive => value.CompareTo(min) >= 0,
-            Inclusion.Exclusive => value.CompareTo(min) > 0,
+            Inclusion.Inclusive => value.CompareTo(other) >= 0,
+            Inclusion.Exclusive => value.CompareTo(other) > 0,
             _ => throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null)
         };
 
     /// <summary>
-    /// Determines whether <paramref name="value"/> is less than (or, when inclusive, equal to) <paramref name="max"/>.
+    /// Determines whether <paramref name="value"/> is less than (or, when inclusive, equal to) <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">The comparable type being compared.</typeparam>
     /// <param name="value">The value to test.</param>
-    /// <param name="max">The upper bound to compare against.</param>
+    /// <param name="other">The upper bound to compare against.</param>
     /// <param name="inclusion">
-    /// Whether <paramref name="max"/> itself satisfies the comparison. Defaults to <see cref="Inclusion.Inclusive"/>.
+    /// Whether <paramref name="other"/> itself satisfies the comparison. Defaults to <see cref="Inclusion.Inclusive"/>.
     /// </param>
     /// <returns>
-    /// <see langword="true"/> if <paramref name="value"/> is less than <paramref name="max"/> (or equal to it, when <paramref name="inclusion"/>
+    /// <see langword="true"/> if <paramref name="value"/> is less than <paramref name="other"/> (or equal to it, when <paramref name="inclusion"/>
     /// is <see cref="Inclusion.Inclusive"/>); otherwise, <see langword="false"/>.
     /// </returns>
-    public static bool IsLessThan<T>(T value, T max, Inclusion inclusion = Inclusion.Inclusive)
+    public static bool IsLessThan<T>(T value, T other, Inclusion inclusion = Inclusion.Inclusive)
         where T : IComparable<T> =>
         inclusion switch
         {
-            Inclusion.Inclusive => value.CompareTo(max) <= 0,
-            Inclusion.Exclusive => value.CompareTo(max) < 0,
+            Inclusion.Inclusive => value.CompareTo(other) <= 0,
+            Inclusion.Exclusive => value.CompareTo(other) < 0,
             _ => throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null)
         };
 }

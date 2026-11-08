@@ -8,10 +8,10 @@ namespace PineGuard.Rules;
 /// <seealso href="https://pineguard.ai/docs/rules/phone">Phone Rules documentation</seealso>
 public static partial class PhoneRules
 {
-    private static readonly char[] DefaultAllowedNonDigitCharactersSource = ['+', '(', ')', '-', '.', '/'];
+    private static readonly char[] DefaultAllowedNonDigitCharactersSource = ['+', '(', ')', '-', '.', '/', ' '];
 
     /// <summary>
-    /// The default set of allowed non-digit characters in phone numbers: <c>+</c>, <c>(</c>, <c>)</c>, <c>-</c>, <c>.</c>, <c>/</c>.
+    /// The default set of allowed non-digit characters in phone numbers: <c>+</c>, <c>(</c>, <c>)</c>, <c>-</c>, <c>.</c>, <c>/</c>, and ASCII space.
     /// </summary>
     /// <remarks>
     /// Returns a fresh copy on every access. <see cref="PhoneUtility.TryParsePhone"/> and every caller that
@@ -44,6 +44,7 @@ public static partial class PhoneRules
     /// <see langword="true"/> if <paramref name="value"/> contains between <paramref name="minDigits"/> and
     /// <paramref name="maxDigits"/> digits with only allowed non-digit characters; otherwise, <see langword="false"/>.
     /// </returns>
+    /// <remarks>This checks digit count and allowed formatting only; it does not establish E.164 conformance or number assignment.</remarks>
     /// <example>
     /// <code>
     /// bool valid = PhoneRules.IsPhoneNumber("+1 (555) 123-4567"); // true

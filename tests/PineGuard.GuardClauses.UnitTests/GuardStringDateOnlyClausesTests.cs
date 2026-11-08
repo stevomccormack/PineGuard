@@ -51,26 +51,26 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
         AssertCustomMessage(tc, () => Guard.Against.PastDateOnly(value, message: CustomMessage));
     }
 
-    // GuardStringDateOnlyClauses.NotBetweenDateOnly
+    // GuardStringDateOnlyClauses.OutOfRangeDateOnly
     [Theory]
-    [MemberData(nameof(GuardStringDateOnlyClausesTestData.NotBetween.ValidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.NotBetween))]
-    [MemberData(nameof(GuardStringDateOnlyClausesTestData.NotBetween.InvalidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.NotBetween))]
-    public void NotBetween_BehavesAsExpected(GuardCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(GuardStringDateOnlyClausesTestData.OutOfRange.ValidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.OutOfRange))]
+    [MemberData(nameof(GuardStringDateOnlyClausesTestData.OutOfRange.InvalidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.OutOfRange))]
+    public void OutOfRange_BehavesAsExpected(GuardCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        AssertResult(tc, () => Guard.Against.NotBetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.NotBetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.OutOfRangeDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.OutOfRangeDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
-    // GuardStringDateOnlyClauses.BetweenDateOnly
+    // GuardStringDateOnlyClauses.InRangeDateOnly
     [Theory]
-    [MemberData(nameof(GuardStringDateOnlyClausesTestData.Between.ValidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.Between))]
-    [MemberData(nameof(GuardStringDateOnlyClausesTestData.Between.InvalidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.Between))]
-    public void Between_BehavesAsExpected(GuardCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(GuardStringDateOnlyClausesTestData.InRange.ValidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.InRange))]
+    [MemberData(nameof(GuardStringDateOnlyClausesTestData.InRange.InvalidCases), MemberType = typeof(GuardStringDateOnlyClausesTestData.InRange))]
+    public void InRange_BehavesAsExpected(GuardCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        AssertResult(tc, () => Guard.Against.BetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.BetweenDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.InRangeDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.InRangeDateOnly(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.NotWithinDaysDateOnly
@@ -210,8 +210,8 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     public void BelowMinimumAge_BehavesAsExpected(GuardCase<(string? value, int years)> tc)
     {
         var value = tc.Value.value;
-        AssertResult(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, timeProvider: FixedTimeProvider.Default));
-        AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, timeProvider: FixedTimeProvider.Default, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.BelowMinimumAgeDateOnly(value, tc.Value.years, timeProvider: FixedTimeProvider.Default));
+        AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAgeDateOnly(value, tc.Value.years, timeProvider: FixedTimeProvider.Default, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.BelowMinimumAge — 29-February birth dates
@@ -220,7 +220,7 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     public void BelowMinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(GuardCase<(string? value, int years, DateTimeOffset utcNow)> tc)
     {
         var value = tc.Value.value;
-        AssertResult(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, timeProvider: new FixedTimeProvider(tc.Value.utcNow)));
-        AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAge(value, tc.Value.years, timeProvider: new FixedTimeProvider(tc.Value.utcNow), message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.BelowMinimumAgeDateOnly(value, tc.Value.years, timeProvider: new FixedTimeProvider(tc.Value.utcNow)));
+        AssertCustomMessage(tc, () => Guard.Against.BelowMinimumAgeDateOnly(value, tc.Value.years, timeProvider: new FixedTimeProvider(tc.Value.utcNow), message: CustomMessage));
     }
 }

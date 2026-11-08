@@ -47,7 +47,7 @@ public static class BufferRules
     /// </code>
     /// </example>
     public static bool IsHex(string? value) =>
-        BufferUtility.IsHexString(value);
+        BufferUtility.IsHex(value);
 
     /// <summary>
     /// Determines whether the specified value is a valid Base64-encoded string.
@@ -68,7 +68,7 @@ public static class BufferRules
     /// </code>
     /// </example>
     public static bool IsBase64(string? value) =>
-        BufferUtility.IsBase64String(value);
+        BufferUtility.IsBase64(value);
 
     /// <summary>
     /// Determines whether the specified value is a valid Base64Url-encoded string
@@ -92,7 +92,7 @@ public static class BufferRules
     /// </code>
     /// </example>
     public static bool IsBase64Url(string? value) =>
-        BufferUtility.IsBase64UrlString(value);
+        BufferUtility.IsBase64Url(value);
 
     /// <summary>
     /// Determines whether the specified bytes are well-formed UTF-8 text.

@@ -38,7 +38,7 @@ public static class FluentDateTimeOffsetExtensions
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
         TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Past(val.Value, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Past(val.GetValueOrDefault(), timeProvider, paramName: null)),
             message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is in the past or present.</summary>
@@ -65,7 +65,7 @@ public static class FluentDateTimeOffsetExtensions
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
         TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.PastOrPresent(val.Value, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.PastOrPresent(val.GetValueOrDefault(), timeProvider, paramName: null)),
             message, MustCodes.Date.Relative.Future);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is in the future.</summary>
@@ -92,7 +92,7 @@ public static class FluentDateTimeOffsetExtensions
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
         TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Future(val.Value, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Future(val.GetValueOrDefault(), timeProvider, paramName: null)),
             message, MustCodes.Date.Relative.NotFuture);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is in the future or present.</summary>
@@ -119,7 +119,7 @@ public static class FluentDateTimeOffsetExtensions
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
         TimeProvider? timeProvider = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FutureOrPresent(val.Value, timeProvider, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.FutureOrPresent(val.GetValueOrDefault(), timeProvider, paramName: null)),
             message, MustCodes.Date.Relative.Past);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is between the specified bounds.</summary>
@@ -130,13 +130,13 @@ public static class FluentDateTimeOffsetExtensions
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    public static IRuleBuilderOptions<TModel, DateTimeOffset> Between<TModel>(
+    public static IRuleBuilderOptions<TModel, DateTimeOffset> InRange<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder,
         DateTimeOffset min,
         DateTimeOffset max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Between(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.InRange(val, min, max, inclusion, paramName: null),
             message, MustCodes.Date.Range.OutOfRange);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is between the specified bounds.</summary>
@@ -148,13 +148,13 @@ public static class FluentDateTimeOffsetExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, DateTimeOffset?> Between<TModel>(
+    public static IRuleBuilderOptions<TModel, DateTimeOffset?> InRange<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
         DateTimeOffset min,
         DateTimeOffset max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Between(val.Value, min, max, inclusion, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.InRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
             message, MustCodes.Date.Range.OutOfRange);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is not between the specified bounds.</summary>
@@ -165,13 +165,13 @@ public static class FluentDateTimeOffsetExtensions
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    public static IRuleBuilderOptions<TModel, DateTimeOffset> NotBetween<TModel>(
+    public static IRuleBuilderOptions<TModel, DateTimeOffset> OutOfRange<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset> ruleBuilder,
         DateTimeOffset min,
         DateTimeOffset max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotBetween(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.OutOfRange(val, min, max, inclusion, paramName: null),
             message, MustCodes.Date.Range.InRange);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is not between the specified bounds.</summary>
@@ -183,13 +183,13 @@ public static class FluentDateTimeOffsetExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, DateTimeOffset?> NotBetween<TModel>(
+    public static IRuleBuilderOptions<TModel, DateTimeOffset?> OutOfRange<TModel>(
         this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder,
         DateTimeOffset min,
         DateTimeOffset max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotBetween(val.Value, min, max, inclusion, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OutOfRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
             message, MustCodes.Date.Range.InRange);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is before the specified timestamp.</summary>
@@ -236,7 +236,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset other,
         DateTimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Before(val.Value, other, precision, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Before(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Order.NotBefore);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is before the timestamp returned by <paramref name="other"/>.</summary>
@@ -299,7 +299,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset other,
         DateTimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.OnOrBefore(val.Value, other, precision, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OnOrBefore(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Order.After);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is on or before the timestamp returned by <paramref name="other"/>.</summary>
@@ -362,7 +362,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset other,
         DateTimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.After(val.Value, other, precision, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.After(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Order.NotAfter);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is after the timestamp returned by <paramref name="other"/>.</summary>
@@ -425,7 +425,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset other,
         DateTimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.OnOrAfter(val.Value, other, precision, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OnOrAfter(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Order.Before);
 
     /// <summary>Validates that the nullable <see cref="DateTimeOffset"/> value is on or after the timestamp returned by <paramref name="other"/>.</summary>
@@ -472,7 +472,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset other,
         DateTimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Same(val.Value, other, precision, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Same(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Equality.NotEqual);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is not the same as the specified timestamp.</summary>
@@ -503,7 +503,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset other,
         DateTimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotSame(val.Value, other, precision, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotSame(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Date.Equality.Equal);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is chronologically before the specified end timestamp.</summary>
@@ -548,7 +548,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset end,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Chronological(val.Value, end, inclusion, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Chronological(val.GetValueOrDefault(), end, inclusion, paramName: null)),
             message, MustCodes.Date.Order.NotChronological);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> range overlaps with the specified range.</summary>
@@ -565,7 +565,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset end1,
         DateTimeOffset start2,
         DateTimeOffset end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Overlapping(val, end1, start2, end2, inclusion, paramName: null),
             message, MustCodes.Date.Overlap.Missing);
@@ -583,7 +583,7 @@ public static class FluentDateTimeOffsetExtensions
         Func<TModel, DateTimeOffset> end1Expression,
         Func<TModel, DateTimeOffset> start2Expression,
         Func<TModel, DateTimeOffset> end2Expression,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe((model, val) => Must.Be.Overlapping(val, end1Expression(model), start2Expression(model), end2Expression(model), inclusion, paramName: null),
             message, MustCodes.Date.Overlap.Missing);
@@ -603,9 +603,9 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset end1,
         DateTimeOffset start2,
         DateTimeOffset end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Overlapping(val.Value, end1, start2, end2, inclusion, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Overlapping(val.GetValueOrDefault(), end1, start2, end2, inclusion, paramName: null)),
             message, MustCodes.Date.Overlap.Missing);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> range does not overlap with the specified range.</summary>
@@ -622,7 +622,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset end1,
         DateTimeOffset start2,
         DateTimeOffset end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotOverlapping(val, end1, start2, end2, inclusion, paramName: null),
             message, MustCodes.Date.Overlap.Present);
@@ -640,7 +640,7 @@ public static class FluentDateTimeOffsetExtensions
         Func<TModel, DateTimeOffset> end1Expression,
         Func<TModel, DateTimeOffset> start2Expression,
         Func<TModel, DateTimeOffset> end2Expression,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe((model, val) => Must.Be.NotOverlapping(val, end1Expression(model), start2Expression(model), end2Expression(model), inclusion, paramName: null),
             message, MustCodes.Date.Overlap.Present);
@@ -660,9 +660,9 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset end1,
         DateTimeOffset start2,
         DateTimeOffset end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotOverlapping(val.Value, end1, start2, end2, inclusion, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotOverlapping(val.GetValueOrDefault(), end1, start2, end2, inclusion, paramName: null)),
             message, MustCodes.Date.Overlap.Present);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is within the specified time window of a reference.</summary>
@@ -693,7 +693,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset reference,
         TimeSpan window,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Within(val.Value, reference, window, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Within(val.GetValueOrDefault(), reference, window, paramName: null)),
             message, MustCodes.Date.Proximity.NotWithin);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is not within the specified time window of a reference.</summary>
@@ -724,7 +724,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset reference,
         TimeSpan window,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotWithin(val.Value, reference, window, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotWithin(val.GetValueOrDefault(), reference, window, paramName: null)),
             message, MustCodes.Date.Proximity.Within);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is within the specified number of calendar months from a reference.</summary>
@@ -755,7 +755,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset reference,
         int months,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.WithinCalendarMonths(val.Value, reference, months, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.WithinCalendarMonths(val.GetValueOrDefault(), reference, months, paramName: null)),
             message, MustCodes.Date.Proximity.NotWithinCalendarMonths);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is not within the specified number of calendar months from a reference.</summary>
@@ -786,7 +786,7 @@ public static class FluentDateTimeOffsetExtensions
         DateTimeOffset reference,
         int months,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotWithinCalendarMonths(val.Value, reference, months, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotWithinCalendarMonths(val.GetValueOrDefault(), reference, months, paramName: null)),
             message, MustCodes.Date.Proximity.WithinCalendarMonths);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value falls on a weekday (Monday through Friday).</summary>
@@ -805,7 +805,7 @@ public static class FluentDateTimeOffsetExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> Weekday<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Weekday(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Weekday(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.NotWeekday);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value falls on a weekend (Saturday or Sunday).</summary>
@@ -824,7 +824,7 @@ public static class FluentDateTimeOffsetExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> Weekend<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Weekend(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Weekend(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.NotWeekend);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is the first day of its month.</summary>
@@ -843,7 +843,7 @@ public static class FluentDateTimeOffsetExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> FirstDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.FirstDayOfMonth(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.FirstDayOfMonth(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.NotFirstDayOfMonth);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is not the first day of its month.</summary>
@@ -862,7 +862,7 @@ public static class FluentDateTimeOffsetExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> NotFirstDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotFirstDayOfMonth(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotFirstDayOfMonth(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.FirstDayOfMonth);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is the last day of its month.</summary>
@@ -881,7 +881,7 @@ public static class FluentDateTimeOffsetExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> LastDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.LastDayOfMonth(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.LastDayOfMonth(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.NotLastDayOfMonth);
 
     /// <summary>Validates that the <see cref="DateTimeOffset"/> value is not the last day of its month.</summary>
@@ -900,6 +900,8 @@ public static class FluentDateTimeOffsetExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, DateTimeOffset?> NotLastDayOfMonth<TModel>(this IRuleBuilder<TModel, DateTimeOffset?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotLastDayOfMonth(val.Value, paramName: null) : MustResult<DateTimeOffset>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotLastDayOfMonth(val.GetValueOrDefault(), paramName: null)),
             message, MustCodes.Date.Calendar.LastDayOfMonth);
+    private static MustResult<T> SkipAbsentValue<T>(T? value, MustResult<T> result) where T : struct =>
+        value is null && result.ParamName is null ? MustResult<T>.Ok(default) : result;
 }

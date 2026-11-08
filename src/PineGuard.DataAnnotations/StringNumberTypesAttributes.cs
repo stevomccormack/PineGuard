@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using PineGuard.Codes;
@@ -21,7 +20,7 @@ namespace PineGuard.DataAnnotations;
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -37,7 +36,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringNumberTypesClauses.Decimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class DecimalStringAttribute(int decimalPlaces = 2) : ValidationAttributeBase(typeof(string), MustCodes.Number.Format.NotDecimal)
+public sealed class DecimalStringAttribute(int decimalPlaces = 2) : ValidationAttributeBase(typeof(string), MustCodes.Number.Format.NotDecimal, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -50,9 +49,9 @@ public sealed class DecimalStringAttribute(int decimalPlaces = 2) : ValidationAt
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.Decimal(strValue, DecimalPlaces, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -69,7 +68,7 @@ public sealed class DecimalStringAttribute(int decimalPlaces = 2) : ValidationAt
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -85,7 +84,7 @@ public sealed class DecimalStringAttribute(int decimalPlaces = 2) : ValidationAt
 /// <seealso cref="MustStringNumberTypesClauses.ExactDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ExactDecimalStringAttribute(int exactDecimalPlaces = 2) : ValidationAttributeBase(typeof(string), MustCodes.Number.Scale.Mismatch)
+public sealed class ExactDecimalStringAttribute(int exactDecimalPlaces = 2) : ValidationAttributeBase(typeof(string), MustCodes.Number.Scale.Mismatch, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -98,9 +97,9 @@ public sealed class ExactDecimalStringAttribute(int exactDecimalPlaces = 2) : Va
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.ExactDecimal(strValue, ExactDecimalPlaces, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -116,7 +115,7 @@ public sealed class ExactDecimalStringAttribute(int exactDecimalPlaces = 2) : Va
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Integer"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -132,7 +131,7 @@ public sealed class ExactDecimalStringAttribute(int exactDecimalPlaces = 2) : Va
 /// <seealso cref="MustStringNumberTypesClauses.Int32"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Int32StringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Format.NotInt32)
+public sealed class Int32StringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Format.NotInt32, allowNull: false)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Integer;
@@ -140,9 +139,9 @@ public sealed class Int32StringAttribute() : ValidationAttributeBase(typeof(stri
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.Int32(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -158,7 +157,7 @@ public sealed class Int32StringAttribute() : ValidationAttributeBase(typeof(stri
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Integer"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -174,7 +173,7 @@ public sealed class Int32StringAttribute() : ValidationAttributeBase(typeof(stri
 /// <seealso cref="MustStringNumberTypesClauses.Int64"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Int64StringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Format.NotInt64)
+public sealed class Int64StringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Format.NotInt64, allowNull: false)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Integer;
@@ -182,9 +181,9 @@ public sealed class Int64StringAttribute() : ValidationAttributeBase(typeof(stri
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.Int64(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -194,30 +193,30 @@ public sealed class Int64StringAttribute() : ValidationAttributeBase(typeof(stri
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumberTypesClauses.Int32InRange"/>. Supported on properties,
+/// Delegates to <see cref="MustStringNumberTypesClauses.InRangeInt32"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Integer"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class PortModel
 /// {
-///     [Int32InRangeString(1, 65535)]
+///     [InRangeInt32String(1, 65535)]
 ///     public string Port { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="Int32OutOfRangeStringAttribute"/>
-/// <seealso cref="MustStringNumberTypesClauses.Int32InRange"/>
+/// <seealso cref="OutOfRangeInt32StringAttribute"/>
+/// <seealso cref="MustStringNumberTypesClauses.InRangeInt32"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Int32InRangeStringAttribute(int min, int max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.OutOfRange)
+public sealed class InRangeInt32StringAttribute(int min, int max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.OutOfRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the valid range.</summary>
     public int Min { get; } = min;
@@ -234,9 +233,9 @@ public sealed class Int32InRangeStringAttribute(int min, int max, Inclusion incl
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Int32InRange(strValue, Min, Max, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.InRangeInt32(strValue, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -246,30 +245,30 @@ public sealed class Int32InRangeStringAttribute(int min, int max, Inclusion incl
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumberTypesClauses.Int32OutOfRange"/>. Supported on properties,
+/// Delegates to <see cref="MustStringNumberTypesClauses.OutOfRangeInt32"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Integer"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class ReservedPortModel
 /// {
-///     [Int32OutOfRangeString(0, 1023)]
+///     [OutOfRangeInt32String(0, 1023)]
 ///     public string Port { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="Int32InRangeStringAttribute"/>
-/// <seealso cref="MustStringNumberTypesClauses.Int32OutOfRange"/>
+/// <seealso cref="InRangeInt32StringAttribute"/>
+/// <seealso cref="MustStringNumberTypesClauses.OutOfRangeInt32"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Int32OutOfRangeStringAttribute(int min, int max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.InRange)
+public sealed class OutOfRangeInt32StringAttribute(int min, int max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.InRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the excluded range.</summary>
     public int Min { get; } = min;
@@ -286,9 +285,9 @@ public sealed class Int32OutOfRangeStringAttribute(int min, int max, Inclusion i
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Int32OutOfRange(strValue, Min, Max, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.OutOfRangeInt32(strValue, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -298,30 +297,30 @@ public sealed class Int32OutOfRangeStringAttribute(int min, int max, Inclusion i
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumberTypesClauses.Int64InRange"/>. Supported on properties,
+/// Delegates to <see cref="MustStringNumberTypesClauses.InRangeInt64"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Integer"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class TimestampModel
 /// {
-///     [Int64InRangeString(0, 253402300799)]
+///     [InRangeInt64String(0, 253402300799)]
 ///     public string UnixTimestamp { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="Int64OutOfRangeStringAttribute"/>
-/// <seealso cref="MustStringNumberTypesClauses.Int64InRange"/>
+/// <seealso cref="OutOfRangeInt64StringAttribute"/>
+/// <seealso cref="MustStringNumberTypesClauses.InRangeInt64"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Int64InRangeStringAttribute(long min, long max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.OutOfRange)
+public sealed class InRangeInt64StringAttribute(long min, long max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.OutOfRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the valid range.</summary>
     public long Min { get; } = min;
@@ -338,9 +337,9 @@ public sealed class Int64InRangeStringAttribute(long min, long max, Inclusion in
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Int64InRange(strValue, Min, Max, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.InRangeInt64(strValue, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -350,30 +349,30 @@ public sealed class Int64InRangeStringAttribute(long min, long max, Inclusion in
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumberTypesClauses.Int64OutOfRange"/>. Supported on properties,
+/// Delegates to <see cref="MustStringNumberTypesClauses.OutOfRangeInt64"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Integer"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class SequenceModel
 /// {
-///     [Int64OutOfRangeString(0, 999)]
+///     [OutOfRangeInt64String(0, 999)]
 ///     public string SequenceId { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="Int64InRangeStringAttribute"/>
-/// <seealso cref="MustStringNumberTypesClauses.Int64OutOfRange"/>
+/// <seealso cref="InRangeInt64StringAttribute"/>
+/// <seealso cref="MustStringNumberTypesClauses.OutOfRangeInt64"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class Int64OutOfRangeStringAttribute(long min, long max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.InRange)
+public sealed class OutOfRangeInt64StringAttribute(long min, long max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.InRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the excluded range.</summary>
     public long Min { get; } = min;
@@ -390,9 +389,8 @@ public sealed class Int64OutOfRangeStringAttribute(long min, long max, Inclusion
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Int64OutOfRange(strValue, Min, Max, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.OutOfRangeInt64(strValue, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
-#endif

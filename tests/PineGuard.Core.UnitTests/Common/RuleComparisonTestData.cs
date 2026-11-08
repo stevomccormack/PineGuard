@@ -22,7 +22,7 @@ public static class RuleComparisonTestData
             : IsCase<(int Value, int Other)>(Name, Value, Expected);
     }
 
-    public static class IsBetween
+    public static class IsInRange
     {
         public static TheoryData<ValidCase> ValidCases =>
         [

@@ -99,7 +99,7 @@ public static class NetworkRulesFixtures
         public static RuleScenario<(string? ip, string cidr)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
-    public static class IsValidHostname
+    public static class IsHostname
     {
         public static readonly string? Simple = "example.com";
         public static readonly string? SingleLabel = "localhost";

@@ -182,7 +182,7 @@ public static class MustNumberClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="min">The minimum bound.</param>
+    /// <param name="other">The minimum bound.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -196,13 +196,13 @@ public static class MustNumberClauses
     /// <seealso href="https://pineguard.ai/docs/must/number">Number Must Clauses documentation</seealso>
     public static MustResult<T> GreaterThan<T>(this IMustClause _,
         T value,
-        T min,
+        T other,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
         const string messageTemplate = "{paramName} must be greater than the minimum.";
 
-        var ok = NumberRules.IsGreaterThan(value, min);
+        var ok = NumberRules.IsGreaterThan(value, other);
         return MustResult<T>.FromBool(ok, MustCodes.Number.Range.NotGreater, messageTemplate, paramName, value, value);
     }
 
@@ -211,7 +211,7 @@ public static class MustNumberClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="min">The minimum bound.</param>
+    /// <param name="other">The minimum bound.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -225,13 +225,13 @@ public static class MustNumberClauses
     /// <seealso href="https://pineguard.ai/docs/must/number">Number Must Clauses documentation</seealso>
     public static MustResult<T> GreaterThanOrEqual<T>(this IMustClause _,
         T value,
-        T min,
+        T other,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
         const string messageTemplate = "{paramName} must be greater than or equal to the minimum.";
 
-        var ok = NumberRules.IsGreaterThanOrEqual(value, min);
+        var ok = NumberRules.IsGreaterThanOrEqual(value, other);
         return MustResult<T>.FromBool(ok, MustCodes.Number.Range.BelowMinimum, messageTemplate, paramName, value, value);
     }
 
@@ -240,7 +240,7 @@ public static class MustNumberClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="other">The maximum bound.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -254,13 +254,13 @@ public static class MustNumberClauses
     /// <seealso href="https://pineguard.ai/docs/must/number">Number Must Clauses documentation</seealso>
     public static MustResult<T> LessThan<T>(this IMustClause _,
         T value,
-        T max,
+        T other,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
         const string messageTemplate = "{paramName} must be less than the maximum.";
 
-        var ok = NumberRules.IsLessThan(value, max);
+        var ok = NumberRules.IsLessThan(value, other);
         return MustResult<T>.FromBool(ok, MustCodes.Number.Range.NotLess, messageTemplate, paramName, value, value);
     }
 
@@ -269,7 +269,7 @@ public static class MustNumberClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="other">The maximum bound.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -283,13 +283,13 @@ public static class MustNumberClauses
     /// <seealso href="https://pineguard.ai/docs/must/number">Number Must Clauses documentation</seealso>
     public static MustResult<T> LessThanOrEqual<T>(this IMustClause _,
         T value,
-        T max,
+        T other,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
         const string messageTemplate = "{paramName} must be less than or equal to the maximum.";
 
-        var ok = NumberRules.IsLessThanOrEqual(value, max);
+        var ok = NumberRules.IsLessThanOrEqual(value, other);
         return MustResult<T>.FromBool(ok, MustCodes.Number.Range.Exceeded, messageTemplate, paramName, value, value);
     }
 
@@ -320,6 +320,9 @@ public static class MustNumberClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, IComparable<T>
     {
+        if (!EnumRules.IsDefined<Inclusion>(inclusion))
+            return MustResult<T>.Fail(MustCodes.Number.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (min.CompareTo(max) > 0)
             return MustResult<T>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
 
@@ -356,6 +359,9 @@ public static class MustNumberClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, IComparable<T>
     {
+        if (!EnumRules.IsDefined<Inclusion>(inclusion))
+            return MustResult<T>.Fail(MustCodes.Number.Range.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (min.CompareTo(max) > 0)
             return MustResult<T>.Fail(MustCodes.Number.Range.Invalid, "{paramName} requires a valid range.", nameof(min), min);
 
@@ -420,6 +426,9 @@ public static class MustNumberClauses
         if (tolerance is null)
             return MustResult<T>.Fail(MustCodes.Number.Tolerance.Null, "{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
 
+        if (tolerance.Value < T.Zero)
+            return MustResult<T>.Fail(MustCodes.Number.Proximity.NotApproximate, "{paramName} must be non-negative.", nameof(tolerance), tolerance);
+
         const string messageTemplate = "{paramName} must be approximately the target value.";
 
         var ok = NumberRules.IsApproximately(value, target, tolerance);
@@ -454,6 +463,9 @@ public static class MustNumberClauses
         if (tolerance is null)
             return MustResult<T>.Fail(MustCodes.Number.Tolerance.Null, "{paramName} requires a non-null tolerance.", nameof(tolerance), tolerance);
 
+        if (tolerance.Value < T.Zero)
+            return MustResult<T>.Fail(MustCodes.Number.Proximity.Approximate, "{paramName} must be non-negative.", nameof(tolerance), tolerance);
+
         const string messageTemplate = "{paramName} must not be approximately the target value.";
 
         var ok = !NumberRules.IsApproximately(value, target, tolerance);
@@ -483,6 +495,9 @@ public static class MustNumberClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
+        if (factor == T.Zero)
+            return MustResult<T>.Fail(MustCodes.Number.Factor.Zero, "{paramName} requires a non-zero factor.", nameof(factor), factor);
+
         const string messageTemplate = "{paramName} must be a multiple of the specified factor.";
 
         var ok = NumberRules.IsMultipleOf(value, factor);
@@ -512,6 +527,9 @@ public static class MustNumberClauses
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
+        if (factor == T.Zero)
+            return MustResult<T>.Fail(MustCodes.Number.Factor.Zero, "{paramName} requires a non-zero factor.", nameof(factor), factor);
+
         const string messageTemplate = "{paramName} must not be a multiple of the specified factor.";
 
         var ok = !NumberRules.IsMultipleOf(value, factor);

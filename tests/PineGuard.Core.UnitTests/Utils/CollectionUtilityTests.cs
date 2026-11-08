@@ -43,4 +43,29 @@ public sealed class CollectionUtilityTests : BaseUnitTest
         Assert.Equal(testCase.Expected, result);
         Assert.Equal(testCase.ExpectedOutValue, index);
     }
+
+    [Theory]
+    [MemberData(nameof(CollectionUtilityTestData.NonNullValueItems), MemberType = typeof(CollectionUtilityTestData))]
+    public void TryValidateNonNullItems_ValueTypes_ReturnsCompleteProjection(CollectionUtilityTestData.NonNullItemsCase<int> testCase)
+    {
+        // Act
+        var success = CollectionUtility.TryValidateNonNullItems(testCase.Value, out var items);
+
+        // Assert
+        Assert.Equal(testCase.Expected, success);
+        Assert.Equal(testCase.ExpectedOutValue, items);
+    }
+
+    [Theory]
+    [MemberData(nameof(CollectionUtilityTestData.NonNullReferenceItems), MemberType = typeof(CollectionUtilityTestData))]
+    public void TryValidateNonNullItems_ReferenceTypes_ReturnsCompleteProjection(CollectionUtilityTestData.NonNullReferenceItemsCase testCase)
+    {
+        // Act
+        var success = CollectionUtility.TryValidateNonNullItems(testCase.Value, out var items);
+
+        // Assert
+        Assert.Equal(testCase.Expected, success);
+        Assert.Equal(testCase.ExpectedOutValue, items);
+    }
+
 }

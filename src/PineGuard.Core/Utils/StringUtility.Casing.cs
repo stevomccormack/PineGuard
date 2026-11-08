@@ -36,7 +36,7 @@ public static partial class StringUtility
             StringCasing.KebabCase => TryCreateWordsFromSeparated(trimmed, separator: '-', requiredLetterCasing: RequiredLetterCasing.Lower, out words),
             StringCasing.DotCase => TryCreateWordsFromSeparated(trimmed, separator: '.', requiredLetterCasing: RequiredLetterCasing.Lower, out words),
             StringCasing.TrainCase => TryCreateWordsFromSeparated(trimmed, separator: '-', requiredLetterCasing: RequiredLetterCasing.TitleOrAcronym, out words),
-            StringCasing.SpaceCase => TryCreateWordsFromSpaceCase(trimmed, out words),
+            StringCasing.SpaceCase => TryCreateWordsFromSeparated(trimmed, separator: ' ', requiredLetterCasing: RequiredLetterCasing.Lower, out words),
             _ => false
         };
     }
@@ -51,35 +51,8 @@ public static partial class StringUtility
     /// When <see langword="false"/>, contains <see cref="string.Empty"/>.
     /// </param>
     /// <returns><see langword="true"/> if the conversion succeeded; otherwise, <see langword="false"/>.</returns>
-    public static bool ToCase(string? value, StringCasing style, out string cased)
+    public static bool TryToCase(string? value, StringCasing style, out string cased)
         => TryToCase(value, inputStyle: style, outputStyle: style, out cased);
-
-    /// <summary>
-    /// Attempts to convert the specified string from one casing convention to another.
-    /// </summary>
-    /// <param name="value">The string to convert. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
-    /// <param name="inputStyle">The <see cref="StringCasing"/> convention of the input string.</param>
-    /// <param name="outputStyle">The <see cref="StringCasing"/> convention for the output.</param>
-    /// <param name="cased">
-    /// When this method returns <see langword="true"/>, contains the converted string.
-    /// When <see langword="false"/>, contains <see cref="string.Empty"/>.
-    /// </param>
-    /// <returns><see langword="true"/> if the conversion succeeded; otherwise, <see langword="false"/>.</returns>
-    public static bool ToCase(string? value, StringCasing inputStyle, StringCasing outputStyle, out string cased)
-        => TryToCase(value, inputStyle, outputStyle, out cased);
-
-    /// <summary>
-    /// Attempts to join the specified words into a string using the given casing convention.
-    /// </summary>
-    /// <param name="words">The words to join. If <see langword="null"/> or empty, returns <see langword="false"/>.</param>
-    /// <param name="outputStyle">The <see cref="StringCasing"/> convention for the output.</param>
-    /// <param name="cased">
-    /// When this method returns <see langword="true"/>, contains the joined string.
-    /// When <see langword="false"/>, contains <see cref="string.Empty"/>.
-    /// </param>
-    /// <returns><see langword="true"/> if the words were successfully joined; otherwise, <see langword="false"/>.</returns>
-    public static bool ToCase(IReadOnlyList<string> words, StringCasing outputStyle, out string cased)
-        => TryToCase(words, outputStyle, out cased);
 
     /// <summary>
     /// Attempts to convert the specified string from one casing convention to another.
@@ -141,7 +114,7 @@ public static partial class StringUtility
             StringCasing.KebabCase => ToSeparatedCase(words, "-", WordTransform.Lower),
             StringCasing.DotCase => ToSeparatedCase(words, ".", WordTransform.Lower),
             StringCasing.TrainCase => ToSeparatedCase(words, "-", WordTransform.Title),
-            StringCasing.SpaceCase => ToSeparatedCase(words, " ", WordTransform.Title),
+            StringCasing.SpaceCase => ToSeparatedCase(words, " ", WordTransform.Lower),
             _ => string.Empty
         };
 
@@ -160,40 +133,6 @@ public static partial class StringUtility
         Lower,
         Upper,
         Title
-    }
-
-    private static bool TryCreateWordsFromSpaceCase(string value, out IReadOnlyList<string> words)
-    {
-        words = [];
-
-        // Enforce simple single-space separation.
-        // `TryCreateWords` passes a trimmed value so this method never sees leading/trailing spaces.
-
-        var list = new List<string>();
-        var start = 0;
-
-        for (var i = 0; i < value.Length; i++)
-        {
-            var ch = value[i];
-
-            if (ch == ' ')
-            {
-                if (i == start)
-                    return false; // empty segment
-
-                list.Add(value[start..i]);
-                start = i + 1;
-                continue;
-            }
-
-            if (!char.IsLetterOrDigit(ch))
-                return false;
-        }
-
-        list.Add(value[start..]);
-
-        words = list;
-        return true;
     }
 
     private static bool TryCreateWordsFromSeparated(

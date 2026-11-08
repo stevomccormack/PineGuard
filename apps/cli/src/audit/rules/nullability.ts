@@ -6,6 +6,7 @@ import type { Node } from "web-tree-sitter";
 import { registerRule } from "../catalog.js";
 import {
     findMethodDeclarations,
+    findTypeDeclarations,
     parseFile as parseCsharpFile,
 } from "../parsing/csharp.js";
 import type {
@@ -133,19 +134,7 @@ const PREDEFINED_REFERENCE_TYPES = new Set<string>([
     "dynamic",
 ]);
 
-/**
- * Named (non-keyword) BCL value types this codebase's Must/Guard clauses
- * parameterise on today — the same set `must-collisions` maintains for the
- * same reason (see that rule's `KNOWN_VALUE_TYPES` doc comment): a
- * syntax-only rule cannot resolve an arbitrary type name's kind, so anything
- * not in this set (or {@link PREDEFINED_VALUE_TYPES}) defaults to the
- * reference-type bucket. A real custom `struct` primary parameter this list
- * misses (e.g. one of the small value-object structs under
- * `src/PineGuard.Core/Common/`) produces a false-positive finding rather
- * than a false negative — the safer direction for a merge-blocking-adjacent
- * rule to err in, and fixable either by extending this list or by an
- * exemption entry (see the module doc comment above).
- */
+/** BCL value types whose declarations are outside the source inventory. */
 const KNOWN_NAMED_VALUE_TYPES = new Set<string>([
     "Guid",
     "DateTime",
@@ -265,7 +254,8 @@ function splitNullable(typeText: string): { base: string; nullable: boolean } {
     if (trimmed.endsWith("?")) {
         return { base: trimmed.slice(0, -1).trim(), nullable: true };
     }
-    const wrapperMatch = /^Nullable<\s*(.+?)\s*>$/.exec(trimmed);
+    const wrapperMatch =
+        /^(?:global::)?(?:System\.)?Nullable<\s*(.+?)\s*>$/.exec(trimmed);
     if (wrapperMatch) {
         return { base: (wrapperMatch[1] ?? trimmed).trim(), nullable: true };
     }
@@ -299,6 +289,7 @@ interface PrimaryClassification {
 function classifyPrimaryParameter(
     parameter: ParameterInfo,
     generics: GenericInfo,
+    declaredTypes: ReadonlyMap<string, ReadonlySet<TypeBucket>>,
 ): PrimaryClassification | undefined {
     if (parameter.typeText === null) {
         return undefined;
@@ -320,7 +311,7 @@ function classifyPrimaryParameter(
         };
     }
 
-    if (PREDEFINED_REFERENCE_TYPES.has(simple)) {
+    if (PREDEFINED_REFERENCE_TYPES.has(simple) || base.endsWith("]")) {
         return {
             bucket: "reference",
             isNullableSyntax: nullable,
@@ -328,9 +319,36 @@ function classifyPrimaryParameter(
         };
     }
 
-    const isValueType =
-        PREDEFINED_VALUE_TYPES.has(simple) ||
-        KNOWN_NAMED_VALUE_TYPES.has(simple);
+    const qualified = base.replace(/^global::/, "").replace(/<.*>/, "");
+    let root = parameter.node;
+    while (root.parent) root = root.parent;
+    const namespaces: string[] = [];
+    const fileNamespace = root.namedChildren
+        .find((node) => node.type === "file_scoped_namespace_declaration")
+        ?.childForFieldName("name")?.text;
+    if (fileNamespace) namespaces.push(fileNamespace);
+    for (const directive of root.descendantsOfType("using_directive")) {
+        if (!directive.children.some((node) => node.type === "=")) {
+            const name = directive.namedChildren.at(-1)?.text;
+            if (name) namespaces.push(name);
+        }
+    }
+    const scoped = namespaces
+        .map((namespace) => declaredTypes.get(namespace + "." + qualified))
+        .filter((types) => types !== undefined);
+    const scopedBuckets = new Set(scoped.flatMap((types) => [...types]));
+    const declared = qualified.includes(".")
+        ? declaredTypes.get(qualified)
+        : scopedBuckets.size > 0
+          ? scopedBuckets
+          : KNOWN_NAMED_VALUE_TYPES.has(simple)
+            ? undefined
+            : declaredTypes.get(simple);
+    if (declared && declared.size !== 1) return undefined;
+    const isValueType = declared
+        ? declared.has("value")
+        : PREDEFINED_VALUE_TYPES.has(simple) ||
+          KNOWN_NAMED_VALUE_TYPES.has(simple);
     const bucket: TypeBucket = isValueType ? "value" : "reference";
     return {
         bucket,
@@ -394,6 +412,59 @@ function collectCandidateFiles(ctx: RuleContext): CandidateFile[] {
     }));
 }
 
+/** Resolve source-declared structs, record structs and enums without a product-specific allowlist. */
+async function collectDeclaredTypes(
+    ctx: RuleContext,
+): Promise<Map<string, Set<TypeBucket>>> {
+    const parse = ctx.parseFile ?? parseCsharpFile;
+    const paths = ctx.trackedFiles
+        ? ctx.trackedFiles
+              .filter((file) => file.startsWith("src/") && file.endsWith(".cs"))
+              .map((file) => join(ctx.rootDir, file))
+        : [...walkCsFiles(ctx.rootDir)];
+    const types = new Map<string, Set<TypeBucket>>();
+    for (const path of paths) {
+        const { root } = await parse(path);
+        const fileNamespace = root.namedChildren
+            .find((node) => node.type === "file_scoped_namespace_declaration")
+            ?.childForFieldName("name")?.text;
+        for (const declaration of findTypeDeclarations(root)) {
+            const value =
+                declaration.kind === "struct" ||
+                declaration.kind === "enum" ||
+                (declaration.kind === "record" &&
+                    declaration.node.children.some(
+                        (node) => node.type === "struct",
+                    ));
+            const parts = [declaration.name];
+            for (
+                let ancestor = declaration.node.parent;
+                ancestor;
+                ancestor = ancestor.parent
+            ) {
+                if (
+                    [
+                        "namespace_declaration",
+                        "class_declaration",
+                        "struct_declaration",
+                        "record_declaration",
+                    ].includes(ancestor.type)
+                ) {
+                    const name = ancestor.childForFieldName("name")?.text;
+                    if (name) parts.unshift(name);
+                }
+            }
+            if (fileNamespace) parts.unshift(fileNamespace);
+            for (const name of new Set([declaration.name, parts.join(".")])) {
+                const buckets = types.get(name) ?? new Set<TypeBucket>();
+                buckets.add(value ? "value" : "reference");
+                types.set(name, buckets);
+            }
+        }
+    }
+    return types;
+}
+
 registerRule({
     slug: "nullability",
     legacyId: "Rule07",
@@ -404,6 +475,7 @@ registerRule({
     async run(ctx: RuleContext): Promise<Finding[]> {
         const parse = ctx.parseFile ?? parseCsharpFile;
         const files = collectCandidateFiles(ctx);
+        const declaredTypes = await collectDeclaredTypes(ctx);
 
         const findings: Finding[] = [];
         for (const file of files) {
@@ -422,6 +494,7 @@ registerRule({
                 const classification = classifyPrimaryParameter(
                     primary,
                     generics,
+                    declaredTypes,
                 );
                 if (!classification || !violates(classification)) {
                     continue;

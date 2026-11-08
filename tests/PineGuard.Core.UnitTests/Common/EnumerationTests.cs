@@ -1,20 +1,145 @@
-using System.Reflection;
+using System.Runtime.CompilerServices;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
+using Xunit.Abstractions;
 
 namespace PineGuard.Core.UnitTests.Common;
 
-public sealed class EnumerationTests : BaseUnitTest
+public sealed class EnumerationTests(ITestOutputHelper output)
+    : BaseRuleUnitTest(output)
 {
-    protected override void OnDispose()
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.CatalogueMembership.Cases), MemberType = typeof(EnumerationTestData.CatalogueMembership))]
+    public void GetAll_UsesClosedInheritedCatalogue(EnumerationTestData.CatalogueMembership.Case testCase)
     {
-        ClearRegistries(typeof(Enumeration<int>));
-        ClearRegistries(typeof(Enumeration<string>));
+        // Act
+        var members = testCase.Query();
+        var again = testCase.Query();
+
+        // Assert
+        Assert.Same(members, again);
+        Assert.Equal(testCase.ExpectedNames, members.Select(member => member.Name));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.CatalogueFailure.Cases), MemberType = typeof(EnumerationTestData.CatalogueFailure))]
+    public void GetAll_CachesCatalogueFailureWithoutPublishingMembers(EnumerationTestData.CatalogueFailure.Case testCase)
+    {
+        // Act
+        var first = Assert.Throws(testCase.ExceptionType, testCase.Query);
+        var second = Assert.Throws(testCase.ExceptionType, testCase.Query);
+
+        // Assert
+        Assert.Same(first, second);
+        Assert.Contains(testCase.MessageContains, first.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.InitializationQuery.Cases), MemberType = typeof(EnumerationTestData.InitializationQuery))]
+    public void GetAll_FirstQueryDuringInitializationRejectsIncompleteFields(EnumerationTestData.InitializationQuery.Case testCase)
+    {
+        // Act
+        var initializationFailure = Assert.Throws<TypeInitializationException>(() => RuntimeHelpers.RunClassConstructor(typeof(EnumerationTestData.InitializingCatalogue).TypeHandle));
+        var catalogueFailure = Assert.Throws<InvalidOperationException>(() => Enumeration<int>.GetAll<EnumerationTestData.InitializingCatalogue>());
+
+        // Assert
+        Assert.Same(initializationFailure.InnerException, catalogueFailure);
+        Assert.Contains(testCase.MissingField, catalogueFailure.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.CatalogueConcurrency.Cases), MemberType = typeof(EnumerationTestData.CatalogueConcurrency))]
+    public async Task GetAll_ConcurrentFirstAccessPublishesOneCompleteCatalogue(EnumerationTestData.CatalogueConcurrency.Case testCase)
+    {
+        // Act
+        var readers = Enumerable.Range(0, testCase.ReaderCount)
+            .Select(_ => Task.Run(Enumeration<int>.GetAll<EnumerationTestData.ConcurrentCatalogue>));
+        var catalogues = await Task.WhenAll(readers);
+
+        // Assert
+        Assert.All(catalogues, catalogue =>
+        {
+            Assert.Same(catalogues[0], catalogue);
+            Assert.Equal(testCase.ExpectedNames, catalogue.Select(member => member.Name));
+            Assert.All(catalogue, member =>
+            {
+                Assert.Same(member, Enumeration<int>.FromValue<EnumerationTestData.ConcurrentCatalogue>(member.Value));
+                Assert.Same(member, Enumeration<int>.FromName<EnumerationTestData.ConcurrentCatalogue>(member.Name));
+            });
+        });
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.CatalogueImmutability.Cases), MemberType = typeof(EnumerationTestData.CatalogueImmutability))]
+    public void GetAll_DoesNotExposeMutableBackingStorage(EnumerationTestData.CatalogueImmutability.Case testCase)
+    {
+        // Arrange
+        var members = Enumeration<int>.GetAll<EnumerationTestData.TestColor>();
+        var collection = Assert.IsAssignableFrom<IList<EnumerationTestData.TestColor>>(members);
+        var original = members[0];
+
+        // Act
+        var failure = Record.Exception(() => collection[0] = testCase.Replacement);
+
+        // Assert
+        Assert.IsType<NotSupportedException>(failure);
+        Assert.True(collection.IsReadOnly);
+        Assert.Same(original, Enumeration<int>.GetAll<EnumerationTestData.TestColor>()[0]);
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.ConstructionRecovery.Cases), MemberType = typeof(EnumerationTestData.ConstructionRecovery))]
+    public void ConstructionFailure_DoesNotReserveIdentityOrRegisterInstances(EnumerationTestData.ConstructionRecovery.Case testCase)
+    {
+        // Act
+        var failure = Record.Exception(() => new EnumerationTestData.RecoverableEnumeration(testCase.MemberValue, testCase.MemberName, true));
+        var recovered = new EnumerationTestData.RecoverableEnumeration(testCase.MemberValue, testCase.MemberName, false);
+        var duplicate = new EnumerationTestData.RecoverableEnumeration(testCase.MemberValue, testCase.MemberName, false);
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(failure);
+        Assert.Equal(recovered, duplicate);
+        Assert.Empty(Enumeration<int>.GetAll<EnumerationTestData.RecoverableEnumeration>());
+        Assert.Null(Enumeration<int>.FromValue<EnumerationTestData.RecoverableEnumeration>(testCase.MemberValue));
+        Assert.Null(Enumeration<int>.FromName<EnumerationTestData.RecoverableEnumeration>(testCase.MemberName));
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.StringIdentity.Cases), MemberType = typeof(EnumerationTestData.StringIdentity))]
+    public void StringLookup_PreservesOrdinalValuesAndCaseInsensitiveNames(EnumerationTestData.StringIdentity.Case testCase)
+    {
+        // Arrange
+        using var culture = UseCulture("tr-TR");
+
+        // Act
+        var valueFound = Enumeration<string>.TryFromValue<EnumerationTestData.StringIdentityCatalogue>(testCase.MemberValue, out var byValue);
+        var nameFound = Enumeration<string>.TryFromName<EnumerationTestData.StringIdentityCatalogue>(testCase.MemberName, out var byName);
+
+        // Assert
+        Assert.Equal(testCase.Expected is not null, valueFound);
+        Assert.Equal(testCase.Expected is not null, nameFound);
+        Assert.Same(testCase.Expected, byValue);
+        Assert.Same(testCase.Expected, byName);
+        Assert.NotEqual(EnumerationTestData.StringIdentityCatalogue.Lower, EnumerationTestData.StringIdentityCatalogue.Upper);
+        Assert.True(EnumerationTestData.StringIdentityCatalogue.Upper.CompareTo(EnumerationTestData.StringIdentityCatalogue.Lower) < 0);
+        Assert.Equal(StringComparer.Ordinal.GetHashCode(EnumerationTestData.StringIdentityCatalogue.Lower.Value), EnumerationTestData.StringIdentityCatalogue.Lower.GetHashCode());
+    }
+
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.NullValueLookup.Cases), MemberType = typeof(EnumerationTestData.NullValueLookup))]
+    public void FromValue_RejectsNullReferenceValue(EnumerationTestData.NullValueLookup.Case testCase)
+    {
+        // Act
+        var failure = Assert.Throws<ArgumentNullException>(() => Enumeration<string>.FromValue<EnumerationTestData.StringIdentityCatalogue>(testCase.MemberValue!));
+
+        // Assert
+        Assert.Equal("value", failure.ParamName);
     }
 
     [Theory]
     [MemberData(nameof(EnumerationTestData.IntConstructor.ValidCases), MemberType = typeof(EnumerationTestData.IntConstructor))]
-    public void Ctor_RegistersValueAndName(EnumerationTestData.IntConstructor.ValidCase testCase)
+    public void Ctor_InitializesValueAndName(EnumerationTestData.IntConstructor.ValidCase testCase)
     {
         // Act
         var enumeration = new EnumerationTestData.DynamicIntEnumeration(testCase.InputValue, testCase.EnumerationName);
@@ -39,41 +164,6 @@ public sealed class EnumerationTests : BaseUnitTest
 
         // Assert
         ThrowsCaseAssert.Expected(ex, invalidCase);
-    }
-
-    [Theory]
-    [MemberData(nameof(EnumerationTestData.DuplicateName.Cases), MemberType = typeof(EnumerationTestData.DuplicateName))]
-    public void Ctor_WhenNameIsDuplicate_IgnoresCase_Throws(EnumerationTestData.DuplicateName.Case testCase)
-    {
-        // Arrange
-        _ = new EnumerationTestData.DynamicIntEnumeration(testCase.FirstValue, testCase.FirstName);
-
-        // Act
-        var ex = Assert.Throws(testCase.ExpectedException.Type,
-            () => _ = new EnumerationTestData.DynamicIntEnumeration(testCase.SecondValue, testCase.SecondName));
-
-        // Assert
-        ThrowsCaseAssert.Expected(ex, testCase);
-    }
-
-    [Theory]
-    [MemberData(nameof(EnumerationTestData.DuplicateValue.Cases), MemberType = typeof(EnumerationTestData.DuplicateValue))]
-    public void Ctor_WhenValueIsDuplicate_Throws_AndRollsBackNameRegistration(
-        EnumerationTestData.DuplicateValue.Case testCase)
-    {
-        // Arrange
-        _ = new EnumerationTestData.DynamicIntEnumeration(testCase.FirstValue, testCase.FirstName);
-
-        // Act
-        var ex = Assert.Throws(testCase.ExpectedException.Type,
-            () => _ = new EnumerationTestData.DynamicIntEnumeration(testCase.SecondValue, testCase.SecondName));
-
-        // Assert
-        ThrowsCaseAssert.Expected(ex, testCase);
-
-        var recovered = new EnumerationTestData.DynamicIntEnumeration(testCase.SecondValue + 1, testCase.SecondName);
-        Assert.Equal(testCase.SecondValue + 1, recovered.Value);
-        Assert.Equal(testCase.SecondName, recovered.Name);
     }
 
     [Theory]
@@ -222,62 +312,50 @@ public sealed class EnumerationTests : BaseUnitTest
         ThrowsCaseAssert.Expected(ex, invalidCase);
     }
 
-    public static class TryFromValueNull
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.TryFromValueNull.EdgeCases), MemberType = typeof(EnumerationTestData.TryFromValueNull))]
+    public void TryFromValueNull_ShouldReturnFalse_WhenNull(EnumerationTestData.TryFromValueNull.ValidCase testCase)
     {
-        [Theory]
-        [MemberData(nameof(EnumerationTestData.TryFromValueNull.EdgeCases), MemberType = typeof(EnumerationTestData.TryFromValueNull))]
-        public static void ShouldReturnFalse_WhenNull(EnumerationTestData.TryFromValueNull.ValidCase testCase)
-        {
-            // Act
-            var ok = Enumeration<string>.TryFromValue<EnumerationTestData.TestStringColor>(testCase.Value, out var result);
+        // Act
+        var ok = Enumeration<string>.TryFromValue<EnumerationTestData.TestStringColor>(testCase.Value, out var result);
 
-            // Assert
-            Assert.Equal(testCase.Expected, ok);
-            Assert.Null(result);
-        }
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Null(result);
     }
 
-    public static class ImplicitOperatorString
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.ImplicitOperatorString.ValidCases), MemberType = typeof(EnumerationTestData.ImplicitOperatorString))]
+    public void ImplicitOperatorString_ShouldReturnName(EnumerationTestData.ImplicitOperatorString.ValidCase testCase)
     {
-        [Theory]
-        [MemberData(nameof(EnumerationTestData.ImplicitOperatorString.ValidCases), MemberType = typeof(EnumerationTestData.ImplicitOperatorString))]
-        public static void ShouldReturnName(EnumerationTestData.ImplicitOperatorString.ValidCase testCase)
-        {
-            // Act
-            string name = testCase.Input;
+        // Act
+        string name = testCase.Input;
 
-            // Assert
-            Assert.Equal(testCase.ExpectedString, name);
-        }
+        // Assert
+        Assert.Equal(testCase.ExpectedString, name);
     }
 
-    public static class ImplicitOperatorInt
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.ImplicitOperatorInt.ValidCases), MemberType = typeof(EnumerationTestData.ImplicitOperatorInt))]
+    public void ImplicitOperatorInt_ShouldReturnValue(EnumerationTestData.ImplicitOperatorInt.ValidCase testCase)
     {
-        [Theory]
-        [MemberData(nameof(EnumerationTestData.ImplicitOperatorInt.ValidCases), MemberType = typeof(EnumerationTestData.ImplicitOperatorInt))]
-        public static void ShouldReturnValue(EnumerationTestData.ImplicitOperatorInt.ValidCase testCase)
-        {
-            // Act
-            int value = testCase.Input;
+        // Act
+        int value = testCase.Input;
 
-            // Assert
-            Assert.Equal(testCase.ExpectedValue, value);
-        }
+        // Assert
+        Assert.Equal(testCase.ExpectedValue, value);
     }
 
-    public static class CompareTo
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.CompareTo.ValidCases), MemberType = typeof(EnumerationTestData.CompareTo))]
+    [MemberData(nameof(EnumerationTestData.CompareTo.EdgeCases), MemberType = typeof(EnumerationTestData.CompareTo))]
+    public void CompareTo_ShouldReturnExpectedSign(EnumerationTestData.CompareTo.ValidCase testCase)
     {
-        [Theory]
-        [MemberData(nameof(EnumerationTestData.CompareTo.ValidCases), MemberType = typeof(EnumerationTestData.CompareTo))]
-        [MemberData(nameof(EnumerationTestData.CompareTo.EdgeCases), MemberType = typeof(EnumerationTestData.CompareTo))]
-        public static void ShouldReturnExpectedSign(EnumerationTestData.CompareTo.ValidCase testCase)
-        {
-            // Act
-            var result = testCase.Left.CompareTo(testCase.Right);
+        // Act
+        var result = testCase.Left.CompareTo(testCase.Right);
 
-            // Assert
-            Assert.Equal(testCase.ExpectedResult, result);
-        }
+        // Assert
+        Assert.Equal(testCase.ExpectedResult, result);
     }
 
     [Theory]
@@ -296,79 +374,50 @@ public sealed class EnumerationTests : BaseUnitTest
         Assert.Equal(testCase.ExpectedLessThanZero, result < 0);
     }
 
-    public static class OperatorEquals
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.OperatorEquals.ValidCases), MemberType = typeof(EnumerationTestData.OperatorEquals))]
+    [MemberData(nameof(EnumerationTestData.OperatorEquals.EdgeCases), MemberType = typeof(EnumerationTestData.OperatorEquals))]
+    public void OperatorEquals_ShouldReturnExpected(EnumerationTestData.OperatorEquals.ValidCase testCase)
     {
-        [Theory]
-        [MemberData(nameof(EnumerationTestData.OperatorEquals.ValidCases), MemberType = typeof(EnumerationTestData.OperatorEquals))]
-        [MemberData(nameof(EnumerationTestData.OperatorEquals.EdgeCases), MemberType = typeof(EnumerationTestData.OperatorEquals))]
-        public static void ShouldReturnExpected(EnumerationTestData.OperatorEquals.ValidCase testCase)
-        {
-            // Act
-            var equal = testCase.Left == testCase.Right;
-            var notEqual = testCase.Left != testCase.Right;
+        // Act
+        var equal = testCase.Left == testCase.Right;
+        var notEqual = testCase.Left != testCase.Right;
 
-            // Assert
-            Assert.Equal(testCase.Expected, equal);
-            Assert.Equal(!testCase.Expected, notEqual);
-        }
+        // Assert
+        Assert.Equal(testCase.Expected, equal);
+        Assert.Equal(!testCase.Expected, notEqual);
     }
 
-    public static class OperatorComparison
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.OperatorComparison.ValidCases), MemberType = typeof(EnumerationTestData.OperatorComparison))]
+    [MemberData(nameof(EnumerationTestData.OperatorComparison.EdgeCases), MemberType = typeof(EnumerationTestData.OperatorComparison))]
+    public void OperatorComparison_ShouldReturnExpected(EnumerationTestData.OperatorComparison.ValidCase testCase)
     {
-        [Theory]
-        [MemberData(nameof(EnumerationTestData.OperatorComparison.ValidCases), MemberType = typeof(EnumerationTestData.OperatorComparison))]
-        [MemberData(nameof(EnumerationTestData.OperatorComparison.EdgeCases), MemberType = typeof(EnumerationTestData.OperatorComparison))]
-        public static void ShouldReturnExpected(EnumerationTestData.OperatorComparison.ValidCase testCase)
-        {
-            // Arrange
-            var (left, right) = testCase.Value;
+        // Arrange
+        var (left, right) = testCase.Value;
 
-            // Act
-            var lessThan = left < right;
-            var lessThanOrEqual = left <= right;
-            var greaterThan = left > right;
-            var greaterThanOrEqual = left >= right;
+        // Act
+        var lessThan = left < right;
+        var lessThanOrEqual = left <= right;
+        var greaterThan = left > right;
+        var greaterThanOrEqual = left >= right;
 
-            // Assert
-            Assert.Equal(testCase.ExpectedLessThan, lessThan);
-            Assert.Equal(testCase.ExpectedLessThanOrEqual, lessThanOrEqual);
-            Assert.Equal(testCase.ExpectedGreaterThan, greaterThan);
-            Assert.Equal(testCase.ExpectedGreaterThanOrEqual, greaterThanOrEqual);
-        }
+        // Assert
+        Assert.Equal(testCase.ExpectedLessThan, lessThan);
+        Assert.Equal(testCase.ExpectedLessThanOrEqual, lessThanOrEqual);
+        Assert.Equal(testCase.ExpectedGreaterThan, greaterThan);
+        Assert.Equal(testCase.ExpectedGreaterThanOrEqual, greaterThanOrEqual);
     }
 
-    public static class HashCode
+    [Theory]
+    [MemberData(nameof(EnumerationTestData.HashCode.ValidCases), MemberType = typeof(EnumerationTestData.HashCode))]
+    public void HashCode_ShouldReturnValueHashCode(EnumerationTestData.HashCode.ValidCase testCase)
     {
-        [Theory]
-        [MemberData(nameof(EnumerationTestData.HashCode.ValidCases), MemberType = typeof(EnumerationTestData.HashCode))]
-        public static void ShouldReturnValueHashCode(EnumerationTestData.HashCode.ValidCase testCase)
-        {
-            // Act
-            var result = testCase.Input.GetHashCode();
+        // Act
+        var result = testCase.Input.GetHashCode();
 
-            // Assert
-            Assert.Equal(testCase.ExpectedValue, result);
-        }
+        // Assert
+        Assert.Equal(testCase.ExpectedValue, result);
     }
 
-    private static void ClearRegistries(Type closedEnumerationType)
-    {
-        ClearStaticConcurrentDictionary(closedEnumerationType, "NameRegistries");
-        ClearStaticConcurrentDictionary(closedEnumerationType, "ValueRegistries");
-    }
-
-    private static void ClearStaticConcurrentDictionary(Type closedEnumerationType, string fieldName)
-    {
-        var field = closedEnumerationType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
-
-        var instance = field?.GetValue(null);
-        if (instance is null)
-        {
-            return;
-        }
-
-        var clear = instance.GetType().GetMethod("Clear", BindingFlags.Public | BindingFlags.Instance, binder: null,
-            types: Type.EmptyTypes, modifiers: null);
-        clear?.Invoke(instance, parameters: null);
-    }
 }

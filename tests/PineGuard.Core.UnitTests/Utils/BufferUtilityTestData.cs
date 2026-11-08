@@ -4,7 +4,7 @@ namespace PineGuard.Core.UnitTests.Utils;
 
 public static class BufferUtilityTestData
 {
-    public static class IsHexString
+    public static class IsHex
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
@@ -31,7 +31,7 @@ public static class BufferUtilityTestData
             : IsCase<string?>(Name, Value, Expected);
     }
 
-    public static class IsBase64String
+    public static class IsBase64
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
@@ -60,7 +60,7 @@ public static class BufferUtilityTestData
             : IsCase<string?>(Name, Value, Expected);
     }
 
-    public static class IsBase64UrlString
+    public static class IsBase64Url
     {
         public static TheoryData<ValidCase> ValidCases =>
         [

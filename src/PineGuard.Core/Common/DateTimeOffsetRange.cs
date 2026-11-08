@@ -67,34 +67,28 @@ public readonly struct DateTimeOffsetRange : IEquatable<DateTimeOffsetRange>
     public bool Contains(DateTimeOffset value) => value >= Start && value <= End;
 
     /// <summary>
-    /// Determines whether this range overlaps with another range (exclusive boundaries).
+    /// Determines whether this range shares at least one included value with another closed range.
     /// </summary>
     /// <param name="other">The other range to compare.</param>
     /// <returns><see langword="true"/> if the ranges overlap; otherwise, <see langword="false"/>.</returns>
-    public bool Overlaps(DateTimeOffsetRange other)
-        => Start < other.End && other.Start < End;
+    public bool Overlaps(DateTimeOffsetRange other) => Overlaps(other, Inclusion.Inclusive);
 
     /// <summary>
     /// Determines whether this range overlaps with another range using the specified boundary inclusion.
     /// </summary>
     /// <param name="other">The other range to compare.</param>
-    /// <param name="inclusion">Whether the boundaries are inclusive or exclusive.</param>
+    /// <param name="inclusion">Whether to intersect the closed ranges or their open interiors. Open interiors exclude both endpoints; singleton and one-step ranges have empty interiors.</param>
     /// <returns><see langword="true"/> if the ranges overlap; otherwise, <see langword="false"/>.</returns>
-    public bool Overlaps(DateTimeOffsetRange other, Inclusion inclusion)
-    {
-        if (inclusion == Inclusion.Exclusive)
-            return Start < other.End && other.Start < End;
-
-        return Start <= other.End && other.Start <= End;
-    }
+    public bool Overlaps(DateTimeOffsetRange other, Inclusion inclusion) =>
+        TemporalRangeComparison.Overlaps(Start.UtcDateTime.Ticks, End.UtcDateTime.Ticks, other.Start.UtcDateTime.Ticks, other.End.UtcDateTime.Ticks, inclusion);
 
     /// <summary>
-    /// Determines whether this range is adjacent to another range (touching at a single point).
+    /// Determines whether this range is adjacent to another range (disjoint, with no representable value between them).
     /// </summary>
     /// <param name="other">The other range to compare.</param>
     /// <returns><see langword="true"/> if the ranges are adjacent; otherwise, <see langword="false"/>.</returns>
-    public bool IsAdjacentTo(DateTimeOffsetRange other)
-        => Start == other.End || End == other.Start;
+    public bool IsAdjacentTo(DateTimeOffsetRange other) =>
+        TemporalRangeComparison.IsAdjacent(Start.UtcDateTime.Ticks, End.UtcDateTime.Ticks, other.Start.UtcDateTime.Ticks, other.End.UtcDateTime.Ticks);
 
     /// <summary>
     /// Computes the intersection of this range with another range.
@@ -117,16 +111,31 @@ public readonly struct DateTimeOffsetRange : IEquatable<DateTimeOffsetRange>
     }
 
     /// <summary>
-    /// Computes the union of this range with another range (smallest range encompassing both).
+    /// Computes the smallest closed range enclosing both operands, including any gap.
     /// </summary>
-    /// <param name="other">The other range to union with.</param>
+    /// <param name="other">The other range to enclose.</param>
     /// <returns>A <see cref="DateTimeOffsetRange"/> encompassing both ranges.</returns>
-    public DateTimeOffsetRange Union(DateTimeOffsetRange other)
+    public DateTimeOffsetRange Enclose(DateTimeOffsetRange other)
     {
         var start = Start < other.Start ? Start : other.Start;
         var end = End > other.End ? End : other.End;
 
         return new DateTimeOffsetRange(start, end);
+    }
+
+    /// <summary>
+    /// Computes the exact union as an ordered, read-only collection of closed ranges.
+    /// </summary>
+    /// <param name="other">The other range.</param>
+    /// <returns>One range when the operands overlap or are adjacent; otherwise two disjoint ranges in ascending order.</returns>
+    public IReadOnlyList<DateTimeOffsetRange> Union(DateTimeOffsetRange other)
+    {
+        if (Overlaps(other) || IsAdjacentTo(other))
+            return Array.AsReadOnly(new[] { Enclose(other) });
+
+        return Start < other.Start
+            ? Array.AsReadOnly(new[] { this, other })
+            : Array.AsReadOnly(new[] { other, this });
     }
 
     /// <inheritdoc />

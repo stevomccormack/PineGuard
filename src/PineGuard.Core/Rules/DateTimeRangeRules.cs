@@ -20,11 +20,12 @@ public static class DateTimeRangeRules
     /// </returns>
     public static bool IsChronological(DateTimeRange? range, Inclusion inclusion = Inclusion.Exclusive)
     {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
         if (range is null)
             return false;
 
         var r = range.Value;
-        return RangeRules.IsChronological<DateTime>(r.Start, r.End, inclusion);
+        return RangeRules.IsChronological(DateTimeUtility.ToUtc(r.Start), DateTimeUtility.ToUtc(r.End), inclusion);
     }
 
     /// <summary>
@@ -32,13 +33,14 @@ public static class DateTimeRangeRules
     /// </summary>
     /// <param name="range1">The first range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="range2">The second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the endpoints are inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="inclusion">Whether to intersect closed ranges or open interiors. Singleton and one-step interiors are empty. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns>
     /// <see langword="true"/> if <paramref name="range1"/> and <paramref name="range2"/> overlap;
     /// otherwise, <see langword="false"/>.
     /// </returns>
-    public static bool IsOverlapping(DateTimeRange? range1, DateTimeRange? range2, Inclusion inclusion = Inclusion.Exclusive)
+    public static bool IsOverlapping(DateTimeRange? range1, DateTimeRange? range2, Inclusion inclusion = Inclusion.Inclusive)
     {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
         if (range1 is null || range2 is null)
             return false;
 
@@ -57,6 +59,7 @@ public static class DateTimeRangeRules
     /// </returns>
     public static bool Contains(DateTimeRange? range, DateTime? value, Inclusion inclusion = Inclusion.Inclusive)
     {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
         if (range is null || value is null)
             return false;
 
@@ -66,6 +69,6 @@ public static class DateTimeRangeRules
         var start = DateTimeUtility.ToUtc(r.Start)!.Value;
         var end = DateTimeUtility.ToUtc(r.End)!.Value;
 
-        return inclusion == Inclusion.Exclusive ? v > start && v < end : v >= start && v <= end;
+        return RuleComparison.IsInRange(v, start, end, inclusion);
     }
 }

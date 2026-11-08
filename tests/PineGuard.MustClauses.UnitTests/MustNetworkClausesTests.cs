@@ -33,33 +33,6 @@ public sealed class MustNetworkClausesTests(ITestOutputHelper output) : BaseMust
     }
 
     [Theory]
-    [MemberData(nameof(MustNetworkClausesTestData.IpAddressString.ValidCases), MemberType = typeof(MustNetworkClausesTestData.IpAddressString))]
-    [MemberData(nameof(MustNetworkClausesTestData.IpAddressString.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.IpAddressString))]
-    public void IpAddressString_BehavesAsExpected(MustCase<string?> tc)
-    {
-        var result = Must.Be.IpAddressString(tc.Value, paramName: "value");
-        AssertResult(tc, result);
-    }
-
-    [Theory]
-    [MemberData(nameof(MustNetworkClausesTestData.Ipv4String.ValidCases), MemberType = typeof(MustNetworkClausesTestData.Ipv4String))]
-    [MemberData(nameof(MustNetworkClausesTestData.Ipv4String.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.Ipv4String))]
-    public void Ipv4String_BehavesAsExpected(MustCase<string?> tc)
-    {
-        var result = Must.Be.Ipv4String(tc.Value, paramName: "value");
-        AssertResult(tc, result);
-    }
-
-    [Theory]
-    [MemberData(nameof(MustNetworkClausesTestData.Ipv6String.ValidCases), MemberType = typeof(MustNetworkClausesTestData.Ipv6String))]
-    [MemberData(nameof(MustNetworkClausesTestData.Ipv6String.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.Ipv6String))]
-    public void Ipv6String_BehavesAsExpected(MustCase<string?> tc)
-    {
-        var result = Must.Be.Ipv6String(tc.Value, paramName: "value");
-        AssertResult(tc, result);
-    }
-
-    [Theory]
     [MemberData(nameof(MustNetworkClausesTestData.InCidrRange.ValidCases), MemberType = typeof(MustNetworkClausesTestData.InCidrRange))]
     [MemberData(nameof(MustNetworkClausesTestData.InCidrRange.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.InCidrRange))]
     public void InCidrRange_BehavesAsExpected(MustCase<(string? ip, string cidr)> tc)
@@ -126,33 +99,6 @@ public sealed class MustNetworkClausesTests(ITestOutputHelper output) : BaseMust
     }
 
     [Theory]
-    [MemberData(nameof(MustNetworkClausesTestData.NotIpAddressString.ValidCases), MemberType = typeof(MustNetworkClausesTestData.NotIpAddressString))]
-    [MemberData(nameof(MustNetworkClausesTestData.NotIpAddressString.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.NotIpAddressString))]
-    public void NotIpAddressString_BehavesAsExpected(MustCase<string?> tc)
-    {
-        var result = Must.Be.NotIpAddressString(tc.Value, paramName: "value");
-        AssertResult(tc, result);
-    }
-
-    [Theory]
-    [MemberData(nameof(MustNetworkClausesTestData.NotIpv4String.ValidCases), MemberType = typeof(MustNetworkClausesTestData.NotIpv4String))]
-    [MemberData(nameof(MustNetworkClausesTestData.NotIpv4String.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.NotIpv4String))]
-    public void NotIpv4String_BehavesAsExpected(MustCase<string?> tc)
-    {
-        var result = Must.Be.NotIpv4String(tc.Value, paramName: "value");
-        AssertResult(tc, result);
-    }
-
-    [Theory]
-    [MemberData(nameof(MustNetworkClausesTestData.NotIpv6String.ValidCases), MemberType = typeof(MustNetworkClausesTestData.NotIpv6String))]
-    [MemberData(nameof(MustNetworkClausesTestData.NotIpv6String.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.NotIpv6String))]
-    public void NotIpv6String_BehavesAsExpected(MustCase<string?> tc)
-    {
-        var result = Must.Be.NotIpv6String(tc.Value, paramName: "value");
-        AssertResult(tc, result);
-    }
-
-    [Theory]
     [MemberData(nameof(MustNetworkClausesTestData.NotInCidrRange.ValidCases), MemberType = typeof(MustNetworkClausesTestData.NotInCidrRange))]
     [MemberData(nameof(MustNetworkClausesTestData.NotInCidrRange.InvalidCases), MemberType = typeof(MustNetworkClausesTestData.NotInCidrRange))]
     public void NotInCidrRange_BehavesAsExpected(MustCase<(string? ip, string cidr)> tc)
@@ -176,6 +122,17 @@ public sealed class MustNetworkClausesTests(ITestOutputHelper output) : BaseMust
     public void NotPortNumber_BehavesAsExpected(MustCase<int?> tc)
     {
         var result = Must.Be.NotPortNumber(tc.Value!.Value, paramName: "value");
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustNetworkClausesTestData.CidrConfiguration.Cases), MemberType = typeof(MustNetworkClausesTestData.CidrConfiguration))]
+    public void CidrConfiguration_RejectsInvalidConfigurationBeforeInput(MustCase<Func<MustResult<System.Net.IPAddress>>> tc)
+    {
+        // Act
+        var result = tc.Value();
+
+        // Assert
         AssertResult(tc, result);
     }
 }

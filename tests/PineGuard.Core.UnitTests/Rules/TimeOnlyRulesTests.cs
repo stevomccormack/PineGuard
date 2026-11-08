@@ -8,11 +8,11 @@ namespace PineGuard.Core.UnitTests.Rules;
 public sealed class TimeOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(TimeOnlyRulesTestData.IsBetween.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TimeOnlyRulesTestData.IsInRange.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsInRange))]
+    public void IsInRange_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = TimeOnlyRules.IsBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = TimeOnlyRules.IsInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);
@@ -20,7 +20,7 @@ public sealed class TimeOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
     [Theory]
     [MemberData(nameof(TimeOnlyRulesTestData.IsBefore.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsBefore))]
-    public void IsBefore_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)> tc)
+    public void IsBefore_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly other, Inclusion inclusion, TimePrecision? precision)> tc)
     {
         // Act
         var result = TimeOnlyRules.IsBefore(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
@@ -31,7 +31,7 @@ public sealed class TimeOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
     [Theory]
     [MemberData(nameof(TimeOnlyRulesTestData.IsBeforeDefaultInclusion.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsBeforeDefaultInclusion))]
-    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(TimeOnly? value, TimeOnly? other)> tc)
+    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(TimeOnly? value, TimeOnly other)> tc)
     {
         // Act
         var result = TimeOnlyRules.IsBefore(tc.Value.value, tc.Value.other);
@@ -42,7 +42,7 @@ public sealed class TimeOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
     [Theory]
     [MemberData(nameof(TimeOnlyRulesTestData.IsAfter.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsAfter))]
-    public void IsAfter_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)> tc)
+    public void IsAfter_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly other, Inclusion inclusion, TimePrecision? precision)> tc)
     {
         // Act
         var result = TimeOnlyRules.IsAfter(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
@@ -53,7 +53,7 @@ public sealed class TimeOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
     [Theory]
     [MemberData(nameof(TimeOnlyRulesTestData.IsAfterDefaultInclusion.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsAfterDefaultInclusion))]
-    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(TimeOnly? value, TimeOnly? other)> tc)
+    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(TimeOnly? value, TimeOnly other)> tc)
     {
         // Act
         var result = TimeOnlyRules.IsAfter(tc.Value.value, tc.Value.other);

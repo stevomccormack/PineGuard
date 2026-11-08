@@ -10,12 +10,12 @@ public sealed class FluentStringBoolExtensionsTests(ITestOutputHelper output) : 
 
     private sealed class TrueValidator : AbstractValidator<Model>
     {
-        public TrueValidator() => RuleFor(x => x.Value).True();
+        public TrueValidator() => RuleFor(x => x.Value).TrueBoolean();
     }
 
     private sealed class FalseValidator : AbstractValidator<Model>
     {
-        public FalseValidator() => RuleFor(x => x.Value).False();
+        public FalseValidator() => RuleFor(x => x.Value).FalseBoolean();
     }
 
     // FluentStringBoolExtensions.True

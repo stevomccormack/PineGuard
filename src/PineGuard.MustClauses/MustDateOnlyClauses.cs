@@ -145,16 +145,22 @@ public static class MustDateOnlyClauses
     /// The failure message follows the pattern <c>"{paramName} must be within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
-    public static MustResult<DateOnly> Between(this IMustClause _,
+    public static MustResult<DateOnly> InRange(this IMustClause _,
         DateOnly value,
         DateOnly min,
         DateOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
+        if (min > max)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.OutOfRange, "{paramName} requires a valid range.", nameof(min), min);
+
         const string messageTemplate = "{paramName} must be within the expected range.";
 
-        var ok = DateOnlyRules.IsBetween(value, min, max, inclusion);
+        var ok = DateOnlyRules.IsInRange(value, min, max, inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Range.OutOfRange, messageTemplate, paramName, value, value);
     }
 
@@ -177,16 +183,22 @@ public static class MustDateOnlyClauses
     /// The failure message follows the pattern <c>"{paramName} must not be within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-only">Date Only Must Clauses documentation</seealso>
-    public static MustResult<DateOnly> NotBetween(this IMustClause _,
+    public static MustResult<DateOnly> OutOfRange(this IMustClause _,
         DateOnly value,
         DateOnly min,
         DateOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
+        if (min > max)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.InRange, "{paramName} requires a valid range.", nameof(min), min);
+
         const string messageTemplate = "{paramName} must not be within the expected range.";
 
-        var ok = !DateOnlyRules.IsBetween(value, min, max, inclusion);
+        var ok = !DateOnlyRules.IsInRange(value, min, max, inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Range.InRange, messageTemplate, paramName, value, value);
     }
 
@@ -214,6 +226,9 @@ public static class MustDateOnlyClauses
         DatePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotBefore, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be before the specified date.";
 
         var ok = DateOnlyRules.IsBefore(value, other, Inclusion.Exclusive, precision);
@@ -244,6 +259,9 @@ public static class MustDateOnlyClauses
         DatePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.After, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be on or before the specified date.";
 
         var ok = DateOnlyRules.IsBefore(value, other, Inclusion.Inclusive, precision);
@@ -274,6 +292,9 @@ public static class MustDateOnlyClauses
         DatePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotAfter, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be after the specified date.";
 
         var ok = DateOnlyRules.IsAfter(value, other, Inclusion.Exclusive, precision);
@@ -304,6 +325,9 @@ public static class MustDateOnlyClauses
         DatePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Before, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be on or after the specified date.";
 
         var ok = DateOnlyRules.IsAfter(value, other, Inclusion.Inclusive, precision);
@@ -334,6 +358,9 @@ public static class MustDateOnlyClauses
         DatePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.NotEqual, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must be the same date.";
 
         var ok = DateOnlyRules.IsSame(value, other, precision);
@@ -364,6 +391,9 @@ public static class MustDateOnlyClauses
         DatePrecision? precision = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.Equal, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         const string messageTemplate = "{paramName} must not be the same date.";
 
         var ok = !DateOnlyRules.IsSame(value, other, precision);
@@ -394,6 +424,9 @@ public static class MustDateOnlyClauses
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(start))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotChronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = DateOnlyRules.IsChronological(start, end, inclusion);
@@ -425,9 +458,12 @@ public static class MustDateOnlyClauses
         DateOnly end1,
         DateOnly start2,
         DateOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Missing, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be overlapping.";
 
         var range1Ok = DateOnlyRange.TryCreate(start1, end1, out var _);
@@ -462,15 +498,18 @@ public static class MustDateOnlyClauses
         DateOnly end1,
         DateOnly start2,
         DateOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Present, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must not be overlapping.";
 
         var range1Ok = DateOnlyRange.TryCreate(start1, end1, out var _);
         var range2Ok = DateOnlyRange.TryCreate(start2, end2, out var _);
 
-        var ok = !(range1Ok && range2Ok && DateOnlyRules.IsOverlapping(start1, end1, start2, end2, inclusion));
+        var ok = range1Ok && range2Ok && !DateOnlyRules.IsOverlapping(start1, end1, start2, end2, inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Overlap.Present, messageTemplate, paramName, start1, start1);
     }
 
@@ -771,6 +810,9 @@ public static class MustDateOnlyClauses
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(start))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Chronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must not be chronological.";
 
         var ok = !DateOnlyRules.IsChronological(start, end, inclusion);

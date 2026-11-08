@@ -25,14 +25,14 @@ public static class GuardStringBoolClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringBoolClauses.True"/>
-    public static bool False(this IGuardClause _,
+    /// <seealso cref="MustStringBoolClauses.TrueBoolean"/>
+    public static bool FalseBoolean(this IGuardClause _,
         string? value,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.True(value, paramName); // Guard.Against.False => Must.Be.True (complement)
+        var result = Must.Be.TrueBoolean(value, paramName); // Guard.Against.False => Must.Be.True (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -55,14 +55,14 @@ public static class GuardStringBoolClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringBoolClauses.False"/>
-    public static bool True(this IGuardClause _,
+    /// <seealso cref="MustStringBoolClauses.FalseBoolean"/>
+    public static bool TrueBoolean(this IGuardClause _,
         string? value,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.False(value, paramName); // Guard.Against.True => Must.Be.False (complement)
+        var result = Must.Be.FalseBoolean(value, paramName); // Guard.Against.True => Must.Be.False (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

@@ -96,25 +96,25 @@ public static class GuardCollectionClausesTestData
         ];
     }
 
-    // Guard.Against.NotHasCountBetween — calls Must.Be.HasCountBetween — throws when count is NOT in range
-    public static class NotHasCountBetween
+    // Guard.Against.NotHasCountInRange — calls Must.Be.HasCountInRange — throws when count is NOT in range
+    public static class NotHasCountInRange
     {
-        public static TheoryData<GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases => F.HasCountBetween.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
-        public static TheoryData<GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> InvalidCases => F.HasCountBetween.InvalidScenarios.ToGuardCases(s => s.Inputs.value == null ? new GuardExpected(false, typeof(ArgumentNullException), "value") : new GuardExpected(false, typeof(ArgumentException), "value"));
+        public static TheoryData<GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases => F.HasCountInRange.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
+        public static TheoryData<GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> InvalidCases => F.HasCountInRange.InvalidScenarios.ToGuardCases(s => s.Inputs.value == null ? new GuardExpected(false, typeof(ArgumentNullException), "value") : new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
-    // Guard.Against.HasCountBetween — calls Must.Be.NotHasCountBetween — throws when count IS in range
-    // Null value causes pre-condition throw; only non-null cases that fail NotHasCountBetween truly pass
-    public static class HasCountBetween
+    // Guard.Against.HasCountInRange — calls Must.Be.NotHasCountInRange — throws when count IS in range
+    // Null value causes pre-condition throw; only non-null cases that fail NotHasCountInRange truly pass
+    public static class HasCountInRange
     {
         public static TheoryData<GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases =>
         [
-            new(nameof(F.HasCountBetween.MultipleFourSixInclusive), F.HasCountBetween.MultipleFourSixInclusive, new GuardExpected(true))
+            new(nameof(F.HasCountInRange.MultipleFourSixInclusive), F.HasCountInRange.MultipleFourSixInclusive, new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> InvalidCases =>
         [
-            .. F.HasCountBetween.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.HasCountBetween.NullTwoFourInclusive), F.HasCountBetween.NullTwoFourInclusive, new GuardExpected(false, typeof(ArgumentNullException), "value"))
+            .. F.HasCountInRange.ValidScenarios.ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.HasCountInRange.NullTwoFourInclusive), F.HasCountInRange.NullTwoFourInclusive, new GuardExpected(false, typeof(ArgumentNullException), "value"))
         ];
     }
 
@@ -300,4 +300,8 @@ public static class GuardCollectionClausesTestData
 
         public static Func<string, bool> Predicate { get; } = x => x == "a";
     }
+
+    public static TheoryData<GuardCase<int?[]?>> NullableValueItems => F.NonNullValueItems.AllScenarios.ToGuardCases(s => new(s.IsValid, s.Inputs is null ? typeof(ArgumentNullException) : typeof(ArgumentException), "value"));
+    public static TheoryData<GuardCase<string[]>> ComparerItems => [new("Explicit comparer", ["ABC"], new(true))];
+
 }

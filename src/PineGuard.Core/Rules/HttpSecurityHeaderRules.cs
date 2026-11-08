@@ -180,6 +180,11 @@ public static class HttpSecurityHeaderRules
     /// </summary>
     /// <param name="headers">The HTTP headers to inspect. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the header has the default value; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// Tests exact whole-value presence after trimming, ignoring case. Separate values <c>["garbage", "nosniff"]</c>
+    /// pass in either order; a combined value <c>"garbage, nosniff"</c> does not.
+    /// This does not establish complete header conformance or predict browser security processing.
+    /// </remarks>
     public static bool HasXContentTypeOptionsWithDefaults(IReadOnlyDictionary<string, IEnumerable<string>>? headers) =>
         HasXContentTypeOptions(headers, DefaultXContentTypeOptionsValue);
 

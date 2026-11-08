@@ -12,7 +12,7 @@ public static partial class StringRulesFixtures
         private static readonly TimeOnly T1200 = new(12, 0);
         private static readonly TimeOnly T1300 = new(13, 0);
 
-        public static class IsBetween
+        public static class IsInRange
         {
             public static readonly (string? value, TimeOnly min, TimeOnly max, Inclusion inclusion) InRangeInclusive = ("11:00", T1000, T1200, Inclusion.Inclusive);
             public static readonly (string? value, TimeOnly min, TimeOnly max, Inclusion inclusion) InRangeExclusive = ("11:00", T1000, T1200, Inclusion.Exclusive);

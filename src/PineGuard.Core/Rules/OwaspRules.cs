@@ -1,4 +1,3 @@
-using PineGuard.Rules.Owasp;
 using PineGuard.Utils;
 
 namespace PineGuard.Rules;
@@ -54,116 +53,62 @@ public static class OwaspRules
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the value contains no XSS attack patterns; otherwise, <see langword="false"/>.</returns>
-    public static bool IsXssSafe(string? value)
-    {
-        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
-            return false;
-
-        return !(!OwaspRegex.Xss.NoAngleBracketsRegex().IsMatch(trimmed)
-            || OwaspRegex.Xss.ScriptProtocolRegex().IsMatch(trimmed)
-            || OwaspRegex.Xss.HtmlEventHandlerAttributeRegex().IsMatch(trimmed)
-            || OwaspRegex.Xss.HtmlEntityEncodedAngleBracketRegex().IsMatch(trimmed)
-            || OwaspRegex.Xss.PercentEncodedAngleBracketRegex().IsMatch(trimmed));
-    }
+    public static bool IsXssSafe(string? value) =>
+        !string.IsNullOrWhiteSpace(value) && !OwaspUtility.ContainsXssRisk(value);
 
     /// <summary>
     /// Determines whether the specified value is safe from SQL injection attacks.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the value contains no SQL injection patterns; otherwise, <see langword="false"/>.</returns>
-    public static bool IsSqlInjectionSafe(string? value)
-    {
-        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
-            return false;
-
-        return !(OwaspRegex.SqlInjection.SqlKeywordRegex().IsMatch(trimmed)
-            || OwaspRegex.SqlInjection.SqlCommentRegex().IsMatch(trimmed)
-            || OwaspRegex.SqlInjection.SqlStatementTerminatorRegex().IsMatch(trimmed)
-            || OwaspRegex.SqlInjection.SqlBooleanRegex().IsMatch(trimmed)
-            || OwaspRegex.SqlInjection.SqlUnionSelectRegex().IsMatch(trimmed)
-            || OwaspRegex.SqlInjection.SqlQuoteRegex().IsMatch(trimmed));
-    }
+    public static bool IsSqlInjectionSafe(string? value) =>
+        !string.IsNullOrWhiteSpace(value) && !OwaspUtility.ContainsSqlInjectionRisk(value);
 
     /// <summary>
     /// Determines whether the specified value is safe from path traversal attacks.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the value contains no path traversal patterns; otherwise, <see langword="false"/>.</returns>
-    public static bool IsPathTraversalSafe(string? value)
-    {
-        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
-            return false;
-
-        return !(OwaspRegex.PathTraversal.DotDotSegmentRegex().IsMatch(trimmed)
-            || OwaspRegex.PathTraversal.AbsoluteUnixPathRegex().IsMatch(trimmed)
-            || OwaspRegex.PathTraversal.WindowsDriveAbsolutePathRegex().IsMatch(trimmed)
-            || OwaspRegex.PathTraversal.UncPathRegex().IsMatch(trimmed));
-    }
+    public static bool IsPathTraversalSafe(string? value) =>
+        !string.IsNullOrWhiteSpace(value) && !OwaspUtility.ContainsPathTraversalRisk(value);
 
     /// <summary>
     /// Determines whether the specified value is safe from command injection attacks.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the value contains no command injection patterns; otherwise, <see langword="false"/>.</returns>
-    public static bool IsCommandInjectionSafe(string? value)
-    {
-        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
-            return false;
-
-        return !(OwaspRegex.CommandInjection.ShellMetacharactersRegex().IsMatch(trimmed)
-            || OwaspRegex.CommandInjection.CommandChainingRegex().IsMatch(trimmed)
-            || OwaspRegex.CommandInjection.NewlineRegex().IsMatch(trimmed));
-    }
+    public static bool IsCommandInjectionSafe(string? value) =>
+        !string.IsNullOrWhiteSpace(value) && !OwaspUtility.ContainsCommandInjectionRisk(value);
 
     /// <summary>
     /// Determines whether the specified value is safe from CRLF injection (HTTP header injection) attacks.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the value contains no CR/LF injection patterns; otherwise, <see langword="false"/>.</returns>
-    public static bool IsCrLfSafe(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
-
-        return !OwaspRegex.HeaderInjection.CrLfRegex().IsMatch(value);
-    }
+    public static bool IsCrLfSafe(string? value) =>
+        !string.IsNullOrWhiteSpace(value) && !OwaspUtility.ContainsCrLfRisk(value);
 
     /// <summary>
     /// Determines whether the specified value is safe from LDAP filter injection attacks.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the value contains no LDAP filter special characters; otherwise, <see langword="false"/>.</returns>
-    public static bool IsLdapFilterSafe(string? value)
-    {
-        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
-            return false;
-
-        return !OwaspRegex.LdapInjection.LdapFilterSpecialCharsRegex().IsMatch(trimmed);
-    }
+    public static bool IsLdapFilterSafe(string? value) =>
+        !string.IsNullOrWhiteSpace(value) && !OwaspUtility.ContainsLdapFilterRisk(value);
 
     /// <summary>
     /// Determines whether the specified value is safe from open redirect attacks.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the value contains no absolute or protocol-relative URL patterns; otherwise, <see langword="false"/>.</returns>
-    public static bool IsOpenRedirectSafe(string? value)
-    {
-        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
-            return false;
-
-        return !OwaspRegex.OpenRedirect.AbsoluteOrProtocolRelativeUrlRegex().IsMatch(trimmed);
-    }
+    public static bool IsOpenRedirectSafe(string? value) =>
+        !string.IsNullOrWhiteSpace(value) && !OwaspUtility.ContainsOpenRedirectRisk(value);
 
     /// <summary>
     /// Determines whether the specified value is safe from server-side request forgery (SSRF) via dangerous URI schemes.
     /// </summary>
     /// <param name="value">The value to validate. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
     /// <returns><see langword="true"/> if the value contains no dangerous URI scheme patterns; otherwise, <see langword="false"/>.</returns>
-    public static bool IsSsrfSchemeSafe(string? value)
-    {
-        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
-            return false;
-
-        return !OwaspRegex.Ssrf.DangerousSchemeRegex().IsMatch(trimmed);
-    }
+    public static bool IsSsrfSchemeSafe(string? value) =>
+        !string.IsNullOrWhiteSpace(value) && !OwaspUtility.ContainsSsrfSchemeRisk(value);
 }

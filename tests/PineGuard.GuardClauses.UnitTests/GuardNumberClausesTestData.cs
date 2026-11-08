@@ -219,7 +219,7 @@ public static class GuardNumberClausesTestData
         public static TheoryData<GuardCase<(int value, int factor)>> InvalidCases =>
             F.IsMultipleOf.InvalidScenarios.Except(nameof(F.IsMultipleOf.Null))
             .Select(s => new RuleScenario<(int value, int factor)>(s.Name, (s.Inputs.value!.Value, s.Inputs.factor), s.IsValid)).ToArray()
-            .ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+            .ToGuardCases(s => new GuardExpected(false, typeof(ArgumentException), s.Inputs.factor == 0 ? "factor" : "value"));
     }
 
     // Guard.Against.MultipleOf — throws when value IS NOT a multiple of factor (delegates to Must.Be.NotMultipleOf)
@@ -228,12 +228,12 @@ public static class GuardNumberClausesTestData
         public static TheoryData<GuardCase<(int value, int factor)>> ValidCases =>
             F.IsMultipleOf.InvalidScenarios.Except(nameof(F.IsMultipleOf.Null))
             .Select(s => new RuleScenario<(int value, int factor)>(s.Name, (s.Inputs.value!.Value, s.Inputs.factor), s.IsValid)).ToArray()
-            .ToGuardCases(_ => new GuardExpected(true));
+            .ToGuardCases(s => s.Inputs.factor == 0 ? new GuardExpected(false, typeof(ArgumentException), "factor") : new GuardExpected(true));
 
         public static TheoryData<GuardCase<(int value, int factor)>> InvalidCases =>
             F.IsMultipleOf.ValidScenarios
             .Select(s => new RuleScenario<(int value, int factor)>(s.Name, (s.Inputs.value!.Value, s.Inputs.factor), s.IsValid)).ToArray()
-            .ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+            .ToGuardCases(s => new GuardExpected(false, typeof(ArgumentException), s.Inputs.factor == 0 ? "factor" : "value"));
     }
 
     // Guard.Against.Odd (int) — throws when value IS odd (delegates to Must.Be.Even)

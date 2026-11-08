@@ -52,11 +52,11 @@ public static class MustStringGraphemesClauses
         int count,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Graphemes.Mismatch, NullMessage, paramName, value);
-
         if (count < 0)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.Mismatch, NonNegativeCountMessage, nameof(count), count);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.Mismatch, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must have the expected number of characters.";
 
@@ -91,11 +91,11 @@ public static class MustStringGraphemesClauses
         int count,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Graphemes.Match, NullMessage, paramName, value);
-
         if (count < 0)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.Match, NonNegativeCountMessage, nameof(count), count);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.Match, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not have the expected number of characters.";
 
@@ -130,11 +130,11 @@ public static class MustStringGraphemesClauses
         int min,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooFew, NullMessage, paramName, value);
-
         if (min < 0)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooFew, NonNegativeMinMessage, nameof(min), min);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooFew, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must have at least the minimum number of characters.";
 
@@ -169,11 +169,11 @@ public static class MustStringGraphemesClauses
         int min,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooMany, NullMessage, paramName, value);
-
         if (min < 0)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooMany, NonNegativeMinMessage, nameof(min), min);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooMany, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not have at least the minimum number of characters.";
 
@@ -209,11 +209,11 @@ public static class MustStringGraphemesClauses
         int max,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooMany, NullMessage, paramName, value);
-
         if (max < 0)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooMany, NonNegativeMaxMessage, nameof(max), max);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooMany, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must have at most the maximum number of characters.";
 
@@ -248,11 +248,11 @@ public static class MustStringGraphemesClauses
         int max,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooFew, NullMessage, paramName, value);
-
         if (max < 0)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooFew, NonNegativeMaxMessage, nameof(max), max);
+
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.TooFew, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must not have at most the maximum number of characters.";
 
@@ -280,19 +280,19 @@ public static class MustStringGraphemesClauses
     /// <remarks>
     /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>, or attributed to
     /// <paramref name="min"/> or <paramref name="max"/> if either is negative or the range is inverted.
-    /// Delegates to <see cref="StringRules.Graphemes.HasCountBetween"/>.
+    /// Delegates to <see cref="StringRules.Graphemes.HasCountInRange"/>.
     /// The failure message follows the pattern <c>"{paramName} must have a number of characters within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-graphemes">String Graphemes Must Clauses documentation</seealso>
-    public static MustResult<string> HasGraphemeCountBetween(this IMustClause _,
+    public static MustResult<string> HasGraphemeCountInRange(this IMustClause _,
         string? value,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Graphemes.OutOfRange, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<Inclusion>(inclusion))
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min < 0)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.OutOfRange, NonNegativeMinMessage, nameof(min), min);
@@ -303,9 +303,12 @@ public static class MustStringGraphemesClauses
         if (min > max)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.OutOfRange, ValidRangeMessage, nameof(min), min);
 
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.OutOfRange, NullMessage, paramName, value);
+
         const string messageTemplate = "{paramName} must have a number of characters within the expected range.";
 
-        var ok = StringRules.Graphemes.HasCountBetween(value, min, max, inclusion);
+        var ok = StringRules.Graphemes.HasCountInRange(value, min, max, inclusion);
         return MustResult<string>.FromBool(ok, MustCodes.Text.Graphemes.OutOfRange, messageTemplate, paramName, value, value);
     }
 
@@ -329,19 +332,19 @@ public static class MustStringGraphemesClauses
     /// <remarks>
     /// Returns a failed result immediately if <paramref name="value"/> is <see langword="null"/>, or attributed to
     /// <paramref name="min"/> or <paramref name="max"/> if either is negative or the range is inverted.
-    /// Delegates to <see cref="StringRules.Graphemes.HasCountBetween"/>.
+    /// Delegates to <see cref="StringRules.Graphemes.HasCountInRange"/>.
     /// The failure message follows the pattern <c>"{paramName} must not have a number of characters within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-graphemes">String Graphemes Must Clauses documentation</seealso>
-    public static MustResult<string> NotHasGraphemeCountBetween(this IMustClause _,
+    public static MustResult<string> NotHasGraphemeCountInRange(this IMustClause _,
         string? value,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<string>.Fail(MustCodes.Text.Graphemes.InRange, NullMessage, paramName, value);
+        if (!EnumRules.IsDefined<Inclusion>(inclusion))
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min < 0)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.InRange, NonNegativeMinMessage, nameof(min), min);
@@ -352,9 +355,12 @@ public static class MustStringGraphemesClauses
         if (min > max)
             return MustResult<string>.Fail(MustCodes.Text.Graphemes.InRange, ValidRangeMessage, nameof(min), min);
 
+        if (value is null)
+            return MustResult<string>.Fail(MustCodes.Text.Graphemes.InRange, NullMessage, paramName, value);
+
         const string messageTemplate = "{paramName} must not have a number of characters within the expected range.";
 
-        var ok = !StringRules.Graphemes.HasCountBetween(value, min, max, inclusion);
+        var ok = !StringRules.Graphemes.HasCountInRange(value, min, max, inclusion);
         return MustResult<string>.FromBool(ok, MustCodes.Text.Graphemes.InRange, messageTemplate, paramName, value, value);
     }
 }

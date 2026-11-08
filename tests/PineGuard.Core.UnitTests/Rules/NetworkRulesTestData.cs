@@ -25,9 +25,9 @@ public static class NetworkRulesTestData
         public static TheoryData<RuleCase<(string? ip, string cidr)>> Cases => F.IsInCidr.AllScenarios.ToRuleCases();
     }
 
-    public static class IsValidHostname
+    public static class IsHostname
     {
-        public static TheoryData<RuleCase<string?>> Cases => F.IsValidHostname.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<string?>> Cases => F.IsHostname.AllScenarios.ToRuleCases();
     }
 
     public static class IsPortNumber

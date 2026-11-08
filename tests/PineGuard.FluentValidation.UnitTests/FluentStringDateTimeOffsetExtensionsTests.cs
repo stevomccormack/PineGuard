@@ -146,43 +146,43 @@ public sealed class FluentStringDateTimeOffsetExtensionsTests(ITestOutputHelper 
         AssertResult(tc, result);
     }
 
-    // FluentStringDateTimeOffsetExtensions.IsBetween
-    private sealed class IsBetweenValidator : AbstractValidator<Model>
+    // FluentStringDateTimeOffsetExtensions.IsInRange
+    private sealed class IsInRangeValidator : AbstractValidator<Model>
     {
-        public IsBetweenValidator(DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) =>
-            RuleFor(x => x.Value).BetweenDateTimeOffset(min, max, inclusion);
+        public IsInRangeValidator(DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) =>
+            RuleFor(x => x.Value).InRangeDateTimeOffset(min, max, inclusion);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringDateTimeOffsetExtensionsTestData.IsBetween.Cases), MemberType = typeof(FluentStringDateTimeOffsetExtensionsTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(FluentCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringDateTimeOffsetExtensionsTestData.IsInRange.Cases), MemberType = typeof(FluentStringDateTimeOffsetExtensionsTestData.IsInRange))]
+    public void IsInRange_BehavesAsExpected(FluentCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = new IsBetweenValidator(min, max, inclusion).Validate(new Model { Value = value });
+        var result = new IsInRangeValidator(min, max, inclusion).Validate(new Model { Value = value });
 
         // Assert
         AssertResult(tc, result);
     }
 
-    // FluentStringDateTimeOffsetExtensions.NotBetweenDateTimeOffset
-    private sealed class IsNotBetweenValidator : AbstractValidator<Model>
+    // FluentStringDateTimeOffsetExtensions.OutOfRangeDateTimeOffset
+    private sealed class IsOutOfRangeValidator : AbstractValidator<Model>
     {
-        public IsNotBetweenValidator(DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) =>
-            RuleFor(x => x.Value).NotBetweenDateTimeOffset(min, max, inclusion);
+        public IsOutOfRangeValidator(DateTimeOffset min, DateTimeOffset max, Inclusion inclusion) =>
+            RuleFor(x => x.Value).OutOfRangeDateTimeOffset(min, max, inclusion);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringDateTimeOffsetExtensionsTestData.IsNotBetween.Cases), MemberType = typeof(FluentStringDateTimeOffsetExtensionsTestData.IsNotBetween))]
-    public void IsNotBetween_BehavesAsExpected(FluentCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringDateTimeOffsetExtensionsTestData.IsOutOfRange.Cases), MemberType = typeof(FluentStringDateTimeOffsetExtensionsTestData.IsOutOfRange))]
+    public void IsOutOfRange_BehavesAsExpected(FluentCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = new IsNotBetweenValidator(min, max, inclusion).Validate(new Model { Value = value });
+        var result = new IsOutOfRangeValidator(min, max, inclusion).Validate(new Model { Value = value });
 
         // Assert
         AssertResult(tc, result);

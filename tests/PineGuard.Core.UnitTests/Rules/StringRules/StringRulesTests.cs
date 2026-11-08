@@ -8,6 +8,16 @@ namespace PineGuard.Core.UnitTests.Rules.StringRules;
 public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(output)
 {
     [Theory]
+    [MemberData(nameof(StringRulesTestData.InvalidComparisons), MemberType = typeof(StringRulesTestData))]
+    public void ComparisonConfiguration_IsCheckedBeforeInput(string? value, StringComparison comparison)
+    {
+        // Act / Assert
+        Assert.Equal("comparison", Assert.Throws<ArgumentOutOfRangeException>(() => PineGuard.Rules.StringRules.Contains(value, "x", comparison)).ParamName);
+        Assert.Equal("comparison", Assert.Throws<ArgumentOutOfRangeException>(() => PineGuard.Rules.StringRules.StartsWith(value, "x", comparison)).ParamName);
+        Assert.Equal("comparison", Assert.Throws<ArgumentOutOfRangeException>(() => PineGuard.Rules.StringRules.EndsWith(value, "x", comparison)).ParamName);
+    }
+
+    [Theory]
     [MemberData(nameof(StringRulesTestData.IsExactLength.Cases), MemberType = typeof(StringRulesTestData.IsExactLength))]
     public void IsExactLength_BehavesAsExpected(RuleCase<(string? value, int length)> tc)
     {
@@ -19,11 +29,11 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
     }
 
     [Theory]
-    [MemberData(nameof(StringRulesTestData.IsLengthBetween.Cases), MemberType = typeof(StringRulesTestData.IsLengthBetween))]
-    public void IsLengthBetween_BehavesAsExpected(RuleCase<(string? value, int min, int max)> tc)
+    [MemberData(nameof(StringRulesTestData.IsLengthInRange.Cases), MemberType = typeof(StringRulesTestData.IsLengthInRange))]
+    public void IsLengthInRange_BehavesAsExpected(RuleCase<(string? value, int min, int max)> tc)
     {
         // Act
-        var result = PineGuard.Rules.StringRules.IsLengthBetween(tc.Value.value, tc.Value.min, tc.Value.max);
+        var result = PineGuard.Rules.StringRules.IsLengthInRange(tc.Value.value, tc.Value.min, tc.Value.max);
 
         // Assert
         AssertResult(tc, result);
@@ -478,5 +488,16 @@ public sealed class StringRulesTests(ITestOutputHelper output) : BaseRuleUnitTes
 
         // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringRulesTestData.InvalidRangeConfiguration.Cases), MemberType = typeof(StringRulesTestData.InvalidRangeConfiguration))]
+    public void InvalidRangeConfiguration_RejectsBeforeNullAndReversedBounds(ThrowsCase<Action> tc)
+    {
+        // Act
+        var exception = Assert.Throws(tc.ExpectedException.Type, tc.Value);
+
+        // Assert
+        ThrowsCaseAssert.Expected(exception, tc);
     }
 }

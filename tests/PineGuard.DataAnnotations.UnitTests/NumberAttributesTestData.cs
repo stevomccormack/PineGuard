@@ -174,16 +174,16 @@ public static class NumberAttributesTestData
         public static TheoryData<ValidCase> InvalidCases => [new("exact", 10.0, false)];
     }
 
-    // Config: Target=10. No tolerance (null tolerance always fails in MustNumberClauses).
-    public static class ApproximatelyNoTolerance
+    // Config: Target=10. Negative tolerance is invalid configuration.
+    public static class ApproximatelyNegativeTolerance
     {
-        public static TheoryData<ValidCase> InvalidCases => [new("null tolerance exact", 10.0, false), new("null tolerance far", 100.0, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("negative tolerance exact", 10.0, false), new("negative tolerance far", 100.0, false)];
     }
 
-    // Config: Target=10. No tolerance (null tolerance always fails in MustNumberClauses).
-    public static class NotApproximatelyNoTolerance
+    // Config: Target=10. Negative tolerance is invalid configuration.
+    public static class NotApproximatelyNegativeTolerance
     {
-        public static TheoryData<ValidCase> InvalidCases => [new("null tolerance exact", 10.0, false), new("null tolerance far", 100.0, false)];
+        public static TheoryData<ValidCase> InvalidCases => [new("negative tolerance exact", 10.0, false), new("negative tolerance far", 100.0, false)];
     }
 
     // A fractional or out-of-range double bound cannot be exactly represented in the property's

@@ -168,22 +168,22 @@ public sealed class NetworkUtilityTests : BaseUnitTest
     }
 
     [Theory]
-    [MemberData(nameof(NetworkUtilityTestData.IsValidHostnameLabel.ValidCases), MemberType = typeof(NetworkUtilityTestData.IsValidHostnameLabel))]
-    public void IsValidHostnameLabel_ReturnsTrue_ForValidLabels(NetworkUtilityTestData.IsValidHostnameLabel.ValidCase testCase)
+    [MemberData(nameof(NetworkUtilityTestData.IsHostnameLabel.ValidCases), MemberType = typeof(NetworkUtilityTestData.IsHostnameLabel))]
+    public void IsHostnameLabel_ReturnsTrue_ForValidLabels(NetworkUtilityTestData.IsHostnameLabel.ValidCase testCase)
     {
         // Act
-        var result = NetworkUtility.IsValidHostnameLabel(testCase.Value);
+        var result = NetworkUtility.IsHostnameLabel(testCase.Value);
 
         // Assert
         Assert.True(result);
     }
 
     [Theory]
-    [MemberData(nameof(NetworkUtilityTestData.IsValidHostnameLabel.EdgeCases), MemberType = typeof(NetworkUtilityTestData.IsValidHostnameLabel))]
-    public void IsValidHostnameLabel_ReturnsFalse_ForInvalidLabels(NetworkUtilityTestData.IsValidHostnameLabel.ValidCase testCase)
+    [MemberData(nameof(NetworkUtilityTestData.IsHostnameLabel.EdgeCases), MemberType = typeof(NetworkUtilityTestData.IsHostnameLabel))]
+    public void IsHostnameLabel_ReturnsFalse_ForInvalidLabels(NetworkUtilityTestData.IsHostnameLabel.ValidCase testCase)
     {
         // Act
-        var result = NetworkUtility.IsValidHostnameLabel(testCase.Value);
+        var result = NetworkUtility.IsHostnameLabel(testCase.Value);
 
         // Assert
         Assert.False(result);

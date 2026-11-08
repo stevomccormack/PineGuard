@@ -63,6 +63,10 @@ public static class ValidXmlAttributeTestData
             new ActionThrowsCase(
                 "no-schema-service",
                 () => new ValidXmlAttribute().GetValidationResult(TestSchemas.ValidMessage, new ValidationContext(new object())),
+                new ExpectedException(typeof(InvalidOperationException), null, "XmlSchemaSet")),
+            new ActionThrowsCase(
+                "null-does-not-hide-missing-schema-service",
+                () => new ValidXmlAttribute().GetValidationResult(null, new ValidationContext(new object())),
                 new ExpectedException(typeof(InvalidOperationException), null, "XmlSchemaSet"))
         ];
     }

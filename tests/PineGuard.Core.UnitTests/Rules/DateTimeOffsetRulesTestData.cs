@@ -51,29 +51,29 @@ public static class DateTimeOffsetRulesTestData
         ];
     }
 
-    public static class IsBetween
+    public static class IsInRange
     {
-        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> Cases => F.IsBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> Cases => F.IsInRange.AllScenarios.ToRuleCases();
     }
 
     public static class IsBefore
     {
-        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsBefore.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsBefore.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(DateTimeOffset? value, DateTimeOffset other, Inclusion inclusion, DateTimePrecision? precision)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault(), scenario.Inputs.inclusion, scenario.Inputs.precision), scenario.IsValid)).ToArray().ToRuleCases();
     }
 
     public static class IsBeforeDefaultInclusion
     {
-        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset? other)>> Cases => F.IsBeforeDefaultInclusion.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset other)>> Cases => F.IsBeforeDefaultInclusion.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(DateTimeOffset? value, DateTimeOffset other)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault()), scenario.IsValid)).ToArray().ToRuleCases();
     }
 
     public static class IsAfter
     {
-        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsAfter.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset other, Inclusion inclusion, DateTimePrecision? precision)>> Cases => F.IsAfter.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(DateTimeOffset? value, DateTimeOffset other, Inclusion inclusion, DateTimePrecision? precision)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault(), scenario.Inputs.inclusion, scenario.Inputs.precision), scenario.IsValid)).ToArray().ToRuleCases();
     }
 
     public static class IsAfterDefaultInclusion
     {
-        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset? other)>> Cases => F.IsAfterDefaultInclusion.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(DateTimeOffset? value, DateTimeOffset other)>> Cases => F.IsAfterDefaultInclusion.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(DateTimeOffset? value, DateTimeOffset other)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault()), scenario.IsValid)).ToArray().ToRuleCases();
     }
 
     public static class IsSame

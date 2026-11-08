@@ -18,31 +18,37 @@ public static class TimeOnlyRules
     /// <param name="max">The upper bound of the time range.</param>
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is within the range; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBetween(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion = Inclusion.Inclusive) =>
-        value is not null && RuleComparison.IsBetween(value.Value, min, max, inclusion);
+    public static bool IsInRange(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion = Inclusion.Inclusive)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return value is not null && RuleComparison.IsInRange(value.Value, min, max, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified time is before the given reference time.
     /// </summary>
     /// <param name="value">The time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="other">The reference time. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="other">The reference time.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is before <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBefore(TimeOnly? value, TimeOnly? other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null)
+    public static bool IsBefore(TimeOnly? value, TimeOnly other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null)
     {
-        if (value is null || other is null)
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return false;
+
+        if (value is null)
             return false;
 
         var left = value.Value;
-        var right = other.Value;
+        var right = other;
 
         if (precision is null)
             return RuleComparison.IsLessThan(left, right, inclusion);
 
-        if (!TimeOnlyUtility.TryTruncateToPrecision(left, precision.Value, out var tLeft) ||
-            !TimeOnlyUtility.TryTruncateToPrecision(right, precision.Value, out var tRight))
-            return false;
+        _ = TimeOnlyUtility.TryTruncateToPrecision(left, precision.Value, out var tLeft);
+        _ = TimeOnlyUtility.TryTruncateToPrecision(right, precision.Value, out var tRight);
 
         left = tLeft;
         right = tRight;
@@ -54,24 +60,27 @@ public static class TimeOnlyRules
     /// Determines whether the specified time is after the given reference time.
     /// </summary>
     /// <param name="value">The time to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="other">The reference time. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="other">The reference time.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is after <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsAfter(TimeOnly? value, TimeOnly? other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null)
+    public static bool IsAfter(TimeOnly? value, TimeOnly other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null)
     {
-        if (value is null || other is null)
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return false;
+
+        if (value is null)
             return false;
 
         var left = value.Value;
-        var right = other.Value;
+        var right = other;
 
         if (precision is null)
             return RuleComparison.IsGreaterThan(left, right, inclusion);
 
-        if (!TimeOnlyUtility.TryTruncateToPrecision(left, precision.Value, out var tLeft) ||
-            !TimeOnlyUtility.TryTruncateToPrecision(right, precision.Value, out var tRight))
-            return false;
+        _ = TimeOnlyUtility.TryTruncateToPrecision(left, precision.Value, out var tLeft);
+        _ = TimeOnlyUtility.TryTruncateToPrecision(right, precision.Value, out var tRight);
 
         left = tLeft;
         right = tRight;
@@ -88,6 +97,9 @@ public static class TimeOnlyRules
     /// <returns><see langword="true"/> if the times are equal at the given precision; otherwise, <see langword="false"/>.</returns>
     public static bool IsSame(TimeOnly? value, TimeOnly? other, TimePrecision? precision = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return false;
+
         if (value is null && other is null)
             return true;
 
@@ -100,9 +112,8 @@ public static class TimeOnlyRules
         if (precision is null)
             return RuleComparison.Equals(left, right);
 
-        if (!TimeOnlyUtility.TryTruncateToPrecision(left, precision.Value, out var tLeft) ||
-            !TimeOnlyUtility.TryTruncateToPrecision(right, precision.Value, out var tRight))
-            return false;
+        _ = TimeOnlyUtility.TryTruncateToPrecision(left, precision.Value, out var tLeft);
+        _ = TimeOnlyUtility.TryTruncateToPrecision(right, precision.Value, out var tRight);
 
         left = tLeft;
         right = tRight;
@@ -144,10 +155,8 @@ public static class TimeOnlyRules
     /// <returns><see langword="true"/> if <paramref name="start"/> precedes <paramref name="end"/>; otherwise, <see langword="false"/>.</returns>
     public static bool IsChronological(TimeOnly? start, TimeOnly? end, Inclusion inclusion = Inclusion.Exclusive)
     {
-        if (start is null || end is null)
-            return false;
-
-        return inclusion == Inclusion.Inclusive ? start.Value <= end.Value : start.Value < end.Value;
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return RangeRules.IsChronological(start, end, inclusion);
     }
 
     /// <summary>
@@ -157,19 +166,12 @@ public static class TimeOnlyRules
     /// <param name="end1">The end of the first range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="start2">The start of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end2">The end of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundaries are inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="inclusion">Whether to intersect closed ranges or open interiors. Singleton and one-step interiors are empty. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if the two time ranges overlap; otherwise, <see langword="false"/>. Returns <see langword="false"/> if either range is inverted (start after end).</returns>
-    public static bool IsOverlapping(TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion = Inclusion.Exclusive)
+    public static bool IsOverlapping(TimeOnly? start1, TimeOnly? end1, TimeOnly? start2, TimeOnly? end2, Inclusion inclusion = Inclusion.Inclusive)
     {
-        if (start1 is null || end1 is null || start2 is null || end2 is null)
-            return false;
-
-        if (start1.Value > end1.Value || start2.Value > end2.Value)
-            return false;
-
-        return inclusion == Inclusion.Exclusive
-            ? start1.Value < end2.Value && start2.Value < end1.Value
-            : start1.Value <= end2.Value && start2.Value <= end1.Value;
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return RangeRules.IsOverlapping(start1?.Ticks, end1?.Ticks, start2?.Ticks, end2?.Ticks, inclusion);
     }
 }
 #endif

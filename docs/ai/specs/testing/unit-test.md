@@ -276,7 +276,7 @@ new InvalidCase($"{nameof(F.Parse.TooShort)}-CustomMessage", F.Parse.TooShort, .
 Canonical example:
 
 ```csharp
-public static class IsBetween
+public static class IsInRange
 {
     public static TheoryData<RuleCase<(int value, int min, int max)>> ValidCases =>
     [
@@ -698,7 +698,7 @@ Test Fixtures provide **shared, reusable input constants** for validations teste
 | **Folder** | `tests/PineGuard.Testing/Fixtures/` |
 | **Namespace** | `PineGuard.Testing.Fixtures` |
 | **Class name** | `[CoreRulesClassName]Fixtures` — mirrors the Core Rules class where the validation originates |
-| **Inner class** | Matches the Core Rules method name (e.g., `IsExactLength`, `IsBetween`, `Parse`) |
+| **Inner class** | Matches the Core Rules method name (e.g., `IsExactLength`, `IsInRange`, `Parse`) |
 | **Alias** | `using F = PineGuard.Testing.Fixtures.[Class]Fixtures;` — standard alias in TestData files |
 | **Partial split** | When the source Rules class is split across `XxxRules.Yyy.cs` files, the fixture class mirrors it one-for-one as `XxxRulesFixtures.Yyy.cs`, each declaring `public static partial class XxxRulesFixtures` |
 

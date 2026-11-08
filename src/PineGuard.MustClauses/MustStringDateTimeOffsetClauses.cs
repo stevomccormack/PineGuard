@@ -42,6 +42,9 @@ public static class MustStringDateTimeOffsetClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Relative.NotPast, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Relative.NotPast, NullMessage, paramName, value);
 
@@ -50,7 +53,7 @@ public static class MustStringDateTimeOffsetClauses
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateTimeOffsetRules.IsInPast(parsedValue, timeProvider: timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, parsedValue);
     }
@@ -79,6 +82,9 @@ public static class MustStringDateTimeOffsetClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Relative.Future, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Relative.Future, NullMessage, paramName, value);
 
@@ -87,7 +93,7 @@ public static class MustStringDateTimeOffsetClauses
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateTimeOffsetRules.IsInPast(parsedValue, Inclusion.Inclusive, timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, parsedValue);
     }
@@ -116,6 +122,9 @@ public static class MustStringDateTimeOffsetClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Relative.NotFuture, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Relative.NotFuture, NullMessage, paramName, value);
 
@@ -124,7 +133,7 @@ public static class MustStringDateTimeOffsetClauses
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateTimeOffsetRules.IsInFuture(parsedValue, timeProvider: timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, parsedValue);
     }
@@ -153,6 +162,9 @@ public static class MustStringDateTimeOffsetClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Relative.Past, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Relative.Past, NullMessage, paramName, value);
 
@@ -161,7 +173,7 @@ public static class MustStringDateTimeOffsetClauses
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateTimeOffsetRules.IsInFuture(parsedValue, Inclusion.Inclusive, timeProvider);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, parsedValue);
     }
@@ -186,7 +198,7 @@ public static class MustStringDateTimeOffsetClauses
     /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-time-offset">String Date Time Offset Must Clauses documentation</seealso>
-    public static MustResult<DateTimeOffset> BetweenDateTimeOffset(this IMustClause _,
+    public static MustResult<DateTimeOffset> InRangeDateTimeOffset(this IMustClause _,
         string? value,
         DateTimeOffset min,
         DateTimeOffset max,
@@ -194,20 +206,26 @@ public static class MustStringDateTimeOffsetClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.OutOfRange, NullMessage, paramName, value);
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.OutOfRange, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min > max)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.OutOfRange,
                 "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
+
+        if (value is null)
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.OutOfRange, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date/time within the expected range.";
 
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateTimeOffsetRules.IsBetween(parsedValue, min, max, inclusion);
+        var parsedValue = parsed;
+        var ok = DateTimeOffsetRules.IsInRange(parsedValue, min, max, inclusion);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Range.OutOfRange, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -231,7 +249,7 @@ public static class MustStringDateTimeOffsetClauses
     /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-time-offset">String Date Time Offset Must Clauses documentation</seealso>
-    public static MustResult<DateTimeOffset> NotBetweenDateTimeOffset(this IMustClause _,
+    public static MustResult<DateTimeOffset> OutOfRangeDateTimeOffset(this IMustClause _,
         string? value,
         DateTimeOffset min,
         DateTimeOffset max,
@@ -239,20 +257,26 @@ public static class MustStringDateTimeOffsetClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.InRange, NullMessage, paramName, value);
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.InRange, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min > max)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.InRange,
                 "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
+
+        if (value is null)
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Range.InRange, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date/time not within the expected range.";
 
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = !DateTimeOffsetRules.IsBetween(parsedValue, min, max, inclusion);
+        var parsedValue = parsed;
+        var ok = !DateTimeOffsetRules.IsInRange(parsedValue, min, max, inclusion);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Range.InRange, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -282,6 +306,9 @@ public static class MustStringDateTimeOffsetClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Proximity.NotWithin, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Proximity.NotWithin, NullMessage, paramName, value);
 
@@ -294,7 +321,7 @@ public static class MustStringDateTimeOffsetClauses
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateTimeOffsetRules.IsWithin(parsedValue, reference, window);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Proximity.NotWithin, messageTemplate, paramName, value, parsedValue);
     }
@@ -325,6 +352,9 @@ public static class MustStringDateTimeOffsetClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Proximity.Within, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Proximity.Within, NullMessage, paramName, value);
 
@@ -337,7 +367,7 @@ public static class MustStringDateTimeOffsetClauses
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !DateTimeOffsetRules.IsWithin(parsedValue, reference, window);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Proximity.Within, messageTemplate, paramName, value, parsedValue);
     }
@@ -368,6 +398,9 @@ public static class MustStringDateTimeOffsetClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Proximity.NotWithinCalendarMonths, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Proximity.NotWithinCalendarMonths, NullMessage, paramName, value);
 
@@ -380,7 +413,7 @@ public static class MustStringDateTimeOffsetClauses
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateTimeOffsetRules.IsWithinCalendarMonths(parsedValue, reference, months);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Proximity.NotWithinCalendarMonths,
             messageTemplate, paramName, value, parsedValue);
@@ -412,6 +445,9 @@ public static class MustStringDateTimeOffsetClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateTimeOffset.IsValidStyles(styles))
+            return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Proximity.WithinCalendarMonths, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Proximity.WithinCalendarMonths, NullMessage, paramName, value);
 
@@ -424,7 +460,7 @@ public static class MustStringDateTimeOffsetClauses
         if (!StringUtility.DateTimeOffset.TryParse(value, out var parsed, styles))
             return MustResult<DateTimeOffset>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !DateTimeOffsetRules.IsWithinCalendarMonths(parsedValue, reference, months);
         return MustResult<DateTimeOffset>.FromBool(ok, MustCodes.Date.Proximity.WithinCalendarMonths,
             messageTemplate, paramName, value, parsedValue);

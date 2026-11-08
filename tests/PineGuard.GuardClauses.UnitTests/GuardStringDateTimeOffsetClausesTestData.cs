@@ -33,31 +33,31 @@ public static class GuardStringDateTimeOffsetClausesTestData
         public static TheoryData<GuardCase<string?>> InvalidCases => F.DateTimeOffsetIsInFuture.InvalidScenarios.ToGuardCases("value");
     }
 
-    // Guard.Against.NotBetween — passes when between range; throws when not between / null / unparseable
-    public static class NotBetween
+    // Guard.Against.OutOfRange — passes when between range; throws when not between / null / unparseable
+    public static class OutOfRange
     {
         public static TheoryData<GuardCase<(string? value, DateTimeOffset min, DateTimeOffset max, Common.Inclusion inclusion)>> ValidCases =>
-            F.DateTimeOffsetIsBetween.AllValid.ToGuardCases(_ => new GuardExpected(true));
+            F.DateTimeOffsetIsInRange.AllValid.ToGuardCases(_ => new GuardExpected(true));
 
         public static TheoryData<GuardCase<(string? value, DateTimeOffset min, DateTimeOffset max, Common.Inclusion inclusion)>> InvalidCases =>
-            F.DateTimeOffsetIsBetween.AllInvalid.ToGuardCases(s => s.Inputs.value is null
+            F.DateTimeOffsetIsInRange.AllInvalid.ToGuardCases(s => s.Inputs.value is null
                 ? new GuardExpected(false, typeof(ArgumentNullException), "value")
                 : new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
-    // Guard.Against.Between — passes when not between (parseable); throws when between / null / unparseable
-    public static class Between
+    // Guard.Against.InRange — passes when not between (parseable); throws when between / null / unparseable
+    public static class InRange
     {
         public static TheoryData<GuardCase<(string? value, DateTimeOffset min, DateTimeOffset max, Common.Inclusion inclusion)>> ValidCases =>
         [
-            new(nameof(F.DateTimeOffsetIsBetween.MinExclusive), F.DateTimeOffsetIsBetween.MinExclusive, new GuardExpected(true))
+            new(nameof(F.DateTimeOffsetIsInRange.MinExclusive), F.DateTimeOffsetIsInRange.MinExclusive, new GuardExpected(true))
         ];
 
         public static TheoryData<GuardCase<(string? value, DateTimeOffset min, DateTimeOffset max, Common.Inclusion inclusion)>> InvalidCases =>
         [
-            new(nameof(F.DateTimeOffsetIsBetween.InsideRange), F.DateTimeOffsetIsBetween.InsideRange, new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.DateTimeOffsetIsBetween.NotADate),    F.DateTimeOffsetIsBetween.NotADate,    new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.DateTimeOffsetIsBetween.NullValue),   F.DateTimeOffsetIsBetween.NullValue,   new GuardExpected(false, typeof(ArgumentNullException), "value"))
+            new(nameof(F.DateTimeOffsetIsInRange.InsideRange), F.DateTimeOffsetIsInRange.InsideRange, new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.DateTimeOffsetIsInRange.NotADate),    F.DateTimeOffsetIsInRange.NotADate,    new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.DateTimeOffsetIsInRange.NullValue),   F.DateTimeOffsetIsInRange.NullValue,   new GuardExpected(false, typeof(ArgumentNullException), "value"))
         ];
     }
 

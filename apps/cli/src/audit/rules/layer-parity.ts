@@ -55,16 +55,16 @@ import type { Finding, RuleContext, VocabularyConfig } from "../types.js";
  *   names intentionally diverge from Must clause names (e.g.
  *   `NullOrEmptyAttribute` vs. a differently-named clause is not assumed),
  *   so — exactly as the legacy rule did — the raw concept is read from the
- *   `Must.Be.<Name>(...)` call *inside* each attribute's validation method,
+ *   `Must.Be.<Name>(...)` call or reflective `Invoke*(nameof(MustXClauses.Name), ...)` dispatch *inside* each attribute's validation method,
  *   not the attribute's own type name. This is the one layer that uses a
  *   different extraction shape from the other three; see
  *   {@link LayerSpec.kind}.
  *
  * Every raw name is then normalised via {@link normalizeConcept} (identical
- * algorithm to the legacy `Normalize-ConceptName`): drop anything in
+ * vocabulary-driven successor to the legacy `Normalize-ConceptName`): drop anything in
  * `ignoreMethods`, apply `aliases` (checked both before and after prefix
  * stripping, since an alias target can itself need no further stripping),
- * strip the first matching `stripPrefixes` entry.
+ * repeatedly strip known prefixes at PascalCase word boundaries.
  *
  * ## Comparison: which layers are "in scope", and what counts as a gap
  *
@@ -209,7 +209,7 @@ function resolveVocabulary(ctx: RuleContext): VocabularyConfig {
  * Normalises one raw concept name (a method name, or the `<Name>` from a
  * `Must.Be.<Name>(...)` call) exactly as the legacy tool's
  * `Normalize-ConceptName` did: drop anything in `ignoreMethods`, apply an
- * `aliases` match, strip the first matching `stripPrefixes` entry, then
+ * `aliases` match, repeatedly strip known PascalCase prefixes, then
  * apply `aliases` again (an alias target can itself be a prefixed name that
  * needs no further stripping — or could, in principle, itself be aliased
  * again; this mirrors the legacy single second pass, not a fixed point).
@@ -230,11 +230,19 @@ function normalizeConcept(
         name = aliasedBeforeStrip;
     }
 
-    for (const prefix of vocabulary.stripPrefixes) {
-        if (name.startsWith(prefix)) {
-            name = name.slice(prefix.length);
+    const maximumPasses = name.length;
+    for (let pass = 0; pass < maximumPasses; pass++) {
+        const prefix = vocabulary.stripPrefixes.find((candidate) => {
+            if (candidate.length === 0 || !name.startsWith(candidate)) {
+                return false;
+            }
+            const remainder = name.slice(candidate.length);
+            return remainder.length === 0 || /^[A-Z]/.test(remainder);
+        });
+        if (prefix === undefined) {
             break;
         }
+        name = name.slice(prefix.length);
     }
 
     const aliasedAfterStrip = vocabulary.aliases[name];
@@ -339,12 +347,38 @@ function extractExtensionConcepts(
 const MUST_BE_PREFIX = "Must.Be.";
 
 function extractMustCallConcepts(root: Node): string[] {
-    return findInvocations(root, "Must.Be")
-        .filter((invocation) =>
-            invocation.memberPath.startsWith(MUST_BE_PREFIX),
-        )
-        .map((invocation) => invocation.memberPath.slice(MUST_BE_PREFIX.length))
-        .filter((name) => name.length > 0);
+    const names: string[] = [];
+    for (const invocation of findInvocations(root)) {
+        if (invocation.memberPath.startsWith(MUST_BE_PREFIX)) {
+            names.push(invocation.memberPath.slice(MUST_BE_PREFIX.length));
+            continue;
+        }
+
+        // Reflection adapters name the Must member in their first dispatch argument.
+        const callee = invocation.memberPath.split(".").at(-1) ?? "";
+        if (!/^Invoke[A-Z]/.test(callee)) {
+            continue;
+        }
+        const firstArgument =
+            invocation.node.childForFieldName("arguments")?.namedChildren[0];
+        if (!firstArgument) {
+            continue;
+        }
+        for (const nameOf of findInvocations(firstArgument, "nameof")) {
+            const target =
+                nameOf.node.childForFieldName("arguments")?.namedChildren[0]
+                    ?.namedChildren[0];
+            if (target?.type !== "member_access_expression") {
+                continue;
+            }
+            const owner = target.childForFieldName("expression")?.text ?? "";
+            const name = target.childForFieldName("name")?.text ?? "";
+            if (/(?:^|\.)Must\w*Clauses$/.test(owner) && name.length > 0) {
+                names.push(name);
+            }
+        }
+    }
+    return names.filter((name) => name.length > 0);
 }
 
 // ---------------------------------------------------------------------------

@@ -6,18 +6,18 @@ namespace PineGuard.Core.UnitTests.Rules;
 
 public static class TimeSpanRulesTestData
 {
-    public static class IsDurationBetween
+    public static class IsInRange
     {
-        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan min, TimeSpan max, Inclusion inclusion)>> Cases => F.IsDurationBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan min, TimeSpan max, Inclusion inclusion)>> Cases => F.IsInRange.AllScenarios.ToRuleCases();
     }
 
     public static class IsGreaterThan
     {
-        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>> Cases => F.IsGreaterThan.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan other, Inclusion inclusion)>> Cases => F.IsGreaterThan.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(TimeSpan? value, TimeSpan other, Inclusion inclusion)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault(), scenario.Inputs.inclusion), scenario.IsValid)).ToArray().ToRuleCases();
     }
 
     public static class IsLessThan
     {
-        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan? threshold, Inclusion inclusion)>> Cases => F.IsLessThan.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(TimeSpan? value, TimeSpan other, Inclusion inclusion)>> Cases => F.IsLessThan.AllScenarios.Where(scenario => scenario.Inputs.other.HasValue).Select(scenario => new RuleScenario<(TimeSpan? value, TimeSpan other, Inclusion inclusion)>(scenario.Name, (scenario.Inputs.value, scenario.Inputs.other.GetValueOrDefault(), scenario.Inputs.inclusion), scenario.IsValid)).ToArray().ToRuleCases();
     }
 }

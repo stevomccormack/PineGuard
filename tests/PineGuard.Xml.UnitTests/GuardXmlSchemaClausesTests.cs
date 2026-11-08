@@ -9,6 +9,14 @@ public sealed class GuardXmlSchemaClausesTests(ITestOutputHelper output)
     : BaseGuardUnitTest(output)
 {
     [Theory]
+    [MemberData(nameof(GuardXmlSchemaClausesTestData.InvalidXmlNullSchemas.InvalidCases), MemberType = typeof(GuardXmlSchemaClausesTestData.InvalidXmlNullSchemas))]
+    public void InvalidXmlNullSchemas_AttributesConfigurationFailure(GuardCase<string?> tc)
+    {
+        // Act + Assert
+        AssertResult(tc, () => Guard.Against.InvalidXml(tc.Value, null!));
+    }
+
+    [Theory]
     [MemberData(nameof(GuardXmlSchemaClausesTestData.InvalidXml.ValidCases), MemberType = typeof(GuardXmlSchemaClausesTestData.InvalidXml))]
     [MemberData(nameof(GuardXmlSchemaClausesTestData.InvalidXml.InvalidCases), MemberType = typeof(GuardXmlSchemaClausesTestData.InvalidXml))]
     public void InvalidXml_BehavesAsExpected(GuardCase<string?> tc)

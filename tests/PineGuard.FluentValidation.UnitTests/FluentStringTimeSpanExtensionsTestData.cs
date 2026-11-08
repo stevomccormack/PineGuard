@@ -6,25 +6,25 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public static class FluentStringTimeSpanExtensionsTestData
 {
-    public static class DurationBetween
+    public static class InRange
     {
         public static TheoryData<FluentCase<(string? value, TimeSpan min, TimeSpan max, PineGuard.Common.Inclusion inclusion)>> Cases =>
-            F.TimeSpanIsDurationBetween.AllScenarios.ToFluentCases(s => s.Name switch
+            F.TimeSpanIsInRange.AllScenarios.ToFluentCases(s => s.Name switch
             {
-                nameof(F.TimeSpanIsDurationBetween.NullValue) => new FluentExpected(true),
+                nameof(F.TimeSpanIsInRange.NullValue) => new FluentExpected(true),
                 _ when s.IsValid => new FluentExpected(true),
                 _ => new FluentExpected(false, "Value must be a duration within the expected range.", Code: MustCodes.Time.Duration.OutOfRange)
             });
     }
 
-    public static class NotDurationBetween
+    public static class OutOfRange
     {
         public static TheoryData<FluentCase<(string? value, TimeSpan min, TimeSpan max, PineGuard.Common.Inclusion inclusion)>> Cases =>
-            F.TimeSpanIsDurationBetween.AllScenarios.ToFluentCases(s => s.Name switch
+            F.TimeSpanIsInRange.AllScenarios.ToFluentCases(s => s.Name switch
             {
-                nameof(F.TimeSpanIsDurationBetween.NullValue) => new FluentExpected(true),
-                nameof(F.TimeSpanIsDurationBetween.AtMinExclusive) => new FluentExpected(true),
-                nameof(F.TimeSpanIsDurationBetween.NotADuration) => new FluentExpected(false, "Value must be a duration not within the expected range."),
+                nameof(F.TimeSpanIsInRange.NullValue) => new FluentExpected(true),
+                nameof(F.TimeSpanIsInRange.AtMinExclusive) => new FluentExpected(true),
+                nameof(F.TimeSpanIsInRange.NotADuration) => new FluentExpected(false, "Value must be a duration not within the expected range."),
                 _ when s.IsValid => new FluentExpected(false, "Value must be a duration not within the expected range."),
                 _ => new FluentExpected(true)
             });
@@ -32,7 +32,7 @@ public static class FluentStringTimeSpanExtensionsTestData
 
     public static class GreaterThan
     {
-        public static TheoryData<FluentCase<(string? value, TimeSpan threshold, PineGuard.Common.Inclusion inclusion)>> Cases =>
+        public static TheoryData<FluentCase<(string? value, TimeSpan other, PineGuard.Common.Inclusion inclusion)>> Cases =>
             F.TimeSpanIsGreaterThan.AllScenarios.ToFluentCases(s => s.Name switch
             {
                 nameof(F.TimeSpanIsGreaterThan.NullValue) => new FluentExpected(true),
@@ -43,7 +43,7 @@ public static class FluentStringTimeSpanExtensionsTestData
 
     public static class LessThan
     {
-        public static TheoryData<FluentCase<(string? value, TimeSpan threshold, PineGuard.Common.Inclusion inclusion)>> Cases =>
+        public static TheoryData<FluentCase<(string? value, TimeSpan other, PineGuard.Common.Inclusion inclusion)>> Cases =>
             F.TimeSpanIsLessThan.AllScenarios.ToFluentCases(s => s.Name switch
             {
                 nameof(F.TimeSpanIsLessThan.NullValue) => new FluentExpected(true),

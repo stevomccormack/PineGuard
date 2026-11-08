@@ -39,8 +39,8 @@ public static class StringRulesDateTimeOffsetTestData
         ];
     }
 
-    public static class IsBetween
+    public static class IsInRange
     {
-        public static TheoryData<RuleCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> Cases => F.DateTimeOffsetIsBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> Cases => F.DateTimeOffsetIsInRange.AllScenarios.ToRuleCases();
     }
 }

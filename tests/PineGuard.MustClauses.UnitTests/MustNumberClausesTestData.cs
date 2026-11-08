@@ -107,6 +107,7 @@ public static class MustNumberClausesTestData
         public static TheoryData<MustCase<(decimal value, decimal target, decimal? tolerance)>> ValidCases => F.IsApproximately.ValidScenarios.Except(nameof(F.IsApproximately.NullValue)).Project(v => (v.value!.Value, v.target, v.tolerance)).ToMustCases();
         public static TheoryData<MustCase<(decimal value, decimal target, decimal? tolerance)>> InvalidCases => F.IsApproximately.InvalidScenarios.Except(nameof(F.IsApproximately.NullValue)).Project(v => (v.value!.Value, v.target, v.tolerance)).ToMustCases(s => s.Name switch
         {
+            nameof(F.IsApproximately.NegativeTolerance) => new MustExpected(false, "tolerance must be non-negative.", "tolerance", Code: MustCodes.Number.Proximity.NotApproximate),
             nameof(F.IsApproximately.NullTolerance) => new MustExpected(false, "tolerance requires a non-null tolerance.", "tolerance", Code: MustCodes.Number.Tolerance.Null),
             _ => new MustExpected(false, "value must be approximately the target value.", Code: MustCodes.Number.Proximity.NotApproximate)
         });
@@ -114,13 +115,14 @@ public static class MustNumberClausesTestData
 
     public static class NotApproximately
     {
-        public static TheoryData<MustCase<(decimal value, decimal target, decimal? tolerance)>> ValidCases => F.IsApproximately.InvalidScenarios.Except(nameof(F.IsApproximately.NullValue), nameof(F.IsApproximately.NullTolerance)).Project(v => (v.value!.Value, v.target, v.tolerance)).ToMustCases(_ => new MustExpected(true));
+        public static TheoryData<MustCase<(decimal value, decimal target, decimal? tolerance)>> ValidCases => F.IsApproximately.InvalidScenarios.Except(nameof(F.IsApproximately.NullValue), nameof(F.IsApproximately.NullTolerance), nameof(F.IsApproximately.NegativeTolerance)).Project(v => (v.value!.Value, v.target, v.tolerance)).ToMustCases(_ => new MustExpected(true));
         public static TheoryData<MustCase<(decimal value, decimal target, decimal? tolerance)>> InvalidCases
         {
             get
             {
                 var data = F.IsApproximately.ValidScenarios.Except(nameof(F.IsApproximately.NullValue)).Project(v => (v.value!.Value, v.target, v.tolerance)).ToMustCases(_ => new MustExpected(false, "value must not be approximately the target value.", Code: MustCodes.Number.Proximity.Approximate));
                 data.Add(new MustCase<(decimal Value, decimal target, decimal? tolerance)>(nameof(F.IsApproximately.NullTolerance), (10.0m, 10.0m, null), new MustExpected(false, "tolerance requires a non-null tolerance.", "tolerance", Code: MustCodes.Number.Tolerance.Null)));
+                data.Add(new(nameof(F.IsApproximately.NegativeTolerance), (10m, 10m, -0.1m), new(false, "tolerance must be non-negative.", "tolerance", MustCodes.Number.Proximity.Approximate)));
                 return data;
             }
         }
@@ -129,12 +131,12 @@ public static class MustNumberClausesTestData
     public static class MultipleOf
     {
         public static TheoryData<MustCase<(int value, int factor)>> ValidCases => F.IsMultipleOf.ValidScenarios.Except(nameof(F.IsMultipleOf.Null)).Project(v => (v.value!.Value, v.factor)).ToMustCases();
-        public static TheoryData<MustCase<(int value, int factor)>> InvalidCases => F.IsMultipleOf.InvalidScenarios.Except(nameof(F.IsMultipleOf.Null)).Project(v => (v.value!.Value, v.factor)).ToMustCases(_ => new MustExpected(false, "value must be a multiple of the specified factor.", Code: MustCodes.Number.Divisibility.NotMultiple));
+        public static TheoryData<MustCase<(int value, int factor)>> InvalidCases => F.IsMultipleOf.InvalidScenarios.Except(nameof(F.IsMultipleOf.Null)).Project(v => (v.value!.Value, v.factor)).ToMustCases(s => s.Inputs.factor == 0 ? new MustExpected(false, "factor requires a non-zero factor.", "factor", MustCodes.Number.Factor.Zero) : new MustExpected(false, "value must be a multiple of the specified factor.", Code: MustCodes.Number.Divisibility.NotMultiple));
     }
 
     public static class NotMultipleOf
     {
-        public static TheoryData<MustCase<(int value, int factor)>> ValidCases => F.IsMultipleOf.InvalidScenarios.Except(nameof(F.IsMultipleOf.Null)).Project(v => (v.value!.Value, v.factor)).ToMustCases(_ => new MustExpected(true));
+        public static TheoryData<MustCase<(int value, int factor)>> ValidCases => F.IsMultipleOf.InvalidScenarios.Except(nameof(F.IsMultipleOf.Null), nameof(F.IsMultipleOf.ZeroFactor)).Project(v => (v.value!.Value, v.factor)).ToMustCases(_ => new MustExpected(true));
         public static TheoryData<MustCase<(int value, int factor)>> InvalidCases => F.IsMultipleOf.ValidScenarios.Except(nameof(F.IsMultipleOf.Null)).Project(v => (v.value!.Value, v.factor)).ToMustCases(_ => new MustExpected(false, "value must not be a multiple of the specified factor.", Code: MustCodes.Number.Divisibility.Multiple));
     }
 
@@ -184,5 +186,17 @@ public static class MustNumberClausesTestData
         public static TheoryData<MustCase<float>> InvalidCasesFloat => F.IsNaN.FloatInvalidScenarios.Except("NullFloat").Project(v => v!.Value).ToMustCases(_ => new MustExpected(false, "value must be NaN.", Code: MustCodes.Number.Form.NotNan));
         public static TheoryData<MustCase<double>> ValidCasesDouble => F.IsNaN.DoubleValidScenarios.Project(v => v!.Value).ToMustCases(_ => new MustExpected(true));
         public static TheoryData<MustCase<double>> InvalidCasesDouble => F.IsNaN.DoubleInvalidScenarios.Except("NullDouble").Project(v => v!.Value).ToMustCases(_ => new MustExpected(false, "value must be NaN.", Code: MustCodes.Number.Form.NotNan));
+    }
+    public static class ConfigurationPrecedence
+    {
+        public static TheoryData<MustCase<Func<MustResult<int>>>> Cases =>
+        [
+            new("ZeroFactor", () => Must.Be.MultipleOf(1, 0), new(false, "factor requires a non-zero factor.", "factor", MustCodes.Number.Factor.Zero)),
+            new("NegativeZeroFactor", () => Must.Be.NotMultipleOf(1, 0), new(false, "factor requires a non-zero factor.", "factor", MustCodes.Number.Factor.Zero)),
+            new("InRangeUndefined", () => Must.Be.InRange(0, 10, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.", "inclusion", MustCodes.Number.Range.OutOfRange)),
+            new("OutOfRangeUndefined", () => Must.Be.OutOfRange(0, 10, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.", "inclusion", MustCodes.Number.Range.InRange)),
+            new("ApproximatelyNegative", () => Must.Be.Approximately<int>(1, 1, -1), new(false, "tolerance must be non-negative.", "tolerance", MustCodes.Number.Proximity.NotApproximate)),
+            new("NotApproximatelyNegative", () => Must.Be.NotApproximately<int>(1, 1, -1), new(false, "tolerance must be non-negative.", "tolerance", MustCodes.Number.Proximity.Approximate))
+        ];
     }
 }

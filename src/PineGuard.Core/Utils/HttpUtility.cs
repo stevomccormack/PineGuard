@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PineGuard.Utils;
 
 /// <summary>
@@ -80,14 +82,14 @@ public static class HttpUtility
     /// HttpUtility.TryGetSingleHeaderValue(headers, "x-request-id", out var value);
     /// </code>
     /// </example>
-    public static bool TryGetSingleHeaderValue(IReadOnlyDictionary<string, IEnumerable<string>>? headers, string? name, out string? value)
+    public static bool TryGetSingleHeaderValue(IReadOnlyDictionary<string, IEnumerable<string>>? headers, string? name, [NotNullWhen(true)] out string? value)
     {
         value = null;
 
         if (!TryGetHeaderValues(headers, name, out var values) || values is null)
             return false;
 
-        string? single = null;
+        var single = string.Empty;
         var seen = 0;
 
         foreach (var candidate in values)

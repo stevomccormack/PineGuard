@@ -90,10 +90,10 @@ public sealed class MustResult<T> : IMustResult
     /// Creates a successful <see cref="MustResult{T}"/> with the given typed result.
     /// </summary>
     /// <param name="result">The typed result value.</param>
-    /// <param name="value">The original untyped value that was validated.</param>
     /// <param name="paramName">The optional parameter name associated with this result.</param>
+    /// <param name="value">The original untyped value that was validated.</param>
     /// <returns>A <see cref="MustResult{T}"/> with <see cref="Success"/> set to <see langword="true"/>.</returns>
-    public static MustResult<T> Ok(T? result, object? value = null, string? paramName = null) =>
+    public static MustResult<T> Ok(T? result, string? paramName = null, object? value = null) =>
         new(true, string.Empty, string.Empty, string.Empty, paramName, value, result);
 
     /// <summary>
@@ -167,7 +167,7 @@ public sealed class MustResult<T> : IMustResult
     /// <param name="result">The typed result to carry on success.</param>
     /// <returns>A success or failure <see cref="MustResult{T}"/> based on <paramref name="ok"/>.</returns>
     public static MustResult<T> FromBool(bool? ok, string code, string messageTemplate, string? paramName, object? value, T? result) =>
-        ok ?? false ? Ok(result!, value, paramName) : Fail(code, messageTemplate, paramName, value);
+        ok ?? false ? Ok(result!, value: value, paramName: paramName) : Fail(code, messageTemplate, paramName, value);
 
     /// <summary>
     /// Creates a <see cref="MustResult{T}"/> carrying a stable machine-readable <paramref name="code"/> from a
@@ -393,7 +393,7 @@ public static class MustResultExtension
     {
         ThrowHelper.ThrowIfNull(result);
 
-        return condition ? result : MustResult<T>.Ok(result.Result, result.Value, result.ParamName);
+        return condition ? result : MustResult<T>.Ok(result.Result, value: result.Value, paramName: result.ParamName);
     }
 
     /// <summary>

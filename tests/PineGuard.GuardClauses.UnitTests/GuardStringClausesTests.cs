@@ -64,15 +64,15 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     }
 
     [Theory]
-    [MemberData(nameof(TD.NotLengthBetween.ValidCases), MemberType = typeof(TD.NotLengthBetween))]
-    [MemberData(nameof(TD.NotLengthBetween.InvalidCases), MemberType = typeof(TD.NotLengthBetween))]
-    public void NotLengthBetween_BehavesAsExpected(GuardCase<(string? value, int min, int max)> tc)
+    [MemberData(nameof(TD.NotLengthInRange.ValidCases), MemberType = typeof(TD.NotLengthInRange))]
+    [MemberData(nameof(TD.NotLengthInRange.InvalidCases), MemberType = typeof(TD.NotLengthInRange))]
+    public void NotLengthInRange_BehavesAsExpected(GuardCase<(string? value, int min, int max)> tc)
     {
         var value = tc.Value.value;
         var min = tc.Value.min;
         var max = tc.Value.max;
-        var result = AssertResult(tc, () => Guard.Against.NotLengthBetween(value, min, max));
-        AssertCustomMessage(tc, () => Guard.Against.NotLengthBetween(value, min, max, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.NotLengthInRange(value, min, max));
+        AssertCustomMessage(tc, () => Guard.Against.NotLengthInRange(value, min, max, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -342,17 +342,6 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
         var allowCommonWhitespace = tc.Value.allowCommonWhitespace;
         var result = AssertResult(tc, () => Guard.Against.PrintableAscii(value, allowCommonWhitespace));
         AssertCustomMessage(tc, () => Guard.Against.PrintableAscii(value, allowCommonWhitespace, message: CustomMessage));
-        if (tc.Expected.IsValid) Assert.Equal(value, result);
-    }
-
-    [Theory]
-    [MemberData(nameof(TD.IsWhitespace.ValidCases), MemberType = typeof(TD.IsWhitespace))]
-    [MemberData(nameof(TD.IsWhitespace.InvalidCases), MemberType = typeof(TD.IsWhitespace))]
-    public void IsWhitespace_BehavesAsExpected(GuardCase<string?> tc)
-    {
-        var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.IsWhitespace(value));
-        AssertCustomMessage(tc, () => Guard.Against.IsWhitespace(value, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 

@@ -18,17 +18,17 @@ public static class FluentCsvExtensions
     /// </summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
+    /// <param name="separator">The CSV field separator, excluding quotes and line breaks.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustCsvClauses.CsvLine"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// validation is skipped after configuration is checked; compose <c>.Required()</c> for presence.
     /// </remarks>
     /// <example><code>RuleFor(x => x.CsvRow).CsvLine();</code></example>
     /// <seealso cref="MustCsvClauses.CsvLine"/>
-    public static IRuleBuilderOptions<TModel, string?> CsvLine<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.CsvLine(val, paramName: null),
+    public static IRuleBuilderOptions<TModel, string?> CsvLine<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder, char separator = CsvRules.DefaultCsvSeparator, string? message = null) =>
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.CsvLine(val, separator, paramName: null)),
             message, MustCodes.Csv.Line.Invalid);
 
     /// <summary>
@@ -37,14 +37,13 @@ public static class FluentCsvExtensions
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="expectedHeader">The expected header column names to match against.</param>
-    /// <param name="separator">The CSV separator character. Defaults to <see cref="CsvRules.DefaultCsvSeparator"/>.</param>
+    /// <param name="separator">The CSV field separator, excluding quotes and line breaks.</param>
     /// <param name="comparison">The string comparison mode for header names.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustCsvClauses.CsvHeaderLine"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// validation is skipped after configuration is checked; compose <c>.Required()</c> for presence.
     /// </remarks>
     /// <example><code>RuleFor(x => x.Header).CsvHeaderLine(new[] { "Id", "Name", "Email" });</code></example>
     /// <seealso cref="MustCsvClauses.CsvHeaderLine"/>
@@ -53,7 +52,7 @@ public static class FluentCsvExtensions
         char separator = CsvRules.DefaultCsvSeparator,
         StringComparison comparison = StringComparison.OrdinalIgnoreCase,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.CsvHeaderLine(val, expectedHeader, separator, comparison, paramName: null),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.CsvHeaderLine(val, expectedHeader, separator, comparison, paramName: null)),
             message, MustCodes.Csv.Header.Invalid);
 
     /// <summary>
@@ -62,13 +61,12 @@ public static class FluentCsvExtensions
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="schema">The column schema definitions for type-checking each field.</param>
-    /// <param name="separator">The CSV separator character. Defaults to <see cref="CsvRules.DefaultCsvSeparator"/>.</param>
+    /// <param name="separator">The CSV field separator, excluding quotes and line breaks.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustCsvClauses.CsvRowLine(IMustClause, string, IReadOnlyList{CsvColumnSchema}, char, string)"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// validation is skipped after configuration is checked; compose <c>.Required()</c> for presence.
     /// </remarks>
     /// <example><code>RuleFor(x => x.DataRow).CsvRowLine(schema);</code></example>
     /// <seealso cref="MustCsvClauses.CsvRowLine(IMustClause, string, IReadOnlyList{CsvColumnSchema}, char, string)"/>
@@ -76,7 +74,7 @@ public static class FluentCsvExtensions
         IReadOnlyList<CsvColumnSchema>? schema,
         char separator = CsvRules.DefaultCsvSeparator,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.CsvRowLine(val, schema, separator, paramName: null),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.CsvRowLine(val, schema, separator, paramName: null)),
             message, MustCodes.Csv.Row.Invalid);
 
     /// <summary>
@@ -86,14 +84,13 @@ public static class FluentCsvExtensions
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="header">The header column names.</param>
     /// <param name="types">A mapping of column names to their expected types.</param>
-    /// <param name="separator">The CSV separator character. Defaults to <see cref="CsvRules.DefaultCsvSeparator"/>.</param>
+    /// <param name="separator">The CSV field separator, excluding quotes and line breaks.</param>
     /// <param name="headerNameComparison">The string comparison mode for header name matching.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustCsvClauses.CsvRowLine(IMustClause, string, IReadOnlyList{string}, IReadOnlyDictionary{string, CsvColumnType}, char, StringComparison, string)"/>. If the value is <see langword="null"/>,
-    /// validation fails; use a separate <c>.NotNull()</c> rule beforehand if <see langword="null"/> should be
-    /// reported as a distinct failure.
+    /// validation is skipped after configuration is checked; compose <c>.Required()</c> for presence.
     /// </remarks>
     /// <example><code>RuleFor(x => x.DataRow).CsvRowLine(header, types);</code></example>
     /// <seealso cref="MustCsvClauses.CsvRowLine(IMustClause, string, IReadOnlyList{string}, IReadOnlyDictionary{string, CsvColumnType}, char, StringComparison, string)"/>
@@ -103,6 +100,9 @@ public static class FluentCsvExtensions
         char separator = CsvRules.DefaultCsvSeparator,
         StringComparison headerNameComparison = StringComparison.OrdinalIgnoreCase,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.CsvRowLine(val, header, types, separator, headerNameComparison, paramName: null),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.CsvRowLine(val, header, types, separator, headerNameComparison, paramName: null)),
             message, MustCodes.Csv.Row.Invalid);
+
+    private static MustResult<string> SkipAbsentValue(string? value, MustResult<string> result) =>
+        value is null && result.ParamName is null ? MustResult<string>.Ok(default) : result;
 }

@@ -7,6 +7,8 @@ namespace PineGuard.DataAnnotations.UnitTests;
 
 public static class StringNumbersAttributesTestData
 {
+    public static TheoryData<string?> ConfigurationInputs => [null, "bad"];
+
     public sealed record ValidCase(string Name, object? Value, bool Expected) : ReturnCase<object?, bool>(Name, Value, Expected);
 
     private static TheoryData<ValidCase> CommonEdgeCases() =>

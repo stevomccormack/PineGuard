@@ -1,3 +1,4 @@
+using System.Globalization;
 using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests;
@@ -75,13 +76,13 @@ public static class MustStringNumberTypesClausesTestData
         });
     }
 
-    public static class Int32InRange
+    public static class InRangeInt32
     {
         public static TheoryData<MustCase<(string text, int min, int max, Inclusion inclusion)>> ValidCases =>
-            F.IsInt32InRange.AllValid.ToMustCases();
+            F.IsInRangeInt32.AllValid.ToMustCases();
 
         public static TheoryData<MustCase<(string text, int min, int max, Inclusion inclusion)>> InvalidCases =>
-            F.IsInt32InRange.AllInvalid.ToMustCases(_ => new MustExpected(false, "value must be a 32-bit integer within the expected range.", Code: MustCodes.Number.Range.OutOfRange));
+            F.IsInRangeInt32.AllInvalid.ToMustCases(_ => new MustExpected(false, "value must be a 32-bit integer within the expected range.", Code: MustCodes.Number.Range.OutOfRange));
 
         public static TheoryData<NullCase> NullCases =>
         [
@@ -100,7 +101,7 @@ public static class MustStringNumberTypesClausesTestData
             : IsCase<(string text, int min, int max, Inclusion inclusion)>(Name, Value, Expected);
     }
 
-    public static class Int32OutOfRange
+    public static class OutOfRangeInt32
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
@@ -133,13 +134,13 @@ public static class MustStringNumberTypesClausesTestData
             : IsCase<(string text, int min, int max, Inclusion inclusion)>(Name, Value, Expected);
     }
 
-    public static class Int64InRange
+    public static class InRangeInt64
     {
         public static TheoryData<MustCase<(string text, long min, long max, Inclusion inclusion)>> ValidCases =>
-            F.IsInt64InRange.AllValid.ToMustCases();
+            F.IsInRangeInt64.AllValid.ToMustCases();
 
         public static TheoryData<MustCase<(string text, long min, long max, Inclusion inclusion)>> InvalidCases =>
-            F.IsInt64InRange.AllInvalid.ToMustCases(_ => new MustExpected(false, "value must be a 64-bit integer within the expected range.", Code: MustCodes.Number.Range.OutOfRange));
+            F.IsInRangeInt64.AllInvalid.ToMustCases(_ => new MustExpected(false, "value must be a 64-bit integer within the expected range.", Code: MustCodes.Number.Range.OutOfRange));
 
         public static TheoryData<NullCase> NullCases =>
         [
@@ -158,7 +159,7 @@ public static class MustStringNumberTypesClausesTestData
             : IsCase<(string text, long min, long max, Inclusion inclusion)>(Name, Value, Expected);
     }
 
-    public static class Int64OutOfRange
+    public static class OutOfRangeInt64
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
@@ -189,5 +190,33 @@ public static class MustStringNumberTypesClausesTestData
 
         public sealed record RangeCase(string Name, (string text, long min, long max, Inclusion inclusion) Value, bool Expected, string ParamName)
             : IsCase<(string text, long min, long max, Inclusion inclusion)>(Name, Value, Expected);
+    }
+    public static class ConfigurationPrecedence
+    {
+        public static TheoryData<MustCase<Func<MustResult<decimal>>>> DecimalCases =>
+        [
+            new("DecimalStyleBeforeNull", () => Must.Be.Decimal(null, styles: (NumberStyles)(-1)), new(false, "styles must be a valid number style.", "styles", MustCodes.Number.Format.NotDecimal)),
+            new("ExactDecimalStyleBeforeNull", () => Must.Be.ExactDecimal(null, styles: (NumberStyles)(-1)), new(false, "styles must be a valid number style.", "styles", MustCodes.Number.Scale.Mismatch))
+        ];
+
+        public static TheoryData<MustCase<Func<MustResult<long>>>> Int64Cases =>
+        [
+            new("Int64StyleBeforeNull", () => Must.Be.Int64(null, (NumberStyles)(-1)), new(false, "styles must be a valid number style.", "styles", MustCodes.Number.Format.NotInt64)),
+            new("InclusionBeforeNull", () => Must.Be.InRangeInt64(null, 0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.", "inclusion", MustCodes.Number.Range.OutOfRange)),
+            new("OutInclusionBeforeNull", () => Must.Be.OutOfRangeInt64(null, 0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.", "inclusion", MustCodes.Number.Range.InRange)),
+            new("RangeStyleBeforeNull", () => Must.Be.InRangeInt64(null, 0, 1, styles: (NumberStyles)(-1)), new(false, "styles must be a valid number style.", "styles", MustCodes.Number.Range.OutOfRange)),
+            new("OutRangeStyleBeforeNull", () => Must.Be.OutOfRangeInt64(null, 0, 1, styles: (NumberStyles)(-1)), new(false, "styles must be a valid number style.", "styles", MustCodes.Number.Range.InRange))
+        ];
+
+        public static TheoryData<MustCase<Func<MustResult<int>>>> Cases =>
+        [
+            new("RangeStyleBeforeNull", () => Must.Be.InRangeInt32(null, 0, 1, styles: (NumberStyles)(-1)), new(false, "styles must be a valid number style.", "styles", MustCodes.Number.Range.OutOfRange)),
+            new("OutRangeStyleBeforeNull", () => Must.Be.OutOfRangeInt32(null, 0, 1, styles: (NumberStyles)(-1)), new(false, "styles must be a valid number style.", "styles", MustCodes.Number.Range.InRange)),
+            new("InvalidStyleBeforeNull", () => Must.Be.Int32(null, (NumberStyles)(-1)), new(false, "styles must be a valid number style.", "styles", MustCodes.Number.Format.NotInt32)),
+            new("InclusionBeforeNull", () => Must.Be.InRangeInt32(null, 0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.", "inclusion", MustCodes.Number.Range.OutOfRange)),
+            new("OutInclusionBeforeNull", () => Must.Be.OutOfRangeInt32(null, 0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.", "inclusion", MustCodes.Number.Range.InRange)),
+            new("BoundsBeforeNull", () => Must.Be.InRangeInt32(null, 2, 1), new(false, "min requires a valid range.", "min", MustCodes.Number.Range.Invalid)),
+            new("NegativeBoundsBeforeNull", () => Must.Be.OutOfRangeInt32(null, 2, 1), new(false, "min requires a valid range.", "min", MustCodes.Number.Range.Invalid))
+        ];
     }
 }

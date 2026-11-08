@@ -98,30 +98,30 @@ public sealed class GuardStringGraphemesClausesTests(ITestOutputHelper output) :
     }
 
     [Theory]
-    [MemberData(nameof(TD.NotHasGraphemeCountBetween.ValidCases), MemberType = typeof(TD.NotHasGraphemeCountBetween))]
-    [MemberData(nameof(TD.NotHasGraphemeCountBetween.InvalidCases), MemberType = typeof(TD.NotHasGraphemeCountBetween))]
-    public void NotHasGraphemeCountBetween_BehavesAsExpected(GuardCase<(string? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.NotHasGraphemeCountInRange.ValidCases), MemberType = typeof(TD.NotHasGraphemeCountInRange))]
+    [MemberData(nameof(TD.NotHasGraphemeCountInRange.InvalidCases), MemberType = typeof(TD.NotHasGraphemeCountInRange))]
+    public void NotHasGraphemeCountInRange_BehavesAsExpected(GuardCase<(string? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act + Assert
-        var result = AssertResult(tc, () => Guard.Against.NotHasGraphemeCountBetween(value, min, max, inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.NotHasGraphemeCountBetween(value, min, max, inclusion, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.NotHasGraphemeCountInRange(value, min, max, inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotHasGraphemeCountInRange(value, min, max, inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
     [Theory]
-    [MemberData(nameof(TD.HasGraphemeCountBetween.ValidCases), MemberType = typeof(TD.HasGraphemeCountBetween))]
-    [MemberData(nameof(TD.HasGraphemeCountBetween.InvalidCases), MemberType = typeof(TD.HasGraphemeCountBetween))]
-    public void HasGraphemeCountBetween_BehavesAsExpected(GuardCase<(string? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.HasGraphemeCountInRange.ValidCases), MemberType = typeof(TD.HasGraphemeCountInRange))]
+    [MemberData(nameof(TD.HasGraphemeCountInRange.InvalidCases), MemberType = typeof(TD.HasGraphemeCountInRange))]
+    public void HasGraphemeCountInRange_BehavesAsExpected(GuardCase<(string? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act + Assert
-        var result = AssertResult(tc, () => Guard.Against.HasGraphemeCountBetween(value, min, max, inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.HasGraphemeCountBetween(value, min, max, inclusion, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.HasGraphemeCountInRange(value, min, max, inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.HasGraphemeCountInRange(value, min, max, inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

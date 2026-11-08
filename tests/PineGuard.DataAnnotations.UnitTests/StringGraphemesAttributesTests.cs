@@ -104,12 +104,12 @@ public sealed class StringGraphemesAttributesTests(ITestOutputHelper output) : B
     }
 
     [Theory]
-    [MemberData(nameof(StringGraphemesAttributesTestData.HasGraphemeCountBetween.Cases), MemberType = typeof(StringGraphemesAttributesTestData.HasGraphemeCountBetween))]
-    public void HasGraphemeCountBetween_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringGraphemesAttributesTestData.HasGraphemeCountInRange.Cases), MemberType = typeof(StringGraphemesAttributesTestData.HasGraphemeCountInRange))]
+    public void HasGraphemeCountInRange_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
         var (value, min, max, inclusion) = ((string? value, int min, int max, Inclusion inclusion))tc.Value!;
-        var attr = new HasGraphemeCountBetweenAttribute(min, max, inclusion);
+        HasGraphemeCountInRangeAttribute attr = new HasGraphemeCountInRangeAttribute(min, max, inclusion);
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -120,12 +120,12 @@ public sealed class StringGraphemesAttributesTests(ITestOutputHelper output) : B
     }
 
     [Theory]
-    [MemberData(nameof(StringGraphemesAttributesTestData.NotHasGraphemeCountBetween.Cases), MemberType = typeof(StringGraphemesAttributesTestData.NotHasGraphemeCountBetween))]
-    public void NotHasGraphemeCountBetween_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringGraphemesAttributesTestData.NotHasGraphemeCountInRange.Cases), MemberType = typeof(StringGraphemesAttributesTestData.NotHasGraphemeCountInRange))]
+    public void NotHasGraphemeCountInRange_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
         var (value, min, max, inclusion) = ((string? value, int min, int max, Inclusion inclusion))tc.Value!;
-        var attr = new NotHasGraphemeCountBetweenAttribute(min, max, inclusion);
+        NotHasGraphemeCountInRangeAttribute attr = new NotHasGraphemeCountInRangeAttribute(min, max, inclusion);
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -133,5 +133,20 @@ public sealed class StringGraphemesAttributesTests(ITestOutputHelper output) : B
 
         // Assert
         AssertResult(tc, result, attr.Code);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringGraphemesAttributesTestData.NullConfiguration.Cases), MemberType = typeof(StringGraphemesAttributesTestData.NullConfiguration))]
+    public void NullConfiguration_ValidatesConfigurationBeforeSkippingNull(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attribute = (ValidationAttribute)tc.Value!;
+        var context = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attribute.GetValidationResult(null, context);
+
+        // Assert
+        AssertResult(tc, result);
     }
 }

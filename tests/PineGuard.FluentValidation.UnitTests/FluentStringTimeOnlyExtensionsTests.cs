@@ -14,21 +14,21 @@ public sealed class FluentStringTimeOnlyExtensionsTests(ITestOutputHelper output
     private static readonly string S0800 = new TimeOnly(8, 0).ToString("HH:mm");
     private static readonly string S0900 = new TimeOnly(9, 0).ToString("HH:mm");
 
-    private sealed class BetweenTimeOnlyValidator : AbstractValidator<Model>
-    { public BetweenTimeOnlyValidator() => RuleFor(x => x.Value).BetweenTimeOnly(T1000, T1200); }
+    private sealed class InRangeTimeOnlyValidator : AbstractValidator<Model>
+    { public InRangeTimeOnlyValidator() => RuleFor(x => x.Value).InRangeTimeOnly(T1000, T1200); }
 
     [Theory]
-    [MemberData(nameof(FluentStringTimeOnlyExtensionsTestData.BetweenTimeOnly.Cases), MemberType = typeof(FluentStringTimeOnlyExtensionsTestData.BetweenTimeOnly))]
-    public void BetweenTimeOnly_BehavesAsExpected(FluentCase<string?> tc)
-    { AssertResult(tc, new BetweenTimeOnlyValidator().Validate(new Model { Value = tc.Value })); }
+    [MemberData(nameof(FluentStringTimeOnlyExtensionsTestData.InRangeTimeOnly.Cases), MemberType = typeof(FluentStringTimeOnlyExtensionsTestData.InRangeTimeOnly))]
+    public void InRangeTimeOnly_BehavesAsExpected(FluentCase<string?> tc)
+    { AssertResult(tc, new InRangeTimeOnlyValidator().Validate(new Model { Value = tc.Value })); }
 
-    private sealed class NotBetweenTimeOnlyValidator : AbstractValidator<Model>
-    { public NotBetweenTimeOnlyValidator() => RuleFor(x => x.Value).NotBetweenTimeOnly(T1000, T1200); }
+    private sealed class OutOfRangeTimeOnlyValidator : AbstractValidator<Model>
+    { public OutOfRangeTimeOnlyValidator() => RuleFor(x => x.Value).OutOfRangeTimeOnly(T1000, T1200); }
 
     [Theory]
-    [MemberData(nameof(FluentStringTimeOnlyExtensionsTestData.NotBetweenTimeOnly.Cases), MemberType = typeof(FluentStringTimeOnlyExtensionsTestData.NotBetweenTimeOnly))]
-    public void NotBetweenTimeOnly_BehavesAsExpected(FluentCase<string?> tc)
-    { AssertResult(tc, new NotBetweenTimeOnlyValidator().Validate(new Model { Value = tc.Value })); }
+    [MemberData(nameof(FluentStringTimeOnlyExtensionsTestData.OutOfRangeTimeOnly.Cases), MemberType = typeof(FluentStringTimeOnlyExtensionsTestData.OutOfRangeTimeOnly))]
+    public void OutOfRangeTimeOnly_BehavesAsExpected(FluentCase<string?> tc)
+    { AssertResult(tc, new OutOfRangeTimeOnlyValidator().Validate(new Model { Value = tc.Value })); }
 
     private sealed class WithinTimeOnlyValidator : AbstractValidator<Model>
     { public WithinTimeOnlyValidator() => RuleFor(x => x.Value).WithinTimeOnly(S1200, TimeSpan.FromMinutes(30)); }

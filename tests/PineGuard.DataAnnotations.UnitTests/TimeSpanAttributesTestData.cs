@@ -5,7 +5,7 @@ namespace PineGuard.DataAnnotations.UnitTests;
 
 public static class TimeSpanAttributesTestData
 {
-    public static class DurationBetweenTimeSpan
+    public static class InRangeTimeSpan
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [
@@ -18,7 +18,7 @@ public static class TimeSpanAttributesTestData
         ];
     }
 
-    public static class NotDurationBetweenTimeSpan
+    public static class OutOfRangeTimeSpan
     {
         public static TheoryData<DataAnnotationCase> Cases =>
         [

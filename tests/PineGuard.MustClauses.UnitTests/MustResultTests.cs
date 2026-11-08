@@ -9,7 +9,7 @@ public class MustResultTests : BaseUnitTest
     [MemberData(nameof(MustResultTestData.Ok.ValidCases), MemberType = typeof(MustResultTestData.Ok))]
     public void Ok_Checks(MustResultTestData.Ok.ValidCase testCase)
     {
-        var result = MustResult<int>.Ok(testCase.Value.Result, testCase.Value.Value, testCase.Value.ParamName);
+        var result = MustResult<int>.Ok(testCase.Value.Result, value: testCase.Value.Value, paramName: testCase.Value.ParamName);
         Assert.Equal(testCase.Expected, result.Success);
         Assert.Equal(testCase.Value.Result, result.Result);
         Assert.Equal(testCase.Value.Value, result.Value);

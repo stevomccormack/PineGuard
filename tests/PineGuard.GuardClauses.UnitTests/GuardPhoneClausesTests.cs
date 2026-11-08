@@ -18,18 +18,4 @@ public sealed class GuardPhoneClausesTests(ITestOutputHelper output) : BaseGuard
 
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
-
-    // Guard.Against.NotPhoneNumberString
-    [Theory]
-    [MemberData(nameof(GuardPhoneClausesTestData.NotPhoneNumberString.ValidCases), MemberType = typeof(GuardPhoneClausesTestData.NotPhoneNumberString))]
-    [MemberData(nameof(GuardPhoneClausesTestData.NotPhoneNumberString.InvalidCases), MemberType = typeof(GuardPhoneClausesTestData.NotPhoneNumberString))]
-    public void NotPhoneNumberString_BehavesAsExpected(GuardCase<string?> tc)
-    {
-        // Act + Assert
-        var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.NotPhoneNumberString(value));
-        AssertCustomMessage(tc, () => Guard.Against.NotPhoneNumberString(value, message: CustomMessage));
-
-        if (tc.Expected.IsValid) Assert.Equal(value, result);
-    }
 }

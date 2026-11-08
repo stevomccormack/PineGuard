@@ -9,6 +9,7 @@ public static class PhoneUtilityTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("US Format", ("+1(425)555-0123", 7, 15, null), true, "14255550123"),
+            new("Documented spaced format", ("+1 (555) 123-4567", 7, 15, null), true, "15551234567"),
             new("Simple Digits", ("1234567890", 7, 15, null), true, "1234567890")
         ];
 
@@ -19,6 +20,8 @@ public static class PhoneUtilityTestData
             new("Invalid Config Min > Max", ("1234567890", 10, 5, null), false, string.Empty),
             new("Invalid Config Min < 1", ("1234567890", 0, 15, null), false, string.Empty),
             new("Invalid Config Max < 1", ("1234567890", 7, 0, null), false, string.Empty),
+            new("Explicit set rejects space", ("123 4567", 7, 15, ['-']), false, string.Empty),
+            new("Default rejects tab", ("123\t4567", 7, 15, null), false, string.Empty),
             new("Disallowed Char", ("12x3", 1, 15, ['-']), false, string.Empty),
             new("Too Short", ("123", 4, 10, null), false, "123"),
             new("Too Long", ("123456", 1, 5, null), false, "123456")

@@ -29,4 +29,10 @@ public static class CsvAttributesTestData
             new("wrong order", "Name,Id", new DataAnnotationExpected(false))
         ];
     }
+
+    public static class ConfiguredSeparator
+    {
+        public static TheoryData<char> Cases => [';', '|', '\t'];
+        public static TheoryData<char> InvalidCases => ['"', '\r', '\n'];
+    }
 }

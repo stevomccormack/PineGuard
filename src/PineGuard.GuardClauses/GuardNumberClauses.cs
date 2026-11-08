@@ -295,12 +295,12 @@ public static class GuardNumberClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> is less than or equal to <paramref name="min"/>.
+    /// Throws if <paramref name="value"/> is less than or equal to <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">The numeric type to guard.</typeparam>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="min">The minimum threshold.</param>
+    /// <param name="other">The minimum threshold.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
     /// from <see cref="MustNumberClauses.GreaterThan{T}"/>.
@@ -315,19 +315,19 @@ public static class GuardNumberClauses
     /// </param>
     /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
     /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is less than or equal to <paramref name="min"/> and no
+    /// Thrown when <paramref name="value"/> is less than or equal to <paramref name="other"/> and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <seealso cref="MustNumberClauses.GreaterThan{T}"/>
     public static T LessThanOrEqual<T>(this IGuardClause _,
         T value,
-        T min,
+        T other,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
-        var result = Must.Be.GreaterThan(value, min, paramName);
+        var result = Must.Be.GreaterThan(value, other, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -335,12 +335,12 @@ public static class GuardNumberClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> is less than <paramref name="min"/>.
+    /// Throws if <paramref name="value"/> is less than <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">The numeric type to guard.</typeparam>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="min">The minimum threshold.</param>
+    /// <param name="other">The minimum threshold.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
     /// from <see cref="MustNumberClauses.GreaterThanOrEqual{T}"/>.
@@ -355,19 +355,19 @@ public static class GuardNumberClauses
     /// </param>
     /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
     /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is less than <paramref name="min"/> and no
+    /// Thrown when <paramref name="value"/> is less than <paramref name="other"/> and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <seealso cref="MustNumberClauses.GreaterThanOrEqual{T}"/>
     public static T LessThan<T>(this IGuardClause _,
         T value,
-        T min,
+        T other,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
-        var result = Must.Be.GreaterThanOrEqual(value, min, paramName);
+        var result = Must.Be.GreaterThanOrEqual(value, other, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -375,12 +375,12 @@ public static class GuardNumberClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> is greater than or equal to <paramref name="max"/>.
+    /// Throws if <paramref name="value"/> is greater than or equal to <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">The numeric type to guard.</typeparam>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="max">The maximum threshold.</param>
+    /// <param name="other">The maximum threshold.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
     /// from <see cref="MustNumberClauses.LessThan{T}"/>.
@@ -395,19 +395,19 @@ public static class GuardNumberClauses
     /// </param>
     /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
     /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is greater than or equal to <paramref name="max"/> and no
+    /// Thrown when <paramref name="value"/> is greater than or equal to <paramref name="other"/> and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <seealso cref="MustNumberClauses.LessThan{T}"/>
     public static T GreaterThanOrEqual<T>(this IGuardClause _,
         T value,
-        T max,
+        T other,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
-        var result = Must.Be.LessThan(value, max, paramName);
+        var result = Must.Be.LessThan(value, other, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -415,12 +415,12 @@ public static class GuardNumberClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> is greater than <paramref name="min"/>.
+    /// Throws if <paramref name="value"/> is greater than <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">The numeric type to guard.</typeparam>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="min">The upper bound threshold.</param>
+    /// <param name="other">The upper bound threshold.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
     /// from <see cref="MustNumberClauses.LessThanOrEqual{T}"/>.
@@ -435,19 +435,19 @@ public static class GuardNumberClauses
     /// </param>
     /// <returns>The validated value of <paramref name="value"/> if the guard passes.</returns>
     /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is greater than <paramref name="min"/> and no
+    /// Thrown when <paramref name="value"/> is greater than <paramref name="other"/> and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <seealso cref="MustNumberClauses.LessThanOrEqual{T}"/>
     public static T GreaterThan<T>(this IGuardClause _,
         T value,
-        T min,
+        T other,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
         where T : struct, INumber<T>
     {
-        var result = Must.Be.LessThanOrEqual(value, min, paramName);
+        var result = Must.Be.LessThanOrEqual(value, other, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

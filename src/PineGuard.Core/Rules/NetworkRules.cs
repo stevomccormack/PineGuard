@@ -62,10 +62,10 @@ public static class NetworkRules
     /// <summary>
     /// Determines whether the specified IP address falls within the given CIDR block.
     /// </summary>
-    /// <param name="ip">The IP address to check. If <see langword="null"/> or invalid, returns <see langword="false"/>.</param>
+    /// <param name="value">The IP address to check. If <see langword="null"/> or invalid, returns <see langword="false"/>.</param>
     /// <param name="cidr">The CIDR notation block (e.g., <c>"192.168.1.0/24"</c>).</param>
     /// <returns>
-    /// <see langword="true"/> if <paramref name="ip"/> falls within the <paramref name="cidr"/> range;
+    /// <see langword="true"/> if <paramref name="value"/> falls within the <paramref name="cidr"/> range;
     /// otherwise, <see langword="false"/>.
     /// </returns>
     /// <example>
@@ -73,9 +73,9 @@ public static class NetworkRules
     /// bool inRange = NetworkRules.IsInCidr("192.168.1.100", "192.168.1.0/24"); // true
     /// </code>
     /// </example>
-    public static bool IsInCidr(string? ip, string cidr)
+    public static bool IsInCidr(string? value, string cidr)
     {
-        if (!NetworkUtility.TryParseIpAddress(ip, out var address) || address is null)
+        if (!NetworkUtility.TryParseIpAddress(value, out var address) || address is null)
             return false;
 
         if (!NetworkUtility.TryParseCidr(cidr, out var network, out var prefixLength) || network is null)
@@ -94,11 +94,11 @@ public static class NetworkRules
     /// </returns>
     /// <example>
     /// <code>
-    /// bool valid = NetworkRules.IsValidHostname("example.com");   // true
-    /// bool invalid = NetworkRules.IsValidHostname("-invalid-.com"); // false
+    /// bool valid = NetworkRules.IsHostname("example.com");   // true
+    /// bool invalid = NetworkRules.IsHostname("-invalid-.com"); // false
     /// </code>
     /// </example>
-    public static bool IsValidHostname(string? value)
+    public static bool IsHostname(string? value)
     {
         var idnConversionSucceeded = NetworkUtility.TryGetAsciiHostname(value, out var ascii) && ascii is not null;
 

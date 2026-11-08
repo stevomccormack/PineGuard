@@ -36,6 +36,9 @@ public static class MustTimeOnlyRangeClauses
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(range))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnlyRange>.Fail(MustCodes.Range.Order.NotChronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = TimeOnlyRangeRules.IsChronological(range, inclusion);
@@ -63,9 +66,12 @@ public static class MustTimeOnlyRangeClauses
     public static MustResult<TimeOnlyRange> Overlapping(this IMustClause _,
         TimeOnlyRange range1,
         TimeOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnlyRange>.Fail(MustCodes.Range.Overlap.Missing, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be overlapping.";
 
         var ok = TimeOnlyRangeRules.IsOverlapping(range1, range2, inclusion);
@@ -93,9 +99,12 @@ public static class MustTimeOnlyRangeClauses
     public static MustResult<TimeOnlyRange> NotOverlapping(this IMustClause _,
         TimeOnlyRange range1,
         TimeOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnlyRange>.Fail(MustCodes.Range.Overlap.Present, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must not be overlapping.";
 
         var ok = !TimeOnlyRangeRules.IsOverlapping(range1, range2, inclusion);
@@ -126,6 +135,9 @@ public static class MustTimeOnlyRangeClauses
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnlyRange>.Fail(MustCodes.Range.Bounds.NotContains, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must contain the specified time.";
 
         var ok = TimeOnlyRangeRules.Contains(range, value, inclusion);
@@ -156,6 +168,9 @@ public static class MustTimeOnlyRangeClauses
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnlyRange>.Fail(MustCodes.Range.Bounds.Contains, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must not contain the specified time.";
 
         var ok = !TimeOnlyRangeRules.Contains(range, value, inclusion);

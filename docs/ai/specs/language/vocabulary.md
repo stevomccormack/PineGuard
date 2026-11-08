@@ -37,7 +37,7 @@ This exists to prevent repeated churn around:
 - **Preferred Fluent name**: the preferred FluentValidation extension name.
   - Typically the concept name (e.g. `Email`, `Url`, `Latitude`).
 
-- **Alternatives**: accepted aliases/synonyms that are allowed to exist but are not the preferred choice.
+- **Alternatives**: rejected candidates recorded for design rationale. The greenfield surface keeps one canonical spelling per operation; a distinct framework adapter must have its own documented collision rationale.
 
 ## 2) Audit normalization (required)
 
@@ -106,6 +106,60 @@ The library also exposes:
 - Guard: `Guard.Against.OwaspUnsafe(...)`
 
 For parity purposes, both are normalized to the shared concept `Owasp` via `aliases`.
+
+### 5.3 Range and scalar parsing vocabulary
+
+See [API target capabilities](api-capabilities.md) for supported framework boundaries and result contracts.
+
+Equivalent scalar range predicates use `InRange` / `OutOfRange` across Rules, Must, Guard,
+FluentValidation and attributes. Keep dimensions in compound predicates: `LengthInRange`,
+`HasCountInRange`, `HasGraphemeCountInRange`; their negative clauses retain `Not` and Guards
+delegate to the corresponding Must complement. `Within` remains the distinct proximity concept.
+
+Generic scalar predicates whose input is a string use `<Concept><ParsedType>` on the flattened
+Must/Guard/Fluent surfaces throughout each family: `PositiveDecimal`, `EvenInt32`, `FiniteDouble`,
+`TrueBoolean`, `InRangeInt32`, `InRangeTimeSpan`, `MinimumAgeDateOnly`. Use CLR type spellings
+consistently. Typed-input clauses keep the short concept. Nested Core classes retain their context;
+do not repeat a type already supplied by the class. A multi-type Core class retains the type
+qualifier, as in `StringRules.NumberTypes.IsInRangeInt32`.
+
+Domain concepts already name their meaning: `Guid`, `HasGuidVersion`, `NotEmptyGuid`, `Ipv4`,
+`Ipv6`, `IpAddress`, `PhoneNumber`, `Email`, `Hostname` and `ValidXml` do not acquire redundant
+output-type suffixes. Attribute `String` qualifiers distinguish input representation where needed
+(for example `PastDateOnly` versus `PastDateOnlyString`); they do not mean raw-result projection.
+
+Must.Result holds the successful parsed/normalized output and Must.Value the original input.
+Guard returns that successful result. Do not add raw-result twins such as `Ipv4String` or
+`PhoneNumberString`; a caller can retain its original input. Fluent validation does not replace
+the property's value with the parsed result.
+
+Guard applies the existing semantic opposite before the parsed-type suffix:
+`ZeroOrNegativeDecimal` calls `PositiveDecimal`, `FalseBoolean` calls `TrueBoolean`, and
+`OutOfRangeInt32` calls `InRangeInt32`. Temporal equality boundaries remain explicit; `Past`
+and `Future` are not strict complements at the reference instant.
+
+Single-bound comparisons use `other`; two-bound comparisons use `min` / `max`. Required bounds
+are configuration, not optional validated values. Explicit nullable peer/equality contracts such
+as `IsSame` are separate and must document their null semantics.
+
+### 5.4 XML validity and object validation
+
+XML deliberately distinguishes well-formedness (`XmlRules.IsXml`, `Must.Be.Xml`,
+`Guard.Against.NotXml`, `XmlStringAttribute`) from XSD validity
+(`XmlSchemaRules.IsValidXml`, `Must.Be.ValidXml`, `Guard.Against.InvalidXml`, `ValidXmlAttribute`).
+The word Valid is meaningful here; see the [XML specification](../xml/project.md).
+`XmlSchemaRules` and `XmlSchemaMustValidator` also avoid Core/BCL type-name collisions.
+
+The exact `InvalidXml` domain exception and Guard's `Invalid` object-validator entry point do
+not authorize a general Invalid-prefix convention. The XML package intentionally has no direct
+FluentValidation dependency; use the existing MustBe composition adapter.
+
+### 5.5 Configuration predicates
+
+Parsing-utility `IsValidStyles` helpers validate permitted flag combinations rather than asking
+whether input is of a named domain. Multi-parser containers qualify the style family where needed,
+as in `StringUtility.NumberTypes.IsValidFloatingPointStyles`. This is a configuration contract;
+it does not justify redundant input predicates such as `IsValidHostname`.
 
 ## 6) Updating this map
 

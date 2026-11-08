@@ -10,13 +10,18 @@ public static partial class StringUtility
     /// </summary>
     public static class DateOnly
     {
+        /// <summary>Determines whether the parsing styles are supported for this temporal type.</summary>
+        /// <param name="styles">The parsing styles to validate.</param>
+        /// <returns>Whether all flags and their combination are supported.</returns>
+        public static bool IsValidStyles(DateTimeStyles styles) => (styles & ~DateTimeStyles.AllowWhiteSpaces) == 0;
+
         /// <summary>
-        /// Attempts to parse the specified string as a nullable <see cref="System.DateOnly"/> using invariant culture.
+        /// Attempts to parse the specified string as a <see cref="System.DateOnly"/> using invariant culture.
         /// </summary>
         /// <param name="value">The string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
         /// <param name="date">
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="System.DateOnly"/>.
-        /// When <see langword="false"/>, contains <see langword="null"/>.
+        /// When <see langword="false"/>, contains the default value.
         /// </param>
         /// <param name="styles">
         /// The <see cref="DateTimeStyles"/> to apply during parsing.
@@ -28,11 +33,11 @@ public static partial class StringUtility
         /// StringUtility.DateOnly.TryParse("2024-01-15", out var date); // true
         /// </code>
         /// </example>
-        public static bool TryParse(string? value, out System.DateOnly? date, DateTimeStyles styles = DateTimeStyles.AllowWhiteSpaces)
+        public static bool TryParse(string? value, out System.DateOnly date, DateTimeStyles styles = DateTimeStyles.AllowWhiteSpaces)
         {
-            date = null;
+            date = default;
 
-            if (string.IsNullOrWhiteSpace(value))
+            if (!IsValidStyles(styles) || string.IsNullOrWhiteSpace(value))
                 return false;
 
             if (!System.DateOnly.TryParse(value, CultureInfo.InvariantCulture, styles,

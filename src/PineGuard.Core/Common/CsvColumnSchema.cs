@@ -22,10 +22,11 @@ public readonly record struct CsvColumnSchema(
     /// Initializes a new instance of the <see cref="CsvColumnSchema"/> struct using a string type name.
     /// </summary>
     /// <param name="name">The column name.</param>
-    /// <param name="type">The column type as a string (e.g., <c>"string"</c>, <c>"int"</c>, <c>"guid"</c>).</param>
+    /// <param name="type">The column type name. The ambiguous <c>datetime</c> name is unsupported; use <c>datetimeoffset</c> with explicit offset semantics.</param>
     /// <param name="isRequired">Whether the column value is required. Defaults to <see langword="true"/>.</param>
     /// <param name="maxLength">The maximum character length for the column value. Defaults to <see cref="DefaultMaxLength"/>.</param>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="type"/> is <see langword="null"/>, empty, or an unsupported type name.</exception>
+    /// <exception cref="ArgumentException">The name is blank or the type name is unsupported.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The maximum length is not positive.</exception>
     public CsvColumnSchema(
         string name,
         string type,
@@ -33,6 +34,10 @@ public readonly record struct CsvColumnSchema(
         int maxLength = DefaultMaxLength)
         : this(name, ParseColumnType(type), isRequired, maxLength)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Column name must not be blank.", nameof(name));
+        if (maxLength <= 0)
+            throw new ArgumentOutOfRangeException(nameof(maxLength), "Maximum length must be positive.");
     }
 
     private static CsvColumnType ParseColumnType(string type)

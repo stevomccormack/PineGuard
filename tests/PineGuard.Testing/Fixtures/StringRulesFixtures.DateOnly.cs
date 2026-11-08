@@ -60,7 +60,7 @@ public static partial class StringRulesFixtures
         private static string Iso(DateOnly value) => value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
 
-    public static class DateOnlyIsBetween
+    public static class DateOnlyIsInRange
     {
         public static readonly (string? value, DateOnly min, DateOnly max, Inclusion inclusion) InsideRange = ("2020-01-15", new DateOnly(2020, 1, 1), new DateOnly(2020, 1, 31), Inclusion.Inclusive);
         public static readonly (string? value, DateOnly min, DateOnly max, Inclusion inclusion) OnMinInclusive = ("2020-01-01", new DateOnly(2020, 1, 1), new DateOnly(2020, 1, 31), Inclusion.Inclusive);
@@ -77,7 +77,7 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
-    public static class DateOnlyIsNotBetween
+    public static class DateOnlyIsOutOfRange
     {
         private static readonly DateOnly D20200101 = new(2020, 1, 1);
         private static readonly DateOnly D20200131 = new(2020, 1, 31);

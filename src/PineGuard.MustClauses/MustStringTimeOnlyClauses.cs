@@ -42,7 +42,7 @@ public static class MustStringTimeOnlyClauses
     /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-only">String Time Only Must Clauses documentation</seealso>
-    public static MustResult<TimeOnly> BetweenTimeOnly(this IMustClause _,
+    public static MustResult<TimeOnly> InRangeTimeOnly(this IMustClause _,
         string? value,
         TimeOnly min,
         TimeOnly max,
@@ -50,19 +50,25 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, NullMessage, paramName, value);
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min > max)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
+
+        if (value is null)
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a time within the expected range.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = TimeOnlyRules.IsBetween(parsedValue, min, max, inclusion);
+        var parsedValue = parsed;
+        var ok = TimeOnlyRules.IsInRange(parsedValue, min, max, inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Range.OutOfRange, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -86,7 +92,7 @@ public static class MustStringTimeOnlyClauses
     /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-only">String Time Only Must Clauses documentation</seealso>
-    public static MustResult<TimeOnly> NotBetweenTimeOnly(this IMustClause _,
+    public static MustResult<TimeOnly> OutOfRangeTimeOnly(this IMustClause _,
         string? value,
         TimeOnly min,
         TimeOnly max,
@@ -94,19 +100,25 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, NullMessage, paramName, value);
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min > max)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
+
+        if (value is null)
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a time not within the expected range.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = !TimeOnlyRules.IsBetween(parsedValue, min, max, inclusion);
+        var parsedValue = parsed;
+        var ok = !TimeOnlyRules.IsInRange(parsedValue, min, max, inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Range.InRange, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -136,6 +148,9 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Proximity.NotWithin, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Proximity.NotWithin, NullMessage, paramName, value);
 
@@ -153,7 +168,7 @@ public static class MustStringTimeOnlyClauses
         if (!StringUtility.TimeOnly.TryParse(reference, out var parsedReference, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsed = parsedValue.GetValueOrDefault();
+        var parsed = parsedValue;
         var ok = TimeOnlyRules.IsWithin(parsed, parsedReference, window);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Proximity.NotWithin, messageTemplate, paramName, value, parsed);
     }
@@ -184,6 +199,9 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Proximity.Within, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Proximity.Within, NullMessage, paramName, value);
 
@@ -201,7 +219,7 @@ public static class MustStringTimeOnlyClauses
         if (!StringUtility.TimeOnly.TryParse(reference, out var parsedReference, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsed = parsedValue.GetValueOrDefault();
+        var parsed = parsedValue;
         var ok = !TimeOnlyRules.IsWithin(parsed, parsedReference, window);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Proximity.Within, messageTemplate, paramName, value, parsed);
     }
@@ -232,18 +250,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be a time before the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = TimeOnlyRules.IsBefore(parsedValue, other, Inclusion.Exclusive, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotBefore, messageTemplate, paramName, value, parsedValue);
     }
@@ -274,18 +296,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be a time on or before the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = TimeOnlyRules.IsBefore(parsedValue, other, Inclusion.Inclusive, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.After, messageTemplate, paramName, value, parsedValue);
     }
@@ -316,18 +342,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be a time after the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = TimeOnlyRules.IsAfter(parsedValue, other, Inclusion.Exclusive, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotAfter, messageTemplate, paramName, value, parsedValue);
     }
@@ -358,18 +388,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be a time on or after the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = TimeOnlyRules.IsAfter(parsedValue, other, Inclusion.Inclusive, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.Before, messageTemplate, paramName, value, parsedValue);
     }
@@ -400,18 +434,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.NotEqual, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.NotEqual, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.NotEqual, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.NotEqual, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be a time the same as the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = TimeOnlyRules.IsSame(parsedValue, other, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Equality.NotEqual, messageTemplate, paramName, value, parsedValue);
     }
@@ -442,18 +480,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.Equal, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.Equal, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.Equal, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Equality.Equal, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must be a time not the same as the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !TimeOnlyRules.IsSame(parsedValue, other, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Equality.Equal, messageTemplate, paramName, value, parsedValue);
     }
@@ -484,6 +526,12 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(start))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotChronological, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotChronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (start is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotChronological, NullMessage, paramName, start);
 
@@ -498,8 +546,8 @@ public static class MustStringTimeOnlyClauses
         if (!StringUtility.TimeOnly.TryParse(end, out var parsedEnd, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, nameof(end), end, result: default);
 
-        var parsedStartValue = parsedStart.GetValueOrDefault();
-        var ok = TimeOnlyRules.IsChronological(parsedStartValue, parsedEnd.GetValueOrDefault(), inclusion);
+        var parsedStartValue = parsedStart;
+        var ok = TimeOnlyRules.IsChronological(parsedStartValue, parsedEnd, inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotChronological, messageTemplate, paramName, start, parsedStartValue);
     }
 
@@ -529,10 +577,16 @@ public static class MustStringTimeOnlyClauses
         string? end1,
         string? start2,
         string? end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Overlap.Missing, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Overlap.Missing, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (start1 is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Overlap.Missing, NullMessage, paramName, start1);
 
@@ -559,12 +613,12 @@ public static class MustStringTimeOnlyClauses
         if (!StringUtility.TimeOnly.TryParse(end2, out var e2, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, nameof(end2), end2, result: default);
 
-        var parsedStartValue = s1.GetValueOrDefault();
+        var parsedStartValue = s1;
         var ok = TimeOnlyRules.IsOverlapping(
             parsedStartValue,
-            e1.GetValueOrDefault(),
-            s2.GetValueOrDefault(),
-            e2.GetValueOrDefault(),
+            e1,
+            s2,
+            e2,
             inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Overlap.Missing, messageTemplate, paramName, start1, parsedStartValue);
     }
@@ -595,10 +649,16 @@ public static class MustStringTimeOnlyClauses
         string? end1,
         string? start2,
         string? end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Overlap.Present, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Overlap.Present, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (start1 is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Overlap.Present, NullMessage, paramName, start1);
 
@@ -625,12 +685,12 @@ public static class MustStringTimeOnlyClauses
         if (!StringUtility.TimeOnly.TryParse(end2, out var e2, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, nameof(end2), end2, result: default);
 
-        var parsedStartValue = s1.GetValueOrDefault();
+        var parsedStartValue = s1;
         var ok = !TimeOnlyRules.IsOverlapping(
             parsedStartValue,
-            e1.GetValueOrDefault(),
-            s2.GetValueOrDefault(),
-            e2.GetValueOrDefault(),
+            e1,
+            s2,
+            e2,
             inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Overlap.Present, messageTemplate, paramName, start1, parsedStartValue);
     }
@@ -661,18 +721,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Before, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must not be a time before the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !TimeOnlyRules.IsBefore(parsedValue, other, Inclusion.Exclusive, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.Before, messageTemplate, paramName, value, parsedValue);
     }
@@ -703,18 +767,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotAfter, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must not be a time on or before the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !TimeOnlyRules.IsBefore(parsedValue, other, Inclusion.Inclusive, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotAfter, messageTemplate, paramName, value, parsedValue);
     }
@@ -745,18 +813,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.After, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must not be a time after the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !TimeOnlyRules.IsAfter(parsedValue, other, Inclusion.Exclusive, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.After, messageTemplate, paramName, value, parsedValue);
     }
@@ -787,18 +859,22 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<TimePrecision>(precision.Value))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, InvalidTimePrecisionMessage, nameof(precision), precision);
+
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, NullMessage, paramName, value);
 
-        if (precision is not null && !Enum.IsDefined(precision.Value))
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.NotBefore, InvalidTimePrecisionMessage, nameof(precision), precision);
 
         const string messageTemplate = "{paramName} must not be a time on or after the specified time.";
 
         if (!StringUtility.TimeOnly.TryParse(value, out var parsed, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !TimeOnlyRules.IsAfter(parsedValue, other, Inclusion.Inclusive, precision);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.NotBefore, messageTemplate, paramName, value, parsedValue);
     }
@@ -829,6 +905,12 @@ public static class MustStringTimeOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(start))] string? paramName = null)
     {
+        if (!StringUtility.TimeOnly.IsValidStyles(styles))
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Chronological, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Chronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (start is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Order.Chronological, NullMessage, paramName, start);
 
@@ -843,8 +925,8 @@ public static class MustStringTimeOnlyClauses
         if (!StringUtility.TimeOnly.TryParse(end, out var parsedEnd, styles))
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, nameof(end), end, result: default);
 
-        var parsedStartValue = parsedStart.GetValueOrDefault();
-        var ok = !TimeOnlyRules.IsChronological(parsedStartValue, parsedEnd.GetValueOrDefault(), inclusion);
+        var parsedStartValue = parsedStart;
+        var ok = !TimeOnlyRules.IsChronological(parsedStartValue, parsedEnd, inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Order.Chronological, messageTemplate, paramName, start, parsedStartValue);
     }
 }

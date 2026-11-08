@@ -398,11 +398,16 @@ public static class HttpSecurityHeaderRulesFixtures
 
         public static RuleScenario<IReadOnlyDictionary<string, IEnumerable<string>>?>[] ValidScenarios =>
         [
-            new(nameof(NoSniff), NoSniff, true)
+            new(nameof(NoSniff), NoSniff, true),
+            new("CaseAndWhitespace", BuildHeaders("X-Content-Type-Options", "  NoSnIfF  "), true),
+            new("RepeatedNosniffFirst", BuildHeaders("X-Content-Type-Options", ["nosniff", "garbage"]), true),
+            new("RepeatedNosniffLast", BuildHeaders("X-Content-Type-Options", ["garbage", "nosniff"]), true)
         ];
 
         public static RuleScenario<IReadOnlyDictionary<string, IEnumerable<string>>?>[] InvalidScenarios =>
         [
+            new("CombinedNosniffFirst", BuildHeaders("X-Content-Type-Options", "nosniff, garbage"), false),
+            new("CombinedNosniffLast", BuildHeaders("X-Content-Type-Options", "garbage, nosniff"), false),
             new(nameof(EmptyHeaders), EmptyHeaders, false),
             new(nameof(Null), Null, false)
         ];

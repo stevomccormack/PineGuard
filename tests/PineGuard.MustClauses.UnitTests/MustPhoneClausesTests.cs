@@ -16,16 +16,4 @@ public sealed class MustPhoneClausesTests(ITestOutputHelper output) : BaseMustUn
         // Assert
         AssertResult(tc, result);
     }
-
-    [Theory]
-    [MemberData(nameof(MustPhoneClausesTestData.PhoneNumberString.ValidCases), MemberType = typeof(MustPhoneClausesTestData.PhoneNumberString))]
-    [MemberData(nameof(MustPhoneClausesTestData.PhoneNumberString.InvalidCases), MemberType = typeof(MustPhoneClausesTestData.PhoneNumberString))]
-    public void PhoneNumberString_BehavesAsExpected(MustCase<string?> tc)
-    {
-        // Act
-        var result = Must.Be.PhoneNumberString(tc.Value, paramName: "value");
-
-        // Assert
-        AssertResult(tc, result);
-    }
 }

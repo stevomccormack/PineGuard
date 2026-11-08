@@ -15,8 +15,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void ZeroOrNegative_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.ZeroOrNegative(value));
-        AssertCustomMessage(tc, () => Guard.Against.ZeroOrNegative(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.ZeroOrNegativeDecimal(value));
+        AssertCustomMessage(tc, () => Guard.Against.ZeroOrNegativeDecimal(value, message: CustomMessage));
     }
 
     [Theory]
@@ -25,8 +25,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void ZeroOrPositive_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.ZeroOrPositive(value));
-        AssertCustomMessage(tc, () => Guard.Against.ZeroOrPositive(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.ZeroOrPositiveDecimal(value));
+        AssertCustomMessage(tc, () => Guard.Against.ZeroOrPositiveDecimal(value, message: CustomMessage));
     }
 
     [Theory]
@@ -35,8 +35,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void NotZero_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.NotZero(value));
-        AssertCustomMessage(tc, () => Guard.Against.NotZero(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.NotZeroDecimal(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotZeroDecimal(value, message: CustomMessage));
     }
 
     [Theory]
@@ -45,8 +45,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void Zero_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.Zero(value));
-        AssertCustomMessage(tc, () => Guard.Against.Zero(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.ZeroDecimal(value));
+        AssertCustomMessage(tc, () => Guard.Against.ZeroDecimal(value, message: CustomMessage));
     }
 
     [Theory]
@@ -55,8 +55,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void Negative_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.Negative(value));
-        AssertCustomMessage(tc, () => Guard.Against.Negative(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.NegativeDecimal(value));
+        AssertCustomMessage(tc, () => Guard.Against.NegativeDecimal(value, message: CustomMessage));
     }
 
     [Theory]
@@ -65,8 +65,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void Positive_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.Positive(value));
-        AssertCustomMessage(tc, () => Guard.Against.Positive(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.PositiveDecimal(value));
+        AssertCustomMessage(tc, () => Guard.Against.PositiveDecimal(value, message: CustomMessage));
     }
 
     [Theory]
@@ -75,8 +75,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void Odd_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.Odd(value));
-        AssertCustomMessage(tc, () => Guard.Against.Odd(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.OddInt32(value));
+        AssertCustomMessage(tc, () => Guard.Against.OddInt32(value, message: CustomMessage));
     }
 
     [Theory]
@@ -85,8 +85,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void Even_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.Even(value));
-        AssertCustomMessage(tc, () => Guard.Against.Even(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.EvenInt32(value));
+        AssertCustomMessage(tc, () => Guard.Against.EvenInt32(value, message: CustomMessage));
     }
 
     [Theory]
@@ -95,8 +95,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void NotFinite_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.NotFinite(value));
-        AssertCustomMessage(tc, () => Guard.Against.NotFinite(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.NotFiniteDouble(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotFiniteDouble(value, message: CustomMessage));
     }
 
     [Theory]
@@ -105,8 +105,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void NotPercentage_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.NotPercentage(value));
-        AssertCustomMessage(tc, () => Guard.Against.NotPercentage(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.NotPercentageDecimal(value));
+        AssertCustomMessage(tc, () => Guard.Against.NotPercentageDecimal(value, message: CustomMessage));
     }
 
     [Theory]
@@ -115,8 +115,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void Finite_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.Finite(value));
-        AssertCustomMessage(tc, () => Guard.Against.Finite(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.FiniteDouble(value));
+        AssertCustomMessage(tc, () => Guard.Against.FiniteDouble(value, message: CustomMessage));
     }
 
     [Theory]
@@ -125,8 +125,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void NaN_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.NaN(value));
-        AssertCustomMessage(tc, () => Guard.Against.NaN(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.NaNDouble(value));
+        AssertCustomMessage(tc, () => Guard.Against.NaNDouble(value, message: CustomMessage));
     }
 
     // ── Comparison ops (tuple) ──────────────────────────────────────
@@ -137,8 +137,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void LessThanOrEqual_BehavesAsExpected(GuardCase<(string? text, decimal min)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.LessThanOrEqual(value, tc.Value.min));
-        AssertCustomMessage(tc, () => Guard.Against.LessThanOrEqual(value, tc.Value.min, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.LessThanOrEqualDecimal(value, tc.Value.min));
+        AssertCustomMessage(tc, () => Guard.Against.LessThanOrEqualDecimal(value, tc.Value.min, message: CustomMessage));
     }
 
     [Theory]
@@ -147,8 +147,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void LessThan_BehavesAsExpected(GuardCase<(string? text, decimal min)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.LessThan(value, tc.Value.min));
-        AssertCustomMessage(tc, () => Guard.Against.LessThan(value, tc.Value.min, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.LessThanDecimal(value, tc.Value.min));
+        AssertCustomMessage(tc, () => Guard.Against.LessThanDecimal(value, tc.Value.min, message: CustomMessage));
     }
 
     [Theory]
@@ -157,8 +157,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void GreaterThanOrEqual_BehavesAsExpected(GuardCase<(string? text, decimal max)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.GreaterThanOrEqual(value, tc.Value.max));
-        AssertCustomMessage(tc, () => Guard.Against.GreaterThanOrEqual(value, tc.Value.max, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.GreaterThanOrEqualDecimal(value, tc.Value.max));
+        AssertCustomMessage(tc, () => Guard.Against.GreaterThanOrEqualDecimal(value, tc.Value.max, message: CustomMessage));
     }
 
     [Theory]
@@ -167,8 +167,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void GreaterThan_BehavesAsExpected(GuardCase<(string? text, decimal max)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.GreaterThan(value, tc.Value.max));
-        AssertCustomMessage(tc, () => Guard.Against.GreaterThan(value, tc.Value.max, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.GreaterThanDecimal(value, tc.Value.max));
+        AssertCustomMessage(tc, () => Guard.Against.GreaterThanDecimal(value, tc.Value.max, message: CustomMessage));
     }
 
     // ── Range ops (tuple) ───────────────────────────────────────────
@@ -179,8 +179,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void OutOfRange_BehavesAsExpected(GuardCase<(string? text, decimal min, decimal max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.OutOfRangeDecimal(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.OutOfRangeDecimal(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]
@@ -189,8 +189,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void InRange_BehavesAsExpected(GuardCase<(string? text, decimal min, decimal max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.InRangeDecimal(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.InRangeDecimal(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     // ── Approximation ops (tuple) ───────────────────────────────────
@@ -201,8 +201,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void NotApproximately_BehavesAsExpected(GuardCase<(string? text, decimal target, decimal? tolerance)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.NotApproximately(value, tc.Value.target, tc.Value.tolerance));
-        AssertCustomMessage(tc, () => Guard.Against.NotApproximately(value, tc.Value.target, tc.Value.tolerance, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.NotApproximatelyDecimal(value, tc.Value.target, tc.Value.tolerance));
+        AssertCustomMessage(tc, () => Guard.Against.NotApproximatelyDecimal(value, tc.Value.target, tc.Value.tolerance, message: CustomMessage));
     }
 
     [Theory]
@@ -211,8 +211,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void Approximately_BehavesAsExpected(GuardCase<(string? text, decimal target, decimal? tolerance)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.Approximately(value, tc.Value.target, tc.Value.tolerance));
-        AssertCustomMessage(tc, () => Guard.Against.Approximately(value, tc.Value.target, tc.Value.tolerance, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.ApproximatelyDecimal(value, tc.Value.target, tc.Value.tolerance));
+        AssertCustomMessage(tc, () => Guard.Against.ApproximatelyDecimal(value, tc.Value.target, tc.Value.tolerance, message: CustomMessage));
     }
 
     // ── Multiple ops (tuple) ────────────────────────────────────────
@@ -223,8 +223,8 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void NotMultipleOf_BehavesAsExpected(GuardCase<(string? text, decimal factor)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.NotMultipleOf(value, tc.Value.factor));
-        AssertCustomMessage(tc, () => Guard.Against.NotMultipleOf(value, tc.Value.factor, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.NotMultipleOfDecimal(value, tc.Value.factor));
+        AssertCustomMessage(tc, () => Guard.Against.NotMultipleOfDecimal(value, tc.Value.factor, message: CustomMessage));
     }
 
     [Theory]
@@ -233,7 +233,7 @@ public sealed class GuardStringNumbersClausesTests(ITestOutputHelper output) : B
     public void MultipleOf_BehavesAsExpected(GuardCase<(string? text, decimal factor)> tc)
     {
         var value = tc.Value.text;
-        AssertResult(tc, () => Guard.Against.MultipleOf(value, tc.Value.factor));
-        AssertCustomMessage(tc, () => Guard.Against.MultipleOf(value, tc.Value.factor, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.MultipleOfDecimal(value, tc.Value.factor));
+        AssertCustomMessage(tc, () => Guard.Against.MultipleOfDecimal(value, tc.Value.factor, message: CustomMessage));
     }
 }

@@ -55,8 +55,13 @@ public static partial class StringRules
     /// <param name="max">The maximum character count.</param>
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if the length is within the specified range; otherwise, <see langword="false"/>.</returns>
-    public static bool IsLengthBetween(string? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive) =>
-        value is not null && RuleComparison.IsBetween(value.Length, min, max, inclusion);
+    public static bool IsLengthInRange(string? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive)
+    {
+        if (!EnumRules.IsDefined<Inclusion>(inclusion))
+            throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null);
+
+        return value is not null && RuleComparison.IsInRange(value.Length, min, max, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified string is longer than <paramref name="length"/> characters.
@@ -65,8 +70,13 @@ public static partial class StringRules
     /// <param name="length">The length threshold.</param>
     /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <returns><see langword="true"/> if the string length satisfies the condition; otherwise, <see langword="false"/>.</returns>
-    public static bool IsLongerThan(string? value, int length, Inclusion inclusion = Inclusion.Exclusive) =>
-        value is not null && RuleComparison.IsGreaterThan(value.Length, length, inclusion);
+    public static bool IsLongerThan(string? value, int length, Inclusion inclusion = Inclusion.Exclusive)
+    {
+        if (!EnumRules.IsDefined<Inclusion>(inclusion))
+            throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null);
+
+        return value is not null && RuleComparison.IsGreaterThan(value.Length, length, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified string is shorter than <paramref name="length"/> characters.
@@ -75,8 +85,13 @@ public static partial class StringRules
     /// <param name="length">The length threshold.</param>
     /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <returns><see langword="true"/> if the string length satisfies the condition; otherwise, <see langword="false"/>.</returns>
-    public static bool IsShorterThan(string? value, int length, Inclusion inclusion = Inclusion.Exclusive) =>
-        value is not null && RuleComparison.IsLessThan(value.Length, length, inclusion);
+    public static bool IsShorterThan(string? value, int length, Inclusion inclusion = Inclusion.Exclusive)
+    {
+        if (!EnumRules.IsDefined<Inclusion>(inclusion))
+            throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null);
+
+        return value is not null && RuleComparison.IsLessThan(value.Length, length, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified string matches the given regular expression pattern.
@@ -433,6 +448,9 @@ public static partial class StringRules
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="substring"/> is <see langword="null"/>.</exception>
     public static bool Contains(string? value, string substring, StringComparison comparison = StringComparison.Ordinal)
     {
+        if (!EnumRules.IsDefined<StringComparison>(comparison))
+            throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null);
+
         ThrowHelper.ThrowIfNull(substring);
 
         return value is not null && value.Contains(substring, comparison);
@@ -448,6 +466,9 @@ public static partial class StringRules
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="prefix"/> is <see langword="null"/>.</exception>
     public static bool StartsWith(string? value, string prefix, StringComparison comparison = StringComparison.Ordinal)
     {
+        if (!EnumRules.IsDefined<StringComparison>(comparison))
+            throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null);
+
         ThrowHelper.ThrowIfNull(prefix);
 
         return value is not null && value.StartsWith(prefix, comparison);
@@ -463,6 +484,9 @@ public static partial class StringRules
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="suffix"/> is <see langword="null"/>.</exception>
     public static bool EndsWith(string? value, string suffix, StringComparison comparison = StringComparison.Ordinal)
     {
+        if (!EnumRules.IsDefined<StringComparison>(comparison))
+            throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null);
+
         ThrowHelper.ThrowIfNull(suffix);
 
         return value is not null && value.EndsWith(suffix, comparison);

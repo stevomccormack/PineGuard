@@ -226,7 +226,7 @@ public sealed class HasMaxCountCollectionAttribute(int max) : CollectionAttribut
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustCollectionClauses.HasCountBetween{T}"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustCollectionClauses.HasCountInRange{T}"/>. Supported on properties, fields, and
 /// parameters of any type that implements <see cref="IEnumerable{T}"/>.
 /// </para>
 /// </remarks>
@@ -234,15 +234,15 @@ public sealed class HasMaxCountCollectionAttribute(int max) : CollectionAttribut
 /// <code><![CDATA[
 /// public class CartModel
 /// {
-///     [HasCountBetweenCollection(1, 20)]
+///     [HasCountInRangeCollection(1, 20)]
 ///     public List<string> Items { get; set; }
 /// }
 /// ]]></code>
 /// </example>
-/// <seealso cref="MustCollectionClauses.HasCountBetween{T}"/>
+/// <seealso cref="MustCollectionClauses.HasCountInRange{T}"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/collection">Collection Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class HasCountBetweenCollectionAttribute(
+public sealed class HasCountInRangeCollectionAttribute(
     int min,
     int max,
     PineGuard.Common.Inclusion inclusion = PineGuard.Common.Inclusion.Inclusive)
@@ -258,7 +258,16 @@ public sealed class HasCountBetweenCollectionAttribute(
     public PineGuard.Common.Inclusion Inclusion { get; } = inclusion;
 
     /// <inheritdoc/>
-    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) => InvokeCollectionMust(nameof(MustCollectionClauses.HasCountBetween), value, validationContext, Min, Max, Inclusion);
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    {
+        var configuration = Must.Be.HasCountInRange<object>(null, Min, Max, Inclusion, paramName: null);
+        return configuration.ParamName is not null
+            ? FromMustResult(configuration, validationContext)
+            : base.IsValid(value, validationContext);
+    }
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext) => InvokeCollectionMust(nameof(MustCollectionClauses.HasCountInRange), value, validationContext, Min, Max, Inclusion);
 }
 
 /// <summary>

@@ -43,11 +43,11 @@ public sealed class TimeAttributesTests(ITestOutputHelper output) : BaseDataAnno
         => Verify(new FutureOrPresentAttribute(), testCase);
 
     [Theory]
-    [MemberData(nameof(TimeAttributesTestData.DateOnlyBetween.ValidCases), MemberType = typeof(TimeAttributesTestData.DateOnlyBetween))]
-    [MemberData(nameof(TimeAttributesTestData.DateOnlyBetween.EdgeCases), MemberType = typeof(TimeAttributesTestData.DateOnlyBetween))]
-    [MemberData(nameof(TimeAttributesTestData.DateOnlyBetween.InvalidCases), MemberType = typeof(TimeAttributesTestData.DateOnlyBetween))]
-    public void DateOnlyBetween_ShouldReturnExpected(TimeAttributesTestData.ValidCase testCase)
-        => Verify(new DateOnlyBetweenAttribute("2020-01-01", "2020-01-31"), testCase);
+    [MemberData(nameof(TimeAttributesTestData.InRangeDateOnly.ValidCases), MemberType = typeof(TimeAttributesTestData.InRangeDateOnly))]
+    [MemberData(nameof(TimeAttributesTestData.InRangeDateOnly.EdgeCases), MemberType = typeof(TimeAttributesTestData.InRangeDateOnly))]
+    [MemberData(nameof(TimeAttributesTestData.InRangeDateOnly.InvalidCases), MemberType = typeof(TimeAttributesTestData.InRangeDateOnly))]
+    public void InRangeDateOnly_ShouldReturnExpected(TimeAttributesTestData.ValidCase testCase)
+        => Verify(new InRangeDateOnlyAttribute("2020-01-01", "2020-01-31"), testCase);
 
     [Theory]
     [MemberData(nameof(TimeAttributesTestData.Utc.ValidCases), MemberType = typeof(TimeAttributesTestData.Utc))]

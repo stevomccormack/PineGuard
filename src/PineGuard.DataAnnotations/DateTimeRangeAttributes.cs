@@ -33,7 +33,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalDateTimeRangeAttribute(Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Order.NotChronological)
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Order.NotChronological, allowNull: false)
 {
     /// <summary>Gets whether the range boundaries are included or excluded when evaluating the constraint.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -41,9 +41,9 @@ public sealed class ChronologicalDateTimeRangeAttribute(Inclusion inclusion = In
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range = (DateTimeRange)value!;
+        var range = ((DateTimeRange?)value).GetValueOrDefault();
         var result = Must.Be.Chronological(range, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -59,7 +59,7 @@ public sealed class ChronologicalDateTimeRangeAttribute(Inclusion inclusion = In
 /// <para>
 /// The <paramref name="start2"/> and <paramref name="end2"/> constructor arguments are parsed from
 /// <see cref="DateTime"/> string format (e.g., <c>"2024-01-01T00:00:00"</c>) using invariant culture.
-/// Defaults to <see cref="Inclusion.Exclusive"/> boundaries.
+/// Defaults to <see cref="Inclusion.Inclusive"/> boundaries.
 /// </para>
 /// </remarks>
 /// <example>
@@ -75,8 +75,8 @@ public sealed class ChronologicalDateTimeRangeAttribute(Inclusion inclusion = In
 /// <seealso cref="MustDateTimeRangeClauses.Overlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OverlappingDateTimeRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Overlap.Missing)
+public sealed class OverlappingDateTimeRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Overlap.Missing, allowNull: false)
 {
     /// <summary>Gets the reference range that the annotated range must overlap.</summary>
     public DateTimeRange Range2 { get; } = new(
@@ -89,9 +89,9 @@ public sealed class OverlappingDateTimeRangeAttribute(string start2, string end2
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range1 = (DateTimeRange)value!;
+        var range1 = ((DateTimeRange?)value).GetValueOrDefault();
         var result = Must.Be.Overlapping(range1, Range2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -106,7 +106,7 @@ public sealed class OverlappingDateTimeRangeAttribute(string start2, string end2
 /// </para>
 /// <para>
 /// The <paramref name="start2"/> and <paramref name="end2"/> constructor arguments are parsed from
-/// <see cref="DateTime"/> string format using invariant culture. Defaults to <see cref="Inclusion.Exclusive"/>
+/// <see cref="DateTime"/> string format using invariant culture. Defaults to <see cref="Inclusion.Inclusive"/>
 /// boundaries.
 /// </para>
 /// </remarks>
@@ -123,8 +123,8 @@ public sealed class OverlappingDateTimeRangeAttribute(string start2, string end2
 /// <seealso cref="MustDateTimeRangeClauses.NotOverlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOverlappingDateTimeRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Overlap.Present)
+public sealed class NotOverlappingDateTimeRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Overlap.Present, allowNull: false)
 {
     /// <summary>Gets the reference range that the annotated range must not overlap.</summary>
     public DateTimeRange Range2 { get; } = new(
@@ -137,9 +137,9 @@ public sealed class NotOverlappingDateTimeRangeAttribute(string start2, string e
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range1 = (DateTimeRange)value!;
+        var range1 = ((DateTimeRange?)value).GetValueOrDefault();
         var result = Must.Be.NotOverlapping(range1, Range2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -171,7 +171,7 @@ public sealed class NotOverlappingDateTimeRangeAttribute(string start2, string e
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ContainsDateTimeRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Bounds.NotContains)
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Bounds.NotContains, allowNull: false)
 {
     /// <summary>Gets the date/time that the annotated range must contain.</summary>
     public DateTime Value { get; } = DateTime.Parse(value, CultureInfo.InvariantCulture);
@@ -182,9 +182,9 @@ public sealed class ContainsDateTimeRangeAttribute(string value, Inclusion inclu
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range = (DateTimeRange)value!;
+        var range = ((DateTimeRange?)value).GetValueOrDefault();
         var result = Must.Be.Contains(range, Value, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -216,7 +216,7 @@ public sealed class ContainsDateTimeRangeAttribute(string value, Inclusion inclu
 /// <seealso href="https://pineguard.ai/docs/annotations/datetimerange">DateTimeRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotContainsDateTimeRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Bounds.Contains)
+    : ValidationAttributeBase(typeof(DateTimeRange), MustCodes.Range.Bounds.Contains, allowNull: false)
 {
     /// <summary>Gets the date/time that the annotated range must not contain.</summary>
     public DateTime Value { get; } = DateTime.Parse(value, CultureInfo.InvariantCulture);
@@ -227,8 +227,8 @@ public sealed class NotContainsDateTimeRangeAttribute(string value, Inclusion in
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range = (DateTimeRange)value!;
+        var range = ((DateTimeRange?)value).GetValueOrDefault();
         var result = Must.Be.NotContains(range, Value, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }

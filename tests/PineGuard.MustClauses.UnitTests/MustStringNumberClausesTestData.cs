@@ -125,6 +125,7 @@ public static class MustStringNumberClausesTestData
         public static TheoryData<MustCase<(string? text, decimal target, decimal? tolerance)>> InvalidCases => F.NumbersIsApproximately.AllInvalid.ToMustCases(s => s.Name switch
         {
             nameof(F.NumbersIsApproximately.NullValue) => new MustExpected(false, "value must not be null.", "value", Code: MustCodes.Number.Proximity.NotApproximate),
+            nameof(F.NumbersIsApproximately.NegativeTolerance) => new MustExpected(false, "tolerance must be non-negative.", "tolerance", Code: MustCodes.Number.Proximity.NotApproximate),
             nameof(F.NumbersIsApproximately.NullTolerance) => new MustExpected(false, "tolerance requires a non-null tolerance.", "tolerance", Code: MustCodes.Number.Tolerance.Null),
             _ => new MustExpected(false, $"value must be approximately '{s.Inputs.target}'.", Code: MustCodes.Number.Proximity.NotApproximate)
         });

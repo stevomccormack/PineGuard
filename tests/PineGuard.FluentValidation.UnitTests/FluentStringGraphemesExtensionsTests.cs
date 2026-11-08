@@ -39,14 +39,14 @@ public sealed class FluentStringGraphemesExtensionsTests(ITestOutputHelper outpu
         public NotHasMaxGraphemeCountValidator(int max) => RuleFor(x => x.Value).NotHasMaxGraphemeCount(max);
     }
 
-    private sealed class HasGraphemeCountBetweenValidator : AbstractValidator<Model>
+    private sealed class HasGraphemeCountInRangeValidator : AbstractValidator<Model>
     {
-        public HasGraphemeCountBetweenValidator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).HasGraphemeCountBetween(min, max, inclusion);
+        public HasGraphemeCountInRangeValidator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).HasGraphemeCountInRange(min, max, inclusion);
     }
 
-    private sealed class NotHasGraphemeCountBetweenValidator : AbstractValidator<Model>
+    private sealed class NotHasGraphemeCountInRangeValidator : AbstractValidator<Model>
     {
-        public NotHasGraphemeCountBetweenValidator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).NotHasGraphemeCountBetween(min, max, inclusion);
+        public NotHasGraphemeCountInRangeValidator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).NotHasGraphemeCountInRange(min, max, inclusion);
     }
 
     // FluentStringGraphemesExtensions.HasExactGraphemeCount
@@ -121,25 +121,25 @@ public sealed class FluentStringGraphemesExtensionsTests(ITestOutputHelper outpu
         AssertResult(tc, result);
     }
 
-    // FluentStringGraphemesExtensions.HasGraphemeCountBetween
+    // FluentStringGraphemesExtensions.HasGraphemeCountInRange
     [Theory]
-    [MemberData(nameof(FluentStringGraphemesExtensionsTestData.HasGraphemeCountBetween.Cases), MemberType = typeof(FluentStringGraphemesExtensionsTestData.HasGraphemeCountBetween))]
-    public void HasGraphemeCountBetween_BehavesAsExpected(FluentCase<(string? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringGraphemesExtensionsTestData.HasGraphemeCountInRange.Cases), MemberType = typeof(FluentStringGraphemesExtensionsTestData.HasGraphemeCountInRange))]
+    public void HasGraphemeCountInRange_BehavesAsExpected(FluentCase<(string? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = new HasGraphemeCountBetweenValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion).Validate(new Model { Value = tc.Value.value });
+        var result = new HasGraphemeCountInRangeValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion).Validate(new Model { Value = tc.Value.value });
 
         // Assert
         AssertResult(tc, result);
     }
 
-    // FluentStringGraphemesExtensions.NotHasGraphemeCountBetween
+    // FluentStringGraphemesExtensions.NotHasGraphemeCountInRange
     [Theory]
-    [MemberData(nameof(FluentStringGraphemesExtensionsTestData.NotHasGraphemeCountBetween.Cases), MemberType = typeof(FluentStringGraphemesExtensionsTestData.NotHasGraphemeCountBetween))]
-    public void NotHasGraphemeCountBetween_BehavesAsExpected(FluentCase<(string? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringGraphemesExtensionsTestData.NotHasGraphemeCountInRange.Cases), MemberType = typeof(FluentStringGraphemesExtensionsTestData.NotHasGraphemeCountInRange))]
+    public void NotHasGraphemeCountInRange_BehavesAsExpected(FluentCase<(string? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = new NotHasGraphemeCountBetweenValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion).Validate(new Model { Value = tc.Value.value });
+        var result = new NotHasGraphemeCountInRangeValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion).Validate(new Model { Value = tc.Value.value });
 
         // Assert
         AssertResult(tc, result);

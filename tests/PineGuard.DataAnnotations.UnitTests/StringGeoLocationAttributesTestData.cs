@@ -1,9 +1,21 @@
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.DataAnnotations;
+using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.DataAnnotations.UnitTests;
 
 public static class StringGeoLocationAttributesTestData
 {
+    public static class Styles
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.GeoLocationStyles.AllScenarios.ToDataAnnotationCases();
+    }
+
+    public static class InvalidStyles
+    {
+        public static TheoryData<DataAnnotationCase> Cases => F.GeoLocationInvalidStyles.AllScenarios.ToDataAnnotationCases(_ => new DataAnnotationExpected(false));
+    }
+
     public sealed record ValidCase(string Name, object? Value, bool Expected) : ReturnCase<object?, bool>(Name, Value, Expected);
 
     private static TheoryData<ValidCase> CommonEdgeCases() =>

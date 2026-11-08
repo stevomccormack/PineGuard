@@ -34,51 +34,51 @@ public static class GuardStringNumberTypesClausesTestData
         public static TheoryData<GuardCase<string?>> InvalidCases => F.IsInt64.InvalidScenarios.ToGuardCases("value");
     }
 
-    public static class Int32OutOfRange
+    public static class OutOfRangeInt32
     {
         public static TheoryData<GuardCase<(string text, int min, int max, Inclusion inclusion)>> ValidCases =>
-            F.IsInt32InRange.AllValid.ToGuardCases();
+            F.IsInRangeInt32.AllValid.ToGuardCases();
 
         public static TheoryData<GuardCase<(string text, int min, int max, Inclusion inclusion)>> InvalidCases =>
-            F.IsInt32InRange.AllInvalid.ToGuardCases("value");
+            F.IsInRangeInt32.AllInvalid.ToGuardCases("value");
     }
 
-    public static class Int32InRange
+    public static class InRangeInt32
     {
         public static TheoryData<GuardCase<(string text, int min, int max, Inclusion inclusion)>> ValidCases =>
         [
-            new(nameof(F.IsInt32InRange.AtMinExclusive), F.IsInt32InRange.AtMinExclusive, new GuardExpected(true))
+            new(nameof(F.IsInRangeInt32.AtMinExclusive), F.IsInRangeInt32.AtMinExclusive, new GuardExpected(true))
         ];
 
         public static TheoryData<GuardCase<(string text, int min, int max, Inclusion inclusion)>> InvalidCases =>
         [
-            new(nameof(F.IsInt32InRange.BetweenInclusive), F.IsInt32InRange.BetweenInclusive, new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.IsInt32InRange.AtMinInclusive),   F.IsInt32InRange.AtMinInclusive,   new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.IsInt32InRange.NotNumeric),       F.IsInt32InRange.NotNumeric,       new GuardExpected(false, typeof(ArgumentException), "value"))
+            new(nameof(F.IsInRangeInt32.BetweenInclusive), F.IsInRangeInt32.BetweenInclusive, new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.IsInRangeInt32.AtMinInclusive),   F.IsInRangeInt32.AtMinInclusive,   new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.IsInRangeInt32.NotNumeric),       F.IsInRangeInt32.NotNumeric,       new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 
-    public static class Int64OutOfRange
+    public static class OutOfRangeInt64
     {
         public static TheoryData<GuardCase<(string text, long min, long max, Inclusion inclusion)>> ValidCases =>
-            F.IsInt64InRange.AllValid.ToGuardCases();
+            F.IsInRangeInt64.AllValid.ToGuardCases();
 
         public static TheoryData<GuardCase<(string text, long min, long max, Inclusion inclusion)>> InvalidCases =>
-            F.IsInt64InRange.AllInvalid.ToGuardCases("value");
+            F.IsInRangeInt64.AllInvalid.ToGuardCases("value");
     }
 
-    public static class Int64InRange
+    public static class InRangeInt64
     {
         public static TheoryData<GuardCase<(string text, long min, long max, Inclusion inclusion)>> ValidCases =>
         [
-            new(nameof(F.IsInt64InRange.AtMinExclusive), F.IsInt64InRange.AtMinExclusive, new GuardExpected(true))
+            new(nameof(F.IsInRangeInt64.AtMinExclusive), F.IsInRangeInt64.AtMinExclusive, new GuardExpected(true))
         ];
 
         public static TheoryData<GuardCase<(string text, long min, long max, Inclusion inclusion)>> InvalidCases =>
         [
-            new(nameof(F.IsInt64InRange.BetweenInclusive), F.IsInt64InRange.BetweenInclusive, new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.IsInt64InRange.AtMinInclusive),   F.IsInt64InRange.AtMinInclusive,   new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.IsInt64InRange.NotNumeric),       F.IsInt64InRange.NotNumeric,       new GuardExpected(false, typeof(ArgumentException), "value"))
+            new(nameof(F.IsInRangeInt64.BetweenInclusive), F.IsInRangeInt64.BetweenInclusive, new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.IsInRangeInt64.AtMinInclusive),   F.IsInRangeInt64.AtMinInclusive,   new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.IsInRangeInt64.NotNumeric),       F.IsInRangeInt64.NotNumeric,       new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 }

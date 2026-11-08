@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace PineGuard.Utils;
@@ -16,7 +17,7 @@ public static class HttpSecurityHeaderUtility
     /// When this method returns, contains the trimmed, non-empty segments if successful; otherwise, <see langword="null"/>.
     /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> yielded at least one non-empty segment; otherwise, <see langword="false"/>.</returns>
-    public static bool TrySplitSemicolonSeparatedSegments(string? value, out IReadOnlyList<string>? segments)
+    public static bool TrySplitSemicolonSeparatedSegments(string? value, [NotNullWhen(true)] out IReadOnlyList<string>? segments)
     {
         segments = null;
 

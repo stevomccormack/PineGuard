@@ -22,4 +22,9 @@ public static class MustStringClauses
     {
         return MustResult<string>.FromBool(true, value);
     }
+
+    public static bool Island(this IMustClause _, string value) => true;
+    public static bool Hash(this IMustClause _, string value) => true;
+    public static bool Notable(this IMustClause _, string value) => true;
+
 }

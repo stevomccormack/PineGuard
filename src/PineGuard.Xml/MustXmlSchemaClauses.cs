@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Xml.Schema;
 using PineGuard.Codes;
-using PineGuard.Common;
 using PineGuard.MustClauses;
 
 namespace PineGuard.Xml;
@@ -52,7 +51,6 @@ public static class MustXmlSchemaClauses
     /// or <see cref="XmlSchemaMustValidator"/> when the full list is needed.
     /// </para>
     /// </remarks>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="schemas"/> is <see langword="null"/>.</exception>
     /// <example>
     /// <code>
     /// var result = Must.Be.ValidXml(payload, schemas);
@@ -67,14 +65,15 @@ public static class MustXmlSchemaClauses
         XmlSchemaValidationOptions? options = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        ThrowHelper.ThrowIfNull(schemas);
+        if (schemas is null)
+            return MustResult<string>.Fail(MustCodes.Xml.Schema.Mismatch, "{paramName} must not be null.", nameof(schemas), schemas);
 
         if (value is null)
             return MustResult<string>.Fail(MustCodes.Xml.Document.Invalid, "{paramName} must not be null.", paramName, value);
 
         var ok = XmlSchemaUtility.TryValidate(value, schemas, options, out var violations);
         if (ok)
-            return MustResult<string>.Ok(value, value, paramName);
+            return MustResult<string>.Ok(value, value: value, paramName: paramName);
 
         // Whitespace-only input yields no XmlSchemaViolation (TryValidate treats it like a null/blank
         // string), so it is reported the same way as a well-formedness failure.

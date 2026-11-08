@@ -53,13 +53,13 @@ public static class DateTimeUtility
     /// </summary>
     /// <param name="value">The date/time to truncate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="precision">The precision level to truncate to.</param>
-    /// <param name="truncated">When this method returns, contains the truncated value if successful; otherwise, <see langword="null"/>.</param>
+    /// <param name="truncated">When this method returns, contains the truncated value if successful; otherwise, the default value. Check the Boolean return value before using the output.</param>
     /// <returns><see langword="true"/> if truncation succeeded; otherwise, <see langword="false"/>.</returns>
-    public static bool TryTruncateToPrecisionUtc(DateTime? value, DateTimePrecision precision, out DateTime? truncated)
+    public static bool TryTruncateToPrecisionUtc(DateTime? value, DateTimePrecision precision, out DateTime truncated)
     {
         if (value is null)
         {
-            truncated = null;
+            truncated = default;
             return false;
         }
 
@@ -89,7 +89,7 @@ public static class DateTimeUtility
                 truncated = new DateTime(utc.Year, utc.Month, utc.Day, utc.Hour, utc.Minute, utc.Second, utc.Millisecond, DateTimeKind.Utc);
                 return true;
             default:
-                truncated = null;
+                truncated = default;
                 return false;
         }
     }
@@ -99,17 +99,17 @@ public static class DateTimeUtility
     /// </summary>
     /// <param name="value">The date/time offset to truncate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="precision">The precision level to truncate to.</param>
-    /// <param name="truncated">When this method returns, contains the truncated value if successful; otherwise, <see langword="null"/>.</param>
+    /// <param name="truncated">When this method returns, contains the truncated value if successful; otherwise, the default value. Check the Boolean return value before using the output.</param>
     /// <returns><see langword="true"/> if truncation succeeded; otherwise, <see langword="false"/>.</returns>
-    public static bool TryTruncateToPrecisionUtc(DateTimeOffset? value, DateTimePrecision precision, out DateTimeOffset? truncated)
+    public static bool TryTruncateToPrecisionUtc(DateTimeOffset? value, DateTimePrecision precision, out DateTimeOffset truncated)
     {
         if (value is null || !TryTruncateToPrecisionUtc(value.Value.UtcDateTime, precision, out var truncatedUtc))
         {
-            truncated = null;
+            truncated = default;
             return false;
         }
 
-        truncated = new DateTimeOffset(truncatedUtc!.Value, TimeSpan.Zero);
+        truncated = new DateTimeOffset(truncatedUtc, TimeSpan.Zero);
         return true;
     }
 
@@ -119,13 +119,13 @@ public static class DateTimeUtility
     /// </summary>
     /// <param name="value">The date to truncate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="precision">The precision level to truncate to.</param>
-    /// <param name="truncated">When this method returns, contains the truncated value if successful; otherwise, <see langword="null"/>.</param>
+    /// <param name="truncated">When this method returns, contains the truncated value if successful; otherwise, the default value. Check the Boolean return value before using the output.</param>
     /// <returns><see langword="true"/> if truncation succeeded; otherwise, <see langword="false"/>.</returns>
-    public static bool TryTruncateToPrecision(DateOnly? value, DatePrecision precision, out DateOnly? truncated)
+    public static bool TryTruncateToPrecision(DateOnly? value, DatePrecision precision, out DateOnly truncated)
     {
         if (value is null)
         {
-            truncated = null;
+            truncated = default;
             return false;
         }
 
@@ -138,10 +138,10 @@ public static class DateTimeUtility
                 truncated = new DateOnly(value.Value.Year, value.Value.Month, 1);
                 return true;
             case DatePrecision.Day:
-                truncated = value;
+                truncated = value.Value;
                 return true;
             default:
-                truncated = null;
+                truncated = default;
                 return false;
         }
     }

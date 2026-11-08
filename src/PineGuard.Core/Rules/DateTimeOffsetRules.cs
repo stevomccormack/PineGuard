@@ -16,8 +16,11 @@ public static class DateTimeOffsetRules
     /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the past; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInPast(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
-        value is not null && IsBefore(value, DateTimeUtility.GetUtcNow(timeProvider), inclusion);
+    public static bool IsInPast(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return value is not null && IsBefore(value, DateTimeUtility.GetUtcNow(timeProvider), inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date/time offset is in the future relative to UTC now.
@@ -26,8 +29,11 @@ public static class DateTimeOffsetRules
     /// <param name="inclusion">Whether the current instant is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="timeProvider">The clock that supplies the current instant. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the future; otherwise, <see langword="false"/>.</returns>
-    public static bool IsInFuture(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null) =>
-        value is not null && IsAfter(value, DateTimeUtility.GetUtcNow(timeProvider), inclusion);
+    public static bool IsInFuture(DateTimeOffset? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return value is not null && IsAfter(value, DateTimeUtility.GetUtcNow(timeProvider), inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date/time offset falls within [<paramref name="min"/>, <paramref name="max"/>].
@@ -37,33 +43,39 @@ public static class DateTimeOffsetRules
     /// <param name="max">The upper bound of the range.</param>
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is within the range; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBetween(DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion = Inclusion.Inclusive) =>
-        value is not null && RuleComparison.IsBetween(value.Value, min, max, inclusion);
+    public static bool IsInRange(DateTimeOffset? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion = Inclusion.Inclusive)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return value is not null && RuleComparison.IsInRange(value.Value, min, max, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date/time offset is before the given reference.
     /// </summary>
     /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="other">The reference date/time offset. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="other">The reference date/time offset.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date/time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is before <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsBefore(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion = Inclusion.Exclusive, DateTimePrecision? precision = null)
+    public static bool IsBefore(DateTimeOffset? value, DateTimeOffset other, Inclusion inclusion = Inclusion.Exclusive, DateTimePrecision? precision = null)
     {
-        if (value is null || other is null) return false;
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        if (precision.HasValue && !EnumRules.IsDefined<DateTimePrecision>(precision.Value))
+            return false;
+
+        if (value is null) return false;
 
         var v = value.Value;
-        var o = other.Value;
+        var o = other;
 
         if (precision is null)
             return RuleComparison.IsLessThan(v, o, inclusion);
 
-        if (!DateTimeUtility.TryTruncateToPrecisionUtc(v, precision.Value, out var truncatedV) ||
-            !DateTimeUtility.TryTruncateToPrecisionUtc(o, precision.Value, out var truncatedO))
-            return false;
+        _ = DateTimeUtility.TryTruncateToPrecisionUtc(v, precision.Value, out var truncatedV);
+        _ = DateTimeUtility.TryTruncateToPrecisionUtc(o, precision.Value, out var truncatedO);
 
-        v = truncatedV!.Value;
-        o = truncatedO!.Value;
+        v = truncatedV;
+        o = truncatedO;
 
         return RuleComparison.IsLessThan(v, o, inclusion);
     }
@@ -72,26 +84,29 @@ public static class DateTimeOffsetRules
     /// Determines whether the specified date/time offset is after the given reference.
     /// </summary>
     /// <param name="value">The date/time offset to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="other">The reference date/time offset. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="other">The reference date/time offset.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <param name="precision">Optional precision for date/time truncation before comparison.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is after <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsAfter(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion = Inclusion.Exclusive, DateTimePrecision? precision = null)
+    public static bool IsAfter(DateTimeOffset? value, DateTimeOffset other, Inclusion inclusion = Inclusion.Exclusive, DateTimePrecision? precision = null)
     {
-        if (value is null || other is null) return false;
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        if (precision.HasValue && !EnumRules.IsDefined<DateTimePrecision>(precision.Value))
+            return false;
+
+        if (value is null) return false;
 
         var v = value.Value;
-        var o = other.Value;
+        var o = other;
 
         if (precision is null)
             return RuleComparison.IsGreaterThan(v, o, inclusion);
 
-        if (!DateTimeUtility.TryTruncateToPrecisionUtc(v, precision.Value, out var truncatedV) ||
-            !DateTimeUtility.TryTruncateToPrecisionUtc(o, precision.Value, out var truncatedO))
-            return false;
+        _ = DateTimeUtility.TryTruncateToPrecisionUtc(v, precision.Value, out var truncatedV);
+        _ = DateTimeUtility.TryTruncateToPrecisionUtc(o, precision.Value, out var truncatedO);
 
-        v = truncatedV!.Value;
-        o = truncatedO!.Value;
+        v = truncatedV;
+        o = truncatedO;
 
         return RuleComparison.IsGreaterThan(v, o, inclusion);
     }
@@ -105,6 +120,9 @@ public static class DateTimeOffsetRules
     /// <returns><see langword="true"/> if the values are equal at the given precision; otherwise, <see langword="false"/>.</returns>
     public static bool IsSame(DateTimeOffset? value, DateTimeOffset? other, DateTimePrecision? precision = null)
     {
+        if (precision.HasValue && !EnumRules.IsDefined<DateTimePrecision>(precision.Value))
+            return false;
+
         if (value is null && other is null) return true;
         if (value is null || other is null) return false;
 
@@ -114,12 +132,11 @@ public static class DateTimeOffsetRules
         if (precision is null)
             return RuleComparison.Equals(v, o);
 
-        if (!DateTimeUtility.TryTruncateToPrecisionUtc(v, precision.Value, out var truncatedV) ||
-            !DateTimeUtility.TryTruncateToPrecisionUtc(o, precision.Value, out var truncatedO))
-            return false;
+        _ = DateTimeUtility.TryTruncateToPrecisionUtc(v, precision.Value, out var truncatedV);
+        _ = DateTimeUtility.TryTruncateToPrecisionUtc(o, precision.Value, out var truncatedO);
 
-        v = truncatedV!.Value;
-        o = truncatedO!.Value;
+        v = truncatedV;
+        o = truncatedO;
 
         return RuleComparison.Equals(v, o);
     }
@@ -131,8 +148,11 @@ public static class DateTimeOffsetRules
     /// <param name="end">The end date/time offset. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="start"/> precedes <paramref name="end"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsChronological(DateTimeOffset? start, DateTimeOffset? end, Inclusion inclusion = Inclusion.Exclusive) =>
-        RangeRules.IsChronological(start, end, inclusion);
+    public static bool IsChronological(DateTimeOffset? start, DateTimeOffset? end, Inclusion inclusion = Inclusion.Exclusive)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return RangeRules.IsChronological(start, end, inclusion);
+    }
 
     /// <summary>
     /// Determines whether two date/time offset ranges overlap.
@@ -141,10 +161,13 @@ public static class DateTimeOffsetRules
     /// <param name="end1">The end of the first range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="start2">The start of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="end2">The end of the second range. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="inclusion">Whether the boundaries are inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+    /// <param name="inclusion">Whether to intersect closed ranges or open interiors. Singleton and one-step interiors are empty. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if the two ranges overlap; otherwise, <see langword="false"/>.</returns>
-    public static bool IsOverlapping(DateTimeOffset? start1, DateTimeOffset? end1, DateTimeOffset? start2, DateTimeOffset? end2, Inclusion inclusion = Inclusion.Exclusive) =>
-        RangeRules.IsOverlapping(start1, end1, start2, end2, inclusion);
+    public static bool IsOverlapping(DateTimeOffset? start1, DateTimeOffset? end1, DateTimeOffset? start2, DateTimeOffset? end2, Inclusion inclusion = Inclusion.Inclusive)
+    {
+        TemporalRangeComparison.ValidateInclusion(inclusion);
+        return RangeRules.IsOverlapping(start1?.UtcDateTime.Ticks, end1?.UtcDateTime.Ticks, start2?.UtcDateTime.Ticks, end2?.UtcDateTime.Ticks, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified date/time offset is within a given time window of a reference.

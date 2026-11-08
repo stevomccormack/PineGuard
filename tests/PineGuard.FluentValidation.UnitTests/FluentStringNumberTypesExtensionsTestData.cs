@@ -46,16 +46,16 @@ public static class FluentStringNumberTypesExtensionsTestData
         });
     }
 
-    public static class Int32InRange
+    public static class InRangeInt32
     {
-        public static TheoryData<FluentCase<(string text, int min, int max, PineGuard.Common.Inclusion inclusion)>> Cases => F.IsInt32InRange.AllScenarios.ToFluentCases(s => s.Name switch
+        public static TheoryData<FluentCase<(string text, int min, int max, PineGuard.Common.Inclusion inclusion)>> Cases => F.IsInRangeInt32.AllScenarios.ToFluentCases(s => s.Name switch
         {
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must be a 32-bit integer within the expected range.")
         });
     }
 
-    public static class Int32InRangeNull
+    public static class InRangeInt32Null
     {
         public static TheoryData<FluentCase<string?>> Cases =>
         [
@@ -63,7 +63,7 @@ public static class FluentStringNumberTypesExtensionsTestData
         ];
     }
 
-    public static class Int32OutOfRange
+    public static class OutOfRangeInt32
     {
         public static TheoryData<FluentCase<string?>> Cases =>
         [
@@ -74,16 +74,16 @@ public static class FluentStringNumberTypesExtensionsTestData
         ];
     }
 
-    public static class Int64InRange
+    public static class InRangeInt64
     {
-        public static TheoryData<FluentCase<(string text, long min, long max, PineGuard.Common.Inclusion inclusion)>> Cases => F.IsInt64InRange.AllScenarios.ToFluentCases(s => s.Name switch
+        public static TheoryData<FluentCase<(string text, long min, long max, PineGuard.Common.Inclusion inclusion)>> Cases => F.IsInRangeInt64.AllScenarios.ToFluentCases(s => s.Name switch
         {
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must be a 64-bit integer within the expected range.")
         });
     }
 
-    public static class Int64InRangeNull
+    public static class InRangeInt64Null
     {
         public static TheoryData<FluentCase<string?>> Cases =>
         [
@@ -91,7 +91,7 @@ public static class FluentStringNumberTypesExtensionsTestData
         ];
     }
 
-    public static class Int64OutOfRange
+    public static class OutOfRangeInt64
     {
         public static TheoryData<FluentCase<string?>> Cases =>
         [

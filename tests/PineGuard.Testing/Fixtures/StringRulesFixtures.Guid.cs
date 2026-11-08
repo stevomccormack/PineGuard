@@ -21,6 +21,22 @@ public static partial class StringRulesFixtures
         public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
+    public static class GuidIsEmpty
+    {
+        public static readonly string? EmptyGuid = Guid.Empty.ToString("D");
+        public static readonly string? BracedEmptyGuid = Guid.Empty.ToString("B");
+        public static readonly string? PaddedEmptyGuid = " " + Guid.Empty.ToString("N") + " ";
+        public static readonly string? ValidGuid = GuidIsGuid.ValidGuid;
+        public static readonly string? NotAGuid = GuidIsGuid.NotAGuid;
+        public static readonly string? NullValue = null;
+        public static readonly string? Space = GuidIsGuid.Space;
+        public static readonly string? Empty = string.Empty;
+
+        public static RuleScenario<string?>[] ValidScenarios => [new(nameof(EmptyGuid), EmptyGuid, true), new(nameof(BracedEmptyGuid), BracedEmptyGuid, true), new(nameof(PaddedEmptyGuid), PaddedEmptyGuid, true)];
+        public static RuleScenario<string?>[] InvalidScenarios => [new(nameof(ValidGuid), ValidGuid, false), new(nameof(NotAGuid), NotAGuid, false), new(nameof(NullValue), NullValue, false), new(nameof(Space), Space, false), new(nameof(Empty), Empty, false)];
+        public static RuleScenario<string?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
     public static class GuidIsNotEmpty
     {
         public static readonly string? ValidGuid = "11111111-1111-1111-1111-111111111111";

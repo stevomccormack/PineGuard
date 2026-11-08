@@ -86,84 +86,6 @@ public sealed class FluentNetworkExtensionsTests(ITestOutputHelper output) : Bas
         AssertResult(tc, result);
     }
 
-    private sealed class IpAddressStringValidator : AbstractValidator<Model>
-    {
-        public IpAddressStringValidator() => RuleFor(x => x.Value).IpAddressString();
-    }
-
-    [Theory]
-    [MemberData(nameof(FluentNetworkExtensionsTestData.IpAddressString.Cases), MemberType = typeof(FluentNetworkExtensionsTestData.IpAddressString))]
-    public void IpAddressString_BehavesAsExpected(FluentCase<string?> tc)
-    {
-        var result = new IpAddressStringValidator().Validate(new Model { Value = tc.Value });
-        AssertResult(tc, result);
-    }
-
-    private sealed class NotIpAddressStringValidator : AbstractValidator<Model>
-    {
-        public NotIpAddressStringValidator() => RuleFor(x => x.Value).NotIpAddressString();
-    }
-
-    [Theory]
-    [MemberData(nameof(FluentNetworkExtensionsTestData.NotIpAddressString.Cases), MemberType = typeof(FluentNetworkExtensionsTestData.NotIpAddressString))]
-    public void NotIpAddressString_BehavesAsExpected(FluentCase<string?> tc)
-    {
-        var result = new NotIpAddressStringValidator().Validate(new Model { Value = tc.Value });
-        AssertResult(tc, result);
-    }
-
-    private sealed class Ipv4StringValidator : AbstractValidator<Model>
-    {
-        public Ipv4StringValidator() => RuleFor(x => x.Value).Ipv4String();
-    }
-
-    [Theory]
-    [MemberData(nameof(FluentNetworkExtensionsTestData.Ipv4String.Cases), MemberType = typeof(FluentNetworkExtensionsTestData.Ipv4String))]
-    public void Ipv4String_BehavesAsExpected(FluentCase<string?> tc)
-    {
-        var result = new Ipv4StringValidator().Validate(new Model { Value = tc.Value });
-        AssertResult(tc, result);
-    }
-
-    private sealed class NotIpv4StringValidator : AbstractValidator<Model>
-    {
-        public NotIpv4StringValidator() => RuleFor(x => x.Value).NotIpv4String();
-    }
-
-    [Theory]
-    [MemberData(nameof(FluentNetworkExtensionsTestData.NotIpv4String.Cases), MemberType = typeof(FluentNetworkExtensionsTestData.NotIpv4String))]
-    public void NotIpv4String_BehavesAsExpected(FluentCase<string?> tc)
-    {
-        var result = new NotIpv4StringValidator().Validate(new Model { Value = tc.Value });
-        AssertResult(tc, result);
-    }
-
-    private sealed class Ipv6StringValidator : AbstractValidator<Model>
-    {
-        public Ipv6StringValidator() => RuleFor(x => x.Value).Ipv6String();
-    }
-
-    [Theory]
-    [MemberData(nameof(FluentNetworkExtensionsTestData.Ipv6String.Cases), MemberType = typeof(FluentNetworkExtensionsTestData.Ipv6String))]
-    public void Ipv6String_BehavesAsExpected(FluentCase<string?> tc)
-    {
-        var result = new Ipv6StringValidator().Validate(new Model { Value = tc.Value });
-        AssertResult(tc, result);
-    }
-
-    private sealed class NotIpv6StringValidator : AbstractValidator<Model>
-    {
-        public NotIpv6StringValidator() => RuleFor(x => x.Value).NotIpv6String();
-    }
-
-    [Theory]
-    [MemberData(nameof(FluentNetworkExtensionsTestData.NotIpv6String.Cases), MemberType = typeof(FluentNetworkExtensionsTestData.NotIpv6String))]
-    public void NotIpv6String_BehavesAsExpected(FluentCase<string?> tc)
-    {
-        var result = new NotIpv6StringValidator().Validate(new Model { Value = tc.Value });
-        AssertResult(tc, result);
-    }
-
     private sealed class HostnameValidator : AbstractValidator<Model>
     {
         public HostnameValidator() => RuleFor(x => x.Value).Hostname();
@@ -193,6 +115,23 @@ public sealed class FluentNetworkExtensionsTests(ITestOutputHelper output) : Bas
     private sealed class InCidrRangeValidator : AbstractValidator<Model>
     {
         public InCidrRangeValidator(string cidr) => RuleFor(x => x.Value).InCidrRange(cidr);
+    }
+
+    [Theory]
+    [MemberData(nameof(FluentNetworkExtensionsTestData.InvalidCidrConfiguration), MemberType = typeof(FluentNetworkExtensionsTestData))]
+    public void CidrConfiguration_IsValidatedBeforeSkippingNull(string cidr)
+    {
+        // Arrange
+        var model = new Model { Value = null };
+
+        // Act
+        var positive = new InCidrRangeValidator(cidr).Validate(model);
+        var negative = new NotInCidrRangeValidator(cidr).Validate(model);
+
+        // Assert
+        Assert.False(positive.IsValid);
+        Assert.False(negative.IsValid);
+        Assert.All(positive.Errors.Concat(negative.Errors), error => Assert.Contains("cidr", error.ErrorMessage, StringComparison.Ordinal));
     }
 
     [Theory]

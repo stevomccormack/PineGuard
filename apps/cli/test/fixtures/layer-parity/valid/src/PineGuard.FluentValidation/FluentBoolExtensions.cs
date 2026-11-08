@@ -8,4 +8,8 @@ public static class FluentBoolExtensions
     {
         return ruleBuilder.Must(value => value);
     }
+
+    public static IRuleBuilderOptions<T, string> HasXmlRoot<T>(this IRuleBuilder<T, string> rule) => rule;
+    public static IRuleBuilderOptions<T, int> Positive<T>(this IRuleBuilder<T, int> rule) => rule;
+
 }

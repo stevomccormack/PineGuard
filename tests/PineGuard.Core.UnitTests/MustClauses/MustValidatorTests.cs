@@ -695,7 +695,7 @@ public sealed class MustValidatorTests(ITestOutputHelper output)
 
         var available = email is not null && !email.StartsWith("taken", StringComparison.OrdinalIgnoreCase) && !email.StartsWith("TAKEN", StringComparison.OrdinalIgnoreCase);
         return new ValueTask<MustResult<string>>(available
-            ? MustResult<string>.Ok(email!, email, nameof(email))
+            ? MustResult<string>.Ok(email!, value: email, paramName: nameof(email))
             : MustResult<string>.Fail("sample.email.taken", "{paramName} must be available.", nameof(email), email));
     }
 

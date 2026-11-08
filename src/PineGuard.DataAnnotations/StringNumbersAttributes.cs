@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using PineGuard.Codes;
@@ -14,14 +13,14 @@ namespace PineGuard.DataAnnotations;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.Positive"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.PositiveDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -34,10 +33,10 @@ namespace PineGuard.DataAnnotations;
 /// </code>
 /// </example>
 /// <seealso cref="NegativeStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.Positive"/>
+/// <seealso cref="MustStringNumbersClauses.PositiveDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PositiveStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.NotPositive)
+public sealed class PositiveStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.NotPositive, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -47,9 +46,9 @@ public sealed class PositiveStringAttribute() : ValidationAttributeBase(typeof(s
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Positive(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.PositiveDecimal(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -59,14 +58,14 @@ public sealed class PositiveStringAttribute() : ValidationAttributeBase(typeof(s
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.Negative"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.NegativeDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -79,10 +78,10 @@ public sealed class PositiveStringAttribute() : ValidationAttributeBase(typeof(s
 /// </code>
 /// </example>
 /// <seealso cref="PositiveStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.Negative"/>
+/// <seealso cref="MustStringNumbersClauses.NegativeDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NegativeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.NotNegative)
+public sealed class NegativeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.NotNegative, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -92,9 +91,9 @@ public sealed class NegativeStringAttribute() : ValidationAttributeBase(typeof(s
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Negative(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.NegativeDecimal(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -104,14 +103,14 @@ public sealed class NegativeStringAttribute() : ValidationAttributeBase(typeof(s
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.Zero"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.ZeroDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -124,10 +123,10 @@ public sealed class NegativeStringAttribute() : ValidationAttributeBase(typeof(s
 /// </code>
 /// </example>
 /// <seealso cref="NotZeroStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.Zero"/>
+/// <seealso cref="MustStringNumbersClauses.ZeroDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ZeroStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.NotZero)
+public sealed class ZeroStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.NotZero, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -137,9 +136,9 @@ public sealed class ZeroStringAttribute() : ValidationAttributeBase(typeof(strin
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Zero(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.ZeroDecimal(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -149,14 +148,14 @@ public sealed class ZeroStringAttribute() : ValidationAttributeBase(typeof(strin
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.NotZero"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.NotZeroDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -169,10 +168,10 @@ public sealed class ZeroStringAttribute() : ValidationAttributeBase(typeof(strin
 /// </code>
 /// </example>
 /// <seealso cref="ZeroStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.NotZero"/>
+/// <seealso cref="MustStringNumbersClauses.NotZeroDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotZeroStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.Zero)
+public sealed class NotZeroStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.Zero, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -182,9 +181,9 @@ public sealed class NotZeroStringAttribute() : ValidationAttributeBase(typeof(st
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.NotZero(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.NotZeroDecimal(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -193,13 +192,13 @@ public sealed class NotZeroStringAttribute() : ValidationAttributeBase(typeof(st
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.Even"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.EvenInt32"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Integer"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -212,10 +211,10 @@ public sealed class NotZeroStringAttribute() : ValidationAttributeBase(typeof(st
 /// </code>
 /// </example>
 /// <seealso cref="OddStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.Even"/>
+/// <seealso cref="MustStringNumbersClauses.EvenInt32"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class EvenStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Parity.Odd)
+public sealed class EvenStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Parity.Odd, allowNull: false)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Integer;
@@ -223,9 +222,9 @@ public sealed class EvenStringAttribute() : ValidationAttributeBase(typeof(strin
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Even(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.EvenInt32(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -234,13 +233,13 @@ public sealed class EvenStringAttribute() : ValidationAttributeBase(typeof(strin
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.Odd"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.OddInt32"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Integer"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -253,10 +252,10 @@ public sealed class EvenStringAttribute() : ValidationAttributeBase(typeof(strin
 /// </code>
 /// </example>
 /// <seealso cref="EvenStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.Odd"/>
+/// <seealso cref="MustStringNumbersClauses.OddInt32"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OddStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Parity.Even)
+public sealed class OddStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Parity.Even, allowNull: false)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Integer;
@@ -264,9 +263,9 @@ public sealed class OddStringAttribute() : ValidationAttributeBase(typeof(string
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Odd(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.OddInt32(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -276,14 +275,14 @@ public sealed class OddStringAttribute() : ValidationAttributeBase(typeof(string
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.ZeroOrPositive"/>. Supported on properties,
+/// Delegates to <see cref="MustStringNumbersClauses.ZeroOrPositiveDecimal"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -296,10 +295,10 @@ public sealed class OddStringAttribute() : ValidationAttributeBase(typeof(string
 /// </code>
 /// </example>
 /// <seealso cref="ZeroOrNegativeStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.ZeroOrPositive"/>
+/// <seealso cref="MustStringNumbersClauses.ZeroOrPositiveDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ZeroOrPositiveStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.Negative)
+public sealed class ZeroOrPositiveStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.Negative, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -309,9 +308,9 @@ public sealed class ZeroOrPositiveStringAttribute() : ValidationAttributeBase(ty
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.ZeroOrPositive(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.ZeroOrPositiveDecimal(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -321,14 +320,14 @@ public sealed class ZeroOrPositiveStringAttribute() : ValidationAttributeBase(ty
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.ZeroOrNegative"/>. Supported on properties,
+/// Delegates to <see cref="MustStringNumbersClauses.ZeroOrNegativeDecimal"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -341,10 +340,10 @@ public sealed class ZeroOrPositiveStringAttribute() : ValidationAttributeBase(ty
 /// </code>
 /// </example>
 /// <seealso cref="ZeroOrPositiveStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.ZeroOrNegative"/>
+/// <seealso cref="MustStringNumbersClauses.ZeroOrNegativeDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ZeroOrNegativeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.Positive)
+public sealed class ZeroOrNegativeStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Sign.Positive, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -354,9 +353,9 @@ public sealed class ZeroOrNegativeStringAttribute() : ValidationAttributeBase(ty
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.ZeroOrNegative(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.ZeroOrNegativeDecimal(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -366,35 +365,35 @@ public sealed class ZeroOrNegativeStringAttribute() : ValidationAttributeBase(ty
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.GreaterThanOrEqual"/>. Supported on properties,
+/// Delegates to <see cref="MustStringNumbersClauses.GreaterThanOrEqualDecimal"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class OrderModel
 /// {
-///     [GreaterThanOrEqualString(1)]
+///     [GreaterThanOrEqualString("1")]
 ///     public string Quantity { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="LessThanOrEqualStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.GreaterThanOrEqual"/>
+/// <seealso cref="MustStringNumbersClauses.GreaterThanOrEqualDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class GreaterThanOrEqualStringAttribute(decimal min) : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.BelowMinimum)
+public sealed class GreaterThanOrEqualStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.BelowMinimum, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
     /// <summary>Gets the minimum allowed numeric value (inclusive).</summary>
-    public decimal Min { get; } = min;
+    public string Other { get; } = other;
 
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = DefaultStyles;
@@ -402,9 +401,13 @@ public sealed class GreaterThanOrEqualStringAttribute(decimal min) : ValidationA
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.GreaterThanOrEqual(strValue, Min, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var parsedOther = DecimalAttributeConfiguration.Parse(Other, nameof(Other));
+        if (parsedOther.Failed)
+            return FromMustResult(parsedOther, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.GreaterThanOrEqualDecimal(strValue, parsedOther.Result, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -414,35 +417,35 @@ public sealed class GreaterThanOrEqualStringAttribute(decimal min) : ValidationA
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.LessThanOrEqual"/>. Supported on properties,
+/// Delegates to <see cref="MustStringNumbersClauses.LessThanOrEqualDecimal"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class RatingModel
 /// {
-///     [LessThanOrEqualString(100)]
+///     [LessThanOrEqualString("100")]
 ///     public string Score { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="GreaterThanOrEqualStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.LessThanOrEqual"/>
+/// <seealso cref="MustStringNumbersClauses.LessThanOrEqualDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LessThanOrEqualStringAttribute(decimal max) : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.Exceeded)
+public sealed class LessThanOrEqualStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.Exceeded, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
     /// <summary>Gets the maximum allowed numeric value (inclusive).</summary>
-    public decimal Max { get; } = max;
+    public string Other { get; } = other;
 
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = DefaultStyles;
@@ -450,9 +453,13 @@ public sealed class LessThanOrEqualStringAttribute(decimal max) : ValidationAttr
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.LessThanOrEqual(strValue, Max, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var parsedOther = DecimalAttributeConfiguration.Parse(Other, nameof(Other));
+        if (parsedOther.Failed)
+            return FromMustResult(parsedOther, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.LessThanOrEqualDecimal(strValue, parsedOther.Result, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -462,39 +469,39 @@ public sealed class LessThanOrEqualStringAttribute(decimal max) : ValidationAttr
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.InRange"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.InRangeDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class PercentageModel
 /// {
-///     [InRangeString(0, 100)]
+///     [InRangeString("0", "100")]
 ///     public string Percentage { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="OutOfRangeStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.InRange"/>
+/// <seealso cref="MustStringNumbersClauses.InRangeDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class InRangeStringAttribute(decimal min, decimal max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.OutOfRange)
+public sealed class InRangeStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.OutOfRange, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
-    /// <summary>Gets the lower boundary of the valid range.</summary>
-    public decimal Min { get; } = min;
+    /// <summary>Gets the invariant decimal configuration string, parsed without conversion through double.</summary>
+    public string Min { get; } = min;
 
-    /// <summary>Gets the upper boundary of the valid range.</summary>
-    public decimal Max { get; } = max;
+    /// <summary>Gets the invariant decimal configuration string, parsed without conversion through double.</summary>
+    public string Max { get; } = max;
 
     /// <summary>Gets whether the boundary values are included or excluded in the valid range.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -505,9 +512,17 @@ public sealed class InRangeStringAttribute(decimal min, decimal max, Inclusion i
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.InRange(strValue, Min, Max, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var parsedMin = DecimalAttributeConfiguration.Parse(Min, nameof(Min));
+        if (parsedMin.Failed)
+            return FromMustResult(parsedMin, validationContext);
+
+        var parsedMax = DecimalAttributeConfiguration.Parse(Max, nameof(Max));
+        if (parsedMax.Failed)
+            return FromMustResult(parsedMax, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.InRangeDecimal(strValue, parsedMin.Result, parsedMax.Result, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -517,39 +532,39 @@ public sealed class InRangeStringAttribute(decimal min, decimal max, Inclusion i
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.OutOfRange"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.OutOfRangeDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class TemperatureModel
 /// {
-///     [OutOfRangeString(-40, 60)]
+///     [OutOfRangeString("-40", "60")]
 ///     public string Temperature { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="InRangeStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.OutOfRange"/>
+/// <seealso cref="MustStringNumbersClauses.OutOfRangeDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OutOfRangeStringAttribute(decimal min, decimal max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.InRange)
+public sealed class OutOfRangeStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.InRange, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
-    /// <summary>Gets the lower boundary of the excluded range.</summary>
-    public decimal Min { get; } = min;
+    /// <summary>Gets the invariant decimal configuration string, parsed without conversion through double.</summary>
+    public string Min { get; } = min;
 
-    /// <summary>Gets the upper boundary of the excluded range.</summary>
-    public decimal Max { get; } = max;
+    /// <summary>Gets the invariant decimal configuration string, parsed without conversion through double.</summary>
+    public string Max { get; } = max;
 
     /// <summary>Gets whether the boundary values are included or excluded in the excluded range.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -560,9 +575,17 @@ public sealed class OutOfRangeStringAttribute(decimal min, decimal max, Inclusio
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.OutOfRange(strValue, Min, Max, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var parsedMin = DecimalAttributeConfiguration.Parse(Min, nameof(Min));
+        if (parsedMin.Failed)
+            return FromMustResult(parsedMin, validationContext);
+
+        var parsedMax = DecimalAttributeConfiguration.Parse(Max, nameof(Max));
+        if (parsedMax.Failed)
+            return FromMustResult(parsedMax, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.OutOfRangeDecimal(strValue, parsedMin.Result, parsedMax.Result, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -572,35 +595,35 @@ public sealed class OutOfRangeStringAttribute(decimal min, decimal max, Inclusio
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.MultipleOf"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.MultipleOfDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class GridModel
 /// {
-///     [MultipleOfString(5)]
+///     [MultipleOfString("5")]
 ///     public string Step { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="NotMultipleOfStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.MultipleOf"/>
+/// <seealso cref="MustStringNumbersClauses.MultipleOfDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class MultipleOfStringAttribute(decimal factor) : ValidationAttributeBase(typeof(string), MustCodes.Number.Divisibility.NotMultiple)
+public sealed class MultipleOfStringAttribute(string factor) : ValidationAttributeBase(typeof(string), MustCodes.Number.Divisibility.NotMultiple, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
     /// <summary>Gets the factor that the numeric value must be a multiple of.</summary>
-    public decimal Factor { get; } = factor;
+    public string Factor { get; } = factor;
 
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = DefaultStyles;
@@ -608,9 +631,13 @@ public sealed class MultipleOfStringAttribute(decimal factor) : ValidationAttrib
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.MultipleOf(strValue, Factor, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var parsedFactor = DecimalAttributeConfiguration.Parse(Factor, nameof(Factor));
+        if (parsedFactor.Failed)
+            return FromMustResult(parsedFactor, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.MultipleOfDecimal(strValue, parsedFactor.Result, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -620,35 +647,35 @@ public sealed class MultipleOfStringAttribute(decimal factor) : ValidationAttrib
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.NotMultipleOf"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.NotMultipleOfDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class PrimeModel
 /// {
-///     [NotMultipleOfString(2)]
+///     [NotMultipleOfString("2")]
 ///     public string Candidate { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="MultipleOfStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.NotMultipleOf"/>
+/// <seealso cref="MustStringNumbersClauses.NotMultipleOfDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotMultipleOfStringAttribute(decimal factor) : ValidationAttributeBase(typeof(string), MustCodes.Number.Divisibility.Multiple)
+public sealed class NotMultipleOfStringAttribute(string factor) : ValidationAttributeBase(typeof(string), MustCodes.Number.Divisibility.Multiple, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
     /// <summary>Gets the factor that the numeric value must not be a multiple of.</summary>
-    public decimal Factor { get; } = factor;
+    public string Factor { get; } = factor;
 
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = DefaultStyles;
@@ -656,52 +683,55 @@ public sealed class NotMultipleOfStringAttribute(decimal factor) : ValidationAtt
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.NotMultipleOf(strValue, Factor, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var parsedFactor = DecimalAttributeConfiguration.Parse(Factor, nameof(Factor));
+        if (parsedFactor.Failed)
+            return FromMustResult(parsedFactor, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.NotMultipleOfDecimal(strValue, parsedFactor.Result, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
 /// <summary>
 /// Validates that the annotated <see cref="string"/> property or field represents a numeric value
-/// approximately equal to the specified target within an optional tolerance.
+/// approximately equal to the specified target within the required tolerance.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.Approximately"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.ApproximatelyDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
-/// The <see cref="Tolerance"/> property specifies the maximum allowed deviation; when
-/// <see langword="null"/>, a default tolerance is applied by the underlying rule.
+/// Target and tolerance are required invariant decimal strings; tolerance must be non-negative.
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class MeasurementModel
 /// {
-///     [ApproximatelyString(3.14)]
+///     [ApproximatelyString("3.14", "0.01")]
 ///     public string Pi { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="NotApproximatelyStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.Approximately"/>
+/// <seealso cref="MustStringNumbersClauses.ApproximatelyDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ApproximatelyStringAttribute(decimal target) : ValidationAttributeBase(typeof(string), MustCodes.Number.Proximity.NotApproximate)
+public sealed class ApproximatelyStringAttribute(string target, string tolerance) : ValidationAttributeBase(typeof(string), MustCodes.Number.Proximity.NotApproximate, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
-    /// <summary>Gets the target numeric value to compare against.</summary>
-    public decimal Target { get; } = target;
+    /// <summary>Gets the invariant decimal configuration string, parsed without conversion through double.</summary>
+    public string Target { get; } = target;
 
-    /// <summary>Gets or sets the maximum allowed deviation from the target. When <see langword="null"/>, the underlying rule applies a default tolerance.</summary>
-    public decimal? Tolerance { get; set; }
+    /// <summary>Gets the required non-negative tolerance as an invariant decimal string.</summary>
+    public string Tolerance { get; } = tolerance;
 
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = DefaultStyles;
@@ -709,52 +739,59 @@ public sealed class ApproximatelyStringAttribute(decimal target) : ValidationAtt
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Approximately(strValue, Target, Tolerance, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var parsedTarget = DecimalAttributeConfiguration.Parse(Target, nameof(Target));
+        if (parsedTarget.Failed)
+            return FromMustResult(parsedTarget, validationContext);
+
+        var parsedTolerance = DecimalAttributeConfiguration.Parse(Tolerance, nameof(Tolerance));
+        if (parsedTolerance.Failed)
+            return FromMustResult(parsedTolerance, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.ApproximatelyDecimal(strValue, parsedTarget.Result, parsedTolerance.Result, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
 /// <summary>
 /// Validates that the annotated <see cref="string"/> property or field represents a numeric value
-/// that is not approximately equal to the specified target within an optional tolerance.
+/// that is not approximately equal to the specified target within the required tolerance.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.NotApproximately"/>. Supported on properties,
+/// Delegates to <see cref="MustStringNumbersClauses.NotApproximatelyDecimal"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
-/// The <see cref="Tolerance"/> property specifies the minimum required deviation; when
-/// <see langword="null"/>, a default tolerance is applied by the underlying rule.
+/// Target and tolerance are required invariant decimal strings; tolerance must be non-negative.
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class SensorModel
 /// {
-///     [NotApproximatelyString(0)]
+///     [NotApproximatelyString("0", "0.01")]
 ///     public string Reading { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="ApproximatelyStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.NotApproximately"/>
+/// <seealso cref="MustStringNumbersClauses.NotApproximatelyDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotApproximatelyStringAttribute(decimal target) : ValidationAttributeBase(typeof(string), MustCodes.Number.Proximity.Approximate)
+public sealed class NotApproximatelyStringAttribute(string target, string tolerance) : ValidationAttributeBase(typeof(string), MustCodes.Number.Proximity.Approximate, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
-    /// <summary>Gets the target numeric value to compare against.</summary>
-    public decimal Target { get; } = target;
+    /// <summary>Gets the invariant decimal configuration string, parsed without conversion through double.</summary>
+    public string Target { get; } = target;
 
-    /// <summary>Gets or sets the minimum required deviation from the target. When <see langword="null"/>, the underlying rule applies a default tolerance.</summary>
-    public decimal? Tolerance { get; set; }
+    /// <summary>Gets the required non-negative tolerance as an invariant decimal string.</summary>
+    public string Tolerance { get; } = tolerance;
 
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = DefaultStyles;
@@ -762,9 +799,17 @@ public sealed class NotApproximatelyStringAttribute(decimal target) : Validation
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.NotApproximately(strValue, Target, Tolerance, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var parsedTarget = DecimalAttributeConfiguration.Parse(Target, nameof(Target));
+        if (parsedTarget.Failed)
+            return FromMustResult(parsedTarget, validationContext);
+
+        var parsedTolerance = DecimalAttributeConfiguration.Parse(Tolerance, nameof(Tolerance));
+        if (parsedTolerance.Failed)
+            return FromMustResult(parsedTolerance, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.NotApproximatelyDecimal(strValue, parsedTarget.Result, parsedTolerance.Result, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -774,14 +819,14 @@ public sealed class NotApproximatelyStringAttribute(decimal target) : Validation
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.Finite"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.FiniteDouble"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Float"/> | <see cref="NumberStyles.AllowLeadingWhite"/> |
 /// <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -794,10 +839,10 @@ public sealed class NotApproximatelyStringAttribute(decimal target) : Validation
 /// </code>
 /// </example>
 /// <seealso cref="NotFiniteStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.Finite"/>
+/// <seealso cref="MustStringNumbersClauses.FiniteDouble"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FiniteStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Form.NotFinite)
+public sealed class FiniteStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Form.NotFinite, allowNull: false)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Float | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
@@ -805,9 +850,9 @@ public sealed class FiniteStringAttribute() : ValidationAttributeBase(typeof(str
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Finite(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.FiniteDouble(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -817,14 +862,14 @@ public sealed class FiniteStringAttribute() : ValidationAttributeBase(typeof(str
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.NotFinite"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.NotFiniteDouble"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Float"/> | <see cref="NumberStyles.AllowLeadingWhite"/> |
 /// <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -837,10 +882,10 @@ public sealed class FiniteStringAttribute() : ValidationAttributeBase(typeof(str
 /// </code>
 /// </example>
 /// <seealso cref="FiniteStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.NotFinite"/>
+/// <seealso cref="MustStringNumbersClauses.NotFiniteDouble"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotFiniteStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Form.Finite)
+public sealed class NotFiniteStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Form.Finite, allowNull: false)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Float | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
@@ -848,9 +893,9 @@ public sealed class NotFiniteStringAttribute() : ValidationAttributeBase(typeof(
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.NotFinite(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.NotFiniteDouble(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -860,14 +905,14 @@ public sealed class NotFiniteStringAttribute() : ValidationAttributeBase(typeof(
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.NotNaN"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.NotNaNDouble"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.Float"/> | <see cref="NumberStyles.AllowLeadingWhite"/> |
 /// <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -880,10 +925,10 @@ public sealed class NotFiniteStringAttribute() : ValidationAttributeBase(typeof(
 /// </code>
 /// </example>
 /// <seealso cref="FiniteStringAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.NotNaN"/>
+/// <seealso cref="MustStringNumbersClauses.NotNaNDouble"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotNaNStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Form.Nan)
+public sealed class NotNaNStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Form.Nan, allowNull: false)
 {
     /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
     public NumberStyles Styles { get; set; } = NumberStyles.Float | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
@@ -891,9 +936,9 @@ public sealed class NotNaNStringAttribute() : ValidationAttributeBase(typeof(str
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.NotNaN(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.NotNaNDouble(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -903,7 +948,7 @@ public sealed class NotNaNStringAttribute() : ValidationAttributeBase(typeof(str
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringNumbersClauses.Percentage"/>. Supported on properties, fields,
+/// Delegates to <see cref="MustStringNumbersClauses.PercentageDecimal"/>. Supported on properties, fields,
 /// and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
@@ -911,7 +956,7 @@ public sealed class NotNaNStringAttribute() : ValidationAttributeBase(typeof(str
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="NumberStyles.AllowLeadingSign"/> | <see cref="NumberStyles.AllowDecimalPoint"/> |
 /// <see cref="NumberStyles.AllowLeadingWhite"/> | <see cref="NumberStyles.AllowTrailingWhite"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -923,11 +968,11 @@ public sealed class NotNaNStringAttribute() : ValidationAttributeBase(typeof(str
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="PercentageNumberAttribute"/>
-/// <seealso cref="MustStringNumbersClauses.Percentage"/>
+/// <seealso cref="MustStringNumbersClauses.PercentageDecimal"/>
+/// <seealso cref="MustStringNumbersClauses.PercentageDecimal"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PercentageStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.NotPercentage)
+public sealed class PercentageStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.NotPercentage, allowNull: false)
 {
     private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
 
@@ -937,9 +982,60 @@ public sealed class PercentageStringAttribute() : ValidationAttributeBase(typeof
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.Percentage(strValue, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.PercentageDecimal(strValue, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
-#endif
+
+/// <summary>Validates a numeric string using a strict GreaterThan comparison.</summary>
+/// <param name="other">The comparison value as an invariant decimal string; invalid configuration fails validation.</param>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class GreaterThanStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.NotGreater, allowNull: false)
+{
+    private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
+
+    /// <summary>Gets the exclusive comparison bound as an invariant decimal string.</summary>
+    public string Other { get; } = other;
+
+    /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
+    public NumberStyles Styles { get; set; } = DefaultStyles;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var parsedOther = DecimalAttributeConfiguration.Parse(Other, nameof(Other));
+        if (parsedOther.Failed)
+            return FromMustResult(parsedOther, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.GreaterThanDecimal(strValue, parsedOther.Result, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>Validates a numeric string using a strict LessThan comparison.</summary>
+/// <param name="other">The comparison value as an invariant decimal string; invalid configuration fails validation.</param>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class LessThanStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Number.Range.NotLess, allowNull: false)
+{
+    private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
+
+    /// <summary>Gets the exclusive comparison bound as an invariant decimal string.</summary>
+    public string Other { get; } = other;
+
+    /// <summary>Gets or sets the <see cref="NumberStyles"/> used when parsing the string value.</summary>
+    public NumberStyles Styles { get; set; } = DefaultStyles;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var parsedOther = DecimalAttributeConfiguration.Parse(Other, nameof(Other));
+        if (parsedOther.Failed)
+            return FromMustResult(parsedOther, validationContext);
+
+        var strValue = (string?)value;
+        var result = Must.Be.LessThanDecimal(strValue, parsedOther.Result, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
+    }
+}

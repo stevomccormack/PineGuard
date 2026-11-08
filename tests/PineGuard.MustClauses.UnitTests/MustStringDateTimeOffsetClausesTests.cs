@@ -39,20 +39,20 @@ public sealed class MustStringDateTimeOffsetClausesTests(ITestOutputHelper outpu
     }
 
     [Theory]
-    [MemberData(nameof(MustStringDateTimeOffsetClausesTestData.BetweenDateTimeOffset.Cases), MemberType = typeof(MustStringDateTimeOffsetClausesTestData.BetweenDateTimeOffset))]
-    public void BetweenDateTimeOffset_BehavesAsExpected(MustCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustStringDateTimeOffsetClausesTestData.InRangeDateTimeOffset.Cases), MemberType = typeof(MustStringDateTimeOffsetClausesTestData.InRangeDateTimeOffset))]
+    public void InRangeDateTimeOffset_BehavesAsExpected(MustCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        var result = Must.Be.BetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = Must.Be.InRangeDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringDateTimeOffsetClausesTestData.NotBetweenDateTimeOffset.Cases), MemberType = typeof(MustStringDateTimeOffsetClausesTestData.NotBetweenDateTimeOffset))]
-    public void NotBetweenDateTimeOffset_BehavesAsExpected(MustCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustStringDateTimeOffsetClausesTestData.OutOfRangeDateTimeOffset.Cases), MemberType = typeof(MustStringDateTimeOffsetClausesTestData.OutOfRangeDateTimeOffset))]
+    public void OutOfRangeDateTimeOffset_BehavesAsExpected(MustCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        var result = Must.Be.NotBetweenDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = Must.Be.OutOfRangeDateTimeOffset(value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
         AssertResult(tc, result);
     }
 

@@ -21,6 +21,24 @@ namespace PineGuard.Utils;
 public static class OwaspUtility
 {
     /// <summary>
+    /// Detects common cross-site scripting patterns, including markup, script protocols, event handlers,
+    /// and encoded angle brackets. This heuristic is not a substitute for context-specific output encoding.
+    /// </summary>
+    /// <param name="value">The value to check. Null or whitespace returns false.</param>
+    /// <returns>True when a known XSS pattern is present; otherwise false.</returns>
+    public static bool ContainsXssRisk(string? value)
+    {
+        if (!StringUtility.TryGetTrimmed(value, out var trimmed))
+            return false;
+
+        return !OwaspRegex.Xss.NoAngleBracketsRegex().IsMatch(trimmed)
+            || OwaspRegex.Xss.ScriptProtocolRegex().IsMatch(trimmed)
+            || OwaspRegex.Xss.HtmlEventHandlerAttributeRegex().IsMatch(trimmed)
+            || OwaspRegex.Xss.HtmlEntityEncodedAngleBracketRegex().IsMatch(trimmed)
+            || OwaspRegex.Xss.PercentEncodedAngleBracketRegex().IsMatch(trimmed);
+    }
+
+    /// <summary>
     /// Performs a heuristic pattern check for input that resembles SQL injection (keywords, comment markers,
     /// statement terminators, boolean tautologies, UNION SELECT, or unescaped quotes). This is a best-effort
     /// heuristic, not a guarantee that the input is safe or unsafe.

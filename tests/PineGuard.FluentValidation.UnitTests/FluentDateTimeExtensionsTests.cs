@@ -13,8 +13,8 @@ public sealed class FluentDateTimeExtensionsTests(ITestOutputHelper output) : Ba
     private sealed class FutureValidator : AbstractValidator<Model> { public FutureValidator() => RuleFor(x => x.Value).Future(); }
     private sealed class PastOrPresentValidator : AbstractValidator<Model> { public PastOrPresentValidator() => RuleFor(x => x.Value).PastOrPresent(); }
     private sealed class FutureOrPresentValidator : AbstractValidator<Model> { public FutureOrPresentValidator() => RuleFor(x => x.Value).FutureOrPresent(); }
-    private sealed class BetweenValidator : AbstractValidator<Model> { public BetweenValidator(DateTime min, DateTime max) => RuleFor(x => x.Value).Between(min, max); }
-    private sealed class NotBetweenValidator : AbstractValidator<Model> { public NotBetweenValidator(DateTime min, DateTime max) => RuleFor(x => x.Value).NotBetween(min, max); }
+    private sealed class InRangeValidator : AbstractValidator<Model> { public InRangeValidator(DateTime min, DateTime max) => RuleFor(x => x.Value).InRange(min, max); }
+    private sealed class OutOfRangeValidator : AbstractValidator<Model> { public OutOfRangeValidator(DateTime min, DateTime max) => RuleFor(x => x.Value).OutOfRange(min, max); }
     private sealed class BeforeValidator : AbstractValidator<Model> { public BeforeValidator(DateTime other) => RuleFor(x => x.Value).Before(other); }
     private sealed class OnOrBeforeValidator : AbstractValidator<Model> { public OnOrBeforeValidator(DateTime other) => RuleFor(x => x.Value).OnOrBefore(other); }
     private sealed class AfterValidator : AbstractValidator<Model> { public AfterValidator(DateTime other) => RuleFor(x => x.Value).After(other); }
@@ -81,18 +81,18 @@ public sealed class FluentDateTimeExtensionsTests(ITestOutputHelper output) : Ba
     }
 
     [Theory]
-    [MemberData(nameof(FluentDateTimeExtensionsTestData.Between.Cases), MemberType = typeof(FluentDateTimeExtensionsTestData.Between))]
-    public void Between_BehavesAsExpected(FluentCase<(DateTime value, DateTime min, DateTime max)> tc)
+    [MemberData(nameof(FluentDateTimeExtensionsTestData.InRange.Cases), MemberType = typeof(FluentDateTimeExtensionsTestData.InRange))]
+    public void InRange_BehavesAsExpected(FluentCase<(DateTime value, DateTime min, DateTime max)> tc)
     {
-        var result = new BetweenValidator(tc.Value.min, tc.Value.max).Validate(new Model { Value = tc.Value.value });
+        var result = new InRangeValidator(tc.Value.min, tc.Value.max).Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(FluentDateTimeExtensionsTestData.NotBetween.Cases), MemberType = typeof(FluentDateTimeExtensionsTestData.NotBetween))]
-    public void NotBetween_BehavesAsExpected(FluentCase<(DateTime value, DateTime min, DateTime max)> tc)
+    [MemberData(nameof(FluentDateTimeExtensionsTestData.OutOfRange.Cases), MemberType = typeof(FluentDateTimeExtensionsTestData.OutOfRange))]
+    public void OutOfRange_BehavesAsExpected(FluentCase<(DateTime value, DateTime min, DateTime max)> tc)
     {
-        var result = new NotBetweenValidator(tc.Value.min, tc.Value.max).Validate(new Model { Value = tc.Value.value });
+        var result = new OutOfRangeValidator(tc.Value.min, tc.Value.max).Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 

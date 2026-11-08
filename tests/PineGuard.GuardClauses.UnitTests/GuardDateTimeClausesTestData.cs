@@ -68,24 +68,24 @@ public static class GuardDateTimeClausesTestData
         ];
     }
 
-    // Guard.Against.NotBetween — throws when value is NOT between; passes when it IS between
-    // Delegates to Must.Be.Between
-    public static class NotBetween
+    // Guard.Against.OutOfRange — throws when value is NOT between; passes when it IS between
+    // Delegates to Must.Be.InRange
+    public static class OutOfRange
     {
         public static TheoryData<GuardCase<(DateTime value, DateTime min, DateTime max, Inclusion inclusion)>> ValidCases =>
-            F.IsBetween.ValidScenarios.Except("NullValue").Project(t => (t.value!.Value, t.min, t.max, t.inclusion)).ToGuardCases(_ => new GuardExpected(true));
+            F.IsInRange.ValidScenarios.Except("NullValue").Project(t => (t.value!.Value, t.min, t.max, t.inclusion)).ToGuardCases(_ => new GuardExpected(true));
         public static TheoryData<GuardCase<(DateTime value, DateTime min, DateTime max, Inclusion inclusion)>> InvalidCases =>
-            F.IsBetween.InvalidScenarios.Except("NullValue").Project(t => (t.value!.Value, t.min, t.max, t.inclusion)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+            F.IsInRange.InvalidScenarios.Except("NullValue").Project(t => (t.value!.Value, t.min, t.max, t.inclusion)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
-    // Guard.Against.Between — throws when value IS between; passes when NOT between
-    // Delegates to Must.Be.NotBetween (complement)
-    public static class Between
+    // Guard.Against.InRange — throws when value IS between; passes when NOT between
+    // Delegates to Must.Be.OutOfRange (complement)
+    public static class InRange
     {
         public static TheoryData<GuardCase<(DateTime value, DateTime min, DateTime max, Inclusion inclusion)>> ValidCases =>
-            F.IsBetween.InvalidScenarios.Except("NullValue").Project(t => (t.value!.Value, t.min, t.max, t.inclusion)).ToGuardCases(_ => new GuardExpected(true));
+            F.IsInRange.InvalidScenarios.Except("NullValue").Project(t => (t.value!.Value, t.min, t.max, t.inclusion)).ToGuardCases(_ => new GuardExpected(true));
         public static TheoryData<GuardCase<(DateTime value, DateTime min, DateTime max, Inclusion inclusion)>> InvalidCases =>
-            F.IsBetween.ValidScenarios.Except("NullValue").Project(t => (t.value!.Value, t.min, t.max, t.inclusion)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+            F.IsInRange.ValidScenarios.Except("NullValue").Project(t => (t.value!.Value, t.min, t.max, t.inclusion)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
     // Guard.Against.OnOrAfter — throws when value IS on-or-after; passes when before
@@ -187,7 +187,7 @@ public static class GuardDateTimeClausesTestData
     public static class Overlapping
     {
         public static TheoryData<GuardCase<(DateTime start1, DateTime end1, DateTime start2, DateTime end2, Inclusion inclusion)>> ValidCases =>
-            F.IsOverlapping.InvalidScenarios.Except("AllNull", "End1Null", "Start2Null", "End2Null").Project(t => (t.start1!.Value, t.end1!.Value, t.start2!.Value, t.end2!.Value, t.inclusion)).ToGuardCases(_ => new GuardExpected(true));
+            F.IsOverlapping.InvalidScenarios.Except("AllNull", "End1Null", "Start2Null", "End2Null").Project(t => (t.start1!.Value, t.end1!.Value, t.start2!.Value, t.end2!.Value, t.inclusion)).ToGuardCases(s => s.Name == "FirstRangeInverted" ? new GuardExpected(false, typeof(ArgumentException), "start1") : new GuardExpected(true));
         public static TheoryData<GuardCase<(DateTime start1, DateTime end1, DateTime start2, DateTime end2, Inclusion inclusion)>> InvalidCases =>
             F.IsOverlapping.ValidScenarios.Except("AllNull", "End1Null", "Start2Null", "End2Null").Project(t => (t.start1!.Value, t.end1!.Value, t.start2!.Value, t.end2!.Value, t.inclusion)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "start1"));
     }

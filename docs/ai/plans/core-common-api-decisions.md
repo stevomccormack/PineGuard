@@ -1,471 +1,865 @@
 <!-- metadata_header
 type: plan
 id: core-common-api-decisions
-version: 1.0
-status: open
-last_updated: 2026-08-25
+version: 2.1
+status: implemented
+last_updated: 2026-11-09
 -->
 
 # Core / Common API Decisions
 
-> **Status**: Open - 36 decisions awaiting an owner's call.
-> **Origin**: The core/common adversarial review (merged as `206bbc4`, 2026-08-23).
-> **Scope**: `PineGuard.Core`, plus `PineGuard.DataAnnotations/Common` and `PineGuard.FluentValidation/Common`.
+> **Status**: Implemented following owner approval. Exact declaration reconciliation, decision dispositions and verification evidence are recorded in [Core / Common API implementation](core-common-api-implementation.md). The design rationale and acceptance criteria below are retained as the decision record.
+> **Origin**: The core/common adversarial review (merged as `206bbc4`, 2026-08-23), re-read on 2026-11-08 against the flattened `Must.Be` / `Guard.Against` surfaces.
+> **Scope**: Core, MustClauses, GuardClauses, all affected FluentValidation and DataAnnotations adapters, PineGuard.Xml, tests/fixtures, canonical specifications, documentation, and audit vocabulary/baselines.
+
+> [!IMPORTANT]
+> **No backward compatibility. (Owner, 2026-11-08.)**
+> *"Backward compatibility is not a thing. We are designing fresh always (for now)."*
+>
+> Nothing in this document is weighed against source compatibility. There are no `[Obsolete]`
+> forwarders, no alias overloads kept "for ergonomics", no batching of renames for a major
+> version, and no migration notes. When a name or shape is agreed, rename it, delete the old
+> member, and update every call site, test and doc in the same change. The only questions this
+> document asks are *which name is right* and *which behaviour is right*. Revisit at first release.
 
 ## Why this document exists
 
 The core/common review raised 174 findings across 116 files. 170 survived independent
-adversarial verification, and the 134 of those with an unambiguous correct answer were fixed
-and merged in `206bbc4`.
+adversarial verification, and the 134 with an unambiguous correct answer were fixed and merged in
+`206bbc4`.
 
-The 36 items below are the remainder. They were **deliberately not fixed**, because each one
-has more than one defensible answer and the choice belongs to whoever owns the public API,
-not to a review agent. Most are breaking changes; several are judgement calls about what the
-library should mean rather than bugs in what it currently does.
+Version 1 of this document recorded the 36 remaining items as "decisions", mostly because fixing
+them would break source compatibility. That reason no longer exists. Version 2 re-sorts the items
+by the only test that matters now: **does this have one defensible answer, or more than one?**
+Items with one answer are a fix list. Items with more than one are decisions, and every naming
+decision now carries its rejected alternatives, because a public name is a product decision.
 
-They are recorded here rather than left in a scratch file so the reasoning survives.
+## Policy provenance and design disposition
+
+The owner's initial instruction was **finish the corrected plan first**. After that review,
+the owner explicitly authorized full implementation, 100% line and branch coverage, and commit
+and push without a PR. Existing policies are not reopened merely because version 2 overlooked them.
+
+| Policy read | Binding direction used in this review |
+|---|---|
+| [Global specification](../specs/spec.md), [project architecture](../specs/project.md), [global rules](../rules/global.md) | Greenfield changes; single ownership of validation; validated values versus configuration; full affected-surface updates and verification. |
+| [Core specification](../specs/core/project.md) §§3.2–3.3.1, 4.1, 6 | Context-local Rules names; documented Guid/control-character exceptions; parsed outputs; shared comparison and temporal normalization. |
+| [Must specification](../specs/must-clauses/project.md), “What MustClauses are” and “Required semantic contract” | `Value` is original input; `Result` is successful parsed/normalized output. Validate configuration before input-dependent returns. Complements operate over the valid domain. |
+| [Guard specification](../specs/guard-clauses/project.md) §§4–5, 8–9, 11.6 | Derive forbidden states from Must; prefer `InRange` / `OutOfRange`; return successful Must results; parse once; explicit ordering and object-validator exception. |
+| [DataAnnotations specification](../specs/data-annotations/project.md) §§2.1, 3.2 | Domain-wide collision qualifiers; shortest collision-safe names; input-type suffixes where needed; null skipping is intentional. |
+| [FluentValidation specification](../specs/fluent-validation/project.md) §§4.2, 5 | Must vocabulary subject to real framework collisions; intentional null skipping and adapter behavior. |
+| [Shared vocabulary](../specs/language/vocabulary.md), [machine map](../specs/language/vocabulary.json), [collision policy](../specs/language/naming-collisions.md) | Curated complements, OWASP suffix normalization and framework exceptions; update machine audits with vocabulary changes. |
+| [XML schema design](xml-schema-validation.md) §2.2 | `Xml` means well-formedness; `ValidXml` means schema conformance. The distinction and `InvalidXml` are deliberate. |
+
+These recommendations extend policy only where identified below. They are concrete proposed
+decisions for this plan, not a list of unanswered questions.
+
+| ID | Recommended design | Existing policy versus new design | Related entries |
+|---|---|---|---|
+| P1 | Use `InRange` / `OutOfRange` across equivalent range predicates. Use concept-first parsed-type suffixes throughout generic scalar **string-input** families; retain meaningful domain concepts and qualified Core context. | Guard range spelling and annotation collision rules already exist. Library-wide propagation and whole-family Must/Guard scalar suffixes are explicit policy amendments. | A-3/A-8, N-1, A-5, B-6 |
+| P2 | Preserve parsed/normalized successful results and remove redundant raw-result twins. | Result semantics are already mandatory. Removing the alternative projections is the proposed surface simplification. No new output-policy approval is needed. | N-2 |
+| P3 | Keep `TimeOnlyRange` linear in this correction; add its coherent linear set operations. Design midnight-crossing windows as a distinct circular domain with range-set results before adding that surface. | Prevents a local consistency fix from silently changing every existing range's set model. Circular support is a separate specified feature, not a reason to block the linear corrections. | C-1, C-4/C-5, C-6 |
+| P4 | Use a closed, immutable catalogue of declared, completed Enumeration members for GetAll and cached lookups. Keep ordinal string-value identity and independent case-insensitive name lookup. | Catalogue lifecycle is a design decision; existing equality/hash semantics constrain lookup consistency. | E-1, F-1/F-2/F-5 |
+
+Rejected alternatives and their concrete costs remain with the relevant entries. Implementation
+must prove the declaration mapping, collision behavior and semantic contracts below; “perfect
+alignment” means every difference is explicit and justified, not that adapters with different
+responsibilities must have identical signatures.
+
+## The surface that actually collides
+
+Version 1 argued every naming item from `XxxRules` classes. That is the wrong surface. Names in
+`NumberRules` and `DateOnlyRules` are qualified by class and cannot collide. The surface that
+collides is the one consumers type:
+
+- `Must.Be.*` is 56 static classes contributing extension methods to one receiver (`IMustClause`)
+  in one namespace. They share one IntelliSense list and one overload set.
+- `Guard.Against.*` is the same shape over `IGuardClause`, and derives its names from Must.
+- FluentValidation, DataAnnotations and XML map the same concepts into their own public surfaces.
+  Framework collisions, input-representation collisions and qualified Core context are explicit
+  reasons for different spelling; existing names alone are not.
+
+Two consequences for this document:
+
+1. **Must owns the approved vocabulary.** Existing Must names are still subject to review.
+   Core keeps context-local names where its class already supplies the domain/type; for example,
+   `StringRules.Guid.HasVersion` need not repeat Guid merely because a flattened clause needs it.
+2. **Inventory actual declarations.** Every rename needs a complete mapping across Rules, Must,
+   Guard, FluentValidation, DataAnnotations and XML where applicable, including result type,
+   parameter shape, failure code and TFM. The examples below do not substitute for that inventory.
 
 ## How to read an entry
 
-Every entry states the defect, a concrete consequence, and the options. The **consequence**
-lines are reproducible: each was traced through the real code by a verifier whose brief was to
-refute the finding.
+Every entry states the defect, a concrete consequence, and either the fix or the options.
+The original findings were adversarially reviewed; this revision corrects factual and design
+errors found in the subsequent source review. P1–P4 record this plan's recommended design. Other entries
+state a recommended engineering disposition and its acceptance criteria. No recommendation is a
+claim that the corresponding production change has landed.
 
-Severity reflects impact *if the current behaviour is wrong*. It is not a claim that the
-current behaviour is wrong, since that is precisely what is being asked.
+Severity reflects impact *if the current behaviour is wrong*. It is not a claim that the current
+behaviour is wrong.
 
-## Status against current `main`
+## Verification baseline
 
-Re-verified on 2026-08-25 against `55eecd7`. All 36 still apply, with one amendment:
+Re-verified on 2026-11-08 against worktree baseline `e88762c` on
+`feature/api-decisions-refresh`; this is not a claim to have reviewed later main commits. Since the previous verification (`55eecd7`,
+2026-08-25) 89 commits touched Core, Must and Guard, including the `MustCodes` landing. Changes:
 
-- **G-1** is now *partially* resolved. The remediation removed the `netstandard2.1` exclusion
-  from `GeoLocationRules.cs`, but `StringRules.Numbers.cs` and `StringRules.GeoLocation.cs`
-  remain gated behind `#if NET8_0_OR_GREATER`, so the gap persists for those two files.
+- **C-2 is resolved and removed.** `DateOnlyRules` and `DateTimeOffsetRules` now expose
+  `IsWeekend`, `IsWeekday`, `IsFirstDayOfMonth` and `IsLastDayOfMonth`.
+- **A-2, A-6, A-7 have existing vocabulary to evaluate.** `Must.Be.Hostname`, `Must.Be.NotEmptyGuid` and
+  `Must.Be.ContainsControlChars` / `NotContainsControlChars` exist. Their proposed treatment below is justified by meaning and scoped naming, not by existence alone.
+- **A-3 was understated.** The range vocabulary split runs through Must, Guard, FluentValidation,
+  DataAnnotations, `MustCodes` and the Guard spec, not just four Core members. Rewritten.
+- **B-2's quoted signatures were stale.** `Fail` and `FromBool` now take a `code` first; the
+  ordering inconsistency with `Ok` persists.
+- **H-1's accessor changed.** `DefaultAllowedNonDigitCharacters` is now a copying property, so
+  the CA2105 angle is closed; the missing space and the contradicting example remain.
+- **G-1 is clarified.** `GeoLocationRules` is un-gated. The whole `DateOnly` / `TimeOnly` family
+  is also gated, which is structural (those types do not exist on netstandard2.1) and is not a gap.
+- **Four additional entries** cover N-1 (type qualifiers), N-2 (result-projection twins),
+  N-3 (`Guard.Against.IsWhitespace`) and N-4 (the established XML schema vocabulary).
+- The critical review re-traced C-3, C-6, F-3, F-5 and F-7 and corrected their recommendations.
+- New evidence includes duplicate DateOnly range attributes, typed/string annotation collisions,
+  direct ungated GeoLocation dependencies, and XML schema naming outside the original scope.
 
-Line numbers below are current as of `55eecd7`.
+Line numbers below are current as of `e88762c` unless marked otherwise.
 
 ---
 
-## A. Breaking renames - naming consistency
+## Part I. Corrective work and explicit dependencies
 
-Each of these is a rename that would break source compatibility for consumers. They are worth doing together, in one major version, or not at all - dribbling them out one release at a time is the worst option.
+Independent corrections can be implemented without separate policy choices once implementation
+is requested. E-1/F-2 depend on P4 and must be designed together. Retain completed rationale in
+canonical specs and mark completion with evidence; do not delete the only record of an exception.
 
-### A-1. IsHexString/IsBase64String vs BufferRules.IsHex/IsBase64: same predicate, 'String' suffix only in Utils
+### A-1. Align `BufferUtility.IsHexString` / `IsBase64String` with `BufferRules.IsHex` / `IsBase64`
 
-**`src/PineGuard.Core/Utils/BufferUtility.cs`:23** - severity **minor** - `naming`
+**`src/PineGuard.Core/Utils/BufferUtility.cs`:24, 37** - severity **minor** - `naming`
 
-BufferRules exposes IsHex(string?) and IsBase64(string?) which delegate to BufferUtility.IsHexString(string?) and IsBase64String(string?). The identical concept carries a 'String' suffix in the Utils layer only; no other Rules/Utils pair renames the predicate between layers (e.g. NetworkRules.IsInCidr delegates to NetworkUtility.IsInCidr).
+These predicates carry a redundant `String` suffix in Utils while their Rules counterparts
+use the domain names. **Fix:** rename the Utils members to `IsHex` / `IsBase64`. Flattened surface:
+none (`Must.Be.Hex` / `Base64` already use the short form).
 
-**Consequence.** A user working at the Utils layer types BufferUtility.IsHex(s) by analogy with BufferRules.IsHex and gets CS0117; grep for 'IsBase64' finds two names for one check.
+### A-2. Rename `NetworkRules.IsValidHostname` to `IsHostname`
 
-**Options.** Align the names (IsHex/IsBase64 in both layers) since the parameter type already says 'string'.
+**`src/PineGuard.Core/Rules/NetworkRules.cs`:101** - severity **minor** - `naming`
 
-### A-2. IsValidHostname is the only 'IsValidX' name on the entire Rules surface
+The redundant `Valid` in Core's hostname predicate adds no domain distinction. XML schema
+`IsValidXml` is different: see N-4 for its established well-formedness/validity distinction. Must already says `Hostname`, Guard `NotHostname`.
+**Fix:** rename; update the XML examples on lines 97-98 and every call site. No forwarder.
 
-**`src/PineGuard.Core/Rules/NetworkRules.cs`:93** - severity **minor** - `naming`
+### A-4. Delete the `StringUtility.ToCase` pass-throughs
 
-Every other predicate uses bare IsX: IsIpAddress, IsIpv4, IsIpv6, IsPortNumber (same file), IsEmail, IsUrl, IsGuid, IsJson, IsXml, IsPhoneNumber. IsValidHostname alone inserts 'Valid', implying siblings are somehow less strict validity checks when they are the same kind of predicate.
+**`src/PineGuard.Core/Utils/StringUtility.Casing.cs`:54, 68, 81** - severity **minor** - `naming`
 
-**Consequence.** A user types NetworkRules.IsHostname("example.com") by analogy with IsIpAddress/IsUrl and gets CS0117; conversely a user hunting for IsValidEmail / IsValidUrl finds nothing.
+Three `ToCase` overloads forward verbatim to `TryToCase` with bool+out semantics. `ToX` is
+reserved for transformations, `Try*` for fallible operations. **Fix:** delete the three
+`ToCase` members; add a single-style `TryToCase(value, style, out cased)` convenience overload
+so no caller loses a shape.
 
-**Options.** Rename to IsHostname (keeping an [Obsolete] forwarder if surface stability requires it).
-
-### A-3. IsInRange vs IsBetween: same concept named differently across families
-
-**`src/PineGuard.Core/Rules/NumberRules.cs`:116** - severity **minor** - `naming`
-
-NumberRules.IsInRange(value, min, max, inclusion) and StringRules.Numbers.IsInRange / IsInt32InRange / IsInt64InRange use 'InRange', while DateOnlyRules, DateTimeRules, DateTimeOffsetRules, TimeOnlyRules, StringRules.DateOnly, StringRules.DateTimeOffset, and StringRules.TimeOnly all use IsBetween(value, min, max, inclusion) for the identical (value, min, max, Inclusion=Inclusive) shape. StringRules also has IsLengthBetween and CollectionRules HasCountBetween and TimeSpanRules IsDurationBetween, making 'Between' the majority term (10+ members) versus 4 'InRange' members.
-
-**Consequence.** A user types NumberRules.IsBetween(x, 1, 10) by analogy with DateOnlyRules.IsBetween and gets CS0117 (no such member), then must discover the numeric family alone calls it IsInRange.
-
-**Options.** Add IsBetween to the numeric families (or rename IsInRange to IsBetween) so the range predicate has one name library-wide.
-
-### A-4. ToCase overloads are pure pass-through duplicates of TryToCase with a convention-violating name
-
-**`src/PineGuard.Core/Utils/StringUtility.Casing.cs`:54** - severity **minor** - `naming`
-
-Three ToCase overloads (lines 54, 68, 81) each forward directly to TryToCase with identical signatures and bool+out fallible semantics. The naming convention reserves ToX for transformations and Try* for fallible operations; publishing both names for the same behavior doubles the surface and leaves callers unsure which is canonical (and whether ToCase throws where TryToCase does not — it doesn't).
-
-**Consequence.** IntelliSense shows both ToCase and TryToCase with the same parameters; a user assumes ToCase is the throwing/infallible variant (per BCL ToX conventions) and writes error handling that never triggers, or asks which to use in review.
-
-**Options.** Delete the ToCase pass-throughs (or make ToCase a genuine string-returning transformation) and keep only TryToCase, adding a single-style TryToCase(value, style, out cased) convenience overload.
-
-### A-5. Contains/ContainsNullItems break the Rules IsX/HasX naming convention and have no Nullable<T> counterpart
-
-**`src/PineGuard.Core/Rules/CollectionRules.cs`:263** - severity **info** - `api-consistency`
-
-The spec reserves `ContainsX` for Utils; Rules methods are IsX/HasX (DictionaryRules uses HasKey/HasValue for the same semantic). CollectionRules.Contains and ContainsNullItems are the only Contains-prefixed Rules methods in this chunk. Additionally ContainsNullItems is constrained `where T : class`, so a collection of nullable value types (IEnumerable<int?>) cannot be checked for null items at all.
-
-**Consequence.** Naming inconsistency only: a consumer looking for HasItem/HasNullItems by convention finds Contains-prefixed methods instead; IEnumerable<int?> null-item validation has no API.
-
-**Options.** Consider HasItem/HasNullItems aliases (or a documented exemption) and a `where T : struct` overload for Nullable<T> elements.
-
-### A-6. StringRules.Guid.IsNotEmpty means 'parses to a non-empty Guid', unlike every other IsNotEmpty, and has no IsEmpty twin
-
-**`src/PineGuard.Core/Rules/StringRules.Guid.cs`:32** - severity **info** - `naming`
-
-Everywhere else IsNotEmpty checks emptiness of the value itself (CollectionRules.IsNotEmpty, DictionaryRules.IsNotEmpty, GuidRules.IsNotEmpty). StringRules.Guid.IsNotEmpty(string? value) instead means 'parses as a Guid AND is not Guid.Empty' — a non-empty string like "abc" returns false. It also breaks the family symmetry: GuidRules has the IsEmpty/IsNotEmpty pair, StringRules.Guid has only IsNotEmpty (alongside IsGuid).
-
-**Consequence.** StringRules.Guid.IsNotEmpty("abc") returns false even though the string is plainly not empty — a reader skimming call sites (or a user picking the method from IntelliSense inside StringRules) assumes it is a string-emptiness check; and StringRules.Guid.IsEmpty(s) does not exist for the inverse validation.
-
-**Options.** Rename to IsNonEmptyGuid (or IsGuidNotEmpty) and add the IsEmpty counterpart if the pair is wanted.
-
-### A-7. NotContainsControlChars is the only 'NotX' verb-negation on the surface
-
-**`src/PineGuard.Core/Rules/StringRules.cs`:338** - severity **info** - `naming`
-
-The spec allows positive names with explicit exemptions (IsNotNull, IsNotEmpty, IsNotZero — all 'IsNot*'). 'NotContainsControlChars' is a unique grammatical form: negations elsewhere are expressed as IsNot* (GuidRules.IsNotEmpty) or as safe-predicates (OwaspRules.IsCrLfSafe wraps !ContainsCrLfRisk). No other Contains* method has a Not twin (ContainsWhitespace, ContainsNullItems, ContainsDisallowed do not).
-
-**Consequence.** A user looking for the negation of ContainsWhitespace finds none and, by analogy with this member, guesses NotContainsWhitespace (CS0117); a user looking for the negation of ContainsControlChars searches 'IsFreeOfControlChars'/'HasNoControlChars' and misses NotContainsControlChars in IntelliSense's alphabetical list.
-
-**Options.** Rename to something matching an existing pattern (e.g. IsControlCharSafe, mirroring OwaspRules.Is*Safe) or drop it since it is just !ContainsControlChars plus a null-handling twist worth documenting.
-
-### A-8. IsDurationBetween breaks the IsBetween naming pattern used by every other temporal rule class
-
-**`src/PineGuard.Core/Rules/TimeSpanRules.cs`:19** - severity **info** - `api-consistency`
-
-DateOnlyRules, DateTimeRules, DateTimeOffsetRules, and TimeOnlyRules all expose IsBetween(value, min, max, inclusion). TimeSpanRules alone names the identical operation IsDurationBetween. Its siblings IsGreaterThan/IsLessThan carry no 'Duration' prefix, so the prefix is inconsistent even within the file.
-
-**Consequence.** No behavioral impact; discoverability inconsistency only — a consumer typing TimeSpanRules.IsBetween finds nothing and must guess the Duration prefix.
-
-**Options.** Rename to IsBetween (or add an IsBetween alias and obsolete the old name) for cross-class symmetry.
-
-
-## B. API shape - parameter order, naming and nullability
-
-Signature-level inconsistencies. Some are source-breaking (parameter renames break named arguments; overload changes break `out var`), so they belong with theme A in a major version.
-
-### B-1. IsCsvLine omits the separator parameter that every sibling CSV rule exposes
+### B-1. `CsvRules.IsCsvLine` omits the separator and misnames its input
 
 **`src/PineGuard.Core/Rules/CsvRules.cs`:22** - severity **minor** - `api-consistency`
 
-CsvRules.IsCsvHeaderLine and both IsCsvRowLine overloads take char separator = DefaultCsvSeparator and forward it, but IsCsvLine hard-codes the CsvUtility.TryParseCsvLine default (','), even though the underlying utility accepts a separator. A caller validating semicolon-separated files can validate headers and rows but not bare lines.
-
-**Consequence.** CsvRules.IsCsvLine("a;\"b;c\";d") for a semicolon-delimited file — caller has no way to pass ';', and the quoted field parses differently than intended (quote after non-empty builder -> false), while CsvRules.IsCsvHeaderLine handles the same file correctly via its separator parameter.
-
-**Options.** Add char separator = DefaultCsvSeparator to IsCsvLine and forward it.
-
-### B-2. Ok and Fail factories order value/paramName oppositely
-
-**`src/PineGuard.Core/MustClauses/MustResult.cs`:110** - severity **minor** - `api-consistency`
-
-Ok is `Ok(T? result, object? value = null, string? paramName = null)` (value before paramName) while Fail is `Fail(string messageTemplate, string? paramName, object? value)` (paramName before value). FromBool follows Fail's order (`..., paramName, value, result`). Within the same type, positional callers of the two factories must remember opposite orderings of two parameters that are both object?/string? adjacent, and value/paramName are both frequently-null string-ish arguments, so a swap compiles when value is a string.
-
-**Consequence.** A Must clause author writes `MustResult<string>.Ok(parsed, paramName, value)` by analogy with the Fail call two lines above; because both arguments are strings it compiles, and every success result now reports the validated value as its ParamName (e.g. ParamName == "admin@example.com") and the parameter name as its Value.
-
-**Options.** Align the factory signatures (e.g. make Fail's tail `value, paramName` to match Ok, or vice versa) before the public surface is frozen.
-
-### B-3. Validated parameter named latitude/longitude instead of value; no styles parameter unlike sibling string rules
-
-**`src/PineGuard.Core/Rules/StringRules.GeoLocation.cs`:20** - severity **minor** - `api-consistency`
-
-The repo invariant states the validated input parameter must be named `value`. StringRules.Numbers and StringRules.NumberTypes comply, but StringRules.GeoLocation.IsLatitude(string? latitude) and IsLongitude(string? longitude) do not (IsGeoLocation's two-parameter case is a legitimate exception). This matters for named-argument callers and for Must/Guard layers that mirror parameter names. Secondary inconsistency in the same class: every rule in StringRules.Numbers/NumberTypes exposes a NumberStyles styles parameter, but the GeoLocation rules hard-code the default styles, so e.g. exponent notation ("9e1" = 90) or thousands separators can never be opted into for coordinates while they can for every other numeric string rule.
-
-**Consequence.** StringRules.Numbers.IsPositive(value: s) compiles while StringRules.GeoLocation.IsLatitude(value: s) is a CS1739 compile error; and IsLatitude("9e1") is false with no way to opt in, while IsPositive("9e1", NumberStyles.Float) is true.
-
-**Options.** Rename the single-input parameters to value (keeping latitude/longitude only on the pair overload), and either add the styles parameter or document that coordinate strings must be plain fixed-point notation.
-
-### B-4. Guid.TryParse has dual overloads differing only in out-parameter nullability, breaking `out var`
-
-**`src/PineGuard.Core/Utils/StringUtility.Guid.cs`:52** - severity **minor** - `api-consistency`
-
-StringUtility.Guid exposes TryParse(string?, out System.Guid? guid) and TryParse(string?, out System.Guid guid). Every other nested StringUtility parser (DateOnly, DateTimeOffset, TimeOnly, TimeSpan, Bool) exposes exactly one overload with a nullable out. Overloading purely on out-type nullability means the idiomatic call `StringUtility.Guid.TryParse(s, out var guid)` fails with CS8130 (cannot infer the type of implicitly-typed out variable), a failure mode no sibling parser has.
-
-**Consequence.** StringUtility.Guid.TryParse(input, out var guid) — compiles fine for StringUtility.DateOnly.TryParse and every sibling, but fails with CS8130 here; the user must write an explicit out type, and callers copy-pasting from sibling usage break.
-
-**Options.** Keep only the nullable-out overload for parity with siblings (StringRules.Guid.IsGuid can use System.Guid.TryParse directly), or give the non-nullable variant a distinct name such as TryParseExact.
-
-### B-5. TryTruncateToPrecision out parameter is non-nullable TimeOnly while all DateTimeUtility counterparts use nullable outs
-
-**`src/PineGuard.Core/Utils/TimeOnlyUtility.cs`:19** - severity **minor** - `api-consistency`
-
-DateTimeUtility.TryTruncateToPrecisionUtc(DateTime?, ..., out DateTime?), (DateTimeOffset?, ..., out DateTimeOffset?), and TryTruncateToPrecision(DateOnly?, ..., out DateOnly?) all declare nullable out parameters, forcing callers into 't!.Value' dances (see DateOnlyRules lines 65-66, DateTimeRules lines 66-67). The TimeOnly overload alone uses out TimeOnly (non-nullable, default on failure), letting TimeOnlyRules consume the result directly (lines 47-48). Same family of parallel Try* APIs, two different out-param shapes.
-
-**Consequence.** No wrong verdict; the inconsistency shows up as API friction: a consumer switching from the TimeOnly overload to the DateOnly overload must add null-forgiveness/Value handling for an out param that is never null when the method returns true.
-
-**Options.** Standardize on non-nullable outs with default-on-failure (the conventional BCL Try* shape), updating the DateTime/DateTimeOffset/DateOnly overloads and their call sites.
-
-### B-6. Comparison-bound parameter naming and nullability drift: threshold (TimeSpan?) vs min/max (T) vs other (T?)
-
-**`src/PineGuard.Core/Rules/TimeSpanRules.cs`:29** - severity **minor** - `api-consistency`
-
-For the same 'compare value to a bound' concept: NumberRules.IsGreaterThan names the bound 'min' (non-nullable T) and IsLessThan names it 'max'; TimeSpanRules and StringRules.TimeSpan name it 'threshold' (nullable TimeSpan? in TimeSpanRules, non-nullable System.TimeSpan in StringRules.TimeSpan — drift even between those two adjacent files); date families name it 'other' (nullable). Named-argument call sites and null-passing behavior therefore differ per family: TimeSpanRules.IsGreaterThan(v, null) compiles and returns false, while StringRules.TimeSpan.IsGreaterThan(v, null) does not compile.
-
-**Consequence.** A user writes NumberRules.IsGreaterThan(x, threshold: 5) after using TimeSpanRules and gets CS1739 (parameter is named 'min'); a helper generic over 'nullable bound returns false' behavior works with TimeSpanRules but fails to compile against StringRules.TimeSpan.
-
-**Options.** Pick one bound name (threshold or other) and one nullability policy for bounds across families.
-
-### B-7. IsInCidr parameter naming and nullability diverge from the chunk's conventions
-
-**`src/PineGuard.Core/Rules/NetworkRules.cs`:68** - severity **info** - `api-consistency`
-
-Every other rule in this chunk names the validated input 'value' (per the repo invariant) and annotates it nullable; IsInCidr uses 'ip' (string?) and 'cidr' declared as non-nullable string even though the implementation tolerates null (TryParseCidr takes string? and returns false). A caller with NRT disabled passing a null cidr silently gets false rather than the annotation contract implying non-null; siblings would have been annotated string?.
-
-**Consequence.** API consumers see 'string cidr' and assume null is invalid to pass (compiler warning), while ip is 'string?' — inconsistent surface within one class; renaming later would be a breaking change for named-argument callers.
-
-**Options.** Declare cidr as string? and consider value/cidr naming alignment before the surface stabilizes.
-
-### B-8. Inconsistent overload usage within StringRules.Guid and asymmetric nullable-out overload availability across the parsing utilities
-
-**`src/PineGuard.Core/Rules/StringRules.Guid.cs`:33** - severity **info** - `api-consistency`
-
-IsGuid (line 25) calls the non-nullable overload StringUtility.Guid.TryParse(value, out System.Guid _), while IsNotEmpty (line 33) calls the nullable overload and then routes through GuidRules.IsNotEmpty(Guid?) — the nullable box is pointless because TryParse==true guarantees non-null. Separately, StringUtility.Guid is the only utility in this chunk offering both nullable and non-nullable out overloads; StringUtility.DateOnly/TimeOnly/DateTimeOffset/TimeSpan expose only 'out T?', forcing every Rules delegate through the nullable path. No behavioral impact, but the surface is uneven for consumers.
-
-**Consequence.** No wrong verdict; inconsistency only: a consumer of StringUtility.DateOnly must handle 'DateOnly?' where a consumer of StringUtility.Guid can choose 'Guid', and the two methods inside StringRules.Guid model the identical parse step two different ways.
-
-**Options.** Have IsNotEmpty use the non-nullable overload (TryParse(value, out System.Guid parsed) && GuidRules.IsNotEmpty(parsed)), and consider adding non-nullable out overloads to the other parsing utilities for symmetry.
-
-
-## C. Missing capability - real gaps in what can be expressed
-
-These are not inconsistencies but genuine holes: things a user will reasonably try to validate and cannot. Additive, so they can ship in a minor version.
-
-### C-1. Duration is inclusive day count (End-Start+1 days) while sibling range types use End-Start
-
-**`src/PineGuard.Core/Common/DateOnlyRange.cs`:66** - severity **minor** - `api-consistency`
-
-DateOnlyRange.Duration = TimeSpan.FromDays(DayCount) where DayCount includes both endpoints, so a single-day range has Duration 1.00:00:00 and [Jan1, Jan2] has 2 days. DateTimeRange/DateTimeOffsetRange/TimeOnlyRange all define Duration = End - Start (a degenerate range is Zero). Code treating 'Duration' uniformly across the four range types is off by one day for DateOnlyRange.
-
-**Consequence.** new DateOnlyRange(Jan1, Jan1).Duration == TimeSpan.FromDays(1) but new DateTimeRange(Jan1_00:00, Jan1_00:00).Duration == TimeSpan.Zero; converting the same conceptual range between types changes its Duration.
-
-**Options.** Either document loudly, or make Duration = End.DayNumber - Start.DayNumber days and let DayCount carry the inclusive semantics.
-
-### C-2. Pure calendar predicates (IsWeekday, IsWeekend, IsFirstDayOfMonth, IsLastDayOfMonth) exist only on DateTimeRules, not DateOnlyRules
-
-**`src/PineGuard.Core/Rules/DateOnlyRules.cs`:19** - severity **minor** - `missing-symmetry`
-
-DateTimeRules has IsWeekday, IsWeekend, IsFirstDayOfMonth, IsLastDayOfMonth, IsSameDay, and IsWithinDaysFromNow. These are date-only concepts (no time component involved), yet DateOnlyRules — the type purpose-built for dates — lacks all of them. The general pattern elsewhere is member parity between DateOnly/DateTime/DateTimeOffset families (IsInPast, IsInFuture, IsBetween, IsBefore, IsAfter, IsSame, IsChronological, IsOverlapping, IsWithinCalendarMonths all exist in each).
-
-**Consequence.** A user modeling a date as DateOnly (the idiomatic type) writes DateOnlyRules.IsWeekend(d) and gets CS0117, forced to convert to DateTime just to use the calendar predicates.
-
-**Options.** Add the calendar predicates to DateOnlyRules (and DateTimeOffsetRules where meaningful) or document why they are DateTime-only.
-
-### C-3. HasHeaderValue compares whole raw values only; comma-merged list headers never match
-
-**`src/PineGuard.Core/Rules/HttpRules.cs`:120** - severity **minor** - `edge-case`
-
-HasHeaderValue trims and compares each stored value string in full. HTTP intermediaries commonly merge repeated headers into one comma-separated value ('nosniff, nosniff' for X-Content-Type-Options is seen in the wild behind proxies), and list-typed headers carry multiple tokens in one value. HasXContentTypeOptionsWithDefaults then returns false for a response that effectively has nosniff set. Whether to split on commas is a design decision (not valid for all headers, e.g. dates), but the current behavior is worth documenting on the security-header wrappers.
-
-**Consequence.** headers = { "X-Content-Type-Options": ["nosniff, nosniff"] } (proxy-merged duplicate) -> HasXContentTypeOptionsWithDefaults returns false although the protection is active.
-
-**Options.** Document exact-match semantics, or split list-typed header values on ',' before comparison in the security-header rules.
-
-### C-4. TimeOnlyRange lacks Intersect/Union/IsAdjacentTo and cannot represent midnight-crossing ranges
-
-**`src/PineGuard.Core/Common/TimeOnlyRange.cs`:7** - severity **minor** - `api-consistency`
-
-The other three range types expose IsAdjacentTo, Intersect, and Union; TimeOnlyRange stops at Overlaps, an unexplained gap in an otherwise parallel API family. Separately, the Start <= End constraint makes wrap-around time windows (22:00-06:00 — night shifts, quiet hours, the primary use case for time-of-day ranges) unrepresentable, even though the BCL's own TimeOnly.IsBetween supports wrap-around. Contains cannot express what TimeOnly natively can.
-
-**Consequence.** Modeling quiet hours 22:00-06:00: new TimeOnlyRange(new TimeOnly(22,0), new TimeOnly(6,0)) throws ArgumentException; there is no supported way to validate 'value is within 22:00-06:00' with this type.
-
-**Options.** Either support wrap-around (Contains: Start <= End ? normal : value >= Start || value <= End, as TimeOnly.IsBetween does) or document the limitation; add the missing set operations for parity.
-
-### C-5. Midnight-wrapping time ranges (e.g. 22:00-06:00) are unrepresentable, so overnight windows cannot be validated
-
-**`src/PineGuard.Core/Rules/TimeOnlyRangeRules.cs`:21** - severity **minor** - `edge-case`
-
-TimeOnlyRange's constructor throws and TryCreate returns false when start > end, and TimeOnlyRules.IsChronological/IsOverlapping treat start > end as non-chronological/never-overlapping. There is therefore no supported way to express or validate an overnight window (a very common TimeOnly use case: night shifts, maintenance windows, quiet hours). This is a coherent design choice, but nothing in the XML docs states that wrap-around ranges are unsupported.
-
-**Consequence.** TimeOnlyRange.TryCreate(new TimeOnly(22,0), new TimeOnly(6,0), out _) returns false; a caller validating a 22:00-06:00 quiet-hours window has no API that models it and may incorrectly conclude the configuration is invalid.
-
-**Options.** Document the no-wrap constraint on TimeOnlyRange and TimeOnlyRangeRules, or add explicit wrap-aware support (e.g., a ContainsWrapped/IsInWindow helper) if overnight windows are in scope.
-
-### C-6. IsAdjacentTo semantics contradict inclusive overlap and differ from DateOnlyRange's definition
-
-**`src/PineGuard.Core/Common/DateTimeRange.cs`:134** - severity **info** - `api-consistency`
-
-DateTimeRange/DateTimeOffsetRange define adjacency as sharing an endpoint (Start == other.End || End == other.Start). But for inclusive ranges, sharing an endpoint IS an overlap: [a,b] and [b,c] both Contains(b), and Overlaps(other, Inclusion.Inclusive) returns true — so ranges can be simultaneously 'adjacent (no overlap implied)' and 'overlapping'. DateOnlyRange (line 105) uses the disjoint definition (End.DayNumber + 1 == other.Start.DayNumber), i.e. genuinely gap-free and non-overlapping. The two definitions are mutually inconsistent across the same family of types.
-
-**Consequence.** Interval-merging code that partitions pairs into adjacent XOR overlapping: for DateTimeRange [a,b],[b,c] both IsAdjacentTo and Overlaps(Inclusive) return true (double-handled); porting the same logic to DateOnlyRange behaves differently because adjacency there excludes the shared-day case.
-
-**Options.** Pick one adjacency semantic (disjoint-and-gap-free, i.e. End + 1 tick == other.Start, matching DateOnlyRange) and apply it to all range types.
-
-
-## D. Comparer semantics - whose equality wins?
-
-Both concern a rule silently adopting a comparer the caller did not ask for. The behaviour may be defensible; the documentation currently promises something else. Decide the contract, then make code and docs agree.
-
-### D-1. Contains uses the collection's own comparer for ICollection<T> but the default comparer otherwise, while the doc promises the default comparer
-
-**`src/PineGuard.Core/Rules/CollectionRules.cs`:279** - severity **minor** - `api-consistency`
-
-The switch fast-path `ICollection<T> c => c.Contains(item)` delegates to the collection's membership semantics (e.g. a HashSet<string> built with StringComparer.OrdinalIgnoreCase), whereas the fallback branch explicitly uses EqualityComparer<T>.Default. The XML doc (lines 272-273) states the check is 'according to the default equality comparer'. The verdict therefore depends on the runtime type of the sequence, not on its contents.
-
-**Consequence.** var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase){"ABC"}; CollectionRules.Contains(set, "abc") returns true, but CollectionRules.Contains(set.ToList(), "abc") returns false — two different validation verdicts for the same logical data, and the first contradicts the documented default-comparer contract.
-
-**Options.** Either drop the ICollection fast-path (always use EqualityComparer<T>.Default) or document that the collection's own semantics win; consider adding an IEqualityComparer<T>? overload like HasDistinctItems has.
-
-### D-2. IsSubsetOf silently adopts the comparer of a caller-supplied HashSet, otherwise the default comparer
-
-**`src/PineGuard.Core/Rules/CollectionRules.cs`:298** - severity **minor** - `api-consistency`
-
-`var otherSet = other as HashSet<T> ?? [.. other];` reuses an existing HashSet including its custom IEqualityComparer, while any other sequence type is materialized into a HashSet with the default comparer. Membership verdicts thus change with the runtime type of `other`. Unlike HasDistinctItems/HasDuplicateItems, there is no comparer parameter to make the intent explicit, and the XML doc says nothing about comparers.
-
-**Consequence.** IsSubsetOf(new[]{"A"}, new HashSet<string>(StringComparer.OrdinalIgnoreCase){"a"}) returns true, but IsSubsetOf(new[]{"A"}, new List<string>{"a"}) returns false — same logical superset, opposite verdicts.
-
-**Options.** Only reuse `other` when it is a HashSet<T> whose Comparer equals EqualityComparer<T>.Default, or add an `IEqualityComparer<T>? comparer = null` parameter and always build the set with it.
-
-
-## E. Mutable shared state
-
-Process-wide state that one consumer can mutate to change another's validation verdicts. Fixing these is behaviour-preserving for well-behaved callers but removes a supported (if unwise) mutation path.
-
-### E-1. Constructor publishes 'this' to static registries before construction completes; failed derived constructors leave permanent phantom registrations
-
-**`src/PineGuard.Core/Common/Enumeration.cs`:46** - severity **minor** - `thread-safety`
-
-The base constructor stores 'this' into the static ConcurrentDictionaries before derived-class construction finishes (leaked-this: other threads can observe a partially constructed member via a registry-backed lookup if registries are ever used for lookup). Worse, if a derived constructor throws AFTER the base constructor completes, the half-constructed instance stays registered forever — the name and value are permanently blocked in that AppDomain and any retry throws 'already exists'. There is also a small rollback race: thread A adds name X, fails the value TryAdd, and removes X (line 46); a concurrent thread B legitimately registering name X in that window is spuriously rejected.
-
-**Consequence.** class Currency : StringEnumeration { Currency(string v, string n) : base(v, n) { if (v.Length != 3) throw ... } } — a failed construction with value 'USDX' still registers 'USDX'; constructing the corrected member with the same name later throws "already exists" until process restart.
-
-**Options.** Validate everything before registering, or move registration out of the constructor (e.g. lazily build registries from GetAll<T> on first lookup).
-
-### E-2. DefaultAllowedDigitSeparators is a public mutable static char[] that feeds process-wide parsing behavior
+`IsCsvHeaderLine` and both `IsCsvRowLine` overloads take `char separator = DefaultCsvSeparator`;
+`IsCsvLine` hard-codes `','`. Its parameter is also named `line`, breaking the `value` invariant
+B-3 cites. **Consequence.** `IsCsvLine("a;\"b;c\";d")` cannot be told the file is
+semicolon-delimited while `IsCsvHeaderLine` can. **Fix:** rename `line` to `value`, add
+`char separator = DefaultCsvSeparator`, forward it. Flattened surface: `Must.Be.CsvLine`,
+`Guard.Against.NotCsvLine`, FluentValidation `CsvLine` and `CsvLineAttribute` gain the parameter.
+Rename single validated `line` parameters across the CSV family, including CallerArgumentExpression
+and XML docs. Quote/CR/LF separators cause the utility to throw; Must must reject invalid separator
+configuration first with an attributed failure, preserving the no-throw Must contract. Cover all
+adapters, failure codes and Guard translation.
+
+### B-2. `MustResult<T>.Ok` orders `value` / `paramName` opposite to `Fail` and `FromBool`
+
+**`src/PineGuard.Core/MustClauses/MustResult.cs`:96, 110, 169** - severity **minor** - `api-consistency`
+
+`Ok(T? result, object? value = null, string? paramName = null)` versus
+`Fail(string code, string messageTemplate, string? paramName, object? value)` and
+`FromBool(bool? ok, string code, string messageTemplate, string? paramName, object? value, T? result)`.
+Both tail parameters are string-ish, so a swap compiles. **Consequence.** A clause author writing
+`Ok(parsed, paramName, value)` by analogy with the `Fail` call above it ships success results whose
+`ParamName` is the validated value. **Fix:** `Ok(T? result, string? paramName = null, object? value = null)`,
+matching the metadata order of the other factories. Update every call site and use named metadata
+arguments internally to prevent silent swaps between adjacent string values.
+
+### B-3 (part). Rename `latitude` / `longitude` parameters to `value`
+
+**`src/PineGuard.Core/Rules/StringRules.GeoLocation.cs`:20, 27** - severity **minor** - `api-consistency`
+
+Single-input rules must name the validated input `value`. `IsLatitude(string? latitude)` and
+`IsLongitude(string? longitude)` do not; `IsGeoLocation`'s two-parameter case is the legitimate
+exception. **Fix:** rename. Add the explicit `styles` configuration described in B-3 below.
+
+### B-7. `NetworkRules.IsInCidr` parameter naming and nullability
+
+**`src/PineGuard.Core/Rules/NetworkRules.cs`:76** - severity **info** - `api-consistency`
+
+Rename `ip` to `value`, retaining non-nullable `cidr` as required configuration. A lower-level
+parser tolerating null does not imply a nullable configuration contract. Must must reject missing
+or malformed CIDR configuration in both positive and complement clauses, attributing the failure
+to `cidr`; invalid configuration must not become successful out-of-range validation. Retain the domain-specific `InCidrRange` / `NotInCidrRange` vocabulary unless the complete
+mapping establishes a collision or semantic defect; P1 does not turn domain names into generic scalar names.
+
+### E-1. `Enumeration` publishes `this` to static registries before construction completes
+
+**`src/PineGuard.Core/Common/Enumeration.cs`:14-46** - severity **minor** - `thread-safety`
+
+A derived constructor that throws after the base constructor leaves a phantom registration, so
+the corrected member later fails with "already exists" until process restart. There is also a
+rollback race between name and value registration. The base constructor already validates its
+arguments; it cannot validate subsequent derived-constructor work. **Fix under P4:** remove
+constructor self-registration and publish an immutable catalogue only from completed members.
+Define recursive static-initialization behavior so no partial catalogue is cached. Implement
+E-1/F-1/F-2 together.
+
+### E-2. `DefaultAllowedDigitSeparators` is a public mutable `char[]`
 
 **`src/PineGuard.Core/Rules/StringRules.NumberTypes.cs`:36** - severity **minor** - `thread-safety`
 
-`public static readonly char[] DefaultAllowedDigitSeparators = [' ', '-'];` — readonly protects the reference, not the elements. Any consumer can write `StringRules.NumberTypes.DefaultAllowedDigitSeparators[0] = '.'` (accidentally or maliciously) and silently change the default separator-stripping behavior of StringUtility.TryParseDigits for every caller in the process (StringUtility.cs line 53 uses it as the null default). This is shared mutable static state: a data race on element writes is possible, and there is no way to detect or restore the original values. Analyzer rule CA2105 exists precisely for this pattern.
+`public static readonly char[]` protects the reference, not the elements; any consumer can change
+process-wide parsing (CA2105). **Consequence.** Library A writes `[1] = '.'`; library B's
+`TryParseDigits("4111-1111-1111-1111")` starts returning false. **Fix:** use a private source array and return a fresh array from the public property, matching
+PhoneRules on every TFM. Verify that mutating a returned array cannot affect future parsing.
+Do not vary the public return type by TFM or expose the backing array indirectly.
 
-**Consequence.** Library A mutates DefaultAllowedDigitSeparators[1] = '.'; thereafter library B's call TryParseDigits("4111-1111-1111-1111", out d) returns false (hyphen no longer allowed) while TryParseDigits("41.11", out d) starts returning true — global validation drift with no local cause.
-
-**Options.** Expose it as `public static ReadOnlySpan<char> DefaultAllowedDigitSeparators => [' ', '-'];` (net8+ compiles this to immutable data) or an ImmutableArray<char>/IReadOnlyList<char>, keeping a private char[] for internal use.
-
-
-## F. Internal structure - layering, dead code and duplication
-
-No behaviour change for consumers; these are about the codebase not fighting its own conventions. Safe to do incrementally in patch releases.
-
-### F-1. GetAll<T> uses DeclaredOnly, so members declared on a base enumeration class are invisible to lookups on a derived type
-
-**`src/PineGuard.Core/Common/Enumeration.cs`:65** - severity **minor** - `edge-case`
-
-GetFields(BindingFlags.DeclaredOnly) skips inherited static fields. In a hierarchy where a shared abstract subclass declares common members and concrete types extend it, GetAll<Derived>/FromName<Derived>/FromValue<Derived> silently miss the base-declared members even though they are assignable to Derived is false... more precisely: members declared as fields on the base type are excluded from GetAll<Derived> because DeclaredOnly only reflects Derived's own fields.
-
-**Consequence.** abstract class PaymentMethod declares public static readonly fields; class ExtendedPaymentMethod : PaymentMethod adds more. GetAll<ExtendedPaymentMethod>() returns only the extended members; FromName<ExtendedPaymentMethod>("Visa") for a base-declared 'Visa' field returns null.
-
-**Options.** Drop DeclaredOnly (keeping the IsAssignableFrom filter) or document that members must be declared directly on the queried type.
-
-### F-2. FromValue/FromName do a reflection scan per call; the static registries are written but never read
+### F-2. `FromValue` / `FromName` reflect on every call; the registries are never read
 
 **`src/PineGuard.Core/Common/Enumeration.cs`:81** - severity **minor** - `performance`
 
-NameRegistries/ValueRegistries (lines 14-15) are populated in the constructor solely to enforce uniqueness and are never consulted for lookups. FromValue<T>/FromName<T> instead call GetAll<T>() on every invocation: GetFields reflection + f.GetValue(null) per field + a new list allocation + LINQ FirstOrDefault. Enumeration lookups are exactly the kind of thing Rules call in hot validation paths (e.g. validating a code against a smart enum for every request/row).
+`GetFields` + `GetValue` + list allocation + LINQ per lookup, on a path Rules call per row.
+**Fix under P4:** cache one declared-member catalogue and its lookup dictionaries. Do not switch
+to the existing registries: they contain constructed instances, which is a different membership
+set from reflected public fields. GetAll and lookups must agree. Define initialization, duplicate
+detection and ordering with E-1/F-1.
 
-**Consequence.** A Must clause validating a CSV column against FromName<T> performs O(members) reflection and allocates a fresh list for every one of a million rows.
-
-**Options.** Serve FromName/FromValue from the existing concurrent registries (after ensuring the type's static fields are initialized via RuntimeHelpers.RunClassConstructor), or cache GetAll<T> per closed type.
-
-### F-3. OwaspRules duplicates OwaspUtility's regex OR-chains verbatim instead of sharing one implementation; XSS has no Utility counterpart
+### F-3. `OwaspRules` duplicates `OwaspUtility`'s regex chains; XSS has no Utility counterpart
 
 **`src/PineGuard.Core/Utils/OwaspUtility.cs`:21** - severity **minor** - `layering`
 
-ContainsSqlInjectionRisk / ContainsPathTraversalRisk / ContainsCommandInjectionRisk are character-for-character the same six/four/three-regex OR-chains as OwaspRules.IsSqlInjectionSafe / IsPathTraversalSafe / IsCommandInjectionSafe (negated). The repo invariant says validation logic lives in exactly one layer with no duplication. The drift risk is already realized: OwaspUtility has Contains* methods for 7 of the 8 categories but no ContainsXssRisk, and the Rules-side XSS check has silently diverged from its own pattern set (see the IsXssSafe finding). Any future pattern-list edit must now be made in two files.
+The repo invariant says validation logic lives in exactly one layer. Three OR-chains exist twice
+character for character, and `ContainsXssRisk` is missing. **Fix:** one layer owns the patterns
+(Rules call `!OwaspUtility.Contains*Risk` after their own null gate), add `ContainsXssRisk`. Preserve null/whitespace gates and raw CR/LF detection before any
+normalization. These are heuristic risk checks, not proof that arbitrary input is safe. Test
+Rules/Utility verdict parity over the existing fixtures and those boundary cases.
 
-**Consequence.** A developer adds a new pattern to ContainsSqlInjectionRisk in OwaspUtility but not to OwaspRules.IsSqlInjectionSafe; the same payload is then simultaneously reported 'risky' by the Utility and 'safe' by the Rule.
+### F-4. `RangeRules` hand-rolls inclusion instead of using `RuleComparison`
 
-**Options.** Make one layer the single source (e.g. Rules call !OwaspUtility.Contains*Risk after their own null/whitespace gate, or extract a private shared matcher), and add ContainsXssRisk for symmetry.
+**`src/PineGuard.Core/Rules/RangeRules.cs`:13**, also `TimeOnlyRules.cs`:150, `CollectionRules.cs`:168 - severity **minor** - `api-consistency`
 
-### F-4. RangeRules duplicates inclusion logic instead of using RuleComparison and silently treats undefined Inclusion values as Exclusive
+`inclusion == Inclusion.Inclusive ? <= : <` treats `(Inclusion)42` as Exclusive, while
+`RuleComparison` throws `ArgumentOutOfRangeException` for the same input. **Fix:** route through
+`RuleComparison`, with configuration validation before value-dependent early returns. The helper
+currently checks reversed bounds before its enum switch; collection fast paths can disagree with
+iterators. Audit every family, including DateTimeRangeRules. Core may throw for invalid
+configuration; Must must return an attributed failure before calling Core. Test invalid Inclusion
+with null/empty inputs, reversed bounds, collections and iterators.
 
-**`src/PineGuard.Core/Rules/RangeRules.cs`:13** - severity **minor** - `api-consistency`
-
-IsChronological and IsOverlapping hand-roll `inclusion == Inclusion.Inclusive ? <= : <` instead of using the shared RuleComparison helper mandated by the repo style invariant ('Use RuleComparison shared helper for IComparable<T> with inclusive/exclusive support'). Behaviorally, an out-of-range enum value such as `(Inclusion)42` falls through to the Exclusive branch here, whereas RuleComparison.IsBetween/IsGreaterThan/IsLessThan throw ArgumentOutOfRangeException for the same input — two different conventions for the same configuration error inside one Rules namespace.
-
-**Consequence.** RangeRules.IsChronological(1, 1, (Inclusion)42) returns false (treated as Exclusive), while NumberRules.IsInRange(1, 0, 2, (Inclusion)42) throws ArgumentOutOfRangeException via RuleComparison — inconsistent handling of an identical invalid configuration value across sibling rules.
-
-**Options.** Route both methods through RuleComparison (e.g. RuleComparison.IsLessThan(start, end, inclusion) for IsChronological) so undefined enum values are rejected uniformly.
-
-### F-5. Name lookup is case-insensitive but Value lookup is case-sensitive ordinal for string enumerations
-
-**`src/PineGuard.Core/Common/StringEnumeration.cs`:8** - severity **minor** - `api-consistency`
-
-FromName/TryFromName use OrdinalIgnoreCase and the name registry is OrdinalIgnoreCase, but FromValue/TryFromValue for StringEnumeration use EqualityComparer<string>.Default (case-sensitive ordinal), and the value registry is case-sensitive too. For string-valued enums where Value and Name are often the same token, the asymmetry surprises: 'usd' finds the member by name but not by value.
-
-**Consequence.** StringEnumeration member (value: "USD", name: "USD"): TryFromName("usd") succeeds while TryFromValue("usd") fails.
-
-**Options.** Document the asymmetry or let StringEnumeration pin a StringComparer for value lookups.
-
-### F-6. SpaceCase validation enforces no letter casing, unlike every other separated style
-
-**`src/PineGuard.Core/Utils/StringUtility.Casing.cs`:165** - severity **minor** - `api-consistency`
-
-TryCreateWordsFromSpaceCase only checks single-space separation and char.IsLetterOrDigit; it applies no RequiredLetterCasing, whereas Snake/Kebab/Dot require lower, UpperSnake requires upper, and Train requires Title/Acronym. Meanwhile the output direction (TryToCase, line 131) renders SpaceCase with WordTransform.Title. So IsSpaceCase accepts strings that ToCase(SpaceCase) could never produce, and the IsSpaceCase XML doc example ("my variable name") implies lowercase.
-
-**Consequence.** StringRules.IsSpaceCase("hELLo WoRLD") returns TRUE; StringUtility.ToCase("hELLo WoRLD", StringCasing.SpaceCase, out var cased) returns "Hello World" — validation accepts a value that round-trips to a different string, unlike all sibling styles which are closed under their own ToCase.
-
-**Options.** Decide the canonical letter casing for SpaceCase (Title, to match the output transform, or Lower to match the doc example) and enforce it in TryCreateWordsFromSpaceCase.
-
-### F-7. Type string is strictly validated but Name and MaxLength are not validated at all
+### F-7. `CsvColumnSchema` validates `Type` but not `Name` or `MaxLength`
 
 **`src/PineGuard.Core/Common/CsvColumnSchema.cs`:29** - severity **info** - `api-consistency`
 
-ParseColumnType throws for null/empty/unknown type, yet Name may be null or whitespace (both constructors) and MaxLength may be zero or negative — nothing checks them, despite Name being declared non-nullable. default(CsvColumnSchema) likewise has a null Name. Also note ParseColumnType accepts 'datetimeoffset' but there is no 'datetime' mapping and CsvColumnType has no DateTime member — schema authors writing the most common type name 'datetime' get an ArgumentException; if that is a deliberate push toward DateTimeOffset it deserves a doc note.
+The positional record struct also permits invalid states through its typed constructor, init/with
+paths and default value. Checks in the string constructor alone cannot establish an invariant.
+**Engineering disposition:** retain the value type and explicitly validate schema configuration
+at consumption: nonblank Name, defined Type, positive MaxLength. Preserve Core's false result
+for invalid schema configuration, using a shared configuration validator so Must can attribute
+failures to `schema` before inspecting row data. Constructor checks are supplementary. Keep `datetime` unmapped rather than introducing an implicit timezone
+interpretation. Update tests for every construction route.
 
-**Consequence.** new CsvColumnSchema(null!, "int", maxLength: -5) constructs successfully; downstream validation using MaxLength = -5 rejects every value and Name-based error messages NRE or print empty names.
+### F-8. `SignedIntegerPattern` / `SignedIntegerRegex` are public, unused, and disagree with `IsInt32`
 
-**Options.** Validate name via ThrowHelper.ThrowIfNullOrWhiteSpace and require MaxLength > 0; document (or add) 'datetime' handling.
+**`src/PineGuard.Core/Rules/StringRules.NumberTypes.cs`:19, 26** - severity **info** - `api-consistency`
 
-### F-8. SignedIntegerPattern/SignedIntegerRegex are public but unused, and the regex accepts Unicode digits the parse-based rules reject
+Dead public API; `\d` matches Unicode digits that `int.TryParse` rejects, so two members of one
+class disagree on "is this a signed integer". **Fix:** delete both and their dedicated tests; no production callers were found. The stronger
+reason is lack of a useful supported contract, not an assumption that a lexical regex must match
+all of an Int32 parser's range and whitespace semantics.
 
-**`src/PineGuard.Core/Rules/StringRules.NumberTypes.cs`:19** - severity **info** - `api-consistency`
+### N-3. `Guard.Against.IsWhitespace` is an `Is`-prefixed Guard member with a forwarding alias
 
-Grep across src shows no consumer of SignedIntegerRegex() or SignedIntegerPattern — they are dead public API inside the rules class. Worse, `\d` without RegexOptions.ECMAScript matches all Unicode Nd digits (RegexOptions.CultureInvariant does not change this), so SignedIntegerRegex().IsMatch("٤٢") (Arabic-Indic 42) returns true, while IsInt32("٤٢") in the same class returns false (int.TryParse with InvariantCulture rejects non-ASCII digits). Two public members of the same class thus give contradictory answers to "is this a signed integer". Additionally the netstandard2.1 fallback (line 32) has a 250ms match timeout while the net8+ [GeneratedRegex] version has none — a per-TFM behavior difference (harmless for this non-backtracking pattern, but gratuitous drift).
+**`src/PineGuard.GuardClauses/GuardStringClauses.cs`:1243, 1386** - severity **minor** - `naming` - *new 2026-11-08*
 
-**Consequence.** Caller uses the advertised public SignedIntegerRegex() as a pre-filter: "٤٢" passes the regex but fails IsInt32, so the two "same" checks disagree; conversely "0x2A"-style inputs behave consistently. On netstandard2.1 a pathological input could throw RegexMatchTimeoutException where net8.0 would not.
-
-**Options.** Either delete the unused members or change the pattern to ^[+\-]?[0-9]+$ and align the timeout behavior across TFMs.
-
-
-## G. Multi-target coverage
-
-netstandard2.1 consumers silently get a smaller API surface than the package advertises.
-
-### G-1. netstandard2.1 build ships StringRules.NumberTypes but not StringRules.Numbers/GeoLocation
-
-**`src/PineGuard.Core/Rules/StringRules.Numbers.cs`:1** - severity **minor** - `multi-target`
-
-Directory.Build.props targets netstandard2.1;net8.0;net10.0. StringRules.Numbers.cs, StringRules.GeoLocation.cs and GeoLocationRules.cs are wholly inside #if NET8_0_OR_GREATER (forced by NumberRules' INumber<T> dependency), while StringRules.NumberTypes.cs and StringUtility.NumberTypes.cs compile for all TFMs. So a netstandard2.1 consumer gets IsInt32/IsDecimal but no IsPositive/IsLatitude, an arbitrary-looking API split. GeoLocationRules in particular needs nothing newer than double.IsFinite (available on netstandard2.1); its absence there is purely transitive via NumberRules.IsFinite and could be lifted with a trivial local finiteness check. Compile-time visible, so no silent behavior difference — noting for API-surface planning.
-
-**Consequence.** A netstandard2.1 consumer calling GeoLocationRules.IsLatitude(51.5) gets CS0103 (type does not exist) although every API the method needs exists on that TFM.
-
-> **Amended 2026-08-25.** The `GeoLocationRules` half of this item was resolved during
-> remediation: its `#if NET8_0_OR_GREATER` gate is gone and it now compiles for every target.
-> `StringRules.Numbers.cs` and `StringRules.GeoLocation.cs` remain gated, so the decision below
-> still stands for those two files and for the question of whether netstandard2.1 is first-class.
-
-**Options.** Un-gate GeoLocationRules (replace NumberRules.IsFinite with double.IsFinite or an #if-free helper) and consider non-generic netstandard2.1 fallbacks for the decimal-based Numbers rules if that TFM is meant to be first-class.
-
-
-## H. Documentation that contradicts behaviour
-
-The one item here is the highest-severity entry in this document, because a shipped example that returns the opposite of what it claims will be copied verbatim by users.
-
-### H-1. Documented example IsPhoneNumber("+1 (555) 123-4567") actually returns false — space is not an allowed character
-
-**`src/PineGuard.Core/Rules/PhoneRules.cs`:11** - severity **major** - `doc-drift`
-
-DefaultAllowedNonDigitCharacters = ['+','(',')','-','.','/'] contains no space, and StringUtility.TryParseDigits (StringUtility.cs line 82) returns false on the first disallowed character; only leading/trailing whitespace is removed by Trim. Yet the XML doc on the allowedNonDigitCharacters parameter (line 33) says 'e.g., spaces, dashes' and the <example> block (line 42) claims IsPhoneNumber("+1 (555) 123-4567") // true. Interior spaces are the single most common phone formatting character, so the default rejects the library's own canonical example and most real-world formatted numbers.
-
-**Consequence.** PhoneRules.IsPhoneNumber("+1 (555) 123-4567") returns false because the interior ' ' characters are neither digits nor in the default allowed set — directly contradicting the shipped XML doc example.
-
-**Options.** Add ' ' to DefaultAllowedNonDigitCharacters (matching the docs and E.164 formatting reality), or fix the docs/example if space rejection is intended.
-
+`IsWhitespace(string?)` is the only `Is*` name on the Guard surface (`Is` is Core's prefix), and
+`Whitespace(string?)` forwards to it. Two names for one action; IntelliSense readers stop to diff
+them. **Fix:** delete `IsWhitespace`, keep `Whitespace` (which already matches the `char`
+overload in `GuardCharClauses`).
 
 ---
 
-## Suggested sequencing
+## Part II. Naming design and exact propagation
 
-1. **H-1 first, on its own.** It is a documentation bug with a one-line fix either way, and it
-   misleads users today. It does not need to wait for a major version.
-2. **F and E next.** Internal structure and shared-state fixes are invisible to well-behaved
-   consumers and can ship continuously.
-3. **C and G when convenient.** Both are additive - new capability and wider target coverage
-   break nobody.
-4. **A, B and D together, in one major version.** These are the source-breaking ones. Batch
-   them, write one migration note, and take the hit once.
+Apply existing policy and the explicit P1 amendments as one coherent naming pass when
+implementation is requested. Do not treat a source filename as a public type, a shared return
+type as an identical contract, or current implementation as sufficient justification.
 
-## What this document is not
+### A-3 (absorbs A-8). One range vocabulary across equivalent concepts
 
-It is not a backlog of known bugs. Every unambiguous defect the review found is already fixed
-and on `main`. If an item here turns out on closer reading to have only one defensible answer,
-that makes it a bug: fix it and delete the entry.
+**Source families:** NumberRules, date/time Rules and their StringRules counterparts,
+TimeSpanRules, RuleComparison, string length, collection count and grapheme count;
+all corresponding Must, Guard, FluentValidation and DataAnnotations declarations.
+
+**Decision:** use `InRange` / `OutOfRange` for scalar range membership. Preserve the
+dimension in compound predicates: `LengthInRange`, `HasCountInRange`,
+`HasGraphemeCountInRange`. Fold `DurationBetween(TimeSpan, …)` into
+`InRange(TimeSpan, …)`; string-input TimeSpan uses N-1's `InRangeTimeSpan`.
+Core `IsBetween` becomes `IsInRange`; Core negative predicates use their corresponding
+`IsOutOfRange` or documented `IsNot…` / `NotHas…` form as applicable. Do not
+invent an unqualified `OutOfRange` for a count or length predicate.
+
+| Concept | Core | Must | Guard, implemented through the shown Must concept | FluentValidation |
+|---|---|---|---|---|
+| Scalar inside | `IsInRange` | `InRange` | `OutOfRange` → `InRange` | `InRange` |
+| Scalar outside | `IsOutOfRange` | `OutOfRange` | `InRange` → `OutOfRange` | `OutOfRange` |
+| String length inside | `IsLengthInRange` | `LengthInRange` | `NotLengthInRange` → `LengthInRange` | `LengthInRange` |
+| Collection count inside | `HasCountInRange` | `HasCountInRange` | `NotHasCountInRange` → `HasCountInRange` | `HasCountInRange` |
+| Grapheme count inside | `HasGraphemeCountInRange` | `HasGraphemeCountInRange` | `NotHasGraphemeCountInRange` → `HasGraphemeCountInRange` | `HasGraphemeCountInRange` |
+
+For dimensioned negative clauses, retain the matching `NotLengthInRange`,
+`NotHasCountInRange` and `NotHasGraphemeCountInRange` vocabulary; Guards use the
+opposite member through Must. This follows the existing `NotHas*` rule, rather than adding
+special `CountOutOfRange` synonyms. Preserve inclusion parameters and valid-domain parse gates.
+
+**DataAnnotations inventory correction.** `DateOnlyRangeAttributes` and its siblings are
+source containers, not scalar attribute names. Actual declarations include
+`BetweenDateOnlyAttribute`, `NotBetweenDateOnlyAttribute`, `BetweenTimeOnlyAttribute`,
+`DurationBetweenTimeSpanAttribute`, `NotDurationBetweenTimeSpanAttribute`,
+`BetweenDateTimeOffsetStringAttribute`, `LengthBetweenAttribute`,
+`HasCountBetweenCollectionAttribute` and the grapheme attributes. Rename their
+**concept** segments using the table, retaining required domain/input qualifiers:
+`InRangeDateOnlyAttribute`, `OutOfRangeDateOnlyAttribute`,
+`InRangeTimeOnlyAttribute`, `InRangeTimeSpanAttribute`,
+`OutOfRangeTimeSpanAttribute`, `InRangeDateTimeOffsetStringAttribute`,
+`LengthInRangeAttribute`, `HasCountInRangeCollectionAttribute`.
+Do not rename range-object attributes merely because their filenames contain “Range”.
+
+`DateOnlyBetweenAttribute` in TimeAttributes and `BetweenDateOnlyAttribute` in
+DateOnlyAttributes duplicate the same scalar validation. Consolidate into the single
+`InRangeDateOnlyAttribute`, with one canonical declaration and test family.
+There is no current `BetweenDateOnlyStringAttribute`; do not invent inventory entries.
+
+**Why this choice:** Guard §5.4.5 already prefers the pair. Extending it across scalar concepts
+removes the number/time split. The code catalogue is already range-based; retain existing
+semantic codes and verify mappings. Guard's default failure path is GuardFailure; this decision
+does **not** imply all range failures throw ArgumentOutOfRangeException.
+
+**Rejected:** keep `Between` in Must and curated `OutOfRange` in Guard (two words for the
+same ordinary range concept); rename everything to `Between` (contradicts established Guard
+policy); use `WithinRange` (adds vocabulary beside existing proximity `Within`).
+Neither ecosystem popularity nor filenames substitute for this internal rationale.
+
+### N-1. One qualifier policy for string-input scalar clauses
+
+The current mix of `Int32InRange`, bare decimal `InRange`,
+`BetweenDateOnly` and `GreaterThan(string, TimeSpan)` is inconsistent on the
+flattened entry points. A suffix cannot mean parsed type in one family and raw-result projection
+in another.
+
+**Proposed amendment P1:** generic scalar predicates taking strings use
+`<Concept><ParsedType>`, throughout each family. Typed-input overloads retain the short
+concept. Core nested classes keep the type in the class rather than duplicating it in members.
+This extends existing policy: Core §3.3 currently permits short typed/string overloads; whole-family
+suffixing on Must/Guard is a deliberate new rule, not an existing requirement.
+
+| Current string-input Must member | Proposed Must member | Successful type / reason |
+|---|---|---|
+| `Int32InRange`, `Int64InRange` | `InRangeInt32`, `InRangeInt64` | Int32, Int64 |
+| `InRange`, `OutOfRange` for decimal | `InRangeDecimal`, `OutOfRangeDecimal` | Decimal |
+| `Positive`, `Negative` for decimal | `PositiveDecimal`, `NegativeDecimal` | Decimal; same rule for every generic numeric comparison in that family |
+| `True`, `False` | `TrueBoolean`, `FalseBoolean` | Boolean, using CLR type names consistently with Int32; no mixed Bool/Boolean spelling |
+| `Even`, `Odd` | `EvenInt32`, `OddInt32` | Int32 |
+| `Finite`, `NotNaN` | `FiniteDouble`, `NotNaNDouble` | Double; preserve IEEE predicate meaning |
+| `GreaterThan`, `DurationBetween` for TimeSpan | `GreaterThanTimeSpan`, `InRangeTimeSpan` | TimeSpan |
+| `BetweenDateOnly`, `PastDateOnly`, `MinimumAge` | `InRangeDateOnly`, `PastDateOnly`, `MinimumAgeDateOnly` | DateOnly |
+| `BetweenTimeOnly`, `BetweenDateTimeOffset` | `InRangeTimeOnly`, `InRangeDateTimeOffset` | TimeOnly, DateTimeOffset |
+
+The table demonstrates the rule; the implementation inventory must enumerate **every declaration**,
+including negative/complement forms, equality, chronology, proximity, calendar and numeric
+families. Do not finish by renaming only the range examples.
+
+**Domain concepts are not generic scalar predicates.** `Guid`, `HasGuidVersion`,
+`Ipv4`, `Ipv6`, `IpAddress`, `PhoneNumber`, `Email`, `Hostname` and
+`ValidXml` already state their domain. Keep them: no `Ipv4IPAddress`,
+`PhoneNumberString` or `HasGuidVersionGuid`. A type already at the end is not appended
+twice (`NotEmptyGuid` remains); embedded domain nouns such as `HasGuidVersion` are explicit
+semantic names, not ad hoc qualifier placement. Document each family boundary in the manifest.
+
+**Propagation:** Guard takes the corresponding forbidden-state vocabulary and the same terminal
+parsed-type qualifier (`ZeroOrNegativeDecimal` → `PositiveDecimal`, `FalseBoolean`,
+`OutOfRangeInt32`). FluentValidation follows Must subject to actual framework collisions.
+DataAnnotations retain their own specified shape: domain/type qualifier, then `String` where
+it distinguishes string input from a typed attribute. For example `PastDateOnly` and
+`PastDateOnlyString` are an existing, justified distinction. This is **input representation**,
+not N-2's redundant return projection. Do not mechanically double qualifiers when combining rules.
+
+**Rejected alternatives:** type-first families (`DateOnlyPast`) undermine concept grouping;
+qualify only compiler collisions permits lean standard overloads but perpetuates mixed
+`InRange(string, DateOnly, DateOnly)` / `PastDateOnly(string)` families.
+Whole-family qualification is chosen for predictable discovery. Its cost is longer names and
+additional renames, not compatibility. Do not claim every existing short overload is ambiguous;
+prove actual collisions with compiled consumer examples.
+
+### N-2. Remove raw-result twins; preserve the established result contract
+
+`Ipv4`, `Ipv6` and `IpAddress` produce parsed IPAddress results;
+their `*String` twins preserve input text. `PhoneNumber` produces normalized digits;
+`PhoneNumberString` preserves the original input. The successful output policy is already
+settled by Must and Core: `Value` retains input and `Result` holds the parsed/normalized
+result.
+
+**Decision:** keep that policy and delete raw-result twins and corresponding redundant adapters.
+Do not change PhoneNumber.Result to original text and do not add a PhoneDigits alias.
+Inspect each polarity before consolidating: `Guard.Against.NotIpv4` returns IPAddress, while
+`NotIpv4String` returns string. The guards forbidding a valid IPv4 value both return string
+when the corresponding valid-domain complement succeeds. The two directions are not all
+identical signatures/contracts.
+
+Guard returns the successful Must result; it has no `Value` property. A caller needing original
+text alongside the Guard output retains its input variable. FluentValidation validates a property
+without replacing that property with the parsed result. Attribute `String` input discriminators
+are governed by N-1 and are not deleted by a suffix search.
+
+**Rejected:** change every successful result to raw input (violates established parse/normalize
+architecture); introduce `Raw` / `Text` aliases (duplicates validation vocabulary for an
+output projection). Tests must assert original Value, successful Result and Guard return value
+separately, including formatted phone numbers and both network polarities.
+
+### A-5. Document affirmative Contains vocabulary and support nullable value-type elements
+
+Keep `CollectionRules.Contains`, `ContainsNullItems` and their established Must/Guard
+concepts. Membership and containment are useful domain predicates, consistent with the existing
+range and collection surfaces. Add the affirmative `Contains*` convention to Core §3.2;
+§3.3.1 is a **negation-exception table**, not a general waiver. Retain its specific existing
+Guid/control-character exceptions separately.
+
+Add nullable value-type element support alongside reference-type support across Rules, Must,
+Guard and applicable adapters. Reject null collections consistently with their existing contract;
+a null element is distinct from an empty collection. Do not implement the negative clause as
+unconditional Boolean negation over invalid input.
+
+For any successful non-null-element result, document the actual result type. Converting
+`IEnumerable<T?>` to `IEnumerable<T>` for structs requires projecting each nullable value's
+`Value`; null-forgiving annotations cannot change the runtime element type. Enumerate a
+one-shot source once and reuse the materialized validation/result data. Verify generic inference,
+nullable reference annotations and struct overload resolution.
+
+**Rejected:** Core-only `HasItem` renaming would split a domain concept already shared by
+range and collection consumers; pretending `!` implements a typed sequence projection is
+incorrect. Any method whose result remains the original nullable-element collection must say so,
+rather than promising narrowed output.
+
+### B-6. Comparison-bound parameter naming and nullability drift
+
+**`src/PineGuard.Core/Rules/TimeSpanRules.cs`:29**, `StringRules.Numbers.cs`:83, `NumberRules`, the date families - severity **minor** - `api-consistency`
+
+The same "compare value to a bound" concept names the bound `min` / `max` (numbers, `T`),
+`threshold` (TimeSpan: `TimeSpan?` in `TimeSpanRules`, non-nullable in `StringRules.TimeSpan`),
+or `other` (dates, nullable). **Flattened surface.** The `Must.Be.GreaterThan` overloads disagree
+with each other: `GreaterThan(T value, T min)`, `GreaterThan(string, decimal min)`,
+`GreaterThan(TimeSpan, TimeSpan threshold)`, `GreaterThan(string, TimeSpan threshold)`.
+Overloads of one method name with different names for the same role is a named-argument trap
+the Core framing could not see.
+
+**Consequence.** `Must.Be.GreaterThan(TimeSpan.FromMinutes(10), threshold: TimeSpan.FromMinutes(5))`
+compiles, but `Must.Be.GreaterThan(10, threshold: 5)` does not because the numeric bound is
+named `min`; `TimeSpanRules.IsGreaterThan(v, null)` compiles and returns false while
+`StringRules.TimeSpan.IsGreaterThan(v, null)` does not compile.
+
+**Decision.** Two-bound members use `min` / `max`; single-bound comparisons use `other`
+across every family (`GreaterThan(value, other)`, `Before(value, other)`). Required bounds are non-nullable configuration. Core may reject invalid configuration;
+Must returns a configuration-attributed failure before invoking Core, and Guard translates that
+failure. A deliberately optional bound needs a distinct documented contract, not accidental
+nullable drift. Rename parameters through CallerArgumentExpression, XML docs and named call sites.
+
+| Candidate | Story | Why it lost |
+|---|---|---|
+| **`other` for one bound, `min`/`max` for two** (recommended) | "greater than the other" | — Already the date families' word; `Equals(other)` / `CompareTo(other)` precedent in the BCL. |
+| `threshold` everywhere | "crosses the threshold" | Wrong for `Before` / `After` and for equality; only reads for magnitudes. |
+| `min` for `GreaterThan`, `max` for `LessThan` | mirrors the range pair | Direction-specific parameter names fragment named calls across otherwise parallel predicates; inclusion remains an explicit separate property. |
+
+---
+
+## Part III. Shape and semantics dispositions
+
+The following recommendations are resolved for this plan. Their testable contracts matter as much
+as naming. Policy amendments and independent future features are identified explicitly.
+
+### B-3 (part). Expose NumberStyles on string coordinate predicates
+
+Add `NumberStyles styles` with the existing parser default to the latitude/longitude and
+combined coordinate-string families. Forward it consistently through applicable clauses and
+adapters, with invariant culture and configuration-first validation. Preserve the existing default
+accepted grammar; allow explicit scientific notation when requested. Tests cover `"9e1"`,
+out-of-range coordinates, invalid styles and culture independence. Pair this with G-1's removal
+of unnecessary target gating.
+
+**Rejected:** permanently hard-code fixed-point syntax while sibling parsers expose styles; this
+creates avoidable configuration inconsistency without a domain requirement.
+
+### B-4 / B-5 / B-8 (merged). Type-sensitive Try output contracts
+
+Delete the duplicate nullable Guid output overload: `out var` cannot choose between
+`out Guid` and `out Guid?`. Use `out Guid` with default on failure.
+Use the same value-type rule for truncation outputs; callers must check the Boolean result.
+
+“Non-nullable outputs everywhere” is incorrect for reference types. Use:
+
+| Output category | Contract |
+|---|---|
+| Concrete value type | `out T`, default on failure; no redundant `out T?` overload |
+| Reference type that returns null on failure | `[NotNullWhen(true)] out T?` |
+| Generic output that may be default/null on failure | Appropriate `[MaybeNullWhen(false)] out T` contract and constraints |
+| Existing non-null empty string/list output | Preserve the useful non-null empty-output contract; document it explicitly |
+
+Audit Try members rather than regex-replacing question marks. Successful-null outputs, if any,
+need an explicit reason and cannot carry a false NotNullWhen promise. Verify consumer nullable
+flow and inference on every supported target. See the [.NET nullability guidelines](https://github.com/dotnet/runtime/blob/main/docs/coding-guidelines/api-guidelines/nullability.md)
+for the conditional-output annotation model.
+
+### C-1. Separate range duration from inclusive cardinality
+
+Set DateOnlyRange.Duration to the calendar-day distance `End.DayNumber - Start.DayNumber`;
+retain the inclusive count under `DayCount`. A singleton has zero duration and one included day.
+DateOnly is a calendar domain, not a timezone-dependent elapsed-time measurement.
+
+For DateTimeRange, use the same normalized instant endpoints for Duration as for ordering and
+equality. Raw `End - Start` can disagree when Kind differs. DateTimeOffsetRange uses elapsed
+instants. TimeOnlyRange remains linear under P3. Test singleton, extrema, mixed DateTime kinds,
+offsets and daylight-saving boundaries using deterministic timezone setup where required.
+Specify each unit in XML documentation; a shared property name does not erase domain differences.
+
+### C-3. Keep exact header matching distinct from browser security processing
+
+Keep generic `HttpRules.HasHeaderValue` as exact whole-value matching and document it.
+Do not split arbitrary headers on commas. Even security headers do not share one token algorithm.
+
+For `HasXContentTypeOptionsWithDefaults`, explicitly document the current
+whole-value presence check: an exact `nosniff` entry is accepted even when another supplied
+entry is `garbage`; a single combined value is not accepted. This is not a configuration-conformance
+or browser-effectiveness oracle. The [Fetch nosniff algorithm](https://fetch.spec.whatwg.org/#x-content-type-options-header)
+examines the first extracted value: `nosniff, garbage` and `garbage, nosniff` are not
+interchangeable. An “any token equals nosniff” rewrite would give false assurance.
+
+**Decision:** retain exact-value presence matching in this correction and correct claims/examples
+that equate rejection with absent browser protection. If browser-effectiveness validation is
+introduced, give it a separately specified contract and header-specific parser; do not change
+this predicate silently. Test repeated field values, combined fields, ordering, case and whitespace
+against the chosen exact-value presence contract. In particular, `["garbage", "nosniff"]`
+passes this presence predicate; `"garbage, nosniff"` does not. Neither result is a claim about
+complete header conformance. Review the other security headers independently.
+
+### C-4 / C-5 (merged). Preserve a coherent linear TimeOnlyRange; specify circular windows separately
+
+The TimeOnlyRange constructor **already documents** `Start <= End`. Its linear domain is not
+an undocumented bug. Keep this invariant for P3; add the missing linear operations with the same
+closed-set semantics as the other ranges, rather than changing Contains alone to wrap around.
+
+Use `Intersect` for a nullable single-range intersection. A true `Union` of two disjoint
+linear ranges cannot return one range: return an ordered, normalized read-only range collection
+across the four range families. Empty collection means empty set; coalesce overlapping or adjacent
+ranges under the domain's representable-step model. Rename existing gap-filling union behavior
+to `Enclose`; it returns the smallest linear range containing both operands and may include
+values absent from either. Do not use Union to mean an enclosing hull.
+
+**Circular follow-on specification:** a midnight-crossing interval needs an explicit representation
+of empty, singleton and full-day states, endpoint inclusion, and range sets for disconnected results.
+For example, closed arcs 22:00–10:00 and 08:00–02:00 intersect in two arcs:
+22:00–02:00 and 08:00–10:00. A single nullable range cannot represent that result. Any circular
+enclosure operation also needs a deterministic tie rule where two equal hulls exist.
+
+**Rejected:** simply permit Start > End and copy linear Intersect/Union (mathematically wrong);
+silently return a hull from Union (adds values). Circular support remains a separate designed
+feature requirement recorded in this section; the linear naming and semantic corrections do
+not depend on its introduction.
+
+### C-6. Make closed-range overlap, intersection and adjacency agree
+
+Default Overlaps currently uses exclusive comparisons on several range types while Contains and
+Intersect include endpoints. Fix the whole model: default Overlaps for closed ranges is true iff
+Intersect is nonempty. Shared endpoints overlap; a singleton overlaps itself.
+
+IsAdjacentTo means disjoint with no representable value between the ranges: one day for DateOnly,
+one tick for the other linear temporal ranges. Compare safely near MinValue/MaxValue rather than
+adding a unit that can overflow. Normalize DateTime instants before comparison.
+
+Overlap and adjacency are **mutually exclusive**, not an exhaustive XOR: separated ranges have
+neither relation. Define `Overlaps(other, Inclusion.Exclusive)` as intersection of the two open intervals on
+that type's representable domain: both operands exclude their endpoints. A singleton and a
+one-step interval have empty open interiors. An overlap exists only when a representable value
+is strictly greater than both starts and strictly less than both ends; compute this without
+overflow. Do not retain the current strict-cross-comparison shortcut, which can report a
+singleton contained in another range as overlapping despite its empty interior. This explicit
+mode does not redefine the default closed-set Intersect.
+Test endpoint touch, singleton, containment, one-step adjacency, larger gaps, reversed operands
+and extrema across all four range types. Apply the same model to Rules and adapters.
+
+### D-1. `CollectionRules.Contains` uses the collection's comparer for `ICollection<T>` only
+
+**`src/PineGuard.Core/Rules/CollectionRules.cs`:279** - severity **minor** - `api-consistency`
+
+`HashSet<string>(OrdinalIgnoreCase){"ABC"}`: `Contains(set, "abc")` is true, `Contains(set.ToList(), "abc")`
+is false, and the XML doc promises the default comparer. **Options.** Drop the fast path; or document
+that the collection's semantics win; and either way consider an `IEqualityComparer<T>?` overload like
+`HasDistinctItems`. Recommendation: add the comparer parameter and make the verdict depend on
+contents, not runtime type.
+
+### D-2. `IsSubsetOf` silently adopts a caller-supplied `HashSet<T>`'s comparer
+
+**`src/PineGuard.Core/Rules/CollectionRules.cs`:298** - severity **minor** - `api-consistency`
+
+Same defect as D-1 for `other`. **Options.** Reuse `other` only when its `Comparer` is the default, or
+add `IEqualityComparer<T>? comparer = null` and always build the set with it. Recommendation: the
+comparer parameter, decided together with D-1.
+
+### F-1. Define Enumeration catalogue membership and inheritance explicitly
+
+Removing `DeclaredOnly` alone does not solve inheritance. Static reflection needs intentional
+hierarchy traversal/FlattenHierarchy, and an instance of PaymentMethod cannot be returned as
+ExtendedPaymentMethod merely because its field is declared on a base type.
+
+**Decision under P4:** each queried enumeration type has one closed catalogue built from public
+static readonly member fields on that type and its relevant base hierarchy. A field is eligible
+when its declared type is assignable to the queried type; include only completed instances of
+that type. This deliberately does not inspect every base-typed field for a possible runtime subtype.
+An eligible member field containing null is a
+catalogue-definition/initialization error, never a silently skipped entry. Exclude arbitrary static
+properties and unrelated constructed instances. Order the accepted catalogue by ordinal Name;
+reject duplicate names under the name comparer and duplicate values under the value comparer
+before publication.
+
+Do not promise discovery of every subclass in every loaded assembly. A family root may hold
+declared subtype instances assignable to that root; a subtype query cannot contain base instances.
+Catalogue queries are supported only after the queried type's static initialization completes
+successfully. Queries from that type's static initializer, member initializer or construction path
+are unsupported: an initializer cannot require its own completed catalogue. Normal external
+discovery first ensures successful initialization of the queried type and each participating field's
+declaring type, then validates and atomically publishes the immutable catalogue. Eligible null
+fields, reentrant catalogue builds and duplicate names/values cause deterministic failures;
+cache build failures without exposing partial results. These checks detect common initialization
+misuse but do not promise detection of every unsupported same-thread initialization-time query.
+
+Test supported external initialization, base/derived fields, unassignable members, concurrent first
+access, failed static initialization, failed construction, duplicates and detected null/reentrant
+misuse. Include a first-ever lookup during member initialization before later fields are assigned;
+it must not silently cache a catalogue missing those fields. Preserve the existing reflection/
+trimming annotations through the cache and hierarchy-discovery path; verify the supported trimmed
+publication scenario rather than assuming a generic cache automatically retains reflected fields.
+
+**Rejected:** reuse constructor registries (different, dynamic membership); cast inherited base
+members into a subtype (invalid); switch to dynamic registration without defining its lifecycle.
+Implement with E-1/F-2 as one change.
+
+### F-5. Preserve string-value identity; document name lookup separately
+
+Keep string-valued Enumeration equality, hashing, ordering and value lookup ordinal. A display/name
+lookup may remain OrdinalIgnoreCase. These are different roles, so case-insensitive lookup of
+the name `"usd"` does not imply case-insensitive identity of the value `"USD"`.
+
+Changing only lookup to OrdinalIgnoreCase would collapse values such as `"abc"` and `"ABC"`
+while equality still distinguishes them. Verify duplicate detection and caches use the same
+comparer as their respective role. Document this deliberate distinction.
+
+**Rejected:** “the asymmetry has no user” is unsupported. If configurable value comparers are ever
+added, one immutable comparer must govern the entire family, including equality, hash codes,
+ordering, duplicate detection and lookup. That additional feature is not needed here.
+
+### F-6. Enforce the documented lowercase SpaceCase contract
+
+StringCasing.SpaceCase explicitly documents lowercase words separated by spaces; this is not
+merely an ambiguous example. Fix both the transform (currently renders title case) and validation
+(currently accepts mixed case) to that documented contract. Do not rewrite the documentation to
+bless the implementation accident.
+
+Tests cover lowercase, uppercase/mixed-case rejection, digits, separator placement, transform
+idempotence and the invariant that a successful transform satisfies the matching predicate.
+Keep word splitting and Unicode/culture policy consistent with the shared casing machinery.
+
+### G-1. Remove unnecessary target gating; document genuine capability differences
+
+netstandard2.1 is a supported target, not a promise that unavailable BCL types exist there.
+Maintain a capability matrix: DateOnly/TimeOnly and generic-math APIs need appropriate target
+support; common string/number behavior should not disappear merely because a whole file was gated.
+
+StringRules.GeoLocation calls an ungated double parser and GeoLocationRules directly.
+Lift that file's unnecessary gate; it does **not** need a decimal fallback.
+Review StringRules.Numbers separately: where it relies on generic NumberRules, supply equivalent
+concrete numeric implementations only with the same parsing, rounding, overflow and NaN contracts.
+Do not replace double semantics with decimal as a blanket fallback.
+
+Publish the exact supported-family/TFM matrix and test all common members for equivalent results.
+Any intentionally unavailable signature must have a concrete platform reason, not an unexplained
+conditional compilation outlier. Reconcile target constants and package READMEs with the matrix.
+
+### H-1. Make the phone-format example true without overclaiming validation
+
+Add ASCII space to the default permitted non-digit characters. The documented formatted example
+`"+1 (555) 123-4567"` should pass the existing permissive phone-format contract.
+Verify the parsed/normalized Result contains the digits and Value preserves the original input.
+
+This is formatting tolerance, not proof of an allocated number or complete E.164 conformance.
+Correct any documentation that makes that stronger claim. Coordinate with E-2's defensive-copy
+pattern and N-2's preserved normalized output.
+
+### N-4. Preserve and formally register XML's well-formedness/validity distinction
+
+The XML schema design §2.2 deliberately separates the two concepts:
+
+| Concept | Rules | Must | Guard | DataAnnotations | FluentValidation |
+|---|---|---|---|---|---|
+| Well-formed XML document | `XmlRules.IsXml` | `Xml` | `NotXml` | `XmlStringAttribute` | `Xml` |
+| XSD schema conformance | `XmlSchemaRules.IsValidXml` | `ValidXml` | `InvalidXml` | `ValidXmlAttribute` | Existing `MustBe` composition recipe; no dedicated adapter in PineGuard.Xml |
+
+Keep these names. XML “validity” is an established domain distinction; removing Valid would
+conflate different validations. `XmlSchemaRules` avoids colliding with Core's XmlRules when both
+namespaces are imported. `XmlSchemaMustValidator` follows the validator naming pattern and
+avoids `System.Xml.Schema.XmlSchemaValidator`. The dedicated `PineGuard.Xml` namespace
+and absence of a direct FluentValidation dependency are intentional package boundaries.
+
+Carry the rationale from the XML design into the canonical vocabulary, Core/Guard specifications
+and audit map. Scope the `InvalidXml` exception to this concept; it is not permission to invent
+InvalidEmail or InvalidGuid. Also record `Guard.Against.Invalid` as the existing object-validator
+entry point exception from Guard §11.6.
+
+Repair the dangling `src/PineGuard.Xml/AGENTS.md` reference to
+`docs/ai/rules/xml.md` by completing XML scope onboarding during implementation. The missing
+rules page does not erase the existing design rationale. Keep schema failures, unknown namespaces
+and malformed XML distinct in codes, messages and tests. Verify import collisions with System.Xml,
+System.Xml.Schema, System.Xml.Serialization and the core PineGuard layers.
+
+---
+
+## Existing exceptions retained and Guid symmetry completed
+
+- **A-6. Guid predicate names retained; missing twin implemented.**
+  Core §3.3.1 explicitly permits `StringRules.Guid.IsNotEmpty`;
+  `Must.Be.NotEmptyGuid` and `Guard.Against.EmptyGuid` are aligned with that concept.
+  The implementation adds the Core `IsEmpty` twin and tests both predicates.
+  Both must require successful Guid parsing; malformed/null strings are false for both.
+  They are complements within the parsed-Guid domain, not over every possible string.
+  Completion evidence is recorded in the linked implementation tracker.
+- **A-7. Control-character exception retained.** Core §3.3.1 permits
+  `NotContainsControlChars`; Must exposes both polarities and Guard derives the forbidden
+  state through Must. `IsControlCharSafe` would borrow the OWASP-specific Safe convention.
+- **C-2. Calendar predicates resolved at the baseline.** Retain the historical disposition;
+  no new implementation is required for this finding.
+
+## Exception register: differences must earn their place
+
+This is the minimum register, not permission to ignore unnamed outliers. Every affected declaration
+must be mapped to the general rule or a specific, documented exception.
+
+| Difference | Reason and governing policy | Required verification |
+|---|---|---|
+| Context-local Core names versus qualified flattened clauses | Rules class supplies domain/type; Must/Guard share an extension receiver. Core §3.3 and P1/N-1. | Consumer examples and exact mapping; no duplicated nouns without a collision reason. |
+| Attribute domain/type and final String qualifiers | Attributes do not overload by validated property type. DataAnnotations §§2.1, 3.2. | Typed/string property examples; unique declarations; whole affected-domain family reviewed. |
+| Fluent `WebUrl`, `Required`, `NotRequired` and other proven framework collisions | FluentValidation and BCL imports can make otherwise matching extensions ambiguous. Collision policy and Fluent §4.2. | Compile with the relevant framework imports; select one canonical collision-safe spelling. |
+| XML Valid/Invalid vocabulary and dedicated namespace | Well-formedness versus XSD validity, package isolation and BCL type-name collisions. XML design §2.2; N-4. | Distinct semantic tests, import tests and exact audit-map entry. |
+| Guard `Invalid` object-validator entry point | Existing Guard §11.6 umbrella-validation contract. | Limit exemption to the exact entry point; no general Invalid-prefix waiver. |
+| Guid `IsNotEmpty`; control-character `NotContainsControlChars` | Explicit Core §3.3.1 domain exceptions. | Valid-domain gating and correct Must/Guard polarity. |
+| Contains predicate spelling | Affirmative domain membership/containment; A-5 adds explicit Core §3.2 policy. | Collection and range vocabulary parity; no Core-only synonym. |
+| Guard temporal, distinct/duplicate and OWASP opposites | Curated semantic complements in Guard §5.4 and the shared map, not mechanical Not-prefix stripping. | Boundary/equality tests and positive/negative mapping; OWASP Safe normalization remains scoped. |
+| Guard file ordering | Ordered by the Must clause invoked, per Guard §4. | Review method pairs by delegation, not just the literal negative prefix. |
+| Annotation/Fluent null skipping versus direct Must/Guard rejection | Optional property validation differs from direct validation; their layer specs explicitly define it. | Null tests per adapter; requiredness composed explicitly. |
+| Enumeration name lookup versus value identity | Human-facing name lookup versus identifier equality; F-5. | Role-specific comparer tests across lookup, duplicate detection, equality and hashing. |
+| Platform-specific types | DateOnly/TimeOnly and generic-math availability; G-1. | Published capability matrix and shared-contract tests for common signatures. |
+
+The register must identify the exact family/member and rationale; “legacy,” “already exists,”
+“more ergonomic,” or “avoids a breaking change” is insufficient. Compatibility aliases are absent.
+A framework-required facade is not a compatibility shim, but redundant public spellings for the
+same PineGuard operation are not retained merely because a current spec permits optional aliases.
+
+## Canonical policy reconciliation required by implementation
+
+Update policy before or with its corresponding source change; do not leave this plan as a
+competing permanent source of truth.
+
+1. Must/Core/Guard/FV/DataAnnotations: add the P1 range and string-input qualifier mappings;
+   replace stale Between examples and stale MustResult factory examples, preserving required codes.
+2. Core §3.2: explicitly permit affirmative Contains vocabulary. Keep §3.3.1 focused on
+   the existing negation exceptions; describe parsed-domain rather than universal Boolean complements.
+3. Core/Guard/shared vocabulary: register XML validity and the exact Guard Invalid entry point.
+   Qualify Fluent §4.2's broad statement that Guard may prefer Invalid*; its current wording
+   conflicts with Guard's general prohibition.
+4. Clarify nonthrowing validation versus invalid configuration using the existing scope contracts:
+   Core helpers can reject bad configuration; Must turns configuration errors into attributed
+   failures; Guard throws from Must failures. Do not weaken this to “all layers never throw.”
+5. Update vocabulary.json, collision normalization and audit baselines with specific mappings.
+   Do not silence new findings through broad exemptions or regenerate baselines without review.
+6. Complete the XML rules/spec onboarding reference and preserve the established no-direct-FV-
+   dependency architecture. Align affected READMEs, XML comments, examples, fixture names and tests.
+7. Resolve any allowance for optional convenience aliases in the affected naming specs explicitly:
+   this greenfield pass keeps one canonical spelling per operation, except a distinct documented
+   framework facade. Remove historical examples of deleted aliases.
+
+## Entry points remain as specified
+
+Retain `Must.Be` and `Guard.Against`. Has/Contains members have a grammar tradeoff under
+Must.Be, but the assertion that a second entry point is the “only cure” is not established.
+No Must.Have redesign is needed to complete this plan. Preserve the one approved vocabulary and
+do not invent synonyms to make isolated call sites read more naturally.
+
+## Order of work
+
+1. **Plan completion (completed before implementation):** reconcile review findings with existing policy, supply the
+   recommended decisions and acceptance gates, and leave the plan reviewable and uncommitted.
+2. **Establish the complete API manifest before renaming:** inventory actual public declarations,
+   not filenames. Include Core/Utils, Must, Guard, FluentValidation, DataAnnotations and XML;
+   record input/output types, named parameters/defaults, nullable flow, codes, complements,
+   configuration behavior and TFM availability. Resolve all collisions before editing consumers.
+3. **Independent corrections:** H-1, A-1/A-2/A-4, B-1/B-2/B-3/B-7, E-2, F-3/F-4/F-7/F-8,
+   N-3 and the A-6 twin. Apply dependencies explicitly (CSV schema/config validation together;
+   phone result tests with N-2; common configuration handling before adapter propagation).
+4. **Vocabulary and surface changes:** update canonical policy and machine maps, then A-3/A-8,
+   N-1/N-2/N-4, A-5 and B-6 across all affected layers. Consolidate duplicate attributes and
+   delete obsolete spellings outright. Group by complete semantic family, not isolated project.
+5. **Semantic work:** B-4/B-5/B-8; C-1/C-4/C-5/C-6 as a coherent range pass; D-1/D-2 together;
+   E-1/F-1/F-2/F-5 together; B-3/G-1 target parity; F-6 casing. C-3 is an exact-match
+   documentation/contract correction, not a generic token-splitting patch.
+6. **Verify and record completion:** satisfy the acceptance gates below, mark each original ID
+   with its completion evidence, and retain rationale in canonical policy. No item is “done”
+   merely because its paragraph has been deleted.
+
+## Acceptance gates
+
+- **Complete declaration mapping:** every affected public member has an old/new disposition
+  (retain, rename, merge, remove, add) with all layers and target frameworks accounted for.
+  Every exception has a precise register entry and source policy; no unexplained outlier remains.
+- **Compiler proof:** consumer examples exercise imports together, overload inference,
+  `out var`, nullable flow, named arguments and omitted defaults. Include typed/string
+  collisions, LINQ/FV/BCL imports, attributes and XML namespace/type collisions.
+- **Semantic parity:** Rules/Must/Guard/adapters agree on the applicable valid domain, parsed
+  result and canonical failure code. Test malformed input, null, empty values, configuration
+  errors and every complement boundary. Respect explicit adapter null-skipping policy.
+- **Configuration precedence:** invalid separators, schemas, CIDR, bounds, Inclusion and styles
+  cannot be hidden by input-dependent short-circuits or negative predicates. Must failures name
+  the configuration parameter; Guard uses the corresponding canonical failure.
+- **Result contracts:** assert original Value versus Result, normalized phone digits, parsed IP
+  addresses, Guard returns, one-pass enumerables and nullable-element projection separately.
+- **Range laws:** default Overlaps iff Intersect is nonempty; adjacency implies no overlap;
+  Union contains exactly the operands' values; Enclose may fill gaps and is named accordingly.
+  Include singleton/empty results, disconnected union, boundary inclusions, extrema, normalized
+  instants and commutativity. Explicit exclusive overlap tests include empty open interiors for
+  singleton/one-step intervals and the first nonempty open interval. No circular semantics leak
+  into the linear range type.
+- **Enumeration invariants:** closed membership shared by GetAll/lookups, no partial publication,
+  deterministic ordering and failure, assignability, duplicate/comparer consistency, concurrent
+  initialization and failed derived construction.
+- **Documentation and vocabulary:** stale-name search distinguishes historical rationale from
+  live examples. Update XML documentation, README examples, canonical specs, fixtures, tooling
+  and machine maps. Audit links and the XML onboarding reference.
+- **Repository verification:** run the affected build/test/format/audit checks and the repository's
+  required coverage gates for each affected supported test TFM. Compile netstandard2.1 surfaces
+  even where test projects target newer runtimes. Broaden to required cross-layer checks after
+  shared Core changes. Actual results belong in the linked implementation evidence rather than
+  being inferred from this list of requirements.
+
+## Completion boundary
+
+This decision record is now implemented. The linked implementation tracker records each original
+decision, the exact baseline-to-final declaration map, consumer compilation, independent review
+and 100% line/branch coverage on both supported test runtimes. A written plan alone does not
+prove API correctness; those concrete checks are the completion evidence. No backward-compatibility
+aliases or migration work were introduced.

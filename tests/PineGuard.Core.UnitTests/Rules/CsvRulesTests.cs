@@ -59,4 +59,26 @@ public sealed class CsvRulesTests(ITestOutputHelper output) : BaseRuleUnitTest(o
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(CsvRulesTestData.SchemaConfiguration.Cases), MemberType = typeof(CsvRulesTestData.SchemaConfiguration))]
+    public void IsCsvRowLine_RejectsInvalidSchema(RuleCase<IReadOnlyList<CsvColumnSchema>?> tc)
+    {
+        // Act
+        var result = CsvRules.IsCsvRowLine("\"\"", tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(CsvRulesTestData.Separator.Cases), MemberType = typeof(CsvRulesTestData.Separator))]
+    public void IsCsvLine_UsesConfiguredSeparator(RuleCase<(string? value, char separator)> tc)
+    {
+        // Act
+        var result = CsvRules.IsCsvLine(value: tc.Value.value, separator: tc.Value.separator);
+
+        // Assert
+        AssertResult(tc, result);
+    }
 }

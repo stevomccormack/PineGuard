@@ -2,5 +2,5 @@
   "aliases": {
     "NotBlank": "NullOrEmpty"
   },
-  "stripPrefixes": ["Not"]
+  "stripPrefixes": ["Not", "Has", "Is"]
 }

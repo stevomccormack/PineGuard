@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
@@ -27,7 +28,7 @@ public static class NetworkUtility
     /// When this method returns, contains the parsed <see cref="IPAddress"/> if successful; otherwise, <see langword="null"/>.
     /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> was successfully parsed; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseIpAddress(string? value, out IPAddress? ipAddress)
+    public static bool TryParseIpAddress(string? value, [NotNullWhen(true)] out IPAddress? ipAddress)
     {
         ipAddress = null;
 
@@ -55,7 +56,7 @@ public static class NetworkUtility
     /// When this method returns, contains the parsed IPv4 <see cref="IPAddress"/> if successful; otherwise, <see langword="null"/>.
     /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is a valid dotted-quad IPv4 address; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseIpv4(string? value, out IPAddress? ipAddress)
+    public static bool TryParseIpv4(string? value, [NotNullWhen(true)] out IPAddress? ipAddress)
     {
         ipAddress = null;
 
@@ -108,11 +109,11 @@ public static class NetworkUtility
     /// When this method returns, contains the parsed IPv6 <see cref="IPAddress"/> if successful; otherwise, <see langword="null"/>.
     /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is a valid IPv6 address; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseIpv6(string? value, out IPAddress? ipAddress)
+    public static bool TryParseIpv6(string? value, [NotNullWhen(true)] out IPAddress? ipAddress)
     {
         ipAddress = null;
 
-        if (!TryParseIpAddress(value, out var parsed) || parsed is null)
+        if (!TryParseIpAddress(value, out var parsed))
             return false;
 
         if (parsed.AddressFamily != AddressFamily.InterNetworkV6)
@@ -138,7 +139,7 @@ public static class NetworkUtility
     /// When this method returns, contains the parsed prefix length if successful; otherwise, <c>0</c>.
     /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> was successfully parsed as CIDR notation; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParseCidr(string? value, out IPAddress? network, out int prefixLength)
+    public static bool TryParseCidr(string? value, [NotNullWhen(true)] out IPAddress? network, out int prefixLength)
     {
         network = null;
         prefixLength = 0;
@@ -153,7 +154,7 @@ public static class NetworkUtility
         var addressPart = trimmed[..slashIndex];
         var prefixPart = trimmed[(slashIndex + 1)..];
 
-        if (!TryParseIpAddress(addressPart, out var parsed) || parsed is null)
+        if (!TryParseIpAddress(addressPart, out var parsed))
             return false;
 
         if (!int.TryParse(prefixPart, NumberStyles.None, CultureInfo.InvariantCulture, out var prefix))
@@ -233,7 +234,7 @@ public static class NetworkUtility
     /// When this method returns, contains the ASCII-compatible hostname if successful; otherwise, <see langword="null"/>.
     /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> was successfully converted to ASCII; otherwise, <see langword="false"/>.</returns>
-    public static bool TryGetAsciiHostname(string? value, out string? asciiHostname)
+    public static bool TryGetAsciiHostname(string? value, [NotNullWhen(true)] out string? asciiHostname)
     {
         asciiHostname = null;
 
@@ -267,7 +268,7 @@ public static class NetworkUtility
 
         var labels = asciiHostname.Split('.', StringSplitOptions.RemoveEmptyEntries);
 
-        return labels.All(IsValidHostnameLabel);
+        return labels.All(IsHostnameLabel);
     }
 
     /// <remarks>
@@ -275,7 +276,7 @@ public static class NetworkUtility
     /// <see cref="ValidateHostnameLabels"/> splits with <see cref="StringSplitOptions.RemoveEmptyEntries"/>,
     /// so a zero-length label is unreachable through that path.
     /// </remarks>
-    internal static bool IsValidHostnameLabel(string label)
+    internal static bool IsHostnameLabel(string label)
     {
         if (label.Length is < 1 or > 63)
             return false;

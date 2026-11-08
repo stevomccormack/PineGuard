@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using PineGuard.Common;
 using PineGuard.Rules;
@@ -52,7 +53,7 @@ public static class CronUtility
     /// The grammar accepted is described on <see cref="CronRules.IsCronExpression"/>.
     /// </para>
     /// </remarks>
-    public static bool TryParse(string? value, CronFormat format, out IReadOnlyList<string>? fields)
+    public static bool TryParse(string? value, CronFormat format, [NotNullWhen(true)] out IReadOnlyList<string>? fields)
     {
         fields = null;
 

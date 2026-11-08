@@ -56,11 +56,11 @@ public sealed class CollectionAttributesTests
         => Verify(new HasMaxCountCollectionAttribute(2), testCase);
 
     [Theory]
-    [MemberData(nameof(CollectionAttributesTestData.HasCountBetweenCollection.ValidCases), MemberType = typeof(CollectionAttributesTestData.HasCountBetweenCollection))]
-    [MemberData(nameof(CollectionAttributesTestData.HasCountBetweenCollection.EdgeCases), MemberType = typeof(CollectionAttributesTestData.HasCountBetweenCollection))]
-    [MemberData(nameof(CollectionAttributesTestData.HasCountBetweenCollection.InvalidCases), MemberType = typeof(CollectionAttributesTestData.HasCountBetweenCollection))]
-    public void HasCountBetweenCollection_ShouldReturnExpected(CollectionAttributesTestData.ValidCase testCase)
-        => Verify(new HasCountBetweenCollectionAttribute(1, 3), testCase);
+    [MemberData(nameof(CollectionAttributesTestData.HasCountInRangeCollection.ValidCases), MemberType = typeof(CollectionAttributesTestData.HasCountInRangeCollection))]
+    [MemberData(nameof(CollectionAttributesTestData.HasCountInRangeCollection.EdgeCases), MemberType = typeof(CollectionAttributesTestData.HasCountInRangeCollection))]
+    [MemberData(nameof(CollectionAttributesTestData.HasCountInRangeCollection.InvalidCases), MemberType = typeof(CollectionAttributesTestData.HasCountInRangeCollection))]
+    public void HasCountInRangeCollection_ShouldReturnExpected(CollectionAttributesTestData.ValidCase testCase)
+        => Verify(new HasCountInRangeCollectionAttribute(1, 3), testCase);
 
     [Theory]
     [MemberData(nameof(CollectionAttributesTestData.HasDistinctItemsCollection.ValidCases), MemberType = typeof(CollectionAttributesTestData.HasDistinctItemsCollection))]
@@ -85,4 +85,20 @@ public sealed class CollectionAttributesTests
     [MemberData(nameof(CollectionAttributesTestData.TypeMismatchCases), MemberType = typeof(CollectionAttributesTestData))]
     public void NotEmptyCollection_ShouldThrow_WhenNotACollection(ThrowsCase testCase)
         => VerifyThrows(new NotEmptyCollectionAttribute(), testCase);
+
+    [Theory]
+    [MemberData(nameof(CollectionAttributesTestData.NullRangeConfiguration), MemberType = typeof(CollectionAttributesTestData))]
+    public void HasCountInRangeCollection_ValidatesConfigurationBeforeSkippingNull(CollectionAttributesTestData.RangeConfigurationCase testCase)
+    {
+        // Arrange
+        var (min, max, inclusion) = testCase.Value;
+        var attribute = new HasCountInRangeCollectionAttribute(min, max, inclusion);
+
+        // Act
+        var result = attribute.GetValidationResult(null, new ValidationContext(new object()));
+
+        // Assert
+        Assert.Equal(testCase.Expected, result is null);
+    }
+
 }

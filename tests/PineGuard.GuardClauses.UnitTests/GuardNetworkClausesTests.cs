@@ -42,42 +42,6 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
         if (tc.Expected.IsValid) Assert.NotNull(result);
     }
 
-    // Guard.Against.NotIpAddressString
-    [Theory]
-    [MemberData(nameof(TD.NotIpAddressString.ValidCases), MemberType = typeof(TD.NotIpAddressString))]
-    [MemberData(nameof(TD.NotIpAddressString.InvalidCases), MemberType = typeof(TD.NotIpAddressString))]
-    public void NotIpAddressString_BehavesAsExpected(GuardCase<string?> tc)
-    {
-        var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.NotIpAddressString(value!));
-        AssertCustomMessage(tc, () => Guard.Against.NotIpAddressString(value!, message: CustomMessage));
-        if (tc.Expected.IsValid) Assert.Equal(value, result);
-    }
-
-    // Guard.Against.NotIpv4String
-    [Theory]
-    [MemberData(nameof(TD.NotIpv4String.ValidCases), MemberType = typeof(TD.NotIpv4String))]
-    [MemberData(nameof(TD.NotIpv4String.InvalidCases), MemberType = typeof(TD.NotIpv4String))]
-    public void NotIpv4String_BehavesAsExpected(GuardCase<string?> tc)
-    {
-        var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.NotIpv4String(value!));
-        AssertCustomMessage(tc, () => Guard.Against.NotIpv4String(value!, message: CustomMessage));
-        if (tc.Expected.IsValid) Assert.Equal(value, result);
-    }
-
-    // Guard.Against.NotIpv6String
-    [Theory]
-    [MemberData(nameof(TD.NotIpv6String.ValidCases), MemberType = typeof(TD.NotIpv6String))]
-    [MemberData(nameof(TD.NotIpv6String.InvalidCases), MemberType = typeof(TD.NotIpv6String))]
-    public void NotIpv6String_BehavesAsExpected(GuardCase<string?> tc)
-    {
-        var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.NotIpv6String(value!));
-        AssertCustomMessage(tc, () => Guard.Against.NotIpv6String(value!, message: CustomMessage));
-        if (tc.Expected.IsValid) Assert.Equal(value, result);
-    }
-
     // Guard.Against.NotInCidrRange
     [Theory]
     [MemberData(nameof(TD.NotInCidrRange.ValidCases), MemberType = typeof(TD.NotInCidrRange))]
@@ -165,42 +129,6 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
-    // Guard.Against.IpAddressString
-    [Theory]
-    [MemberData(nameof(TD.IpAddressString.ValidCases), MemberType = typeof(TD.IpAddressString))]
-    [MemberData(nameof(TD.IpAddressString.InvalidCases), MemberType = typeof(TD.IpAddressString))]
-    public void IpAddressString_BehavesAsExpected(GuardCase<string?> tc)
-    {
-        var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.IpAddressString(value!));
-        AssertCustomMessage(tc, () => Guard.Against.IpAddressString(value!, message: CustomMessage));
-        if (tc.Expected.IsValid) Assert.Equal(value, result);
-    }
-
-    // Guard.Against.Ipv4String
-    [Theory]
-    [MemberData(nameof(TD.Ipv4String.ValidCases), MemberType = typeof(TD.Ipv4String))]
-    [MemberData(nameof(TD.Ipv4String.InvalidCases), MemberType = typeof(TD.Ipv4String))]
-    public void Ipv4String_BehavesAsExpected(GuardCase<string?> tc)
-    {
-        var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.Ipv4String(value!));
-        AssertCustomMessage(tc, () => Guard.Against.Ipv4String(value!, message: CustomMessage));
-        if (tc.Expected.IsValid) Assert.Equal(value, result);
-    }
-
-    // Guard.Against.Ipv6String
-    [Theory]
-    [MemberData(nameof(TD.Ipv6String.ValidCases), MemberType = typeof(TD.Ipv6String))]
-    [MemberData(nameof(TD.Ipv6String.InvalidCases), MemberType = typeof(TD.Ipv6String))]
-    public void Ipv6String_BehavesAsExpected(GuardCase<string?> tc)
-    {
-        var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.Ipv6String(value!));
-        AssertCustomMessage(tc, () => Guard.Against.Ipv6String(value!, message: CustomMessage));
-        if (tc.Expected.IsValid) Assert.Equal(value, result);
-    }
-
     // Guard.Against.InCidrRange
     [Theory]
     [MemberData(nameof(TD.InCidrRange.ValidCases), MemberType = typeof(TD.InCidrRange))]
@@ -210,7 +138,7 @@ public sealed class GuardNetworkClausesTests(ITestOutputHelper output) : BaseGua
         var value = tc.Value.ip;
         var result = AssertResult(tc, () => Guard.Against.InCidrRange(value!, tc.Value.cidr));
         AssertCustomMessage(tc, () => Guard.Against.InCidrRange(value!, tc.Value.cidr, message: CustomMessage));
-        if (tc.Expected.IsValid) Assert.Equal(value, result);
+        if (tc.Expected.IsValid) Assert.Equal(System.Net.IPAddress.Parse(value!), result);
     }
 
     // Guard.Against.Hostname

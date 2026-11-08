@@ -30,7 +30,7 @@ public static class MustCsvClausesTestData
         [
             new("mismatch",    ("Col1,Col2", ["Col1"]),  new MustExpected(false, "line must be a valid CSV header line.", Code: MustCodes.Csv.Header.Invalid)),
             new("null input",  (null, ["Col1"]),  new MustExpected(false, "line must not be null.", "line")),
-            new("null header", ("Col1",      null),   new MustExpected(false, "line must be a valid CSV header line."))
+            new("null header", ("Col1",      null),   new MustExpected(false, "expectedHeader must contain nonblank CSV column names.", "expectedHeader", Code: MustCodes.Csv.Header.Invalid))
         ];
     }
 
@@ -75,5 +75,46 @@ public static class MustCsvClausesTestData
             new("count mismatch", ("1",         Header, Types), new MustExpected(false, "line must be a valid CSV row line.")),
             new("null input",     (null,        Header, Types), new MustExpected(false, "line must not be null.", "line"))
         ];
+    }
+
+    public static class SchemaConfiguration
+    {
+        public static TheoryData<MustCase<IReadOnlyList<CsvColumnSchema>?>> Cases => F.SchemaConfiguration.InvalidScenarios.ToMustCases(_ => new MustExpected(false, "schema must contain valid CSV column definitions.", "schema", Code: MustCodes.Csv.Row.Invalid));
+    }
+    public static class Separator
+    {
+        public static TheoryData<MustCase<char>> InvalidCases =>
+        [
+            new("quote", '"', new MustExpected(false, "separator must be a supported CSV separator.", "separator")),
+            new("carriage return", '\r', new MustExpected(false, "separator must be a supported CSV separator.", "separator")),
+            new("line feed", '\n', new MustExpected(false, "separator must be a supported CSV separator.", "separator"))
+        ];
+    }
+    public static class HeaderConfiguration
+    {
+        public static TheoryData<MustCase<IReadOnlyList<string>?>> InvalidCases =>
+        [
+            new("null", null, new MustExpected(false, "expectedHeader must contain nonblank CSV column names.", "expectedHeader")),
+            new("empty", [], new MustExpected(false, "expectedHeader must contain nonblank CSV column names.", "expectedHeader")),
+            new("blank", [" "], new MustExpected(false, "expectedHeader must contain nonblank CSV column names.", "expectedHeader"))
+        ];
+    }
+    public static class TypeMapConfiguration
+    {
+        public static TheoryData<MustCase<IReadOnlyDictionary<string, CsvColumnType>?>> InvalidCases =>
+        [
+            new("null", null, new MustExpected(false, "types must contain defined CSV column types.", "types", Code: MustCodes.Csv.Row.Invalid)),
+            new("empty", new Dictionary<string, CsvColumnType>(), new MustExpected(false, "types must contain defined CSV column types.", "types", Code: MustCodes.Csv.Row.Invalid)),
+            new("undefined", new Dictionary<string, CsvColumnType> { ["a"] = (CsvColumnType)99 }, new MustExpected(false, "types must contain defined CSV column types.", "types", Code: MustCodes.Csv.Row.Invalid))
+        ];
+    }
+    public static class ComparisonConfiguration
+    {
+        public static TheoryData<StringComparison> InvalidCases => [(StringComparison)(-1), (StringComparison)99];
+    }
+
+    public static class ConfiguredSeparator
+    {
+        public static TheoryData<char> Cases => [';', '|', '\t'];
     }
 }

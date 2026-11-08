@@ -35,13 +35,13 @@ public static class MustStringBoolClauses
     /// </remarks>
     /// <example>
     /// <code>
-    /// var result = Must.Be.True(boolString);
+    /// var result = Must.Be.TrueBoolean(boolString);
     /// if (result.Failed)
     ///     Console.WriteLine(result.Message);
     /// </code>
     /// </example>
     /// <seealso href="https://pineguard.ai/docs/must/string-bool">String Bool Must Clauses documentation</seealso>
-    public static MustResult<bool> True(this IMustClause _,
+    public static MustResult<bool> TrueBoolean(this IMustClause _,
         string? value,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
@@ -53,9 +53,8 @@ public static class MustStringBoolClauses
         if (!StringUtility.Bool.TryParse(value, out var parsed))
             return MustResult<bool>.FromBool(false, MustCodes.Boolean.Value.False, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = BoolRules.IsTrue(parsedValue);
-        return MustResult<bool>.FromBool(ok, MustCodes.Boolean.Value.False, messageTemplate, paramName, value, parsedValue);
+        var ok = BoolRules.IsTrue(parsed);
+        return MustResult<bool>.FromBool(ok, MustCodes.Boolean.Value.False, messageTemplate, paramName, value, parsed);
     }
 
     /// <summary>
@@ -80,13 +79,13 @@ public static class MustStringBoolClauses
     /// </remarks>
     /// <example>
     /// <code>
-    /// var result = Must.Be.False(boolString);
+    /// var result = Must.Be.FalseBoolean(boolString);
     /// if (result.Failed)
     ///     Console.WriteLine(result.Message);
     /// </code>
     /// </example>
     /// <seealso href="https://pineguard.ai/docs/must/string-bool">String Bool Must Clauses documentation</seealso>
-    public static MustResult<bool> False(this IMustClause _,
+    public static MustResult<bool> FalseBoolean(this IMustClause _,
         string? value,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
@@ -98,8 +97,7 @@ public static class MustStringBoolClauses
         if (!StringUtility.Bool.TryParse(value, out var parsed))
             return MustResult<bool>.FromBool(false, MustCodes.Boolean.Value.True, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = BoolRules.IsFalse(parsedValue);
-        return MustResult<bool>.FromBool(ok, MustCodes.Boolean.Value.True, messageTemplate, paramName, value, parsedValue);
+        var ok = BoolRules.IsFalse(parsed);
+        return MustResult<bool>.FromBool(ok, MustCodes.Boolean.Value.True, messageTemplate, paramName, value, parsed);
     }
 }

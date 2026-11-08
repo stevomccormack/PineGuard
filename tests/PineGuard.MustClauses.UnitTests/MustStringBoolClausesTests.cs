@@ -12,7 +12,7 @@ public sealed class MustStringBoolClausesTests(ITestOutputHelper output) : BaseM
     public void True_BehavesAsExpected(MustCase<string?> tc)
     {
         // Act
-        var result = Must.Be.True(tc.Value, paramName: "value");
+        var result = Must.Be.TrueBoolean(tc.Value, paramName: "value");
 
         // Assert
         AssertResult(tc, result);
@@ -25,7 +25,7 @@ public sealed class MustStringBoolClausesTests(ITestOutputHelper output) : BaseM
     public void False_BehavesAsExpected(MustCase<string?> tc)
     {
         // Act
-        var result = Must.Be.False(tc.Value, paramName: "value");
+        var result = Must.Be.FalseBoolean(tc.Value, paramName: "value");
 
         // Assert
         AssertResult(tc, result);

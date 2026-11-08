@@ -1,10 +1,38 @@
 using System.Globalization;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
 
 namespace PineGuard.Core.UnitTests.Utils;
 
 public static class StringUtilityNumberTypesTestData
 {
+    public static class IsValidIntegerStyles
+    {
+        public static TheoryData<RuleCase<NumberStyles>> Cases =>
+        [
+            new("Decimal", NumberStyles.Any, new(true)),
+            new("Hexadecimal", NumberStyles.HexNumber, new(true)),
+            new("Binary", NumberStyles.BinaryNumber, new(true)),
+            new("Hexadecimal decimal point", NumberStyles.HexNumber | NumberStyles.AllowDecimalPoint, new(false)),
+            new("Binary exponent", NumberStyles.BinaryNumber | NumberStyles.AllowExponent, new(false)),
+            new("Mixed bases", NumberStyles.HexNumber | NumberStyles.BinaryNumber, new(false)),
+            new("Undefined", (NumberStyles)4096, new(false))
+        ];
+    }
+    public static class IsValidFloatingPointStyles
+    {
+        public static TheoryData<RuleCase<NumberStyles>> Cases =>
+        [
+            new(nameof(NumberStyles.None), NumberStyles.None, new(true)),
+            new(nameof(NumberStyles.Float), NumberStyles.Float, new(true)),
+            new(nameof(NumberStyles.Any), NumberStyles.Any, new(true)),
+            new(nameof(NumberStyles.HexNumber), NumberStyles.HexNumber, new(false)),
+            new(nameof(NumberStyles.BinaryNumber), NumberStyles.BinaryNumber, new(false)),
+            new("Undefined bits", (NumberStyles)4096, new(false)),
+            new("Negative flags", (NumberStyles)(-1), new(false))
+        ];
+    }
+
     public static class TryParseInt32
     {
         public static TheoryData<ValidCase> ValidCases =>

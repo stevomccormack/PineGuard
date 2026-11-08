@@ -77,7 +77,7 @@ public static class TimeOnlyRangeTestData
             {
                 var range = new TimeOnlyRange(new TimeOnly(10, 0), new TimeOnly(20, 0));
                 var beforeTouching = new TimeOnlyRange(new TimeOnly(1, 0), new TimeOnly(10, 0));
-                Assert.False(range.Overlaps(beforeTouching));
+                Assert.True(range.Overlaps(beforeTouching));
                 Assert.True(range.Overlaps(beforeTouching, Inclusion.Inclusive));
 
                 var strictlyBefore = new TimeOnlyRange(new TimeOnly(1, 0), new TimeOnly(9, 59));
@@ -87,7 +87,7 @@ public static class TimeOnlyRangeTestData
             {
                 var range = new TimeOnlyRange(new TimeOnly(10, 0), new TimeOnly(20, 0));
                 var afterTouching = new TimeOnlyRange(new TimeOnly(20, 0), new TimeOnly(23, 0));
-                Assert.False(range.Overlaps(afterTouching));
+                Assert.True(range.Overlaps(afterTouching));
                 Assert.True(range.Overlaps(afterTouching, Inclusion.Inclusive));
 
                 var strictlyAfter = new TimeOnlyRange(new TimeOnly(20, 1), new TimeOnly(23, 0));

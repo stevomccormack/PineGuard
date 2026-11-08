@@ -50,16 +50,16 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
         public FutureOrPresentPinnedClockDateOnlyValidator(TimeProvider timeProvider) => RuleFor(x => x.Value).FutureOrPresentDateOnly(timeProvider);
     }
 
-    private sealed class BetweenDateOnlyValidator : AbstractValidator<Model>
+    private sealed class InRangeDateOnlyValidator : AbstractValidator<Model>
     {
-        public BetweenDateOnlyValidator(DateOnly min, DateOnly max, Inclusion inclusion) =>
-            RuleFor(x => x.Value).BetweenDateOnly(min, max, inclusion);
+        public InRangeDateOnlyValidator(DateOnly min, DateOnly max, Inclusion inclusion) =>
+            RuleFor(x => x.Value).InRangeDateOnly(min, max, inclusion);
     }
 
-    private sealed class NotBetweenDateOnlyValidator : AbstractValidator<Model>
+    private sealed class OutOfRangeDateOnlyValidator : AbstractValidator<Model>
     {
-        public NotBetweenDateOnlyValidator(DateOnly min, DateOnly max, Inclusion inclusion) =>
-            RuleFor(x => x.Value).NotBetweenDateOnly(min, max, inclusion);
+        public OutOfRangeDateOnlyValidator(DateOnly min, DateOnly max, Inclusion inclusion) =>
+            RuleFor(x => x.Value).OutOfRangeDateOnly(min, max, inclusion);
     }
 
     private sealed class WithinDaysDateOnlyValidator : AbstractValidator<Model>
@@ -173,7 +173,7 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
     private sealed class MinimumAgeValidator : AbstractValidator<Model>
     {
         public MinimumAgeValidator(int years, TimeProvider timeProvider) =>
-            RuleFor(x => x.Value).MinimumAge(years, timeProvider);
+            RuleFor(x => x.Value).MinimumAgeDateOnly(years, timeProvider);
     }
 
     // FluentStringDateOnlyExtensions.PastDateOnly
@@ -248,22 +248,22 @@ public sealed class FluentStringDateOnlyExtensionsTests(ITestOutputHelper output
         AssertResult(tc, result);
     }
 
-    // FluentStringDateOnlyExtensions.BetweenDateOnly
+    // FluentStringDateOnlyExtensions.InRangeDateOnly
     [Theory]
-    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.IsBetween.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(FluentCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.IsInRange.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.IsInRange))]
+    public void IsInRange_BehavesAsExpected(FluentCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
     {
-        var result = new BetweenDateOnlyValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion)
+        var result = new InRangeDateOnlyValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion)
             .Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
 
-    // FluentStringDateOnlyExtensions.NotBetweenDateOnly
+    // FluentStringDateOnlyExtensions.OutOfRangeDateOnly
     [Theory]
-    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.IsNotBetween.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.IsNotBetween))]
-    public void IsNotBetween_BehavesAsExpected(FluentCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringDateOnlyExtensionsTestData.IsOutOfRange.Cases), MemberType = typeof(FluentStringDateOnlyExtensionsTestData.IsOutOfRange))]
+    public void IsOutOfRange_BehavesAsExpected(FluentCase<(string? value, DateOnly min, DateOnly max, Inclusion inclusion)> tc)
     {
-        var result = new NotBetweenDateOnlyValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion)
+        var result = new OutOfRangeDateOnlyValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion)
             .Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }

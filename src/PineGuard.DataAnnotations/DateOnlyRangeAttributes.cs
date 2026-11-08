@@ -34,7 +34,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalDateOnlyRangeAttribute(Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Order.NotChronological)
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Order.NotChronological, allowNull: false)
 {
     /// <summary>Gets whether the range boundaries are included or excluded when evaluating the constraint.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -42,9 +42,9 @@ public sealed class ChronologicalDateOnlyRangeAttribute(Inclusion inclusion = In
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range = (DateOnlyRange)value!;
+        var range = ((DateOnlyRange?)value).GetValueOrDefault();
         var result = Must.Be.Chronological(range, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -60,7 +60,7 @@ public sealed class ChronologicalDateOnlyRangeAttribute(Inclusion inclusion = In
 /// <para>
 /// The <paramref name="start2"/> and <paramref name="end2"/> constructor arguments are parsed from
 /// <see cref="DateOnly"/> string format (e.g., <c>"2024-01-01"</c>) using invariant culture. Defaults to
-/// <see cref="Inclusion.Exclusive"/> boundaries.
+/// <see cref="Inclusion.Inclusive"/> boundaries.
 /// </para>
 /// </remarks>
 /// <example>
@@ -76,8 +76,8 @@ public sealed class ChronologicalDateOnlyRangeAttribute(Inclusion inclusion = In
 /// <seealso cref="MustDateOnlyRangeClauses.Overlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OverlappingDateOnlyRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Overlap.Missing)
+public sealed class OverlappingDateOnlyRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Overlap.Missing, allowNull: false)
 {
     /// <summary>Gets the reference range that the annotated range must overlap.</summary>
     public DateOnlyRange Range2 { get; } = new(
@@ -90,9 +90,9 @@ public sealed class OverlappingDateOnlyRangeAttribute(string start2, string end2
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range1 = (DateOnlyRange)value!;
+        var range1 = ((DateOnlyRange?)value).GetValueOrDefault();
         var result = Must.Be.Overlapping(range1, Range2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -107,7 +107,7 @@ public sealed class OverlappingDateOnlyRangeAttribute(string start2, string end2
 /// </para>
 /// <para>
 /// The <paramref name="start2"/> and <paramref name="end2"/> constructor arguments are parsed from
-/// <see cref="DateOnly"/> string format using invariant culture. Defaults to <see cref="Inclusion.Exclusive"/>
+/// <see cref="DateOnly"/> string format using invariant culture. Defaults to <see cref="Inclusion.Inclusive"/>
 /// boundaries.
 /// </para>
 /// </remarks>
@@ -124,8 +124,8 @@ public sealed class OverlappingDateOnlyRangeAttribute(string start2, string end2
 /// <seealso cref="MustDateOnlyRangeClauses.NotOverlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOverlappingDateOnlyRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Overlap.Present)
+public sealed class NotOverlappingDateOnlyRangeAttribute(string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Overlap.Present, allowNull: false)
 {
     /// <summary>Gets the reference range that the annotated range must not overlap.</summary>
     public DateOnlyRange Range2 { get; } = new(
@@ -138,9 +138,9 @@ public sealed class NotOverlappingDateOnlyRangeAttribute(string start2, string e
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range1 = (DateOnlyRange)value!;
+        var range1 = ((DateOnlyRange?)value).GetValueOrDefault();
         var result = Must.Be.NotOverlapping(range1, Range2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -171,7 +171,7 @@ public sealed class NotOverlappingDateOnlyRangeAttribute(string start2, string e
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ContainsDateOnlyRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Bounds.NotContains)
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Bounds.NotContains, allowNull: false)
 {
     /// <summary>Gets the date that the annotated range must contain.</summary>
     public DateOnly Value { get; } = DateOnly.Parse(value, CultureInfo.InvariantCulture);
@@ -182,9 +182,9 @@ public sealed class ContainsDateOnlyRangeAttribute(string value, Inclusion inclu
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range = (DateOnlyRange)value!;
+        var range = ((DateOnlyRange?)value).GetValueOrDefault();
         var result = Must.Be.Contains(range, Value, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -216,7 +216,7 @@ public sealed class ContainsDateOnlyRangeAttribute(string value, Inclusion inclu
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonlyrange">DateOnlyRange Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotContainsDateOnlyRangeAttribute(string value, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Bounds.Contains)
+    : ValidationAttributeBase(typeof(DateOnlyRange), MustCodes.Range.Bounds.Contains, allowNull: false)
 {
     /// <summary>Gets the date that the annotated range must not contain.</summary>
     public DateOnly Value { get; } = DateOnly.Parse(value, CultureInfo.InvariantCulture);
@@ -227,9 +227,9 @@ public sealed class NotContainsDateOnlyRangeAttribute(string value, Inclusion in
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var range = (DateOnlyRange)value!;
+        var range = ((DateOnlyRange?)value).GetValueOrDefault();
         var result = Must.Be.NotContains(range, Value, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 #endif

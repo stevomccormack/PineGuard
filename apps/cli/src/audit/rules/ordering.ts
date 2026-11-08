@@ -180,11 +180,10 @@ export interface NegativePrefixResult {
 }
 
 /**
- * Recognises the three "this name is the forbidden/negative complement of
- * the real concept" prefixes — `Not`, `Non`, `Invalid` — each guarded so a
- * bare `"Invalid"` (or `"Not"`/`"Non"`) is left untouched rather than
- * stripped down to an empty string. Mirrors
- * `MethodOrderingAudit.TryStripNegativePrefix` exactly.
+ * Recognises negative prefixes and the exact XML validity exception.
+ * InvalidXml means the complement of ValidXml; arbitrary Invalid-prefixed
+ * names are not a library naming convention. Scalar OutOfRange operations
+ * share the corresponding InRange key, retaining any parsed-type suffix.
  */
 export function tryStripNegativePrefix(
     operationName: string,
@@ -197,8 +196,15 @@ export function tryStripNegativePrefix(
         return { isNegative: true, baseName: operationName.slice(3) };
     }
 
-    if (operationName.startsWith("Invalid") && operationName.length > 7) {
-        return { isNegative: true, baseName: operationName.slice(7) };
+    if (operationName === "InvalidXml") {
+        return { isNegative: true, baseName: "ValidXml" };
+    }
+
+    if (operationName.startsWith("OutOfRange")) {
+        return {
+            isNegative: true,
+            baseName: `InRange${operationName.slice("OutOfRange".length)}`,
+        };
     }
 
     return { isNegative: false, baseName: operationName };

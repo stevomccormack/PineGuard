@@ -48,18 +48,18 @@ public sealed class DateOnlyAttributesTests(ITestOutputHelper output) : BaseData
         => Verify(new FutureOrPresentDateOnlyAttribute(), testCase);
 
     [Theory]
-    [MemberData(nameof(DateOnlyAttributesTestData.BetweenDateOnly.ValidCases), MemberType = typeof(DateOnlyAttributesTestData.BetweenDateOnly))]
-    [MemberData(nameof(DateOnlyAttributesTestData.BetweenDateOnly.EdgeCases), MemberType = typeof(DateOnlyAttributesTestData.BetweenDateOnly))]
-    [MemberData(nameof(DateOnlyAttributesTestData.BetweenDateOnly.InvalidCases), MemberType = typeof(DateOnlyAttributesTestData.BetweenDateOnly))]
-    public void BetweenDateOnly_ShouldReturnExpected(DateOnlyAttributesTestData.ValidCase testCase)
-        => Verify(new BetweenDateOnlyAttribute("2020-01-01", "2020-01-31"), testCase);
+    [MemberData(nameof(DateOnlyAttributesTestData.InRangeDateOnly.ValidCases), MemberType = typeof(DateOnlyAttributesTestData.InRangeDateOnly))]
+    [MemberData(nameof(DateOnlyAttributesTestData.InRangeDateOnly.EdgeCases), MemberType = typeof(DateOnlyAttributesTestData.InRangeDateOnly))]
+    [MemberData(nameof(DateOnlyAttributesTestData.InRangeDateOnly.InvalidCases), MemberType = typeof(DateOnlyAttributesTestData.InRangeDateOnly))]
+    public void InRangeDateOnly_ShouldReturnExpected(DateOnlyAttributesTestData.ValidCase testCase)
+        => Verify(new InRangeDateOnlyAttribute("2020-01-01", "2020-01-31"), testCase);
 
     [Theory]
-    [MemberData(nameof(DateOnlyAttributesTestData.NotBetweenDateOnly.ValidCases), MemberType = typeof(DateOnlyAttributesTestData.NotBetweenDateOnly))]
-    [MemberData(nameof(DateOnlyAttributesTestData.NotBetweenDateOnly.EdgeCases), MemberType = typeof(DateOnlyAttributesTestData.NotBetweenDateOnly))]
-    [MemberData(nameof(DateOnlyAttributesTestData.NotBetweenDateOnly.InvalidCases), MemberType = typeof(DateOnlyAttributesTestData.NotBetweenDateOnly))]
-    public void NotBetweenDateOnly_ShouldReturnExpected(DateOnlyAttributesTestData.ValidCase testCase)
-        => Verify(new NotBetweenDateOnlyAttribute("2020-01-01", "2020-01-31"), testCase);
+    [MemberData(nameof(DateOnlyAttributesTestData.OutOfRangeDateOnly.ValidCases), MemberType = typeof(DateOnlyAttributesTestData.OutOfRangeDateOnly))]
+    [MemberData(nameof(DateOnlyAttributesTestData.OutOfRangeDateOnly.EdgeCases), MemberType = typeof(DateOnlyAttributesTestData.OutOfRangeDateOnly))]
+    [MemberData(nameof(DateOnlyAttributesTestData.OutOfRangeDateOnly.InvalidCases), MemberType = typeof(DateOnlyAttributesTestData.OutOfRangeDateOnly))]
+    public void OutOfRangeDateOnly_ShouldReturnExpected(DateOnlyAttributesTestData.ValidCase testCase)
+        => Verify(new OutOfRangeDateOnlyAttribute("2020-01-01", "2020-01-31"), testCase);
 
     [Theory]
     [MemberData(nameof(DateOnlyAttributesTestData.BeforeDateOnly.ValidCases), MemberType = typeof(DateOnlyAttributesTestData.BeforeDateOnly))]

@@ -54,7 +54,7 @@ public static class MustStringDateTimeOffsetClausesTestData
         ];
     }
 
-    public static class BetweenDateTimeOffset
+    public static class InRangeDateTimeOffset
     {
         public static TheoryData<MustCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> Cases =>
         [
@@ -68,7 +68,7 @@ public static class MustStringDateTimeOffsetClausesTestData
         ];
     }
 
-    public static class NotBetweenDateTimeOffset
+    public static class OutOfRangeDateTimeOffset
     {
         public static TheoryData<MustCase<(string? value, DateTimeOffset min, DateTimeOffset max, Inclusion inclusion)>> Cases =>
         [

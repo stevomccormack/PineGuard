@@ -119,22 +119,22 @@ public sealed class CollectionRulesTests(ITestOutputHelper output) : BaseRuleUni
     }
 
     [Theory]
-    [MemberData(nameof(CollectionRulesTestData.HasCountBetween.Cases), MemberType = typeof(CollectionRulesTestData.HasCountBetween))]
-    public void HasCountBetween_BehavesAsExpected(RuleCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(CollectionRulesTestData.HasCountInRange.Cases), MemberType = typeof(CollectionRulesTestData.HasCountInRange))]
+    public void HasCountInRange_BehavesAsExpected(RuleCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = CollectionRules.HasCountBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = CollectionRules.HasCountInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(CollectionRulesTestData.HasCountBetween.AdHocCases), MemberType = typeof(CollectionRulesTestData.HasCountBetween))]
-    public void HasCountBetween_AdHoc_BehavesAsExpected(RuleCase<(IEnumerable<string>? Value, int Min, int Max, Inclusion Inclusion)> tc)
+    [MemberData(nameof(CollectionRulesTestData.HasCountInRange.AdHocCases), MemberType = typeof(CollectionRulesTestData.HasCountInRange))]
+    public void HasCountInRange_AdHoc_BehavesAsExpected(RuleCase<(IEnumerable<string>? Value, int Min, int Max, Inclusion Inclusion)> tc)
     {
         // Act
-        var result = CollectionRules.HasCountBetween(tc.Value.Value, tc.Value.Min, tc.Value.Max, tc.Value.Inclusion);
+        var result = CollectionRules.HasCountInRange(tc.Value.Value, tc.Value.Min, tc.Value.Max, tc.Value.Inclusion);
 
         // Assert
         AssertResult(tc, result);
@@ -289,4 +289,43 @@ public sealed class CollectionRulesTests(ITestOutputHelper output) : BaseRuleUni
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(CollectionRulesTestData.ComparisonShapes), MemberType = typeof(CollectionRulesTestData))]
+    public void Membership_UsesExplicitComparerRegardlessOfCollectionType(RuleCase<(IEnumerable<string> Value, IEnumerable<string> Other)> testCase)
+    {
+        // Arrange
+        var (value, other) = testCase.Value;
+
+        // Act and Assert
+        Assert.False(CollectionRules.Contains(value, "abc"));
+        Assert.True(CollectionRules.Contains(value, "abc", StringComparer.OrdinalIgnoreCase));
+        Assert.False(CollectionRules.IsSubsetOf(value, other));
+        Assert.True(CollectionRules.IsSubsetOf(value, other, StringComparer.OrdinalIgnoreCase));
+        Assert.True(CollectionRules.IsSubsetOf(value, value));
+    }
+
+    [Theory]
+    [MemberData(nameof(CollectionRulesTestData.NullableValueItems), MemberType = typeof(CollectionRulesTestData))]
+    public void ContainsNullItems_ValueTypes_ReturnsExpected(RuleCase<int?[]?> testCase)
+    {
+        // Act
+        var result = CollectionRules.ContainsNullItems(testCase.Value);
+
+        // Assert
+        AssertResult(testCase, result);
+    }
+
+
+    [Theory]
+    [MemberData(nameof(CollectionRulesTestData.InvalidInclusionCases), MemberType = typeof(CollectionRulesTestData))]
+    public void HasCountInRange_RejectsUndefinedInclusionBeforeInput(CollectionRulesTestData.InvalidInclusionCase testCase)
+    {
+        // Act
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => CollectionRules.HasCountInRange(testCase.Value, 0, 0, (Inclusion)99));
+
+        // Assert
+        ThrowsCaseAssert.Expected(exception, testCase);
+    }
+
 }

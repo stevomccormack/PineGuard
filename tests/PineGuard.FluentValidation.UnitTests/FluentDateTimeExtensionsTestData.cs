@@ -48,7 +48,7 @@ public static class FluentDateTimeExtensionsTestData
         ];
     }
 
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<FluentCase<(DateTime value, DateTime min, DateTime max)>> Cases =>
         [
@@ -58,7 +58,7 @@ public static class FluentDateTimeExtensionsTestData
         ];
     }
 
-    public static class NotBetween
+    public static class OutOfRange
     {
         public static TheoryData<FluentCase<(DateTime value, DateTime min, DateTime max)>> Cases =>
         [

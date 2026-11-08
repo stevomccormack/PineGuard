@@ -35,13 +35,19 @@ public static class MustStringTimeSpanClauses
     /// The failure message follows the pattern <c>"{paramName} must be a duration within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-span">String Time Span Must Clauses documentation</seealso>
-    public static MustResult<TimeSpan> DurationBetween(this IMustClause _,
+    public static MustResult<TimeSpan> InRangeTimeSpan(this IMustClause _,
         string? value,
         TimeSpan min,
         TimeSpan max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
+        if (min > max)
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.OutOfRange, "{paramName} requires a valid range.", nameof(min), min);
+
         if (value is null)
             return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.OutOfRange, NullMessage, paramName, value);
 
@@ -50,8 +56,8 @@ public static class MustStringTimeSpanClauses
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
             return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = TimeSpanRules.IsDurationBetween(parsedValue, min, max, inclusion);
+        var parsedValue = parsed;
+        var ok = TimeSpanRules.IsInRange(parsedValue, min, max, inclusion);
         return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.OutOfRange, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -60,7 +66,7 @@ public static class MustStringTimeSpanClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="threshold">The value to validate.</param>
+    /// <param name="other">The value to validate.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
@@ -73,12 +79,15 @@ public static class MustStringTimeSpanClauses
     /// The failure message follows the pattern <c>"{paramName} must be a duration greater than the threshold."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-span">String Time Span Must Clauses documentation</seealso>
-    public static MustResult<TimeSpan> GreaterThan(this IMustClause _,
+    public static MustResult<TimeSpan> GreaterThanTimeSpan(this IMustClause _,
         string? value,
-        TimeSpan threshold,
+        TimeSpan other,
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotGreater, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (value is null)
             return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotGreater, NullMessage, paramName, value);
 
@@ -87,8 +96,8 @@ public static class MustStringTimeSpanClauses
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
             return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = TimeSpanRules.IsGreaterThan(parsedValue, threshold, inclusion);
+        var parsedValue = parsed;
+        var ok = TimeSpanRules.IsGreaterThan(parsedValue, other, inclusion);
         return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotGreater, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -97,7 +106,7 @@ public static class MustStringTimeSpanClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="threshold">The value to validate.</param>
+    /// <param name="other">The value to validate.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
@@ -110,12 +119,15 @@ public static class MustStringTimeSpanClauses
     /// The failure message follows the pattern <c>"{paramName} must be a duration less than the threshold."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-span">String Time Span Must Clauses documentation</seealso>
-    public static MustResult<TimeSpan> LessThan(this IMustClause _,
+    public static MustResult<TimeSpan> LessThanTimeSpan(this IMustClause _,
         string? value,
-        TimeSpan threshold,
+        TimeSpan other,
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotLess, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (value is null)
             return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotLess, NullMessage, paramName, value);
 
@@ -124,8 +136,8 @@ public static class MustStringTimeSpanClauses
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
             return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = TimeSpanRules.IsLessThan(parsedValue, threshold, inclusion);
+        var parsedValue = parsed;
+        var ok = TimeSpanRules.IsLessThan(parsedValue, other, inclusion);
         return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotLess, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -148,13 +160,19 @@ public static class MustStringTimeSpanClauses
     /// The failure message follows the pattern <c>"{paramName} must be a duration not within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-span">String Time Span Must Clauses documentation</seealso>
-    public static MustResult<TimeSpan> NotDurationBetween(this IMustClause _,
+    public static MustResult<TimeSpan> OutOfRangeTimeSpan(this IMustClause _,
         string? value,
         TimeSpan min,
         TimeSpan max,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
+        if (min > max)
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.InRange, "{paramName} requires a valid range.", nameof(min), min);
+
         if (value is null)
             return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.InRange, NullMessage, paramName, value);
 
@@ -163,8 +181,8 @@ public static class MustStringTimeSpanClauses
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
             return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = !TimeSpanRules.IsDurationBetween(parsedValue, min, max, inclusion);
+        var parsedValue = parsed;
+        var ok = !TimeSpanRules.IsInRange(parsedValue, min, max, inclusion);
         return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.InRange, messageTemplate, paramName, value, parsedValue);
     }
 }

@@ -110,4 +110,20 @@ public sealed class NetworkAttributesTests(ITestOutputHelper output) : BaseDataA
         // Assert
         AssertResult(tc, result, attr.Code);
     }
+
+    [Theory]
+    [MemberData(nameof(NetworkAttributesTestData.CidrConfiguration.Cases), MemberType = typeof(NetworkAttributesTestData.CidrConfiguration))]
+    public void CidrConfiguration_ValidatesBeforeNullSkip(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, cidr) = ((string? value, string? cidr))tc.Value!;
+        var attribute = new InCidrRangeAttribute(cidr!);
+        var context = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attribute.GetValidationResult(value, context);
+
+        // Assert
+        AssertResult(tc, result, attribute.Code);
+    }
 }

@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using PineGuard.Common;
@@ -31,15 +30,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.Positive"/>
-    public static decimal ZeroOrNegative(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.PositiveDecimal"/>
+    public static decimal ZeroOrNegativeDecimal(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Positive(value, styles, paramName);
+        var result = Must.Be.PositiveDecimal(value, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -63,15 +62,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.Negative"/>
-    public static decimal ZeroOrPositive(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.NegativeDecimal"/>
+    public static decimal ZeroOrPositiveDecimal(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Negative(value, styles, paramName);
+        var result = Must.Be.NegativeDecimal(value, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -95,15 +94,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.Zero"/>
-    public static decimal NotZero(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.ZeroDecimal"/>
+    public static decimal NotZeroDecimal(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Zero(value, styles, paramName); // Guard.Against.NotZero => Must.Be.Zero (complement)
+        var result = Must.Be.ZeroDecimal(value, styles, paramName); // Guard.Against.NotZero => Must.Be.Zero (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -127,15 +126,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.NotZero"/>
-    public static decimal Zero(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.NotZeroDecimal"/>
+    public static decimal ZeroDecimal(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotZero(value, styles, paramName); // Guard.Against.Zero => Must.Be.NotZero (complement)
+        var result = Must.Be.NotZeroDecimal(value, styles, paramName); // Guard.Against.Zero => Must.Be.NotZero (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -159,15 +158,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.ZeroOrPositive"/>
-    public static decimal Negative(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.ZeroOrPositiveDecimal"/>
+    public static decimal NegativeDecimal(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.ZeroOrPositive(value, styles, paramName);
+        var result = Must.Be.ZeroOrPositiveDecimal(value, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -191,15 +190,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.ZeroOrNegative"/>
-    public static decimal Positive(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.ZeroOrNegativeDecimal"/>
+    public static decimal PositiveDecimal(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.ZeroOrNegative(value, styles, paramName);
+        var result = Must.Be.ZeroOrNegativeDecimal(value, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -211,7 +210,7 @@ public static class GuardStringNumbersClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="other">The maximum bound.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -224,16 +223,16 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.GreaterThan"/>
-    public static decimal LessThanOrEqual(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.GreaterThanDecimal"/>
+    public static decimal LessThanOrEqualDecimal(this IGuardClause _,
         string? value,
-        decimal max,
+        decimal other,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.GreaterThan(value, max, styles, paramName);
+        var result = Must.Be.GreaterThanDecimal(value, other, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -245,7 +244,7 @@ public static class GuardStringNumbersClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="other">The maximum bound.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -258,16 +257,16 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.GreaterThanOrEqual"/>
-    public static decimal LessThan(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.GreaterThanOrEqualDecimal"/>
+    public static decimal LessThanDecimal(this IGuardClause _,
         string? value,
-        decimal max,
+        decimal other,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.GreaterThanOrEqual(value, max, styles, paramName);
+        var result = Must.Be.GreaterThanOrEqualDecimal(value, other, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -279,7 +278,7 @@ public static class GuardStringNumbersClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="min">The minimum bound.</param>
+    /// <param name="other">The minimum bound.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -292,16 +291,16 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.LessThan"/>
-    public static decimal GreaterThanOrEqual(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.LessThanDecimal"/>
+    public static decimal GreaterThanOrEqualDecimal(this IGuardClause _,
         string? value,
-        decimal min,
+        decimal other,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.LessThan(value, min, styles, paramName); // Guard.Against.LessThan => Must.Be.GreaterThanOrEqual (complement)
+        var result = Must.Be.LessThanDecimal(value, other, styles, paramName); // Guard.Against.LessThan => Must.Be.GreaterThanOrEqual (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -313,7 +312,7 @@ public static class GuardStringNumbersClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="min">The minimum bound.</param>
+    /// <param name="other">The minimum bound.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -326,16 +325,16 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.LessThanOrEqual"/>
-    public static decimal GreaterThan(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.LessThanOrEqualDecimal"/>
+    public static decimal GreaterThanDecimal(this IGuardClause _,
         string? value,
-        decimal min,
+        decimal other,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.LessThanOrEqual(value, min, styles, paramName); // Guard.Against.GreaterThanOrEqual => Must.Be.LessThan (complement)
+        var result = Must.Be.LessThanOrEqualDecimal(value, other, styles, paramName); // Guard.Against.GreaterThanOrEqual => Must.Be.LessThan (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -362,8 +361,8 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.InRange"/>
-    public static decimal OutOfRange(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.InRangeDecimal"/>
+    public static decimal OutOfRangeDecimal(this IGuardClause _,
         string? value,
         decimal min,
         decimal max,
@@ -373,7 +372,7 @@ public static class GuardStringNumbersClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.InRange(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.InRangeDecimal(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -400,8 +399,8 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.OutOfRange"/>
-    public static decimal InRange(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.OutOfRangeDecimal"/>
+    public static decimal InRangeDecimal(this IGuardClause _,
         string? value,
         decimal min,
         decimal max,
@@ -411,7 +410,7 @@ public static class GuardStringNumbersClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.OutOfRange(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.OutOfRangeDecimal(value, min, max, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -435,15 +434,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.Percentage"/>
-    public static decimal NotPercentage(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.PercentageDecimal"/>
+    public static decimal NotPercentageDecimal(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Percentage(value, styles, paramName); // Guard.Against.NotPercentage => Must.Be.Percentage (complement)
+        var result = Must.Be.PercentageDecimal(value, styles, paramName); // Guard.Against.NotPercentage => Must.Be.Percentage (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -469,8 +468,8 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.Approximately"/>
-    public static decimal NotApproximately(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.ApproximatelyDecimal"/>
+    public static decimal NotApproximatelyDecimal(this IGuardClause _,
         string? value,
         decimal target,
         decimal? tolerance,
@@ -479,7 +478,7 @@ public static class GuardStringNumbersClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Approximately(value, target, tolerance, styles, paramName);
+        var result = Must.Be.ApproximatelyDecimal(value, target, tolerance, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -505,8 +504,8 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.NotApproximately"/>
-    public static decimal Approximately(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.NotApproximatelyDecimal"/>
+    public static decimal ApproximatelyDecimal(this IGuardClause _,
         string? value,
         decimal target,
         decimal? tolerance,
@@ -515,7 +514,7 @@ public static class GuardStringNumbersClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotApproximately(value, target, tolerance, styles, paramName);
+        var result = Must.Be.NotApproximatelyDecimal(value, target, tolerance, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -540,8 +539,8 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.MultipleOf"/>
-    public static decimal NotMultipleOf(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.MultipleOfDecimal"/>
+    public static decimal NotMultipleOfDecimal(this IGuardClause _,
         string? value,
         decimal factor,
         NumberStyles styles = DefaultStyles,
@@ -549,7 +548,7 @@ public static class GuardStringNumbersClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.MultipleOf(value, factor, styles, paramName);
+        var result = Must.Be.MultipleOfDecimal(value, factor, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -574,8 +573,8 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.NotMultipleOf"/>
-    public static decimal MultipleOf(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.NotMultipleOfDecimal"/>
+    public static decimal MultipleOfDecimal(this IGuardClause _,
         string? value,
         decimal factor,
         NumberStyles styles = DefaultStyles,
@@ -583,7 +582,7 @@ public static class GuardStringNumbersClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotMultipleOf(value, factor, styles, paramName);
+        var result = Must.Be.NotMultipleOfDecimal(value, factor, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -607,15 +606,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.Even"/>
-    public static int Odd(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.EvenInt32"/>
+    public static int OddInt32(this IGuardClause _,
         string? value,
         NumberStyles styles = NumberStyles.Integer,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Even(value, styles, paramName);
+        var result = Must.Be.EvenInt32(value, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -639,15 +638,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.Odd"/>
-    public static int Even(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.OddInt32"/>
+    public static int EvenInt32(this IGuardClause _,
         string? value,
         NumberStyles styles = NumberStyles.Integer,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Odd(value, styles, paramName); // Guard.Against.Even => Must.Be.Odd (complement)
+        var result = Must.Be.OddInt32(value, styles, paramName); // Guard.Against.Even => Must.Be.Odd (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -671,15 +670,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.Finite"/>
-    public static double NotFinite(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.FiniteDouble"/>
+    public static double NotFiniteDouble(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Finite(value, styles, paramName);
+        var result = Must.Be.FiniteDouble(value, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -703,15 +702,15 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.NotFinite"/>
-    public static double Finite(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.NotFiniteDouble"/>
+    public static double FiniteDouble(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotFinite(value, styles, paramName);
+        var result = Must.Be.NotFiniteDouble(value, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -735,19 +734,18 @@ public static class GuardStringNumbersClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustStringNumbersClauses.NotNaN"/>
-    public static double NaN(this IGuardClause _,
+    /// <seealso cref="MustStringNumbersClauses.NotNaNDouble"/>
+    public static double NaNDouble(this IGuardClause _,
         string? value,
         NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotNaN(value, styles, paramName);
+        var result = Must.Be.NotNaNDouble(value, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
 }
-#endif

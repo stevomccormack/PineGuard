@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using PineGuard.Common;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using Xunit.Abstractions;
@@ -39,13 +41,13 @@ public sealed class StringDateTimeOffsetAttributesTests(ITestOutputHelper output
         AssertResult(tc, result);
     }
 
-    // BetweenDateTimeOffsetStringAttribute
+    // InRangeDateTimeOffsetStringAttribute
     [Theory]
-    [MemberData(nameof(StringDateTimeOffsetAttributesTestData.BetweenDateTimeOffsetString.Cases), MemberType = typeof(StringDateTimeOffsetAttributesTestData.BetweenDateTimeOffsetString))]
-    public void BetweenDateTimeOffsetString_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringDateTimeOffsetAttributesTestData.InRangeDateTimeOffsetString.Cases), MemberType = typeof(StringDateTimeOffsetAttributesTestData.InRangeDateTimeOffsetString))]
+    public void InRangeDateTimeOffsetString_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new BetweenDateTimeOffsetStringAttribute("2020-01-01T00:00:00Z", "2020-01-02T00:00:00Z");
+        InRangeDateTimeOffsetStringAttribute attr = new InRangeDateTimeOffsetStringAttribute("2020-01-01T00:00:00Z", "2020-01-02T00:00:00Z");
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -55,13 +57,13 @@ public sealed class StringDateTimeOffsetAttributesTests(ITestOutputHelper output
         AssertResult(tc, result);
     }
 
-    // BetweenDateTimeOffsetStringAttribute — offset-less values are assumed UTC on any host time zone
+    // InRangeDateTimeOffsetStringAttribute — offset-less values are assumed UTC on any host time zone
     [Theory]
-    [MemberData(nameof(StringDateTimeOffsetAttributesTestData.BetweenDateTimeOffsetStringAssumeUtc.Cases), MemberType = typeof(StringDateTimeOffsetAttributesTestData.BetweenDateTimeOffsetStringAssumeUtc))]
-    public void BetweenDateTimeOffsetString_OffsetLessValue_IsAssumedUtc(DataAnnotationCase tc)
+    [MemberData(nameof(StringDateTimeOffsetAttributesTestData.InRangeDateTimeOffsetStringAssumeUtc.Cases), MemberType = typeof(StringDateTimeOffsetAttributesTestData.InRangeDateTimeOffsetStringAssumeUtc))]
+    public void InRangeDateTimeOffsetString_OffsetLessValue_IsAssumedUtc(DataAnnotationCase tc)
     {
         // Arrange — a one-minute UTC window around the offset-less value; only UTC-assumed parsing lands inside it
-        var attr = new BetweenDateTimeOffsetStringAttribute("2024-01-15T10:29:30Z", "2024-01-15T10:30:30Z");
+        InRangeDateTimeOffsetStringAttribute attr = new InRangeDateTimeOffsetStringAttribute("2024-01-15T10:29:30Z", "2024-01-15T10:30:30Z");
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -101,5 +103,19 @@ public sealed class StringDateTimeOffsetAttributesTests(ITestOutputHelper output
 
         // Assert
         AssertResult(tc, result, attr.Code);
+    }
+    [Theory]
+    [MemberData(nameof(StringDateTimeOffsetAttributesTestData.OutOfRangeDateTimeOffsetStringConfiguration.Cases), MemberType = typeof(StringDateTimeOffsetAttributesTestData.OutOfRangeDateTimeOffsetStringConfiguration))]
+    public void OutOfRangeDateTimeOffsetString_ValidatesConfigurationAndValue(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, min, max, inclusion, styles) = ((string? value, string min, string max, Inclusion inclusion, DateTimeStyles styles))tc.Value!;
+        var attribute = new OutOfRangeDateTimeOffsetStringAttribute(min, max, inclusion) { Styles = styles };
+
+        // Act
+        var result = attribute.GetValidationResult(value, new ValidationContext(new object()) { MemberName = "Value" });
+
+        // Assert
+        AssertResult(tc, result, attribute.Code);
     }
 }

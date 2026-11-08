@@ -11,8 +11,8 @@ public static class StringTimeSpanAttributesTestData
         new("null", null, true)
     ];
 
-    // DurationBetween("00:05:00", "02:00:00") — inclusive
-    public static class DurationBetweenTimeSpanString
+    // InRange("00:05:00", "02:00:00") — inclusive
+    public static class InRangeTimeSpanString
     {
         public static TheoryData<ValidCase> ValidCases => [new("within", "01:00:00", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
@@ -35,8 +35,8 @@ public static class StringTimeSpanAttributesTestData
         public static TheoryData<ValidCase> InvalidCases => [new("greater", "03:00:00", false), new("unparseable", "abc", false)];
     }
 
-    // NotDurationBetween("00:05:00", "02:00:00") — inclusive
-    public static class NotDurationBetweenTimeSpanString
+    // OutOfRange("00:05:00", "02:00:00") — inclusive
+    public static class OutOfRangeTimeSpanString
     {
         public static TheoryData<ValidCase> ValidCases => [new("outside", "03:00:00", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();

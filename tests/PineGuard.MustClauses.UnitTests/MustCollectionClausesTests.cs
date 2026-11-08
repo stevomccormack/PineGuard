@@ -68,13 +68,13 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
     }
 
     [Theory]
-    [MemberData(nameof(MustCollectionClausesTestData.HasCountBetween.ValidCases), MemberType = typeof(MustCollectionClausesTestData.HasCountBetween))]
-    [MemberData(nameof(MustCollectionClausesTestData.HasCountBetween.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.HasCountBetween))]
-    [MemberData(nameof(MustCollectionClausesTestData.HasCountBetween.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.HasCountBetween))]
-    public void HasCountBetween_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustCollectionClausesTestData.HasCountInRange.ValidCases), MemberType = typeof(MustCollectionClausesTestData.HasCountInRange))]
+    [MemberData(nameof(MustCollectionClausesTestData.HasCountInRange.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.HasCountInRange))]
+    [MemberData(nameof(MustCollectionClausesTestData.HasCountInRange.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.HasCountInRange))]
+    public void HasCountInRange_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = Must.Be.HasCountBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.HasCountInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
 
         // Assert
         AssertResult(tc, result);
@@ -279,15 +279,109 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
     }
 
     [Theory]
-    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountBetween.ValidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountBetween))]
-    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountBetween.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountBetween))]
-    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountBetween.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountBetween))]
-    public void NotHasCountBetween_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountInRange.ValidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountInRange))]
+    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountInRange.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountInRange))]
+    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountInRange.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountInRange))]
+    public void NotHasCountInRange_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = Must.Be.NotHasCountBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.NotHasCountInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
 
         // Assert
         AssertResult(tc, result);
     }
+
+    [Theory]
+    [MemberData(nameof(MustCollectionClausesTestData.NullableValueItems), MemberType = typeof(MustCollectionClausesTestData))]
+    public void NotContainsNullItems_ValueTypes_PreservesInputAndProjects(MustCase<int?[]?> testCase)
+    {
+        // Arrange
+        var value = testCase.Value;
+        var expected = testCase.Expected.IsValid ? value!.Select(item => item.GetValueOrDefault()).ToArray() : null;
+        var source = value is null ? null : new MustCollectionClausesTestData.SinglePassEnumerable<int?>(value);
+        var result = Must.Be.NotContainsNullItems(source);
+        Assert.Equal(expected is not null, result.Success);
+        Assert.Same(source, result.Value);
+        Assert.Equal(expected, result.Result);
+        if (source is not null)
+            Assert.Equal(1, source.EnumerationCount);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustCollectionClausesTestData.ComparerItems), MemberType = typeof(MustCollectionClausesTestData))]
+    public void Membership_PropagatesComparerAndPreservesInput(MustCase<string[]> testCase)
+    {
+        // Arrange
+        var value = testCase.Value;
+        var source = new MustCollectionClausesTestData.SinglePassEnumerable<string>(value);
+        var contains = Must.Be.Contains(source, "abc", StringComparer.OrdinalIgnoreCase);
+        Assert.True(contains.Success);
+        Assert.Same(source, contains.Value);
+        Assert.Equal(value, contains.Result);
+        Assert.Equal(1, source.EnumerationCount);
+        Assert.False(Must.Be.Contains(value, "abc").Success);
+        Assert.True(Must.Be.NotContains(value, "abc").Success);
+        Assert.False(Must.Be.NotContains(value, "abc", StringComparer.OrdinalIgnoreCase).Success);
+        Assert.True(Must.Be.SubsetOf(value, new[] { "abc" }, StringComparer.OrdinalIgnoreCase).Success);
+        Assert.False(Must.Be.SubsetOf(value, new[] { "abc" }).Success);
+        Assert.True(Must.Be.NotSubsetOf(value, new[] { "abc" }).Success);
+        Assert.False(Must.Be.NotSubsetOf(value, new[] { "abc" }, StringComparer.OrdinalIgnoreCase).Success);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustCollectionClausesTestData.ComparerItems), MemberType = typeof(MustCollectionClausesTestData))]
+    public void SubsetOf_SameSinglePassSequence_EnumeratesOnce(MustCase<string[]> testCase)
+    {
+        // Arrange
+        var value = testCase.Value;
+        var source = new MustCollectionClausesTestData.SinglePassEnumerable<string>(value);
+        var result = Must.Be.SubsetOf(source, source);
+        Assert.True(result.Success);
+        Assert.Same(source, result.Value);
+        Assert.Equal(value, result.Result);
+        Assert.Equal(1, source.EnumerationCount);
+
+        var negativeSource = new MustCollectionClausesTestData.SinglePassEnumerable<string>(value);
+        var negative = Must.Be.NotSubsetOf(negativeSource, negativeSource);
+        Assert.False(negative.Success);
+        Assert.Same(negativeSource, negative.Value);
+        Assert.Equal(1, negativeSource.EnumerationCount);
+    }
+
+
+    [Theory]
+    [MemberData(nameof(MustCollectionClausesTestData.InvalidRangeConfiguration), MemberType = typeof(MustCollectionClausesTestData))]
+    public void CountInRange_ReportsConfigurationBeforeNullValue(MustCase<(IEnumerable<int>? Value, int Min, int Max, Inclusion Inclusion)> testCase)
+    {
+        // Arrange
+        var (value, min, max, inclusion) = testCase.Value;
+
+        // Act
+        var positive = Must.Be.HasCountInRange(value, min, max, inclusion);
+        var negative = Must.Be.NotHasCountInRange(value, min, max, inclusion);
+
+        // Assert
+        AssertResult(testCase, positive);
+        AssertResult(testCase, negative);
+    }
+
+
+    [Theory]
+    [MemberData(nameof(MustCollectionClausesTestData.ComparerItems), MemberType = typeof(MustCollectionClausesTestData))]
+    public void NotContainsNullItems_ReferenceTypes_PreservesOriginalAndEnumeratesOnce(MustCase<string[]> testCase)
+    {
+        // Arrange
+        var source = new MustCollectionClausesTestData.SinglePassEnumerable<string?>(testCase.Value);
+
+        // Act
+        var result = Must.Be.NotContainsNullItems(source);
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Same(source, result.Value);
+        Assert.Equal(testCase.Value, result.Result);
+        Assert.Equal(testCase.Value, result.Result);
+        Assert.Equal(1, source.EnumerationCount);
+    }
+
 }

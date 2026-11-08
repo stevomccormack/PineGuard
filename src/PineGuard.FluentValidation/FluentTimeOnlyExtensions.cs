@@ -22,14 +22,14 @@ public static class FluentTimeOnlyExtensions
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <example><code>RuleFor(x => x.StartTime).Between(new TimeOnly(9, 0), new TimeOnly(17, 0));</code></example>
-    public static IRuleBuilderOptions<TModel, TimeOnly> Between<TModel>(
+    /// <example><code>RuleFor(x => x.StartTime).InRange(new TimeOnly(9, 0), new TimeOnly(17, 0));</code></example>
+    public static IRuleBuilderOptions<TModel, TimeOnly> InRange<TModel>(
         this IRuleBuilder<TModel, TimeOnly> ruleBuilder,
         TimeOnly min,
         TimeOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Between(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.InRange(val, min, max, inclusion, paramName: null),
             message, MustCodes.Time.Range.OutOfRange);
 
     /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is between the specified bounds.</summary>
@@ -41,13 +41,13 @@ public static class FluentTimeOnlyExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, TimeOnly?> Between<TModel>(
+    public static IRuleBuilderOptions<TModel, TimeOnly?> InRange<TModel>(
         this IRuleBuilder<TModel, TimeOnly?> ruleBuilder,
         TimeOnly min,
         TimeOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Between(val.Value, min, max, inclusion, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.InRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
             message, MustCodes.Time.Range.OutOfRange);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is not between the specified bounds.</summary>
@@ -58,13 +58,13 @@ public static class FluentTimeOnlyExtensions
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    public static IRuleBuilderOptions<TModel, TimeOnly> NotBetween<TModel>(
+    public static IRuleBuilderOptions<TModel, TimeOnly> OutOfRange<TModel>(
         this IRuleBuilder<TModel, TimeOnly> ruleBuilder,
         TimeOnly min,
         TimeOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotBetween(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.OutOfRange(val, min, max, inclusion, paramName: null),
             message, MustCodes.Time.Range.InRange);
 
     /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is not between the specified bounds.</summary>
@@ -76,13 +76,13 @@ public static class FluentTimeOnlyExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
-    public static IRuleBuilderOptions<TModel, TimeOnly?> NotBetween<TModel>(
+    public static IRuleBuilderOptions<TModel, TimeOnly?> OutOfRange<TModel>(
         this IRuleBuilder<TModel, TimeOnly?> ruleBuilder,
         TimeOnly min,
         TimeOnly max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotBetween(val.Value, min, max, inclusion, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OutOfRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
             message, MustCodes.Time.Range.InRange);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is before the specified time.</summary>
@@ -129,7 +129,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Before(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Before(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Order.NotBefore);
 
     /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is before the time returned by <paramref name="other"/>.</summary>
@@ -176,7 +176,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotBefore(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotBefore(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Order.Before);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is on or before the specified time.</summary>
@@ -223,7 +223,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.OnOrBefore(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OnOrBefore(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Order.After);
 
     /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is on or before the time returned by <paramref name="other"/>.</summary>
@@ -270,7 +270,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotOnOrBefore(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotOnOrBefore(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Order.NotAfter);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is after the specified time.</summary>
@@ -317,7 +317,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.After(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.After(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Order.NotAfter);
 
     /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is after the time returned by <paramref name="other"/>.</summary>
@@ -364,7 +364,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotAfter(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotAfter(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Order.After);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is on or after the specified time.</summary>
@@ -411,7 +411,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.OnOrAfter(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OnOrAfter(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Order.Before);
 
     /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is on or after the time returned by <paramref name="other"/>.</summary>
@@ -458,7 +458,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotOnOrAfter(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotOnOrAfter(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Order.NotBefore);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is the same as the specified time.</summary>
@@ -489,7 +489,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Same(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Same(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Equality.NotEqual);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is not the same as the specified time.</summary>
@@ -520,7 +520,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly other,
         TimePrecision? precision = null,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotSame(val.Value, other, precision, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotSame(val.GetValueOrDefault(), other, precision, paramName: null)),
             message, MustCodes.Time.Equality.Equal);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is within the specified time window of a reference.</summary>
@@ -551,7 +551,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly reference,
         TimeSpan window,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Within(val.Value, reference, window, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Within(val.GetValueOrDefault(), reference, window, paramName: null)),
             message, MustCodes.Time.Proximity.NotWithin);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is not within the specified time window of a reference.</summary>
@@ -582,7 +582,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly reference,
         TimeSpan window,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotWithin(val.Value, reference, window, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotWithin(val.GetValueOrDefault(), reference, window, paramName: null)),
             message, MustCodes.Time.Proximity.Within);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is chronologically before the specified end time.</summary>
@@ -613,7 +613,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly end,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Chronological(val.Value, end, inclusion, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Chronological(val.GetValueOrDefault(), end, inclusion, paramName: null)),
             message, MustCodes.Time.Order.NotChronological);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is not chronologically before the specified end time.</summary>
@@ -644,7 +644,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly end,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotChronological(val.Value, end, inclusion, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotChronological(val.GetValueOrDefault(), end, inclusion, paramName: null)),
             message, MustCodes.Time.Order.Chronological);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> range overlaps with the specified range.</summary>
@@ -661,7 +661,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly end1,
         TimeOnly start2,
         TimeOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Overlapping(val, end1, start2, end2, inclusion, paramName: null),
             message, MustCodes.Time.Overlap.Missing);
@@ -681,9 +681,9 @@ public static class FluentTimeOnlyExtensions
         TimeOnly end1,
         TimeOnly start2,
         TimeOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.Overlapping(val.Value, end1, start2, end2, inclusion, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Overlapping(val.GetValueOrDefault(), end1, start2, end2, inclusion, paramName: null)),
             message, MustCodes.Time.Overlap.Missing);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> range does not overlap with the specified range.</summary>
@@ -700,7 +700,7 @@ public static class FluentTimeOnlyExtensions
         TimeOnly end1,
         TimeOnly start2,
         TimeOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotOverlapping(val, end1, start2, end2, inclusion, paramName: null),
             message, MustCodes.Time.Overlap.Present);
@@ -720,9 +720,11 @@ public static class FluentTimeOnlyExtensions
         TimeOnly end1,
         TimeOnly start2,
         TimeOnly end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val.HasValue ? Must.Be.NotOverlapping(val.Value, end1, start2, end2, inclusion, paramName: null) : MustResult<TimeOnly>.Ok(default),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.NotOverlapping(val.GetValueOrDefault(), end1, start2, end2, inclusion, paramName: null)),
             message, MustCodes.Time.Overlap.Present);
+    private static MustResult<T> SkipAbsentValue<T>(T? value, MustResult<T> result) where T : struct =>
+        value is null && result.ParamName is null ? MustResult<T>.Ok(default) : result;
 }
 #endif

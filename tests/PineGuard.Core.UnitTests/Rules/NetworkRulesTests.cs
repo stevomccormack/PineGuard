@@ -51,11 +51,11 @@ public sealed class NetworkRulesTests(ITestOutputHelper output) : BaseRuleUnitTe
     }
 
     [Theory]
-    [MemberData(nameof(NetworkRulesTestData.IsValidHostname.Cases), MemberType = typeof(NetworkRulesTestData.IsValidHostname))]
-    public void IsValidHostname_BehavesAsExpected(RuleCase<string?> tc)
+    [MemberData(nameof(NetworkRulesTestData.IsHostname.Cases), MemberType = typeof(NetworkRulesTestData.IsHostname))]
+    public void IsHostname_BehavesAsExpected(RuleCase<string?> tc)
     {
         // Act
-        var result = NetworkRules.IsValidHostname(tc.Value);
+        var result = NetworkRules.IsHostname(tc.Value);
 
         // Assert
         AssertResult(tc, result);

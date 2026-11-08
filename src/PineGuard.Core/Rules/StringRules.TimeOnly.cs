@@ -24,8 +24,11 @@ public static partial class StringRules
         /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
         /// <param name="styles">The <see cref="DateTimeStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed time falls within the range; otherwise, <see langword="false"/>.</returns>
-        public static bool IsBetween(string? value, System.TimeOnly min, System.TimeOnly max, Inclusion inclusion = Inclusion.Inclusive, DateTimeStyles styles = DefaultStyles) =>
-            StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsBetween(parsed, min, max, inclusion);
+        public static bool IsInRange(string? value, System.TimeOnly min, System.TimeOnly max, Inclusion inclusion = Inclusion.Inclusive, DateTimeStyles styles = DefaultStyles)
+        {
+            TemporalRangeComparison.ValidateInclusion(inclusion);
+            return StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsInRange(parsed, min, max, inclusion);
+        }
 
         /// <summary>
         /// Determines whether the specified time string is within a given window of a reference time string.
@@ -52,8 +55,11 @@ public static partial class StringRules
         /// <param name="precision">Optional precision for time truncation before comparison.</param>
         /// <param name="styles">The <see cref="DateTimeStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed time is before <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool IsBefore(string? value, System.TimeOnly other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null, DateTimeStyles styles = DefaultStyles) =>
-            StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsBefore(parsed, other, inclusion, precision);
+        public static bool IsBefore(string? value, System.TimeOnly other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null, DateTimeStyles styles = DefaultStyles)
+        {
+            TemporalRangeComparison.ValidateInclusion(inclusion);
+            return StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsBefore(parsed, other, inclusion, precision);
+        }
 
         /// <summary>
         /// Determines whether the specified time string parses to a time after the given reference.
@@ -64,8 +70,11 @@ public static partial class StringRules
         /// <param name="precision">Optional precision for time truncation before comparison.</param>
         /// <param name="styles">The <see cref="DateTimeStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed time is after <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-        public static bool IsAfter(string? value, System.TimeOnly other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null, DateTimeStyles styles = DefaultStyles) =>
-            StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsAfter(parsed, other, inclusion, precision);
+        public static bool IsAfter(string? value, System.TimeOnly other, Inclusion inclusion = Inclusion.Exclusive, TimePrecision? precision = null, DateTimeStyles styles = DefaultStyles)
+        {
+            TemporalRangeComparison.ValidateInclusion(inclusion);
+            return StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsAfter(parsed, other, inclusion, precision);
+        }
 
         /// <summary>
         /// Determines whether the specified time string parses to the same time as the given reference.
@@ -88,6 +97,7 @@ public static partial class StringRules
         /// <returns><see langword="true"/> if start is before end; otherwise, <see langword="false"/>.</returns>
         public static bool IsChronological(string? start, string? end, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles)
         {
+            TemporalRangeComparison.ValidateInclusion(inclusion);
             if (!StringUtility.TimeOnly.TryParse(start, out var parsedStart, styles))
                 return false;
 
@@ -109,9 +119,10 @@ public static partial class StringRules
             string? end1,
             string? start2,
             string? end2,
-            Inclusion inclusion = Inclusion.Exclusive,
+            Inclusion inclusion = Inclusion.Inclusive,
             DateTimeStyles styles = DefaultStyles)
         {
+            TemporalRangeComparison.ValidateInclusion(inclusion);
             if (!StringUtility.TimeOnly.TryParse(start1, out var s1, styles))
                 return false;
 

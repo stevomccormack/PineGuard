@@ -1,4 +1,4 @@
-#if NET8_0_OR_GREATER
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using PineGuard.MustClauses;
 
@@ -10,11 +10,13 @@ namespace PineGuard.GuardClauses;
 /// <seealso href="https://pineguard.ai/docs/guard/string-geo-location">Guard StringGeoLocation documentation</seealso>
 public static class GuardStringGeoLocationClauses
 {
+    private const NumberStyles DefaultStyles = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
     /// <summary>
     /// Throws if <paramref name="value"/> violates the NotLatitude constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="styles">Numeric parsing flags; defaults to sign, decimal point and surrounding whitespace.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -29,11 +31,12 @@ public static class GuardStringGeoLocationClauses
     /// <seealso cref="MustStringGeoLocationClauses.Latitude"/>
     public static double NotLatitude(this IGuardClause _,
         string? value,
+        NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Latitude(value, paramName); // Guard.Against.NotLatitude => Must.Be.Latitude
+        var result = Must.Be.Latitude(value, styles, paramName); // Guard.Against.NotLatitude => Must.Be.Latitude
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -45,6 +48,7 @@ public static class GuardStringGeoLocationClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
+    /// <param name="styles">Numeric parsing flags; defaults to sign, decimal point and surrounding whitespace.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -59,11 +63,12 @@ public static class GuardStringGeoLocationClauses
     /// <seealso cref="MustStringGeoLocationClauses.Longitude"/>
     public static double NotLongitude(this IGuardClause _,
         string? value,
+        NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Longitude(value, paramName); // Guard.Against.NotLongitude => Must.Be.Longitude
+        var result = Must.Be.Longitude(value, styles, paramName); // Guard.Against.NotLongitude => Must.Be.Longitude
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -76,6 +81,7 @@ public static class GuardStringGeoLocationClauses
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="latitude">The latitude string to guard.</param>
     /// <param name="longitude">The longitude string to guard.</param>
+    /// <param name="styles">Numeric parsing flags; defaults to sign, decimal point and surrounding whitespace.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">
@@ -91,15 +97,15 @@ public static class GuardStringGeoLocationClauses
     public static (double Latitude, double Longitude) NotGeoLocation(this IGuardClause _,
         string? latitude,
         string? longitude,
+        NumberStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(latitude))] string? paramName = null)
     {
-        var result = Must.Be.GeoLocation(latitude, longitude, paramName); // Guard.Against.NotGeoLocation => Must.Be.GeoLocation
+        var result = Must.Be.GeoLocation(latitude, longitude, styles, paramName); // Guard.Against.NotGeoLocation => Must.Be.GeoLocation
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
         return result.Result;
     }
 }
-#endif

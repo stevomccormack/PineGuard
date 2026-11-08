@@ -8,6 +8,8 @@ namespace PineGuard.FluentValidation.UnitTests;
 
 public static class FluentNumberExtensionsTestData
 {
+    public static TheoryData<Inclusion> InvalidInclusions => [(Inclusion)42, (Inclusion)(-1)];
+
     public static class Positive
     {
         public static TheoryData<FluentCase<int?>> Cases => F.IsPositive.AllScenarios.ToFluentCases(s => s.Name switch
@@ -112,6 +114,7 @@ public static class FluentNumberExtensionsTestData
         public static TheoryData<FluentCase<(decimal? value, decimal target, decimal? tolerance)>> Cases => F.IsApproximately.AllScenarios.ToFluentCases(s => s.Name switch
         {
             nameof(F.IsApproximately.NullValue) => new FluentExpected(true),
+            nameof(F.IsApproximately.NegativeTolerance) => new FluentExpected(false, "tolerance must be non-negative."),
             nameof(F.IsApproximately.NullTolerance) => new FluentExpected(false, "tolerance requires a non-null tolerance."),
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must be approximately the target value.")
@@ -133,7 +136,7 @@ public static class FluentNumberExtensionsTestData
         public static TheoryData<FluentCase<(decimal? value, decimal target, decimal? tolerance)>> Cases => AllScenarios.ToFluentCases(s => s.Name switch
         {
             "NullValue" => new FluentExpected(true),
-            "NegativeTolerance" => new FluentExpected(true),
+            "NegativeTolerance" => new FluentExpected(false, "tolerance must be non-negative."),
             "NullTolerance" => new FluentExpected(false, "tolerance requires a non-null tolerance."),
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must not be approximately the target value.")
@@ -145,6 +148,7 @@ public static class FluentNumberExtensionsTestData
         public static TheoryData<FluentCase<(int? value, int factor)>> Cases => F.IsMultipleOf.AllScenarios.ToFluentCases(s => s.Name switch
         {
             nameof(F.IsMultipleOf.Null) => new FluentExpected(true),
+            nameof(F.IsMultipleOf.ZeroFactor) => new FluentExpected(false, "factor requires a non-zero factor."),
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must be a multiple of the specified factor.")
         });
@@ -163,7 +167,7 @@ public static class FluentNumberExtensionsTestData
         public static TheoryData<FluentCase<(int? value, int factor)>> Cases => AllScenarios.ToFluentCases(s => s.Name switch
         {
             "Null" => new FluentExpected(true),
-            "ZeroFactor" => new FluentExpected(true),
+            "ZeroFactor" => new FluentExpected(false, "factor requires a non-zero factor."),
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must not be a multiple of the specified factor.")
         });

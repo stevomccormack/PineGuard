@@ -8,7 +8,7 @@ public static partial class StringUtility
     public static class Bool
     {
         /// <summary>
-        /// Attempts to parse the specified string as a nullable <see cref="bool"/> value.
+        /// Attempts to parse the specified string as a <see cref="bool"/> value.
         /// </summary>
         /// <param name="value">
         /// The string to parse. If <see langword="null"/>, whitespace-only, or not a valid boolean representation,
@@ -16,18 +16,18 @@ public static partial class StringUtility
         /// </param>
         /// <param name="boolean">
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="bool"/> value.
-        /// When <see langword="false"/>, contains <see langword="null"/>.
+        /// When <see langword="false"/>, contains <see langword="false"/>.
         /// </param>
         /// <returns><see langword="true"/> if <paramref name="value"/> was successfully parsed; otherwise, <see langword="false"/>.</returns>
         /// <example>
         /// <code>
         /// StringUtility.Bool.TryParse("true", out var boolean);  // true, boolean = true
-        /// StringUtility.Bool.TryParse(null, out var boolean2);   // false, boolean2 = null
+        /// StringUtility.Bool.TryParse(null, out var boolean2);   // false, boolean2 = false
         /// </code>
         /// </example>
-        public static bool TryParse(string? value, out bool? boolean)
+        public static bool TryParse(string? value, out bool boolean)
         {
-            boolean = null;
+            boolean = default;
 
             if (!TryGetTrimmed(value, out var trimmed))
                 return false;

@@ -36,6 +36,9 @@ public static class MustDateOnlyRangeClauses
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(range))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnlyRange>.Fail(MustCodes.Range.Order.NotChronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be chronological.";
 
         var ok = DateOnlyRangeRules.IsChronological(range, inclusion);
@@ -63,9 +66,12 @@ public static class MustDateOnlyRangeClauses
     public static MustResult<DateOnlyRange> Overlapping(this IMustClause _,
         DateOnlyRange range1,
         DateOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnlyRange>.Fail(MustCodes.Range.Overlap.Missing, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must be overlapping.";
 
         var ok = DateOnlyRangeRules.IsOverlapping(range1, range2, inclusion);
@@ -93,9 +99,12 @@ public static class MustDateOnlyRangeClauses
     public static MustResult<DateOnlyRange> NotOverlapping(this IMustClause _,
         DateOnlyRange range1,
         DateOnlyRange range2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range1))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnlyRange>.Fail(MustCodes.Range.Overlap.Present, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must not be overlapping.";
 
         var ok = !DateOnlyRangeRules.IsOverlapping(range1, range2, inclusion);
@@ -126,6 +135,9 @@ public static class MustDateOnlyRangeClauses
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnlyRange>.Fail(MustCodes.Range.Bounds.NotContains, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must contain the specified date.";
 
         var ok = DateOnlyRangeRules.Contains(range, value, inclusion);
@@ -156,6 +168,9 @@ public static class MustDateOnlyRangeClauses
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(range))] string? paramName = null)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnlyRange>.Fail(MustCodes.Range.Bounds.Contains, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         const string messageTemplate = "{paramName} must not contain the specified date.";
 
         var ok = !DateOnlyRangeRules.Contains(range, value, inclusion);

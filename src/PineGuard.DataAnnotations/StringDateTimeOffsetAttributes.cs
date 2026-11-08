@@ -21,7 +21,7 @@ namespace PineGuard.DataAnnotations;
 /// <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AssumeUniversal"/> |
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>, so offset-less input is treated as UTC regardless of
 /// the host time zone.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -37,7 +37,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringDateTimeOffsetClauses.PastDateTimeOffset"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotPast)
+public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotPast, allowNull: false)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
@@ -47,9 +47,9 @@ public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBas
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.PastDateTimeOffset(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -67,7 +67,7 @@ public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBas
 /// <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AssumeUniversal"/> |
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>, so offset-less input is treated as UTC regardless of
 /// the host time zone.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -83,7 +83,7 @@ public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBas
 /// <seealso cref="MustStringDateTimeOffsetClauses.FutureDateTimeOffset"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotFuture)
+public sealed class FutureDateTimeOffsetStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotFuture, allowNull: false)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
 
@@ -93,9 +93,9 @@ public sealed class FutureDateTimeOffsetStringAttribute() : ValidationAttributeB
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.FutureDateTimeOffset(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -105,7 +105,7 @@ public sealed class FutureDateTimeOffsetStringAttribute() : ValidationAttributeB
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringDateTimeOffsetClauses.BetweenDateTimeOffset"/>. Supported on
+/// Delegates to <see cref="MustStringDateTimeOffsetClauses.InRangeDateTimeOffset"/>. Supported on
 /// properties, fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
@@ -115,32 +115,32 @@ public sealed class FutureDateTimeOffsetStringAttribute() : ValidationAttributeB
 /// <see cref="DateTimeStyles.RoundtripKind"/> | <see cref="DateTimeStyles.AssumeUniversal"/> |
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>, so offset-less input is treated as UTC regardless of
 /// the host time zone.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// public class EventModel
 /// {
-///     [BetweenDateTimeOffsetString("2024-01-01T00:00:00+00:00", "2024-12-31T23:59:59+00:00")]
+///     [InRangeDateTimeOffsetString("2024-01-01T00:00:00+00:00", "2024-12-31T23:59:59+00:00")]
 ///     public string EventAt { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="MustStringDateTimeOffsetClauses.BetweenDateTimeOffset"/>
+/// <seealso cref="MustStringDateTimeOffsetClauses.InRangeDateTimeOffset"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BetweenDateTimeOffsetStringAttribute(
+public sealed class InRangeDateTimeOffsetStringAttribute(
     string min,
     string max,
     Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Date.Range.OutOfRange)
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Range.OutOfRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the valid range.</summary>
-    public DateTimeOffset Min { get; } = DateTimeOffset.Parse(min, CultureInfo.InvariantCulture);
+    public DateTimeOffset Min { get; } = DateTimeOffset.Parse(min, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces);
 
     /// <summary>Gets the upper boundary of the valid range.</summary>
-    public DateTimeOffset Max { get; } = DateTimeOffset.Parse(max, CultureInfo.InvariantCulture);
+    public DateTimeOffset Max { get; } = DateTimeOffset.Parse(max, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces);
 
     /// <summary>Gets whether the boundary values are included or excluded in the valid range.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -153,8 +153,39 @@ public sealed class BetweenDateTimeOffsetStringAttribute(
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.BetweenDateTimeOffset(strValue, Min, Max, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.InRangeDateTimeOffset(strValue, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>Validates that the string represents a DateTimeOffset outside the configured range.</summary>
+/// <param name="min">The invariant-culture lower boundary.</param>
+/// <param name="max">The invariant-culture upper boundary.</param>
+/// <param name="inclusion">Whether range boundaries are included.</param>
+/// <remarks>Null values are skipped after configuration is validated. Non-null values delegate configuration and value validation to Must.</remarks>
+/// <example><code>[OutOfRangeDateTimeOffsetString("2024-01-01", "2024-12-31")]</code></example>
+/// <seealso cref="MustStringDateTimeOffsetClauses.OutOfRangeDateTimeOffset"/>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class OutOfRangeDateTimeOffsetStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Range.InRange, allowNull: false)
+{
+    /// <summary>Gets the lower boundary.</summary>
+    public DateTimeOffset Min { get; } = DateTimeOffset.Parse(min, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces);
+
+    /// <summary>Gets the upper boundary.</summary>
+    public DateTimeOffset Max { get; } = DateTimeOffset.Parse(max, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces);
+
+    /// <summary>Gets whether the boundaries are included.</summary>
+    public Inclusion Inclusion { get; } = inclusion;
+
+    /// <summary>Gets or sets the parsing styles.</summary>
+    public DateTimeStyles Styles { get; set; } = DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal | DateTimeStyles.AllowWhiteSpaces;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var result = Must.Be.OutOfRangeDateTimeOffset((string?)value, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }

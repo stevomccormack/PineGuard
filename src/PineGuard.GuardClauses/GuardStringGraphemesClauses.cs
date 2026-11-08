@@ -295,7 +295,7 @@ public static class GuardStringGraphemesClauses
     /// <param name="inclusion">Specifies whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
-    /// from <see cref="MustStringGraphemesClauses.HasGraphemeCountBetween"/>.
+    /// from <see cref="MustStringGraphemesClauses.HasGraphemeCountInRange"/>.
     /// </param>
     /// <param name="exceptionCreator">
     /// An optional factory to create a custom exception. If <see langword="null"/>,
@@ -312,16 +312,16 @@ public static class GuardStringGraphemesClauses
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <remarks>
-    /// This guard is the complement of <see cref="MustStringGraphemesClauses.HasGraphemeCountBetween"/>:
-    /// <c>Guard.Against.NotHasGraphemeCountBetween</c> passes when the count is within the range.
+    /// This guard is the complement of <see cref="MustStringGraphemesClauses.HasGraphemeCountInRange"/>:
+    /// <c>Guard.Against.NotHasGraphemeCountInRange</c> passes when the count is within the range.
     /// </remarks>
     /// <example>
     /// <code>
-    /// Guard.Against.NotHasGraphemeCountBetween(displayName, min: 2, max: 50);
+    /// Guard.Against.NotHasGraphemeCountInRange(displayName, min: 2, max: 50);
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringGraphemesClauses.HasGraphemeCountBetween"/>
-    public static string NotHasGraphemeCountBetween(this IGuardClause _,
+    /// <seealso cref="MustStringGraphemesClauses.HasGraphemeCountInRange"/>
+    public static string NotHasGraphemeCountInRange(this IGuardClause _,
         string? value,
         int min,
         int max,
@@ -330,7 +330,7 @@ public static class GuardStringGraphemesClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.HasGraphemeCountBetween(value, min, max, inclusion, paramName); // Guard.Against.NotHasGraphemeCountBetween => Must.Be.HasGraphemeCountBetween (complement)
+        var result = Must.Be.HasGraphemeCountInRange(value, min, max, inclusion, paramName); // Guard.Against.NotHasGraphemeCountInRange => Must.Be.HasGraphemeCountInRange (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -348,7 +348,7 @@ public static class GuardStringGraphemesClauses
     /// <param name="inclusion">Specifies whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
-    /// from <see cref="MustStringGraphemesClauses.NotHasGraphemeCountBetween"/>.
+    /// from <see cref="MustStringGraphemesClauses.NotHasGraphemeCountInRange"/>.
     /// </param>
     /// <param name="exceptionCreator">
     /// An optional factory to create a custom exception. If <see langword="null"/>,
@@ -365,11 +365,11 @@ public static class GuardStringGraphemesClauses
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <remarks>
-    /// This guard is the complement of <see cref="MustStringGraphemesClauses.NotHasGraphemeCountBetween"/>:
-    /// <c>Guard.Against.HasGraphemeCountBetween</c> passes when the count is outside the range.
+    /// This guard is the complement of <see cref="MustStringGraphemesClauses.NotHasGraphemeCountInRange"/>:
+    /// <c>Guard.Against.HasGraphemeCountInRange</c> passes when the count is outside the range.
     /// </remarks>
-    /// <seealso cref="MustStringGraphemesClauses.NotHasGraphemeCountBetween"/>
-    public static string HasGraphemeCountBetween(this IGuardClause _,
+    /// <seealso cref="MustStringGraphemesClauses.NotHasGraphemeCountInRange"/>
+    public static string HasGraphemeCountInRange(this IGuardClause _,
         string? value,
         int min,
         int max,
@@ -378,7 +378,7 @@ public static class GuardStringGraphemesClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotHasGraphemeCountBetween(value, min, max, inclusion, paramName); // Guard.Against.HasGraphemeCountBetween => Must.Be.NotHasGraphemeCountBetween (complement)
+        var result = Must.Be.NotHasGraphemeCountInRange(value, min, max, inclusion, paramName); // Guard.Against.HasGraphemeCountInRange => Must.Be.NotHasGraphemeCountInRange (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

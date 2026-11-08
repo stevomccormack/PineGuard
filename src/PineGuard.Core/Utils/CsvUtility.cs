@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using PineGuard.Common;
@@ -10,6 +11,30 @@ namespace PineGuard.Utils;
 /// <seealso href="https://pineguard.ai/docs/utils/csv">CSV Utility documentation</seealso>
 public static class CsvUtility
 {
+    /// <summary>Determines whether a character can delimit CSV fields.</summary>
+    /// <param name="separator">The proposed delimiter.</param>
+    /// <returns>False for quotes and line breaks; otherwise true.</returns>
+    public static bool IsSeparatorSupported(char separator) => separator is not ('"' or '\r' or '\n');
+
+    /// <summary>Checks column metadata independently of any row data, including default and with-created schemas.</summary>
+    /// <param name="schema">The complete ordered schema.</param>
+    /// <returns>True for a nonempty schema whose names, enum values and maximum lengths are valid.</returns>
+    public static bool IsSchemaConfigurationValid([NotNullWhen(true)] IReadOnlyList<CsvColumnSchema>? schema) =>
+        schema is { Count: > 0 } && schema.All(column => !string.IsNullOrWhiteSpace(column.Name)
+            && IsDefined(column.Type) && column.MaxLength > 0);
+
+    /// <summary>Checks that configured header names are present and nonblank.</summary>
+    /// <param name="header">The ordered header names.</param>
+    /// <returns>True for a nonempty collection of nonblank names.</returns>
+    public static bool IsHeaderConfigurationValid([NotNullWhen(true)] IReadOnlyList<string>? header) =>
+        header is { Count: > 0 } && header.All(name => !string.IsNullOrWhiteSpace(name));
+
+    /// <summary>Checks that a column type map is nonempty and contains only defined column types.</summary>
+    /// <param name="types">The column-name to type map.</param>
+    /// <returns>True if all mapped types are defined.</returns>
+    public static bool IsTypeMapConfigurationValid([NotNullWhen(true)] IReadOnlyDictionary<string, CsvColumnType>? types) =>
+        types is { Count: > 0 } && types.Values.All(type => IsDefined(type));
+
     /// <summary>
     /// Attempts to parse a single line of RFC 4180-style CSV text into its constituent fields.
     /// </summary>
@@ -37,11 +62,11 @@ public static class CsvUtility
     /// CsvUtility.TryParseCsvLine("a,b,\"c,d\"", out var fields); // true, fields = ["a", "b", "c,d"]
     /// </code>
     /// </example>
-    public static bool TryParseCsvLine(string? value, out IReadOnlyList<string>? fields, char separator = ',')
+    public static bool TryParseCsvLine(string? value, [NotNullWhen(true)] out IReadOnlyList<string>? fields, char separator = ',')
     {
         fields = null;
 
-        if (separator is '"' or '\r' or '\n')
+        if (!IsSeparatorSupported(separator))
             throw new ArgumentException("The separator cannot be a double quote or a line-break character.", nameof(separator));
 
         if (value is null)
@@ -88,6 +113,13 @@ public static class CsvUtility
         fields = list;
         return true;
     }
+
+    private static bool IsDefined<TEnum>(TEnum value) where TEnum : struct, Enum =>
+#if NET8_0_OR_GREATER
+        Enum.IsDefined(value);
+#else
+        Enum.IsDefined(typeof(TEnum), value);
+#endif
 
     private static bool IsLineBreak(char ch) => ch is '\r' or '\n';
 
@@ -179,11 +211,11 @@ public static class CsvUtility
     /// CsvUtility.TryParseCsvHeaderLine("Name, Age ,Email", out var header); // true, header = ["Name", "Age", "Email"]
     /// </code>
     /// </example>
-    public static bool TryParseCsvHeaderLine(string? value, out IReadOnlyList<string>? header, char separator = ',')
+    public static bool TryParseCsvHeaderLine(string? value, [NotNullWhen(true)] out IReadOnlyList<string>? header, char separator = ',')
     {
         header = null;
 
-        if (!TryParseCsvLine(value, out var fields, separator) || fields is null)
+        if (!TryParseCsvLine(value, out var fields, separator))
             return false;
 
         var list = new List<string>(capacity: fields.Count);
@@ -231,16 +263,16 @@ public static class CsvUtility
     public static bool TryParseCsvHeaderLine(
         string? value,
         IReadOnlyList<string>? expectedHeader,
-        out IReadOnlyList<string>? header,
+        [NotNullWhen(true)] out IReadOnlyList<string>? header,
         char separator = ',',
         StringComparison comparison = StringComparison.OrdinalIgnoreCase)
     {
         header = null;
 
-        if (expectedHeader is null || expectedHeader.Count == 0)
+        if (!IsHeaderConfigurationValid(expectedHeader) || !IsDefined(comparison))
             return false;
 
-        if (!TryParseCsvHeaderLine(value, out var parsedHeader, separator) || parsedHeader is null)
+        if (!TryParseCsvHeaderLine(value, out var parsedHeader, separator))
             return false;
 
         if (parsedHeader.Count != expectedHeader.Count)
@@ -248,10 +280,7 @@ public static class CsvUtility
 
         for (var i = 0; i < parsedHeader.Count; i++)
         {
-            if (!StringUtility.TryGetTrimmed(expectedHeader[i], out var expected))
-                return false;
-
-            if (!string.Equals(parsedHeader[i], expected, comparison))
+            if (!string.Equals(parsedHeader[i], expectedHeader[i].Trim(), comparison))
                 return false;
         }
 
@@ -285,7 +314,7 @@ public static class CsvUtility
     public static bool TryParseCsvRowLine(
         string? value,
         int expectedFieldCount,
-        out IReadOnlyList<string>? fields,
+        [NotNullWhen(true)] out IReadOnlyList<string>? fields,
         char separator = ',')
     {
         fields = null;
@@ -293,7 +322,7 @@ public static class CsvUtility
         if (expectedFieldCount <= 0)
             return false;
 
-        if (!TryParseCsvLine(value, out var parsed, separator) || parsed is null)
+        if (!TryParseCsvLine(value, out var parsed, separator))
             return false;
 
         if (parsed.Count != expectedFieldCount)
@@ -331,15 +360,15 @@ public static class CsvUtility
     public static bool TryParseCsvRowLine(
         string? value,
         IReadOnlyList<CsvColumnSchema>? schema,
-        out IReadOnlyList<string>? fields,
+        [NotNullWhen(true)] out IReadOnlyList<string>? fields,
         char separator = ',')
     {
         fields = null;
 
-        if (schema is null || schema.Count == 0)
+        if (!IsSchemaConfigurationValid(schema))
             return false;
 
-        if (!TryParseCsvRowLine(value, schema.Count, out var parsedFields, separator) || parsedFields is null)
+        if (!TryParseCsvRowLine(value, schema.Count, out var parsedFields, separator))
             return false;
 
         for (var i = 0; i < parsedFields.Count; i++)
@@ -395,37 +424,32 @@ public static class CsvUtility
         string? value,
         IReadOnlyList<string>? header,
         IReadOnlyDictionary<string, CsvColumnType>? types,
-        out IReadOnlyList<string>? fields,
+        [NotNullWhen(true)] out IReadOnlyList<string>? fields,
         char separator = ',',
         StringComparison headerNameComparison = StringComparison.OrdinalIgnoreCase)
     {
         fields = null;
 
-        if (header is null || header.Count == 0)
+        if (!IsHeaderConfigurationValid(header) || !IsDefined(headerNameComparison))
             return false;
 
-        if (types is null || types.Count == 0)
+        if (!IsTypeMapConfigurationValid(types))
             return false;
 
-        if (!TryGetSchema(header, types, headerNameComparison, out var schema) || schema is null)
-            return false;
-
+        var schema = GetSchema(header, types, headerNameComparison);
         return TryParseCsvRowLine(value, schema, out fields, separator);
     }
 
-    private static bool TryGetSchema(
+    private static List<CsvColumnSchema> GetSchema(
         IReadOnlyList<string> header,
         IReadOnlyDictionary<string, CsvColumnType> types,
-        StringComparison headerNameComparison,
-        out IReadOnlyList<CsvColumnSchema>? schema)
+        StringComparison headerNameComparison)
     {
-        schema = null;
-
         var result = new List<CsvColumnSchema>(capacity: header.Count);
 
         foreach (var headerName in header)
         {
-            if (!StringUtility.TryGetTrimmed(headerName, out var normalizedHeaderName)) return false;
+            var normalizedHeaderName = headerName.Trim();
 
             if (!TryGetTypeByName(types, normalizedHeaderName, headerNameComparison, out var match))
                 match = CsvColumnType.String;
@@ -433,8 +457,7 @@ public static class CsvUtility
             result.Add(new CsvColumnSchema(normalizedHeaderName, match, IsRequired: true));
         }
 
-        schema = result;
-        return true;
+        return result;
     }
 
     private static bool TryGetTypeByName(
@@ -462,12 +485,6 @@ public static class CsvUtility
 
     private static bool ValidateColumnField(string rawField, CsvColumnSchema column)
     {
-        if (!StringUtility.TryGetTrimmed(column.Name, out _))
-            return false;
-
-        if (column.MaxLength <= 0)
-            return false;
-
         if (rawField.Length > column.MaxLength)
             return false;
 
@@ -482,8 +499,6 @@ public static class CsvUtility
         // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
         switch (type)
         {
-            case CsvColumnType.String: return true;
-
             case CsvColumnType.Int32: return StringUtility.NumberTypes.TryParseInt32(trimmedValue, out _, provider: CultureInfo.InvariantCulture);
             case CsvColumnType.Int64: return StringUtility.NumberTypes.TryParseInt64(trimmedValue, out _, provider: CultureInfo.InvariantCulture);
             case CsvColumnType.Decimal: return StringUtility.NumberTypes.TryParseDecimal(trimmedValue, out _, provider: CultureInfo.InvariantCulture);
@@ -502,7 +517,7 @@ public static class CsvUtility
 #endif
             case CsvColumnType.DateTimeOffset: return StringUtility.DateTimeOffset.TryParse(trimmedValue, out _);
 
-            default: return false;
+            default: return true;
         }
     }
 

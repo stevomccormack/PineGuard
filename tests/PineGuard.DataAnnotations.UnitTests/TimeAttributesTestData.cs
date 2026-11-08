@@ -88,8 +88,8 @@ public static class TimeAttributesTestData
         ];
     }
 
-    // DateOnlyBetweenAttribute("2020-01-01", "2020-01-31")
-    public static class DateOnlyBetween
+    // InRangeDateOnlyAttribute("2020-01-01", "2020-01-31")
+    public static class InRangeDateOnly
     {
         public static TheoryData<ValidCase> ValidCases => [new("mid", new DateOnly(2020, 1, 15), true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();

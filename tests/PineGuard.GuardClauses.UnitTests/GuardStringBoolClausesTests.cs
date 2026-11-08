@@ -11,8 +11,8 @@ public sealed class GuardStringBoolClausesTests(ITestOutputHelper output) : Base
     public void False_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.False(value));
-        AssertCustomMessage(tc, () => Guard.Against.False(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.FalseBoolean(value));
+        AssertCustomMessage(tc, () => Guard.Against.FalseBoolean(value, message: CustomMessage));
     }
 
     [Theory]
@@ -21,7 +21,7 @@ public sealed class GuardStringBoolClausesTests(ITestOutputHelper output) : Base
     public void True_BehavesAsExpected(GuardCase<string?> tc)
     {
         var value = tc.Value;
-        AssertResult(tc, () => Guard.Against.True(value));
-        AssertCustomMessage(tc, () => Guard.Against.True(value, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.TrueBoolean(value));
+        AssertCustomMessage(tc, () => Guard.Against.TrueBoolean(value, message: CustomMessage));
     }
 }

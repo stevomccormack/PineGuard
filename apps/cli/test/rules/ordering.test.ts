@@ -167,7 +167,11 @@ describe("ordering rule (Rule08 port)", () => {
         it("unifies a negative-complement name with its positive counterpart's key", () => {
             expect(normalizeBaseKey("NotEmpty")).toBe("Empty");
             expect(normalizeBaseKey("NonCompliant")).toBe("Compliant");
-            expect(normalizeBaseKey("InvalidToken")).toBe("Token");
+            expect(normalizeBaseKey("InvalidToken")).toBe("InvalidToken");
+            expect(normalizeBaseKey("InvalidXml")).toBe("ValidXml");
+            expect(normalizeBaseKey("ValidXml")).toBe("ValidXml");
+            expect(normalizeBaseKey("OutOfRange")).toBe("InRange");
+            expect(normalizeBaseKey("OutOfRangeInt32")).toBe("InRangeInt32");
             expect(normalizeBaseKey("Empty")).toBe("Empty");
         });
 

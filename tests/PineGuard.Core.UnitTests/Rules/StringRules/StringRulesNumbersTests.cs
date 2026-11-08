@@ -7,6 +7,17 @@ namespace PineGuard.Core.UnitTests.Rules.StringRules;
 public sealed class StringRulesNumbersTests(ITestOutputHelper output) : BaseRuleUnitTest(output)
 {
     [Theory]
+    [MemberData(nameof(StringRulesNumbersTestData.InvalidInclusions), MemberType = typeof(StringRulesNumbersTestData))]
+    public void InRange_UndefinedInclusion_ThrowsBeforeParsingNull(Inclusion inclusion)
+    {
+        // Act
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => PineGuard.Rules.StringRules.Numbers.IsInRange(null, 0, 1, inclusion));
+
+        // Assert
+        Assert.Equal("inclusion", exception.ParamName);
+    }
+
+    [Theory]
     [MemberData(nameof(StringRulesNumbersTestData.IsPositive.Cases), MemberType = typeof(StringRulesNumbersTestData.IsPositive))]
     public void IsPositive_BehavesAsExpected(RuleCase<string?> tc)
     {

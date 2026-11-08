@@ -71,34 +71,34 @@ public class MustDateOnlyClausesTests(ITestOutputHelper output) : BaseMustUnitTe
     }
 
     [Theory]
-    [MemberData(nameof(MustDateOnlyClausesTestData.Between.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.Between))]
-    public void Between_Checks(MustDateOnlyClausesTestData.Between.ValidCase testCase)
+    [MemberData(nameof(MustDateOnlyClausesTestData.InRange.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.InRange))]
+    public void InRange_Checks(MustDateOnlyClausesTestData.InRange.ValidCase testCase)
     {
-        var result = Must.Be.Between(testCase.Value.value, testCase.Value.min, testCase.Value.max);
+        var result = Must.Be.InRange(testCase.Value.value, testCase.Value.min, testCase.Value.max);
         Assert.Equal(testCase.Expected, result.Success);
     }
 
     [Theory]
-    [MemberData(nameof(MustDateOnlyClausesTestData.Between.EdgeCases), MemberType = typeof(MustDateOnlyClausesTestData.Between))]
-    public void Between_EdgeChecks(MustDateOnlyClausesTestData.Between.EdgeCase testCase)
+    [MemberData(nameof(MustDateOnlyClausesTestData.InRange.EdgeCases), MemberType = typeof(MustDateOnlyClausesTestData.InRange))]
+    public void InRange_EdgeChecks(MustDateOnlyClausesTestData.InRange.EdgeCase testCase)
     {
-        var result = Must.Be.Between(testCase.Value.value, testCase.Value.min, testCase.Value.max);
+        var result = Must.Be.InRange(testCase.Value.value, testCase.Value.min, testCase.Value.max);
         Assert.Equal(testCase.Expected, result.Success);
     }
 
     [Theory]
-    [MemberData(nameof(MustDateOnlyClausesTestData.NotBetween.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.NotBetween))]
-    public void NotBetween_Checks(MustDateOnlyClausesTestData.NotBetween.ValidCase testCase)
+    [MemberData(nameof(MustDateOnlyClausesTestData.OutOfRange.ValidCases), MemberType = typeof(MustDateOnlyClausesTestData.OutOfRange))]
+    public void OutOfRange_Checks(MustDateOnlyClausesTestData.OutOfRange.ValidCase testCase)
     {
-        var result = Must.Be.NotBetween(testCase.Value.value, testCase.Value.min, testCase.Value.max);
+        var result = Must.Be.OutOfRange(testCase.Value.value, testCase.Value.min, testCase.Value.max);
         Assert.Equal(testCase.Expected, result.Success);
     }
 
     [Theory]
-    [MemberData(nameof(MustDateOnlyClausesTestData.NotBetween.EdgeCases), MemberType = typeof(MustDateOnlyClausesTestData.NotBetween))]
-    public void NotBetween_EdgeChecks(MustDateOnlyClausesTestData.NotBetween.EdgeCase testCase)
+    [MemberData(nameof(MustDateOnlyClausesTestData.OutOfRange.EdgeCases), MemberType = typeof(MustDateOnlyClausesTestData.OutOfRange))]
+    public void OutOfRange_EdgeChecks(MustDateOnlyClausesTestData.OutOfRange.EdgeCase testCase)
     {
-        var result = Must.Be.NotBetween(testCase.Value.value, testCase.Value.min, testCase.Value.max);
+        var result = Must.Be.OutOfRange(testCase.Value.value, testCase.Value.min, testCase.Value.max);
         Assert.Equal(testCase.Expected, result.Success);
     }
 

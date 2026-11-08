@@ -4,22 +4,8 @@ using PineGuard.Common;
 
 namespace PineGuard.Rules;
 
-/// <summary>
-/// Provides pure numeric validation predicates for any <see cref="INumber{TSelf}"/> type.
-/// </summary>
-/// <seealso href="https://pineguard.ai/docs/rules/number">Number Rules documentation</seealso>
-public static class NumberRules
+public static partial class NumberRules
 {
-    /// <summary>
-    /// The smallest value a percentage can take (<c>0</c>).
-    /// </summary>
-    public const int MinPercentage = 0;
-
-    /// <summary>
-    /// The largest value a percentage can take (<c>100</c>).
-    /// </summary>
-    public const int MaxPercentage = 100;
-
     /// <summary>
     /// Determines whether the specified value is strictly positive (greater than zero).
     /// </summary>
@@ -75,44 +61,44 @@ public static class NumberRules
         value is not null && value.Value <= T.Zero;
 
     /// <summary>
-    /// Determines whether the specified value is greater than <paramref name="min"/>.
+    /// Determines whether the specified value is greater than <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">A numeric value type that implements <see cref="INumber{TSelf}"/>.</typeparam>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="min">The exclusive lower bound.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> &gt; <paramref name="min"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsGreaterThan<T>(T? value, T min) where T : struct, INumber<T> =>
-        value > min;
+    /// <param name="other">The exclusive lower bound.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> &gt; <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+    public static bool IsGreaterThan<T>(T? value, T other) where T : struct, INumber<T> =>
+        value > other;
 
     /// <summary>
-    /// Determines whether the specified value is greater than or equal to <paramref name="min"/>.
+    /// Determines whether the specified value is greater than or equal to <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">A numeric value type that implements <see cref="INumber{TSelf}"/>.</typeparam>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="min">The inclusive lower bound.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> &gt;= <paramref name="min"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsGreaterThanOrEqual<T>(T? value, T min) where T : struct, INumber<T> =>
-        value >= min;
+    /// <param name="other">The inclusive lower bound.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> &gt;= <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+    public static bool IsGreaterThanOrEqual<T>(T? value, T other) where T : struct, INumber<T> =>
+        value >= other;
 
     /// <summary>
-    /// Determines whether the specified value is less than <paramref name="max"/>.
+    /// Determines whether the specified value is less than <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">A numeric value type that implements <see cref="INumber{TSelf}"/>.</typeparam>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="max">The exclusive upper bound.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> &lt; <paramref name="max"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsLessThan<T>(T? value, T max) where T : struct, INumber<T> =>
-        value < max;
+    /// <param name="other">The exclusive upper bound.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> &lt; <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+    public static bool IsLessThan<T>(T? value, T other) where T : struct, INumber<T> =>
+        value < other;
 
     /// <summary>
-    /// Determines whether the specified value is less than or equal to <paramref name="max"/>.
+    /// Determines whether the specified value is less than or equal to <paramref name="other"/>.
     /// </summary>
     /// <typeparam name="T">A numeric value type that implements <see cref="INumber{TSelf}"/>.</typeparam>
     /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="max">The inclusive upper bound.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> &lt;= <paramref name="max"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsLessThanOrEqual<T>(T? value, T max) where T : struct, INumber<T> =>
-        value <= max;
+    /// <param name="other">The inclusive upper bound.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> &lt;= <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+    public static bool IsLessThanOrEqual<T>(T? value, T other) where T : struct, INumber<T> =>
+        value <= other;
 
     /// <summary>
     /// Determines whether the specified value falls within the range [<paramref name="min"/>, <paramref name="max"/>].
@@ -124,8 +110,13 @@ public static class NumberRules
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is within the specified range; otherwise, <see langword="false"/>.</returns>
     public static bool IsInRange<T>(T? value, T min, T max, Inclusion inclusion = Inclusion.Inclusive)
-        where T : struct, IComparable<T> =>
-        value is not null && RuleComparison.IsBetween(value.Value, min, max, inclusion);
+        where T : struct, IComparable<T>
+    {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null);
+
+        return value is not null && RuleComparison.IsInRange(value.Value, min, max, inclusion);
+    }
 
     /// <summary>
     /// Determines whether the specified value is a percentage — between
@@ -215,69 +206,5 @@ public static class NumberRules
             return true;
         }
     }
-
-    /// <summary>
-    /// Determines whether the specified integer value is even.
-    /// </summary>
-    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is divisible by 2; otherwise, <see langword="false"/>.</returns>
-    public static bool IsEven(int? value) =>
-        IsMultipleOf(value, 2);
-
-    /// <summary>
-    /// Determines whether the specified long integer value is even.
-    /// </summary>
-    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is divisible by 2; otherwise, <see langword="false"/>.</returns>
-    public static bool IsEven(long? value) =>
-        IsMultipleOf(value, 2);
-
-    /// <summary>
-    /// Determines whether the specified integer value is odd.
-    /// </summary>
-    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is not divisible by 2; otherwise, <see langword="false"/>.</returns>
-    public static bool IsOdd(int? value) =>
-        value is not null && !IsMultipleOf(value, 2);
-
-    /// <summary>
-    /// Determines whether the specified long integer value is odd.
-    /// </summary>
-    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is not divisible by 2; otherwise, <see langword="false"/>.</returns>
-    public static bool IsOdd(long? value) =>
-        value is not null && !IsMultipleOf(value, 2);
-
-    /// <summary>
-    /// Determines whether the specified float is a finite number (not NaN, not infinite).
-    /// </summary>
-    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is finite; otherwise, <see langword="false"/>.</returns>
-    public static bool IsFinite(float? value) =>
-        value is not null && float.IsFinite(value.Value);
-
-    /// <summary>
-    /// Determines whether the specified double is a finite number (not NaN, not infinite).
-    /// </summary>
-    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is finite; otherwise, <see langword="false"/>.</returns>
-    public static bool IsFinite(double? value) =>
-        value is not null && double.IsFinite(value.Value);
-
-    /// <summary>
-    /// Determines whether the specified float is NaN (not a number).
-    /// </summary>
-    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is NaN; otherwise, <see langword="false"/>.</returns>
-    public static bool IsNaN(float? value) =>
-        value is not null && float.IsNaN(value.Value);
-
-    /// <summary>
-    /// Determines whether the specified double is NaN (not a number).
-    /// </summary>
-    /// <param name="value">The value to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is NaN; otherwise, <see langword="false"/>.</returns>
-    public static bool IsNaN(double? value) =>
-        value is not null && double.IsNaN(value.Value);
 }
 #endif

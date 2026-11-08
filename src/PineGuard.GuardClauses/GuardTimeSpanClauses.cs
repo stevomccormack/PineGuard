@@ -11,7 +11,7 @@ namespace PineGuard.GuardClauses;
 public static class GuardTimeSpanClauses
 {
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the NotDurationBetween constraint.
+    /// Throws if <paramref name="value"/> violates the OutOfRange constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -29,8 +29,8 @@ public static class GuardTimeSpanClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustTimeSpanClauses.DurationBetween"/>
-    public static TimeSpan NotDurationBetween(this IGuardClause _,
+    /// <seealso cref="MustTimeSpanClauses.InRange"/>
+    public static TimeSpan OutOfRange(this IGuardClause _,
         TimeSpan value,
         TimeSpan min,
         TimeSpan max,
@@ -39,7 +39,7 @@ public static class GuardTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.DurationBetween(value, min, max, inclusion, paramName);
+        var result = Must.Be.InRange(value, min, max, inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -47,7 +47,7 @@ public static class GuardTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the DurationBetween constraint.
+    /// Throws if <paramref name="value"/> violates the InRange constraint.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -65,8 +65,8 @@ public static class GuardTimeSpanClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustTimeSpanClauses.NotDurationBetween"/>
-    public static TimeSpan DurationBetween(this IGuardClause _,
+    /// <seealso cref="MustTimeSpanClauses.OutOfRange"/>
+    public static TimeSpan InRange(this IGuardClause _,
         TimeSpan value,
         TimeSpan min,
         TimeSpan max,
@@ -75,7 +75,7 @@ public static class GuardTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotDurationBetween(value, min, max, inclusion, paramName);
+        var result = Must.Be.OutOfRange(value, min, max, inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -87,7 +87,7 @@ public static class GuardTimeSpanClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="threshold">The threshold value.</param>
+    /// <param name="other">The threshold value.</param>
     /// <param name="inclusion">The boundary inclusion mode.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -103,13 +103,13 @@ public static class GuardTimeSpanClauses
     /// <seealso cref="MustTimeSpanClauses.GreaterThan"/>
     public static TimeSpan LessThan(this IGuardClause _,
         TimeSpan value,
-        TimeSpan threshold,
+        TimeSpan other,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.GreaterThan(value, threshold, inclusion, paramName);
+        var result = Must.Be.GreaterThan(value, other, inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -121,7 +121,7 @@ public static class GuardTimeSpanClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="threshold">The threshold value.</param>
+    /// <param name="other">The threshold value.</param>
     /// <param name="inclusion">The boundary inclusion mode.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -137,13 +137,13 @@ public static class GuardTimeSpanClauses
     /// <seealso cref="MustTimeSpanClauses.LessThan"/>
     public static TimeSpan GreaterThan(this IGuardClause _,
         TimeSpan value,
-        TimeSpan threshold,
+        TimeSpan other,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.LessThan(value, threshold, inclusion, paramName);
+        var result = Must.Be.LessThan(value, other, inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

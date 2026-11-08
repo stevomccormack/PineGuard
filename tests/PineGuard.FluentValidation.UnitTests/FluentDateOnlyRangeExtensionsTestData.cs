@@ -31,7 +31,7 @@ public static class FluentDateOnlyRangeExtensionsTestData
             .ToFluentCases(s => s.Name switch
             {
                 "Range1Null" => new FluentExpected(true),
-                "TouchingInclusive" => new FluentExpected(false, "Value must be overlapping."),
+                "TouchingInclusive" or "TouchingExclusive" => new FluentExpected(true),
                 _ when s.IsValid => new FluentExpected(true),
                 _ => new FluentExpected(false, "Value must be overlapping.")
             });
@@ -46,7 +46,8 @@ public static class FluentDateOnlyRangeExtensionsTestData
             .ToFluentCases(s => s.Name switch
             {
                 "Range1Null" => new FluentExpected(true),
-                "TouchingInclusive" => new FluentExpected(true),
+                "TouchingInclusive" or "TouchingExclusive" => new FluentExpected(false, "Value must not be overlapping."),
+                "FirstRangeInverted" => new FluentExpected(false, "Value must not be overlapping."),
                 _ when s.IsValid => new FluentExpected(false, "Value must not be overlapping."),
                 _ => new FluentExpected(true)
             });

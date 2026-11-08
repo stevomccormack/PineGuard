@@ -7,11 +7,11 @@ namespace PineGuard.DataAnnotations.UnitTests;
 public sealed class StringTimeOnlyAttributesTests(ITestOutputHelper output) : BaseDataAnnotationUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(StringTimeOnlyAttributesTestData.BetweenTimeOnlyString.Cases), MemberType = typeof(StringTimeOnlyAttributesTestData.BetweenTimeOnlyString))]
-    public void BetweenTimeOnlyString_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringTimeOnlyAttributesTestData.InRangeTimeOnlyString.Cases), MemberType = typeof(StringTimeOnlyAttributesTestData.InRangeTimeOnlyString))]
+    public void InRangeTimeOnlyString_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new BetweenTimeOnlyStringAttribute(new TimeOnly(10, 0).ToString("HH:mm"), new TimeOnly(14, 0).ToString("HH:mm"));
+        InRangeTimeOnlyStringAttribute attr = new InRangeTimeOnlyStringAttribute(new TimeOnly(10, 0).ToString("HH:mm"), new TimeOnly(14, 0).ToString("HH:mm"));
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -52,11 +52,11 @@ public sealed class StringTimeOnlyAttributesTests(ITestOutputHelper output) : Ba
     }
 
     [Theory]
-    [MemberData(nameof(StringTimeOnlyAttributesTestData.NotBetweenTimeOnlyString.Cases), MemberType = typeof(StringTimeOnlyAttributesTestData.NotBetweenTimeOnlyString))]
-    public void NotBetweenTimeOnlyString_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringTimeOnlyAttributesTestData.OutOfRangeTimeOnlyString.Cases), MemberType = typeof(StringTimeOnlyAttributesTestData.OutOfRangeTimeOnlyString))]
+    public void OutOfRangeTimeOnlyString_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new NotBetweenTimeOnlyStringAttribute(new TimeOnly(10, 0).ToString("HH:mm"), new TimeOnly(14, 0).ToString("HH:mm"));
+        OutOfRangeTimeOnlyStringAttribute attr = new OutOfRangeTimeOnlyStringAttribute(new TimeOnly(10, 0).ToString("HH:mm"), new TimeOnly(14, 0).ToString("HH:mm"));
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act

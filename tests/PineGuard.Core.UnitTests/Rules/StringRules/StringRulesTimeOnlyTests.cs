@@ -7,11 +7,11 @@ namespace PineGuard.Core.UnitTests.Rules.StringRules;
 public sealed class StringRulesTimeOnlyTests(ITestOutputHelper output) : BaseRuleUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(StringRulesTimeOnlyTestData.IsBetween.Cases), MemberType = typeof(StringRulesTimeOnlyTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(RuleCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
+    [MemberData(nameof(StringRulesTimeOnlyTestData.IsInRange.Cases), MemberType = typeof(StringRulesTimeOnlyTestData.IsInRange))]
+    public void IsInRange_BehavesAsExpected(RuleCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = PineGuard.Rules.StringRules.TimeOnly.IsBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = PineGuard.Rules.StringRules.TimeOnly.IsInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);

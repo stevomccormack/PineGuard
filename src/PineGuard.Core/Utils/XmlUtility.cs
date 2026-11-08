@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace PineGuard.Utils;
@@ -26,7 +27,7 @@ public static class XmlUtility
     /// <c>&lt;!DOCTYPE ...&gt;</c> declaration (e.g., legacy XHTML, DOCTYPE-bearing SVG exports) is rejected, not
     /// just documents that attempt entity expansion.
     /// </remarks>
-    public static bool TryGetRootName(string? value, out XmlQualifiedName? rootName)
+    public static bool TryGetRootName(string? value, [NotNullWhen(true)] out XmlQualifiedName? rootName)
     {
         rootName = null;
 
@@ -53,7 +54,7 @@ public static class XmlUtility
             }
 
             rootName = found;
-            return found is not null;
+            return rootName is not null;
         }
         catch (XmlException)
         {

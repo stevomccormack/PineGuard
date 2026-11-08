@@ -10,7 +10,7 @@ public static class FluentCsvExtensionsTestData
     {
         public static TheoryData<FluentCase<string?>> Cases => F.IsCsvLine.AllScenarios.ToFluentCases(s => s.Name switch
         {
-            nameof(F.IsCsvLine.NullValue) => new FluentExpected(false, "Value must not be null."),
+            nameof(F.IsCsvLine.NullValue) => new FluentExpected(true),
             _ when s.IsValid => new FluentExpected(true),
             _ => new FluentExpected(false, "Value must be a valid CSV line.")
         });
@@ -22,7 +22,7 @@ public static class FluentCsvExtensionsTestData
         [
             new(nameof(F.IsCsvHeaderLine.Matches), F.IsCsvHeaderLine.Matches, new FluentExpected(true)),
             new(nameof(F.IsCsvHeaderLine.Mismatch), F.IsCsvHeaderLine.Mismatch, new FluentExpected(false, "Value must be a valid CSV header line.")),
-            new(nameof(F.IsCsvHeaderLine.NullExpected), F.IsCsvHeaderLine.NullExpected, new FluentExpected(false, "Value must be a valid CSV header line."))
+            new(nameof(F.IsCsvHeaderLine.NullExpected), F.IsCsvHeaderLine.NullExpected, new FluentExpected(false, "expectedHeader must contain nonblank CSV column names."))
         ];
     }
 
@@ -56,5 +56,20 @@ public static class FluentCsvExtensionsTestData
             ["name"] = CsvColumnType.String,
             ["age"] = CsvColumnType.Int32
         };
+    }
+
+    public static class ConfiguredSeparator
+    {
+        public static TheoryData<FluentCase<(string? value, char separator)>> Cases =>
+        [
+            new("semicolon", ("a;\"b;c\";d", ';'), new FluentExpected(true)),
+            new("optional null", (null, ';'), new FluentExpected(true)),
+            new("quote config on null", (null, '"'), new FluentExpected(false, "separator must be a supported CSV separator.")),
+            new("line break config", ("a", '\n'), new FluentExpected(false, "separator must be a supported CSV separator."))
+        ];
+    }
+    public static class OptionalValue
+    {
+        public static TheoryData<FluentCase<string?>> Cases => [new("null", null, new FluentExpected(true))];
     }
 }

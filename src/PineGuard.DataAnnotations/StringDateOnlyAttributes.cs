@@ -20,7 +20,7 @@ namespace PineGuard.DataAnnotations;
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -36,7 +36,7 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringDateOnlyClauses.PastDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotPast)
+public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotPast, allowNull: false)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
@@ -46,9 +46,9 @@ public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(type
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.PastDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -64,7 +64,7 @@ public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(type
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -80,7 +80,7 @@ public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(type
 /// <seealso cref="MustStringDateOnlyClauses.FutureDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotFuture)
+public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotFuture, allowNull: false)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
@@ -90,9 +90,9 @@ public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(ty
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.FutureDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -108,7 +108,7 @@ public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(ty
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -124,7 +124,7 @@ public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(ty
 /// <seealso cref="MustStringDateOnlyClauses.PastOrPresentDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.Future)
+public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.Future, allowNull: false)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
@@ -134,9 +134,9 @@ public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttribute
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.PastOrPresentDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -152,7 +152,7 @@ public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttribute
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -168,7 +168,7 @@ public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttribute
 /// <seealso cref="MustStringDateOnlyClauses.FutureOrPresentDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class FutureOrPresentDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.Past)
+public sealed class FutureOrPresentDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.Past, allowNull: false)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
@@ -178,9 +178,9 @@ public sealed class FutureOrPresentDateOnlyStringAttribute() : ValidationAttribu
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.FutureOrPresentDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -197,7 +197,7 @@ public sealed class FutureOrPresentDateOnlyStringAttribute() : ValidationAttribu
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
 /// The <see cref="Styles"/> property controls how the annotated value is parsed; defaults to
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -213,7 +213,7 @@ public sealed class FutureOrPresentDateOnlyStringAttribute() : ValidationAttribu
 /// <seealso cref="MustStringDateOnlyClauses.BeforeDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotBefore)
+public sealed class BeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotBefore, allowNull: false)
 {
     /// <summary>Gets the reference date that the parsed value must precede.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -226,9 +226,9 @@ public sealed class BeforeDateOnlyStringAttribute(string other) : ValidationAttr
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.BeforeDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -243,7 +243,7 @@ public sealed class BeforeDateOnlyStringAttribute(string other) : ValidationAttr
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -259,7 +259,7 @@ public sealed class BeforeDateOnlyStringAttribute(string other) : ValidationAttr
 /// <seealso cref="MustStringDateOnlyClauses.NotBeforeDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.Before)
+public sealed class NotBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.Before, allowNull: false)
 {
     /// <summary>Gets the reference date; the parsed value must not precede it.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -272,9 +272,9 @@ public sealed class NotBeforeDateOnlyStringAttribute(string other) : ValidationA
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotBeforeDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -289,7 +289,7 @@ public sealed class NotBeforeDateOnlyStringAttribute(string other) : ValidationA
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -305,7 +305,7 @@ public sealed class NotBeforeDateOnlyStringAttribute(string other) : ValidationA
 /// <seealso cref="MustStringDateOnlyClauses.OnOrBeforeDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OnOrBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.After)
+public sealed class OnOrBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.After, allowNull: false)
 {
     /// <summary>Gets the reference date that the parsed value must not exceed.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -318,9 +318,9 @@ public sealed class OnOrBeforeDateOnlyStringAttribute(string other) : Validation
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.OnOrBeforeDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -335,7 +335,7 @@ public sealed class OnOrBeforeDateOnlyStringAttribute(string other) : Validation
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -351,7 +351,7 @@ public sealed class OnOrBeforeDateOnlyStringAttribute(string other) : Validation
 /// <seealso cref="MustStringDateOnlyClauses.NotOnOrBeforeDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOnOrBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotAfter)
+public sealed class NotOnOrBeforeDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotAfter, allowNull: false)
 {
     /// <summary>Gets the reference date; the parsed value must be strictly after it.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -364,9 +364,9 @@ public sealed class NotOnOrBeforeDateOnlyStringAttribute(string other) : Validat
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotOnOrBeforeDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -381,7 +381,7 @@ public sealed class NotOnOrBeforeDateOnlyStringAttribute(string other) : Validat
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -397,7 +397,7 @@ public sealed class NotOnOrBeforeDateOnlyStringAttribute(string other) : Validat
 /// <seealso cref="MustStringDateOnlyClauses.AfterDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class AfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotAfter)
+public sealed class AfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotAfter, allowNull: false)
 {
     /// <summary>Gets the reference date that the parsed value must follow.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -410,9 +410,9 @@ public sealed class AfterDateOnlyStringAttribute(string other) : ValidationAttri
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.AfterDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -427,7 +427,7 @@ public sealed class AfterDateOnlyStringAttribute(string other) : ValidationAttri
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -443,7 +443,7 @@ public sealed class AfterDateOnlyStringAttribute(string other) : ValidationAttri
 /// <seealso cref="MustStringDateOnlyClauses.NotAfterDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.After)
+public sealed class NotAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.After, allowNull: false)
 {
     /// <summary>Gets the reference date; the parsed value must not be strictly after it.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -456,9 +456,9 @@ public sealed class NotAfterDateOnlyStringAttribute(string other) : ValidationAt
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotAfterDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -473,7 +473,7 @@ public sealed class NotAfterDateOnlyStringAttribute(string other) : ValidationAt
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -489,7 +489,7 @@ public sealed class NotAfterDateOnlyStringAttribute(string other) : ValidationAt
 /// <seealso cref="MustStringDateOnlyClauses.OnOrAfterDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OnOrAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.Before)
+public sealed class OnOrAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.Before, allowNull: false)
 {
     /// <summary>Gets the reference date that the parsed value must meet or follow.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -502,9 +502,9 @@ public sealed class OnOrAfterDateOnlyStringAttribute(string other) : ValidationA
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.OnOrAfterDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -519,7 +519,7 @@ public sealed class OnOrAfterDateOnlyStringAttribute(string other) : ValidationA
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -535,7 +535,7 @@ public sealed class OnOrAfterDateOnlyStringAttribute(string other) : ValidationA
 /// <seealso cref="MustStringDateOnlyClauses.NotOnOrAfterDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOnOrAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotBefore)
+public sealed class NotOnOrAfterDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotBefore, allowNull: false)
 {
     /// <summary>Gets the reference date; the parsed value must be strictly before it.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -548,9 +548,9 @@ public sealed class NotOnOrAfterDateOnlyStringAttribute(string other) : Validati
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotOnOrAfterDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -565,7 +565,7 @@ public sealed class NotOnOrAfterDateOnlyStringAttribute(string other) : Validati
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -581,7 +581,7 @@ public sealed class NotOnOrAfterDateOnlyStringAttribute(string other) : Validati
 /// <seealso cref="MustStringDateOnlyClauses.SameDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class SameDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Equality.NotEqual)
+public sealed class SameDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Equality.NotEqual, allowNull: false)
 {
     /// <summary>Gets the reference date that the parsed value must equal.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -594,9 +594,9 @@ public sealed class SameDateOnlyStringAttribute(string other) : ValidationAttrib
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.SameDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -611,7 +611,7 @@ public sealed class SameDateOnlyStringAttribute(string other) : ValidationAttrib
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed using invariant culture.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -627,7 +627,7 @@ public sealed class SameDateOnlyStringAttribute(string other) : ValidationAttrib
 /// <seealso cref="MustStringDateOnlyClauses.NotSameDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotSameDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Equality.Equal)
+public sealed class NotSameDateOnlyStringAttribute(string other) : ValidationAttributeBase(typeof(string), MustCodes.Date.Equality.Equal, allowNull: false)
 {
     /// <summary>Gets the reference date that the parsed value must not equal.</summary>
     public DateOnly Other { get; } = DateOnly.Parse(other, CultureInfo.InvariantCulture);
@@ -640,9 +640,9 @@ public sealed class NotSameDateOnlyStringAttribute(string other) : ValidationAtt
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotSameDateOnly(strValue, Other, precision: null, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -658,7 +658,7 @@ public sealed class NotSameDateOnlyStringAttribute(string other) : ValidationAtt
 /// <para>
 /// The annotated value is treated as the start; <see cref="End"/> is the raw end string. Both are parsed
 /// at validation time using <see cref="Styles"/>. Defaults to <see cref="Inclusion.Exclusive"/> boundaries.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -675,7 +675,7 @@ public sealed class NotSameDateOnlyStringAttribute(string other) : ValidationAtt
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalDateOnlyStringAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotChronological)
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.NotChronological, allowNull: false)
 {
     /// <summary>Gets the end date string for the chronological range.</summary>
     public string End { get; } = end;
@@ -691,9 +691,9 @@ public sealed class ChronologicalDateOnlyStringAttribute(string end, Inclusion i
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.ChronologicalDateOnly(strValue, End, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -709,7 +709,7 @@ public sealed class ChronologicalDateOnlyStringAttribute(string end, Inclusion i
 /// <para>
 /// The annotated value is treated as the start; <see cref="End"/> is the raw end string. Both are parsed
 /// at validation time using <see cref="Styles"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -726,7 +726,7 @@ public sealed class ChronologicalDateOnlyStringAttribute(string end, Inclusion i
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotChronologicalDateOnlyStringAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.Chronological)
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Order.Chronological, allowNull: false)
 {
     /// <summary>Gets the end date string used to check the non-chronological constraint.</summary>
     public string End { get; } = end;
@@ -742,9 +742,9 @@ public sealed class NotChronologicalDateOnlyStringAttribute(string end, Inclusio
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotChronologicalDateOnly(strValue, End, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -760,7 +760,7 @@ public sealed class NotChronologicalDateOnlyStringAttribute(string end, Inclusio
 /// <para>
 /// The annotated value is treated as the start of the first interval. All boundary strings are passed
 /// as-is and parsed at validation time using <see cref="Styles"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -776,8 +776,8 @@ public sealed class NotChronologicalDateOnlyStringAttribute(string end, Inclusio
 /// <seealso cref="MustStringDateOnlyClauses.OverlappingDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OverlappingDateOnlyStringAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Date.Overlap.Missing)
+public sealed class OverlappingDateOnlyStringAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Overlap.Missing, allowNull: false)
 {
     /// <summary>Gets the end of the first interval as a string.</summary>
     public string End1 { get; } = end1;
@@ -799,9 +799,9 @@ public sealed class OverlappingDateOnlyStringAttribute(string end1, string start
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.OverlappingDateOnly(strValue, End1, Start2, End2, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -817,7 +817,7 @@ public sealed class OverlappingDateOnlyStringAttribute(string end1, string start
 /// <para>
 /// The annotated value is treated as the start of the first interval. All boundary strings are passed
 /// as-is and parsed at validation time using <see cref="Styles"/>.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
 /// <example>
@@ -833,8 +833,8 @@ public sealed class OverlappingDateOnlyStringAttribute(string end1, string start
 /// <seealso cref="MustStringDateOnlyClauses.NotOverlappingDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOverlappingDateOnlyStringAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Date.Overlap.Present)
+public sealed class NotOverlappingDateOnlyStringAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Overlap.Present, allowNull: false)
 {
     /// <summary>Gets the end of the first interval as a string.</summary>
     public string End1 { get; } = end1;
@@ -856,9 +856,9 @@ public sealed class NotOverlappingDateOnlyStringAttribute(string end1, string st
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
+        var strValue = (string?)value;
         var result = Must.Be.NotOverlappingDateOnly(strValue, End1, Start2, End2, Inclusion, Styles, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -868,13 +868,13 @@ public sealed class NotOverlappingDateOnlyStringAttribute(string end1, string st
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringDateOnlyClauses.MinimumAge"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustStringDateOnlyClauses.MinimumAgeDateOnly"/>. Supported on properties, fields, and
 /// parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>. A value that does not parse fails validation.
-/// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// <para>
 /// The clock supplying today's date is resolved from the validation context's service provider: an
@@ -895,10 +895,10 @@ public sealed class NotOverlappingDateOnlyStringAttribute(string end1, string st
 /// </code>
 /// </example>
 /// <seealso cref="MinimumAgeAttribute"/>
-/// <seealso cref="MustStringDateOnlyClauses.MinimumAge"/>
+/// <seealso cref="MustStringDateOnlyClauses.MinimumAgeDateOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class MinimumAgeStringAttribute(int years) : ValidationAttributeBase(typeof(string), MustCodes.Date.Age.BelowMinimum)
+public sealed class MinimumAgeStringAttribute(int years) : ValidationAttributeBase(typeof(string), MustCodes.Date.Age.BelowMinimum, allowNull: false)
 {
     private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
@@ -911,9 +911,71 @@ public sealed class MinimumAgeStringAttribute(int years) : ValidationAttributeBa
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var strValue = (string)value!;
-        var result = Must.Be.MinimumAge(strValue, Years, Styles, ResolveTimeProvider(validationContext), paramName: null);
-        return FromMustResult(result, validationContext);
+        var strValue = (string?)value;
+        var result = Must.Be.MinimumAgeDateOnly(strValue, Years, Styles, ResolveTimeProvider(validationContext), paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>Validates that the string represents a DateOnly within the configured range.</summary>
+/// <param name="min">The invariant-culture lower boundary.</param>
+/// <param name="max">The invariant-culture upper boundary.</param>
+/// <param name="inclusion">Whether range boundaries are included.</param>
+/// <remarks>Null values are skipped after configuration is validated. Non-null values delegate configuration and value validation to Must.</remarks>
+/// <example><code>[InRangeDateOnlyString("2024-01-01", "2024-12-31")]</code></example>
+/// <seealso cref="MustStringDateOnlyClauses.InRangeDateOnly"/>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class InRangeDateOnlyStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Range.OutOfRange, allowNull: false)
+{
+    /// <summary>Gets the lower boundary.</summary>
+    public DateOnly Min { get; } = DateOnly.Parse(min, CultureInfo.InvariantCulture);
+
+    /// <summary>Gets the upper boundary.</summary>
+    public DateOnly Max { get; } = DateOnly.Parse(max, CultureInfo.InvariantCulture);
+
+    /// <summary>Gets whether the boundaries are included.</summary>
+    public Inclusion Inclusion { get; } = inclusion;
+
+    /// <summary>Gets or sets the parsing styles.</summary>
+    public DateTimeStyles Styles { get; set; } = DateTimeStyles.AllowWhiteSpaces;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var result = Must.Be.InRangeDateOnly((string?)value, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
+    }
+}
+
+/// <summary>Validates that the string represents a DateOnly outside the configured range.</summary>
+/// <param name="min">The invariant-culture lower boundary.</param>
+/// <param name="max">The invariant-culture upper boundary.</param>
+/// <param name="inclusion">Whether range boundaries are included.</param>
+/// <remarks>Null values are skipped after configuration is validated. Non-null values delegate configuration and value validation to Must.</remarks>
+/// <example><code>[OutOfRangeDateOnlyString("2024-01-01", "2024-12-31")]</code></example>
+/// <seealso cref="MustStringDateOnlyClauses.OutOfRangeDateOnly"/>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+public sealed class OutOfRangeDateOnlyStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Date.Range.InRange, allowNull: false)
+{
+    /// <summary>Gets the lower boundary.</summary>
+    public DateOnly Min { get; } = DateOnly.Parse(min, CultureInfo.InvariantCulture);
+
+    /// <summary>Gets the upper boundary.</summary>
+    public DateOnly Max { get; } = DateOnly.Parse(max, CultureInfo.InvariantCulture);
+
+    /// <summary>Gets whether the boundaries are included.</summary>
+    public Inclusion Inclusion { get; } = inclusion;
+
+    /// <summary>Gets or sets the parsing styles.</summary>
+    public DateTimeStyles Styles { get; set; } = DateTimeStyles.AllowWhiteSpaces;
+
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
+    {
+        var result = Must.Be.OutOfRangeDateOnly((string?)value, Min, Max, Inclusion, Styles, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 #endif

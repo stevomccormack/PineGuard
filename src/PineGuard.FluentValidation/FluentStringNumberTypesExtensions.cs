@@ -1,4 +1,3 @@
-#if NET8_0_OR_GREATER
 using System.Globalization;
 using FluentValidation;
 using PineGuard.Codes;
@@ -27,7 +26,7 @@ public static class FluentStringNumberTypesExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustStringNumberTypesClauses.Decimal"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation passes when configuration is valid (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
@@ -37,9 +36,9 @@ public static class FluentStringNumberTypesExtensions
     /// <seealso cref="MustStringNumberTypesClauses.Decimal"/>
     public static IRuleBuilderOptions<TModel, string?> Decimal<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int decimalPlaces = 2,
-        string? message = null,
-        NumberStyles styles = DefaultStyles) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.Decimal(val, decimalPlaces, styles, paramName: null) : MustResult<decimal>.Ok(0),
+        NumberStyles styles = DefaultStyles,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Decimal(val, decimalPlaces, styles, paramName: null)),
             message, MustCodes.Number.Format.NotDecimal);
 
     /// <summary>
@@ -53,7 +52,7 @@ public static class FluentStringNumberTypesExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustStringNumberTypesClauses.ExactDecimal"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation passes when configuration is valid (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
@@ -63,9 +62,9 @@ public static class FluentStringNumberTypesExtensions
     /// <seealso cref="MustStringNumberTypesClauses.ExactDecimal"/>
     public static IRuleBuilderOptions<TModel, string?> ExactDecimal<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int exactDecimalPlaces = 2,
-        string? message = null,
-        NumberStyles styles = DefaultStyles) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.ExactDecimal(val, exactDecimalPlaces, styles, paramName: null) : MustResult<decimal>.Ok(0),
+        NumberStyles styles = DefaultStyles,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.ExactDecimal(val, exactDecimalPlaces, styles, paramName: null)),
             message, MustCodes.Number.Scale.Mismatch);
 
     /// <summary>
@@ -78,7 +77,7 @@ public static class FluentStringNumberTypesExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustStringNumberTypesClauses.Int32"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation passes when configuration is valid (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
@@ -87,9 +86,9 @@ public static class FluentStringNumberTypesExtensions
     /// </example>
     /// <seealso cref="MustStringNumberTypesClauses.Int32"/>
     public static IRuleBuilderOptions<TModel, string?> Int32<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
-        string? message = null,
-        NumberStyles styles = NumberStyles.Integer) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.Int32(val, styles, paramName: null) : MustResult<int>.Ok(0),
+        NumberStyles styles = NumberStyles.Integer,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Int32(val, styles, paramName: null)),
             message, MustCodes.Number.Format.NotInt32);
 
     /// <summary>
@@ -102,7 +101,7 @@ public static class FluentStringNumberTypesExtensions
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
     /// Delegates to <see cref="MustStringNumberTypesClauses.Int64"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// validation passes when configuration is valid (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
@@ -111,9 +110,9 @@ public static class FluentStringNumberTypesExtensions
     /// </example>
     /// <seealso cref="MustStringNumberTypesClauses.Int64"/>
     public static IRuleBuilderOptions<TModel, string?> Int64<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
-        string? message = null,
-        NumberStyles styles = NumberStyles.Integer) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.Int64(val, styles, paramName: null) : MustResult<long>.Ok(0),
+        NumberStyles styles = NumberStyles.Integer,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.Int64(val, styles, paramName: null)),
             message, MustCodes.Number.Format.NotInt64);
 
     /// <summary>
@@ -128,22 +127,22 @@ public static class FluentStringNumberTypesExtensions
     /// <param name="styles">The <see cref="NumberStyles"/> used when parsing the string value.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustStringNumberTypesClauses.Int32InRange"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustStringNumberTypesClauses.InRangeInt32"/>. If the value is <see langword="null"/>,
+    /// validation passes when configuration is valid (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.Age).Int32InRange(0, 150);
+    /// RuleFor(x => x.Age).InRangeInt32(0, 150);
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringNumberTypesClauses.Int32InRange"/>
-    public static IRuleBuilderOptions<TModel, string?> Int32InRange<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+    /// <seealso cref="MustStringNumberTypesClauses.InRangeInt32"/>
+    public static IRuleBuilderOptions<TModel, string?> InRangeInt32<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
-        string? message = null,
-        NumberStyles styles = NumberStyles.Integer) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.Int32InRange(val, min, max, inclusion, styles, paramName: null) : MustResult<int>.Ok(0),
+        NumberStyles styles = NumberStyles.Integer,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.InRangeInt32(val, min, max, inclusion, styles, paramName: null)),
             message, MustCodes.Number.Range.OutOfRange);
 
     /// <summary>
@@ -158,22 +157,22 @@ public static class FluentStringNumberTypesExtensions
     /// <param name="styles">The <see cref="NumberStyles"/> used when parsing the string value.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustStringNumberTypesClauses.Int32OutOfRange"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustStringNumberTypesClauses.OutOfRangeInt32"/>. If the value is <see langword="null"/>,
+    /// validation passes when configuration is valid (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.ExcludedPort).Int32OutOfRange(49152, 65535);
+    /// RuleFor(x => x.ExcludedPort).OutOfRangeInt32(49152, 65535);
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringNumberTypesClauses.Int32OutOfRange"/>
-    public static IRuleBuilderOptions<TModel, string?> Int32OutOfRange<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+    /// <seealso cref="MustStringNumberTypesClauses.OutOfRangeInt32"/>
+    public static IRuleBuilderOptions<TModel, string?> OutOfRangeInt32<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
-        string? message = null,
-        NumberStyles styles = NumberStyles.Integer) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.Int32OutOfRange(val, min, max, inclusion, styles, paramName: null) : MustResult<int>.Ok(0),
+        NumberStyles styles = NumberStyles.Integer,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OutOfRangeInt32(val, min, max, inclusion, styles, paramName: null)),
             message, MustCodes.Number.Range.InRange);
 
     /// <summary>
@@ -188,22 +187,22 @@ public static class FluentStringNumberTypesExtensions
     /// <param name="styles">The <see cref="NumberStyles"/> used when parsing the string value.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustStringNumberTypesClauses.Int64InRange"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustStringNumberTypesClauses.InRangeInt64"/>. If the value is <see langword="null"/>,
+    /// validation passes when configuration is valid (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.Timestamp).Int64InRange(0, long.MaxValue);
+    /// RuleFor(x => x.Timestamp).InRangeInt64(0, long.MaxValue);
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringNumberTypesClauses.Int64InRange"/>
-    public static IRuleBuilderOptions<TModel, string?> Int64InRange<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+    /// <seealso cref="MustStringNumberTypesClauses.InRangeInt64"/>
+    public static IRuleBuilderOptions<TModel, string?> InRangeInt64<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         long min,
         long max,
         Inclusion inclusion = Inclusion.Inclusive,
-        string? message = null,
-        NumberStyles styles = NumberStyles.Integer) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.Int64InRange(val, min, max, inclusion, styles, paramName: null) : MustResult<long>.Ok(0),
+        NumberStyles styles = NumberStyles.Integer,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.InRangeInt64(val, min, max, inclusion, styles, paramName: null)),
             message, MustCodes.Number.Range.OutOfRange);
 
     /// <summary>
@@ -218,22 +217,24 @@ public static class FluentStringNumberTypesExtensions
     /// <param name="styles">The <see cref="NumberStyles"/> used when parsing the string value.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustStringNumberTypesClauses.Int64OutOfRange"/>. If the value is <see langword="null"/>,
-    /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
+    /// Delegates to <see cref="MustStringNumberTypesClauses.OutOfRangeInt64"/>. If the value is <see langword="null"/>,
+    /// validation passes when configuration is valid (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.ExcludedId).Int64OutOfRange(1000, 9999);
+    /// RuleFor(x => x.ExcludedId).OutOfRangeInt64(1000, 9999);
     /// </code>
     /// </example>
-    /// <seealso cref="MustStringNumberTypesClauses.Int64OutOfRange"/>
-    public static IRuleBuilderOptions<TModel, string?> Int64OutOfRange<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+    /// <seealso cref="MustStringNumberTypesClauses.OutOfRangeInt64"/>
+    public static IRuleBuilderOptions<TModel, string?> OutOfRangeInt64<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         long min,
         long max,
         Inclusion inclusion = Inclusion.Inclusive,
-        string? message = null,
-        NumberStyles styles = NumberStyles.Integer) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.Int64OutOfRange(val, min, max, inclusion, styles, paramName: null) : MustResult<long>.Ok(0),
+        NumberStyles styles = NumberStyles.Integer,
+        string? message = null) =>
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OutOfRangeInt64(val, min, max, inclusion, styles, paramName: null)),
             message, MustCodes.Number.Range.InRange);
+
+    private static MustResult<T> SkipAbsentValue<T>(string? value, MustResult<T> result) =>
+        value is null && result.ParamName is null ? MustResult<T>.Ok(default) : result;
 }
-#endif

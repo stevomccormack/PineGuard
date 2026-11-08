@@ -10,12 +10,12 @@ public static partial class StringUtility
     public static class TimeSpan
     {
         /// <summary>
-        /// Attempts to parse the specified string as a nullable <see cref="System.TimeSpan"/> using invariant culture.
+        /// Attempts to parse the specified string as a <see cref="System.TimeSpan"/> using invariant culture.
         /// </summary>
         /// <param name="value">The string to parse. If <see langword="null"/> or whitespace, returns <see langword="false"/>.</param>
         /// <param name="timeSpan">
         /// When this method returns <see langword="true"/>, contains the parsed <see cref="System.TimeSpan"/>.
-        /// When <see langword="false"/>, contains <see langword="null"/>.
+        /// When <see langword="false"/>, contains the default value.
         /// </param>
         /// <returns><see langword="true"/> if <paramref name="value"/> was successfully parsed; otherwise, <see langword="false"/>.</returns>
         /// <example>
@@ -23,9 +23,9 @@ public static partial class StringUtility
         /// StringUtility.TimeSpan.TryParse("01:30:00", out var ts); // true, ts = 1h 30m
         /// </code>
         /// </example>
-        public static bool TryParse(string? value, out System.TimeSpan? timeSpan)
+        public static bool TryParse(string? value, out System.TimeSpan timeSpan)
         {
-            timeSpan = null;
+            timeSpan = default;
 
             if (string.IsNullOrWhiteSpace(value))
                 return false;

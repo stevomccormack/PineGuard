@@ -81,7 +81,7 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     /// <summary>
     /// Gets the duration of the range as a <see cref="TimeSpan"/>.
     /// </summary>
-    public TimeSpan Duration => End - Start;
+    public TimeSpan Duration => EndUtc - StartUtc;
 
     /// <summary>
     /// Gets <see cref="Start"/> normalized to UTC (see the type-level remarks).
@@ -105,34 +105,28 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     }
 
     /// <summary>
-    /// Determines whether this range overlaps with another range (exclusive boundaries).
+    /// Determines whether this range shares at least one included value with another closed range.
     /// </summary>
     /// <param name="other">The other range to compare.</param>
     /// <returns><see langword="true"/> if the ranges overlap; otherwise, <see langword="false"/>.</returns>
-    public bool Overlaps(DateTimeRange other)
-        => StartUtc < other.EndUtc && other.StartUtc < EndUtc;
+    public bool Overlaps(DateTimeRange other) => Overlaps(other, Inclusion.Inclusive);
 
     /// <summary>
     /// Determines whether this range overlaps with another range using the specified boundary inclusion.
     /// </summary>
     /// <param name="other">The other range to compare.</param>
-    /// <param name="inclusion">Whether the boundaries are inclusive or exclusive.</param>
+    /// <param name="inclusion">Whether to intersect the closed ranges or their open interiors. Open interiors exclude both endpoints; singleton and one-step ranges have empty interiors.</param>
     /// <returns><see langword="true"/> if the ranges overlap; otherwise, <see langword="false"/>.</returns>
-    public bool Overlaps(DateTimeRange other, Inclusion inclusion)
-    {
-        if (inclusion == Inclusion.Exclusive)
-            return StartUtc < other.EndUtc && other.StartUtc < EndUtc;
-
-        return StartUtc <= other.EndUtc && other.StartUtc <= EndUtc;
-    }
+    public bool Overlaps(DateTimeRange other, Inclusion inclusion) =>
+        TemporalRangeComparison.Overlaps(StartUtc.Ticks, EndUtc.Ticks, other.StartUtc.Ticks, other.EndUtc.Ticks, inclusion);
 
     /// <summary>
-    /// Determines whether this range is adjacent to another range (touching at a single point).
+    /// Determines whether this range is adjacent to another range (disjoint, with no representable value between them).
     /// </summary>
     /// <param name="other">The other range to compare.</param>
     /// <returns><see langword="true"/> if the ranges are adjacent; otherwise, <see langword="false"/>.</returns>
-    public bool IsAdjacentTo(DateTimeRange other)
-        => StartUtc == other.EndUtc || EndUtc == other.StartUtc;
+    public bool IsAdjacentTo(DateTimeRange other) =>
+        TemporalRangeComparison.IsAdjacent(StartUtc.Ticks, EndUtc.Ticks, other.StartUtc.Ticks, other.EndUtc.Ticks);
 
     /// <summary>
     /// Computes the intersection of this range with another range.
@@ -155,11 +149,11 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
     }
 
     /// <summary>
-    /// Computes the union of this range with another range (smallest range encompassing both).
+    /// Computes the smallest closed range enclosing both operands, including any gap.
     /// </summary>
-    /// <param name="other">The other range to union with.</param>
+    /// <param name="other">The other range to enclose.</param>
     /// <returns>A <see cref="DateTimeRange"/> encompassing both ranges.</returns>
-    public DateTimeRange Union(DateTimeRange other)
+    public DateTimeRange Enclose(DateTimeRange other)
     {
         var start = StartUtc < other.StartUtc ? Start : other.Start;
         var end = EndUtc > other.EndUtc ? End : other.End;
@@ -182,6 +176,21 @@ public readonly struct DateTimeRange : IEquatable<DateTimeRange>
             return new DateTimeRange(start, end);
 
         return new DateTimeRange(DateTimeUtility.ToUtc(start)!.Value, DateTimeUtility.ToUtc(end)!.Value);
+    }
+
+    /// <summary>
+    /// Computes the exact union as an ordered, read-only collection of closed ranges.
+    /// </summary>
+    /// <param name="other">The other range.</param>
+    /// <returns>One range when the operands overlap or are adjacent; otherwise two disjoint ranges in ascending order.</returns>
+    public IReadOnlyList<DateTimeRange> Union(DateTimeRange other)
+    {
+        if (Overlaps(other) || IsAdjacentTo(other))
+            return Array.AsReadOnly(new[] { Enclose(other) });
+
+        return StartUtc < other.StartUtc
+            ? Array.AsReadOnly(new[] { this, other })
+            : Array.AsReadOnly(new[] { other, this });
     }
 
     /// <inheritdoc />

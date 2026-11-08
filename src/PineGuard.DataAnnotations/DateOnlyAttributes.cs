@@ -152,7 +152,7 @@ public sealed class FutureOrPresentDateOnlyAttribute() : ValidationAttributeBase
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustDateOnlyClauses.Between"/>. Supported on properties, fields, and parameters
+/// Delegates to <see cref="MustDateOnlyClauses.InRange"/>. Supported on properties, fields, and parameters
 /// of type <see cref="DateOnly"/>.
 /// </para>
 /// <para>
@@ -164,17 +164,17 @@ public sealed class FutureOrPresentDateOnlyAttribute() : ValidationAttributeBase
 /// <code>
 /// public class BookingModel
 /// {
-///     [BetweenDateOnly("2024-01-01", "2024-12-31")]
+///     [InRangeDateOnly("2024-01-01", "2024-12-31")]
 ///     public DateOnly CheckIn { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="NotBetweenDateOnlyAttribute"/>
-/// <seealso cref="MustDateOnlyClauses.Between"/>
+/// <seealso cref="OutOfRangeDateOnlyAttribute"/>
+/// <seealso cref="MustDateOnlyClauses.InRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class BetweenDateOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Range.OutOfRange)
+public sealed class InRangeDateOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Range.OutOfRange, allowNull: false)
 {
     /// <summary>Gets the lower date boundary.</summary>
     public DateOnly Min { get; } = DateOnly.Parse(min, CultureInfo.InvariantCulture);
@@ -188,10 +188,10 @@ public sealed class BetweenDateOnlyAttribute(string min, string max, Inclusion i
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var dateValue = (DateOnly)value!;
+        var dateValue = ((DateOnly?)value).GetValueOrDefault();
 
-        var result = Must.Be.Between(dateValue, Min, Max, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        var result = Must.Be.InRange(dateValue, Min, Max, Inclusion, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -201,7 +201,7 @@ public sealed class BetweenDateOnlyAttribute(string min, string max, Inclusion i
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustDateOnlyClauses.NotBetween"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustDateOnlyClauses.OutOfRange"/>. Supported on properties, fields, and
 /// parameters of type <see cref="DateOnly"/>.
 /// </para>
 /// <para>
@@ -213,17 +213,17 @@ public sealed class BetweenDateOnlyAttribute(string min, string max, Inclusion i
 /// <code>
 /// public class HolidayModel
 /// {
-///     [NotBetweenDateOnly("2024-12-24", "2024-12-26")]
+///     [OutOfRangeDateOnly("2024-12-24", "2024-12-26")]
 ///     public DateOnly WorkDate { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="BetweenDateOnlyAttribute"/>
-/// <seealso cref="MustDateOnlyClauses.NotBetween"/>
+/// <seealso cref="InRangeDateOnlyAttribute"/>
+/// <seealso cref="MustDateOnlyClauses.OutOfRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotBetweenDateOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
-    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Range.InRange)
+public sealed class OutOfRangeDateOnlyAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Range.InRange, allowNull: false)
 {
     /// <summary>Gets the lower boundary of the excluded date range.</summary>
     public DateOnly Min { get; } = DateOnly.Parse(min, CultureInfo.InvariantCulture);
@@ -237,10 +237,10 @@ public sealed class NotBetweenDateOnlyAttribute(string min, string max, Inclusio
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var dateValue = (DateOnly)value!;
+        var dateValue = ((DateOnly?)value).GetValueOrDefault();
 
-        var result = Must.Be.NotBetween(dateValue, Min, Max, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        var result = Must.Be.OutOfRange(dateValue, Min, Max, Inclusion, paramName: null);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -519,7 +519,7 @@ public sealed class NotSameDateOnlyAttribute(string other) : ValidationAttribute
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class ChronologicalDateOnlyAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Order.NotChronological)
+    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Order.NotChronological, allowNull: false)
 {
     /// <summary>Gets the end date of the chronological range.</summary>
     public DateOnly End { get; } = DateOnly.Parse(end, CultureInfo.InvariantCulture);
@@ -530,9 +530,9 @@ public sealed class ChronologicalDateOnlyAttribute(string end, Inclusion inclusi
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var dateValue = (DateOnly)value!;
+        var dateValue = ((DateOnly?)value).GetValueOrDefault();
         var result = Must.Be.Chronological(dateValue, End, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -564,7 +564,7 @@ public sealed class ChronologicalDateOnlyAttribute(string end, Inclusion inclusi
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotChronologicalDateOnlyAttribute(string end, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Order.Chronological)
+    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Order.Chronological, allowNull: false)
 {
     /// <summary>Gets the end date used to check the non-chronological constraint.</summary>
     public DateOnly End { get; } = DateOnly.Parse(end, CultureInfo.InvariantCulture);
@@ -575,9 +575,9 @@ public sealed class NotChronologicalDateOnlyAttribute(string end, Inclusion incl
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var dateValue = (DateOnly)value!;
+        var dateValue = ((DateOnly?)value).GetValueOrDefault();
         var result = Must.Be.NotChronological(dateValue, End, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -593,7 +593,7 @@ public sealed class NotChronologicalDateOnlyAttribute(string end, Inclusion incl
 /// <para>
 /// The annotated property is treated as the start of the first interval. All constructor arguments are
 /// parsed from <see cref="DateOnly"/> string format using invariant culture. Defaults to
-/// <see cref="Inclusion.Exclusive"/> boundaries.
+/// <see cref="Inclusion.Inclusive"/> boundaries.
 /// </para>
 /// </remarks>
 /// <example>
@@ -609,8 +609,8 @@ public sealed class NotChronologicalDateOnlyAttribute(string end, Inclusion incl
 /// <seealso cref="MustDateOnlyClauses.Overlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OverlappingDateOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Overlap.Missing)
+public sealed class OverlappingDateOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Overlap.Missing, allowNull: false)
 {
     /// <summary>Gets the end of the first interval.</summary>
     public DateOnly End1 { get; } = DateOnly.Parse(end1, CultureInfo.InvariantCulture);
@@ -627,9 +627,9 @@ public sealed class OverlappingDateOnlyAttribute(string end1, string start2, str
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var start1 = (DateOnly)value!;
+        var start1 = ((DateOnly?)value).GetValueOrDefault();
         var result = Must.Be.Overlapping(start1, End1, Start2, End2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -660,8 +660,8 @@ public sealed class OverlappingDateOnlyAttribute(string end1, string start2, str
 /// <seealso cref="MustDateOnlyClauses.NotOverlapping"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotOverlappingDateOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Overlap.Present)
+public sealed class NotOverlappingDateOnlyAttribute(string end1, string start2, string end2, Inclusion inclusion = Inclusion.Inclusive)
+    : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Overlap.Present, allowNull: false)
 {
     /// <summary>Gets the end of the first interval.</summary>
     public DateOnly End1 { get; } = DateOnly.Parse(end1, CultureInfo.InvariantCulture);
@@ -678,9 +678,9 @@ public sealed class NotOverlappingDateOnlyAttribute(string end1, string start2, 
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var start1 = (DateOnly)value!;
+        var start1 = ((DateOnly?)value).GetValueOrDefault();
         var result = Must.Be.NotOverlapping(start1, End1, Start2, End2, Inclusion, paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
@@ -920,7 +920,7 @@ public sealed class NotLastDayOfMonthDateOnlyAttribute() : ValidationAttributeBa
 /// <seealso cref="MustDateOnlyClauses.MinimumAge"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/dateonly">DateOnly Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class MinimumAgeAttribute(int years) : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Age.BelowMinimum)
+public sealed class MinimumAgeAttribute(int years) : ValidationAttributeBase(typeof(DateOnly), MustCodes.Date.Age.BelowMinimum, allowNull: false)
 {
     /// <summary>Gets the minimum age, in whole years, the date of birth must satisfy.</summary>
     public int Years { get; } = years;
@@ -928,10 +928,10 @@ public sealed class MinimumAgeAttribute(int years) : ValidationAttributeBase(typ
     /// <inheritdoc/>
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
-        var dateValue = (DateOnly)value!;
+        var dateValue = ((DateOnly?)value).GetValueOrDefault();
 
         var result = Must.Be.MinimumAge(dateValue, Years, ResolveTimeProvider(validationContext), paramName: null);
-        return FromMustResult(result, validationContext);
+        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 #endif

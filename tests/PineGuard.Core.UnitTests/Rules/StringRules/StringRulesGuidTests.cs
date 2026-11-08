@@ -29,6 +29,17 @@ public sealed class StringRulesGuidTests(ITestOutputHelper output)
     }
 
     [Theory]
+    [MemberData(nameof(StringRulesGuidTestData.IsEmpty.Cases), MemberType = typeof(StringRulesGuidTestData.IsEmpty))]
+    public void IsEmpty_BehavesAsExpected(RuleCase<string?> tc)
+    {
+        // Act
+        var result = PineGuard.Rules.StringRules.Guid.IsEmpty(tc.Value);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(StringRulesGuidTestData.HasVersion.Cases), MemberType = typeof(StringRulesGuidTestData.HasVersion))]
     public void HasVersion_BehavesAsExpected(RuleCase<(string? value, int version)> tc)
     {

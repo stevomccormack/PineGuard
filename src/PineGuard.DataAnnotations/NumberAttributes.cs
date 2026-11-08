@@ -31,8 +31,24 @@ public abstract class NumberAttributeBase(string code) : ValidationAttributeBase
     ];
 
     /// <inheritdoc/>
-    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext) =>
-        value is null ? ValidationResult.Success : ValidateValue(value, validationContext);
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    {
+        var configurationFailure = ValidateConfiguration(validationContext);
+        return configurationFailure ?? (value is null ? ValidationResult.Success : ValidateValue(value, validationContext));
+    }
+
+    /// <summary>Validates numeric configuration before null values are skipped.</summary>
+    /// <param name="validationContext">The context of the annotated member.</param>
+    /// <returns>A configuration failure, or null when configuration is valid.</returns>
+    protected virtual ValidationResult? ValidateConfiguration(ValidationContext validationContext) => null;
+
+    /// <summary>Maps only configuration-attributed failures from a canonical clause.</summary>
+    /// <typeparam name="T">The numeric result type.</typeparam>
+    /// <param name="result">The canonical clause result evaluated with a default numeric input.</param>
+    /// <param name="context">The context of the annotated member.</param>
+    /// <returns>A configuration failure, or null when the result only concerns the numeric input.</returns>
+    protected ValidationResult? FromConfigurationResult<T>(MustResult<T> result, ValidationContext context) =>
+        result.ParamName is null ? ValidationResult.Success : FromMustResult(result, context);
 
     /// <summary>
     /// Converts a numeric bound declared as <see cref="double"/> on the attribute to the runtime type of
@@ -541,7 +557,7 @@ public sealed class NaNNumberAttribute() : NumberAttributeBase(MustCodes.Number.
 /// <remarks>
 /// <para>
 /// Delegates to <see cref="MustNumberClauses.GreaterThanOrEqual"/>. Supported on properties, fields, and
-/// parameters of any primitive numeric type. The <see cref="Min"/> value is converted to the runtime type
+/// parameters of any primitive numeric type. The <see cref="Other"/> value is converted to the runtime type
 /// at validation time. If the value is <see langword="null"/>, validation passes silently.
 /// </para>
 /// </remarks>
@@ -558,10 +574,10 @@ public sealed class NaNNumberAttribute() : NumberAttributeBase(MustCodes.Number.
 /// <seealso cref="MustNumberClauses.GreaterThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class GreaterThanOrEqualNumberAttribute(double min) : NumberAttributeBase(MustCodes.Number.Range.BelowMinimum)
+public sealed class GreaterThanOrEqualNumberAttribute(double other) : NumberAttributeBase(MustCodes.Number.Range.BelowMinimum)
 {
     /// <summary>Gets the minimum value (inclusive) that the property must meet.</summary>
-    public double Min { get; } = min;
+    public double Other { get; } = other;
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">
@@ -571,8 +587,8 @@ public sealed class GreaterThanOrEqualNumberAttribute(double min) : NumberAttrib
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMin = ConvertBound(Min, type, nameof(Min));
-        return InvokeAndMap(nameof(MustNumberClauses.GreaterThanOrEqual), value, validationContext, typedMin);
+        var typedOther = ConvertBound(Other, type, nameof(Other));
+        return InvokeAndMap(nameof(MustNumberClauses.GreaterThanOrEqual), value, validationContext, typedOther);
     }
 }
 
@@ -582,7 +598,7 @@ public sealed class GreaterThanOrEqualNumberAttribute(double min) : NumberAttrib
 /// <remarks>
 /// <para>
 /// Delegates to <see cref="MustNumberClauses.LessThanOrEqual"/>. Supported on properties, fields, and
-/// parameters of any primitive numeric type. The <see cref="Max"/> value is converted to the runtime type
+/// parameters of any primitive numeric type. The <see cref="Other"/> value is converted to the runtime type
 /// at validation time. If the value is <see langword="null"/>, validation passes silently.
 /// </para>
 /// </remarks>
@@ -599,10 +615,10 @@ public sealed class GreaterThanOrEqualNumberAttribute(double min) : NumberAttrib
 /// <seealso cref="MustNumberClauses.LessThanOrEqual"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LessThanOrEqualNumberAttribute(double max) : NumberAttributeBase(MustCodes.Number.Range.Exceeded)
+public sealed class LessThanOrEqualNumberAttribute(double other) : NumberAttributeBase(MustCodes.Number.Range.Exceeded)
 {
     /// <summary>Gets the maximum value (inclusive) that the property must not exceed.</summary>
-    public double Max { get; } = max;
+    public double Other { get; } = other;
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">
@@ -612,8 +628,8 @@ public sealed class LessThanOrEqualNumberAttribute(double max) : NumberAttribute
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var type = value!.GetType();
-        var typedMax = ConvertBound(Max, type, nameof(Max));
-        return InvokeAndMap(nameof(MustNumberClauses.LessThanOrEqual), value, validationContext, typedMax);
+        var typedOther = ConvertBound(Other, type, nameof(Other));
+        return InvokeAndMap(nameof(MustNumberClauses.LessThanOrEqual), value, validationContext, typedOther);
     }
 }
 
@@ -645,6 +661,10 @@ public sealed class LessThanOrEqualNumberAttribute(double max) : NumberAttribute
 public sealed class InRangeNumberAttribute(double min, double max, Inclusion inclusion = Inclusion.Inclusive)
     : NumberAttributeBase(MustCodes.Number.Range.OutOfRange)
 {
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateConfiguration(ValidationContext validationContext) =>
+        FromConfigurationResult(Must.Be.InRange<double>(default, Min, Max, Inclusion, paramName: null), validationContext);
+
     /// <summary>Gets the lower boundary of the valid range.</summary>
     public double Min { get; } = min;
 
@@ -695,6 +715,10 @@ public sealed class InRangeNumberAttribute(double min, double max, Inclusion inc
 public sealed class OutOfRangeNumberAttribute(double min, double max, Inclusion inclusion = Inclusion.Inclusive)
     : NumberAttributeBase(MustCodes.Number.Range.InRange)
 {
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateConfiguration(ValidationContext validationContext) =>
+        FromConfigurationResult(Must.Be.OutOfRange<double>(default, Min, Max, Inclusion, paramName: null), validationContext);
+
     /// <summary>Gets the lower boundary of the excluded range.</summary>
     public double Min { get; } = min;
 
@@ -743,6 +767,10 @@ public sealed class OutOfRangeNumberAttribute(double min, double max, Inclusion 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class MultipleOfNumberAttribute(double factor) : NumberAttributeBase(MustCodes.Number.Divisibility.NotMultiple)
 {
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateConfiguration(ValidationContext validationContext) =>
+        FromConfigurationResult(Must.Be.MultipleOf<double>(default, Factor, paramName: null), validationContext);
+
     /// <summary>Gets the factor that the value must be a multiple of.</summary>
     public double Factor { get; } = factor;
 
@@ -784,6 +812,10 @@ public sealed class MultipleOfNumberAttribute(double factor) : NumberAttributeBa
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class NotMultipleOfNumberAttribute(double factor) : NumberAttributeBase(MustCodes.Number.Divisibility.Multiple)
 {
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateConfiguration(ValidationContext validationContext) =>
+        FromConfigurationResult(Must.Be.NotMultipleOf<double>(default, Factor, paramName: null), validationContext);
+
     /// <summary>Gets the factor that the value must not be a multiple of.</summary>
     public double Factor { get; } = factor;
 
@@ -802,12 +834,12 @@ public sealed class NotMultipleOfNumberAttribute(double factor) : NumberAttribut
 
 /// <summary>
 /// Validates that the annotated numeric property or field is approximately equal to the specified target
-/// value within an optional tolerance.
+/// value within the required tolerance.
 /// </summary>
 /// <remarks>
 /// <para>
 /// Delegates to <see cref="MustNumberClauses.Approximately"/>. Supported on properties, fields, and
-/// parameters of any primitive numeric type. The <see cref="Target"/> and optional <see cref="Tolerance"/>
+/// parameters of any primitive numeric type. The <see cref="Target"/> and required <see cref="Tolerance"/>
 /// are converted to the runtime type at validation time. If the value is <see langword="null"/>,
 /// validation passes silently.
 /// </para>
@@ -816,7 +848,7 @@ public sealed class NotMultipleOfNumberAttribute(double factor) : NumberAttribut
 /// <code>
 /// public class MeasurementModel
 /// {
-///     [ApproximatelyNumber(3.14159)]
+///     [ApproximatelyNumber(3.14159, 0.00001)]
 ///     public double Pi { get; set; }
 /// }
 /// </code>
@@ -825,13 +857,17 @@ public sealed class NotMultipleOfNumberAttribute(double factor) : NumberAttribut
 /// <seealso cref="MustNumberClauses.Approximately"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class ApproximatelyNumberAttribute(double target) : NumberAttributeBase(MustCodes.Number.Proximity.NotApproximate)
+public sealed class ApproximatelyNumberAttribute(double target, double tolerance) : NumberAttributeBase(MustCodes.Number.Proximity.NotApproximate)
 {
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateConfiguration(ValidationContext validationContext) =>
+        FromConfigurationResult(Must.Be.Approximately<double>(default, Target, Tolerance, paramName: null), validationContext);
+
     /// <summary>Gets the target value to approximate.</summary>
     public double Target { get; } = target;
 
-    /// <summary>Gets or sets the optional tolerance. When <see langword="null"/>, a type-default tolerance is used.</summary>
-    public double? Tolerance { get; set; }
+    /// <summary>Gets the required non-negative tolerance.</summary>
+    public double Tolerance { get; } = tolerance;
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">
@@ -842,19 +878,19 @@ public sealed class ApproximatelyNumberAttribute(double target) : NumberAttribut
     {
         var type = value!.GetType();
         var typedTarget = ConvertBound(Target, type, nameof(Target));
-        var typedTolerance = Tolerance is null ? null : ConvertBound(Tolerance.Value, type, nameof(Tolerance));
+        var typedTolerance = ConvertBound(Tolerance, type, nameof(Tolerance));
         return InvokeAndMap(nameof(MustNumberClauses.Approximately), value, validationContext, typedTarget, typedTolerance);
     }
 }
 
 /// <summary>
 /// Validates that the annotated numeric property or field is not approximately equal to the specified
-/// target value within an optional tolerance.
+/// target value within the required tolerance.
 /// </summary>
 /// <remarks>
 /// <para>
 /// Delegates to <see cref="MustNumberClauses.NotApproximately"/>. Supported on properties, fields, and
-/// parameters of any primitive numeric type. The <see cref="Target"/> and optional <see cref="Tolerance"/>
+/// parameters of any primitive numeric type. The <see cref="Target"/> and required <see cref="Tolerance"/>
 /// are converted to the runtime type at validation time. If the value is <see langword="null"/>,
 /// validation passes silently.
 /// </para>
@@ -863,7 +899,7 @@ public sealed class ApproximatelyNumberAttribute(double target) : NumberAttribut
 /// <code>
 /// public class ThresholdModel
 /// {
-///     [NotApproximatelyNumber(0)]
+///     [NotApproximatelyNumber(0, 0.01)]
 ///     public double Signal { get; set; }
 /// }
 /// </code>
@@ -872,13 +908,17 @@ public sealed class ApproximatelyNumberAttribute(double target) : NumberAttribut
 /// <seealso cref="MustNumberClauses.NotApproximately"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/number">Number Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotApproximatelyNumberAttribute(double target) : NumberAttributeBase(MustCodes.Number.Proximity.Approximate)
+public sealed class NotApproximatelyNumberAttribute(double target, double tolerance) : NumberAttributeBase(MustCodes.Number.Proximity.Approximate)
 {
+    /// <inheritdoc/>
+    protected override ValidationResult? ValidateConfiguration(ValidationContext validationContext) =>
+        FromConfigurationResult(Must.Be.NotApproximately<double>(default, Target, Tolerance, paramName: null), validationContext);
+
     /// <summary>Gets the target value to compare against.</summary>
     public double Target { get; } = target;
 
-    /// <summary>Gets or sets the optional tolerance. When <see langword="null"/>, a type-default tolerance is used.</summary>
-    public double? Tolerance { get; set; }
+    /// <summary>Gets the required non-negative tolerance.</summary>
+    public double Tolerance { get; } = tolerance;
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">
@@ -889,7 +929,7 @@ public sealed class NotApproximatelyNumberAttribute(double target) : NumberAttri
     {
         var type = value!.GetType();
         var typedTarget = ConvertBound(Target, type, nameof(Target));
-        var typedTolerance = Tolerance is null ? null : ConvertBound(Tolerance.Value, type, nameof(Tolerance));
+        var typedTolerance = ConvertBound(Tolerance, type, nameof(Tolerance));
         return InvokeAndMap(nameof(MustNumberClauses.NotApproximately), value, validationContext, typedTarget, typedTolerance);
     }
 }

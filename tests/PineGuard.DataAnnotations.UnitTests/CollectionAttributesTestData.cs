@@ -71,7 +71,7 @@ public static class CollectionAttributesTestData
         public static TheoryData<ValidCase> InvalidCases => [new("too many", OneTwoThree, false)];
     }
 
-    public static class HasCountBetweenCollection
+    public static class HasCountInRangeCollection
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
@@ -100,4 +100,17 @@ public static class CollectionAttributesTestData
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases => [new("distinct", OneTwoThree, false)];
     }
+
+    public sealed record RangeConfigurationCase(string Name, (int Min, int Max, PineGuard.Common.Inclusion Inclusion) Value, bool Expected)
+        : ReturnCase<(int Min, int Max, PineGuard.Common.Inclusion Inclusion), bool>(Name, Value, Expected);
+
+    public static TheoryData<RangeConfigurationCase> NullRangeConfiguration =>
+    [
+        new("Valid configuration", (0, 2, PineGuard.Common.Inclusion.Inclusive), true),
+        new("Undefined inclusion", (0, 2, (PineGuard.Common.Inclusion)99), false),
+        new("Negative minimum", (-1, 2, PineGuard.Common.Inclusion.Inclusive), false),
+        new("Negative maximum", (0, -1, PineGuard.Common.Inclusion.Inclusive), false),
+        new("Reversed bounds", (2, 1, PineGuard.Common.Inclusion.Inclusive), false),
+    ];
+
 }

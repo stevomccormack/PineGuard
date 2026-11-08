@@ -101,24 +101,24 @@ public static class FluentStringDateTimeOffsetExtensionsTestData
         ];
     }
 
-    public static class IsBetween
+    public static class IsInRange
     {
         public static TheoryData<FluentCase<(string? value, DateTimeOffset min, DateTimeOffset max, PineGuard.Common.Inclusion inclusion)>> Cases =>
-            F.DateTimeOffsetIsBetween.AllScenarios.ToFluentCases(s => s.Name switch
+            F.DateTimeOffsetIsInRange.AllScenarios.ToFluentCases(s => s.Name switch
             {
-                nameof(F.DateTimeOffsetIsBetween.NullValue) => new FluentExpected(true),
+                nameof(F.DateTimeOffsetIsInRange.NullValue) => new FluentExpected(true),
                 _ when s.IsValid => new FluentExpected(true),
                 _ => new FluentExpected(false, "Value must be a date/time within the expected range.")
             });
     }
 
-    public static class IsNotBetween
+    public static class IsOutOfRange
     {
         public static TheoryData<FluentCase<(string? value, DateTimeOffset min, DateTimeOffset max, PineGuard.Common.Inclusion inclusion)>> Cases =>
-            F.DateTimeOffsetIsNotBetween.AllScenarios.ToFluentCases(s => s.Name switch
+            F.DateTimeOffsetIsOutOfRange.AllScenarios.ToFluentCases(s => s.Name switch
             {
-                nameof(F.DateTimeOffsetIsNotBetween.NullValue) => new FluentExpected(true),
-                nameof(F.DateTimeOffsetIsNotBetween.NotADate) => new FluentExpected(false, "Value must be a date/time not within the expected range."),
+                nameof(F.DateTimeOffsetIsOutOfRange.NullValue) => new FluentExpected(true),
+                nameof(F.DateTimeOffsetIsOutOfRange.NotADate) => new FluentExpected(false, "Value must be a date/time not within the expected range."),
                 _ when s.IsValid => new FluentExpected(true),
                 _ => new FluentExpected(false, "Value must be a date/time not within the expected range.")
             });

@@ -9,41 +9,41 @@ public sealed class FluentStringTimeSpanExtensionsTests(ITestOutputHelper output
 {
     private sealed record Model { public string? Value { get; init; } }
 
-    private sealed class DurationBetweenValidator : AbstractValidator<Model>
+    private sealed class InRangeValidator : AbstractValidator<Model>
     {
-        public DurationBetweenValidator(TimeSpan min, TimeSpan max, Inclusion inclusion) =>
-            RuleFor(x => x.Value).DurationBetween(min, max, inclusion);
+        public InRangeValidator(TimeSpan min, TimeSpan max, Inclusion inclusion) =>
+            RuleFor(x => x.Value).InRangeTimeSpan(min, max, inclusion);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.DurationBetween.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.DurationBetween))]
-    public void DurationBetween_BehavesAsExpected(FluentCase<(string? value, TimeSpan min, TimeSpan max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.InRange.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.InRange))]
+    public void InRange_BehavesAsExpected(FluentCase<(string? value, TimeSpan min, TimeSpan max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = new DurationBetweenValidator(min, max, inclusion).Validate(new Model { Value = value });
+        var result = new InRangeValidator(min, max, inclusion).Validate(new Model { Value = value });
 
         // Assert
         AssertResult(tc, result);
     }
 
-    private sealed class NotDurationBetweenValidator : AbstractValidator<Model>
+    private sealed class OutOfRangeValidator : AbstractValidator<Model>
     {
-        public NotDurationBetweenValidator(TimeSpan min, TimeSpan max, Inclusion inclusion) =>
-            RuleFor(x => x.Value).NotDurationBetween(min, max, inclusion);
+        public OutOfRangeValidator(TimeSpan min, TimeSpan max, Inclusion inclusion) =>
+            RuleFor(x => x.Value).OutOfRangeTimeSpan(min, max, inclusion);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.NotDurationBetween.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.NotDurationBetween))]
-    public void NotDurationBetween_BehavesAsExpected(FluentCase<(string? value, TimeSpan min, TimeSpan max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.OutOfRange.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.OutOfRange))]
+    public void OutOfRange_BehavesAsExpected(FluentCase<(string? value, TimeSpan min, TimeSpan max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = new NotDurationBetweenValidator(min, max, inclusion).Validate(new Model { Value = value });
+        var result = new OutOfRangeValidator(min, max, inclusion).Validate(new Model { Value = value });
 
         // Assert
         AssertResult(tc, result);
@@ -51,19 +51,19 @@ public sealed class FluentStringTimeSpanExtensionsTests(ITestOutputHelper output
 
     private sealed class GreaterThanValidator : AbstractValidator<Model>
     {
-        public GreaterThanValidator(TimeSpan threshold, Inclusion inclusion) =>
-            RuleFor(x => x.Value).GreaterThan(threshold, inclusion);
+        public GreaterThanValidator(TimeSpan other, Inclusion inclusion) =>
+            RuleFor(x => x.Value).GreaterThanTimeSpan(other, inclusion);
     }
 
     [Theory]
     [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.GreaterThan.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.GreaterThan))]
-    public void GreaterThan_BehavesAsExpected(FluentCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
+    public void GreaterThan_BehavesAsExpected(FluentCase<(string? value, TimeSpan other, Inclusion inclusion)> tc)
     {
         // Arrange
-        var (value, threshold, inclusion) = tc.Value;
+        var (value, other, inclusion) = tc.Value;
 
         // Act
-        var result = new GreaterThanValidator(threshold, inclusion).Validate(new Model { Value = value });
+        var result = new GreaterThanValidator(other, inclusion).Validate(new Model { Value = value });
 
         // Assert
         AssertResult(tc, result);
@@ -71,19 +71,19 @@ public sealed class FluentStringTimeSpanExtensionsTests(ITestOutputHelper output
 
     private sealed class LessThanValidator : AbstractValidator<Model>
     {
-        public LessThanValidator(TimeSpan threshold, Inclusion inclusion) =>
-            RuleFor(x => x.Value).LessThan(threshold, inclusion);
+        public LessThanValidator(TimeSpan other, Inclusion inclusion) =>
+            RuleFor(x => x.Value).LessThanTimeSpan(other, inclusion);
     }
 
     [Theory]
     [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.LessThan.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.LessThan))]
-    public void LessThan_BehavesAsExpected(FluentCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
+    public void LessThan_BehavesAsExpected(FluentCase<(string? value, TimeSpan other, Inclusion inclusion)> tc)
     {
         // Arrange
-        var (value, threshold, inclusion) = tc.Value;
+        var (value, other, inclusion) = tc.Value;
 
         // Act
-        var result = new LessThanValidator(threshold, inclusion).Validate(new Model { Value = value });
+        var result = new LessThanValidator(other, inclusion).Validate(new Model { Value = value });
 
         // Assert
         AssertResult(tc, result);

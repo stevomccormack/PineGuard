@@ -73,7 +73,7 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, int max)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
-    public static class GraphemesHasCountBetween
+    public static class GraphemesHasCountInRange
     {
         public static readonly (string? value, int min, int max, Inclusion inclusion) WithinRange = ("abc", 2, 5, Inclusion.Inclusive);
         public static readonly (string? value, int min, int max, Inclusion inclusion) CombiningMarkWithinRange = (GraphemesHasExactCount.CombiningMark, 3, 4, Inclusion.Inclusive);

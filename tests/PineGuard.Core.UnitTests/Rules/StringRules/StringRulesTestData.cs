@@ -10,14 +10,20 @@ namespace PineGuard.Core.UnitTests.Rules.StringRules;
 
 public static class StringRulesTestData
 {
+    public static TheoryData<string?, StringComparison> InvalidComparisons => new()
+    {
+        { null, (StringComparison)42 },
+        { "value", (StringComparison)(-1) }
+    };
+
     public static class IsExactLength
     {
         public static TheoryData<RuleCase<(string? value, int length)>> Cases => F.IsExactLength.AllScenarios.ToRuleCases();
     }
 
-    public static class IsLengthBetween
+    public static class IsLengthInRange
     {
-        public static TheoryData<RuleCase<(string? value, int min, int max)>> Cases => F.IsLengthBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(string? value, int min, int max)>> Cases => F.IsLengthInRange.AllScenarios.ToRuleCases();
     }
 
     public static class IsLongerThan
@@ -256,5 +262,21 @@ public static class StringRulesTestData
     public static class IsNormalized
     {
         public static TheoryData<RuleCase<(string? value, NormalizationForm form)>> Cases => F.IsNormalized.AllScenarios.ToRuleCases();
+    }
+
+    public static class InvalidRangeConfiguration
+    {
+        public sealed record InvalidCase(string Name, Action Value, ExpectedException ExpectedException)
+            : ThrowsCase<Action>(Name, Value, ExpectedException);
+
+        public static TheoryData<InvalidCase> Cases =>
+        [
+            new("LengthNull", () => PineGuard.Rules.StringRules.IsLengthInRange(null, 2, 1, (Inclusion)999), new(typeof(ArgumentOutOfRangeException), "inclusion")),
+            new("LongerNull", () => PineGuard.Rules.StringRules.IsLongerThan(null, 1, (Inclusion)999), new(typeof(ArgumentOutOfRangeException), "inclusion")),
+            new("ShorterNull", () => PineGuard.Rules.StringRules.IsShorterThan(null, 1, (Inclusion)999), new(typeof(ArgumentOutOfRangeException), "inclusion")),
+            new("GraphemeNull", () => PineGuard.Rules.StringRules.Graphemes.HasCountInRange(null, 2, 1, (Inclusion)999), new(typeof(ArgumentOutOfRangeException), "inclusion")),
+            new("Int32Null", () => PineGuard.Rules.StringRules.NumberTypes.IsInRangeInt32(null, 2, 1, (Inclusion)999), new(typeof(ArgumentOutOfRangeException), "inclusion")),
+            new("Int64Null", () => PineGuard.Rules.StringRules.NumberTypes.IsInRangeInt64(null, 2, 1, (Inclusion)999), new(typeof(ArgumentOutOfRangeException), "inclusion"))
+        ];
     }
 }

@@ -109,38 +109,48 @@ public sealed class MustStringGraphemesClausesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween.ValidCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween.InvalidCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween.NullCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween.NegativeMinCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween.NegativeMaxCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween.InvalidRangeCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountBetween))]
-    public void HasGraphemeCountBetween_BehavesAsExpected(MustCase<(string? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange.ValidCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange.InvalidCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange.NullCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange.NegativeMinCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange.NegativeMaxCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange.InvalidRangeCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountInRange))]
+    public void HasGraphemeCountInRange_BehavesAsExpected(MustCase<(string? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = Must.Be.HasGraphemeCountBetween(value, min, max, inclusion, paramName: "value");
+        var result = Must.Be.HasGraphemeCountInRange(value, min, max, inclusion, paramName: "value");
 
         // Assert
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween.ValidCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween.InvalidCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween.NullCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween.NegativeMinCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween.NegativeMaxCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween.InvalidRangeCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountBetween))]
-    public void NotHasGraphemeCountBetween_BehavesAsExpected(MustCase<(string? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.ValidCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.InvalidCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.NullCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.NegativeMinCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.NegativeMaxCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.InvalidRangeCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
+    public void NotHasGraphemeCountInRange_BehavesAsExpected(MustCase<(string? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = Must.Be.NotHasGraphemeCountBetween(value, min, max, inclusion, paramName: "value");
+        var result = Must.Be.NotHasGraphemeCountInRange(value, min, max, inclusion, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+    [Theory]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.ConfigurationPrecedence.Cases), MemberType = typeof(MustStringGraphemesClausesTestData.ConfigurationPrecedence))]
+    public void ConfigurationPrecedence_RejectsInvalidConfiguration(MustCase<Func<MustResult<string>>> tc)
+    {
+        // Act
+        var result = tc.Value();
 
         // Assert
         AssertResult(tc, result);

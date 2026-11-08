@@ -92,9 +92,9 @@ public static class CollectionRulesTestData
         ];
     }
 
-    public static class HasCountBetween
+    public static class HasCountInRange
     {
-        public static TheoryData<RuleCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> Cases => F.HasCountBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> Cases => F.HasCountInRange.AllScenarios.ToRuleCases();
 
         public static TheoryData<RuleCase<(IEnumerable<string>? Value, int Min, int Max, Inclusion Inclusion)>> AdHocCases =>
         [
@@ -207,4 +207,28 @@ public static class CollectionRulesTestData
             new("Non-count out of range", (Enumerate("a"), 1), new RuleExpected(false))
         ];
     }
+
+    public static TheoryData<RuleCase<(IEnumerable<string> Value, IEnumerable<string> Other)>> ComparisonShapes =>
+    [
+        new("Arrays", (new[] { "ABC" }, new[] { "abc" }), new(true)),
+        new("Lists", (new List<string> { "ABC" }, new List<string> { "abc" }), new(true)),
+        new("Sets with nondefault comparer", (new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "ABC" }, new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "abc" }), new(true)),
+        new("Iterators", (Enumerate("ABC"), Enumerate("abc")), new(true)),
+    ];
+    public static TheoryData<RuleCase<int?[]?>> NullableValueItems =>
+    [
+        new("Null collection", null, new(false)), new("Empty", [], new(false)),
+        new("Non-null values", [1, 2], new(false)), new("Null element", [null], new(true)),
+        new("Mixed elements", [1, null, 2], new(true)),
+    ];
+
+
+    public sealed record InvalidInclusionCase(string Name, IEnumerable<string>? Value)
+        : ThrowsCase<IEnumerable<string>?>(Name, Value, typeof(ArgumentOutOfRangeException), "inclusion");
+
+    public static TheoryData<InvalidInclusionCase> InvalidInclusionCases =>
+    [
+        new("Null value", null), new("Empty value", []), new("Nonempty iterator", Enumerate("a", "b")),
+    ];
+
 }

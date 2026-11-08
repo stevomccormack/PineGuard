@@ -44,6 +44,9 @@ public static class MustStringDateOnlyClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotPast, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotPast, NullMessage, paramName, value);
 
@@ -52,7 +55,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsInPast(parsedValue, timeProvider: timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, parsedValue);
     }
@@ -81,6 +84,9 @@ public static class MustStringDateOnlyClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.Future, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.Future, NullMessage, paramName, value);
 
@@ -89,7 +95,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsInPast(parsedValue, Inclusion.Inclusive, timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Future, messageTemplate, paramName, value, parsedValue);
     }
@@ -118,6 +124,9 @@ public static class MustStringDateOnlyClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotFuture, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotFuture, NullMessage, paramName, value);
 
@@ -126,7 +135,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsInFuture(parsedValue, timeProvider: timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotFuture, messageTemplate, paramName, value, parsedValue);
     }
@@ -155,6 +164,9 @@ public static class MustStringDateOnlyClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.Past, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.Past, NullMessage, paramName, value);
 
@@ -163,7 +175,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsInFuture(parsedValue, Inclusion.Inclusive, timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.Past, messageTemplate, paramName, value, parsedValue);
     }
@@ -188,7 +200,7 @@ public static class MustStringDateOnlyClauses
     /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
-    public static MustResult<DateOnly> BetweenDateOnly(this IMustClause _,
+    public static MustResult<DateOnly> InRangeDateOnly(this IMustClause _,
         string? value,
         DateOnly min,
         DateOnly max,
@@ -196,20 +208,26 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.OutOfRange, NullMessage, paramName, value);
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.OutOfRange, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min > max)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Range.OutOfRange,
                 "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
+
+        if (value is null)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.OutOfRange, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date within the expected range.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = DateOnlyRules.IsBetween(parsedValue, min, max, inclusion);
+        var parsedValue = parsed;
+        var ok = DateOnlyRules.IsInRange(parsedValue, min, max, inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Range.OutOfRange, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -233,7 +251,7 @@ public static class MustStringDateOnlyClauses
     /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
-    public static MustResult<DateOnly> NotBetweenDateOnly(this IMustClause _,
+    public static MustResult<DateOnly> OutOfRangeDateOnly(this IMustClause _,
         string? value,
         DateOnly min,
         DateOnly max,
@@ -241,20 +259,26 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (value is null)
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.InRange, NullMessage, paramName, value);
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.InRange, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (min > max)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Range.InRange,
                 "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
+
+        if (value is null)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Range.InRange, NullMessage, paramName, value);
 
         const string messageTemplate = "{paramName} must be a date not within the expected range.";
 
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
-        var ok = !DateOnlyRules.IsBetween(parsedValue, min, max, inclusion);
+        var parsedValue = parsed;
+        var ok = !DateOnlyRules.IsInRange(parsedValue, min, max, inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Range.InRange, messageTemplate, paramName, value, parsedValue);
     }
 
@@ -284,6 +308,9 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.NotWithin, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.NotWithin, NullMessage, paramName, value);
 
@@ -296,7 +323,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsWithin(parsedValue, reference, days);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.NotWithin, messageTemplate, paramName, value, parsedValue);
     }
@@ -327,6 +354,9 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.Within, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.Within, NullMessage, paramName, value);
 
@@ -339,7 +369,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !DateOnlyRules.IsWithin(parsedValue, reference, days);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.Within, messageTemplate, paramName, value, parsedValue);
     }
@@ -370,6 +400,9 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.NotWithinCalendarMonths, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.NotWithinCalendarMonths, NullMessage, paramName, value);
 
@@ -382,7 +415,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsWithinCalendarMonths(parsedValue, reference, months);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.NotWithinCalendarMonths,
             messageTemplate, paramName, value, parsedValue);
@@ -414,6 +447,9 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.WithinCalendarMonths, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Proximity.WithinCalendarMonths, NullMessage, paramName, value);
 
@@ -426,7 +462,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !DateOnlyRules.IsWithinCalendarMonths(parsedValue, reference, months);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Proximity.WithinCalendarMonths,
             messageTemplate, paramName, value, parsedValue);
@@ -458,6 +494,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotBefore, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotBefore, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotBefore, NullMessage, paramName, value);
 
@@ -466,7 +508,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsBefore(parsedValue, other, Inclusion.Exclusive, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotBefore, messageTemplate, paramName, value, parsedValue);
     }
@@ -497,6 +539,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Before, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Before, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Before, NullMessage, paramName, value);
 
@@ -505,7 +553,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !DateOnlyRules.IsBefore(parsedValue, other, Inclusion.Exclusive, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.Before, messageTemplate, paramName, value, parsedValue);
     }
@@ -536,6 +584,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.After, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.After, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.After, NullMessage, paramName, value);
 
@@ -544,7 +598,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsBefore(parsedValue, other, Inclusion.Inclusive, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.After, messageTemplate, paramName, value, parsedValue);
     }
@@ -575,6 +629,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotAfter, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotAfter, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotAfter, NullMessage, paramName, value);
 
@@ -583,7 +643,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !DateOnlyRules.IsBefore(parsedValue, other, Inclusion.Inclusive, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotAfter, messageTemplate, paramName, value, parsedValue);
     }
@@ -614,6 +674,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotAfter, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotAfter, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotAfter, NullMessage, paramName, value);
 
@@ -622,7 +688,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsAfter(parsedValue, other, Inclusion.Exclusive, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotAfter, messageTemplate, paramName, value, parsedValue);
     }
@@ -653,6 +719,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.After, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.After, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.After, NullMessage, paramName, value);
 
@@ -661,7 +733,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !DateOnlyRules.IsAfter(parsedValue, other, Inclusion.Exclusive, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.After, messageTemplate, paramName, value, parsedValue);
     }
@@ -692,6 +764,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Before, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Before, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Before, NullMessage, paramName, value);
 
@@ -700,7 +778,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsAfter(parsedValue, other, Inclusion.Inclusive, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.Before, messageTemplate, paramName, value, parsedValue);
     }
@@ -731,6 +809,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotBefore, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotBefore, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotBefore, NullMessage, paramName, value);
 
@@ -739,7 +823,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !DateOnlyRules.IsAfter(parsedValue, other, Inclusion.Inclusive, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotBefore, messageTemplate, paramName, value, parsedValue);
     }
@@ -770,6 +854,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.NotEqual, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.NotEqual, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.NotEqual, NullMessage, paramName, value);
 
@@ -778,7 +868,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.IsSame(parsedValue, other, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Equality.NotEqual, messageTemplate, paramName, value, parsedValue);
     }
@@ -809,6 +899,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.Equal, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (precision.HasValue && !EnumRules.IsDefined<DatePrecision>(precision.Value))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.Equal, "{paramName} must be a defined precision value.", nameof(precision), precision);
+
         if (value is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Equality.Equal, NullMessage, paramName, value);
 
@@ -817,7 +913,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = !DateOnlyRules.IsSame(parsedValue, other, precision);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Equality.Equal, messageTemplate, paramName, value, parsedValue);
     }
@@ -848,6 +944,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(start))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotChronological, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotChronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (start is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.NotChronological, NullMessage, paramName, start);
 
@@ -862,8 +964,8 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(end, out var parsedEnd, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end), end);
 
-        var parsedStartValue = parsedStart.GetValueOrDefault();
-        var ok = DateOnlyRules.IsChronological(parsedStartValue, parsedEnd.GetValueOrDefault(), inclusion);
+        var parsedStartValue = parsedStart;
+        var ok = DateOnlyRules.IsChronological(parsedStartValue, parsedEnd, inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.NotChronological,
             messageTemplate, paramName, start, parsedStartValue);
     }
@@ -894,6 +996,12 @@ public static class MustStringDateOnlyClauses
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(start))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Chronological, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Chronological, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (start is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Order.Chronological, NullMessage, paramName, start);
 
@@ -908,8 +1016,8 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(end, out var parsedEnd, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end), end);
 
-        var parsedStartValue = parsedStart.GetValueOrDefault();
-        var ok = !DateOnlyRules.IsChronological(parsedStartValue, parsedEnd.GetValueOrDefault(), inclusion);
+        var parsedStartValue = parsedStart;
+        var ok = !DateOnlyRules.IsChronological(parsedStartValue, parsedEnd, inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Order.Chronological, messageTemplate, paramName, start, parsedStartValue);
     }
 
@@ -939,10 +1047,16 @@ public static class MustStringDateOnlyClauses
         string? end1,
         string? start2,
         string? end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Missing, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Missing, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (start1 is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Missing, NullMessage, paramName, start1);
 
@@ -969,12 +1083,12 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(end2, out var e2, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end2), end2);
 
-        var parsedStartValue = s1.GetValueOrDefault();
+        var parsedStartValue = s1;
         var ok = DateOnlyRules.IsOverlapping(
             parsedStartValue,
-            e1.GetValueOrDefault(),
-            s2.GetValueOrDefault(),
-            e2.GetValueOrDefault(),
+            e1,
+            s2,
+            e2,
             inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Overlap.Missing, messageTemplate, paramName, start1, parsedStartValue);
     }
@@ -1005,10 +1119,16 @@ public static class MustStringDateOnlyClauses
         string? end1,
         string? start2,
         string? end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(start1))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Present, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Present, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+
         if (start1 is null)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Overlap.Present, NullMessage, paramName, start1);
 
@@ -1035,12 +1155,12 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(end2, out var e2, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, nameof(end2), end2);
 
-        var parsedStartValue = s1.GetValueOrDefault();
+        var parsedStartValue = s1;
         var ok = !DateOnlyRules.IsOverlapping(
             parsedStartValue,
-            e1.GetValueOrDefault(),
-            s2.GetValueOrDefault(),
-            e2.GetValueOrDefault(),
+            e1,
+            s2,
+            e2,
             inclusion);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Overlap.Present, messageTemplate, paramName, start1, parsedStartValue);
     }
@@ -1065,13 +1185,16 @@ public static class MustStringDateOnlyClauses
     /// A negative <paramref name="years"/> is a configuration error, reported against that parameter.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
-    public static MustResult<DateOnly> MinimumAge(this IMustClause _,
+    public static MustResult<DateOnly> MinimumAgeDateOnly(this IMustClause _,
         string? value,
         int years,
         DateTimeStyles styles = DefaultStyles,
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
+        if (!StringUtility.DateOnly.IsValidStyles(styles))
+            return MustResult<DateOnly>.Fail(MustCodes.Date.Age.BelowMinimum, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
+
         if (years < 0)
             return MustResult<DateOnly>.Fail(MustCodes.Date.Age.BelowMinimum,
                 "{paramName} requires a non-negative number of years.", nameof(years), years);
@@ -1084,7 +1207,7 @@ public static class MustStringDateOnlyClauses
         if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
             return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
 
-        var parsedValue = parsed.GetValueOrDefault();
+        var parsedValue = parsed;
         var ok = DateOnlyRules.HasMinimumAge(parsedValue, years, timeProvider);
         return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Age.BelowMinimum, messageTemplate, paramName, value, parsedValue);
     }

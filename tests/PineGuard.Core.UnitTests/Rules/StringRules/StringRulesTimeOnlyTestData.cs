@@ -6,9 +6,9 @@ namespace PineGuard.Core.UnitTests.Rules.StringRules;
 
 public static class StringRulesTimeOnlyTestData
 {
-    public static class IsBetween
+    public static class IsInRange
     {
-        public static TheoryData<RuleCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases => F.StringTimeOnly.IsBetween.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases => F.StringTimeOnly.IsInRange.AllScenarios.ToRuleCases();
     }
 
     public static class IsBefore

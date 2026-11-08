@@ -70,12 +70,12 @@ public static class FluentDateTimeExtensions
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    public static IRuleBuilderOptions<TModel, DateTime> Between<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
+    public static IRuleBuilderOptions<TModel, DateTime> InRange<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
         DateTime min,
         DateTime max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.Between(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.InRange(val, min, max, inclusion, paramName: null),
             message, MustCodes.Date.Range.OutOfRange);
 
     /// <summary>Validates that the <see cref="DateTime"/> value is not between the specified bounds.</summary>
@@ -86,12 +86,12 @@ public static class FluentDateTimeExtensions
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    public static IRuleBuilderOptions<TModel, DateTime> NotBetween<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
+    public static IRuleBuilderOptions<TModel, DateTime> OutOfRange<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
         DateTime min,
         DateTime max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.NotBetween(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.OutOfRange(val, min, max, inclusion, paramName: null),
             message, MustCodes.Date.Range.InRange);
 
     /// <summary>Validates that the <see cref="DateTime"/> value is before the specified date-time.</summary>
@@ -119,9 +119,12 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime> Before<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
         Func<TModel, DateTime> other,
         DateTimePrecision? precision = null,
-        string? message = null) =>
-        ruleBuilder.MustBe((model, val) => Must.Be.Before(val, other(model), precision, paramName: null),
+        string? message = null)
+    {
+        ThrowHelper.ThrowIfNull(other);
+        return ruleBuilder.MustBe((model, val) => Must.Be.Before(val, other(model), precision, paramName: null),
             message, MustCodes.Date.Order.NotBefore);
+    }
 
     /// <summary>Validates that the nullable <see cref="DateTime"/> value is before the date-time returned by <paramref name="other"/>.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -134,9 +137,12 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime?> Before<TModel>(this IRuleBuilder<TModel, DateTime?> ruleBuilder,
         Func<TModel, DateTime> other,
         DateTimePrecision? precision = null,
-        string? message = null) =>
-        ruleBuilder.MustBe((model, val) => val.HasValue ? Must.Be.Before(val.Value, other(model), precision, paramName: null) : MustResult<DateTime>.Ok(default),
+        string? message = null)
+    {
+        ThrowHelper.ThrowIfNull(other);
+        return ruleBuilder.MustBe((model, val) => SkipAbsentValue(val, Must.Be.Before(val.GetValueOrDefault(), val.HasValue ? other(model) : default, precision, paramName: null)),
             message, MustCodes.Date.Order.NotBefore);
+    }
 
     /// <summary>Validates that the <see cref="DateTime"/> value is on or before the specified date-time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -163,9 +169,12 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime> OnOrBefore<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
         Func<TModel, DateTime> other,
         DateTimePrecision? precision = null,
-        string? message = null) =>
-        ruleBuilder.MustBe((model, val) => Must.Be.OnOrBefore(val, other(model), precision, paramName: null),
+        string? message = null)
+    {
+        ThrowHelper.ThrowIfNull(other);
+        return ruleBuilder.MustBe((model, val) => Must.Be.OnOrBefore(val, other(model), precision, paramName: null),
             message, MustCodes.Date.Order.After);
+    }
 
     /// <summary>Validates that the nullable <see cref="DateTime"/> value is on or before the date-time returned by <paramref name="other"/>.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -178,9 +187,12 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime?> OnOrBefore<TModel>(this IRuleBuilder<TModel, DateTime?> ruleBuilder,
         Func<TModel, DateTime> other,
         DateTimePrecision? precision = null,
-        string? message = null) =>
-        ruleBuilder.MustBe((model, val) => val.HasValue ? Must.Be.OnOrBefore(val.Value, other(model), precision, paramName: null) : MustResult<DateTime>.Ok(default),
+        string? message = null)
+    {
+        ThrowHelper.ThrowIfNull(other);
+        return ruleBuilder.MustBe((model, val) => SkipAbsentValue(val, Must.Be.OnOrBefore(val.GetValueOrDefault(), val.HasValue ? other(model) : default, precision, paramName: null)),
             message, MustCodes.Date.Order.After);
+    }
 
     /// <summary>Validates that the <see cref="DateTime"/> value is after the specified date-time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -207,9 +219,12 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime> After<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
         Func<TModel, DateTime> other,
         DateTimePrecision? precision = null,
-        string? message = null) =>
-        ruleBuilder.MustBe((model, val) => Must.Be.After(val, other(model), precision, paramName: null),
+        string? message = null)
+    {
+        ThrowHelper.ThrowIfNull(other);
+        return ruleBuilder.MustBe((model, val) => Must.Be.After(val, other(model), precision, paramName: null),
             message, MustCodes.Date.Order.NotAfter);
+    }
 
     /// <summary>Validates that the nullable <see cref="DateTime"/> value is after the date-time returned by <paramref name="other"/>.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -222,9 +237,12 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime?> After<TModel>(this IRuleBuilder<TModel, DateTime?> ruleBuilder,
         Func<TModel, DateTime> other,
         DateTimePrecision? precision = null,
-        string? message = null) =>
-        ruleBuilder.MustBe((model, val) => val.HasValue ? Must.Be.After(val.Value, other(model), precision, paramName: null) : MustResult<DateTime>.Ok(default),
+        string? message = null)
+    {
+        ThrowHelper.ThrowIfNull(other);
+        return ruleBuilder.MustBe((model, val) => SkipAbsentValue(val, Must.Be.After(val.GetValueOrDefault(), val.HasValue ? other(model) : default, precision, paramName: null)),
             message, MustCodes.Date.Order.NotAfter);
+    }
 
     /// <summary>Validates that the <see cref="DateTime"/> value is on or after the specified date-time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -251,9 +269,12 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime> OnOrAfter<TModel>(this IRuleBuilder<TModel, DateTime> ruleBuilder,
         Func<TModel, DateTime> other,
         DateTimePrecision? precision = null,
-        string? message = null) =>
-        ruleBuilder.MustBe((model, val) => Must.Be.OnOrAfter(val, other(model), precision, paramName: null),
+        string? message = null)
+    {
+        ThrowHelper.ThrowIfNull(other);
+        return ruleBuilder.MustBe((model, val) => Must.Be.OnOrAfter(val, other(model), precision, paramName: null),
             message, MustCodes.Date.Order.Before);
+    }
 
     /// <summary>Validates that the nullable <see cref="DateTime"/> value is on or after the date-time returned by <paramref name="other"/>.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -266,9 +287,12 @@ public static class FluentDateTimeExtensions
     public static IRuleBuilderOptions<TModel, DateTime?> OnOrAfter<TModel>(this IRuleBuilder<TModel, DateTime?> ruleBuilder,
         Func<TModel, DateTime> other,
         DateTimePrecision? precision = null,
-        string? message = null) =>
-        ruleBuilder.MustBe((model, val) => val.HasValue ? Must.Be.OnOrAfter(val.Value, other(model), precision, paramName: null) : MustResult<DateTime>.Ok(default),
+        string? message = null)
+    {
+        ThrowHelper.ThrowIfNull(other);
+        return ruleBuilder.MustBe((model, val) => SkipAbsentValue(val, Must.Be.OnOrAfter(val.GetValueOrDefault(), val.HasValue ? other(model) : default, precision, paramName: null)),
             message, MustCodes.Date.Order.Before);
+    }
 
     /// <summary>Validates that the <see cref="DateTime"/> value is the same as the specified date-time.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
@@ -325,7 +349,7 @@ public static class FluentDateTimeExtensions
         DateTime end1,
         DateTime start2,
         DateTime end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.Overlapping(val, end1, start2, end2, inclusion, paramName: null),
             message, MustCodes.Date.Overlap.Missing);
@@ -343,7 +367,7 @@ public static class FluentDateTimeExtensions
         DateTime end1,
         DateTime start2,
         DateTime end2,
-        Inclusion inclusion = Inclusion.Exclusive,
+        Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.NotOverlapping(val, end1, start2, end2, inclusion, paramName: null),
             message, MustCodes.Date.Overlap.Present);
@@ -597,4 +621,6 @@ public static class FluentDateTimeExtensions
         string? message = null) =>
         ruleBuilder.MustBe(val => Must.Be.MinimumAge(val, years, timeProvider, paramName: null),
             message, MustCodes.Date.Age.BelowMinimum);
+    private static MustResult<T> SkipAbsentValue<T>(T? value, MustResult<T> result) where T : struct =>
+        value is null && result.ParamName is null ? MustResult<T>.Ok(default) : result;
 }

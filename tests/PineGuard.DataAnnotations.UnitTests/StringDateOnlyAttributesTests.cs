@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using PineGuard.Common;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using Xunit.Abstractions;
@@ -339,5 +341,33 @@ public sealed class StringDateOnlyAttributesTests(ITestOutputHelper output) : Ba
 
         // Assert
         AssertResult(tc, result, attr.Code);
+    }
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.InRangeDateOnlyStringConfiguration.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.InRangeDateOnlyStringConfiguration))]
+    public void InRangeDateOnlyString_ValidatesConfigurationAndValue(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, min, max, inclusion, styles) = ((string? value, string min, string max, Inclusion inclusion, DateTimeStyles styles))tc.Value!;
+        var attribute = new InRangeDateOnlyStringAttribute(min, max, inclusion) { Styles = styles };
+
+        // Act
+        var result = attribute.GetValidationResult(value, new ValidationContext(new object()) { MemberName = "Value" });
+
+        // Assert
+        AssertResult(tc, result, attribute.Code);
+    }
+    [Theory]
+    [MemberData(nameof(StringDateOnlyAttributesTestData.OutOfRangeDateOnlyStringConfiguration.Cases), MemberType = typeof(StringDateOnlyAttributesTestData.OutOfRangeDateOnlyStringConfiguration))]
+    public void OutOfRangeDateOnlyString_ValidatesConfigurationAndValue(DataAnnotationCase tc)
+    {
+        // Arrange
+        var (value, min, max, inclusion, styles) = ((string? value, string min, string max, Inclusion inclusion, DateTimeStyles styles))tc.Value!;
+        var attribute = new OutOfRangeDateOnlyStringAttribute(min, max, inclusion) { Styles = styles };
+
+        // Act
+        var result = attribute.GetValidationResult(value, new ValidationContext(new object()) { MemberName = "Value" });
+
+        // Assert
+        AssertResult(tc, result, attribute.Code);
     }
 }

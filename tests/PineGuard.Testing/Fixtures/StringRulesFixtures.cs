@@ -74,7 +74,7 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, int length)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
-    public static class IsLengthBetween
+    public static class IsLengthInRange
     {
         public static readonly (string? value, int min, int max) WithinBounds = ("abc", 2, 3);
         public static readonly (string? value, int min, int max) OutsideBounds = ("abc", 4, 5);

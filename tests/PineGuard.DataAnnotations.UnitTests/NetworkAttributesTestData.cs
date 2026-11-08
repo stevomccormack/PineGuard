@@ -50,7 +50,7 @@ public static class NetworkAttributesTestData
     public static class InCidrRange
     {
         public static TheoryData<DataAnnotationCase> Cases => F.IsInCidr.AllScenarios
-            .Except(nameof(F.IsInCidr.InvalidCidr))
+            .Except(nameof(F.IsInCidr.InvalidCidr), nameof(F.IsInCidr.CidrPrefixWithSign))
             .ToDataAnnotationCases(inputs => inputs.ip, s => s.Name switch
             {
                 nameof(F.IsInCidr.NullIp) => new DataAnnotationExpected(true),
@@ -61,9 +61,9 @@ public static class NetworkAttributesTestData
 
     public static class Hostname
     {
-        public static TheoryData<DataAnnotationCase> Cases => F.IsValidHostname.AllScenarios.ToDataAnnotationCases(s => s.Name switch
+        public static TheoryData<DataAnnotationCase> Cases => F.IsHostname.AllScenarios.ToDataAnnotationCases(s => s.Name switch
         {
-            nameof(F.IsValidHostname.Null) => new DataAnnotationExpected(true),
+            nameof(F.IsHostname.Null) => new DataAnnotationExpected(true),
             _ when s.IsValid => new DataAnnotationExpected(true),
             _ => new DataAnnotationExpected(false, "Value must be a valid hostname.", Code: MustCodes.Network.Hostname.Invalid)
         });
@@ -87,5 +87,15 @@ public static class NetworkAttributesTestData
             _ when s.IsValid => new DataAnnotationExpected(true),
             _ => new DataAnnotationExpected(false, "Value must be a valid MAC address.", Code: MustCodes.Network.Mac.Invalid)
         });
+    }
+
+    public static class CidrConfiguration
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("NullMalformedCidr", ((string?)null, "invalid"), new(false, "cidr must be a valid CIDR range.", Code: MustCodes.Network.Cidr.OutOfRange)),
+            new("NullMissingCidr", ((string?)null, (string?)null), new(false, "cidr must be a valid CIDR range.", Code: MustCodes.Network.Cidr.OutOfRange)),
+            new("OptionalValue", ((string?)null, "192.168.0.0/24"), new(true))
+        ];
     }
 }

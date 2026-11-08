@@ -77,10 +77,10 @@ public static class GuardDateOnlyClausesTestData
         ];
     }
 
-    // Guard.Against.Between — throws when value IS between (calls Must.Be.NotBetween — complement)
+    // Guard.Against.InRange — throws when value IS between (calls Must.Be.OutOfRange — complement)
     // ValidCases: value is NOT between — Guard does not throw
     // InvalidCases: value IS between — Guard throws
-    public static class Between
+    public static class InRange
     {
         public static TheoryData<GuardCase<(DateOnly value, DateOnly min, DateOnly max, Inclusion inclusion)>> ValidCases =>
         [
@@ -93,10 +93,10 @@ public static class GuardDateOnlyClausesTestData
         ];
     }
 
-    // Guard.Against.NotBetween — throws when value IS NOT between (calls Must.Be.Between)
+    // Guard.Against.OutOfRange — throws when value IS NOT between (calls Must.Be.InRange)
     // ValidCases: value IS between — Guard does not throw
     // InvalidCases: value is NOT between — Guard throws
-    public static class NotBetween
+    public static class OutOfRange
     {
         public static TheoryData<GuardCase<(DateOnly value, DateOnly min, DateOnly max, Inclusion inclusion)>> ValidCases =>
         [

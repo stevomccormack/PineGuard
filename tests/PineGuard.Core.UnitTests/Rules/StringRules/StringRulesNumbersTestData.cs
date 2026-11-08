@@ -6,6 +6,8 @@ namespace PineGuard.Core.UnitTests.Rules.StringRules;
 
 public static class StringRulesNumbersTestData
 {
+    public static TheoryData<Inclusion> InvalidInclusions => [(Inclusion)42, (Inclusion)(-1)];
+
     public static class IsPositive
     {
         public static TheoryData<RuleCase<string?>> Cases => F.NumbersIsPositive.AllScenarios.ToRuleCases();

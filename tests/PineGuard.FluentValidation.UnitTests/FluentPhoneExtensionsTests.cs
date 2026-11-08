@@ -13,28 +13,12 @@ public sealed class FluentPhoneExtensionsTests(ITestOutputHelper output) : BaseF
         public PhoneNumberValidator() => RuleFor(x => x.Value).PhoneNumber();
     }
 
-    private sealed class PhoneNumberStringValidator : AbstractValidator<Model>
-    {
-        public PhoneNumberStringValidator() => RuleFor(x => x.Value).PhoneNumberString();
-    }
-
     [Theory]
     [MemberData(nameof(FluentPhoneExtensionsTestData.PhoneNumber.Cases), MemberType = typeof(FluentPhoneExtensionsTestData.PhoneNumber))]
     public void PhoneNumber_BehavesAsExpected(FluentCase<string?> tc)
     {
         // Act
         var result = new PhoneNumberValidator().Validate(new Model { Value = tc.Value });
-
-        // Assert
-        AssertResult(tc, result);
-    }
-
-    [Theory]
-    [MemberData(nameof(FluentPhoneExtensionsTestData.PhoneNumberString.Cases), MemberType = typeof(FluentPhoneExtensionsTestData.PhoneNumberString))]
-    public void PhoneNumberString_BehavesAsExpected(FluentCase<string?> tc)
-    {
-        // Act
-        var result = new PhoneNumberStringValidator().Validate(new Model { Value = tc.Value });
 
         // Assert
         AssertResult(tc, result);

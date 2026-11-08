@@ -76,11 +76,11 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(DateTimeRulesTestData.IsBetween.Cases), MemberType = typeof(DateTimeRulesTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(RuleCase<(DateTime? value, DateTime min, DateTime max, Inclusion inclusion)> tc)
+    [MemberData(nameof(DateTimeRulesTestData.IsInRange.Cases), MemberType = typeof(DateTimeRulesTestData.IsInRange))]
+    public void IsInRange_BehavesAsExpected(RuleCase<(DateTime? value, DateTime min, DateTime max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = DateTimeRules.IsBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = DateTimeRules.IsInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);
@@ -88,7 +88,7 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
 
     [Theory]
     [MemberData(nameof(DateTimeRulesTestData.IsBefore.Cases), MemberType = typeof(DateTimeRulesTestData.IsBefore))]
-    public void IsBefore_BehavesAsExpected(RuleCase<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)> tc)
+    public void IsBefore_BehavesAsExpected(RuleCase<(DateTime? value, DateTime other, Inclusion inclusion, DateTimePrecision? precision)> tc)
     {
         // Act
         var result = DateTimeRules.IsBefore(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
@@ -99,7 +99,7 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
 
     [Theory]
     [MemberData(nameof(DateTimeRulesTestData.IsBeforeDefaultInclusion.Cases), MemberType = typeof(DateTimeRulesTestData.IsBeforeDefaultInclusion))]
-    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(DateTime? value, DateTime? other)> tc)
+    public void IsBefore_DefaultInclusion_IsExclusive(RuleCase<(DateTime? value, DateTime other)> tc)
     {
         // Act
         var result = DateTimeRules.IsBefore(tc.Value.value, tc.Value.other);
@@ -110,7 +110,7 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
 
     [Theory]
     [MemberData(nameof(DateTimeRulesTestData.IsAfter.Cases), MemberType = typeof(DateTimeRulesTestData.IsAfter))]
-    public void IsAfter_BehavesAsExpected(RuleCase<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)> tc)
+    public void IsAfter_BehavesAsExpected(RuleCase<(DateTime? value, DateTime other, Inclusion inclusion, DateTimePrecision? precision)> tc)
     {
         // Act
         var result = DateTimeRules.IsAfter(tc.Value.value, tc.Value.other, tc.Value.inclusion, tc.Value.precision);
@@ -121,7 +121,7 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
 
     [Theory]
     [MemberData(nameof(DateTimeRulesTestData.IsAfterDefaultInclusion.Cases), MemberType = typeof(DateTimeRulesTestData.IsAfterDefaultInclusion))]
-    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(DateTime? value, DateTime? other)> tc)
+    public void IsAfter_DefaultInclusion_IsExclusive(RuleCase<(DateTime? value, DateTime other)> tc)
     {
         // Act
         var result = DateTimeRules.IsAfter(tc.Value.value, tc.Value.other);

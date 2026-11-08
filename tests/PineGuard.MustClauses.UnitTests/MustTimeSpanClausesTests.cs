@@ -7,40 +7,40 @@ namespace PineGuard.MustClauses.UnitTests;
 public sealed class MustTimeSpanClausesTests(ITestOutputHelper output) : BaseMustUnitTest(output)
 {
     [Theory]
-    [MemberData(nameof(MustTimeSpanClausesTestData.DurationBetween.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.DurationBetween))]
-    [MemberData(nameof(MustTimeSpanClausesTestData.DurationBetween.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.DurationBetween))]
-    [MemberData(nameof(MustTimeSpanClausesTestData.DurationBetween.InvalidRangeCases), MemberType = typeof(MustTimeSpanClausesTestData.DurationBetween))]
-    public void DurationBetween_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan min, TimeSpan max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustTimeSpanClausesTestData.InRange.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.InRange))]
+    [MemberData(nameof(MustTimeSpanClausesTestData.InRange.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.InRange))]
+    [MemberData(nameof(MustTimeSpanClausesTestData.InRange.InvalidRangeCases), MemberType = typeof(MustTimeSpanClausesTestData.InRange))]
+    public void InRange_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan min, TimeSpan max, Inclusion inclusion)> tc)
     {
-        var result = Must.Be.DurationBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.InRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(MustTimeSpanClausesTestData.NotDurationBetween.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.NotDurationBetween))]
-    [MemberData(nameof(MustTimeSpanClausesTestData.NotDurationBetween.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.NotDurationBetween))]
-    [MemberData(nameof(MustTimeSpanClausesTestData.NotDurationBetween.InvalidRangeCases), MemberType = typeof(MustTimeSpanClausesTestData.NotDurationBetween))]
-    public void NotDurationBetween_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan min, TimeSpan max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustTimeSpanClausesTestData.OutOfRange.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.OutOfRange))]
+    [MemberData(nameof(MustTimeSpanClausesTestData.OutOfRange.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.OutOfRange))]
+    [MemberData(nameof(MustTimeSpanClausesTestData.OutOfRange.InvalidRangeCases), MemberType = typeof(MustTimeSpanClausesTestData.OutOfRange))]
+    public void OutOfRange_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan min, TimeSpan max, Inclusion inclusion)> tc)
     {
-        var result = Must.Be.NotDurationBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.OutOfRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 
     [Theory]
     [MemberData(nameof(MustTimeSpanClausesTestData.GreaterThan.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.GreaterThan))]
     [MemberData(nameof(MustTimeSpanClausesTestData.GreaterThan.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.GreaterThan))]
-    public void GreaterThan_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)> tc)
+    public void GreaterThan_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)> tc)
     {
-        var result = Must.Be.GreaterThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.GreaterThan(tc.Value.value, tc.Value.other, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 
     [Theory]
     [MemberData(nameof(MustTimeSpanClausesTestData.LessThan.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.LessThan))]
     [MemberData(nameof(MustTimeSpanClausesTestData.LessThan.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.LessThan))]
-    public void LessThan_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)> tc)
+    public void LessThan_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)> tc)
     {
-        var result = Must.Be.LessThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.LessThan(tc.Value.value, tc.Value.other, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 }

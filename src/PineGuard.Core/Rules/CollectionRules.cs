@@ -149,8 +149,12 @@ public static class CollectionRules
     /// <see langword="true"/> if the element count is within [<paramref name="min"/>, <paramref name="max"/>];
     /// otherwise, <see langword="false"/>.
     /// </returns>
-    public static bool HasCountBetween<T>(IEnumerable<T>? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive)
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="inclusion"/> is undefined, before the collection is inspected.</exception>
+    public static bool HasCountInRange<T>(IEnumerable<T>? value, int min, int max, Inclusion inclusion = Inclusion.Inclusive)
     {
+        if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
+            throw new ArgumentOutOfRangeException(nameof(inclusion), inclusion, null);
+
         if (value is null)
             return false;
 
@@ -160,16 +164,16 @@ public static class CollectionRules
         switch (value)
         {
             case ICollection<T> c:
-                return RuleComparison.IsBetween(c.Count, min, max, inclusion);
+                return RuleComparison.IsInRange(c.Count, min, max, inclusion);
             case IReadOnlyCollection<T> rc:
-                return RuleComparison.IsBetween(rc.Count, min, max, inclusion);
+                return RuleComparison.IsInRange(rc.Count, min, max, inclusion);
         }
 
         var upperBound = inclusion == Inclusion.Inclusive ? max : max - 1;
         if (upperBound < 0)
             return false;
 
-        return TryGetCountUpTo(value, maxInclusive: upperBound, out var seen) && RuleComparison.IsBetween(seen, min, max, inclusion);
+        return TryGetCountUpTo(value, maxInclusive: upperBound, out var seen) && RuleComparison.IsInRange(seen, min, max, inclusion);
     }
 
     /// <summary>
@@ -263,22 +267,28 @@ public static class CollectionRules
     public static bool ContainsNullItems<T>(IEnumerable<T?>? value) where T : class => value is not null && value.Any(item => item is null);
 
     /// <summary>
+    /// Determines whether the specified collection of nullable value types contains any <see langword="null"/> elements.
+    /// </summary>
+    /// <typeparam name="T">The element type (must be a value type).</typeparam>
+    /// <param name="value">The collection to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> if at least one element is <see langword="null"/>; otherwise, <see langword="false"/>.
+    /// </returns>
+    public static bool ContainsNullItems<T>(IEnumerable<T?>? value) where T : struct => value is not null && value.Any(item => !item.HasValue);
+
+    /// <summary>
     /// Determines whether the specified collection contains the given <paramref name="item"/>.
     /// </summary>
     /// <typeparam name="T">The element type.</typeparam>
     /// <param name="value">The collection to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="item">The item to search for.</param>
+    /// <param name="comparer">The equality comparer; null uses the default, independently of collection runtime type.</param>
     /// <returns>
     /// <see langword="true"/> if <paramref name="value"/> contains <paramref name="item"/> according to the
-    /// default equality comparer; otherwise, <see langword="false"/>.
+    /// specified equality comparer; otherwise, <see langword="false"/>.
     /// </returns>
-    public static bool Contains<T>(IEnumerable<T>? value, T item) =>
-        value switch
-        {
-            null => false,
-            ICollection<T> c => c.Contains(item),
-            _ => value.Any(element => EqualityComparer<T>.Default.Equals(element, item))
-        };
+    public static bool Contains<T>(IEnumerable<T>? value, T item, IEqualityComparer<T>? comparer = null) =>
+        value is not null && value.Any(element => (comparer ?? EqualityComparer<T>.Default).Equals(element, item));
 
     /// <summary>
     /// Determines whether all elements of the specified collection are contained in <paramref name="other"/>.
@@ -286,16 +296,20 @@ public static class CollectionRules
     /// <typeparam name="T">The element type.</typeparam>
     /// <param name="value">The collection to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The superset collection. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <param name="comparer">The equality comparer; null uses the default regardless of the other collection's comparer.</param>
     /// <returns>
     /// <see langword="true"/> if every element of <paramref name="value"/> exists in <paramref name="other"/>;
     /// otherwise, <see langword="false"/>.
     /// </returns>
-    public static bool IsSubsetOf<T>(IEnumerable<T>? value, IEnumerable<T>? other)
+    public static bool IsSubsetOf<T>(IEnumerable<T>? value, IEnumerable<T>? other, IEqualityComparer<T>? comparer = null)
     {
         if (value is null || other is null)
             return false;
 
-        var otherSet = other as HashSet<T> ?? [.. other];
+        if (ReferenceEquals(value, other))
+            return true;
+
+        var otherSet = new HashSet<T>(other, comparer);
         return value.All(item => otherSet.Contains(item));
     }
 
