@@ -68,4 +68,6 @@ Residual decisions: exact taxonomy/structure representation; manifest schema; fa
 
 ## Review conclusion
 
+The code-example review found a fixture/signature conformance gap: see [CODEEX-02 in the closeout ledger](closeout-ledger.md#codeex-02--fixture-signature-and-brain-conformance-correction) and the operative [BRAIN conformance gate](quality-constitution.md#brain-conformance-before-drafting-and-at-review). Correct and recheck the complete example chain before publication; the six approved project concepts remain planned and do not establish test execution.
+
 The plan is ready for formal review as a coherent Planned artifact once mechanical link/metadata/source/ownership QA passes. Activation still requires actual council outputs and implementation authorization. Publication should preserve all original dirty/untracked evidence, stage only owned new files and the exact canonical-index hunk, and record bounded reviewed commits. This review approves the plan's direction and explicit gates; it does not certify completed code or readiness.

@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w11
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -15,7 +15,7 @@ W11 provides early, lightweight consumer evidence once the new contracts/package
 
 v1.6 §9 and the handoff call for actual consumer execution. A successful publish or analyzer warning suppression alone is not deployment proof. No exact existing consumer project was verified.
 
-Inputs: package inventory, W01/W03/W04 contracts, W00 evidence contract, W13 dependency facts. D12/D22 require exact target/package/project/path decisions. Output: `docs/reports/readiness-deployment-consumers.md`.
+Inputs: package inventory, W01/W03/W04 contracts, W00 evidence contract, W13 dependency facts. D12/D22 require exact target/package/project/path decisions. Output: `+ docs/reports/readiness-deployment-consumers.md`.
 
 ## Tasks
 
@@ -41,6 +41,10 @@ Checkpoint after support selection, after package restore and after executed pub
 W11 tests the newly chosen product contract. There is no obligation to support old releases, retain old API shapes or build migration shims. W20's large sample projects reuse the established interfaces and evidence; they must not be used to postpone the minimal deployment proof.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
 
 ## Worked code example
 

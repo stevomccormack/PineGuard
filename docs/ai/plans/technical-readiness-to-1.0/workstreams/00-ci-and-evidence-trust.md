@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w00
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -23,7 +23,7 @@ Luna must load coordination and CLI/project testing specifications. Astra must a
 
 | Task | Action and inputs | Required output |
 |---|---|---|
-| 00.1 | Inventory event/path filters, change detection, job conditions, matrix expansion, package scripts, workspace manifests and lockfiles | `docs/reports/readiness-ci-evidence.md`: exact path/job/artifact matrix and current blind spots |
+| 00.1 | Inventory event/path filters, change detection, job conditions, matrix expansion, package scripts, workspace manifests and lockfiles | `+ docs/reports/readiness-ci-evidence.md`: exact path/job/artifact matrix and current blind spots |
 | 00.2 | Define representative changed-file fixtures for shared test props, CLI source/test/config/dependency inputs, docs-only and unrelated legitimate changes | Approved exact fixture path map and expected selected jobs; no filename guessed before inventory |
 | 00.3 | Implement only approved routing corrections and CLI self-check commands | Owned workflow/CLI diff; fixtures prove jobs execute or intentionally skip |
 | 00.4 | Define required artifacts from selected jobs/targets and distinguish no-applicable-test scope from missing/empty/malformed artifacts | Fail-closed artifact manifest/validator in approved existing mechanism |
@@ -41,6 +41,10 @@ Record revision/environment, selected jobs, expected/actual artifact counts, fai
 Sol may edit only Astra-approved workflow/CLI paths; Luna supplies all file reads. Checkpoint after routing inventory, after fail-closed fixtures, and before each gate activation. Astra reviews seeded-failure evidence before a coherent exact-file commit. Stop for unexplained missing matrix entries, unsupported no-coverage exceptions or broad unrelated CI changes. W00 owns routing/artifact trust; semantic expectations remain owned by W01/W05.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
 
 ## Worked code example
 

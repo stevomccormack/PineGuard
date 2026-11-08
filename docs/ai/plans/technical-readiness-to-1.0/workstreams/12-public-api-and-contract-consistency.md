@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w12
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -15,7 +15,7 @@ The user declares PineGuard greenfield for this work. There is **no backward-com
 
 This explicitly supersedes legacy compatibility requirements in v1.6 §10 and the original handoff. Naming and abstraction decisions begin in early W22; W12 finalizes the complete public contract after new structure/manifest/failure decisions.
 
-Inputs: W22 taxonomy, W01 semantics, W02 inventory, W03 structure, W04 failures and actual package boundaries. Output: `docs/reports/readiness-public-contract.md`. Exact API baseline/tool/config paths are selected under D13/D22.
+Inputs: W22 taxonomy, W01 semantics, W02 inventory, W03 structure, W04 failures and actual package boundaries. Output: `+ docs/reports/readiness-public-contract.md`. Exact API baseline/tool/config paths are selected under D13/D22.
 
 ## Tasks
 
@@ -39,6 +39,10 @@ The baseline is the newly approved contract. A seeded unreviewed public API chan
 Checkpoint after complete API map, after new API approval and after forward drift proof. Astra owns all API decisions; Sol implements; Luna supplies source context and package facts. Stop for a local rename that leaves repository-wide inconsistency, accidental public exposure, hidden redundant code or a proposal to spend effort on old-consumer migration.100% validation coverage applies throughout; baseline replacement is reviewed, never a mechanism to ignore an unexplained change.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
 
 ## Worked code example
 

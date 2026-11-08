@@ -56,7 +56,7 @@
 
 .PARAMETER Scope
     Registry coverage scope (see tools/.shared/dotnet-projects.ps1's Get-PineGuardScope), or
-    'All' to run every *.UnitTests.csproj project with no scope-specific narrowing. Same scope
+    'All' to run every recognized ordinary test family with no scope-specific narrowing. Same scope
     vocabulary as the Coverlet engine (§3.5: both engines share one parameter contract).
 
 .PARAMETER Clean
@@ -80,7 +80,7 @@
 
 .PARAMETER ProjectFilter
     Glob used to discover test projects. Defaults to the scope's own DefaultProjectFilter when
-    left at the generic '*.UnitTests.csproj' value.
+    left unbound. Explicit caller filters are preserved unchanged.
 
 .PARAMETER Filter
     `dotnet test --filter` expression, forwarded through dotCover's target-arguments (`-- test
@@ -111,7 +111,7 @@ param(
     [switch] $Clean,
     [switch] $NoOpen,
     [switch] $SkipHtml,
-    [string] $ProjectFilter = '*.UnitTests.csproj',
+    [string] $ProjectFilter,
     [string] $Filter,
     [switch] $Isolated,
     [ValidateSet('cobertura', 'opencover')] [string] $Format,
@@ -166,8 +166,8 @@ else {
 # For speed, default to the single most relevant test project for the selected scope, matching
 # coverlet/New-CoverageReport.ps1's own default resolution (you can override by passing
 # -ProjectFilter explicitly).
-if ($ProjectFilter -eq '*.UnitTests.csproj') {
-    $ProjectFilter = if ($null -ne $generateScopeEntry) { $generateScopeEntry.DefaultProjectFilter } else { '*.UnitTests.csproj' }
+if (-not $PSBoundParameters.ContainsKey('ProjectFilter')) {
+    $ProjectFilter = if ($null -ne $generateScopeEntry) { $generateScopeEntry.DefaultProjectFilter } else { Get-DefaultTestProjectFilter }
 }
 
 $includeEmptyTestProjects = if ($null -ne $generateScopeEntry) { [bool]$generateScopeEntry.IncludeEmptyTestProjects } else { $false }
@@ -239,7 +239,7 @@ try {
                 'cover',
                 '--snapshot-output', $snapshotPath,
                 '--target-working-directory', $repoRoot,
-                '--exclude-assemblies', '*.UnitTests',
+                '--exclude-assemblies', (Get-DefaultTestAssemblyFilter),
                 '--exclude-processes', "VBCSCompiler$exeSuffix",
                 '--exclude-processes', "MSBuild$exeSuffix",
                 '--',

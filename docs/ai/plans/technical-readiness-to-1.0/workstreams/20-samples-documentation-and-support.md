@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W20 aligns product claims and consumer guidance with executed evidence. Lightweight snippets/smoke consumers occur as soon as they clarify the new contract. The largest API, DDD and Clean Architecture sample projects occur LAST, as separately gated subplans. This explicit user direction supersedes any implication that broad application projects precede core readiness.
 
-Inputs: README.md §§Quality metrics, Packages, Where PineGuard fits, Built by AI; docs/reports/readme-verification-2026-09-25.md §Release and documentation checks; W11–W13, W22 and approved competitor dispositions. Output: docs/reports/readiness-documentation-support.md.
+Inputs: README.md §§Quality metrics, Packages, Where PineGuard fits, Built by AI; docs/reports/readme-verification-2026-09-25.md §Release and documentation checks; W11–W13, W22 and approved competitor dispositions. Output: `+ docs/reports/readiness-documentation-support.md`.
 
 ## Tasks
 
@@ -45,6 +45,10 @@ Large samples demonstrate validation integration, not production certification o
 Checkpoint after inventory, lightweight examples and each major sample. Astra reviews architecture/docs; Sol codes; Luna reads/tests/looks up. Inventory and approve exact sample paths first. Stop for speculative scope, duplicated validation logic, undocumented package availability or using samples to hide missing core contracts.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
 
 ## Worked code example
 

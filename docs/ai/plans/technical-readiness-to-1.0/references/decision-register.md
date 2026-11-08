@@ -31,6 +31,10 @@ Current explicit user instructions override v1.6 and the proposed handoff where 
 | D25 | ACCEPTED quality direction | Early global taxonomy/naming, DRY/SOLID, root-cause fixes, no redundancy/hacks/local outliers/speculative abstraction | W22/all |
 | D26 | BLOCKED sample designs | Exact API/DDD/Clean scenarios, frameworks, interfaces and scope chosen separately when late entry gates pass | W20A/B/C |
 
+### TEST-LAYOUT-01 — Approved concept-based test projects
+
+Accepted: the six concept project identities and folder responsibilities in [test-project layout](test-project-layout.md). Crosscutting in-process Rules tests and Architecture checks stay in their respective test projects; host integrations, dedicated fuzz harnesses, consumer executables and BenchmarkDotNet workloads stay separate by execution kind. Keep existing library unit suites, PineGuard.Testing and PineGuard.Testing.UnitTests responsibilities. Extend shared test discovery and coverage filters to approved test project name families while preserving explicit filters and the Testing scope's helper-only TestCsproj behavior. Do not send fuzz, benchmark or consumer executables to ordinary dotnet test. Update solution, CI, inherited test props, documentation and scripts at implementation gates; no project is claimed present or passing while status is Planned.
+
 ## Decision record schema
 
 ### Mandatory maintenance decisions

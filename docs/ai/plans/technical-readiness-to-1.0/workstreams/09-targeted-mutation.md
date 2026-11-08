@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w09
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W09 demonstrates that important assertions detect realistic defects. v1.6 §8 supports targeted mutation. The substantial passing execution count and100% coverage requirement do not themselves prove assertions are strong; this workstream complements both.
 
-Inputs: W01 contracts, W05 conformance, W06–W08 tests and W14 risk priorities. No dedicated mutation configuration was established. D10/D22 requires tool/target/file approval. Output: `docs/reports/readiness-mutation.md`.
+Inputs: W01 contracts, W05 conformance, W06–W08 tests and W14 risk priorities. No dedicated mutation configuration was established. D10/D22 requires tool/target/file approval. Output: `+ docs/reports/readiness-mutation.md`.
 
 ## Tasks
 
@@ -38,7 +38,13 @@ Checkpoint after risk/target selection, after first results and before assertion
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
 
-## Worked code example
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
+
+### Mechanical illustration
+
+This package-free code is a mechanical teaching example only. It is not repository test guidance, a domain test, or evidence that the proposed technique is implemented. Complete source and reproduction scope are in [Code examples](../references/code-examples.md).
 
 This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
 
@@ -48,4 +54,31 @@ Checks.Require(SeededBoundaryMutant(0), "mutant accepts zero");
 Checks.Require(!PositiveInt.Evaluate(0).Passed, "explicit zero expectation kills mutant");
 ```
 
-Purpose: explicit zero expectation kills seeded `>=0` boundary mutant; zero must fail canonical and pass mutant. This does not measure a selected mutation engine or score. Tool selection remains D10. Status pending.
+Purpose: explicit zero expectation kills seeded `>=0` boundary mutant; zero must fail canonical and pass mutant. This does not measure a selected mutation engine or score. Tool selection remains D10. Status: mechanical illustration only; not repository-test evidence.
+
+### Repository test excerpt
+
+This documentation excerpt shows the canonical fixture-to-typed-case-to-TheoryData-to-MemberData-to-assertion chain. It does not implement PineGuard behavior; the full source-inspected patterns and scope limits are in [Code examples](../references/code-examples.md).
+
+W09 source-grounded fixture assertions distinguish one deliberately seeded boundary fault. The local mutant is intentionally wrong and never a second executable authority; no mutation-engine selection/score is claimed:
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: canonical Zero independently expects invalid.
+    static bool SeededBoundaryMutant(int? input) => input is not null && input.Value >= 0;
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert through the existing fixture-backed helper.
+    AssertResult(tc, result);
+    if (tc.Value == 0)
+    {
+        Assert.False(result);
+        Assert.True(SeededBoundaryMutant(tc.Value));
+    }
+}
+```
+
+Scenario acceptance: Zero0 fails canonical and passes the mutant; substituting that mutant into the actual evaluator would fail the existing zero case. This is one distinguishable seed, not an automated campaign.

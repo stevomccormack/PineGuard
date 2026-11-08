@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20b
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -17,7 +17,7 @@ Inputs: W01 input/output semantics, W03 structure, W04 failure contract, W12 pub
 
 ## Tasks
 
-1. Luna inventories existing domain examples/precedents and supplies exact owned paths. Produce `docs/reports/readiness-sample-ddd.md` with target scenario and dependencies.
+1. Luna inventories existing domain examples/precedents and supplies exact owned paths. Produce `+ docs/reports/readiness-sample-ddd.md` with target scenario and dependencies.
 2. Astra specifies raw input versus parsed/normalized output, construction validity, aggregate mutation invariants and where exceptions versus result failures belong.
 3. Sol implements the smallest coherent domain model and application use cases using canonical rules; prevent duplicate conditions across constructors/factories/handlers.
 4. Test construction, invalid transitions, repeated invocation and aggregate invariants with independently specified outcomes. Distinguish request-wide failures from domain impossibility.
@@ -36,6 +36,10 @@ No persistence/event sourcing/CQRS framework or value-object generator is added 
 Engineering-equivalent20–40 hours; active model/tool work6–15 hours; review3–5 hours, low confidence until domain scope. Split by construction, invariant transitions, execution evidence and documentation. Apply [execution protocol](../../references/execution-protocol.md) and [quality constitution](../../references/quality-constitution.md).
 
 Stop for an unresolved core result/lifecycle contract or a domain rule duplicated in multiple layers. Fix the shared cause before extending the sample. Acceptance is separate from API and Clean Architecture projects.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. The small TP-CONSUMERS harness does not replace this final-phase application. Keep the large application late in the dependency sequence.
 
 ## Worked code example
 

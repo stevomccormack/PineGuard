@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w13
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W13 makes dependency and package composition intentional, reproducible and supportable. It evaluates the new product design; it does not preserve old dependency/API arrangements. v1.6 §10 and handoff dependency gates provide review inputs.
 
-Verified anchor: `apps/cli/package.json`. Luna must inventory actual .NET project/package-centralization files, npm workspace manifests, lockfiles, licensing/SBOM/security tooling, package generation and release workflows before choosing paths or commands. Output: `docs/reports/readiness-dependencies.md`.
+Verified anchor: `apps/cli/package.json`. Luna must inventory actual .NET project/package-centralization files, npm workspace manifests, lockfiles, licensing/SBOM/security tooling, package generation and release workflows before choosing paths or commands. Output: `+ docs/reports/readiness-dependencies.md`.
 
 ## Decisions and tasks
 
@@ -39,6 +39,10 @@ Security findings are evaluated against actual package/version/use/reachability 
 Checkpoint after inventory and policy decisions, then after package/gate proof. Luna performs external/database reading and gathers provenance; Sol implements approved tooling; Astra decides tradeoffs. Stop for unexplained package-source changes, speculative package upgrades, copied credentials or blanket suppressions. This workstream may remove dependencies when the best greenfield design warrants it; it does not maintain old package graphs for compatibility.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
 
 ## Worked code example
 

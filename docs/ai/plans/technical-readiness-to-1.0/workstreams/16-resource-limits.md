@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w16
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W16 defines intentional resource behavior for the supported validation model. The handoff proposes operational bounds; the new greenfield design may adopt the best policy, but numeric limits and APIs require evidence. W15 owns regex-specific engine/pattern/timeout choices; W16 owns general input, traversal, iteration, callback/cancellation and cache budgets where applicable.
 
-Inputs: W14 threat model, W10 early benchmarks, W01 contract domains, W19 lifecycle and W15 regex measurements. Output: `docs/reports/readiness-resource-limits.md`. D11/D14/D22 block arbitrary implementation choices.
+Inputs: W14 threat model, W10 early benchmarks, W01 contract domains, W19 lifecycle and W15 regex measurements. Output: `+ docs/reports/readiness-resource-limits.md`. D11/D14/D22 block arbitrary implementation choices.
 
 ## Tasks
 
@@ -41,6 +41,10 @@ For every declared costly operation, either bounded behavior is demonstrated or 
 Checkpoint after cost inventory and policy approval. Sol changes shared enforcement; Luna provides measurements/source reading; Astra decides tradeoffs. Stop for unmeasured arbitrary constants, hidden truncation, unbounded caches, limit bypass through another adapter or tests that hang without approved process bounds. W16 does not require a universal graph engine if the best architecture does not need one.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
 
 ## Worked code example
 

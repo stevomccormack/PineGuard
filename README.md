@@ -1,6 +1,9 @@
 <p align="center">
   <a href="https://github.com/stevomccormack/PineGuard">
-    <img src="docs/brand/pineguard-logo-128px.png" width="128" height="128" alt="PineGuard" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/brand/pineguard-dark-icon.svg" />
+      <img src="docs/brand/pineguard-icon.svg" width="128" height="128" alt="PineGuard" />
+    </picture>
   </a>
 </p>
 

@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w08
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W08 supplies independent comparative correctness evidence. It is not an old-release compatibility gate. Compare a selected implementation with an independently justified reference only where their semantic domains are equivalent. A competitor's behavior is evidence, not PineGuard's definition of truth.
 
-Inputs: W01 new contracts, W05 scenarios, official competitor dossiers and genuine Sol comparative synthesis where relevant. v1.6 §8 supports risk-focused differential testing. No exact harness was verified; D10/D22 requires inventory/tool/path approval. Output: `docs/reports/readiness-differential.md`.
+Inputs: W01 new contracts, W05 scenarios, official competitor dossiers and genuine Sol comparative synthesis where relevant. v1.6 §8 supports risk-focused differential testing. No exact harness was verified; D10/D22 requires inventory/tool/path approval. Output: `+ docs/reports/readiness-differential.md`.
 
 ## Tasks
 
@@ -38,7 +38,13 @@ Checkpoint after reference/domain review and after mismatch triage. Luna does al
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
 
-## Worked code example
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
+
+### Mechanical illustration
+
+This package-free code is a mechanical teaching example only. It is not repository test guidance, a domain test, or evidence that the proposed technique is implemented. Complete source and reproduction scope are in [Code examples](../references/code-examples.md).
 
 This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
 
@@ -52,4 +58,27 @@ for (var i = 0; i < 1000; i++)
 }
 ```
 
-Purpose: BCL Math.Sign is an independent reference over the identical bounded int domain. Expected positive sign only; nullable boundary expectations live in literal W01 rows. Do not compare email syntax or dates against a reference with different semantics. Status pending.
+Purpose: BCL Math.Sign is an independent reference over the identical bounded int domain. Expected positive sign only; nullable boundary expectations live in literal W01 rows. Do not compare email syntax or dates against a reference with different semantics. Status: mechanical illustration only; not repository-test evidence.
+
+### Repository test excerpt
+
+This documentation excerpt shows the canonical fixture-to-typed-case-to-TheoryData-to-MemberData-to-assertion chain. It does not implement PineGuard behavior; the full source-inspected patterns and scope limits are in [Code examples](../references/code-examples.md).
+
+W08 differential assertion over the identical nullable-int domain, using the independent BCL sign model:
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: reference semantics cover exactly int? and treat null as invalid.
+    var reference = tc.Value is int value && Math.Sign(value) == 1;
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert independent fixture truth and independent reference agreement.
+    AssertResult(tc, result);
+    Assert.Equal(reference, result);
+}
+```
+
+Scenario acceptance: Positive1→true; Zero/Negative/Null→false; canonical `int.MinValue`/`int.MaxValue` edge extensions→false/true. No email/date/reference-domain equivalence is inferred.

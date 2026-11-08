@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w02
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -17,7 +17,7 @@ Verified inputs: `apps/cli/src/audit/engine.ts`, `apps/cli/src/audit/rules/layer
 
 ## Decisions and outputs
 
-D07 blocks schema/lowering implementation until Astra approves provenance, representation and reconciliation rules. Output evidence: `docs/reports/readiness-manifest-completeness.md`. Exact manifest/generator/fixture file paths are selected from the Luna inventory under D22, not invented as existing files.
+D07 blocks schema/lowering implementation until Astra approves provenance, representation and reconciliation rules. Output evidence: `+ docs/reports/readiness-manifest-completeness.md`. Exact manifest/generator/fixture file paths are selected from the Luna inventory under D22, not invented as existing files.
 
 The design review must distinguish authoritative rule identity from public method aliases, overloads, code provenance, supported surface projections and test-case references. Absence/not-applicable/unsupported/unmapped must be unambiguous without a competing list of booleans.
 
@@ -44,6 +44,10 @@ No parallel hand-maintained canonical inventory is accepted. Generated outputs m
 W02 owns completeness metadata and audit reconciliation, not semantic truth (W01), failure design (W04) or runtime implementation architecture (W03). Checkpoint after current extraction inventory, after schema decision and after seeded drift proof. Stop when the proposed manifest duplicates an existing authority, forces public API changes, or assumes all rules project to every surface. Gate activation belongs to W00 after W05 validates the expectation contract.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
 
 ## Worked code example
 

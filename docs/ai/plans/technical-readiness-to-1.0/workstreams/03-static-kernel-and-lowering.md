@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w03
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 Design and implement the NEW rule structure EARLY, after W22 taxonomy and W01 pilot semantics. Preserve cheap static executable truth as a design principle, not old API shapes. The user authorizes greenfield design without legacy compatibility/shims/migrations. Avoid per-call polymorphic allocation graphs and speculative abstractions unless concrete evidence justifies a specific choice.
 
-Inputs: W22 inventory/terminology; W01 truth; W02 manifest interface; W04 failures; W10 EARLY baseline. Verified source anchors: src/PineGuard.Core/Rules/OwaspRules.cs, StringRules.cs, src/PineGuard.MustClauses/MustOwaspClauses.cs and MustStringClauses.cs. Output: docs/reports/readiness-static-kernel.md. Luna inventories remaining exact paths; Astra approves D22.
+Inputs: W22 inventory/terminology; W01 truth; W02 manifest interface; W04 failures; W10 EARLY baseline. Verified source anchors: src/PineGuard.Core/Rules/OwaspRules.cs, StringRules.cs, src/PineGuard.MustClauses/MustOwaspClauses.cs and MustStringClauses.cs. Output: `+ docs/reports/readiness-static-kernel.md`. Luna inventories remaining exact paths; Astra approves D22.
 
 ## Tasks
 
@@ -33,6 +33,10 @@ Every rule has one clear executable semantic authority and each projection only 
 Allocation, boxing, closure/reflection and exception costs are measured where relevant. No unsupported zero-allocation claim follows from static syntax. Formatting/analyzer/DRY/SOLID standards apply across the whole affected graph.100% coverage cannot be weakened to make restructuring easier.
 
 Checkpoint after inventory, approved structure, first vertical slice and each measured rollout. Stop for local patches, unexplained abstraction, missing source context, semantic uncertainty or regression without a decision. Use the [quality constitution](../references/quality-constitution.md), [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [estimates](../references/estimates-and-waves.md). Planned; no implementation performed.
+
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
 
 ## Worked code example
 

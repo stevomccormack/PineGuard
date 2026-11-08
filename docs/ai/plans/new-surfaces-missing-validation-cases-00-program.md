@@ -163,7 +163,7 @@ Anything that only exists on net8+ (`INumber<T>`, `TimeProvider` without the BCL
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\docs\brand\pineguard-icon.png" Pack="true" PackagePath="\" />
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 

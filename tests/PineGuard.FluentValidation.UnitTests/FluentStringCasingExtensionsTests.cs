@@ -44,7 +44,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.CamelCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.CamelCase))]
-    public void CamelCase_BehavesAsExpected(FluentCase<string> tc)
+    public void CamelCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new CamelCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -57,7 +57,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.NotCamelCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.NotCamelCase))]
-    public void NotCamelCase_BehavesAsExpected(FluentCase<string> tc)
+    public void NotCamelCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new NotCamelCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -70,7 +70,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.PascalCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.PascalCase))]
-    public void PascalCase_BehavesAsExpected(FluentCase<string> tc)
+    public void PascalCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new PascalCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -83,7 +83,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.NotPascalCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.NotPascalCase))]
-    public void NotPascalCase_BehavesAsExpected(FluentCase<string> tc)
+    public void NotPascalCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new NotPascalCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -96,7 +96,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.SnakeCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.SnakeCase))]
-    public void SnakeCase_BehavesAsExpected(FluentCase<string> tc)
+    public void SnakeCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new SnakeCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -109,7 +109,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.NotSnakeCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.NotSnakeCase))]
-    public void NotSnakeCase_BehavesAsExpected(FluentCase<string> tc)
+    public void NotSnakeCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new NotSnakeCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -122,7 +122,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.UpperSnakeCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.UpperSnakeCase))]
-    public void UpperSnakeCase_BehavesAsExpected(FluentCase<string> tc)
+    public void UpperSnakeCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new UpperSnakeCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -135,7 +135,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.NotUpperSnakeCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.NotUpperSnakeCase))]
-    public void NotUpperSnakeCase_BehavesAsExpected(FluentCase<string> tc)
+    public void NotUpperSnakeCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new NotUpperSnakeCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -148,7 +148,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.KebabCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.KebabCase))]
-    public void KebabCase_BehavesAsExpected(FluentCase<string> tc)
+    public void KebabCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new KebabCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -161,7 +161,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.NotKebabCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.NotKebabCase))]
-    public void NotKebabCase_BehavesAsExpected(FluentCase<string> tc)
+    public void NotKebabCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new NotKebabCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -174,7 +174,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.TrainCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.TrainCase))]
-    public void TrainCase_BehavesAsExpected(FluentCase<string> tc)
+    public void TrainCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new TrainCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -187,7 +187,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.NotTrainCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.NotTrainCase))]
-    public void NotTrainCase_BehavesAsExpected(FluentCase<string> tc)
+    public void NotTrainCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new NotTrainCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -200,7 +200,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.DotCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.DotCase))]
-    public void DotCase_BehavesAsExpected(FluentCase<string> tc)
+    public void DotCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new DotCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -213,7 +213,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.NotDotCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.NotDotCase))]
-    public void NotDotCase_BehavesAsExpected(FluentCase<string> tc)
+    public void NotDotCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new NotDotCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -226,7 +226,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.SpaceCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.SpaceCase))]
-    public void SpaceCase_BehavesAsExpected(FluentCase<string> tc)
+    public void SpaceCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new SpaceCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);
@@ -239,7 +239,7 @@ public sealed class FluentStringCasingExtensionsTests(ITestOutputHelper output) 
 
     [Theory]
     [MemberData(nameof(FluentStringCasingExtensionsTestData.NotSpaceCase.Cases), MemberType = typeof(FluentStringCasingExtensionsTestData.NotSpaceCase))]
-    public void NotSpaceCase_BehavesAsExpected(FluentCase<string> tc)
+    public void NotSpaceCase_BehavesAsExpected(FluentCase<string?> tc)
     {
         var result = new NotSpaceCaseValidator().Validate(new Model { Value = tc.Value });
         AssertResult(tc, result);

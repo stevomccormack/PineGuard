@@ -1,6 +1,7 @@
 using PineGuard.Codes;
 using PineGuard.Common;
 using PineGuard.Testing.UnitTests.FluentValidation;
+using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
 namespace PineGuard.FluentValidation.UnitTests;
@@ -30,82 +31,210 @@ public static class FluentStringCasingExtensionsTestData
 
     public static class CamelCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsCamelCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be camelCase.", Code: MustCodes.Text.Casing.NotCamel));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsCamelCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be camelCase.", Code: MustCodes.Text.Casing.NotCamel));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class NotCamelCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsCamelCase.AllScenarios.ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be camelCase."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsCamelCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be camelCase."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class PascalCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsPascalCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be PascalCase."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsPascalCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be PascalCase."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class NotPascalCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsPascalCase.AllScenarios.ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be PascalCase."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsPascalCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be PascalCase."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class SnakeCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsSnakeCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be snake_case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsSnakeCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be snake_case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class NotSnakeCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsSnakeCase.AllScenarios.ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be snake_case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsSnakeCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be snake_case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class UpperSnakeCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsUpperSnakeCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be UPPER_SNAKE_CASE."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsUpperSnakeCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be UPPER_SNAKE_CASE."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class NotUpperSnakeCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsUpperSnakeCase.AllScenarios.ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be UPPER_SNAKE_CASE."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsUpperSnakeCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be UPPER_SNAKE_CASE."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class KebabCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsKebabCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be kebab-case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsKebabCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be kebab-case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class NotKebabCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsKebabCase.AllScenarios.ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be kebab-case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsKebabCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be kebab-case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class TrainCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsTrainCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be Train-Case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsTrainCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be Train-Case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class NotTrainCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsTrainCase.AllScenarios.ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be Train-Case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsTrainCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be Train-Case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class DotCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsDotCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be dot.case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsDotCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be dot.case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class NotDotCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsDotCase.AllScenarios.ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be dot.case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsDotCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be dot.case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class SpaceCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsSpaceCase.AllScenarios.ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be space case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsSpaceCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be space case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class NotSpaceCase
     {
-        public static TheoryData<FluentCase<string>> Cases => F.IsSpaceCase.AllScenarios.ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be space case."));
+        public static TheoryData<FluentCase<string?>> Cases
+        {
+            get
+            {
+                var td = F.IsSpaceCase.AllScenarios.Project(v => (string?)v).ToFluentCases(s => !s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must not be space case."));
+                td.Add(new FluentCase<string?>("NullValue", null, new FluentExpected(true)));
+                return td;
+            }
+        }
     }
 
     public static class UpperInvariant

@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w07
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 P3 explores hostile inputs at identified parsing/validation boundaries. The original handoff suggests fuzzing; v1.6 §8 permits risk-focused tooling without mandating a named tool. No exact fuzz harness was established by the bounded intake.
 
-Inputs: W01 contracts, W14 threat model, W15 regex semantics, W16 approved resource policy and existing test specifications. Output: `docs/reports/readiness-fuzzing.md`; approved corpus/harness paths are selected under D10/D22.
+Inputs: W01 contracts, W14 threat model, W15 regex semantics, W16 approved resource policy and existing test specifications. Output: `+ docs/reports/readiness-fuzzing.md`; approved corpus/harness paths are selected under D10/D22.
 
 ## Tasks
 
@@ -44,7 +44,13 @@ Checkpoint after target/tool selection, after corpus review and after each campa
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md) and [source map](../references/source-map.md). This child remains Planned; no implementation is authorized by this document.
 
-## Worked code example
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
+
+### Mechanical illustration
+
+This package-free code is a mechanical teaching example only. It is not repository test guidance, a domain test, or evidence that the proposed technique is implemented. Complete source and reproduction scope are in [Code examples](../references/code-examples.md).
 
 This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
 
@@ -56,4 +62,25 @@ foreach (var row in corpus)
     Checks.Require(Boundary.Invoke(row.Input).Status == row.Status, "bounded replay row");
 ```
 
-Purpose: bounded hostile replay corpus: `1`→200; `0`, `-1`, empty, int overflow and 129 digits→400. This is a replay harness, not coverage-guided fuzzing. Persist seed/corpus/tool evidence separately when a tool is selected. Status pending.
+Purpose: bounded hostile replay corpus: `1`→200; `0`, `-1`, empty, int overflow and 129 digits→400. This is a replay harness, not coverage-guided fuzzing. Persist seed/corpus/tool evidence separately when a tool is selected. Status: mechanical illustration only; not repository-test evidence.
+
+### Repository test excerpt
+
+This documentation excerpt shows the canonical fixture-to-typed-case-to-TheoryData-to-MemberData-to-assertion chain. It does not implement PineGuard behavior; the full source-inspected patterns and scope limits are in [Code examples](../references/code-examples.md).
+
+W07 complete fixture-backed replay structure: MemberData enumerates the named canonical corpus and each row is evaluated once. It is not coverage-guided fuzzing, stress/repetition evidence, raw-input parser fuzzing or an adopted operational budget:
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: MemberData supplies one independently authored named corpus row.
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert.
+    AssertResult(tc, result);
+}
+```
+
+Scenario acceptance: MemberData supplies Positive/Zero/Negative/Null once each and the existing typed helper verifies independent truth. Repeating a deterministic row is not extra coverage. The raw-string/overflow/129-character corpus remains an explicitly separate mechanical Boundary example in Program.cs; an adopted hostile raw-input corpus/tool harness is a future prerequisite and must use its approved typed input/expectation contract before integration.

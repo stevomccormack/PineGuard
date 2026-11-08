@@ -55,3 +55,13 @@ No concrete property/fuzz/differential/mutation harness, benchmark project, trim
 ## Provenance rules
 
 Preserve source snapshots/commit references and checked dates. Mark handoff suggestions, current behavior, normative requirements, research facts and architectural inferences separately. Missing or inaccessible material remains unknown. The unavailable user snapshot and the incomplete ChatGPT project mirror cannot be treated as complete evidence.
+
+
+## Test project and naming authorities
+
+- docs/ai/specs/testing/project.md §§1–3: shipped PineGuard.Testing library, its test project, fixture/helper ownership and when helpers may be shared.
+- docs/ai/specs/testing/unit-test.md §§4.1, 4.5, 5.1, 9.1–9.2; docs/ai/specs/testing/fixture.md §§2, 4, 9, 11: operation-group/test-data names, paired test method shape, VIBE fixture schema, typed projections and formatting.
+- docs/ai/specs/must-clauses/unit-test.md, TestData Pattern and Test Structure: fixture-backed ValidCases/InvalidCases, MustCase and AssertResult.
+- docs/ai/specs/fluent-validation/unit-test.md; docs/ai/specs/data-annotations/unit-test.md, DA-Specific Patterns: layer-specific Cases projections and assertion contracts; the current NumberAttributes implementation is legacy where it conflicts with the normative DA addendum.
+- docs/ai/specs/tools/spec.md §1: repository script Verb-Noun / Test-Noun convention.
+- docs/ai/plans/technical-readiness-to-1.0/references/test-project-layout.md: approved six planned test/executable project identities, folder responsibilities, W00–W22 mapping and discovery/coverage/script alignment requirements.

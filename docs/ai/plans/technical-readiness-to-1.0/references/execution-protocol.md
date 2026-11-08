@@ -18,6 +18,8 @@ Before any build/test/coverage action read `docs/ai/rules/coordination.md`. Befo
 
 ## Required dispatch packet
 
+Before every production-bound draft and before Astra acceptance, Luna must provide the BRAIN-conformance applicability table required by [the quality constitution](quality-constitution.md#brain-conformance-before-drafting-and-at-review). Astra checks the patch against each applicable naming, architecture, fixture, test-data/assertion, script/configuration, documentation and formatting requirement; feedback is fixed and the affected evidence is rechecked before the block can close.
+
 Every assignment contains: workstream/task IDs; exact intent and exclusions; model/role; verified source excerpt references; accepted decision IDs; prerequisites; exact owned paths; expected input/output artifacts; commands approved after repository inspection; acceptance and deliberate-failure checks; requested time/token bounds; check-in interval; review/commit checkpoint; stop conditions. The packet must identify unknowns explicitly.
 
 Use one bounded outcome per assignment. Prefer 10–20 minutes and 8k–16k requested tokens for a substantive implementation packet, with a checkpoint at least every two minutes and earlier on blockers. Short read-only inventory packets should be smaller. These are planning defaults, not measured capacity or tool-enforced hard limits. Adjust the packet before dispatch if complexity warrants it; do not keep an indefinitely running agent under an obsolete budget.

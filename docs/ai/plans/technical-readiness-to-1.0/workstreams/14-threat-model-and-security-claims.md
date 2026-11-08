@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w14
-version: 1.2
+version: 1.3
 status: planned
 last_updated: 2026-09-26
 -->
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 
 W14 specifies what security-relevant validation does and does not establish, based on the actual new contracts and consumer boundaries. Rubric security/data is6/10 with medium confidence; v1.6 §8 and the handoff call for formalized claims and hostile evidence.
 
-Inputs: W01 OWASP reproduction and semantics, W03 call paths, W04 failure/privacy contract, W07 fuzz priorities, W15 regex and W16 resource policy. Verified anchors: `src/PineGuard.Core/Rules/OwaspRules.cs`, `src/PineGuard.MustClauses/MustOwaspClauses.cs`, `tests/PineGuard.Testing/Fixtures/OwaspRulesFixtures.cs`. Output: `docs/reports/readiness-threat-model.md`.
+Inputs: W01 OWASP reproduction and semantics, W03 call paths, W04 failure/privacy contract, W07 fuzz priorities, W15 regex and W16 resource policy. Verified anchors: `src/PineGuard.Core/Rules/OwaspRules.cs`, `src/PineGuard.MustClauses/MustOwaspClauses.cs`, `tests/PineGuard.Testing/Fixtures/OwaspRulesFixtures.cs`. Output: `+ docs/reports/readiness-threat-model.md`.
 
 ## Tasks
 
@@ -42,7 +42,13 @@ Checkpoint after threat/claim inventory and before changing behavior or public c
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
 
-## Worked code example
+## Approved test-project boundary
+
+The [approved testing project layout](../references/test-project-layout.md) is authoritative for this workstream's project identity, folder responsibility and execution kind. Use its workstream mapping; do not create one project per testing technique or move this crosscutting work into existing library unit suites. Reuse PineGuard.Testing fixtures and typed projections. Required projects and artifacts must exist before the applicable implementation gate can close; Planned status is not execution evidence.
+
+### Mechanical illustration
+
+This package-free code is a mechanical teaching example only. It is not repository test guidance, a domain test, or evidence that the proposed technique is implemented. Complete source and reproduction scope are in [Code examples](../references/code-examples.md).
 
 This example is documentation, not an implemented PineGuard change. Its classification, dependencies and verification scope are stated below; complete source and reproduction instructions are in [Code examples](../references/code-examples.md).
 
@@ -55,4 +61,36 @@ Checks.Require(Diagnostics.Event(true, verdict) ==
     "rule=illustration.number.positive;code=illustration.number.not-positive", "exact allowlist");
 ```
 
-Purpose: claim-specific tests only: oversize raw numeric input rejected before parsing and diagnostic output has exact allowlist. Overflow/129 digits→400; attempted -987654321 never appears in event. No general security claim or adversarial regex-timeout proof follows. Status pending.
+Purpose: claim-specific tests only: oversize raw numeric input rejected before parsing and diagnostic output has exact allowlist. Overflow/129 digits→400; attempted -987654321 never appears in event. No general security claim or adversarial regex-timeout proof follows. Status: mechanical illustration only; not repository-test evidence.
+
+### Repository test excerpt
+
+This documentation excerpt shows the canonical fixture-to-typed-case-to-TheoryData-to-MemberData-to-assertion chain. It does not implement PineGuard behavior; the full source-inspected patterns and scope limits are in [Code examples](../references/code-examples.md).
+
+#### Group 5: W14/W15/W17/W18/W19 operational test guidance
+
+Use the complete approved typed pipeline below as the structural repository-test reference, preserving the current operation name/type/MemberData/AssertResult. This numeric structural example does not verify security, regex, privacy, date determinism or concurrency. Those workstreams retain concrete relevant implementation illustrations separately, plus the acceptance rows below. Unselected operational expectation contracts must be approved before representing specialized production tests as ready to integrate; do not invent replacement case types or rebrand smoke loops as conformant tests.
+
+```csharp
+public static class IsPositiveInt
+{
+    public static TheoryData<RuleCase<int?>> Cases => F.IsPositive.AllScenarios.ToRuleCases();
+}
+```
+
+```csharp
+[Theory]
+[MemberData(nameof(NumberRulesTestData.IsPositiveInt.Cases), MemberType = typeof(NumberRulesTestData.IsPositiveInt))]
+public void IsPositive_BehavesAsExpected(RuleCase<int?> tc)
+{
+    // Arrange: independently authored canonical fixture and typed case.
+    // Act.
+    var result = NumberRules.IsPositive(tc.Value);
+    // Assert.
+    AssertResult(tc, result);
+}
+```
+
+The structural numeric example does not verify this workstream's operational behavior. The named acceptance rows below are future fixture inputs, and the separate mechanical illustration is not domain-test evidence.
+
+| W14 claim-specific security | Oversize129-character numeric input→rejected before parsing; overflow2147483648→rejected; no attempted numeric value in diagnostic event. These are candidate boundary claims, not general security proof. | Program.cs Boundary.TryCreate and Diagnostics.Event; claimed limits/operational responses remain provisional. |
