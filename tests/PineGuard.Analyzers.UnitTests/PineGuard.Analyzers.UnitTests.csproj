@@ -18,6 +18,10 @@
          restores that floor (1.0.1, a net45-era build) instead of this repo's pinned 4.14.0. -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <!-- Lifts the vulnerable System.Security.Cryptography.Pkcs 9.0.6 that Analyzer.Testing pulls in
+         transitively via NuGet.Packaging 7.0.3 (NU1902/NU1903 fail restore repo-wide); version is
+         central in Directory.Packages.props. Not used by any test directly. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" />
   </ItemGroup>
 
   <ItemGroup>
