@@ -6,6 +6,29 @@ namespace PineGuard.Rules;
 /// <summary>
 /// Provides pure <see cref="DateTime"/> validation predicates for temporal comparisons, range checks, and calendar queries.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Members that compare instants — <see cref="IsInPast"/>, <see cref="IsInFuture"/>, <see cref="IsBetween"/>,
+/// <see cref="IsBefore"/>, <see cref="IsAfter"/>, <see cref="IsSame"/>, <see cref="IsChronological"/>,
+/// <see cref="IsOverlapping"/>, <see cref="IsWithin"/>, <see cref="IsWithinDaysFromNow"/> and
+/// <see cref="IsWithinCalendarMonths"/> (which then counts months on the UTC calendar) — first normalize every
+/// <see cref="DateTime"/> through <see cref="DateTimeUtility.ToUtc"/>: a <see cref="DateTimeKind.Local"/> value is
+/// converted to UTC, a <see cref="DateTimeKind.Utc"/> value is used as-is, and a <see cref="DateTimeKind.Unspecified"/>
+/// value is assumed to already be UTC and is relabeled, not converted. "Now" for <see cref="IsInPast"/>,
+/// <see cref="IsInFuture"/> and <see cref="IsWithinDaysFromNow"/> is <see cref="TimeProvider.GetUtcNow"/> on the
+/// injected <see cref="TimeProvider"/> (the system clock when <see langword="null"/>).
+/// </para>
+/// <para>
+/// Members that answer calendar questions — <see cref="HasMinimumAge"/>, <see cref="IsSameDay"/>,
+/// <see cref="IsWeekday"/>, <see cref="IsWeekend"/>, <see cref="IsFirstDayOfMonth"/> and
+/// <see cref="IsLastDayOfMonth"/> — read the value's own civil <see cref="DateTime.Date"/> fields and ignore
+/// <see cref="DateTime.Kind"/> entirely; no conversion takes place. "Today" for <see cref="HasMinimumAge"/> is the
+/// calendar date in the injected <see cref="TimeProvider"/>'s <see cref="TimeProvider.LocalTimeZone"/>, which is the
+/// host machine's zone when the provider is <see langword="null"/>. The kind inspectors <see cref="IsUtc"/>,
+/// <see cref="IsLocal"/>, <see cref="IsUnspecified"/> and <see cref="HasExplicitKind"/> belong to neither group:
+/// they report <see cref="DateTime.Kind"/> exactly as supplied.
+/// </para>
+/// </remarks>
 /// <seealso href="https://pineguard.ai/docs/rules/datetime">DateTime Rules documentation</seealso>
 public static class DateTimeRules
 {

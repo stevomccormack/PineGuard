@@ -22,6 +22,11 @@ namespace PineGuard.DataAnnotations;
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -65,6 +70,11 @@ public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(type
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
 /// </para>
 /// </remarks>
 /// <example>
@@ -110,6 +120,11 @@ public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(ty
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -153,6 +168,11 @@ public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttribute
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
+/// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
 /// </para>
 /// </remarks>
 /// <example>
@@ -883,6 +903,11 @@ public sealed class NotOverlappingDateOnlyStringAttribute(string end1, string st
 /// </para>
 /// <para>
 /// A negative minimum age is a configuration error and fails validation.
+/// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
 /// </para>
 /// </remarks>
 /// <example>
