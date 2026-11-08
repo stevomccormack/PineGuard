@@ -26,8 +26,8 @@ function Get-DefaultTestAssemblyFilter {
     .SYNOPSIS
         Derives dotCover's comma-separated assembly filter from the shared project families.
     #>
-    return (((Get-DefaultTestProjectFilter) -split ';' |
-        ForEach-Object { $_ -replace '\.csproj$', '' }) -join ',')
+    $families = (Get-DefaultTestProjectFilter) -split ';'
+    return ($families -replace '\.csproj$', '') -join ','
 }
 
 function Get-PineGuardScope {
@@ -379,7 +379,7 @@ function Test-ProjectHasSources {
 
     $csFiles = @(
         Get-ChildItem -Path $projectDir -Recurse -File -Filter '*.cs' -ErrorAction SilentlyContinue |
-            Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
+            Where-Object { $_.FullName -notmatch '[\\/](bin|obj)[\\/]' }
     )
 
     return ($csFiles.Count -gt 0)
