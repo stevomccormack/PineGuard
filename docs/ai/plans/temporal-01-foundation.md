@@ -2,8 +2,8 @@
 type: plan
 id: temporal-01-foundation
 version: 1.1
-status: planned
-last_updated: 2026-09-27
+status: active
+last_updated: 2026-11-08
 -->
 
 # Plan T-01 — Phase 1: Foundation (today derivation, test clock, TimeOnly wrap, TimeSpan rename, precision)
@@ -12,6 +12,7 @@ last_updated: 2026-09-27
 > Astra adjudicated the design under owner authorization; actual revised Fable council remains
 > a mandatory execution gate. No repeated owner signatures. Repo: PineGuard.
 > Worktree `.claude/worktrees/temporal-01-foundation`, branch `feature/temporal-01-foundation`.
+> **Status**: active (2026-11-08). Phase 1 units through U5 are committed on `codex/temporal-foundation` (U5 as `6b3cab3`); U6 (review + merge) is in progress. See the [orchestration tracker](temporal-orchestration.md) §1.
 
 > Current authority and exception handling: T-00 §0 and
 > [Astra register](temporal-astra-decisions.md). Implementation: Codex team;
@@ -415,7 +416,7 @@ and `audit must-codes` before merging Phase 1. Budget 100k / 30 min.
 
 **Binding ruling (2026-09-27):** this unit is created by Claude Fable 5.1's follow-up ruling on the
 T1-U2/U2b string-DateOnly gap, recorded verbatim in
-[`../../artifacts/reviews/T1-U2-U2b-string-followup-ruling.json`](../../artifacts/reviews/T1-U2-U2b-string-followup-ruling.json).
+[`../../../artifacts/reviews/T1-U2-U2b-string-followup-ruling.json`](../../../artifacts/reviews/T1-U2-U2b-string-followup-ruling.json).
 **Not part of the T1-U2/U2b atomic acceptance cohort; no U2/U2b file changes.** Depends on **T1-U2
 and T1-U2b accepted** (uses `TryGetTodayDate`, `TryGetAge` and `Date.Reference.OutOfRange`). Must
 land before T1-U6 and before any T-04 string-DateOnly work. Coverage scope `MustClauses`. Model
@@ -830,7 +831,7 @@ Claude Fable 5.1 phase review (orchestration §2.4) with this phase's file list.
 
 ## 5. Definition of Done
 
-- All ten units (U0, U1, U2, U2b, U3, U4, U4a, U4b, U5, U6) Done in the tracker with commit hashes.
+- All eleven units (U0, U1, U2, U2b, U2c, U3, U4, U4a, U4b, U5, U6) Done in the tracker with commit hashes.
 - `grep -rn "IsGreaterThan\|IsLessThan" src/PineGuard.Core/Rules/TimeSpanRules.cs` returns nothing.
 - `grep -rn "ToCalendarDate" src/PineGuard.Core/Utils/DateTimeUtility.cs` returns nothing (D-1: removed, not renamed).
 - `DateOnlyRules.IsInPast(new DateOnly(2026,6,15), timeProvider: FixedTimeProvider.DefaultAheadOfUtc)` is `true` (it was `false`).
