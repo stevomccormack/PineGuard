@@ -36,6 +36,7 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantInclusive = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantExclusive = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionDay = (new DateTime(2024, 01, 01, 12, 59, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, DateTimePrecision.Day);
+        public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionMicrosecond = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(8), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(5), Inclusion.Inclusive, DateTimePrecision.Microsecond);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionUnknown = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, (DateTimePrecision)999);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) ImplicitLocalVsUtc = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Local), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) NullValue = (null, new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
@@ -46,6 +47,7 @@ public static class DateTimeRulesFixtures
             new(nameof(BeforeInclusive), BeforeInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
             new(nameof(PrecisionDay), PrecisionDay, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true),
             new(nameof(ImplicitLocalVsUtc), ImplicitLocalVsUtc, true)
         ];
 
@@ -84,6 +86,7 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantInclusive = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantExclusive = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionDay = (new DateTime(2020, 01, 02, 23, 59, 59, DateTimeKind.Utc), new DateTime(2020, 01, 01, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, DateTimePrecision.Day);
+        public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionMicrosecond = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(5), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(8), Inclusion.Inclusive, DateTimePrecision.Microsecond);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionUnknown = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, (DateTimePrecision)999);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) NullValue = (null, new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) NullOther = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), null, Inclusion.Inclusive, null);
@@ -92,7 +95,8 @@ public static class DateTimeRulesFixtures
         [
             new(nameof(AfterInclusive), AfterInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
-            new(nameof(PrecisionDay), PrecisionDay, true)
+            new(nameof(PrecisionDay), PrecisionDay, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)>[] InvalidScenarios =>
@@ -129,6 +133,7 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) SameUtc = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), null);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) UnspecifiedVsUtc = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), null);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) PrecisionHour = (new DateTime(2020, 01, 01, 10, 59, 59, DateTimeKind.Utc), new DateTime(2020, 01, 01, 10, 0, 0, DateTimeKind.Utc), DateTimePrecision.Hour);
+        public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) PrecisionMicrosecond = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(5), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(8), DateTimePrecision.Microsecond);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) BothNull = (null, null, null);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) Different = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 03, 0, 0, 0, DateTimeKind.Utc), null);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) PrecisionUnknown = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), (DateTimePrecision)999);
@@ -140,6 +145,7 @@ public static class DateTimeRulesFixtures
             new(nameof(SameUtc), SameUtc, true),
             new(nameof(UnspecifiedVsUtc), UnspecifiedVsUtc, true),
             new(nameof(PrecisionHour), PrecisionHour, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true),
             new(nameof(BothNull), BothNull, true)
         ];
 

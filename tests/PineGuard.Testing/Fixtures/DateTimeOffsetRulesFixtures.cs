@@ -33,6 +33,7 @@ public static class DateTimeOffsetRulesFixtures
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantInclusive = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive, null);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantExclusive = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), Inclusion.Exclusive, null);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionDay = (new DateTimeOffset(2020, 1, 1, 23, 59, 59, TimeSpan.Zero), new DateTimeOffset(2020, 1, 2, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive, DateTimePrecision.Day);
+        public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionMicrosecond = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero).AddTicks(8), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero).AddTicks(5), Inclusion.Inclusive, DateTimePrecision.Microsecond);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionUnknown = (new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2019, 1, 1, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive, (DateTimePrecision)123);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) NullValue = (null, new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive, null);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) NullOther = (new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero), null, Inclusion.Inclusive, null);
@@ -41,7 +42,8 @@ public static class DateTimeOffsetRulesFixtures
         [
             new(nameof(BeforeInclusive), BeforeInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
-            new(nameof(PrecisionDay), PrecisionDay, true)
+            new(nameof(PrecisionDay), PrecisionDay, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)>[] InvalidScenarios =>
@@ -79,6 +81,7 @@ public static class DateTimeOffsetRulesFixtures
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantInclusive = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive, null);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantExclusive = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), Inclusion.Exclusive, null);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionDay = (new DateTimeOffset(2020, 1, 2, 23, 59, 59, TimeSpan.Zero), new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive, DateTimePrecision.Day);
+        public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionMicrosecond = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero).AddTicks(5), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero).AddTicks(8), Inclusion.Inclusive, DateTimePrecision.Microsecond);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionUnknown = (new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2019, 1, 1, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive, (DateTimePrecision)123);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) NullValue = (null, new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), Inclusion.Inclusive, null);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision) NullOther = (new DateTimeOffset(2024, 01, 01, 0, 0, 0, TimeSpan.Zero), null, Inclusion.Inclusive, null);
@@ -87,7 +90,8 @@ public static class DateTimeOffsetRulesFixtures
         [
             new(nameof(AfterInclusive), AfterInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
-            new(nameof(PrecisionDay), PrecisionDay, true)
+            new(nameof(PrecisionDay), PrecisionDay, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other, Inclusion inclusion, DateTimePrecision? precision)>[] InvalidScenarios =>
@@ -124,6 +128,7 @@ public static class DateTimeOffsetRulesFixtures
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, DateTimePrecision? precision) SameInstant = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), null);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, DateTimePrecision? precision) BothNull = (null, null, null);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, DateTimePrecision? precision) PrecisionHour = (new DateTimeOffset(2020, 1, 1, 10, 59, 59, TimeSpan.Zero), new DateTimeOffset(2020, 1, 1, 10, 0, 0, TimeSpan.Zero), DateTimePrecision.Hour);
+        public static readonly (DateTimeOffset? value, DateTimeOffset? other, DateTimePrecision? precision) PrecisionMicrosecond = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero).AddTicks(5), new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero).AddTicks(8), DateTimePrecision.Microsecond);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, DateTimePrecision? precision) DifferentInstant = (new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 01, 03, 0, 0, 0, TimeSpan.Zero), null);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, DateTimePrecision? precision) PrecisionUnknown = (new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero), (DateTimePrecision)123);
         public static readonly (DateTimeOffset? value, DateTimeOffset? other, DateTimePrecision? precision) NullValue = (null, new DateTimeOffset(2024, 01, 02, 0, 0, 0, TimeSpan.Zero), null);
@@ -133,7 +138,8 @@ public static class DateTimeOffsetRulesFixtures
         [
             new(nameof(SameInstant), SameInstant, true),
             new(nameof(BothNull), BothNull, true),
-            new(nameof(PrecisionHour), PrecisionHour, true)
+            new(nameof(PrecisionHour), PrecisionHour, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(DateTimeOffset? value, DateTimeOffset? other, DateTimePrecision? precision)>[] InvalidScenarios =>

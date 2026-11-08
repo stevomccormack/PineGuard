@@ -176,7 +176,9 @@ public static class DateTimeUtilityTestData
             new("Hour", (new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc), DateTimePrecision.Hour), true, new DateTime(2020, 2, 3, 4, 0, 0, 0, DateTimeKind.Utc)),
             new("Minute", (new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc), DateTimePrecision.Minute), true, new DateTime(2020, 2, 3, 4, 5, 0, 0, DateTimeKind.Utc)),
             new("Second", (new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc), DateTimePrecision.Second), true, new DateTime(2020, 2, 3, 4, 5, 6, 0, DateTimeKind.Utc)),
-            new("Millisecond", (new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc), DateTimePrecision.Millisecond), true, new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc))
+            new("Millisecond", (new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc), DateTimePrecision.Millisecond), true, new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc)),
+            new("Microsecond", (new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc).AddTicks(18), DateTimePrecision.Microsecond), true, new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc).AddTicks(10)),
+            new("Tick", (new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc).AddTicks(18), DateTimePrecision.Tick), true, new DateTime(2020, 2, 3, 4, 5, 6, 7, DateTimeKind.Utc).AddTicks(18))
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>
@@ -193,7 +195,8 @@ public static class DateTimeUtilityTestData
     {
         public static TheoryData<ValidCase> ValidCases =>
         [
-            new("Year", (new DateTimeOffset(2020, 2, 3, 4, 5, 6, 7, TimeSpan.Zero), DateTimePrecision.Year), true, new DateTimeOffset(2020, 1, 1, 0, 0, 0, 0, TimeSpan.Zero))
+            new("Year", (new DateTimeOffset(2020, 2, 3, 4, 5, 6, 7, TimeSpan.Zero), DateTimePrecision.Year), true, new DateTimeOffset(2020, 1, 1, 0, 0, 0, 0, TimeSpan.Zero)),
+            new("Microsecond", (new DateTimeOffset(2020, 2, 3, 4, 5, 6, 7, TimeSpan.Zero).AddTicks(18), DateTimePrecision.Microsecond), true, new DateTimeOffset(2020, 2, 3, 4, 5, 6, 7, TimeSpan.Zero).AddTicks(10))
         ];
 
         public static TheoryData<ValidCase> EdgeCases =>

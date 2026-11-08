@@ -56,6 +56,7 @@ public static class TimeOnlyRulesFixtures
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) BeforeInclusive = (new TimeOnly(9, 0), new TimeOnly(10, 0), Inclusion.Inclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) SameInstantInclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Inclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) PrecisionSecond = (new TimeOnly(10, 0, 0, 500), new TimeOnly(10, 0, 0, 600), Inclusion.Inclusive, TimePrecision.Second);
+        public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) PrecisionMicrosecond = (new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(8)), new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(5)), Inclusion.Inclusive, TimePrecision.Microsecond);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) SameInstantExclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Exclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) InvalidPrecision = (new TimeOnly(9, 0), new TimeOnly(10, 0), Inclusion.Inclusive, (TimePrecision)123);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) NullValue = (null, new TimeOnly(10, 0), Inclusion.Inclusive, null);
@@ -65,7 +66,8 @@ public static class TimeOnlyRulesFixtures
         [
             new(nameof(BeforeInclusive), BeforeInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
-            new(nameof(PrecisionSecond), PrecisionSecond, true)
+            new(nameof(PrecisionSecond), PrecisionSecond, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)>[] InvalidScenarios =>
@@ -102,6 +104,7 @@ public static class TimeOnlyRulesFixtures
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) AfterInclusive = (new TimeOnly(10, 0), new TimeOnly(9, 0), Inclusion.Inclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) SameInstantInclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Inclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) PrecisionSecond = (new TimeOnly(10, 0, 0, 600), new TimeOnly(10, 0, 0, 500), Inclusion.Inclusive, TimePrecision.Second);
+        public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) PrecisionMicrosecond = (new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(5)), new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(8)), Inclusion.Inclusive, TimePrecision.Microsecond);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) SameInstantExclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Exclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) InvalidPrecision = (new TimeOnly(10, 0), new TimeOnly(9, 0), Inclusion.Inclusive, (TimePrecision)123);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) NullValue = (null, new TimeOnly(9, 0), Inclusion.Inclusive, null);
@@ -111,7 +114,8 @@ public static class TimeOnlyRulesFixtures
         [
             new(nameof(AfterInclusive), AfterInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
-            new(nameof(PrecisionSecond), PrecisionSecond, true)
+            new(nameof(PrecisionSecond), PrecisionSecond, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)>[] InvalidScenarios =>
@@ -148,6 +152,7 @@ public static class TimeOnlyRulesFixtures
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) SameExact = (new TimeOnly(10, 0), new TimeOnly(10, 0), null);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) BothNull = (null, null, null);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) PrecisionSecond = (new TimeOnly(10, 0, 0, 500), new TimeOnly(10, 0, 0, 600), TimePrecision.Second);
+        public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) PrecisionMicrosecond = (new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(5)), new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(8)), TimePrecision.Microsecond);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) Different = (new TimeOnly(10, 0), new TimeOnly(10, 1), null);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) InvalidPrecision = (new TimeOnly(10, 0), new TimeOnly(10, 0), (TimePrecision)123);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) NullValue = (null, new TimeOnly(10, 0), null);
@@ -157,7 +162,8 @@ public static class TimeOnlyRulesFixtures
         [
             new(nameof(SameExact), SameExact, true),
             new(nameof(BothNull), BothNull, true),
-            new(nameof(PrecisionSecond), PrecisionSecond, true)
+            new(nameof(PrecisionSecond), PrecisionSecond, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? other, TimePrecision? precision)>[] InvalidScenarios =>

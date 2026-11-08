@@ -47,6 +47,11 @@ public enum TimePrecision
     Millisecond,
 
     /// <summary>
+    /// Truncate to the microsecond component (ten ticks).
+    /// </summary>
+    Microsecond,
+
+    /// <summary>
     /// No truncation; compare at tick precision.
     /// </summary>
     Tick
@@ -90,5 +95,15 @@ public enum DateTimePrecision
     /// <summary>
     /// Truncate to the millisecond component.
     /// </summary>
-    Millisecond
+    Millisecond,
+
+    /// <summary>
+    /// Truncate to the microsecond component (ten ticks).
+    /// </summary>
+    Microsecond,
+
+    /// <summary>
+    /// No truncation; compare at tick precision.
+    /// </summary>
+    Tick
 }

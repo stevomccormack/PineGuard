@@ -8,6 +8,9 @@ namespace PineGuard.Utils;
 /// <seealso href="https://pineguard.ai/docs/utils/datetime">DateTime Utility documentation</seealso>
 public static class DateTimeUtility
 {
+    // TimeSpan.TicksPerMicrosecond only exists from .NET 7; the constant keeps netstandard2.1 building.
+    private const long TicksPerMicrosecond = 10;
+
     /// <summary>
     /// Reads the current UTC instant from the supplied clock, falling back to the system clock.
     /// </summary>
@@ -194,6 +197,12 @@ public static class DateTimeUtility
                 return true;
             case DateTimePrecision.Millisecond:
                 truncated = new DateTime(utc.Year, utc.Month, utc.Day, utc.Hour, utc.Minute, utc.Second, utc.Millisecond, DateTimeKind.Utc);
+                return true;
+            case DateTimePrecision.Microsecond:
+                truncated = new DateTime(utc.Ticks - (utc.Ticks % TicksPerMicrosecond), DateTimeKind.Utc);
+                return true;
+            case DateTimePrecision.Tick:
+                truncated = utc;
                 return true;
             default:
                 truncated = null;
