@@ -1,5 +1,6 @@
 using PineGuard.Codes;
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.DateOnlyRulesFixtures;
@@ -8,7 +9,7 @@ namespace PineGuard.GuardClauses.UnitTests;
 
 public static class GuardDateOnlyClausesTestData
 {
-    private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.UtcNow);
+    private static readonly DateOnly Today = DateOnly.FromDateTime(FixedTimeProvider.Default.GetUtcNow().UtcDateTime);
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly Yesterday = Today.AddDays(-1);
     private static readonly DateOnly LeapDayBirth = new(2008, 02, 29);

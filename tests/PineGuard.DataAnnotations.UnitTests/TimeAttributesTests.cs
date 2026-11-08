@@ -10,7 +10,7 @@ public sealed class TimeAttributesTests(ITestOutputHelper output) : BaseDataAnno
     private static void Verify<TAttribute>(TAttribute attribute, TimeAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
     {
-        var result = attribute.GetValidationResult(testCase.Value, new ValidationContext(new object()));
+        var result = attribute.GetValidationResult(testCase.Value, ValidationContextFactory.WithTimeProvider(FixedTimeProvider.Default));
         Assert.Equal(testCase.Expected, result == ValidationResult.Success);
     }
 

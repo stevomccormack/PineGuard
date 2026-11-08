@@ -14,8 +14,8 @@ public sealed class GuardDateOnlyClausesTests(ITestOutputHelper output) : BaseGu
     public void FutureOrPresent_BehavesAsExpected(GuardCase<DateOnly> tc)
     {
         var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.FutureOrPresent(value));
-        AssertCustomMessage(tc, () => Guard.Against.FutureOrPresent(value, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.FutureOrPresent(value, FixedTimeProvider.Default));
+        AssertCustomMessage(tc, () => Guard.Against.FutureOrPresent(value, FixedTimeProvider.Default, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -25,8 +25,8 @@ public sealed class GuardDateOnlyClausesTests(ITestOutputHelper output) : BaseGu
     public void Future_BehavesAsExpected(GuardCase<DateOnly> tc)
     {
         var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.Future(value));
-        AssertCustomMessage(tc, () => Guard.Against.Future(value, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.Future(value, FixedTimeProvider.Default));
+        AssertCustomMessage(tc, () => Guard.Against.Future(value, FixedTimeProvider.Default, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -36,8 +36,8 @@ public sealed class GuardDateOnlyClausesTests(ITestOutputHelper output) : BaseGu
     public void PastOrPresent_BehavesAsExpected(GuardCase<DateOnly> tc)
     {
         var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.PastOrPresent(value));
-        AssertCustomMessage(tc, () => Guard.Against.PastOrPresent(value, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.PastOrPresent(value, FixedTimeProvider.Default));
+        AssertCustomMessage(tc, () => Guard.Against.PastOrPresent(value, FixedTimeProvider.Default, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
@@ -47,8 +47,8 @@ public sealed class GuardDateOnlyClausesTests(ITestOutputHelper output) : BaseGu
     public void Past_BehavesAsExpected(GuardCase<DateOnly> tc)
     {
         var value = tc.Value;
-        var result = AssertResult(tc, () => Guard.Against.Past(value));
-        AssertCustomMessage(tc, () => Guard.Against.Past(value, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.Past(value, FixedTimeProvider.Default));
+        AssertCustomMessage(tc, () => Guard.Against.Past(value, FixedTimeProvider.Default, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 

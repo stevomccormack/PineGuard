@@ -11,7 +11,7 @@ public sealed class DateOnlyAttributesTests(ITestOutputHelper output) : BaseData
     private static void Verify<TAttribute>(TAttribute attribute, DateOnlyAttributesTestData.ValidCase testCase)
         where TAttribute : ValidationAttribute
     {
-        var result = attribute.GetValidationResult(testCase.Value, new ValidationContext(new object()));
+        var result = attribute.GetValidationResult(testCase.Value, ValidationContextFactory.WithTimeProvider(FixedTimeProvider.Default));
         Assert.Equal(testCase.Expected, result == ValidationResult.Success);
     }
 
