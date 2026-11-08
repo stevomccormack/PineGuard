@@ -54,7 +54,7 @@ The binding seven-file sweep contract and red-count adjudication:
 - After the four source complements, the same focused tests passed 18/18 on net10.0.
 - Full `GuardClauses` isolated coverage passed for both TFMs: 2,978/2,978 tests each,
   3,566/3,566 lines, 1,196/1,196 branches, 57 classes. Archived reports and hashes:
-  [`t1-u4-guardclauses-coverage-20260927/manifest.json`](../../../artifacts/reviews/receipts/t1-u4-guardclauses-coverage-20260927/manifest.json).
+  [`+ t1-u4-guardclauses-coverage-20260927/manifest.json`](../../../artifacts/reviews/receipts/t1-u4-guardclauses-coverage-20260927/manifest.json).
 - Research reports Format All passed, CompilerDiagnostics All passed with zero warnings, and
   Tests All passed.
 - The specialized `audit nullability` passed with Rule07 = 0 findings. The canonical shared

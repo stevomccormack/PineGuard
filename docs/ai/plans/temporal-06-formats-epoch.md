@@ -134,7 +134,7 @@ Budget 120k / 45 min (U2b) and 100k / 30 min (U2d).
 
 ### U2c — `UnixTimeRules` + `TryFromUnix*`
 
-New `src/PineGuard.Core/Rules/UnixTimeRules.cs`:
+New `+ src/PineGuard.Core/Rules/UnixTimeRules.cs`:
 
 ```csharp
 public static class UnixTimeRules
@@ -177,12 +177,12 @@ New `MustUnixTimeClauses.cs`: `UnixSeconds(long value)`, `UnixMilliseconds(long 
 
 ### U4 / U5
 
-**Exact sibling ownership**: U4 adds `src/PineGuard.GuardClauses/GuardUnixTimeClauses.cs`
+**Exact sibling ownership**: U4 adds `+ src/PineGuard.GuardClauses/GuardUnixTimeClauses.cs`
 with `NotUnixSeconds` / `NotUnixMilliseconds` returning `long`, plus
 `GuardUnixTimeClausesTests` and paired TestData. U5 adds
-`src/PineGuard.FluentValidation/FluentUnixTimeExtensions.cs` with `UnixSeconds()` /
+`+ src/PineGuard.FluentValidation/FluentUnixTimeExtensions.cs` with `UnixSeconds()` /
 `UnixMilliseconds()` on `long` and `long?`, plus paired tests/TestData; it also adds
-`src/PineGuard.DataAnnotations/UnixTimeAttributes.cs` with `UnixSecondsAttribute` /
+`+ src/PineGuard.DataAnnotations/UnixTimeAttributes.cs` with `UnixSecondsAttribute` /
 `UnixMillisecondsAttribute`, plus `UnixTimeAttributesTests` and paired TestData.
 U2c owns `UnixTimeRules.cs`, `IsUnixSeconds` / `IsUnixMilliseconds`,
 `UnixTimeRulesTests`, TestData and `UnixTimeRulesFixtures.cs`; U3b owns

@@ -101,7 +101,7 @@ build hooks. Retrieve latest stable IANA and latest actually published stable CL
 then pin immutable artifact URLs and versions in a receipt with retrieval UTC and SHA256. Label
 locally computed hashes honestly unless verified against published upstream checksums. Preserve
 the complete IANA source archive, VERSION and all selected Zone/Link source files (including
-backward and etcetera), zone.tab/zone1970.tab references, CLDR windowsZones.xml and license/version
+backward and etcetera), zone.tab and zone1970.tab references, CLDR windowsZones.xml and license/version
 references. Download to staging; validate content, archive path safety, version, XML/schema and
 published hashes where supplied before replacing valid reference files. Failure preserves old
 references. Browser retrieval is a last resort with the same validation and provenance.

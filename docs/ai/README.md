@@ -52,7 +52,8 @@ Statuses mirror each plan's `metadata_header` (`docs/ai/meta/taxonomy.md` §Plan
 |------|--------|
 | [Technical Readiness to 1.0](plans/technical-readiness-to-1.0/plan.md) | Planned |
 | [Library Expansion Roadmap](plans/library-expansion-roadmap.md) | Planned |
-| [New Surfaces Program — charter + phase plans 01–06](plans/new-surfaces-missing-validation-cases-00-program.md) | Active — Phase 1 + Track 0 complete; see [orchestration & progress tracker](plans/new-surfaces-orchestration.md) |
+| [New Surfaces Program — charter + phase plans 01–06](plans/new-surfaces-missing-validation-cases-00-program.md) | Complete — every unit merged to main (last merge dcb906d, 2026-09-01); record in [orchestration & progress tracker](plans/new-surfaces-orchestration.md) |
+| [Temporal & Time-Zone Program — charter T-00 + phases T-01…T-07](plans/temporal-00-program.md) | Active — Phase 1 built on codex/temporal-foundation, final gates in progress; status and ledger in [temporal-orchestration.md](plans/temporal-orchestration.md) and [temporal-branch-ledger.md](plans/temporal-branch-ledger.md) |
 | [Cross-Platform Tools Migration](plans/cross-platform-tools-migration.md) | Planned |
 | [Core / Common API Decisions](plans/core-common-api-decisions.md) | Open — decisions awaiting an owner's call |
 | [Competitive Analysis](plans/competitive-analysis.md) | Living reference — not a work item |

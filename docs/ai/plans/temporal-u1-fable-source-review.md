@@ -7,11 +7,11 @@
 
 ## Required fixes
 
-1. **Correct the half-hour fall-back XML.** In `tests/PineGuard.Testing/Common/TestTimeZones.cs`, the `HalfHourDaylightSaving` summary says the fall-back interval on 5 April 2026 is 02:00–02:29. With base offset +10:30, delta +00:30 and fall-back at 02:00 daylight time, the clock returns to 01:30 standard time; the repeated interval is 01:30–01:59. Correct only the prose. The plan's `HalfHourAmbiguousLocalTime` at 01:45 and test data are already consistent with the rule; this is not a contract change.
+1. **Correct the half-hour fall-back XML.** In `+ tests/PineGuard.Testing/Common/TestTimeZones.cs`, the `HalfHourDaylightSaving` summary says the fall-back interval on 5 April 2026 is 02:00–02:29. With base offset +10:30, delta +00:30 and fall-back at 02:00 daylight time, the clock returns to 01:30 standard time; the repeated interval is 01:30–01:59. Correct only the prose. The plan's `HalfHourAmbiguousLocalTime` at 01:45 and test data are already consistent with the rule; this is not a contract change.
 
    Required summary clause: `In 2026 that is 4 October (02:00–02:29 do not exist) and 5 April (01:30–01:59 occur twice).`
 
-2. **Fail fast when the declared platform-zone prerequisite is unavailable.** In `tests/PineGuard.Testing.UnitTests/Common/TestTimeZonesTests.cs`, remove the `TimeZoneNotFoundException` catch and early return from `PlatformSample_ClassifiesLocalTimes`. Keep its existing Act/Assert blocks. Update the XML summaries on both `PlatformSampleId_Resolves` and `PlatformSample_ClassifiesLocalTimes` to state that these host integration tests require the platform ID and fail, rather than skip, when host zone data cannot resolve it.
+2. **Fail fast when the declared platform-zone prerequisite is unavailable.** In `+ tests/PineGuard.Testing.UnitTests/Common/TestTimeZonesTests.cs`, remove the `TimeZoneNotFoundException` catch and early return from `PlatformSample_ClassifiesLocalTimes`. Keep its existing Act/Assert blocks. Update the XML summaries on both `PlatformSampleId_Resolves` and `PlatformSample_ClassifiesLocalTimes` to state that these host integration tests require the platform ID and fail, rather than skip, when host zone data cannot resolve it.
 
 The resolution test's assertion and the fixture's “resolves on this host” contract make the zone an explicit prerequisite; silently returning from the classification test is inconsistent and cannot make the suite green because the resolution test independently fails. Keep host lookup isolated to these named tests and keep all DST semantic tests on custom zones.
 

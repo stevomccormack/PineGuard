@@ -2,15 +2,15 @@
 type: plan
 id: library-expansion-roadmap
 version: 2.0
-status: planned
-last_updated: 2026-08-26
+status: superseded
+last_updated: 2026-11-08
 -->
 
 # Plan: Library Expansion Roadmap
 
 > **Reconciled (2026-08-26)**: this roadmap is consumed through [Plan 00](new-surfaces-missing-validation-cases-00-program.md) §2, which keeps the parent plan's six-phase numbering and adopts this document's keystone. Names below have been aligned to Plan 00 §5 (`MustValidationResult`, `ValidateMustRules()`, `AddMustValidation(...)`, the `<domain>.<aspect>.<condition>` code grammar); where any remaining detail disagrees with Plan 00, Plan 00 wins.
 
-> **Status**: Planned | **Authors**: Fable intelligence pass (2026-08-20), merged with Fable growth review (2026-08-25)
+> **Status**: Superseded — delivered by the New Surfaces Program (see new-surfaces-orchestration.md); retained as the original rationale | **Authors**: Fable intelligence pass (2026-08-20), merged with Fable growth review (2026-08-25)
 >
 > Supersedes `new-surfaces-missing-validation-cases.md` and `object-validation-and-integration-bridges.md` (merged into this document).
 >

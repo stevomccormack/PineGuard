@@ -2,8 +2,8 @@
 type: plan
 id: new-surfaces-06-analyzers
 version: 1.2
-status: planned
-last_updated: 2026-08-26
+status: completed
+last_updated: 2026-11-08
 parent: new-surfaces-program
 -->
 
@@ -13,7 +13,7 @@ parent: new-surfaces-program
 > [Parent](new-surfaces-missing-validation-cases.md) · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · **06 Analyzers**
 <!-- /plan-nav -->
 
-> **Status**: Planned | **Depends on**: a stable Guard surface (nothing structural; runs last by choice) and Phase 1's `MustResult<T>` shape | **Unblocks**: nothing — leaf phase
+> **Status**: Completed — all units merged to main; see new-surfaces-orchestration.md | **Depends on**: a stable Guard surface (nothing structural; runs last by choice) and Phase 1's `MustResult<T>` shape | **Unblocks**: nothing — leaf phase
 >
 > **Worktree**: `+ .claude/worktrees/analyzers` on `feature/analyzers`.
 >

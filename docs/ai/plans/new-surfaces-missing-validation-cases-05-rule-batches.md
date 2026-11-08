@@ -2,8 +2,8 @@
 type: plan
 id: new-surfaces-05-rule-batches
 version: 1.2
-status: planned
-last_updated: 2026-08-26
+status: completed
+last_updated: 2026-11-08
 parent: new-surfaces-program
 -->
 
@@ -13,7 +13,7 @@ parent: new-surfaces-program
 > [Parent](new-surfaces-missing-validation-cases.md) · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · **05 Rule batches** · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
 <!-- /plan-nav -->
 
-> **Status**: Planned | **Depends on**: Phase 1 (error codes — every new clause needs its `MustCodes` constant; `must-codes` gates it) | **Runs in parallel with**: Phases 2–4 (independent code paths; expect merge conflicts only in a shared `MustCodes.<Domain>.cs`, `vocabulary.json` and `gold-standard.md`)
+> **Status**: Completed — all units merged to main; see new-surfaces-orchestration.md | **Depends on**: Phase 1 (error codes — every new clause needs its `MustCodes` constant; `must-codes` gates it) | **Runs in parallel with**: Phases 2–4 (independent code paths; expect merge conflicts only in a shared `MustCodes.<Domain>.cs`, `vocabulary.json` and `gold-standard.md`)
 >
 > **Worktrees**: one per batch — `rules-string-content`, `rules-identifiers`, `rules-unicode`, `rules-numeric`, `rules-temporal`, `rules-file-signature` — each its own PR. Batches are independent; run them in the listed order unless the operator pulls Batch E (clock injection, the differentiator) forward.
 >

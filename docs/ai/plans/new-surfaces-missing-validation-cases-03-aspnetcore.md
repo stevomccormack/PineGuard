@@ -2,8 +2,8 @@
 type: plan
 id: new-surfaces-03-aspnetcore
 version: 1.2
-status: planned
-last_updated: 2026-08-26
+status: completed
+last_updated: 2026-11-08
 parent: new-surfaces-program
 -->
 
@@ -13,7 +13,7 @@ parent: new-surfaces-program
 > [Parent](new-surfaces-missing-validation-cases.md) · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · **03 ASP.NET Core** · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
 <!-- /plan-nav -->
 
-> **Status**: Planned | **Depends on**: PR 1 — 1a + Track 0 (Plan 00 §10.1; Plan 02's onboarding log is used if it has merged, otherwise this phase executes Plan 00 §8 itself and files the same log); PR 2 — PR 1 **and 1d** (the exception handler reads codes through `ExceptionExtension`) | **Unblocks**: Phase 4 MediatR (reuses the DI package and the async seam)
+> **Status**: Completed — all units merged to main; see new-surfaces-orchestration.md | **Depends on**: PR 1 — 1a + Track 0 (Plan 00 §10.1; Plan 02's onboarding log is used if it has merged, otherwise this phase executes Plan 00 §8 itself and files the same log); PR 2 — PR 1 **and 1d** (the exception handler reads codes through `ExceptionExtension`) | **Unblocks**: Phase 4 MediatR (reuses the DI package and the async seam)
 >
 > **Worktrees** (two PRs, in this order):
 > 1. `+ .claude/worktrees/must-async-di` on `feature/must-async-di` — W1–W3 (async seam, validation mode, `PineGuard.Extensions.DependencyInjection`).

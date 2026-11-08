@@ -2,8 +2,8 @@
 type: plan
 id: new-surfaces-program
 version: 1.3
-status: active
-last_updated: 2026-08-29
+status: completed
+last_updated: 2026-11-08
 parent: new-surfaces-missing-validation-cases
 children:
   - new-surfaces-missing-validation-cases-01-structural-validation.md
@@ -28,7 +28,7 @@ children:
 > under. This charter says what to build; that file says how the work is actually run and where
 > it currently stands.
 
-> **Status**: Active | **Author**: Fable planning pass | **Created**: 2026-08-25
+> **Status**: Completed — all units merged to main; see new-surfaces-orchestration.md | **Author**: Fable planning pass | **Created**: 2026-08-25
 >
 > **Parent**: [new-surfaces-missing-validation-cases.md](new-surfaces-missing-validation-cases.md) (Part 5 phasing).
 > **Reconciled with**: [library-expansion-roadmap.md](library-expansion-roadmap.md) (which declares itself the successor of the parent — see §2).

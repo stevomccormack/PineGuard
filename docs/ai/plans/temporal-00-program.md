@@ -23,7 +23,7 @@ council_trigger: api
 > [temporal-orchestration.md](temporal-orchestration.md). **Nothing in the phase plans asks an
 > implementer to decide anything.** Where a choice exists, this charter has already made it, or §3
 > records the final Astra direction and mandatory Brain execution gates.
-> **Repos**: `stevomccormack/PineGuard` (this repo) and `stevomccormack/PineGuard.Standards` (sibling,
+> **Repos**: `stevomccormack/PineGuard` (this repo) and `+ stevomccormack/PineGuard.Standards` (sibling,
 > `D:\Steve McCormack\GitHub\@stevomccormack\PineGuard.Standards`). Both repos do all work in
 > `.claude/worktrees/<slug>` on `feature/<slug>`.
 
@@ -218,8 +218,8 @@ Conventions the table obeys (all are existing repo precedent, verified 2026-09-2
 
 | Public Testing type | Namespace / file / producer | Contract | Rejected alternatives |
 |---|---|---|---|
-| `CountingTimeProvider` | `PineGuard.Testing.Common`; `tests/PineGuard.Testing/Common/CountingTimeProvider.cs`; T-01 U0 | Sealed TimeProvider; ctor `(DateTimeOffset utcNow, TimeZoneInfo? localTimeZone = null)`; read-only UtcNowCallCount, fixed UTC-normalized instant, zone default UTC | Unnamed private copies; replacement of FixedTimeProvider; production clock abstraction. Fable final detail #4. |
-| `AdvancingTimeProvider` | `PineGuard.Testing.Common`; `tests/PineGuard.Testing/Common/AdvancingTimeProvider.cs`; T-01 U0 | Sealed TimeProvider; ctor `(IReadOnlyList<DateTimeOffset> sequence, TimeZoneInfo? localTimeZone = null)`; read-only UtcNowCallCount, UTC-normalized sequence, throws InvalidOperationException on exhaustion, zone default UTC | Hidden repeated reads; timer virtualization; source-package use. Fable final detail #4. |
+| `CountingTimeProvider` | `PineGuard.Testing.Common`; `+ tests/PineGuard.Testing/Common/CountingTimeProvider.cs`; T-01 U0 | Sealed TimeProvider; ctor `(DateTimeOffset utcNow, TimeZoneInfo? localTimeZone = null)`; read-only UtcNowCallCount, fixed UTC-normalized instant, zone default UTC | Unnamed private copies; replacement of FixedTimeProvider; production clock abstraction. Fable final detail #4. |
+| `AdvancingTimeProvider` | `PineGuard.Testing.Common`; `+ tests/PineGuard.Testing/Common/AdvancingTimeProvider.cs`; T-01 U0 | Sealed TimeProvider; ctor `(IReadOnlyList<DateTimeOffset> sequence, TimeZoneInfo? localTimeZone = null)`; read-only UtcNowCallCount, UTC-normalized sequence, throws InvalidOperationException on exhaustion, zone default UTC | Hidden repeated reads; timer virtualization; source-package use. Fable final detail #4. |
 
 | Core rule (after) | Was | Must | Guard (calls) | Message | Code | Rejected |
 |---|---|---|---|---|---|---|
@@ -433,7 +433,7 @@ to composition/adapter integration tests and declare their runtime, OS and globa
 Use `"UTC"` plus `TestTimeZones.PlatformSampleId` where supported, never unconditioned
 `"Australia/Sydney"` literals. [A-05]
 All DST / offset semantics are tested against custom zones built with
-`TimeZoneInfo.CreateCustomTimeZone(...)` in `tests/PineGuard.Testing/Common/TestTimeZones.cs`
+`TimeZoneInfo.CreateCustomTimeZone(...)` in `+ tests/PineGuard.Testing/Common/TestTimeZones.cs`
 (T-01 U1 defines them; every later phase reuses them). **Exception**: DataAnnotations attributes
 take a zone *id* and must resolve a real zone, so their tests use `"UTC"`, `TestTimeZones.UnknownId`,
 and `TestTimeZones.PlatformSampleId` with the named constants `TestTimeZones.PlatformInvalidLocalTime`

@@ -54,7 +54,7 @@ fixtures, finding keys and baseline deletions. No implementer chooses a mechanis
 | File | Required change |
 |---|---|
 | `apps/cli/src/audit/types.ts` | Add VocabularyConfig.layerAbsences with the exact schema below |
-| `apps/cli/src/audit/vocabulary.ts` (new) | Move resolveVocabulary/normalizeConcept from layer-parity; DEFAULT_VOCABULARY includes empty layerAbsences |
+| `+ apps/cli/src/audit/vocabulary.ts` (new) | Move resolveVocabulary/normalizeConcept from layer-parity; DEFAULT_VOCABULARY includes empty layerAbsences |
 | `apps/cli/src/audit/rules/layer-parity.ts` | Honor declared concept/layer absences; reject unknown concept, invalid layer and declared-absent-but-implemented cases; update description |
 | `apps/cli/src/audit/rules/must-usage.ts` | Share vocabulary normalization; skip only declared concept/layer absence, preserving all other findings and keys; update description |
 | `apps/cli/src/audit/rules/ordering.ts` | String-tail Rules discovery uses StringRules.<Rest>.cs and nested <Rest>; empty Rest uses StringRules.cs/StringRules; preserve non-string mapping/domainName; correct expected missing path |
@@ -86,7 +86,7 @@ that pair's missing-layer/must-usage finding. It never hides other layers or con
   absent → zero ResolvedX findings; Other still reports `must-usage:fluent:Other`.
 - `test/fixtures/ordering/string-family/`: complete Delta string sibling family including
   nested Rules Delta → zero; Echo missing Rules → one finding naming
-  `src/PineGuard.Core/Rules/StringRules.Echo.cs`; existing invalid Charlie remains four.
+  `+ src/PineGuard.Core/Rules/StringRules.Echo.cs`; existing invalid Charlie remains four.
 
 Delete only `layer-parity:SameDay:DataAnnotations`,
 `must-usage:annotations:SameDay`, `must-usage:annotations:NotSameDay`, and every
@@ -116,7 +116,7 @@ Every public Must clause (src/PineGuard.MustClauses) is invoked from Guard, Flue
 
 ### U1 — Codes
 
-**Files**: add `src/PineGuard.Core/Codes/MustCodes.TimeZone.cs` exactly as T-00 §5 (with the
+**Files**: add `+ src/PineGuard.Core/Codes/MustCodes.TimeZone.cs` exactly as T-00 §5 (with the
 per-constant `/// <summary><c>…</c></summary>` lines and the file-top `// Serves:` comment listing
 `MustTimeZoneClauses.cs, MustStringUtcOffsetClauses.cs`). Clone the file shape from
 `MustCodes.Time.cs`. Do not edit MustCodes.Date.cs in this unit: its Kind node and
@@ -150,12 +150,12 @@ the result verbatim. Add direct Must outcome tests and DA-to-Must audit pairing.
 
 | Action | File |
 |---|---|
-| Add | `src/PineGuard.Core/Utils/TimeZoneUtility.cs` |
-| Add | `src/PineGuard.Core/Rules/TimeZoneRules.cs` |
-| Add | `src/PineGuard.Core/Utils/StringUtility.UtcOffset.cs` (partial `StringUtility`, nested `public static class UtcOffset`) |
-| Add | `src/PineGuard.Core/Rules/StringRules.UtcOffset.cs` (partial `StringRules`, nested `public static class UtcOffset`) |
-| Add | `tests/PineGuard.Testing/Fixtures/TimeZoneRulesFixtures.cs`, `StringRulesFixtures.UtcOffset.cs` |
-| Add | `tests/PineGuard.Core.UnitTests/Utils/TimeZoneUtilityTests.cs` + `TestData`, `Rules/TimeZoneRulesTests.cs` + `TestData`, `Utils/StringUtilityUtcOffsetTests.cs` + `TestData` (name per the existing `StringUtility.*` test file convention — copy the DateTimeOffset one), `Rules/StringRulesUtcOffsetTests.cs` + `TestData` |
+| Add | `+ src/PineGuard.Core/Utils/TimeZoneUtility.cs` |
+| Add | `+ src/PineGuard.Core/Rules/TimeZoneRules.cs` |
+| Add | `+ src/PineGuard.Core/Utils/StringUtility.UtcOffset.cs` (partial `StringUtility`, nested `public static class UtcOffset`) |
+| Add | `+ src/PineGuard.Core/Rules/StringRules.UtcOffset.cs` (partial `StringRules`, nested `public static class UtcOffset`) |
+| Add | `+ tests/PineGuard.Testing/Fixtures/TimeZoneRulesFixtures.cs`, `StringRulesFixtures.UtcOffset.cs` |
+| Add | `+ tests/PineGuard.Core.UnitTests/Utils/TimeZoneUtilityTests.cs` + `TestData`, `+ Rules/TimeZoneRulesTests.cs` + `TestData`, `+ Utils/StringUtilityUtcOffsetTests.cs` + `TestData` (name per the existing `StringUtility.*` test file convention — copy the DateTimeOffset one), `+ Rules/StringRulesUtcOffsetTests.cs` + `TestData` |
 
 **Clone from**: `DateTimeUtility.cs` (utility shape), `DateTimeOffsetRules.cs` (rule shape),
 `StringUtility.DateTimeOffset.cs` / `StringRules.DateTimeOffset.cs` (nested string families).
@@ -269,9 +269,9 @@ Tests pin both failure paths, precedence and success. Use exact unknown-ID templ
 dependency name while the supplied ID remains the failing value. [Fable correction #5;
 prior `{0}` template retracted]
 
-**Files**: add `src/PineGuard.MustClauses/MustTimeZoneClauses.cs`,
-`src/PineGuard.MustClauses/MustStringUtcOffsetClauses.cs`; tests
-`tests/PineGuard.MustClauses.UnitTests/MustTimeZoneClausesTests.cs` + `TestData`,
+**Files**: add `+ src/PineGuard.MustClauses/MustTimeZoneClauses.cs`,
+`+ src/PineGuard.MustClauses/MustStringUtcOffsetClauses.cs`; tests
+`+ tests/PineGuard.MustClauses.UnitTests/MustTimeZoneClausesTests.cs` + `TestData`,
 `MustStringUtcOffsetClausesTests.cs` + `TestData`.
 
 Zone-aware `SameDay` / `NotSameDay` belong to `MustTimeZoneClauses.cs` and its paired
@@ -347,7 +347,7 @@ failures according to existing Must boundaries; no blanket custom-provider catch
 
 ### U4 — Guard clauses
 
-**Files**: add `src/PineGuard.GuardClauses/GuardTimeZoneClauses.cs`,
+**Files**: add `+ src/PineGuard.GuardClauses/GuardTimeZoneClauses.cs`,
 `GuardStringUtcOffsetClauses.cs`; tests `GuardTimeZoneClausesTests.cs` + `TestData`,
 `GuardStringUtcOffsetClausesTests.cs` + `TestData`.
 
@@ -409,7 +409,7 @@ Budget 120k / 45 min.
 
 ### U5 — Fluent extensions (∥ U6)
 
-**Files**: add `src/PineGuard.FluentValidation/FluentTimeZoneExtensions.cs` (`TimeSpan`/`TimeSpan?`
+**Files**: add `+ src/PineGuard.FluentValidation/FluentTimeZoneExtensions.cs` (`TimeSpan`/`TimeSpan?`
 `UtcOffset`, `DateTime`/`DateTime?` `ValidLocalTime(TimeZoneInfo)`,
 `UnambiguousLocalTime(TimeZoneInfo)`, `DateTimeOffset`/`DateTimeOffset?` `InTimeZone(TimeZoneInfo)`,
 `SameDay(DateTimeOffset other, TimeZoneInfo)`, `NotSameDay(...)` with a literal `other`, the shape
@@ -437,7 +437,7 @@ Tests cover semantic Summer/Winter/fixed-zone vectors and null-zone composition 
 
 ### U6 — DataAnnotations attributes (∥ U5)
 
-**Files**: add `src/PineGuard.DataAnnotations/TimeZoneAttributes.cs`,
+**Files**: add `+ src/PineGuard.DataAnnotations/TimeZoneAttributes.cs`,
 `StringUtcOffsetAttributes.cs`; tests `TimeZoneAttributesTests.cs` + `TestData`,
 `StringUtcOffsetAttributesTests.cs` + `TestData`.
 

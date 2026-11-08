@@ -14,7 +14,7 @@ last_updated: 2026-09-22
 > (`D:\Steve McCormack\GitHub\@stevomccormack\PineGuard.Standards`, worktree
 > `.claude/worktrees/temporal-timezone`, branch `feature/temporal-timezone`).
 > The Standards-local copy of this plan lives at
-> `PineGuard.Standards/docs/ai/plans/temporal-timezone-sync.md` (plans are not mirrored by `sync` (the deterministic mirror command in `apps/cli`; not the agent-driven `sync`)).
+> `+ PineGuard.Standards/docs/ai/plans/temporal-timezone-sync.md` (plans are not mirrored by `sync` (the deterministic mirror command in `apps/cli`; not the agent-driven `sync`)).
 
 ## 1. Business plan
 
@@ -33,7 +33,7 @@ this phase measures actual package adaptation first (U2), then applies S-01/A-12
 ### Repo B reference refresh — download only [A-04]
 
 This review refreshed references, not generated classes. The dated receipt is
-`tools/code-generators/iana/iana-tz-zone-info/sources/temporal-reference-manifest.md` in the
+`+ tools/code-generators/iana/iana-tz-zone-info/sources/temporal-reference-manifest.md` in the
 Standards worktree. It records IANA 2026d and CLDR core XML release 48 from official stable tag
 `release-48-2` pinned to commit `11299982335beb974c1c63c45265184e759c0f41`. Unicode archive requests
 returned HTTP 522, so the official repository was the fallback. The XML is not cldr-json 48.2.1.
@@ -57,13 +57,13 @@ Validate HTTP success/content and hashes against the receipt (local checksums, n
 upstream signature); for new releases verify upstream hashes when published and label provenance.
 List archive entries before extraction and reject absolute paths / traversal. Extract only inside
 staging, verify IANA `version`, preserve the complete archive and all selected standard Zone/Link
-source files, plus README/LICENSE and zone.tab/zone1970.tab. Parse CLDR with DTD processing
+source files, plus README/LICENSE and zone.tab and zone1970.tab. Parse CLDR with DTD processing
 prohibited and no external resolver; verify `supplementalData` / `windowsZones` / `mapTimezones`
 shape before promotion. Validate actual XML data release and licenses, not a marketing patch label.
 
 Only after every staged input validates, copy reference files into
 `tools/code-generators/iana/iana-tz-zone-info/` and
-`tools/code-generators/cldr/cldr-windows-zones/windowsZones.xml`, retain original sources under
+`+ tools/code-generators/cldr/cldr-windows-zones/windowsZones.xml`, retain original sources under
 their `sources/` directories, and update the manifest with URLs/version/UTC/hash/validation result.
 Failure leaves prior valid references intact. Check `git diff --name-only`: no generated `.cs`,
 catalog/project outputs or generator changes are permitted for a download-only refresh. Never run
@@ -170,8 +170,8 @@ Budget 150k / 45 min each; no D-7 rename scope exists under A-12.
 
 ### U4 — Verify existing host composition boundary [A-05, A-12]
 
-**Files** (Standards): `src/PineGuard.Standards.Iana.TimeZones/Utils/SystemTimeZoneUtility.cs`,
-`src/PineGuard.Standards.Iana.TimeZones/Utils/CldrTimeZoneUtility.cs`, their tests.
+**Files** (Standards): `+ src/PineGuard.Standards.Iana.TimeZones/Utils/SystemTimeZoneUtility.cs`,
+`+ src/PineGuard.Standards.Iana.TimeZones/Utils/CldrTimeZoneUtility.cs`, their tests.
 
 Preserve existing `SystemTimeZone` public clauses, utilities, resolver behavior, diagnostics and
 CLDR fallback. There is no Core host-ID utility to delegate to. Verify actual BCL API availability
@@ -205,11 +205,11 @@ supplies both real zones (`Zone Etc/UTC`, `Zone Etc/GMT`, `Zone Etc/GMT+1` … `
 own `Link` lines (`Link Etc/UTC UTC`, `Link Etc/UTC Universal`, `Link Etc/UTC Zulu`, `Link Etc/GMT
 GMT`, …).
 
-**Files**: extend `tools/code-generators/iana/Gen-IanaTimeZones.ps1` (or add
+**Files**: extend `+ tools/code-generators/iana/Gen-IanaTimeZones.ps1` (or add
 `New-IanaTimeZoneLinkDataGenerator.ps1` beside the existing generator, following that file's shape)
 to parse lines matching `^Link\s+(\S+)\s+(\S+)` (target, link) from **both** `backward` and
 `etcetera`, and emit
-`src/PineGuard.Standards.Iana.TimeZones/Abstractions/DefaultIanaTimeZoneLinkData.cs` with the same
+`+ src/PineGuard.Standards.Iana.TimeZones/Abstractions/DefaultIanaTimeZoneLinkData.cs` with the same
 header comment convention ("generated from IANA tzdb backward + etcetera; do NOT edit"). Separately,
 extend the existing zone generator to parse `etcetera`'s `^Zone\s+(\S+)` blocks (no country codes;
 `null` for the country-code column) into `DefaultIanaTimeZoneData.cs` alongside the `zone1970.tab`
@@ -218,12 +218,12 @@ rows, so `Etc/UTC`, `Etc/GMT` and `Etc/GMT±N` become canonical, resolvable ids.
 extend `IIanaTimeZoneProvider` with `bool TryResolveLink(string? value, out string? canonicalId)`;
 implement in `DefaultIanaTimeZoneProvider` (case-sensitive ordinal lookup, trimmed input; a
 canonical id resolves to itself and returns `true`; unknown → `false`). Update the generator README
-and the Standards agent playbook `docs/ai/standards/agents/generate-iana.md` to run both the zone
+and the Standards agent playbook `+ docs/ai/standards/agents/generate-iana.md` to run both the zone
 and link generation, and to record the `etcetera` version alongside `backward`'s.
 
 **Tests**: provider tests: `US/Eastern` → `America/New_York`; `Asia/Calcutta` → `Asia/Kolkata`;
 `UTC` → `Etc/UTC`; `America/New_York` → itself; `Etc/UTC` → itself; `Not/AZone` → false; null/empty
-→ false. Generator test: add `tools/.tests/Gen-IanaTimeZoneLinks.Tests.ps1` (Pester, same header as
+→ false. Generator test: add `+ tools/.tests/Gen-IanaTimeZoneLinks.Tests.ps1` (Pester, same header as
 the existing files in `tools/.tests/`) with cases: parses `Link\tAmerica/New_York\tUS/Eastern` →
 (`US/Eastern`, `America/New_York`); parses `Link\tEtc/UTC\tUTC` → (`UTC`, `Etc/UTC`); ignores `#`
 comment lines and blank lines. If `tools/.tests/` does not exist in Standards, create it with just

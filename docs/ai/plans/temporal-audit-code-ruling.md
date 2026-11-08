@@ -30,8 +30,8 @@ Governing evidence for the whole ruling:
 | Failing value | `timeZoneId` (null) |
 | Precedence | Checked first, before inspecting `resolvedZone`. |
 | Distinct from | `MustCodes.TimeZone.Id.Unknown` (`"timezone.id.unknown"`), emitted only for non-null ID plus null outcome, template `"Time zone ID '{paramName}' is not a known time zone."`, same `nameof(timeZoneId)` attribution, failing value the supplied ID. |
-| Clause file | `src/PineGuard.MustClauses/MustTimeZoneClauses.cs` |
-| Tests | `tests/PineGuard.MustClauses.UnitTests/MustTimeZoneClausesTests.cs` + `MustTimeZoneClausesTestData.cs`, group `ResolvedTimeZone`: rows for null ID, unknown ID, success, and null-ID-beats-null-outcome precedence. |
+| Clause file | `+ src/PineGuard.MustClauses/MustTimeZoneClauses.cs` |
+| Tests | `+ tests/PineGuard.MustClauses.UnitTests/MustTimeZoneClausesTests.cs` + `MustTimeZoneClausesTestData.cs`, group `ResolvedTimeZone`: rows for null ID, unknown ID, success, and null-ID-beats-null-outcome precedence. |
 
 T-00 §4.2 (`temporal-00-program.md:237-239`) already names this constant. T-02 U3 (`temporal-02-timezone-core.md:175-177, 206`) still says `Value.State.Null` and is the text that must change. `MustCodes.Value.cs` is not edited.
 
@@ -105,7 +105,7 @@ DataAnnotations base codes: `OnIntervalTimeOnlyAttribute` declares `MustCodes.Ti
 
 ## Item 5. Exact `// Serves:` lines and catalogue files
 
-`src/PineGuard.Core/Codes/MustCodes.TimeZone.cs` (T-02 U1 creates; single writer). Final content, in the shape of `MustCodes.Time.cs`:
+`+ src/PineGuard.Core/Codes/MustCodes.TimeZone.cs` (T-02 U1 creates; single writer). Final content, in the shape of `MustCodes.Time.cs`:
 
 ```csharp
 namespace PineGuard.Codes;

@@ -29,8 +29,8 @@ Fable rejected a single canonical IANA ID because it changes the plan's Windows-
 
 Implement only these files:
 
-- `tests/PineGuard.Testing/Common/TestTimeZones.cs`
-- `tests/PineGuard.Testing.UnitTests/Common/TestTimeZonesTestData.cs`
-- `tests/PineGuard.Testing.UnitTests/Common/TestTimeZonesTests.cs`
+- `+ tests/PineGuard.Testing/Common/TestTimeZones.cs`
+- `+ tests/PineGuard.Testing.UnitTests/Common/TestTimeZonesTestData.cs`
+- `+ tests/PineGuard.Testing.UnitTests/Common/TestTimeZonesTests.cs`
 
 Then run format, compiler diagnostics, the Testing tests, and isolated Testing coverage separately for net8.0 and net10.0. Confirm the Cobertura report shows 100% line and branch coverage for `TestTimeZones`; expect the two selector cases to add two tests per TFM. Do not report net10.0 as passing until that run completes. This ruling does not itself accept U1.

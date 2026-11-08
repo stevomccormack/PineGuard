@@ -91,7 +91,7 @@ Bump `vocabulary.json` `"version"` from 1 to 2. Exact entries for `docs/ai/specs
 | File | Change |
 |---|---|
 | `apps/cli/src/audit/types.ts` | `layerAbsences` on `VocabularyConfig` (above). |
-| `apps/cli/src/audit/vocabulary.ts` (new) | Move `resolveVocabulary` and `normalizeConcept` out of `layer-parity.ts:186-249` so `must-usage` shares them; `DEFAULT_VOCABULARY` gains `layerAbsences: {}`. |
+| `+ apps/cli/src/audit/vocabulary.ts` (new) | Move `resolveVocabulary` and `normalizeConcept` out of `layer-parity.ts:186-249` so `must-usage` shares them; `DEFAULT_VOCABULARY` gains `layerAbsences: {}`. |
 | `apps/cli/src/audit/rules/layer-parity.ts` | After computing `allConcepts` (`:401-406`): (a) for each `layerAbsences` key not in `allConcepts`, finding `layer-parity:config:unknown-concept:<Key>` on file `docs/ai/specs/language/vocabulary.json`; (b) for each key whose `absentFrom` contains `"Must"` or an unknown layer name, finding `layer-parity:config:invalid-layer:<Key>`; (c) in the missing loop (`:409-434`), skip a `(concept, layer)` pair when declared absent; (d) when a declared-absent layer does implement the concept, finding `layer-parity:<Concept>:<Layer>:declared-absent-but-implemented`. Update `description`. |
 | `apps/cli/src/audit/rules/must-usage.ts` | In `run` (`:288-302`), before pushing a finding, compute `normalizeConcept(method.name, vocabulary)` and skip when the layer (mapped `guard→Guard`, `fluent→Fluent`, `annotations→DataAnnotations`) is declared absent for that concept. Keys unchanged. Update `description`. |
 | `apps/cli/src/audit/rules/ordering.ts` | In `discoverMustFamilies` (`:329-361`), when `tail.startsWith("String")`: Rules sibling path is `src/PineGuard.Core/Rules/StringRules.<Rest>.cs` with public static nested class `<Rest>` (or `StringRules.cs` / class `StringRules` when `Rest` is empty). `domainName` stays `tail`, so Guard/Fluent/DA normalisation is unchanged. This restores the C# original's `IsStringFamily` discovery the port dropped (`ordering.ts:64-69`) and matches the real layout (`StringRules.Guid.cs:5-11`). Non-string families keep `<Tail>Rules.cs` (`:656-665`). Fix the `missingLayerFinding` expected path accordingly. |
@@ -103,7 +103,7 @@ Tests (VIBE, `audit-cli/spec.md:224-269`):
 
 - `test/fixtures/layer-parity/absences/`: `vocabulary.json` declares `Solo` absent from `DataAnnotations`, `Twice` absent from `Guard`, `Ghost` absent from `Fluent`, `Bad` with `absentFrom: ["Must"]`. Must, Guard and Fluent implement `Solo`; DA does not. Guard implements `Twice`. Nothing implements `Ghost`. Assert exactly three findings: `Twice:Guard:declared-absent-but-implemented`, `config:unknown-concept:Ghost`, `config:invalid-layer:Bad`; assert no `Solo` finding. Existing `invalid/` fixture (`layer-parity.test.ts:34-51`) proves an undeclared DA gap still flags.
 - `test/fixtures/must-usage/absences/`: Must `ResolvedX` called from Guard and DA only; vocabulary declares `Fluent` absent. Assert zero findings for `ResolvedX`; a sibling `Other` with no Fluent call still yields `must-usage:fluent:Other`.
-- `test/fixtures/ordering/string-family/`: `MustStringDeltaClauses` (`Delta`, `NotEmptyDelta`) with `GuardStringDeltaClauses`, `FluentStringDeltaExtensions`, `StringDeltaAttributes`, and `StringRules.Delta.cs` nested `Delta` (`IsDelta`, `IsNotEmpty`) → zero findings. `MustStringEchoClauses` with no `StringRules.Echo.cs` → exactly one finding whose message names `src/PineGuard.Core/Rules/StringRules.Echo.cs`. Existing `invalid/` Charlie case (`ordering.test.ts:62-83`) stays at four findings.
+- `test/fixtures/ordering/string-family/`: `MustStringDeltaClauses` (`Delta`, `NotEmptyDelta`) with `GuardStringDeltaClauses`, `FluentStringDeltaExtensions`, `StringDeltaAttributes`, and `StringRules.Delta.cs` nested `Delta` (`IsDelta`, `IsNotEmpty`) → zero findings. `MustStringEchoClauses` with no `StringRules.Echo.cs` → exactly one finding whose message names `+ src/PineGuard.Core/Rules/StringRules.Echo.cs`. Existing `invalid/` Charlie case (`ordering.test.ts:62-83`) stays at four findings.
 
 ## 4. UnixTime and string DateTime siblings (exact names)
 
@@ -111,11 +111,11 @@ Tests (VIBE, `audit-cli/spec.md:224-269`):
 
 | Layer | File | Members | Tests | Unit |
 |---|---|---|---|---|
-| Rules | `src/PineGuard.Core/Rules/UnixTimeRules.cs` | `IsUnixSeconds`, `IsUnixMilliseconds` | `UnixTimeRulesTests` + `TestData`; `UnixTimeRulesFixtures.cs` | T-06 U2c |
-| Must | `src/PineGuard.MustClauses/MustUnixTimeClauses.cs` | `UnixSeconds(long)`, `UnixMilliseconds(long)` | `MustUnixTimeClausesTests` + `TestData` | T-06 U3b |
-| Guard | `src/PineGuard.GuardClauses/GuardUnixTimeClauses.cs` | `NotUnixSeconds`, `NotUnixMilliseconds` → `long` | `GuardUnixTimeClausesTests` + `TestData` | T-06 U4 |
-| Fluent | `src/PineGuard.FluentValidation/FluentUnixTimeExtensions.cs` | `UnixSeconds()`, `UnixMilliseconds()` on `long` and `long?` | `FluentUnixTimeExtensionsTests` + `TestData` | T-06 U5 |
-| DA | `src/PineGuard.DataAnnotations/UnixTimeAttributes.cs` | `UnixSecondsAttribute`, `UnixMillisecondsAttribute` (class-name exception recorded at T-00 §4.6 stands; the file follows `[Domain]Attributes.cs`, `data-annotations/project.md:114-115`) | `UnixTimeAttributesTests` + `TestData` | T-06 U5 |
+| Rules | `+ src/PineGuard.Core/Rules/UnixTimeRules.cs` | `IsUnixSeconds`, `IsUnixMilliseconds` | `UnixTimeRulesTests` + `TestData`; `UnixTimeRulesFixtures.cs` | T-06 U2c |
+| Must | `+ src/PineGuard.MustClauses/MustUnixTimeClauses.cs` | `UnixSeconds(long)`, `UnixMilliseconds(long)` | `MustUnixTimeClausesTests` + `TestData` | T-06 U3b |
+| Guard | `+ src/PineGuard.GuardClauses/GuardUnixTimeClauses.cs` | `NotUnixSeconds`, `NotUnixMilliseconds` → `long` | `GuardUnixTimeClausesTests` + `TestData` | T-06 U4 |
+| Fluent | `+ src/PineGuard.FluentValidation/FluentUnixTimeExtensions.cs` | `UnixSeconds()`, `UnixMilliseconds()` on `long` and `long?` | `FluentUnixTimeExtensionsTests` + `TestData` | T-06 U5 |
+| DA | `+ src/PineGuard.DataAnnotations/UnixTimeAttributes.cs` | `UnixSecondsAttribute`, `UnixMillisecondsAttribute` (class-name exception recorded at T-00 §4.6 stands; the file follows `[Domain]Attributes.cs`, `data-annotations/project.md:114-115`) | `UnixTimeAttributesTests` + `TestData` | T-06 U5 |
 
 Same for the string DateTime family: `GuardStringDateTimeClauses.cs`, `FluentStringDateTimeExtensions.cs`, `StringDateTimeAttributes.cs` (already at T-06 `:185`), Rules `StringRules.DateTime.cs` nested `DateTime` (T-06 U2a). T-02's `MustStringUtcOffsetClauses` already has `GuardStringUtcOffsetClauses.cs`, `FluentStringUtcOffsetExtensions.cs`, `StringUtcOffsetAttributes.cs`, `StringRules.UtcOffset.cs` nested `UtcOffset`, which the corrected discovery resolves.
 

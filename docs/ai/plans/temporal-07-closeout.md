@@ -35,7 +35,7 @@ Brain mirror in Standards is current.
 ### U1 — READMEs
 
 Include consumer guidance for A-06: new strict instant DateTime clauses reject Local and
-Unspecified kinds, including values obtained from ASP.NET binding/System.Text.Json; show
+Unspecified kinds, including values obtained from ASP.NET binding or System.Text.Json; show
 DateTimeOffset as the input path for offset-bearing instants. Explain coexistence with legacy
 host-converting `DateTimeUtility.ToUtc`. Document null-provider host-zone today and injected
 provider semantics. Record Expansionist suggestions for further README/TestTimeZones consumer
@@ -92,13 +92,13 @@ lessons file if the retrospective (U6) produces any. Budget 60k / 20 min.
 
 ### U4 — Standards Brain sync
 
-Pre-flight (GPT-6 Luna): confirm `apps/cli/src/cli.ts` still registers the `sync` command (`rg -n '.command("sync")'`)
+Pre-flight (GPT-6 Luna): confirm `+ apps/cli/src/cli.ts` still registers the `sync` command (`rg -n '.command("sync")'`)
 and that `pnpm -C apps/cli dev --help` lists it; if not, stop and report. Then, in the Standards
 worktree: `pnpm -C apps/cli dev sync --dry-run` → review the plan; then
 `pnpm -C apps/cli dev sync` (never `--force`); commit the mirrored `docs/ai/specs|rules|skills|agents|workflows`
 changes as `docs(brain): sync upstream Brain after temporal program`. Update Standards-local
 docs: `docs/ai/standards/**` time-zone pages (SystemTimeZone host semantics, IANA links and canonical membership) [A-12], the Iana generator README
-(`backward` step), `docs/ai/plans/temporal-timezone-sync.md` status → completed. Budget 80k / 30 min.
+(`backward` step), `+ docs/ai/plans/temporal-timezone-sync.md` status → completed. Budget 80k / 30 min.
 
 ### U5 — Cleanup (orchestrator, PowerShell, one command per call)
 
