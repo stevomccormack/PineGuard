@@ -6,7 +6,7 @@ namespace PineGuard.Core.UnitTests.Utils;
 
 public static class DateTimeUtilityTestData
 {
-    // Fixed offset zones exactly at the ±14h boundary TryGetDateAtOffset enforces, paired with an instant
+    // Fixed offset zones exactly at the Â±14h boundary TryGetDateAtOffset enforces, paired with an instant
     // at the corresponding DateTimeOffset extreme, so the projection overflows/underflows on tick range,
     // not on the offset check.
     private static readonly TimeZoneInfo PlusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.PlusFourteen", TimeSpan.FromHours(14), "PineGuard Test +14", "PineGuard Test +14");
@@ -67,7 +67,8 @@ public static class DateTimeUtilityTestData
 
     // Only one scenario is meaningful here: proving a null provider reads the system clock and yields the
     // UTC calendar date, never the host's LocalTimeZone (D-1). Asserted against the real machine clock in a
-    // dedicated CI process pinned to a non-UTC zone (TZ=Pacific/Auckland), per unit-test.md §7 (determinism).
+    // two dedicated CI processes pinned to UTC+14 and UTC-12 (Pacific/Kiritimati, Etc/GMT+12), at least one of which
+    // is always on a different calendar date from UTC, per unit-test.md Â§7 (determinism).
     public static class TryGetTodayDateNullProvider
     {
         public static TheoryData<string> Cases => ["SystemClock"];

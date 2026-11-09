@@ -15,7 +15,10 @@ public static class DateOnlyRules
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether today is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the past; otherwise, <see langword="false"/>.</returns>
     /// <remarks>
     /// "Today" is derived from one sampled instant with checked projection into the clock's
@@ -37,7 +40,10 @@ public static class DateOnlyRules
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether today is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the future; otherwise, <see langword="false"/>.</returns>
     /// <remarks>
     /// "Today" is derived from one sampled instant with checked projection into the clock's
@@ -284,7 +290,10 @@ public static class DateOnlyRules
     /// </summary>
     /// <param name="value">The date of birth to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="years">The minimum age in whole years. Negative returns <see langword="false"/>.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> meets the minimum age; otherwise, <see langword="false"/>.</returns>
     /// <remarks>
     /// Age is the whole number of completed years between the birth date and today: the year difference,

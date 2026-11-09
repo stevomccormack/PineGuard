@@ -20,7 +20,10 @@ public static class MustDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -55,7 +58,10 @@ public static class MustDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -90,7 +96,10 @@ public static class MustDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -125,7 +134,10 @@ public static class MustDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -812,7 +824,10 @@ public static class MustDateOnlyClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The date of birth to validate.</param>
     /// <param name="years">The minimum age in whole years.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.

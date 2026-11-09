@@ -68,7 +68,9 @@ public sealed class DateTimeUtilityTests : BaseUnitTest
         // Arrange
         // Bracket the real system clock read on both sides of the call, so a midnight rollover during
         // the test cannot cause a false failure. The expectation is the UTC calendar date, never the
-        // host's zone (D-1); the CI job that runs this under TZ=Pacific/Auckland proves the independence.
+        // host's zone (D-1). The CI job runs this under TZ=Pacific/Kiritimati (UTC+14) and TZ=Etc/GMT+12 (UTC-12),
+        // so at every instant at least one run is on a different calendar date from UTC and would fail if
+        // the host zone leaked into the null-provider path.
         var beforeUtc = DateTimeOffset.UtcNow;
         var beforeExpected = beforeUtc.UtcDateTime.Date;
 
