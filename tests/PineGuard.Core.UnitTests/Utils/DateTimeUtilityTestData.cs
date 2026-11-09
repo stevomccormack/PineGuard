@@ -67,7 +67,7 @@ public static class DateTimeUtilityTestData
 
     // Only one scenario is meaningful here: proving a null provider reads the system clock and yields the
     // UTC calendar date, never the host's LocalTimeZone (D-1). Asserted against the real machine clock in a
-    // dedicated CI process pinned to a non-UTC zone (TZ=Pacific/Auckland), per unit-test.md §6 (time-relative ops).
+    // dedicated CI process pinned to a non-UTC zone (TZ=Pacific/Auckland), per unit-test.md §7 (determinism).
     public static class TryGetTodayDateNullProvider
     {
         public static TheoryData<string> Cases => ["SystemClock"];

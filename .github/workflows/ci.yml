@@ -367,12 +367,12 @@ jobs:
         run: echo "Skipped — no relevant changes detected for ${{ matrix.name }}"
 
   # ---------------------------------------------------------------------------
-  # 3b. Core non-UTC system-provider integration check (T1-U2, D-1/A-03)
-  #     DateTimeUtility.TryGetTodayDate with a null TimeProvider falls back to
-  #     TimeProvider.System, whose LocalTimeZone follows the host OS zone. This
-  #     dedicated Linux process pins TZ=Pacific/Auckland (a real, non-UTC zone)
-  #     to prove that fallback actually reads the host zone, alongside — never
-  #     instead of — the normal UTC "Core" matrix entry above.
+  # 3b. Core non-UTC null-provider invariant check (T1-U2, D-1 as ratified 2026-11-09)
+  #     DateTimeUtility.TryGetTodayDate with a null TimeProvider must yield the
+  #     UTC calendar date on every host: PineGuard never guesses the host zone.
+  #     This dedicated Linux process pins TZ=Pacific/Auckland (a real, non-UTC
+  #     zone) so the test fails if the host zone ever leaks into that path,
+  #     alongside — never instead of — the normal UTC "Core" matrix entry above.
   # ---------------------------------------------------------------------------
   core-null-provider-timezone:
     needs: [changes, build]

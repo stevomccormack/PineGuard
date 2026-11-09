@@ -80,7 +80,7 @@ public sealed class DateTimeUtilityTests : BaseUnitTest
         var afterExpected = afterUtc.UtcDateTime.Date;
 
         Assert.True(ok);
-        Assert.True(today == beforeExpected || today == afterExpected);
+        Assert.InRange(today, beforeExpected, afterExpected);
     }
 
     [Theory]
