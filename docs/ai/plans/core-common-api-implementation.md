@@ -178,9 +178,29 @@ above describe their recorded branch heads; they are not evidence for this integ
 
 Integration verification:
 
-- All-target solution build: zero warnings and errors (`artifacts/integration/build-host-2.log`).
-- Final full suite: 23,491 passing on net8.0 and 23,516 on net10.0, 15 suites each, no failures or skips (`artifacts/integration/test-summary.json`, `tests-all-final.log`). The first run exposed two stale Guard overlap expectations per runtime; explicit boundary cases and expectations were corrected before this clean run.
-- CLI: all 209 tests pass (`artifacts/integration/cli-tests-host.log`).
+- All-target solution build: zero warnings and errors.
+- Final full suite: 23,491 passing on net8.0 and 23,516 on net10.0, 15 suites each, no failures or skips. The first run exposed two stale Guard overlap expectations per runtime; explicit boundary cases and expectations were corrected before this clean run.
+- CLI: all 209 tests pass.
 - Required audit gate, layer parity, Must collision, code and nullability checks pass with zero findings. The collision audit has a bounded scope; consumer compilation and independent source review supplement it.
 - Independent source review found no confirmed declaration, suffix, runtime polarity or overload-collision defects. Its Guard range-summary finding was corrected to describe the forbidden state directly.
 - Coverage was not recollected for this merge; earlier coverage figures remain tied to their recorded heads.
+
+
+### Verification portability correction (2026-11-09)
+
+The integration results above were collected locally. Their raw logs are ignored working-tree
+artifacts, not published evidence. CI run 42599717255 rejected three links to those local logs.
+A tracked-files-only export reproduced all three failures; removing the non-portable references
+made the same check pass without changing audit rules, exceptions or baselines.
+
+Reproduce the checks from the repository root (after restoring the required dependencies):
+
+```powershell
+dotnet build PineGuard.slnx
+dotnet test PineGuard.slnx --no-build
+pnpm -C apps/cli test
+pnpm -C apps/cli exec tsx src/index.ts audit --gate
+```
+
+Documentation verification must also run against a clean checkout or tracked-files-only export,
+so ignored local artifacts cannot make broken links appear valid.
