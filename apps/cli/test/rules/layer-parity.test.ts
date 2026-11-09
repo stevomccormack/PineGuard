@@ -50,17 +50,18 @@ describe("layer-parity", () => {
         }
     });
 
-    it("boundary: alias- and prefix-stripped names resolve to the same concept, but a truly unimplemented concept still flags", async () => {
+    it("boundary: qualified range complements and prefix aliases resolve, while unrelated names still flag", async () => {
         const findings = await runBoundary(rule, "layer-parity");
 
         // "NullOrEmpty"/"NotBlank" (alias) and "Null"/"NotNull" (stripPrefixes)
         // both resolve across Must <-> Guard via this fixture's own
         // vocabulary.json, so neither produces a finding.
-        expect(findings).toHaveLength(4);
+        expect(findings).toHaveLength(5);
         expect(findings.map((finding) => finding.key).sort()).toEqual([
             "layer-parity:Extra:Guard",
             "layer-parity:Hash:Guard",
             "layer-parity:Island:Guard",
+            "layer-parity:LengthOutOfRanger:Guard",
             "layer-parity:Notable:Guard",
         ]);
 

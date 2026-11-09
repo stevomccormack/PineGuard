@@ -128,19 +128,19 @@ public sealed class MustStringGraphemesClausesTests(ITestOutputHelper output) : 
     }
 
     [Theory]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.ValidCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.InvalidCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.NullCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.NegativeMinCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.NegativeMaxCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
-    [MemberData(nameof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange.InvalidRangeCases), MemberType = typeof(MustStringGraphemesClausesTestData.NotHasGraphemeCountInRange))]
-    public void NotHasGraphemeCountInRange_BehavesAsExpected(MustCase<(string? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange.ValidCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange.InvalidCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange.NullCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange.NegativeMinCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange.NegativeMaxCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange))]
+    [MemberData(nameof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange.InvalidRangeCases), MemberType = typeof(MustStringGraphemesClausesTestData.HasGraphemeCountOutOfRange))]
+    public void HasGraphemeCountOutOfRange_BehavesAsExpected(MustCase<(string? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, min, max, inclusion) = tc.Value;
 
         // Act
-        var result = Must.Be.NotHasGraphemeCountInRange(value, min, max, inclusion, paramName: "value");
+        var result = Must.Be.HasGraphemeCountOutOfRange(value, min, max, inclusion, paramName: "value");
 
         // Assert
         AssertResult(tc, result);

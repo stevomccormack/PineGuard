@@ -16,7 +16,7 @@
       },
       {
         "path": "artifacts/api-refresh-manifest.json",
-        "sha256": "029545430dd1b43ad51c6c8f3152ef3d7c8764c50a2bc7af52685fa14cd8eea9"
+        "sha256": "515b8ed7a811c2f212086b25135a49813e6e89451e89b24bece15167e581b895"
       }
     ],
     "limits": [
@@ -78811,10 +78811,10 @@
         }
       },
       {
-        "id": "T:PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute",
+        "id": "T:PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute",
         "file": "src/PineGuard.DataAnnotations/StringGraphemesAttributes.cs",
         "line": 333,
-        "signature": "PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute",
+        "signature": "PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute",
         "contract": {
           "kind": "NamedType",
           "accessibility": "Public",
@@ -78836,10 +78836,10 @@
         }
       },
       {
-        "id": "P:PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute.Min",
+        "id": "P:PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute.Min",
         "file": "src/PineGuard.DataAnnotations/StringGraphemesAttributes.cs",
         "line": 338,
-        "signature": "PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute.Min",
+        "signature": "PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute.Min",
         "contract": {
           "kind": "Property",
           "accessibility": "Public",
@@ -78859,10 +78859,10 @@
         }
       },
       {
-        "id": "P:PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute.Max",
+        "id": "P:PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute.Max",
         "file": "src/PineGuard.DataAnnotations/StringGraphemesAttributes.cs",
         "line": 341,
-        "signature": "PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute.Max",
+        "signature": "PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute.Max",
         "contract": {
           "kind": "Property",
           "accessibility": "Public",
@@ -78882,10 +78882,10 @@
         }
       },
       {
-        "id": "P:PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute.Inclusion",
+        "id": "P:PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute.Inclusion",
         "file": "src/PineGuard.DataAnnotations/StringGraphemesAttributes.cs",
         "line": 344,
-        "signature": "PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute.Inclusion",
+        "signature": "PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute.Inclusion",
         "contract": {
           "kind": "Property",
           "accessibility": "Public",
@@ -80566,10 +80566,10 @@
         }
       },
       {
-        "id": "M:PineGuard.FluentValidation.FluentCollectionExtensions.NotHasCountInRange``2(FluentValidation.IRuleBuilder{``0,System.Collections.Generic.IEnumerable{``1}},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
+        "id": "M:PineGuard.FluentValidation.FluentCollectionExtensions.HasCountOutOfRange``2(FluentValidation.IRuleBuilder{``0,System.Collections.Generic.IEnumerable{``1}},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
         "file": "src/PineGuard.FluentValidation/FluentCollectionExtensions.cs",
         "line": 267,
-        "signature": "PineGuard.FluentValidation.FluentCollectionExtensions.NotHasCountInRange<TModel, T>(FluentValidation.IRuleBuilder<TModel, System.Collections.Generic.IEnumerable<T>?>, int, int, PineGuard.Common.Inclusion, string?)",
+        "signature": "PineGuard.FluentValidation.FluentCollectionExtensions.HasCountOutOfRange<TModel, T>(FluentValidation.IRuleBuilder<TModel, System.Collections.Generic.IEnumerable<T>?>, int, int, PineGuard.Common.Inclusion, string?)",
         "contract": {
           "kind": "Method",
           "accessibility": "Public",
@@ -87252,10 +87252,10 @@
         }
       },
       {
-        "id": "M:PineGuard.FluentValidation.FluentStringGraphemesExtensions.NotHasGraphemeCountInRange``1(FluentValidation.IRuleBuilder{``0,System.String},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
+        "id": "M:PineGuard.FluentValidation.FluentStringGraphemesExtensions.HasGraphemeCountOutOfRange``1(FluentValidation.IRuleBuilder{``0,System.String},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
         "file": "src/PineGuard.FluentValidation/FluentStringGraphemesExtensions.cs",
         "line": 223,
-        "signature": "PineGuard.FluentValidation.FluentStringGraphemesExtensions.NotHasGraphemeCountInRange<TModel>(FluentValidation.IRuleBuilder<TModel, string?>, int, int, PineGuard.Common.Inclusion, string?)",
+        "signature": "PineGuard.FluentValidation.FluentStringGraphemesExtensions.HasGraphemeCountOutOfRange<TModel>(FluentValidation.IRuleBuilder<TModel, string?>, int, int, PineGuard.Common.Inclusion, string?)",
         "contract": {
           "kind": "Method",
           "accessibility": "Public",
@@ -93089,10 +93089,10 @@
         }
       },
       {
-        "id": "M:PineGuard.GuardClauses.GuardCollectionClauses.NotHasCountInRange``1(PineGuard.GuardClauses.IGuardClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)",
+        "id": "M:PineGuard.GuardClauses.GuardCollectionClauses.HasCountOutOfRange``1(PineGuard.GuardClauses.IGuardClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)",
         "file": "src/PineGuard.GuardClauses/GuardCollectionClauses.cs",
         "line": 285,
-        "signature": "PineGuard.GuardClauses.GuardCollectionClauses.NotHasCountInRange<T>(PineGuard.GuardClauses.IGuardClause, System.Collections.Generic.IEnumerable<T>?, int, int, PineGuard.Common.Inclusion, string?, System.Func<System.Exception>?, string?)",
+        "signature": "PineGuard.GuardClauses.GuardCollectionClauses.HasCountOutOfRange<T>(PineGuard.GuardClauses.IGuardClause, System.Collections.Generic.IEnumerable<T>?, int, int, PineGuard.Common.Inclusion, string?, System.Func<System.Exception>?, string?)",
         "contract": {
           "kind": "Method",
           "accessibility": "Public",
@@ -95135,10 +95135,10 @@
         }
       },
       {
-        "id": "M:PineGuard.GuardClauses.GuardStringClauses.NotLengthInRange(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,System.String,System.Func{System.Exception},System.String)",
+        "id": "M:PineGuard.GuardClauses.GuardStringClauses.LengthOutOfRange(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,System.String,System.Func{System.Exception},System.String)",
         "file": "src/PineGuard.GuardClauses/GuardStringClauses.cs",
         "line": 275,
-        "signature": "PineGuard.GuardClauses.GuardStringClauses.NotLengthInRange(PineGuard.GuardClauses.IGuardClause, string?, int, int, string?, System.Func<System.Exception>?, string?)",
+        "signature": "PineGuard.GuardClauses.GuardStringClauses.LengthOutOfRange(PineGuard.GuardClauses.IGuardClause, string?, int, int, string?, System.Func<System.Exception>?, string?)",
         "contract": {
           "kind": "Method",
           "accessibility": "Public",
@@ -96329,10 +96329,10 @@
         }
       },
       {
-        "id": "M:PineGuard.GuardClauses.GuardStringGraphemesClauses.NotHasGraphemeCountInRange(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)",
+        "id": "M:PineGuard.GuardClauses.GuardStringGraphemesClauses.HasGraphemeCountOutOfRange(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)",
         "file": "src/PineGuard.GuardClauses/GuardStringGraphemesClauses.cs",
         "line": 324,
-        "signature": "PineGuard.GuardClauses.GuardStringGraphemesClauses.NotHasGraphemeCountInRange(PineGuard.GuardClauses.IGuardClause, string?, int, int, PineGuard.Common.Inclusion, string?, System.Func<System.Exception>?, string?)",
+        "signature": "PineGuard.GuardClauses.GuardStringGraphemesClauses.HasGraphemeCountOutOfRange(PineGuard.GuardClauses.IGuardClause, string?, int, int, PineGuard.Common.Inclusion, string?, System.Func<System.Exception>?, string?)",
         "contract": {
           "kind": "Method",
           "accessibility": "Public",
@@ -101772,10 +101772,10 @@
         }
       },
       {
-        "id": "M:PineGuard.MustClauses.MustCollectionClauses.NotHasCountInRange``1(PineGuard.MustClauses.IMustClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
+        "id": "M:PineGuard.MustClauses.MustCollectionClauses.HasCountOutOfRange``1(PineGuard.MustClauses.IMustClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
         "file": "src/PineGuard.MustClauses/MustCollectionClauses.cs",
         "line": 836,
-        "signature": "PineGuard.MustClauses.MustCollectionClauses.NotHasCountInRange<T>(PineGuard.MustClauses.IMustClause, System.Collections.Generic.IEnumerable<T>?, int, int, PineGuard.Common.Inclusion, string?)",
+        "signature": "PineGuard.MustClauses.MustCollectionClauses.HasCountOutOfRange<T>(PineGuard.MustClauses.IMustClause, System.Collections.Generic.IEnumerable<T>?, int, int, PineGuard.Common.Inclusion, string?)",
         "contract": {
           "kind": "Method",
           "accessibility": "Public",
@@ -103751,10 +103751,10 @@
         }
       },
       {
-        "id": "M:PineGuard.MustClauses.MustStringGraphemesClauses.NotHasGraphemeCountInRange(PineGuard.MustClauses.IMustClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
+        "id": "M:PineGuard.MustClauses.MustStringGraphemesClauses.HasGraphemeCountOutOfRange(PineGuard.MustClauses.IMustClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
         "file": "src/PineGuard.MustClauses/MustStringGraphemesClauses.cs",
         "line": 339,
-        "signature": "PineGuard.MustClauses.MustStringGraphemesClauses.NotHasGraphemeCountInRange(PineGuard.MustClauses.IMustClause, string?, int, int, PineGuard.Common.Inclusion, string?)",
+        "signature": "PineGuard.MustClauses.MustStringGraphemesClauses.HasGraphemeCountOutOfRange(PineGuard.MustClauses.IMustClause, string?, int, int, PineGuard.Common.Inclusion, string?)",
         "contract": {
           "kind": "Method",
           "accessibility": "Public",
@@ -107993,7 +107993,7 @@
       "baselineId": "T:PineGuard.DataAnnotations.NotHasGraphemeCountBetweenAttribute",
       "disposition": "rename-or-consolidation",
       "finalIds": [
-        "T:PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute"
+        "T:PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -108001,7 +108001,7 @@
       "baselineId": "P:PineGuard.DataAnnotations.NotHasGraphemeCountBetweenAttribute.Min",
       "disposition": "signature-or-declaration-kind-change",
       "finalIds": [
-        "P:PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute.Min"
+        "P:PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute.Min"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -108009,7 +108009,7 @@
       "baselineId": "P:PineGuard.DataAnnotations.NotHasGraphemeCountBetweenAttribute.Max",
       "disposition": "signature-or-declaration-kind-change",
       "finalIds": [
-        "P:PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute.Max"
+        "P:PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute.Max"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -108017,7 +108017,7 @@
       "baselineId": "P:PineGuard.DataAnnotations.NotHasGraphemeCountBetweenAttribute.Inclusion",
       "disposition": "signature-or-declaration-kind-change",
       "finalIds": [
-        "P:PineGuard.DataAnnotations.NotHasGraphemeCountInRangeAttribute.Inclusion"
+        "P:PineGuard.DataAnnotations.HasGraphemeCountOutOfRangeAttribute.Inclusion"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -108545,7 +108545,7 @@
       "baselineId": "M:PineGuard.FluentValidation.FluentCollectionExtensions.NotHasCountBetween``2(FluentValidation.IRuleBuilder{``0,System.Collections.Generic.IEnumerable{``1}},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
       "disposition": "rename-or-consolidation",
       "finalIds": [
-        "M:PineGuard.FluentValidation.FluentCollectionExtensions.NotHasCountInRange``2(FluentValidation.IRuleBuilder{``0,System.Collections.Generic.IEnumerable{``1}},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)"
+        "M:PineGuard.FluentValidation.FluentCollectionExtensions.HasCountOutOfRange``2(FluentValidation.IRuleBuilder{``0,System.Collections.Generic.IEnumerable{``1}},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -109073,7 +109073,7 @@
       "baselineId": "M:PineGuard.FluentValidation.FluentStringGraphemesExtensions.NotHasGraphemeCountBetween``1(FluentValidation.IRuleBuilder{``0,System.String},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
       "disposition": "rename-or-consolidation",
       "finalIds": [
-        "M:PineGuard.FluentValidation.FluentStringGraphemesExtensions.NotHasGraphemeCountInRange``1(FluentValidation.IRuleBuilder{``0,System.String},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)"
+        "M:PineGuard.FluentValidation.FluentStringGraphemesExtensions.HasGraphemeCountOutOfRange``1(FluentValidation.IRuleBuilder{``0,System.String},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -109549,7 +109549,7 @@
       "baselineId": "M:PineGuard.GuardClauses.GuardCollectionClauses.NotHasCountBetween``1(PineGuard.GuardClauses.IGuardClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)",
       "disposition": "rename-or-consolidation",
       "finalIds": [
-        "M:PineGuard.GuardClauses.GuardCollectionClauses.NotHasCountInRange``1(PineGuard.GuardClauses.IGuardClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)"
+        "M:PineGuard.GuardClauses.GuardCollectionClauses.HasCountOutOfRange``1(PineGuard.GuardClauses.IGuardClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -109725,7 +109725,7 @@
       "baselineId": "M:PineGuard.GuardClauses.GuardStringClauses.NotLengthBetween(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,System.String,System.Func{System.Exception},System.String)",
       "disposition": "rename-or-consolidation",
       "finalIds": [
-        "M:PineGuard.GuardClauses.GuardStringClauses.NotLengthInRange(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,System.String,System.Func{System.Exception},System.String)"
+        "M:PineGuard.GuardClauses.GuardStringClauses.LengthOutOfRange(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,System.String,System.Func{System.Exception},System.String)"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -109805,7 +109805,7 @@
       "baselineId": "M:PineGuard.GuardClauses.GuardStringGraphemesClauses.NotHasGraphemeCountBetween(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)",
       "disposition": "rename-or-consolidation",
       "finalIds": [
-        "M:PineGuard.GuardClauses.GuardStringGraphemesClauses.NotHasGraphemeCountInRange(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)"
+        "M:PineGuard.GuardClauses.GuardStringGraphemesClauses.HasGraphemeCountOutOfRange(PineGuard.GuardClauses.IGuardClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String,System.Func{System.Exception},System.String)"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -110149,7 +110149,7 @@
       "baselineId": "M:PineGuard.MustClauses.MustCollectionClauses.NotHasCountBetween``1(PineGuard.MustClauses.IMustClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
       "disposition": "rename-or-consolidation",
       "finalIds": [
-        "M:PineGuard.MustClauses.MustCollectionClauses.NotHasCountInRange``1(PineGuard.MustClauses.IMustClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)"
+        "M:PineGuard.MustClauses.MustCollectionClauses.HasCountOutOfRange``1(PineGuard.MustClauses.IMustClause,System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },
@@ -110365,7 +110365,7 @@
       "baselineId": "M:PineGuard.MustClauses.MustStringGraphemesClauses.NotHasGraphemeCountBetween(PineGuard.MustClauses.IMustClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)",
       "disposition": "rename-or-consolidation",
       "finalIds": [
-        "M:PineGuard.MustClauses.MustStringGraphemesClauses.NotHasGraphemeCountInRange(PineGuard.MustClauses.IMustClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)"
+        "M:PineGuard.MustClauses.MustStringGraphemesClauses.HasGraphemeCountOutOfRange(PineGuard.MustClauses.IMustClause,System.String,System.Int32,System.Int32,PineGuard.Common.Inclusion,System.String)"
       ],
       "mappingPrecision": "Exact final declaration set for owner/name; overload bijection is not inferred."
     },

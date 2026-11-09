@@ -126,3 +126,36 @@ changes. It checked interval laws, configuration precedence, nullable selectors,
 configuration and parsed-result/original-input contracts; numerical and catalogue reviews were
 performed separately. The declaration inventory and per-framework coverage are separate proofs,
 not conclusions inferred from that review.
+
+### Qualified range naming correction — 2026-11-09
+
+The owner identified an unjustified vocabulary inconsistency after the initial implementation:
+numeric ranges used a semantic `OutOfRange` opposite, while length and count ranges mechanically
+prefixed `Not`. The corrected rule preserves the dimension and uses the same semantic opposite.
+
+| Previous name | Canonical name | Existing affected surfaces |
+|---|---|---|
+| `NotLengthInRange` | `LengthOutOfRange` | Guard |
+| `NotHasCountInRange` | `HasCountOutOfRange` | Must, Guard, Fluent |
+| `NotHasGraphemeCountInRange` | `HasGraphemeCountOutOfRange` | Must, Guard, Fluent, DataAnnotations |
+
+The rename preserves validation behavior, failure codes, parameters and existing availability.
+Guard outside-range methods still call the positive Must requirement; Guard inside-range methods
+still call the outside-range Must requirement. No compatibility aliases were retained.
+
+Canonical vocabulary, Guard policy, the decision table, examples, tests and the exact final
+surface map have been reconciled. Historical rename-stage records remain historical. CLI
+regressions cover qualified range pairing and protect unrelated names such as `LengthOutOfRanger`.
+The Brain index now reflects the implemented plan status.
+
+Verification: the all-target build passes with zero warnings/errors; all 209 CLI tests and the
+targeted naming/documentation audits pass. Independent source review found no naming collision
+or changed polarity. The repeated full-library gate passes on both test runtimes:
+23,214 tests on .NET 8 and 23,239 on .NET 10, with zero failures/skips. Line/branch coverage is
+24,922/24,922 and 8,048/8,048 on .NET 8; 24,968/24,968 and 8,068/8,068 on .NET 10.
+Final solution formatting verification, CLI formatting/lint/type checks and the required audit
+gate pass. The 24 changed C# files were also checked against the prior commit to confirm that
+only the three agreed identifier substitutions were applied.
+A Must-only diagnostic run reached 100% lines and 99.70% branches: six branches in unchanged
+temporal code are exercised by cross-layer tests. The final gate uses the complete suite, as in
+the original verification, with the same exact 100% thresholds and no new exclusions.

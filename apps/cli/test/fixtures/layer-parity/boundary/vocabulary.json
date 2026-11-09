@@ -1,6 +1,9 @@
 {
   "aliases": {
-    "NotBlank": "NullOrEmpty"
+    "NotBlank": "NullOrEmpty",
+    "LengthOutOfRange": "LengthInRange",
+    "HasCountOutOfRange": "HasCountInRange",
+    "HasGraphemeCountOutOfRange": "HasGraphemeCountInRange"
   },
   "stripPrefixes": ["Not", "Has", "Is"]
 }

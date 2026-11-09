@@ -202,6 +202,9 @@ Concretely:
 - Prefer **`Not*` complements** when the forbidden state is the complement of a positive Must clause:
   - `Guard.Against.NotX(...)` is the complement of `Must.Be.X(...)`.
   - `Guard.Against.NotHasX(...)` / `NotHasAnyX(...)` are complements of `Must.Be.HasX(...)` / `HasAnyX(...)`.
+  - Established semantic opposites take precedence over mechanical negation. For qualified
+    range predicates, use `LengthOutOfRange`, `HasCountOutOfRange` and
+    `HasGraphemeCountOutOfRange` for the corresponding `*InRange` requirements.
 - Do not introduce general `Non*` or `Invalid*` naming. Standardize on `Not*` plus explicit semantic opposites (see §5.4.9 and the shared vocabulary map). Exact exceptions are `InvalidXml` for XSD validity and `Invalid` for the object-validator entry point (§11.6); their rationale is in the shared vocabulary, not a blanket prefix waiver.
 
 Shared vocabulary map (required):
@@ -213,7 +216,7 @@ Rule: use the **project-wide vocabulary map** so Guard, FluentValidation, and au
 
 Hard rule:
 
-- Do **not** introduce new naming vocabulary such as `Missing*`, `NoMatching*`, `ContainsForbidden*`, etc. If you need a complement name, use `Not*` derived from Must.
+- Do **not** introduce new naming vocabulary such as `Missing*`, `NoMatching*`, `ContainsForbidden*`, etc. Use an established semantic opposite from the shared vocabulary first; otherwise use `Not*` derived from Must.
 
 ### 5.4 Naming conventions by “language” (how we handle ALL cases)
 

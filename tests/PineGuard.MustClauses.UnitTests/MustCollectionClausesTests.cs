@@ -279,13 +279,13 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
     }
 
     [Theory]
-    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountInRange.ValidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountInRange))]
-    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountInRange.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountInRange))]
-    [MemberData(nameof(MustCollectionClausesTestData.NotHasCountInRange.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.NotHasCountInRange))]
-    public void NotHasCountInRange_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustCollectionClausesTestData.HasCountOutOfRange.ValidCases), MemberType = typeof(MustCollectionClausesTestData.HasCountOutOfRange))]
+    [MemberData(nameof(MustCollectionClausesTestData.HasCountOutOfRange.EdgeCases), MemberType = typeof(MustCollectionClausesTestData.HasCountOutOfRange))]
+    [MemberData(nameof(MustCollectionClausesTestData.HasCountOutOfRange.InvalidCases), MemberType = typeof(MustCollectionClausesTestData.HasCountOutOfRange))]
+    public void HasCountOutOfRange_BehavesAsExpected(MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = Must.Be.NotHasCountInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.HasCountOutOfRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion, paramName: "value");
 
         // Assert
         AssertResult(tc, result);
@@ -358,7 +358,7 @@ public sealed class MustCollectionClausesTests(ITestOutputHelper output) : BaseM
 
         // Act
         var positive = Must.Be.HasCountInRange(value, min, max, inclusion);
-        var negative = Must.Be.NotHasCountInRange(value, min, max, inclusion);
+        var negative = Must.Be.HasCountOutOfRange(value, min, max, inclusion);
 
         // Assert
         AssertResult(testCase, positive);

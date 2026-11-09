@@ -113,8 +113,11 @@ See [API target capabilities](api-capabilities.md) for supported framework bound
 
 Equivalent scalar range predicates use `InRange` / `OutOfRange` across Rules, Must, Guard,
 FluentValidation and attributes. Keep dimensions in compound predicates: `LengthInRange`,
-`HasCountInRange`, `HasGraphemeCountInRange`; their negative clauses retain `Not` and Guards
-delegate to the corresponding Must complement. `Within` remains the distinct proximity concept.
+`HasCountInRange`, `HasGraphemeCountInRange`. Their outside-range counterparts are
+`LengthOutOfRange`, `HasCountOutOfRange`, `HasGraphemeCountOutOfRange`: preserve the dimension
+and replace the terminal `InRange` with `OutOfRange`, rather than prefixing `Not`.
+Guards delegate to the corresponding Must complement. A dimension qualifier is not a reason
+to abandon an established semantic opposite. `Within` remains the distinct proximity concept.
 
 Generic scalar predicates whose input is a string use `<Concept><ParsedType>` on the flattened
 Must/Guard/Fluent surfaces throughout each family: `PositiveDecimal`, `EvenInt32`, `FiniteDouble`,

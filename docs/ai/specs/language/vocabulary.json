@@ -1,7 +1,13 @@
 {
   "version": 1,
-  "stripPrefixes": ["Not", "Has", "Is"],
-  "ignoreMethods": ["MustBe"],
+  "stripPrefixes": [
+    "Not",
+    "Has",
+    "Is"
+  ],
+  "ignoreMethods": [
+    "MustBe"
+  ],
   "aliases": {
     "InvalidXml": "ValidXml",
     "BelowMinimumAge": "MinimumAge",
@@ -12,7 +18,6 @@
     "LessThanOrEqualNumber": "LessThanOrEqual",
     "OwaspSafe": "Owasp",
     "OwaspUnsafe": "Owasp",
-
     "XssSafe": "Xss",
     "SqlInjectionSafe": "SqlInjection",
     "PathTraversalSafe": "PathTraversal",
@@ -20,12 +25,10 @@
     "CrLfSafe": "CrLf",
     "LdapFilterSafe": "LdapFilter",
     "OpenRedirectSafe": "OpenRedirect",
-    "SsrfSchemeSafe": "SsrfScheme"
-    ,
+    "SsrfSchemeSafe": "SsrfScheme",
     "InSqlDateTimeOffsetRange": "InSqlDateTimeRange",
     "HasFileExtension": "FileExtension",
-    "Required": "Null"
-    ,
+    "Required": "Null",
     "AfterProperty": "After",
     "OnOrAfterProperty": "OnOrAfter",
     "BeforeProperty": "Before",
@@ -35,7 +38,10 @@
     "LessThanProperty": "LessThan",
     "LessThanOrEqualProperty": "LessThanOrEqual",
     "EqualToProperty": "EqualTo",
-    "NotEqualToProperty": "NotEqualTo"
+    "NotEqualToProperty": "NotEqualTo",
+    "LengthOutOfRange": "LengthInRange",
+    "HasCountOutOfRange": "HasCountInRange",
+    "HasGraphemeCountOutOfRange": "HasGraphemeCountInRange"
   },
   "concepts": [],
   "opposites": [

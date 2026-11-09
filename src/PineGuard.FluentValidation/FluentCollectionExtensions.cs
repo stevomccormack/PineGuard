@@ -256,21 +256,21 @@ public static class FluentCollectionExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustCollectionClauses.NotHasCountInRange"/>. A null property value is skipped; configuration failures remain validation failures.
+    /// Delegates to <see cref="MustCollectionClauses.HasCountOutOfRange"/>. A null property value is skipped; configuration failures remain validation failures.
     /// </remarks>
     /// <example>
     /// <code>
-    /// RuleFor(x => x.Tags).NotHasCountInRange(0, 0);
+    /// RuleFor(x => x.Tags).HasCountOutOfRange(0, 0);
     /// </code>
     /// </example>
-    /// <seealso cref="MustCollectionClauses.NotHasCountInRange"/>
-    public static IRuleBuilderOptions<TModel, IEnumerable<T>?> NotHasCountInRange<TModel, T>(
+    /// <seealso cref="MustCollectionClauses.HasCountOutOfRange"/>
+    public static IRuleBuilderOptions<TModel, IEnumerable<T>?> HasCountOutOfRange<TModel, T>(
         this IRuleBuilder<TModel, IEnumerable<T>?> ruleBuilder,
         int min,
         int max,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.NotHasCountInRange(val, min, max, inclusion, paramName: null)), message, MustCodes.Collection.Count.InRange);
+        ruleBuilder.MustBe(val => SkipAbsentCollectionValue(val, Must.Be.HasCountOutOfRange(val, min, max, inclusion, paramName: null)), message, MustCodes.Collection.Count.InRange);
 
     /// <summary>
     /// Validates that the property value contains at least one element matching the specified predicate.

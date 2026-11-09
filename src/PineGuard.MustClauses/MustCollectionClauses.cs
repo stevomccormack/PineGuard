@@ -833,7 +833,7 @@ public static class MustCollectionClauses
     /// The failure message follows the pattern <c>"{paramName} requires a valid count range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/collection">Collection Must Clauses documentation</seealso>
-    public static MustResult<IEnumerable<T>> NotHasCountInRange<T>(this IMustClause _,
+    public static MustResult<IEnumerable<T>> HasCountOutOfRange<T>(this IMustClause _,
         IEnumerable<T>? value,
         int min,
         int max,

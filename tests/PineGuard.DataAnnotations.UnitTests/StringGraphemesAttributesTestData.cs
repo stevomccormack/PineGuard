@@ -86,7 +86,7 @@ public static class StringGraphemesAttributesTestData
         });
     }
 
-    public static class NotHasGraphemeCountInRange
+    public static class HasGraphemeCountOutOfRange
     {
         public static TheoryData<DataAnnotationCase> Cases => F.GraphemesHasCountInRange.AllScenarios.ToDataAnnotationCases(v => (object?)v, s => s.Name switch
         {
@@ -104,7 +104,7 @@ public static class StringGraphemesAttributesTestData
         public static TheoryData<DataAnnotationCase> Cases =>
         [
             new("UndefinedInclusion", new HasGraphemeCountInRangeAttribute(0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.")),
-            new("NegativeUndefinedInclusion", new NotHasGraphemeCountInRangeAttribute(0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.")),
+            new("NegativeUndefinedInclusion", new HasGraphemeCountOutOfRangeAttribute(0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.")),
             new("NegativeCount", new HasExactGraphemeCountAttribute(-1), new(false, "count requires a non-negative count.")),
             new("NegativeNotCount", new NotHasExactGraphemeCountAttribute(-1), new(false, "count requires a non-negative count.")),
             new("NegativeMinimum", new HasMinGraphemeCountAttribute(-1), new(false, "min requires a non-negative minimum count.")),

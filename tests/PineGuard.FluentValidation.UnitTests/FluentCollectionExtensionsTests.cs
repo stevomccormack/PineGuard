@@ -109,13 +109,13 @@ public sealed class FluentCollectionExtensionsTests(ITestOutputHelper output) : 
         AssertResult(tc, result);
     }
 
-    // FluentCollectionExtensions.NotHasCountInRange
+    // FluentCollectionExtensions.HasCountOutOfRange
     [Theory]
-    [MemberData(nameof(FluentCollectionExtensionsTestData.NotHasCountInRange.Cases), MemberType = typeof(FluentCollectionExtensionsTestData.NotHasCountInRange))]
-    public void NotHasCountInRange_BehavesAsExpected(FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentCollectionExtensionsTestData.HasCountOutOfRange.Cases), MemberType = typeof(FluentCollectionExtensionsTestData.HasCountOutOfRange))]
+    public void HasCountOutOfRange_BehavesAsExpected(FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         var validator = new InlineValidator<Model>();
-        validator.RuleFor(x => x.Value).NotHasCountInRange(tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        validator.RuleFor(x => x.Value).HasCountOutOfRange(tc.Value.min, tc.Value.max, tc.Value.inclusion);
         var result = validator.Validate(new Model { Value = tc.Value.value });
         AssertResult(tc, result);
     }
@@ -304,7 +304,7 @@ public sealed class FluentCollectionExtensionsTests(ITestOutputHelper output) : 
         validator.RuleFor(x => x.Value).SubsetOf(other);
         validator.RuleFor(x => x.Value).NotSubsetOf(other);
         validator.RuleFor(x => x.Value).HasCountInRange(min, max, inclusion);
-        validator.RuleFor(x => x.Value).NotHasCountInRange(min, max, inclusion);
+        validator.RuleFor(x => x.Value).HasCountOutOfRange(min, max, inclusion);
 
         // Act
         var result = validator.Validate(new Model { Value = null });

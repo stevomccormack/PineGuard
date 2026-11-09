@@ -27,4 +27,8 @@ public static class MustStringClauses
     public static bool Hash(this IMustClause _, string value) => true;
     public static bool Notable(this IMustClause _, string value) => true;
 
+    public static bool LengthInRange(this IMustClause _, string value) => true;
+    public static bool HasCountInRange(this IMustClause _, string value) => true;
+    public static bool HasGraphemeCountInRange(this IMustClause _, string value) => true;
+    public static bool LengthOutOfRanger(this IMustClause _, string value) => true;
 }

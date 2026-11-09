@@ -58,8 +58,8 @@ public static partial class GuardStringClausesTestData
         ];
     }
 
-    // Guard.Against.NotLengthInRange — throws when length is NOT between min and max (inline: fixture has simple 3-tuple)
-    public static class NotLengthInRange
+    // Guard.Against.LengthOutOfRange — throws when length is NOT between min and max (inline: fixture has simple 3-tuple)
+    public static class LengthOutOfRange
     {
         private static readonly (string? value, int min, int max) WithinBounds = ("abc", 2, 4);
         private static readonly (string? value, int min, int max) TooShort = ("a", 2, 4);

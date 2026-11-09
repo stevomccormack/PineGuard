@@ -383,7 +383,7 @@ public static class MustCollectionClausesTestData
         ];
     }
 
-    public static class NotHasCountInRange
+    public static class HasCountOutOfRange
     {
         public static TheoryData<MustCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases =>
         [

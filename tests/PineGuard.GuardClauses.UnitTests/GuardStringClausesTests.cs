@@ -64,15 +64,15 @@ public sealed class GuardStringClausesTests(ITestOutputHelper output) : BaseGuar
     }
 
     [Theory]
-    [MemberData(nameof(TD.NotLengthInRange.ValidCases), MemberType = typeof(TD.NotLengthInRange))]
-    [MemberData(nameof(TD.NotLengthInRange.InvalidCases), MemberType = typeof(TD.NotLengthInRange))]
-    public void NotLengthInRange_BehavesAsExpected(GuardCase<(string? value, int min, int max)> tc)
+    [MemberData(nameof(TD.LengthOutOfRange.ValidCases), MemberType = typeof(TD.LengthOutOfRange))]
+    [MemberData(nameof(TD.LengthOutOfRange.InvalidCases), MemberType = typeof(TD.LengthOutOfRange))]
+    public void LengthOutOfRange_BehavesAsExpected(GuardCase<(string? value, int min, int max)> tc)
     {
         var value = tc.Value.value;
         var min = tc.Value.min;
         var max = tc.Value.max;
-        var result = AssertResult(tc, () => Guard.Against.NotLengthInRange(value, min, max));
-        AssertCustomMessage(tc, () => Guard.Against.NotLengthInRange(value, min, max, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.LengthOutOfRange(value, min, max));
+        AssertCustomMessage(tc, () => Guard.Against.LengthOutOfRange(value, min, max, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 

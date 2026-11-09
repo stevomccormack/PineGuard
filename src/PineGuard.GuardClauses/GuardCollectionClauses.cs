@@ -274,15 +274,15 @@ public static class GuardCollectionClauses
     /// </exception>
     /// <remarks>
     /// This guard is the complement of <see cref="MustCollectionClauses.HasCountInRange{T}"/>:
-    /// <c>Guard.Against.NotHasCountInRange</c> passes when the count is within the range.
+    /// <c>Guard.Against.HasCountOutOfRange</c> passes when the count is within the range.
     /// </remarks>
     /// <example>
     /// <code>
-    /// Guard.Against.NotHasCountInRange(items, min: 1, max: 5);
+    /// Guard.Against.HasCountOutOfRange(items, min: 1, max: 5);
     /// </code>
     /// </example>
     /// <seealso cref="MustCollectionClauses.HasCountInRange{T}"/>
-    public static IEnumerable<T> NotHasCountInRange<T>(this IGuardClause _,
+    public static IEnumerable<T> HasCountOutOfRange<T>(this IGuardClause _,
         IEnumerable<T>? value,
         int min,
         int max,
@@ -1132,7 +1132,7 @@ public static class GuardCollectionClauses
     /// <param name="inclusion">Specifies whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">
     /// An optional custom error message. If <see langword="null"/>, uses the default message
-    /// from <see cref="MustCollectionClauses.NotHasCountInRange{T}"/>.
+    /// from <see cref="MustCollectionClauses.HasCountOutOfRange{T}"/>.
     /// </param>
     /// <param name="exceptionCreator">
     /// An optional factory to create a custom exception. If <see langword="null"/>,
@@ -1148,7 +1148,7 @@ public static class GuardCollectionClauses
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
     /// <remarks>
-    /// This guard is the complement of <see cref="MustCollectionClauses.NotHasCountInRange{T}"/>:
+    /// This guard is the complement of <see cref="MustCollectionClauses.HasCountOutOfRange{T}"/>:
     /// <c>Guard.Against.HasCountInRange</c> passes when the count is outside the range.
     /// </remarks>
     /// <example>
@@ -1156,7 +1156,7 @@ public static class GuardCollectionClauses
     /// Guard.Against.HasCountInRange(items, min: 0, max: 5);
     /// </code>
     /// </example>
-    /// <seealso cref="MustCollectionClauses.NotHasCountInRange{T}"/>
+    /// <seealso cref="MustCollectionClauses.HasCountOutOfRange{T}"/>
     public static IEnumerable<T> HasCountInRange<T>(this IGuardClause _,
         IEnumerable<T>? value,
         int min,
@@ -1166,7 +1166,7 @@ public static class GuardCollectionClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotHasCountInRange(value, min, max, inclusion, paramName);
+        var result = Must.Be.HasCountOutOfRange(value, min, max, inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

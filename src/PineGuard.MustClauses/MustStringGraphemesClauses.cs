@@ -336,7 +336,7 @@ public static class MustStringGraphemesClauses
     /// The failure message follows the pattern <c>"{paramName} must not have a number of characters within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-graphemes">String Graphemes Must Clauses documentation</seealso>
-    public static MustResult<string> NotHasGraphemeCountInRange(this IMustClause _,
+    public static MustResult<string> HasGraphemeCountOutOfRange(this IMustClause _,
         string? value,
         int min,
         int max,

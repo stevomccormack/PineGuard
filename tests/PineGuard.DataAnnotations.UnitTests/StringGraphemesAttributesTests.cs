@@ -120,12 +120,12 @@ public sealed class StringGraphemesAttributesTests(ITestOutputHelper output) : B
     }
 
     [Theory]
-    [MemberData(nameof(StringGraphemesAttributesTestData.NotHasGraphemeCountInRange.Cases), MemberType = typeof(StringGraphemesAttributesTestData.NotHasGraphemeCountInRange))]
-    public void NotHasGraphemeCountInRange_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(StringGraphemesAttributesTestData.HasGraphemeCountOutOfRange.Cases), MemberType = typeof(StringGraphemesAttributesTestData.HasGraphemeCountOutOfRange))]
+    public void HasGraphemeCountOutOfRange_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
         var (value, min, max, inclusion) = ((string? value, int min, int max, Inclusion inclusion))tc.Value!;
-        NotHasGraphemeCountInRangeAttribute attr = new NotHasGraphemeCountInRangeAttribute(min, max, inclusion);
+        HasGraphemeCountOutOfRangeAttribute attr = new HasGraphemeCountOutOfRangeAttribute(min, max, inclusion);
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act

@@ -44,9 +44,9 @@ public sealed class FluentStringGraphemesExtensionsTests(ITestOutputHelper outpu
         public HasGraphemeCountInRangeValidator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).HasGraphemeCountInRange(min, max, inclusion);
     }
 
-    private sealed class NotHasGraphemeCountInRangeValidator : AbstractValidator<Model>
+    private sealed class HasGraphemeCountOutOfRangeValidator : AbstractValidator<Model>
     {
-        public NotHasGraphemeCountInRangeValidator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).NotHasGraphemeCountInRange(min, max, inclusion);
+        public HasGraphemeCountOutOfRangeValidator(int min, int max, Inclusion inclusion) => RuleFor(x => x.Value).HasGraphemeCountOutOfRange(min, max, inclusion);
     }
 
     // FluentStringGraphemesExtensions.HasExactGraphemeCount
@@ -133,13 +133,13 @@ public sealed class FluentStringGraphemesExtensionsTests(ITestOutputHelper outpu
         AssertResult(tc, result);
     }
 
-    // FluentStringGraphemesExtensions.NotHasGraphemeCountInRange
+    // FluentStringGraphemesExtensions.HasGraphemeCountOutOfRange
     [Theory]
-    [MemberData(nameof(FluentStringGraphemesExtensionsTestData.NotHasGraphemeCountInRange.Cases), MemberType = typeof(FluentStringGraphemesExtensionsTestData.NotHasGraphemeCountInRange))]
-    public void NotHasGraphemeCountInRange_BehavesAsExpected(FluentCase<(string? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringGraphemesExtensionsTestData.HasGraphemeCountOutOfRange.Cases), MemberType = typeof(FluentStringGraphemesExtensionsTestData.HasGraphemeCountOutOfRange))]
+    public void HasGraphemeCountOutOfRange_BehavesAsExpected(FluentCase<(string? value, int min, int max, Inclusion inclusion)> tc)
     {
         // Act
-        var result = new NotHasGraphemeCountInRangeValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion).Validate(new Model { Value = tc.Value.value });
+        var result = new HasGraphemeCountOutOfRangeValidator(tc.Value.min, tc.Value.max, tc.Value.inclusion).Validate(new Model { Value = tc.Value.value });
 
         // Assert
         AssertResult(tc, result);

@@ -264,15 +264,15 @@ public static class GuardStringClauses
     /// </exception>
     /// <remarks>
     /// This guard is the complement of <see cref="MustStringClauses.LengthInRange"/>:
-    /// <c>Guard.Against.NotLengthInRange</c> passes when the length is within the range.
+    /// <c>Guard.Against.LengthOutOfRange</c> passes when the length is within the range.
     /// </remarks>
     /// <example>
     /// <code>
-    /// Guard.Against.NotLengthInRange(username, 3, 50);
+    /// Guard.Against.LengthOutOfRange(username, 3, 50);
     /// </code>
     /// </example>
     /// <seealso cref="MustStringClauses.LengthInRange"/>
-    public static string NotLengthInRange(this IGuardClause _,
+    public static string LengthOutOfRange(this IGuardClause _,
         string? value,
         int min,
         int max,

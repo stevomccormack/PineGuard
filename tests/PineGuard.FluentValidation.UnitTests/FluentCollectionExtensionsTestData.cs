@@ -101,7 +101,7 @@ public static class FluentCollectionExtensionsTestData
         });
     }
 
-    public static class NotHasCountInRange
+    public static class HasCountOutOfRange
     {
         public static TheoryData<FluentCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> Cases => F.HasCountInRange.AllScenarios.ToFluentCases(s => s.Name switch
         {

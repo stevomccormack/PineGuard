@@ -279,7 +279,7 @@ public sealed class NotHasMaxGraphemeCountAttribute(int max) : ValidationAttribu
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="NotHasGraphemeCountInRangeAttribute"/>
+/// <seealso cref="HasGraphemeCountOutOfRangeAttribute"/>
 /// <seealso cref="MustStringGraphemesClauses.HasGraphemeCountInRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string-graphemes">String Graphemes Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
@@ -310,7 +310,7 @@ public sealed class HasGraphemeCountInRangeAttribute(int min, int max, Inclusion
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringGraphemesClauses.NotHasGraphemeCountInRange"/>. Supported on properties,
+/// Delegates to <see cref="MustStringGraphemesClauses.HasGraphemeCountOutOfRange"/>. Supported on properties,
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
@@ -322,16 +322,16 @@ public sealed class HasGraphemeCountInRangeAttribute(int min, int max, Inclusion
 /// <code>
 /// public class ProfileModel
 /// {
-///     [NotHasGraphemeCountInRange(1, 2)]
+///     [HasGraphemeCountOutOfRange(1, 2)]
 ///     public string Handle { get; set; }
 /// }
 /// </code>
 /// </example>
 /// <seealso cref="HasGraphemeCountInRangeAttribute"/>
-/// <seealso cref="MustStringGraphemesClauses.NotHasGraphemeCountInRange"/>
+/// <seealso cref="MustStringGraphemesClauses.HasGraphemeCountOutOfRange"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string-graphemes">String Graphemes Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class NotHasGraphemeCountInRangeAttribute(int min, int max, Inclusion inclusion = Inclusion.Inclusive)
+public sealed class HasGraphemeCountOutOfRangeAttribute(int min, int max, Inclusion inclusion = Inclusion.Inclusive)
     : ValidationAttributeBase(typeof(string), MustCodes.Text.Graphemes.InRange, allowNull: false)
 {
     /// <summary>Gets the lower bound of the forbidden number of characters.</summary>
@@ -347,7 +347,7 @@ public sealed class NotHasGraphemeCountInRangeAttribute(int min, int max, Inclus
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string?)value;
-        var result = Must.Be.NotHasGraphemeCountInRange(strValue, Min, Max, Inclusion, paramName: null);
+        var result = Must.Be.HasGraphemeCountOutOfRange(strValue, Min, Max, Inclusion, paramName: null);
         return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }

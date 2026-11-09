@@ -66,7 +66,7 @@ public static class MustStringGraphemesClausesTestData
         public static TheoryData<MustCase<(string? value, int min, int max, Inclusion inclusion)>> InvalidRangeCases => F.GraphemesHasCountInRange.AllInvalid.Only(nameof(F.GraphemesHasCountInRange.MinAboveMax)).ToMustCases(_ => new MustExpected(false, "min requires a valid count range.", "min", MustCodes.Text.Graphemes.OutOfRange));
     }
 
-    public static class NotHasGraphemeCountInRange
+    public static class HasGraphemeCountOutOfRange
     {
         public static TheoryData<MustCase<(string? value, int min, int max, Inclusion inclusion)>> ValidCases => F.GraphemesHasCountInRange.AllInvalid.Except(nameof(F.GraphemesHasCountInRange.NullValue), nameof(F.GraphemesHasCountInRange.NegativeMin), nameof(F.GraphemesHasCountInRange.NegativeMax), nameof(F.GraphemesHasCountInRange.MinAboveMax)).ToMustCases(_ => new MustExpected(true));
         public static TheoryData<MustCase<(string? value, int min, int max, Inclusion inclusion)>> InvalidCases => F.GraphemesHasCountInRange.AllValid.ToMustCases(_ => new MustExpected(false, "value must not have a number of characters within the expected range.", Code: MustCodes.Text.Graphemes.InRange));
@@ -82,7 +82,7 @@ public static class MustStringGraphemesClausesTestData
             new("CountBeforeNull", () => Must.Be.HasExactGraphemeCount(null, -1), new(false, "count requires a non-negative count.", "count", MustCodes.Text.Graphemes.Mismatch)),
             new("NegativeCountBeforeNull", () => Must.Be.NotHasExactGraphemeCount(null, -1), new(false, "count requires a non-negative count.", "count", MustCodes.Text.Graphemes.Match)),
             new("InclusionBeforeNull", () => Must.Be.HasGraphemeCountInRange(null, 0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.", "inclusion", MustCodes.Text.Graphemes.OutOfRange)),
-            new("NegativeInclusionBeforeNull", () => Must.Be.NotHasGraphemeCountInRange(null, 0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.", "inclusion", MustCodes.Text.Graphemes.InRange))
+            new("NegativeInclusionBeforeNull", () => Must.Be.HasGraphemeCountOutOfRange(null, 0, 1, (Inclusion)999), new(false, "inclusion must be a defined inclusion value.", "inclusion", MustCodes.Text.Graphemes.InRange))
         ];
     }
 }

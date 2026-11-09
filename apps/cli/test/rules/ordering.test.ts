@@ -175,6 +175,40 @@ describe("ordering rule (Rule08 port)", () => {
             expect(normalizeBaseKey("Empty")).toBe("Empty");
         });
 
+        it("groups only qualified range complements and preserves suffixes", () => {
+            for (const dimension of [
+                "Length",
+                "HasCount",
+                "HasGraphemeCount",
+            ]) {
+                for (const suffix of [
+                    "",
+                    "CollectionAttribute",
+                    "StringAttribute",
+                ]) {
+                    expect(
+                        normalizeBaseKey(dimension + "OutOfRange" + suffix),
+                    ).toBe(dimension + "InRange" + suffix);
+                }
+                expect(
+                    buildGroupOrder(
+                        [dimension + "InRange", dimension + "OutOfRange"],
+                        "",
+                        "must",
+                    ),
+                ).toEqual([dimension + "InRange"]);
+            }
+            for (const name of [
+                "LengthOutOfRanger",
+                "HasCountOutOfRanger",
+                "HasGraphemeCountOutOfRanger",
+                "OtherOutOfRange",
+                "OutOfRanger",
+            ]) {
+                expect(normalizeBaseKey(name)).toBe(name);
+            }
+        });
+
         it("buildGroupOrder deduplicates and preserves first-seen declaration order", () => {
             expect(
                 buildGroupOrder(["NotEmpty", "NotDuplicate"], "", "must"),

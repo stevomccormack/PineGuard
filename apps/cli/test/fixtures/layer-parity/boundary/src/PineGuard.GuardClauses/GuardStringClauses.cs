@@ -19,4 +19,7 @@ public static class GuardStringClauses
     {
         return value;
     }
+    public static bool LengthOutOfRange(this IGuardClause _, string value) => true;
+    public static bool HasCountOutOfRange(this IGuardClause _, string value) => true;
+    public static bool HasGraphemeCountOutOfRange(this IGuardClause _, string value) => true;
 }

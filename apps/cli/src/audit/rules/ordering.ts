@@ -183,7 +183,8 @@ export interface NegativePrefixResult {
  * Recognises negative prefixes and the exact XML validity exception.
  * InvalidXml means the complement of ValidXml; arbitrary Invalid-prefixed
  * names are not a library naming convention. Scalar OutOfRange operations
- * share the corresponding InRange key, retaining any parsed-type suffix.
+ * and the Length/HasCount/HasGraphemeCount qualified ranges share their
+ * corresponding InRange key, retaining PascalCase qualifier suffixes.
  */
 export function tryStripNegativePrefix(
     operationName: string,
@@ -200,7 +201,18 @@ export function tryStripNegativePrefix(
         return { isNegative: true, baseName: "ValidXml" };
     }
 
-    if (operationName.startsWith("OutOfRange")) {
+    const qualifiedRange =
+        /^(Length|HasCount|HasGraphemeCount)OutOfRange(?=$|[A-Z])/.exec(
+            operationName,
+        );
+    if (qualifiedRange !== null) {
+        return {
+            isNegative: true,
+            baseName: operationName.replace("OutOfRange", "InRange"),
+        };
+    }
+
+    if (/^OutOfRange(?=$|[A-Z])/.test(operationName)) {
         return {
             isNegative: true,
             baseName: `InRange${operationName.slice("OutOfRange".length)}`,

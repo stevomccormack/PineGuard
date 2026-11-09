@@ -96,15 +96,15 @@ public static class GuardCollectionClausesTestData
         ];
     }
 
-    // Guard.Against.NotHasCountInRange — calls Must.Be.HasCountInRange — throws when count is NOT in range
-    public static class NotHasCountInRange
+    // Guard.Against.HasCountOutOfRange — calls Must.Be.HasCountInRange — throws when count is NOT in range
+    public static class HasCountOutOfRange
     {
         public static TheoryData<GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases => F.HasCountInRange.ValidScenarios.ToGuardCases(_ => new GuardExpected(true));
         public static TheoryData<GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> InvalidCases => F.HasCountInRange.InvalidScenarios.ToGuardCases(s => s.Inputs.value == null ? new GuardExpected(false, typeof(ArgumentNullException), "value") : new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
-    // Guard.Against.HasCountInRange — calls Must.Be.NotHasCountInRange — throws when count IS in range
-    // Null value causes pre-condition throw; only non-null cases that fail NotHasCountInRange truly pass
+    // Guard.Against.HasCountInRange — calls Must.Be.HasCountOutOfRange — throws when count IS in range
+    // Null value causes pre-condition throw; only non-null cases that fail HasCountOutOfRange truly pass
     public static class HasCountInRange
     {
         public static TheoryData<GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)>> ValidCases =>

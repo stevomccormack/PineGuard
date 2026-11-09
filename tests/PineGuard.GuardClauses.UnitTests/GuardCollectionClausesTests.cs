@@ -90,13 +90,13 @@ public sealed class GuardCollectionClausesTests(ITestOutputHelper output) : Base
     }
 
     [Theory]
-    [MemberData(nameof(TD.NotHasCountInRange.ValidCases), MemberType = typeof(TD.NotHasCountInRange))]
-    [MemberData(nameof(TD.NotHasCountInRange.InvalidCases), MemberType = typeof(TD.NotHasCountInRange))]
-    public void NotHasCountInRange_BehavesAsExpected(GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
+    [MemberData(nameof(TD.HasCountOutOfRange.ValidCases), MemberType = typeof(TD.HasCountOutOfRange))]
+    [MemberData(nameof(TD.HasCountOutOfRange.InvalidCases), MemberType = typeof(TD.HasCountOutOfRange))]
+    public void HasCountOutOfRange_BehavesAsExpected(GuardCase<(IEnumerable<string>? value, int min, int max, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        AssertResult(tc, () => Guard.Against.NotHasCountInRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.NotHasCountInRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.HasCountOutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.HasCountOutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage));
     }
 
     [Theory]

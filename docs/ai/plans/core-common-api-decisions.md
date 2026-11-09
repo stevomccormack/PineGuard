@@ -1,7 +1,7 @@
 <!-- metadata_header
 type: plan
 id: core-common-api-decisions
-version: 2.1
+version: 2.2
 status: implemented
 last_updated: 2026-11-09
 -->
@@ -304,24 +304,26 @@ all corresponding Must, Guard, FluentValidation and DataAnnotations declarations
 
 **Decision:** use `InRange` / `OutOfRange` for scalar range membership. Preserve the
 dimension in compound predicates: `LengthInRange`, `HasCountInRange`,
-`HasGraphemeCountInRange`. Fold `DurationBetween(TimeSpan, …)` into
+`HasGraphemeCountInRange`; their outside-range counterparts preserve that dimension and use
+`OutOfRange`. Fold `DurationBetween(TimeSpan, …)` into
 `InRange(TimeSpan, …)`; string-input TimeSpan uses N-1's `InRangeTimeSpan`.
-Core `IsBetween` becomes `IsInRange`; Core negative predicates use their corresponding
-`IsOutOfRange` or documented `IsNot…` / `NotHas…` form as applicable. Do not
+Core `IsBetween` becomes `IsInRange`; exposed Core negative range predicates use their
+corresponding `IsOutOfRange` or dimension-qualified `*OutOfRange` form. Do not
 invent an unqualified `OutOfRange` for a count or length predicate.
 
 | Concept | Core | Must | Guard, implemented through the shown Must concept | FluentValidation |
 |---|---|---|---|---|
 | Scalar inside | `IsInRange` | `InRange` | `OutOfRange` → `InRange` | `InRange` |
 | Scalar outside | `IsOutOfRange` | `OutOfRange` | `InRange` → `OutOfRange` | `OutOfRange` |
-| String length inside | `IsLengthInRange` | `LengthInRange` | `NotLengthInRange` → `LengthInRange` | `LengthInRange` |
-| Collection count inside | `HasCountInRange` | `HasCountInRange` | `NotHasCountInRange` → `HasCountInRange` | `HasCountInRange` |
-| Grapheme count inside | `HasGraphemeCountInRange` | `HasGraphemeCountInRange` | `NotHasGraphemeCountInRange` → `HasGraphemeCountInRange` | `HasGraphemeCountInRange` |
+| String length inside | `IsLengthInRange` | `LengthInRange` | `LengthOutOfRange` → `LengthInRange` | `LengthInRange` |
+| Collection count inside | `HasCountInRange` | `HasCountInRange` | `HasCountOutOfRange` → `HasCountInRange` | `HasCountInRange` |
+| Grapheme count inside | `HasGraphemeCountInRange` | `HasGraphemeCountInRange` | `HasGraphemeCountOutOfRange` → `HasGraphemeCountInRange` | `HasGraphemeCountInRange` |
 
-For dimensioned negative clauses, retain the matching `NotLengthInRange`,
-`NotHasCountInRange` and `NotHasGraphemeCountInRange` vocabulary; Guards use the
-opposite member through Must. This follows the existing `NotHas*` rule, rather than adding
-special `CountOutOfRange` synonyms. Preserve inclusion parameters and valid-domain parse gates.
+For dimensioned outside-range clauses, use `LengthOutOfRange`, `HasCountOutOfRange` and
+`HasGraphemeCountOutOfRange`; Guards use the opposite member through Must. The owner identified
+the previous mechanical `Not` prefix as an unjustified inconsistency on 2026-11-09. The dimension
+does not change the range relationship, so the same `InRange` / `OutOfRange` pair applies.
+Preserve inclusion parameters, valid-domain parse gates and existing surface availability.
 
 **DataAnnotations inventory correction.** `DateOnlyRangeAttributes` and its siblings are
 source containers, not scalar attribute names. Actual declarations include

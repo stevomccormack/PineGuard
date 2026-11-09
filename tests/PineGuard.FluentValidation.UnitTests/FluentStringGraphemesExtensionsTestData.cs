@@ -96,7 +96,7 @@ public static class FluentStringGraphemesExtensionsTestData
         }
     }
 
-    public static class NotHasGraphemeCountInRange
+    public static class HasGraphemeCountOutOfRange
     {
         public static TheoryData<FluentCase<(string? value, int min, int max, Inclusion inclusion)>> Cases
         {
