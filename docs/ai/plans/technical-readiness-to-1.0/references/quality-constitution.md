@@ -1,6 +1,6 @@
 # Mandatory quality constitution
 
-> **Scope note (2026-11-09):** this reference governs wave activation. The council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md), register D29) takes the string→DateOnly pilot PR out of its scope: the pilot uses the tracker page, one Fable code review per PR and the owner's name sign-off. The role names Astra/Luna/Sol describe the planning-era protocol; the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads.
+> **Scope note (2026-11-09):** the engineering quality requirements apply to the pilot. Its completion process is governed by the [council verdict](../../technical-readiness-to-1.0.council-transcript.md): the pilot exit criteria, tracker row, one Fable review and owner name sign-off replace the closure paperwork and planning-era role protocol.
 
 **Essential maintenance rule:** every workstream, major block, major section and wave must keep BRAIN, all relevant Markdown/indexes and required scripts/tools aligned; save lessons/decisions; and complete full Astra review → feedback → fix → recheck before closure. The rationale is that working code without current execution knowledge or tested support machinery is incomplete. Apply the [closure contract](knowledge-and-tooling-closure.md), impact matrix and feedback log; record no-new-lesson and reasoned N/A outcomes explicitly. Promote reusable hard rules through existing canonical Specs and pointer/cascade rules, not a duplicate guidance hierarchy.
 

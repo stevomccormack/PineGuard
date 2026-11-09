@@ -1,6 +1,6 @@
 # Effort, waves and dispatch budgets
 
-> **Scope note (2026-11-09):** this reference governs wave activation. The council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md), register D29) takes the string→DateOnly pilot PR out of its scope: the pilot uses the tracker page, one Fable code review per PR and the owner's name sign-off. The role names Astra/Luna/Sol describe the planning-era protocol; the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads.
+> **Scope note (2026-11-09):** this reference preserves historical wave proposals; their applicability must be decided when the waves are redrawn from pilot evidence. The council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md), register D29) takes the string→DateOnly pilot PR out of its scope: the pilot uses the tracker page, one Fable code review per PR and the owner's name sign-off. The role names Astra/Luna/Sol describe the planning-era protocol; the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads.
 
 ## Incremental knowledge/tooling closeout allowance — v1.8
 

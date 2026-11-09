@@ -7,7 +7,7 @@ last_updated: 2026-11-09
 -->
 # W18 — Culture, time and deterministic behavior
 
-> **Status 2026-11-09:** not activated. The plan-gated council ran on 2026-11-09 and ruled that this plan is not activated as written; the only unit that may start, on the owner's explicit go, is the string→DateOnly pilot PR described in [plan.md § Where this plan stands](../plan.md#where-this-plan-stands-2026-11-09) and register decision D29. The completion gate, Astra/Luna/Sol roles, checkpoints and D22 inventory steps below apply to a later wave activation, not to the pilot PR.
+> **Status 2026-11-09:** planned; owner authorization is pending. Only the string→DateOnly pilot may be authorized under [the current plan disposition](../plan.md#where-this-plan-stands-2026-11-09) (register D29). The wave procedures and role assignments below are historical proposals, subject to redrafting from pilot evidence and owner approval.
 
 > **Mandatory completion gate:** This workstream and every major block inherit the [knowledge, documentation and tooling closure contract](../references/knowledge-and-tooling-closure.md). Save evidence-linked lessons/decisions (or an explicit no-new-lesson outcome), synchronize all relevant BRAIN/Markdown/indexes, build or update required supporting scripts/tools and test/run them (or record reviewed N/A), then complete full Astra review → feedback → fix → recheck. Persist the impact matrix, feedback and owned commit evidence; reopen the unit when relevant context changes. Feature implementation alone cannot close this work.
 
@@ -34,7 +34,7 @@ Select cultures with materially different parsing/casing behavior; do not enumer
 
 ## Acceptance
 
-No test depends accidentally on wall-clock date (the CI job `core-null-provider-timezone` runs the null-provider test under `TZ=Pacific/Kiritimati` and `Etc/GMT+12` to enforce this), developer locale or nondeterministic collection order. Replaying a case under its declared environment reproduces its outcome. Any environment-dependent behavior is explicit and independently tested.100% validation coverage includes branches introduced for environmental behavior; exclusions cannot hide them.
+No test depends accidentally on wall-clock date, developer locale or nondeterministic collection order. The `core-null-provider-timezone` CI job checks the separate D-1 invariant that a null provider uses the UTC calendar date, under `TZ=Pacific/Kiritimati` and `TZ=Etc/GMT+12`. Replaying a case under its declared environment reproduces its outcome. Any environment-dependent behavior is explicit and independently tested.100% validation coverage includes branches introduced for environmental behavior; exclusions cannot hide them.
 
 ## Controls
 

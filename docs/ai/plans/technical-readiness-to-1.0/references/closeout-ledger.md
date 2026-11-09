@@ -1,6 +1,6 @@
 # Knowledge and tooling closeout ledger
 
-> **Scope note (2026-11-09):** this reference governs wave activation. The council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md), register D29) takes the string→DateOnly pilot PR out of its scope: the pilot uses the tracker page, one Fable code review per PR and the owner's name sign-off. The role names Astra/Luna/Sol describe the planning-era protocol; the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads. No pilot entries are made in this ledger; pilot evidence lives in the tracker page.
+> **Scope note (2026-11-09):** this reference preserves historical wave proposals; their applicability must be decided when the waves are redrawn from pilot evidence. The council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md), register D29) takes the string→DateOnly pilot PR out of its scope: the pilot uses the tracker page, one Fable code review per PR and the owner's name sign-off. The role names Astra/Luna/Sol describe the planning-era protocol; the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads. No pilot entries are made in this ledger; pilot evidence lives in the tracker page.
 
 ## CODEEX-01 — Code-example amendment, 2026-09-26
 
