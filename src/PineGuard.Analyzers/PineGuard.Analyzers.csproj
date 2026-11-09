@@ -55,7 +55,7 @@
        ProjectReference-with-ReferenceOutputAssembly=false trick used by the Roslyn SDK template's
        separate .Package project would be a reference cycle here. Build the code-fix assembly
        explicitly instead, so its DLL exists when the <None Include> above is evaluated at pack. -->
-  <Target Name="BuildCodeFixesBeforePack" BeforeTargets="GenerateNuspec">
+  <Target Name="BuildCodeFixesBeforePack" BeforeTargets="GenerateNuspec" Condition="'$(NoBuild)' != 'true'">
     <MSBuild Projects="..\PineGuard.Analyzers.CodeFixes\PineGuard.Analyzers.CodeFixes.csproj"
              Targets="Build"
              Properties="Configuration=$(Configuration)" />
