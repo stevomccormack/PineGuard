@@ -13,9 +13,10 @@ name: pineguard
 
 services:
   sonarqube:
-    # Pinned to the 2025.1 LTA (Long-Term Active) Community Edition release, not the
-    # floating :community tag — see F-51 in docs/ai/plans/tools-review-and-standardisation.md.
-    image: sonarqube:2025.1-community
+    # Pinned to the 2025.1 Community Build release, not the floating :community tag — see F-51 in
+    # docs/ai/plans/tools-review-and-standardisation.md. Docker Hub retired the `2025.1-community`
+    # alias (2026-11-09: "not found"); the same release is published as the full build tag below.
+    image: sonarqube:25.1.0.102122-community
     container_name: pineguard-sonarqube
     ports:
       # Loopback-only — the admin UI must not be reachable from the LAN (F-23).
