@@ -1,17 +1,19 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w10
-version: 1.3
+version: 1.4
 status: planned
-last_updated: 2026-09-26
+last_updated: 2026-11-09
 -->
 # W10 — Early benchmarks, performance and allocation budgets
+
+> **Status 2026-11-09:** not activated. The plan-gated council ran on 2026-11-09 and ruled that this plan is not activated as written; the only unit that may start, on the owner's explicit go, is the string→DateOnly pilot PR described in [plan.md § Where this plan stands](../plan.md#where-this-plan-stands-2026-11-09) and register decision D29. The completion gate, Astra/Luna/Sol roles, checkpoints and D22 inventory steps below apply to a later wave activation, not to the pilot PR.
 
 > **Mandatory completion gate:** This workstream and every major block inherit the [knowledge, documentation and tooling closure contract](../references/knowledge-and-tooling-closure.md). Save evidence-linked lessons/decisions (or an explicit no-new-lesson outcome), synchronize all relevant BRAIN/Markdown/indexes, build or update required supporting scripts/tools and test/run them (or record reviewed N/A), then complete full Astra review → feedback → fix → recheck. Persist the impact matrix, feedback and owned commit evidence; reopen the unit when relevant context changes. Feature implementation alone cannot close this work.
 
 ## Purpose and new priority
 
-Benchmarks begin EARLY, alongside CI trust and naming/semantic inventory, by explicit user direction. This overrides v1.6 §9's later-phase placement. Baseline representative current behavior before the new rule structure, then measure each structural decision. The final budget gate remains dependent on approved semantics and measured evidence.
+Benchmarks begin EARLY, by explicit user direction: the string→DateOnly pilot PR carries a BenchmarkDotNet project measuring the new path and the current `StringRules.DateOnly`/Must path (council 2026-11-09), and a new-path allocation where the current path has none is the pilot's kill criterion. This overrides v1.6 §9's later-phase placement. Baseline representative current behavior before the new rule structure, then measure each structural decision. The final budget gate remains dependent on approved semantics and measured evidence.
 
 Rubric performance/resource is4/10 with high confidence in the evidence gap. The handoff's numeric budgets are proposals, not measurements. No concrete benchmark project was verified; D11/D22 requires inventory and approval.
 

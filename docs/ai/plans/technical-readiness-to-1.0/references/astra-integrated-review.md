@@ -1,5 +1,7 @@
 # Astra integrated critical review
 
+> **Historical note (2026-11-09):** this is the planning-era disposition/review (plan v1.9). Its sequencing (naming early, three pilots together) is superseded by the council verdict of 2026-11-09: pilot-first activation of string→DateOnly only, W22 after the pilot. See [plan.md § Where this plan stands](../plan.md#where-this-plan-stands-2026-11-09).
+
 ## Code-example amendment — plan v1.9
 
 The user's review identified that the plan lacked code examples. The correction adds complete canonical source plus substantive direct examples in all 26 child plans, without implementing product changes or changing the roadmap. Sol authored the code; Luna supplied source/version evidence and performed bounded verification; Astra specified and reviewed the examples.

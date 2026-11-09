@@ -1,5 +1,7 @@
 # Acceptance matrix for each 10/10 criterion
 
+> **Scope note (2026-11-09):** this reference governs wave activation. The council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md), register D29) takes the string→DateOnly pilot PR out of its scope: the pilot uses the tracker page, one Fable code review per PR and the owner's name sign-off. The role names Astra/Luna/Sol describe the planning-era protocol; the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads.
+
 ## Mandatory closure across every criterion
 
 Every workstream, major block/section and wave must satisfy the [knowledge/tooling closure gate](knowledge-and-tooling-closure.md), in addition to its technical row below. Require a saved impact matrix, relevant BRAIN/Markdown/index updates, supporting scripts/tools built or updated and tested/run (or reviewed N/A), evidence-linked lessons or an explicit none-found outcome, canonical rule-promotion disposition and a complete Astra feedback→fix→recheck record. Parent waves reconcile all child records; changed evidence reopens affected units. Missing closure evidence blocks completion and the documentation/maintainability 10/10 claim.

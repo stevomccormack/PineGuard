@@ -50,7 +50,7 @@ Statuses mirror each plan's `metadata_header` (`docs/ai/meta/taxonomy.md` §Plan
 
 | Plan | Status |
 |------|--------|
-| [Technical Readiness to 1.0](plans/technical-readiness-to-1.0/plan.md) | Planned |
+| [Technical Readiness to 1.0](plans/technical-readiness-to-1.0/plan.md) | Planned — council run 2026-11-09 ([transcript](plans/technical-readiness-to-1.0.council-transcript.md)): not activated as written; one string→DateOnly pilot PR first (register D29); owner implementation authorization pending |
 | [Library Expansion Roadmap](plans/library-expansion-roadmap.md) | Superseded — delivered by the New Surfaces Program; retained as the original rationale |
 | [New Surfaces Program — charter + phase plans 01–06](plans/new-surfaces-missing-validation-cases-00-program.md) | Complete — every unit merged to main (last merge dcb906d, 2026-09-01); record in [orchestration & progress tracker](plans/new-surfaces-orchestration.md) |
 | [Temporal & Time-Zone Program — charter T-00 + phases T-01…T-07](plans/temporal-00-program.md) | Active — Phase 1 (foundation) merged to main as `ee08ccd` on 2026-11-09 with the §3 register ratified by the owner (D-1: UTC default when no clock is injected); Phase 2 (T-02) next, T2-U0 first; see [temporal-orchestration.md](plans/temporal-orchestration.md) and [temporal-branch-ledger.md](plans/temporal-branch-ledger.md) |

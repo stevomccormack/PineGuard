@@ -1,5 +1,7 @@
 # Execution protocol
 
+> **Scope note (2026-11-09):** this reference governs wave activation. The council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md), register D29) takes the string→DateOnly pilot PR out of its scope: the pilot uses the tracker page, one Fable code review per PR and the owner's name sign-off. The role names Astra/Luna/Sol describe the planning-era protocol; the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads.
+
 ## Mandatory block and wave closure
 
 The [knowledge, documentation and tooling closure contract](knowledge-and-tooling-closure.md) is a hard completion gate for every workstream, major task block, section and wave. Before dispatch, assign a stable block ID (for example W03-B02), enumerate owned outputs and the exact source→docs/spec/rule/memory/tool/self-test/index impact matrix, and name the parent wave. Keep this packet targeted and hash-fresh; do not wait until the end of a large workstream to update knowledge.

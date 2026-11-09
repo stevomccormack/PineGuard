@@ -26,6 +26,6 @@ The current workflow's found=false path can skip thresholds when no XML is found
 
 ## Reporting
 
-State covered/total line and branch counts, scope, targets, exclusions and artifact locations. The37,749 historical passing framework executions collected no fresh coverage. A conformance matrix or property run cannot support a100% coverage claim without the required Coverlet artifacts.
+State covered/total line and branch counts, scope, targets, exclusions and artifact locations. The37,749 historical passing framework executions collected no fresh coverage. Current: 100% line and 100% branch at main `86ba9c9` (CI run 42599717255, 2026-11-09). A conformance matrix or property run cannot support a100% coverage claim without the required Coverlet artifacts.
 
 Any material coverage gap blocks completion of the affected validation workstream and the final10/10 assessment. Only an explicit user change can relax this hard requirement; agents cannot substitute a lower target or a convenient exclusion.

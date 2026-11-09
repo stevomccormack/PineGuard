@@ -1,17 +1,19 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w03
-version: 1.3
+version: 1.4
 status: planned
-last_updated: 2026-09-26
+last_updated: 2026-11-09
 -->
 # W03 — Early new static rule structure and lowering
+
+> **Status 2026-11-09:** not activated. The plan-gated council ran on 2026-11-09 and ruled that this plan is not activated as written; the only unit that may start, on the owner's explicit go, is the string→DateOnly pilot PR described in [plan.md § Where this plan stands](../plan.md#where-this-plan-stands-2026-11-09) and register decision D29. The completion gate, Astra/Luna/Sol roles, checkpoints and D22 inventory steps below apply to a later wave activation, not to the pilot PR.
 
 > **Mandatory completion gate:** This workstream and every major block inherit the [knowledge, documentation and tooling closure contract](../references/knowledge-and-tooling-closure.md). Save evidence-linked lessons/decisions (or an explicit no-new-lesson outcome), synchronize all relevant BRAIN/Markdown/indexes, build or update required supporting scripts/tools and test/run them (or record reviewed N/A), then complete full Astra review → feedback → fix → recheck. Persist the impact matrix, feedback and owned commit evidence; reopen the unit when relevant context changes. Feature implementation alone cannot close this work.
 
 ## Approved direction
 
-Design and implement the NEW rule structure EARLY, after W22 taxonomy and W01 pilot semantics. Preserve cheap static executable truth as a design principle, not old API shapes. The user authorizes greenfield design without legacy compatibility/shims/migrations. Avoid per-call polymorphic allocation graphs and speculative abstractions unless concrete evidence justifies a specific choice.
+Prove the NEW rule structure FIRST through the string→DateOnly pilot PR (council 2026-11-09, register D29): if any adapter needs logic the rule object cannot supply, or the new path allocates where the current one does not, W03 returns to redesign. W22 taxonomy follows the pilot and takes its owner-signed names table as first input. Preserve cheap static executable truth as a design principle, not old API shapes. The user authorizes greenfield design without legacy compatibility/shims/migrations. Avoid per-call polymorphic allocation graphs and speculative abstractions unless concrete evidence justifies a specific choice.
 
 Inputs: W22 inventory/terminology; W01 truth; W02 manifest interface; W04 failures; W10 EARLY baseline. Verified source anchors: src/PineGuard.Core/Rules/OwaspRules.cs, StringRules.cs, src/PineGuard.MustClauses/MustOwaspClauses.cs and MustStringClauses.cs. Output: `+ docs/reports/readiness-static-kernel.md`. Luna inventories remaining exact paths; Astra approves D22.
 

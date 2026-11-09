@@ -1,5 +1,7 @@
 # Original handoff disposition
 
+> **Historical note (2026-11-09):** this is the planning-era disposition/review (plan v1.9). Its sequencing (naming early, three pilots together) is superseded by the council verdict of 2026-11-09: pilot-first activation of string→DateOnly only, W22 after the pilot. See [plan.md § Where this plan stands](../plan.md#where-this-plan-stands-2026-11-09).
+
 Source: [byte-preserved original engineering handoff](snapshots/original-engineering-handoff.txt); provenance in [snapshot register](snapshot-provenance.md). It was a proposal written without repository access. Counts, example APIs/paths and budgets were not source-verified. The current user overrides older compatibility and sequencing assumptions.
 
 | Handoff idea | Astra disposition | Work/decision |

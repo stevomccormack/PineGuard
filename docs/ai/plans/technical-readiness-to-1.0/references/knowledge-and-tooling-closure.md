@@ -1,5 +1,7 @@
 # Mandatory knowledge, documentation and tooling closure
 
+> **Scope note (2026-11-09):** this reference governs wave activation. The council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md), register D29) takes the string→DateOnly pilot PR out of its scope: the pilot uses the tracker page, one Fable code review per PR and the owner's name sign-off. The role names Astra/Luna/Sol describe the planning-era protocol; the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads.
+
 This binding project requirement applies to **every workstream, every major task block, every major section/wave and each large sample project**. A feature or passing test is insufficient for completion. BRAIN, relevant Markdown, scripts, tools, tests and indexes must be aligned; lessons and decisions must be saved; Astra must complete a full review and feedback loop.
 
 This document implements the user's requirement through existing BRAIN authorities. It does not create a parallel global rule hierarchy or implement future supporting scripts during this planning-only amendment.

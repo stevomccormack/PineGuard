@@ -1,5 +1,7 @@
 # Effort, waves and dispatch budgets
 
+> **Scope note (2026-11-09):** this reference governs wave activation. The council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md), register D29) takes the string→DateOnly pilot PR out of its scope: the pilot uses the tracker page, one Fable code review per PR and the owner's name sign-off. The role names Astra/Luna/Sol describe the planning-era protocol; the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads.
+
 ## Incremental knowledge/tooling closeout allowance — v1.8
 
 The original per-workstream estimates below already include ordinary implementation review, relevant feature documentation and their named test/tool work. Do not charge that work twice. The user-added mandatory per-block knowledge capture, complete BRAIN/docs/tooling impact audit, recorded feedback/rechecks and wave consolidation receive a separate provisional coordination/maintenance reserve:

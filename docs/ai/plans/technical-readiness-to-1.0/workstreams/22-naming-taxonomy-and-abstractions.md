@@ -1,17 +1,19 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w22
-version: 1.3
+version: 1.4
 status: planned
-last_updated: 2026-09-26
+last_updated: 2026-11-09
 -->
-# W22 — Early naming, taxonomy and shared abstractions
+# W22 — Naming, taxonomy and shared abstractions (after the pilot)
+
+> **Status 2026-11-09:** not activated. The plan-gated council ran on 2026-11-09 and ruled that this plan is not activated as written; the only unit that may start, on the owner's explicit go, is the string→DateOnly pilot PR described in [plan.md § Where this plan stands](../plan.md#where-this-plan-stands-2026-11-09) and register decision D29. The completion gate, Astra/Luna/Sol roles, checkpoints and D22 inventory steps below apply to a later wave activation, not to the pilot PR.
 
 > **Mandatory completion gate:** This workstream and every major block inherit the [knowledge, documentation and tooling closure contract](../references/knowledge-and-tooling-closure.md). Save evidence-linked lessons/decisions (or an explicit no-new-lesson outcome), synchronize all relevant BRAIN/Markdown/indexes, build or update required supporting scripts/tools and test/run them (or record reviewed N/A), then complete full Astra review → feedback → fix → recheck. Persist the impact matrix, feedback and owned commit evidence; reopen the unit when relevant context changes. Feature implementation alone cannot close this work.
 
 ## Purpose and priority
 
-W22 runs EARLY despite its numerical ID: dependencies, not filenames, determine order. This workstream applies the greenfield instruction by choosing the best globally consistent naming/taxonomy and shared abstractions before locking the new rule structure and manifest.
+W22 runs AFTER the string→DateOnly pilot (council 2026-11-09): names are the output of the shape, D01 makes renames free, and the pilot's owner-signed names table is W22's first input. This workstream applies the greenfield instruction by choosing the best globally consistent naming/taxonomy and shared abstractions before rolling the proven rule structure out beyond the pilot.
 
 Existing APIs impose no backward-compatibility constraint. DRY/SOLID, clarity and formatting hygiene are mandatory. Avoid speculative abstractions: a shared mechanism must serve a demonstrated responsibility.
 
@@ -38,7 +40,7 @@ No interface/factory/generator exists solely for hypothetical future use. Duplic
 
 Checkpoint after whole-repository inventory, taxonomy approval and each structural slice. Astra decides/reviews; Sol codes; Luna performs all reading and BRAIN retrieval. Stop for local fixes without blast-radius review, missed consumers/tests/docs or abstractions without present need.
 
-W01, W10 early benchmarks and W19 lifecycle characterization may proceed concurrently. W03/W02 depend on W22 approval. The new structure/manifest is an early committed design objective, not optional research.
+After a passing pilot, W01, W10 and W19 may proceed concurrently with W22. W03's premise is tested by the pilot PR before W22 runs; the broader W03 rollout and W02 depend on a passing pilot and then on W22 approval. The new structure/manifest is an early committed design objective, not optional research.
 
 Follow the [execution protocol](../references/execution-protocol.md), [decision register](../references/decision-register.md), [quality constitution](../references/quality-constitution.md) and [estimates and waves](../references/estimates-and-waves.md). This child remains Planned.
 

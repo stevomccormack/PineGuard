@@ -1,11 +1,13 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w21
-version: 1.3
+version: 1.4
 status: planned
-last_updated: 2026-09-26
+last_updated: 2026-11-09
 -->
 # W21 — Per-criterion10/10 readiness and release
+
+> **Status 2026-11-09:** not activated. The plan-gated council ran on 2026-11-09 and ruled that this plan is not activated as written; the only unit that may start, on the owner's explicit go, is the string→DateOnly pilot PR described in [plan.md § Where this plan stands](../plan.md#where-this-plan-stands-2026-11-09) and register decision D29. The completion gate, Astra/Luna/Sol roles, checkpoints and D22 inventory steps below apply to a later wave activation, not to the pilot PR.
 
 > **Mandatory completion gate:** This workstream and every major block inherit the [knowledge, documentation and tooling closure contract](../references/knowledge-and-tooling-closure.md). Save evidence-linked lessons/decisions (or an explicit no-new-lesson outcome), synchronize all relevant BRAIN/Markdown/indexes, build or update required supporting scripts/tools and test/run them (or record reviewed N/A), then complete full Astra review → feedback → fix → recheck. Persist the impact matrix, feedback and owned commit evidence; reopen the unit when relevant context changes. Feature implementation alone cannot close this work.
 
@@ -13,7 +15,7 @@ last_updated: 2026-09-26
 
 The user requires **10/10 for every technical rubric criterion**. No weighted average can conceal a weaker row. This is an evidence-based engineering acceptance target within declared support scope, not mathematical proof of perfect software.
 
-Inputs: docs/reports/technical-readiness-rubric-2026-09-25.md §§How to interpret, Rubric, R1–R7, Assessment decision; all child evidence; coverage contract; actual council verdict; current package facts. Preserve the historical rubric unchanged. Output: `+ docs/reports/readiness-final-assessment.md`.
+Inputs: docs/reports/technical-readiness-rubric-2026-09-25.md §§How to interpret, Rubric, R1–R7, Assessment decision; all child evidence; coverage contract; the council verdict of 2026-11-09 ([transcript](../../technical-readiness-to-1.0.council-transcript.md)) and any later re-run; current package facts. Preserve the historical rubric unchanged. Output: `+ docs/reports/readiness-final-assessment.md`.
 
 ## Tasks
 
@@ -30,7 +32,7 @@ Inputs: docs/reports/technical-readiness-rubric-2026-09-25.md §§How to interpr
 
 All validation surfaces meet100% line and branch coverage in the audited approved Coverlet denominator; all required reports exist. New structure/manifest, semantic truth, projections, security/resources, performance, deployment and consumer guidance pass their distinct gates. Duplicates, local outliers, hacks, hidden failures and speculative abstractions violate the quality constitution.
 
-Any unmet material criterion prevents declaring every row10/10. Explicit unsupported scope may be documented honestly; it cannot hide a promised failing capability or dilute coverage. Required council records must exist, not be inferred from an agent's role.
+Any unmet material criterion prevents declaring every row10/10. Explicit unsupported scope may be documented honestly; it cannot hide a promised failing capability or dilute coverage. Required council records must exist, not be inferred from an agent's role. The 2026-11-09 record exists at the transcript path above.
 
 ## Controls
 

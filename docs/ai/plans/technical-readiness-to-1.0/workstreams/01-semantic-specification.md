@@ -1,23 +1,25 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w01
-version: 1.3
+version: 1.4
 status: planned
-last_updated: 2026-09-26
+last_updated: 2026-11-09
 -->
 # W01 — Semantic specification and independent truth
+
+> **Status 2026-11-09:** not activated. The plan-gated council ran on 2026-11-09 and ruled that this plan is not activated as written; the only unit that may start, on the owner's explicit go, is the string→DateOnly pilot PR described in [plan.md § Where this plan stands](../plan.md#where-this-plan-stands-2026-11-09) and register decision D29. The completion gate, Astra/Luna/Sol roles, checkpoints and D22 inventory steps below apply to a later wave activation, not to the pilot PR.
 
 > **Mandatory completion gate:** This workstream and every major block inherit the [knowledge, documentation and tooling closure contract](../references/knowledge-and-tooling-closure.md). Save evidence-linked lessons/decisions (or an explicit no-new-lesson outcome), synchronize all relevant BRAIN/Markdown/indexes, build or update required supporting scripts/tools and test/run them (or record reviewed N/A), then complete full Astra review → feedback → fix → recheck. Persist the impact matrix, feedback and owned commit evidence; reopen the unit when relevant context changes. Feature implementation alone cannot close this work.
 
 ## Purpose and current evidence
 
-P0–P1 establishes reviewed truth before adapting implementation. Use v1.6 §§3,5.1,6 and the rubric's semantic/failure row. The initial pilot is Email, bounded numeric validation and string-to-DateOnly past-date behavior. The handoff's specification-first direction is useful; its unverified API examples and broad redesign are not requirements.
+P0–P1 establishes reviewed truth before adapting implementation. Use v1.6 §§3,5.1,6 and the rubric's semantic/failure row. The pilot is string→DateOnly as one PR (council 2026-11-09); Email and bounded numeric follow only if it passes. The handoff's specification-first direction is useful; its unverified API examples and broad redesign are not requirements.
 
 Verified inputs: `src/PineGuard.Core/Rules/OwaspRules.cs`, `src/PineGuard.MustClauses/MustOwaspClauses.cs`, `tests/PineGuard.Testing/Fixtures/OwaspRulesFixtures.cs`, `src/PineGuard.Core/Rules/StringRules.cs`, `src/PineGuard.MustClauses/MustStringClauses.cs`, `src/PineGuard.Core/Codes/MustCodes.Email.cs`.
 
 ## Preconditions and unresolved choices
 
-D04/D05 require runtime reproductions before a bug classification. D16 governs culture/time choices. Luna must identify exact pilot overloads, fixtures and return/failure shapes. Astra resolves null/empty/whitespace, normalization, conversion, bound inclusivity, date source/clock, exceptions and returned-value semantics. Current behavior is evidence only: the greenfield contract may deliberately choose better semantics without backward-compatibility constraints.
+D04/D05 require runtime reproductions before a bug classification. D16 governs culture/time choices. Luna must identify exact pilot overloads, fixtures and return/failure shapes. Astra resolves null/empty/whitespace, normalization, conversion, bound inclusivity, date source/clock (now decided by Temporal D-1, see W18), exceptions and returned-value semantics. Current behavior is evidence only: the greenfield contract may deliberately choose better semantics without backward-compatibility constraints.
 
 ## Ordered tasks
 
@@ -33,7 +35,7 @@ D04/D05 require runtime reproductions before a bug classification. D16 governs c
 
 ## Required case families
 
-Email includes null/empty/whitespace and explicitly supported normalization/syntax boundaries. Bounded numeric includes endpoints, immediately adjacent values, invalid range configuration and type-specific exceptional numeric values only where the selected type supports them. String-to-DateOnly includes parse success/failure, agreed format/culture, past/today/future relative to the chosen clock and conversion output. These are review prompts, not invented semantics or commitments to every possible overload.
+Email includes null/empty/whitespace and explicitly supported normalization/syntax boundaries. Bounded numeric includes endpoints, immediately adjacent values, invalid range configuration and type-specific exceptional numeric values only where the selected type supports them. String-to-DateOnly includes parse success/failure, agreed format/culture, past/today/future relative to the clock defined by Temporal D-1 (UTC calendar date when no `TimeProvider` is injected; an injected provider's `LocalTimeZone` otherwise) and conversion output. These are review prompts, not invented semantics or commitments to every possible overload.
 
 The OWASP investigation must distinguish individual rules, composite OwaspSafe behavior, normalization and the value returned by Must. Do not generalize the source observation into an exploit or a claim about all composite behavior.
 

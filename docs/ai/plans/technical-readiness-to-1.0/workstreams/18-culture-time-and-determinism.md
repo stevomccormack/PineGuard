@@ -1,17 +1,19 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w18
-version: 1.3
+version: 1.4
 status: planned
-last_updated: 2026-09-26
+last_updated: 2026-11-09
 -->
 # W18 — Culture, time and deterministic behavior
+
+> **Status 2026-11-09:** not activated. The plan-gated council ran on 2026-11-09 and ruled that this plan is not activated as written; the only unit that may start, on the owner's explicit go, is the string→DateOnly pilot PR described in [plan.md § Where this plan stands](../plan.md#where-this-plan-stands-2026-11-09) and register decision D29. The completion gate, Astra/Luna/Sol roles, checkpoints and D22 inventory steps below apply to a later wave activation, not to the pilot PR.
 
 > **Mandatory completion gate:** This workstream and every major block inherit the [knowledge, documentation and tooling closure contract](../references/knowledge-and-tooling-closure.md). Save evidence-linked lessons/decisions (or an explicit no-new-lesson outcome), synchronize all relevant BRAIN/Markdown/indexes, build or update required supporting scripts/tools and test/run them (or record reviewed N/A), then complete full Astra review → feedback → fix → recheck. Persist the impact matrix, feedback and owned commit evidence; reopen the unit when relevant context changes. Feature implementation alone cannot close this work.
 
 ## Purpose
 
-W18 establishes reproducible behavior across supported environmental conditions, particularly the early string-to-DateOnly past-date pilot. The handoff and v1.6 §§6–8 identify environment-sensitive correctness as a review dimension; specific clock/culture rules remain Astra decisions.
+W18 establishes reproducible behavior across supported environmental conditions, particularly the early string-to-DateOnly past-date pilot. The handoff and v1.6 §§6–8 identify environment-sensitive correctness as a review dimension; the clock rule is decided: Temporal D-1 (ratified by the owner, merged to main as `ee08ccd` on 2026-11-09) makes today the UTC calendar date when no `TimeProvider` is injected and uses an injected provider's `LocalTimeZone` otherwise (the merged DataAnnotations adapter resolves the provider via `ValidationContext.GetService(typeof(TimeProvider))`, an implementation detail rather than a D-1 term); culture rules remain owner decisions.
 
 Inputs: W01 semantics, W04 path/message/order policies and W05 scenarios. Luna inventories culture/time/date/randomness/environment dependencies and exact test paths. Output: `+ docs/reports/readiness-determinism.md`. D16/D22 must be resolved before normative expectations or abstractions are introduced.
 
@@ -28,11 +30,11 @@ Inputs: W01 semantics, W04 path/message/order policies and W05 scenarios. Luna i
 
 ## Case-selection guidance
 
-Select cultures with materially different parsing/casing behavior; do not enumerate many cultures without a reason. DateOnly semantics must specify how today is obtained and whether timezones/calendars are relevant. DST and UTC/local cases belong only where the chosen date/time contract uses those concepts. Determinism requirements must distinguish stable contractual output from intentionally environment-aware behavior.
+Select cultures with materially different parsing/casing behavior; do not enumerate many cultures without a reason. DateOnly "today" is obtained per Temporal D-1 (above); whether calendars are relevant remains to be specified. DST and UTC/local cases belong only where the chosen date/time contract uses those concepts. Determinism requirements must distinguish stable contractual output from intentionally environment-aware behavior.
 
 ## Acceptance
 
-No test depends accidentally on wall-clock date, developer locale or nondeterministic collection order. Replaying a case under its declared environment reproduces its outcome. Any environment-dependent behavior is explicit and independently tested.100% validation coverage includes branches introduced for environmental behavior; exclusions cannot hide them.
+No test depends accidentally on wall-clock date (the CI job `core-null-provider-timezone` runs the null-provider test under `TZ=Pacific/Kiritimati` and `Etc/GMT+12` to enforce this), developer locale or nondeterministic collection order. Replaying a case under its declared environment reproduces its outcome. Any environment-dependent behavior is explicit and independently tested.100% validation coverage includes branches introduced for environmental behavior; exclusions cannot hide them.
 
 ## Controls
 

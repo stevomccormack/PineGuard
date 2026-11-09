@@ -1,11 +1,13 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0-w20b
-version: 1.3
+version: 1.4
 status: planned
-last_updated: 2026-09-26
+last_updated: 2026-11-09
 -->
 # W20B — Major DDD validation sample, scheduled last
+
+> **Status 2026-11-09:** not activated. The plan-gated council ran on 2026-11-09 and ruled that this plan is not activated as written; the only unit that may start, on the owner's explicit go, is the string→DateOnly pilot PR described in [plan.md § Where this plan stands](../../plan.md#where-this-plan-stands-2026-11-09) and register decision D29. The completion gate, Astra/Luna/Sol roles, checkpoints and D22 inventory steps below apply to a later wave activation, not to the pilot PR.
 
 > **Mandatory completion gate:** This workstream and every major block inherit the [knowledge, documentation and tooling closure contract](../../references/knowledge-and-tooling-closure.md). Save evidence-linked lessons/decisions (or an explicit no-new-lesson outcome), synchronize all relevant BRAIN/Markdown/indexes, build or update required supporting scripts/tools and test/run them (or record reviewed N/A), then complete full Astra review → feedback → fix → recheck. Persist the impact matrix, feedback and owned commit evidence; reopen the unit when relevant context changes. Feature implementation alone cannot close this work.
 
@@ -60,4 +62,4 @@ internal sealed class PositiveAmount
 }
 ```
 
-Purpose: raw input→invariant int conversion→factory→single authority→candidate amount. `1` creates an immutable amount with Value1; zero returns false with null. The sealed class/private constructor prevents ordinary construction bypass in this teaching sample; there is no claim about reflection or serialization. Choosing production constructor/failure shape stays D08/D26. Email and string→DateOnly roadmap examples use verified current APIs above rather than silently inventing semantic policy. Status pending.
+Purpose: raw input→invariant int conversion→factory→single authority→candidate amount. `1` creates an immutable amount with Value1; zero returns false with null. The sealed class/private constructor prevents ordinary construction bypass in this teaching sample; there is no claim about reflection or serialization. Choosing production constructor/failure shape stays D08/D26. Email and string→DateOnly roadmap examples use APIs verified on 2026-09-26; re-verify against the Core/Common API baseline merged 2026-11-09 (`InRange`/`OutOfRange`, parsed-type suffixes) before use rather than silently inventing semantic policy. Status pending.

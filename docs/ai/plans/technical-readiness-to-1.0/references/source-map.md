@@ -25,8 +25,8 @@ These references were supplied by Luna's read-only intake. Paths are repository-
 | `AGENTS.md` and applicable scoped adapters | Repository entry points | Refresh BRAIN and scoped authority before operations |
 | `docs/ai/specs/spec.md`, `protocol.md`, `safety.md` | Governing specifications; safety §§2,7,8 | Scope, safe operations, ownership |
 | `docs/ai/specs/orchestration.md` | Context refresh; Workflow Orchestration | Explicit plan, checkpoints, drift/replan |
-| `docs/ai/specs/council.md` | §§1,4,5,6 | Activation criteria, recorded council procedure; user model override is explicit |
-| `docs/ai/workflows/plan-with-council.md` | Formal workflow | Transcript, revisions and verdict reference |
+| `docs/ai/specs/council.md` | §§1,4,5,6 | Activation criteria, recorded council procedure; user model override is explicit; executed 2026-11-09, transcript `docs/ai/plans/technical-readiness-to-1.0.council-transcript.md` |
+| `docs/ai/workflows/plan-with-council.md` | Formal workflow | Transcript, revisions and verdict reference; verdict stamped on plan.md header 2026-11-09 |
 | `docs/ai/meta/taxonomy.md` | Plans | Plan organization; user-requested folder overrides flat convention |
 | `docs/ai/README.md` | Active Plans | Canonical master index and matching metadata |
 | `docs/ai/rules/global.md`, `coordination.md` | Applicable global/test-operation rules | Coordination before builds/tests/coverage |
@@ -48,9 +48,10 @@ These references were supplied by Luna's read-only intake. Paths are repository-
 - Regex: `src/PineGuard.Core/Rules/StringRules.cs`, `src/PineGuard.MustClauses/MustStringClauses.cs`, `src/PineGuard.Core/Rules/Owasp/OwaspRegex.cs`.
 - CI/CLI: `.github/workflows/ci.yml`, `tests/Directory.Build.props`, `apps/cli/package.json` (scripts at reviewed lines 15–21), `apps/cli/src/audit/engine.ts`, `apps/cli/src/audit/rules/layer-parity.ts`, `apps/cli/src/audit/rules/must-codes.ts`.
 - Pilot code provenance: `src/PineGuard.Core/Codes/MustCodes.Email.cs`.
+- string→DateOnly pilot: `src/PineGuard.Core/Rules/StringRules.DateOnly.cs`, `src/PineGuard.Core/Utils/StringUtility.DateOnly.cs`, `src/PineGuard.MustClauses/MustStringDateOnlyClauses.cs`, `src/PineGuard.GuardClauses/GuardStringDateOnlyClauses.cs`, `src/PineGuard.FluentValidation/FluentStringDateOnlyExtensions.cs`, `src/PineGuard.DataAnnotations/StringDateOnlyAttributes.cs` — the current path the pilot's benchmark and consistency test compare against (council 2026-11-09).
 - Mutable lifecycle: `src/PineGuard.Core/MustClauses/MustValidator.cs`, `InlineMustValidator.cs`, `MustPropertyRule.cs`; `tests/PineGuard.Core.UnitTests/MustClauses/MustValidatorTests.cs`.
 
-No concrete property/fuzz/differential/mutation harness, benchmark project, trimmed/native consumer project, API baseline or analyzer-test file was established by this bounded intake. Reviewed configuration/source/dependencies/workflows did not reveal dedicated evidence for several of those categories; this is not proof of repository-wide absence. Each affected workstream first inventories and approves exact paths.
+No concrete property/fuzz/differential/mutation harness, benchmark project, trimmed/native consumer project, API baseline or analyzer-test file was established by this bounded intake: the pilot PR establishes the BenchmarkDotNet project (TP-BENCH). Reviewed configuration/source/dependencies/workflows did not reveal dedicated evidence for several of those categories; this is not proof of repository-wide absence. Each affected workstream first inventories and approves exact paths.
 
 ## Provenance rules
 
