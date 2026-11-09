@@ -61,6 +61,7 @@ fixtures, finding keys and baseline deletions. No implementer chooses a mechanis
 | `docs/ai/specs/language/vocabulary.json`, `vocabulary.md` | Version 2 schema and SameDay declaration; §2 step 5 documents two-way enforcement |
 | `docs/ai/specs/tools/audit-cli/spec.md` §3.1 | Exact matching updated rule descriptions from the ruling |
 | `apps/cli/config/baseline.json` | Delete only prescribed debt keys; no additions |
+| `apps/cli/config/baseline.json` (Phase 1 carry-over, bounded exception in T-00 §9) | Delete the 23 `test-structure` and 1 `test-records` keys that `4356045` added for the plan-versus-spec test-naming conflict, by renaming the 24 test data members to the `unit-test.md` names (or by recording a spec exception for `ClockReadCase` in `unit-test.md` itself, with Fable review, if the plan's name is kept). Delete the 2 `layer-parity`, 2 `must-usage` and 6 `rules-usage` keys for the reflective DataAnnotations invocation once this unit's layer-parity/must-usage changes recognise that invocation; otherwise record each as a declared absence in `vocabulary.json`. Acceptance: full audit exit 0 with those 34 keys gone and no replacement keys; the exception in T-00 §9 is then struck |
 | Audit tests and fixtures under `apps/cli/test/` | VIBE vectors below and paired test registrations using existing rule-test conventions |
 
 ```ts

@@ -1,14 +1,15 @@
 <!-- metadata_header
 type: plan
 id: temporal-00-program
-version: 1.1
+version: 1.2
 status: active
-last_updated: 2026-11-08
+last_updated: 2026-11-09
 final_acceptance_ref: docs/ai/plans/temporal-final-fable-acceptance-2.md
-council_verdict_ref: docs/ai/plans/temporal-00-program.fable-council-transcript.md
+council_verdict_ref: docs/ai/plans/temporal-00-program.council-transcript-2026-11-08.md
+previous_council_verdict_ref: docs/ai/plans/temporal-00-program.fable-council-transcript.md
 historical_council_verdict_ref: docs/ai/plans/temporal-00-program.council-transcript.md
-council_verdict_date: 2026-09-26
-council_trigger: api
+council_verdict_date: 2026-11-08
+council_trigger: explicit
 -->
 
 # Plan T-00 — Temporal & Time-Zone Program: Charter, Decisions, Naming Canon, Sub-Agent Contract
@@ -17,6 +18,11 @@ council_trigger: api
 > Revised real Claude Fable 5.1 council and corrective acceptance are complete: P0 READY FOR
 > IMPLEMENTATION, recorded in `temporal-final-fable-acceptance-2.md`. Historical evidence remains separate.
 > No further owner row-signing is required. [A-01]
+> **Owner ratification (2026-11-09)**: a second Fable council (2026-11-08, transcript in
+> `council_verdict_ref` above) reviewed every §3 row before the Phase 1 merge. The owner ratified the
+> register on 2026-11-09 and resolved D-1 as the **UTC default** ("PineGuard never guesses your zone.
+> Without an injected clock, dates are UTC; inject a `TimeProvider` to choose a zone"). §3 records the
+> ratified rows, the new D-16 and the D-12 tombstone.
 > **Author**: Claude Fable 5.1 planning pass (2026-09-22), from the temporal gap assessment of the same day.
 > **Implementers**: Codex team agents; Claude Fable 5.1 handles all
 > implementation decisions, reviews and councils. Dispatch follows
@@ -168,9 +174,21 @@ signature is needed. Earlier council approval does not prove the revised council
 Claude Fable 5.1 rerun completed with corrective findings; its actual transcript/receipt
 records the run and controlling corrections. Final Fable acceptance gates activation.
 Exceptional reopening follows section 0, not model preference. [A-01]
+
+**Status vocabulary and the 2026-11-09 ratification.** A row is *Proposed* until the owner signs
+it and *Ratified* afterwards. On 2026-11-09 the owner ratified every row in this table after the
+2026-11-08 Fable council (transcript: `council_verdict_ref`), which was convened because Phase 1 had
+embodied the rows while each still read "Recommended" or "Astra final under owner authorization".
+Those historical status phrases are preserved below as provenance; every row is **Ratified (owner,
+2026-11-09)** unless its Status cell says otherwise. "Astra final under owner authorization" means
+the owner delegated the September adjudication to Astra; it never meant the owner had signed. D-1
+changed at ratification (UTC default replaces the interim host-zone default); D-14 was reworded
+from "not promised" to "deferred, additive"; D-16 records the implemented TimeSpan rename, which
+previously had no row; D-12 is a tombstone for an id the register skipped.
+
 | Id | Decision | Recommendation | Rejected alternatives | Status |
 |---|---|---|---|---|
-| D-1 | Calendar today for DateOnly and DateTime age. | Provider LocalTimeZone defines today, derived from one GetUtcNow sample via foundation TryGetTodayDate and checked TryGetDateAtOffset. Do not route predicates through unchecked GetLocalNow. DateTime input is own Date with Kind ignored; no host conversion. Reference projection failure is date.reference.out-of-range attributed timeProvider. Fixed-clock foundation lands first. [A-03, A-07] | UTC calendar today, implicit host conversion, out-of-range reference dates. | Astra final under owner authorization |
+| D-1 | Calendar today for DateOnly and DateTime age. | **PineGuard never guesses the host's zone.** With no injected `TimeProvider`, "today" is the **UTC calendar date** (the pre-Phase-1 behaviour). With an injected provider, "today" is the calendar date in that provider's `LocalTimeZone`. Both paths are the one foundation helper `TryGetTodayDate`: one `GetUtcNow` sample, checked `TryGetDateAtOffset` (offset zero for a null provider; the provider's offset at the sampled instant otherwise); never unchecked `GetLocalNow`. DateTime input is its own Date with Kind ignored; no host conversion. Reference projection failure is date.reference.out-of-range attributed timeProvider. The `core-null-provider-timezone` CI job (Linux, `TZ=Pacific/Auckland`) asserts the UTC-date invariant. Ratified on the 2026-11-08 Fable council's recommendation, independently matched by Astra's Phase 2 review. [A-03, A-07; council 2026-11-08] | Host `LocalTimeZone` as the null-provider default: the interim Phase 1 implementation (`3b5e90f`…`e7844e2`), replaced because it made validation answers depend on the process zone and produced the 14-test regression the September council predicted. Mandatory provider with no default (unusable without ceremony). A global static default clock (ambient state). Implicit host conversion; out-of-range reference dates. | Ratified (owner, 2026-11-09); supersedes "Astra final under owner authorization" |
 | D-2 | Which calendar `DateTimeRules` calendar predicates use (F-5). | Change `DateTimeRules.IsSameDay(DateTime?, DateTime?)` to compare `a.Value.Date == b.Value.Date` (Kind ignored), so every DateTimeRules calendar predicate uses the value's own wall-clock date. Document "Kind is ignored" in the `<summary>`. Add `IsSameDay(DateTimeOffset, DateTimeOffset, TimeZoneInfo timeZone)` in Phase 2 as written. | Keep UTC comparison and document — the only defence is back-compat, forbidden pre-1.0. | Recommended (council 2026-09-26: REJECT — replaced) |
 | D-3 | OS zone lookup inside Core versus the "no IO in Core" invariant. | **Astra override A-05:** preserve spec §5.3. Core accepts supplied `TimeZoneInfo`; remove the Core host-ID lookup family and proposed broad spec exception. Existing composition/DA boundaries resolve host IDs once; consumers can use BCL resolution directly. Host resolvability, versioned snapshot membership and mapping remain distinct. Runtime/OS/globalization behavior is verified at composition boundaries; netstandard2.1 is a compile surface, not a runtime guarantee. | A Core host lookup with a generic culture/environment exception violates the Brain. A satellite package is unnecessary. Snapshot membership cannot answer host resolvability. A separate host predicate proposal is deferred pending concrete demand and Claude Fable 5.1 review/council; no exception is authorized by this plan. | Astra final recommendation; revised real Claude Fable 5.1 council and corrective acceptance completed; P0 READY FOR IMPLEMENTATION (`temporal-final-fable-acceptance-2.md`) |
 | D-4 | Public `PineGuard.Testing` clock double. | Keep `FixedTimeProvider`. New ctor `FixedTimeProvider(DateTimeOffset utcNow, TimeZoneInfo? localTimeZone = null)`; `LocalTimeZone` is overridden and returns `localTimeZone ?? TimeZoneInfo.Utc`; fall-through to the host zone is forbidden and tested. Add `DefaultBehindUtc` beside §6.3's `DefaultAheadOfUtc`; every today-relative rule has at least one midnight-boundary vector in each. Lands as its own commit before D-1. Document Microsoft's `FakeTimeProvider` as the recommended consumer choice for advancing clocks; PineGuard's double stays frozen-instant only. | Replace with `FakeTimeProvider` dependency — adds `Microsoft.Extensions.TimeProvider.Testing` to a published package and breaks Standards. Extend with a settable `LocalTimeZone` that defaults to the host zone — F-3 restated. | Recommended (council 2026-09-26: AMEND) |
@@ -180,10 +198,12 @@ Exceptional reopening follows section 0, not model preference. [A-01]
 | D-8 | tzdata `backward` links in Standards. | Ingest `backward` (and `etcetera` if `Etc/GMT±n` are absent); generate `DefaultIanaTimeZoneLinkData.cs`. `IsIanaTimeZoneId` / `Must.Be.IanaTimeZoneId` accept canonical ids AND links (a link is a valid tzdata id). Add strict opt-in `IsCanonicalIanaTimeZoneId` / `Must.Be.CanonicalIanaTimeZoneId` / `Guard.Against.NotCanonicalIanaTimeZoneId`, message `"{paramName} must be a canonical IANA time zone id."`; code constant is a T-03 U2 discovery item (in the existing Standards IANA code family, condition `not-canonical`) (the Standards IANA code family was not read in this session). Keep `IIanaTimeZoneProvider.TryResolveLink(string? value, out string? canonicalId)`; document it as the canonicalisation path. Own unit in the F-11 pass. | Canonical-only default with `*OrLink` clauses (`IanaTimeZoneRules.IsIanaTimeZoneId(value, provider)` staying canonical-only, `IsIanaTimeZoneIdOrLink`, `Must.Be.IanaTimeZoneIdOrLink`) — rejects `Europe/Oslo` et al. (2022b `backward` links). A `bool acceptLinks` parameter — boolean parameters read badly at call sites. An enum `IanaIdMatch` — one enum for one method. `OrAlias` suffix family — same defect, different word. | Recommended (council 2026-09-26: REJECT — replaced) |
 | D-9 | `GuardTimeSpanClauses` boundary polarity (F-6). | Fix as originally specified: the two threshold guards call the complement Must clause with the **complemented** `inclusion` (`Inclusive ↔ Exclusive`), so the boundary passes exactly as in `GuardNumberClauses` (`Guard.Against.LessThan` → `Must.Be.GreaterThanOrEqual`); the exact mapping is in T-01 U4b. Land it as a standalone commit BEFORE the T-01 rename, with a failing test first (`Guard.Against.LessThan(v, v)` must not throw). Sweep every threshold guard in every `Guard*Clauses` class with a `v == t` boundary test; F-6 audited TimeSpan and Number only. | Leave it — a `Guard.Against.ShorterThan(v, t)` that throws on `v == t` is a boundary defect shipped under a new name. Fix inside the rename diff — dirty bisect. | Recommended (council 2026-09-26: AMEND) |
 | D-10 | Routines and the "no PRs, direct `merge --no-ff` to `main`" standing rule. | Routines push `claude/temporal-<unit>` branches only, rebased on main before push, and never edit the tracker; the owner updates the tracker on main at merge. Routines never open PRs. | Let routines open PRs — contradicts the 2026-08-30 standing rule. Per-branch tracker edits — conflict when units run in parallel. | Recommended (council 2026-09-26: AMEND) |
-| D-11 | Council evidence and activation. | Earlier council remains historical evidence. Current revised design is Astra-adjudicated under owner authorization; no owner row-signing is required. The actual revised Claude Fable 5.1 council completed; its real transcript records corrective findings. Final Fable acceptance of these corrections is mandatory before activation. | Implied or fabricated rerun approval. | Design finalized; execution gate pending |
+| D-11 | Council evidence and activation. | Earlier council remains historical evidence. Current revised design is Astra-adjudicated under owner authorization; no owner row-signing is required. The actual revised Claude Fable 5.1 council completed; its real transcript records corrective findings. Final Fable acceptance of these corrections is mandatory before activation. | Implied or fabricated rerun approval. | Design finalized; execution gate pending (superseded 2026-11-09: the owner signed the register; see the status vocabulary note above) |
+| D-12 | — | Never allocated. The register went D-11 → D-13 at the Astra revision; the id is retired so existing references stay stable. | — | Tombstone |
 | D-13 | Required zone configuration. | Must returns Zone.Null failure attributed nameof(timeZone) before value/null equality or negation; Guards delegate. Fluent checks zone at composition. DA checks the ID constructor and resolves it once at the existing adapter boundary; unknown ID is passed as a resolution outcome to Must.Be.ResolvedTimeZone; Must owns Id.Unknown and its message, with no Core/Must lookup. | Must throwing on null zone, naive complement success, nonexistent Core resolver. | Astra final A-05/A-10 |
-| D-14 | DTO calendar age basis. | Age uses value.Date and one sampled clock instant projected to the value offset through foundation TryGetDateAtOffset, then shared TryGetAge completed years. Guard representability before projection; failure is provider reference diagnostic, never clamp or unchecked ToOffset. This fixed-offset convention is not named-zone/DST or legal/regional age. New instant predicates use actual instants and separate rules. No zone-aware age overload is promised. [A-03, A-07] | Mix caller offset with provider zone, threshold AddYears overflow, machine-date conversion. | Astra final under owner authorization |
+| D-14 | DTO calendar age basis. | Age uses value.Date and one sampled clock instant projected to the value offset through foundation TryGetDateAtOffset, then shared TryGetAge completed years. Guard representability before projection; failure is provider reference diagnostic, never clamp or unchecked ToOffset. This fixed-offset convention is not named-zone/DST or legal/regional age. New instant predicates use actual instants and separate rules. A zone-aware age overload (a `TimeZoneInfo` parameter on Past/Future/MinimumAge) is **deferred, not foreclosed**: it would be additive, is a T-04 candidate, and needs its own register row before it ships (council 2026-11-08). [A-03, A-07] | Mix caller offset with provider zone, threshold AddYears overflow, machine-date conversion. | Ratified (owner, 2026-11-09); wording changed from "no zone-aware age overload is promised" |
 | D-15 | Which new Must clauses get a `Not*` pair. | **State predicates** get a pair, matching `FirstDayOfMonth`/`NotFirstDayOfMonth`: `LeapYear`, `LeapDay`, `Midnight`, `OnDayOfWeek`, `OnInterval`, `WholeSeconds`, `WholeMinutes`, `MultipleOf`, `BusinessDay`, `SameMonth`/`SameYear`/`SameIsoWeek`/`SameDay(zone)`, `WithinLast`, `WithinNext`, `OlderThan`, `Expired`/`NotExpired`, `FirstDayOfQuarter`, `LastDayOfQuarter`. `WithinLast`/`WithinNext` keep their pairs per the existing precedent `NotWithinDaysFromNow`. **Constraints** get none, matching `MinimumAge`: `Effective`, `WithinValidity`, `MinimumAge`/`MaximumAge`/`AgeBetween`, `Timeout`, the sign family (explicit complements exist), `UtcOffset`, `ValidLocalTime`, `UnambiguousLocalTime`, `InTimeZone`, `Iso8601*`/`Rfc*`, `UnixSeconds`/`UnixMilliseconds`. §4.5/§5 list the pairs and their codes. | Pair everything — `NotEffective`, `NotTimeout` read as nonsense at call sites. `Unexpired` — violates the `Not*` canon (`docs/ai/specs/guard-clauses/project.md:205`). Drop pairs on comparisons (`WithinLast`/`WithinNext`/`OlderThan`) — contradicts the existing precedent `NotWithinDaysFromNow`. | Recommended (council 2026-09-26: AMEND) |
+| D-16 | TimeSpan comparison naming at every layer (added 2026-11-09; previously carried only by the §5 naming canon). | `TimeSpanRules.IsGreaterThan`/`IsLessThan` → `IsLongerThan`/`IsShorterThan` (Core, including the string TimeSpan rules), `Must.Be.LongerThan`/`ShorterThan`, `Guard.Against.ShorterThan`/`LongerThan`, Fluent `LongerThan`/`ShorterThan`, DataAnnotations `[LongerThan]`/`[ShorterThan]`. Implemented in T-01 U4a/U4b with the D-9 boundary fix landed first. An observable behaviour change needs a register row (council 2026-11-08). | Keep `GreaterThan`/`LessThan` for TimeSpan: reads as magnitude on a duration and collides with the sign family planned in T-05. | Ratified (owner, 2026-11-09) |
 
 ### 3.1 Historical council and current revision
 
@@ -588,6 +608,22 @@ owned by removed members in their deleting unit; do not add keys except the exac
 moves defined above, and do not add ignoreMethods/aliases workarounds, exceptions,
 `--update-baseline`, or fake layer members. T-02 U0 establishes the
 reviewed absence schema and string Rules mapping before temporal Must work.
+
+**Bounded exception, Phase 1 only (recorded 2026-11-09).** Commit `4356045` on
+`codex/temporal-foundation` changed `apps/cli/config/baseline.json` by +53/−23 lines (net +30 keys)
+so that the branch's full audit is key-for-key identical to main's 16 visible findings. The additions
+are: 19 `test-tuples` keys that re-key entries whose line numbers moved (paired with 19 deletions:
+rename moves, permitted above); 6 `rules-usage` keys for the four D-1 members
+(`DateOnlyRules.IsInPast`/`IsInFuture`/`HasMinimumAge`, `DateTimeRules.HasMinimumAge`) and the two
+string TimeSpan rules, where the audit cannot see the reflective DataAnnotations invocation that T-01
+§U2b documents; 2 `layer-parity` and 2 `must-usage` keys for `GreaterThan`/`LessThan` in
+DataAnnotations, the same reflective false positive; and 23 `test-structure` plus 1 `test-records`
+keys for the plan-versus-spec test-naming conflict (T-01 followed the plan's `ClockReadCase` naming
+where `unit-test.md` prescribes otherwise). The owner accepted these additions on 2026-11-09 as a
+bounded exception to the "deletions only" clause above, because the alternative was to rewrite 24
+test files to the spec's naming before the merge. The exception expires with T2-U0, which owns the
+removal criteria recorded in `temporal-02-timezone-core.md` §U0; the Phase 2 cohort gate reverts to
+"deletions only" with no carry-over.
 
 Default Qodana also requires securely provisioned `QODANA_TOKEN`; the documented
 `-Linter auto` mode is its alternate invocation. Missing scanner prerequisites remain

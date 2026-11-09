@@ -233,11 +233,13 @@ at `artifacts/reviews/T1-U1-fable-source-review.json`.
 ### U2 — Today derivation (D-1) + same-day calendar fix (D-2)
 
 **Named host integration check (U2 ownership)**: U2 adds
-`DateTimeUtilityTests.TryGetTodayDate_NullProviderUsesSystemLocalTimeZone` and paired
+`DateTimeUtilityTests.TryGetTodayDate_NullProviderUsesUtcDate` (named
+`…UsesSystemLocalTimeZone` until the D-1 ratification of 2026-11-09) and paired
 data in `DateTimeUtilityTestData.cs`. Run it in a dedicated Linux CI process with
 `TZ=Pacific/Auckland` (non-UTC) once, alongside the normal UTC jobs. Bracket the system
-instant reads to tolerate midnight rollover and assert the derived system-local date;
-do not change the running process's global zone or infer this result from FixedTimeProvider.
+instant reads to tolerate midnight rollover and assert the derived **UTC** calendar date, proving
+the null-provider path is independent of the process zone; do not change the running process's
+global zone or infer this result from FixedTimeProvider.
 List `.github/workflows/ci.yml` as U2's CI file ownership. [A-03; Fable corrective council]
 
 **Atomic acceptance cohort**: U2 and U2b share one pre-merge gate. U2 is not independently commit-ready or mergeable: Date.Reference.OutOfRange gains its first Must consumers in U2b before the complete gate and audit must-codes run. All Brain checks run for this combined cohort; Phase 1 cannot merge without U2b and a passing audit.
@@ -279,8 +281,9 @@ T-02 zone-day comparison and T-04 age consume this helper; neither adds
 its own duplicate implementation or depends on a later phase.
 
 Also add internal `DateTimeUtility.TryGetTodayDate(TimeProvider? timeProvider, out DateTime today)`:
-select provider once, sample GetUtcNow once, read provider.LocalTimeZone, obtain that zone's
-offset at the sampled instant once, then call TryGetDateAtOffset. New today/calendar-age/DateOnly
+sample GetUtcNow once (the system clock when the provider is null); for an injected provider read
+its LocalTimeZone and obtain that zone's offset at the sampled instant once, for a null provider use
+offset zero (the UTC calendar date; D-1 as ratified 2026-11-09), then call TryGetDateAtOffset. New today/calendar-age/DateOnly
 relative predicates use the guarded reference; they must not accept unverified GetLocalNow boundary behavior at
 range extremes. Existing unrelated public GetLocalNow behavior stays unchanged. Must evaluates
 this single sampled reference through existing internal-rule precedent without resampling.
@@ -343,8 +346,12 @@ return value.Value.Date == other.Value.Date;
 Update the `<remarks>` on the four D-1 members (`DateOnlyRules.IsInPast`, `IsInFuture`,
 `HasMinimumAge`, and `DateTimeRules.HasMinimumAge`): replace "UTC" wording with "the clock's local
 calendar date, derived from one sampled instant with checked projection". Do not touch `IsWithinDaysFromNow` (instant
-arithmetic, D-6). State explicitly that null selects `TimeProvider.System` and today follows
-the host zone; inject a provider to select a stable reference zone. [A-03; Fable corrective council]
+arithmetic, D-6). State explicitly that null reads the system clock and uses the UTC calendar date
+(PineGuard never guesses the host's zone); inject a provider to evaluate today in a chosen zone.
+(Until the owner's D-1 ratification of 2026-11-09 this sentence read "today follows the host zone";
+the UTC default was adopted on the 2026-11-08 council's recommendation and the remarks on
+`DateOnlyRules`, `DateTimeRules` and the 15 DataAnnotations attributes were reworded in the same
+commit.) [A-03; Fable corrective council; council 2026-11-08]
 
 Update `DateTimeRules.IsSameDay`'s `<summary>`/`<remarks>` (D-2): first sentence states the two
 values are compared "by their own calendar date; `Kind` is ignored" (drop the old "in UTC" wording
@@ -372,7 +379,7 @@ the Core predicate's semantics and doc change.
 | | `UnspecifiedBoundaryAheadOfUtc` | `2008-06-16 00:00 Unspecified`, 18 | `DefaultAheadOfUtc` | true (local today is 06-16; exactly 18) |
 | | `UtcKindNoLongerConvertedAheadOfUtc` | `2008-06-16 20:00 Utc`, 18 | `DefaultAheadOfUtc` | true — **was `false` pre-D-1**: the old rule converted this UTC instant into `+10` (→ 2008-06-17, one day short); the new rule reads `value.Date` literally (2008-06-16), which meets the boundary |
 | | `OneDayShortBehindUtc` | `2008-06-15 02:00 Utc`, 18 | `DefaultBehindUtc` | false — **was `true` pre-D-1**: the old rule converted this UTC instant into `−8` (→ 2008-06-14, meeting the boundary); the new rule reads `value.Date` literally (2008-06-15), which is one day short of local today (2026-06-14 minus 18 years = 2008-06-14) |
-| Internal guarded reference test data (`TryGetTodayDate`, using existing internal-testing precedent) | `AheadOfUtc` → `2026-06-16`; `BehindUtc` → `2026-06-14`; `Default` → `2026-06-15`; extreme projection → false/out default. Null-provider fallback is pinned by TryGetTodayDate_NullProviderUsesSystemLocalTimeZone in a dedicated non-UTC CI process, using a captured/bracketed system-provider date. | | | |
+| Internal guarded reference test data (`TryGetTodayDate`, using existing internal-testing precedent) | `AheadOfUtc` → `2026-06-16`; `BehindUtc` → `2026-06-14`; `Default` → `2026-06-15`; extreme projection → false/out default. Null-provider fallback is pinned by TryGetTodayDate_NullProviderUsesUtcDate in a dedicated non-UTC CI process, asserting the bracketed UTC calendar date (D-1 as ratified 2026-11-09). | | | |
 | `DateTimeRulesFixtures.IsSameDay` | `MixedKindUnspecifiedAndUtcSameDate` | `2026-06-15 23:30 Unspecified`, `2026-06-15 05:00 Utc` | — | true (unchanged pre/post D-2: neither Kind was ever converted by the old rule either, since `DateTimeUtility.ToUtc` only shifts `Local`) |
 | | `MixedKindLocalAndUnspecifiedNowDeterministic` | `2026-06-15 23:30 Local`, `2026-06-15 23:30 Unspecified` | — | true, and now deterministic on every host — **pre-D-2 this pair's result depended on the actual host's `TimeZoneInfo.Local`** (the `Local`-Kind side was silently converted via `DateTime.ToUniversalTime()`), so it could not be pinned as a fixture at all; this is the case D-2 exists to fix |
 
@@ -832,18 +839,19 @@ Claude Fable 5.1 phase review (orchestration §2.4) with this phase's file list.
 ## 5. Definition of Done
 
 - All eleven units (U0, U1, U2, U2b, U2c, U3, U4, U4a, U4b, U5, U6) Done in the tracker with commit hashes.
-- `grep -rn "IsGreaterThan\|IsLessThan" src/PineGuard.Core/Rules/TimeSpanRules.cs` returns nothing.
+- `grep -n "public static bool Is\(Greater\|Less\)Than" src/PineGuard.Core/Rules/TimeSpanRules.cs` returns nothing (the public surface carries only `IsLongerThan`/`IsShorterThan`; the private bodies still call `RuleComparison.IsGreaterThan`/`IsLessThan`, which U4a forbids touching — the original unqualified grep could never pass and was corrected on 2026-11-08 during the Phase 1 review).
 - `grep -rn "ToCalendarDate" src/PineGuard.Core/Utils/DateTimeUtility.cs` returns nothing (D-1: removed, not renamed).
 - `DateOnlyRules.IsInPast(new DateOnly(2026,6,15), timeProvider: FixedTimeProvider.DefaultAheadOfUtc)` is `true` (it was `false`).
 - `TimeOnlyRules.IsBetween(new TimeOnly(23,0), new TimeOnly(22,0), new TimeOnly(6,0))` is `true`; every TimeOnly integration layer follows this wrap contract.
-- `Guard.Against.LessThan(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5))` does not throw (it did).
+- `Guard.Against.ShorterThan(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5))` does not throw (its predecessor `Guard.Against.LessThan` did, before U4b; the clause was renamed by U4a).
+- `DateTimeUtility.TryGetTodayDate(null, out var today)` yields the UTC calendar date on a host in any zone (D-1 as ratified 2026-11-09; asserted by the `core-null-provider-timezone` CI job under `TZ=Pacific/Auckland`).
 - Standards is **not** affected yet (it pins alpha.7); the rename reaches it in Phase 3.
 
 ## 6. Risks specific to this phase
 
 | Risk | Mitigation |
 |---|---|
-| D-1 changes `HasMinimumAge` results for any `DateTime` birth date whose local calendar date, read literally, differs from what the old UTC-conversion logic computed — not just `Utc`-kind values, since `Kind` is now ignored entirely | Only when the caller does not pin a provider (containers are UTC, so this needs a non-UTC `TimeProvider.LocalTimeZone`); documented in the `<remarks>`. U2's fixtures pin both directions (`DefaultAheadOfUtc`/`DefaultBehindUtc`) and name the two rows whose expectation flips, with the pre-change result recorded alongside each. |
+| D-1 changes `HasMinimumAge` results for any `DateTime` birth date whose local calendar date, read literally, differs from what the old UTC-conversion logic computed — not just `Utc`-kind values, since `Kind` is now ignored entirely | Only when the caller injects a provider whose `LocalTimeZone` is not UTC; with no provider "today" is the UTC calendar date (D-1 as ratified 2026-11-09), so the pre- and post-D-1 reference dates coincide and only the Kind handling of the birth date changes. Documented in the `<remarks>`. U2's fixtures pin both directions (`DefaultAheadOfUtc`/`DefaultBehindUtc`) and name the two rows whose expectation flips, with the pre-change result recorded alongside each. |
 | D-2 makes `DateTimeRules.IsSameDay` deterministic for `DateTimeKind.Local` operands, where it was previously silently host-dependent (via `DateTime.ToUniversalTime()` against the real `TimeZoneInfo.Local`) | This is a bug fix, not a behaviour change callers can rely on: any test asserting the old Local-Kind result was already unreproducible off the author's machine. U2's fixtures record this explicitly rather than picking an arbitrary "before" value. |
 | D-9's guard-polarity fix only inspects the two TimeSpan guard files without confirming no other `Guard*Clauses` class has the same single-threshold-plus-`Inclusion` shape | U4's audit note classifies each current file; Claude Fable 5.1 re-runs the inventory and checks actual boundaries, not only the two diffs. [A-01, A-11] |
 | Renaming `GreaterThan` touches a Number-family file by mistake | The grep restricts to `*TimeSpan*` paths; Claude Fable 5.1 checks the diff against the owned file list. [A-01] |

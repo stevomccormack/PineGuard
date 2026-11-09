@@ -184,7 +184,8 @@ that helper then TryGetAge; DateOnly wraps its date only on supported targets. [
 **Clock/configuration contract [A-03]**: capture now exactly once per predicate. Tests include a
 counting provider and a provider that advances on each read, proving one read and stable boundary
 behavior. Separate composed validations may read different instants; no cross-rule atomic snapshot
-is promised. Calendar operations use the provider's LocalTimeZone only where D-1 applies;
+is promised. Calendar operations use the injected provider's LocalTimeZone only where D-1 applies,
+and the UTC calendar date when no provider is injected (D-1 as ratified 2026-11-09);
 DateTimeOffset age retains D-14's fixed-offset basis. Do not introduce a global clock or zone.
 
 **Fixtures** (every group has the clock as the last tuple element; use `FixedTimeProvider.Default`
