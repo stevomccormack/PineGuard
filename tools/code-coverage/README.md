@@ -150,7 +150,10 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/Ne
 # Clean + Debug
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Configuration Debug -Clean
 
-# Run in isolated mode (separate test results per run)
+# Run in isolated mode (separate test results per run). Publish is per target framework: when
+# -Framework is left unbound, every test project multi-targets net8.0;net10.0
+# (tests/Directory.Build.props), so -Isolated publishes to its own temp directory once per TFM
+# rather than once with no -f (which fails NETSDK1129). Bind -Framework to restrict to one pass.
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Scope All -Isolated
 
 # Filter tests (dotnet test --filter expression)

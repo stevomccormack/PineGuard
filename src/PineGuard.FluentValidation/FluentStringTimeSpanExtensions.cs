@@ -61,7 +61,7 @@ public static class FluentStringTimeSpanExtensions
             message, MustCodes.Time.Duration.InRange);
 
     /// <summary>
-    /// Validates that the string value represents a <see cref="TimeSpan"/> greater than the specified threshold.
+    /// Validates that the string value represents a <see cref="TimeSpan"/> longer than the specified threshold.
     /// </summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
@@ -70,20 +70,20 @@ public static class FluentStringTimeSpanExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustTimeSpanClauses.GreaterThan"/>. If the value is <see langword="null"/>,
+    /// Delegates to <see cref="MustTimeSpanClauses.LongerThan"/>. If the value is <see langword="null"/>,
     /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
-    /// <example><code>RuleFor(x => x.Timeout).GreaterThan(TimeSpan.FromSeconds(30));</code></example>
-    /// <seealso cref="MustTimeSpanClauses.GreaterThan"/>
-    public static IRuleBuilderOptions<TModel, string?> GreaterThan<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+    /// <example><code>RuleFor(x => x.Timeout).LongerThan(TimeSpan.FromSeconds(30));</code></example>
+    /// <seealso cref="MustTimeSpanClauses.LongerThan"/>
+    public static IRuleBuilderOptions<TModel, string?> LongerThan<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         TimeSpan threshold,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.GreaterThan(val, threshold, inclusion, paramName: null) : MustResult<TimeSpan>.Ok(TimeSpan.Zero),
-            message, MustCodes.Time.Duration.NotGreater);
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.LongerThan(val, threshold, inclusion, paramName: null) : MustResult<TimeSpan>.Ok(TimeSpan.Zero),
+            message, MustCodes.Time.Duration.NotLonger);
 
     /// <summary>
-    /// Validates that the string value represents a <see cref="TimeSpan"/> less than the specified threshold.
+    /// Validates that the string value represents a <see cref="TimeSpan"/> shorter than the specified threshold.
     /// </summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
@@ -92,15 +92,15 @@ public static class FluentStringTimeSpanExtensions
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>
-    /// Delegates to <see cref="MustTimeSpanClauses.LessThan"/>. If the value is <see langword="null"/>,
+    /// Delegates to <see cref="MustTimeSpanClauses.ShorterThan"/>. If the value is <see langword="null"/>,
     /// validation passes (null values should be handled by a separate <c>.NotNull()</c> rule).
     /// </remarks>
-    /// <example><code>RuleFor(x => x.Delay).LessThan(TimeSpan.FromMinutes(5));</code></example>
-    /// <seealso cref="MustTimeSpanClauses.LessThan"/>
-    public static IRuleBuilderOptions<TModel, string?> LessThan<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
+    /// <example><code>RuleFor(x => x.Delay).ShorterThan(TimeSpan.FromMinutes(5));</code></example>
+    /// <seealso cref="MustTimeSpanClauses.ShorterThan"/>
+    public static IRuleBuilderOptions<TModel, string?> ShorterThan<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         TimeSpan threshold,
         Inclusion inclusion = Inclusion.Exclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => val is not null ? Must.Be.LessThan(val, threshold, inclusion, paramName: null) : MustResult<TimeSpan>.Ok(TimeSpan.Zero),
-            message, MustCodes.Time.Duration.NotLess);
+        ruleBuilder.MustBe(val => val is not null ? Must.Be.ShorterThan(val, threshold, inclusion, paramName: null) : MustResult<TimeSpan>.Ok(TimeSpan.Zero),
+            message, MustCodes.Time.Duration.NotShorter);
 }

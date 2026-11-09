@@ -494,6 +494,34 @@ public class MustDateTimeClausesTests(ITestOutputHelper output) : BaseMustUnitTe
     }
 
     [Theory]
+    [MemberData(nameof(MustDateTimeClausesTestData.MinimumAgeReferenceProjection.Cases), MemberType = typeof(MustDateTimeClausesTestData.MinimumAgeReferenceProjection))]
+    public void MinimumAge_ReferenceProjection_BehavesAsExpected(MustCase<(DateTime value, int years, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, years, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.MinimumAge(value, years, timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustDateTimeClausesTestData.OneReadBehavior.Cases), MemberType = typeof(MustDateTimeClausesTestData.OneReadBehavior))]
+    public void MinimumAge_ReadsTheClockExactlyOnce(string _)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        Must.Be.MinimumAge(DateTime.MinValue, 18, provider, paramName: "value");
+
+        // Assert
+        Assert.Equal(1, provider.UtcNowCallCount);
+    }
+
+    [Theory]
     [MemberData(nameof(MustDateTimeClausesTestData.MinimumAgeOnLeapDay.Cases), MemberType = typeof(MustDateTimeClausesTestData.MinimumAgeOnLeapDay))]
     public void MinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(MustCase<(DateTime value, int years, DateTimeOffset utcNow)> tc)
     {

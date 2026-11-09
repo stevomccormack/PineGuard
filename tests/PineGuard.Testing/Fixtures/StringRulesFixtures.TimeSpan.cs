@@ -24,7 +24,7 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, TimeSpan min, TimeSpan max, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
-    public static class TimeSpanIsGreaterThan
+    public static class TimeSpanIsLongerThan
     {
         public static readonly (string? value, TimeSpan threshold, Inclusion inclusion) GreaterExclusive = ("00:11:00", TimeSpan.FromMinutes(10), Inclusion.Exclusive);
         public static readonly (string? value, TimeSpan threshold, Inclusion inclusion) EqualInclusive = ("00:10:00", TimeSpan.FromMinutes(10), Inclusion.Inclusive);
@@ -41,7 +41,7 @@ public static partial class StringRulesFixtures
         public static RuleScenario<(string? value, TimeSpan threshold, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
-    public static class TimeSpanIsLessThan
+    public static class TimeSpanIsShorterThan
     {
         public static readonly (string? value, TimeSpan threshold, Inclusion inclusion) LessExclusive = ("00:09:00", TimeSpan.FromMinutes(10), Inclusion.Exclusive);
         public static readonly (string? value, TimeSpan threshold, Inclusion inclusion) EqualInclusive = ("00:10:00", TimeSpan.FromMinutes(10), Inclusion.Inclusive);

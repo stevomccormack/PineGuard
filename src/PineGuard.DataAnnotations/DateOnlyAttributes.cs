@@ -16,6 +16,11 @@ namespace PineGuard.DataAnnotations;
 /// Delegates to <see cref="MustDateOnlyClauses.Past"/>. Supported on properties, fields, and parameters
 /// of type <see cref="DateOnly"/>.
 /// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -51,6 +56,11 @@ public sealed class PastDateOnlyAttribute() : ValidationAttributeBase(typeof(Dat
 /// Delegates to <see cref="MustDateOnlyClauses.PastOrPresent"/>. Supported on properties, fields, and
 /// parameters of type <see cref="DateOnly"/>.
 /// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -84,6 +94,11 @@ public sealed class PastOrPresentDateOnlyAttribute() : ValidationAttributeBase(t
 /// <para>
 /// Delegates to <see cref="MustDateOnlyClauses.Future"/>. Supported on properties, fields, and parameters
 /// of type <see cref="DateOnly"/>.
+/// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
 /// </para>
 /// </remarks>
 /// <example>
@@ -119,6 +134,11 @@ public sealed class FutureDateOnlyAttribute() : ValidationAttributeBase(typeof(D
 /// <para>
 /// Delegates to <see cref="MustDateOnlyClauses.FutureOrPresent"/>. Supported on properties, fields, and
 /// parameters of type <see cref="DateOnly"/>.
+/// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
 /// </para>
 /// </remarks>
 /// <example>
@@ -903,8 +923,14 @@ public sealed class NotLastDayOfMonthDateOnlyAttribute() : ValidationAttributeBa
 /// </para>
 /// <para>
 /// A negative minimum age is a configuration error and fails validation. A 29-February date of birth has no
-/// anniversary in a non-leap year and matures on 1 March, which is what <see cref="DateOnly.AddYears"/>
-/// yields for the boundary the clause computes.
+/// anniversary in a non-leap year and matures on 1 March: the clause counts completed years by comparing the
+/// month and day of today against the date of birth, so the anniversary is reached only once the calendar
+/// passes 28 February.
+/// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
 /// </para>
 /// </remarks>
 /// <example>

@@ -11,29 +11,37 @@ public static partial class StringRulesFixtures
         private static readonly TimeOnly T1100 = new(11, 0);
         private static readonly TimeOnly T1200 = new(12, 0);
         private static readonly TimeOnly T1300 = new(13, 0);
+        private static readonly TimeOnly T2200 = new(22, 0);
+        private static readonly TimeOnly T0200 = new(2, 0);
 
         public static class IsBetween
         {
-            public static readonly (string? value, TimeOnly min, TimeOnly max, Inclusion inclusion) InRangeInclusive = ("11:00", T1000, T1200, Inclusion.Inclusive);
-            public static readonly (string? value, TimeOnly min, TimeOnly max, Inclusion inclusion) InRangeExclusive = ("11:00", T1000, T1200, Inclusion.Exclusive);
-            public static readonly (string? value, TimeOnly min, TimeOnly max, Inclusion inclusion) NullValue = (null, T1000, T1200, Inclusion.Inclusive);
-            public static readonly (string? value, TimeOnly min, TimeOnly max, Inclusion inclusion) Unparseable = ("invalid", T1000, T1200, Inclusion.Inclusive);
-            public static readonly (string? value, TimeOnly min, TimeOnly max, Inclusion inclusion) OutOfRange = ("09:00", T1000, T1200, Inclusion.Inclusive);
+            public static readonly (string? value, TimeOnly start, TimeOnly end, Inclusion inclusion) InRangeInclusive = ("11:00", T1000, T1200, Inclusion.Inclusive);
+            public static readonly (string? value, TimeOnly start, TimeOnly end, Inclusion inclusion) InRangeExclusive = ("11:00", T1000, T1200, Inclusion.Exclusive);
+            public static readonly (string? value, TimeOnly start, TimeOnly end, Inclusion inclusion) NullValue = (null, T1000, T1200, Inclusion.Inclusive);
+            public static readonly (string? value, TimeOnly start, TimeOnly end, Inclusion inclusion) Unparseable = ("invalid", T1000, T1200, Inclusion.Inclusive);
+            public static readonly (string? value, TimeOnly start, TimeOnly end, Inclusion inclusion) OutOfRange = ("09:00", T1000, T1200, Inclusion.Inclusive);
+            public static readonly (string? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapInside = ("23:00", T2200, T0200, Inclusion.Inclusive);
+            public static readonly (string? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapOutside = ("12:00", T2200, T0200, Inclusion.Inclusive);
+            public static readonly (string? value, TimeOnly start, TimeOnly end, Inclusion inclusion) EqualEndpoint = ("10:00", T1000, T1000, Inclusion.Inclusive);
 
-            public static RuleScenario<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>[] ValidScenarios =>
+            public static RuleScenario<(string? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>[] ValidScenarios =>
             [
                 new(nameof(InRangeInclusive), InRangeInclusive, true),
-                new(nameof(InRangeExclusive), InRangeExclusive, true)
+                new(nameof(InRangeExclusive), InRangeExclusive, true),
+                new(nameof(WrapInside), WrapInside, true),
+                new(nameof(EqualEndpoint), EqualEndpoint, true)
             ];
 
-            public static RuleScenario<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>[] InvalidScenarios =>
+            public static RuleScenario<(string? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>[] InvalidScenarios =>
             [
                 new(nameof(NullValue), NullValue, false),
                 new(nameof(Unparseable), Unparseable, false),
-                new(nameof(OutOfRange), OutOfRange, false)
+                new(nameof(OutOfRange), OutOfRange, false),
+                new(nameof(WrapOutside), WrapOutside, false)
             ];
 
-            public static RuleScenario<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+            public static RuleScenario<(string? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
         }
 
         public static class IsBefore

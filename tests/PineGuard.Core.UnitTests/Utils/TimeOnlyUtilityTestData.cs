@@ -13,6 +13,7 @@ public static class TimeOnlyUtilityTestData
             new("Minute", (new TimeOnly(10, 59, 58, 123), TimePrecision.Minute), true, new TimeOnly(10, 59, 0, 0)),
             new("Second", (new TimeOnly(10, 59, 58, 123), TimePrecision.Second), true, new TimeOnly(10, 59, 58, 0)),
             new("Millisecond", (new TimeOnly(10, 0, 0, 0).Add(TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond + 7)), TimePrecision.Millisecond), true, new TimeOnly(10, 0, 0, 0).Add(TimeSpan.FromMilliseconds(1))),
+            new("Microsecond", (new TimeOnly(10, 0, 0, 0).Add(TimeSpan.FromTicks(18)), TimePrecision.Microsecond), true, new TimeOnly(10, 0, 0, 0).Add(TimeSpan.FromTicks(10))),
             new("Tick (NoOp)", (new TimeOnly(10, 59, 58, 123), TimePrecision.Tick), true, new TimeOnly(10, 59, 58, 123))
         ];
 

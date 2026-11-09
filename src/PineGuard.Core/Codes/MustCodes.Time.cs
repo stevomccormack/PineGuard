@@ -82,11 +82,11 @@ public static partial class MustCodes
             /// <summary><c>time.duration.in-range</c></summary>
             public const string InRange = Prefix + ".in-range";
 
-            /// <summary><c>time.duration.not-greater</c></summary>
-            public const string NotGreater = Prefix + ".not-greater";
+            /// <summary><c>time.duration.not-longer</c></summary>
+            public const string NotLonger = Prefix + ".not-longer";
 
-            /// <summary><c>time.duration.not-less</c></summary>
-            public const string NotLess = Prefix + ".not-less";
+            /// <summary><c>time.duration.not-shorter</c></summary>
+            public const string NotShorter = Prefix + ".not-shorter";
         }
 
         /// <summary>Nearness to a reference time, measured against a tolerance window.</summary>

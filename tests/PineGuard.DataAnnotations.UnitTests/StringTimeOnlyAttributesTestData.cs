@@ -54,6 +54,26 @@ public static class StringTimeOnlyAttributesTestData
         ];
     }
 
+    public static class BetweenTimeOnlyStringWrap
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("inside", "23:00", new DataAnnotationExpected(true)),
+            new("outside", "12:00", new DataAnnotationExpected(false, "Value must be a time within the expected range.")),
+            new("null", null, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class NotBetweenTimeOnlyStringWrap
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("outside", "12:00", new DataAnnotationExpected(true)),
+            new("inside", "23:00", new DataAnnotationExpected(false, "Value must be a time not within the expected range.")),
+            new("null", null, new DataAnnotationExpected(true))
+        ];
+    }
+
     public static class NotBeforeTimeOnlyString
     {
         public static TheoryData<DataAnnotationCase> Cases =>

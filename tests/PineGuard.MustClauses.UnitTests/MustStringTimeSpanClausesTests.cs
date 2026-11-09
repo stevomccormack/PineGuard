@@ -18,14 +18,14 @@ public sealed class MustStringTimeSpanClausesTests(ITestOutputHelper output) : B
     { var value = tc.Value.value; var result = Must.Be.NotDurationBetween(value, tc.Value.min, tc.Value.max, tc.Value.inclusion); AssertResult(tc, result); }
 
     [Theory]
-    [MemberData(nameof(MustStringTimeSpanClausesTestData.GreaterThan.ValidCases), MemberType = typeof(MustStringTimeSpanClausesTestData.GreaterThan))]
-    [MemberData(nameof(MustStringTimeSpanClausesTestData.GreaterThan.InvalidCases), MemberType = typeof(MustStringTimeSpanClausesTestData.GreaterThan))]
-    public void GreaterThan_BehavesAsExpected(MustCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
-    { var value = tc.Value.value; var result = Must.Be.GreaterThan(value, tc.Value.threshold, tc.Value.inclusion); AssertResult(tc, result); }
+    [MemberData(nameof(MustStringTimeSpanClausesTestData.LongerThan.ValidCases), MemberType = typeof(MustStringTimeSpanClausesTestData.LongerThan))]
+    [MemberData(nameof(MustStringTimeSpanClausesTestData.LongerThan.InvalidCases), MemberType = typeof(MustStringTimeSpanClausesTestData.LongerThan))]
+    public void LongerThan_BehavesAsExpected(MustCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
+    { var value = tc.Value.value; var result = Must.Be.LongerThan(value, tc.Value.threshold, tc.Value.inclusion); AssertResult(tc, result); }
 
     [Theory]
-    [MemberData(nameof(MustStringTimeSpanClausesTestData.LessThan.ValidCases), MemberType = typeof(MustStringTimeSpanClausesTestData.LessThan))]
-    [MemberData(nameof(MustStringTimeSpanClausesTestData.LessThan.InvalidCases), MemberType = typeof(MustStringTimeSpanClausesTestData.LessThan))]
-    public void LessThan_BehavesAsExpected(MustCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
-    { var value = tc.Value.value; var result = Must.Be.LessThan(value, tc.Value.threshold, tc.Value.inclusion); AssertResult(tc, result); }
+    [MemberData(nameof(MustStringTimeSpanClausesTestData.ShorterThan.ValidCases), MemberType = typeof(MustStringTimeSpanClausesTestData.ShorterThan))]
+    [MemberData(nameof(MustStringTimeSpanClausesTestData.ShorterThan.InvalidCases), MemberType = typeof(MustStringTimeSpanClausesTestData.ShorterThan))]
+    public void ShorterThan_BehavesAsExpected(MustCase<(string? value, TimeSpan threshold, Inclusion inclusion)> tc)
+    { var value = tc.Value.value; var result = Must.Be.ShorterThan(value, tc.Value.threshold, tc.Value.inclusion); AssertResult(tc, result); }
 }

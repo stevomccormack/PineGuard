@@ -1,4 +1,5 @@
 using PineGuard.Codes;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.MustClauses;
 using PineGuard.Testing.UnitTests.Rules;
@@ -12,6 +13,14 @@ public static class MustDateTimeClausesTestData
     private static readonly DateTime LeapDayBirth = new(2008, 02, 29, 0, 0, 0, DateTimeKind.Utc);
     private static readonly DateTime PastDate = Now.AddDays(-1);
     private static readonly DateTime FutureDate = Now.AddDays(1);
+
+    // Zones exactly at the ±14h boundary DateTimeOffsetUtility.TryGetDateAtOffset enforces, paired with an
+    // instant at the corresponding DateTimeOffset extreme, so the reference projection fails on tick range
+    // representability, not on the offset check.
+    private static readonly TimeZoneInfo PlusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.Must.DateTime.PlusFourteen", TimeSpan.FromHours(14), "PineGuard Test +14", "PineGuard Test +14");
+    private static readonly TimeZoneInfo MinusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.Must.DateTime.MinusFourteen", TimeSpan.FromHours(-14), "PineGuard Test -14", "PineGuard Test -14");
+    private static readonly TimeProvider MinValueProjectionFails = new FixedTimeProvider(DateTimeOffset.MinValue, MinusFourteen);
+    private static readonly TimeProvider MaxValueProjectionFails = new FixedTimeProvider(DateTimeOffset.MaxValue, PlusFourteen);
 
     public static class Past
     {
@@ -653,6 +662,22 @@ public static class MustDateTimeClausesTestData
             nameof(F.HasMinimumAge.NegativeYears) => new MustExpected(false, "years requires a non-negative number of years.", "years", Code: MustCodes.Date.Age.BelowMinimum),
             _ => new MustExpected(false, "value must meet the expected minimum age.", Code: MustCodes.Date.Age.BelowMinimum)
         });
+    }
+
+    public static class MinimumAgeReferenceProjection
+    {
+        public static TheoryData<MustCase<(DateTime value, int years, TimeProvider timeProvider)>> Cases =>
+        [
+            new MustCase<(DateTime value, int years, TimeProvider timeProvider)>("MinValueUnderflow", (Now, 18, MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new MustCase<(DateTime value, int years, TimeProvider timeProvider)>("MaxValueOverflow", (Now, 18, MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange))
+        ];
+    }
+
+    // Only one scenario is meaningful: proving exactly one GetUtcNow() read per call. Asserted directly
+    // against CountingTimeProvider.UtcNowCallCount in the test method, not through AssertResult.
+    public static class OneReadBehavior
+    {
+        public static TheoryData<string> Cases => ["SingleRead"];
     }
 
     public static class MinimumAgeOnLeapDay

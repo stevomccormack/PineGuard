@@ -9,10 +9,10 @@ public sealed class TimeOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 {
     [Theory]
     [MemberData(nameof(TimeOnlyRulesTestData.IsBetween.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsBetween))]
-    public void IsBetween_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
+    public void IsBetween_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion)> tc)
     {
         // Act
-        var result = TimeOnlyRules.IsBetween(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = TimeOnlyRules.IsBetween(tc.Value.value, tc.Value.start, tc.Value.end, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);

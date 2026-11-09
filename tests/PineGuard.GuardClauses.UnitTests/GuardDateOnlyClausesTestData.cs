@@ -1,5 +1,6 @@
 using PineGuard.Codes;
 using PineGuard.Common;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.DateOnlyRulesFixtures;
@@ -8,7 +9,7 @@ namespace PineGuard.GuardClauses.UnitTests;
 
 public static class GuardDateOnlyClausesTestData
 {
-    private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.UtcNow);
+    private static readonly DateOnly Today = DateOnly.FromDateTime(FixedTimeProvider.Default.GetUtcNow().UtcDateTime);
     private static readonly DateOnly Tomorrow = Today.AddDays(1);
     private static readonly DateOnly Yesterday = Today.AddDays(-1);
     private static readonly DateOnly LeapDayBirth = new(2008, 02, 29);
@@ -85,11 +86,13 @@ public static class GuardDateOnlyClausesTestData
         public static TheoryData<GuardCase<(DateOnly value, DateOnly min, DateOnly max, Inclusion inclusion)>> ValidCases =>
         [
             new("out of range low", (Yesterday.AddDays(-1), Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(true)),
-            new("out of range high", (Tomorrow.AddDays(1), Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(true))
+            new("out of range high", (Tomorrow.AddDays(1), Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(true)),
+            new(nameof(F.IsBetween.AtMinExclusive), (F.IsBetween.AtMinExclusive.value!.Value, F.IsBetween.AtMinExclusive.min, F.IsBetween.AtMinExclusive.max, F.IsBetween.AtMinExclusive.inclusion), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateOnly value, DateOnly min, DateOnly max, Inclusion inclusion)>> InvalidCases =>
         [
-            new("in range", (Today, Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value"))
+            new("in range", (Today, Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.IsBetween.AtMinInclusive), (F.IsBetween.AtMinInclusive.value!.Value, F.IsBetween.AtMinInclusive.min, F.IsBetween.AtMinInclusive.max, F.IsBetween.AtMinInclusive.inclusion), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 
@@ -100,12 +103,14 @@ public static class GuardDateOnlyClausesTestData
     {
         public static TheoryData<GuardCase<(DateOnly value, DateOnly min, DateOnly max, Inclusion inclusion)>> ValidCases =>
         [
-            new("in range", (Today, Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(true))
+            new("in range", (Today, Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(true)),
+            new(nameof(F.IsBetween.AtMinInclusive), (F.IsBetween.AtMinInclusive.value!.Value, F.IsBetween.AtMinInclusive.min, F.IsBetween.AtMinInclusive.max, F.IsBetween.AtMinInclusive.inclusion), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateOnly value, DateOnly min, DateOnly max, Inclusion inclusion)>> InvalidCases =>
         [
             new("out of range low", (Yesterday.AddDays(-1), Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value")),
-            new("out of range high", (Tomorrow.AddDays(1), Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value"))
+            new("out of range high", (Tomorrow.AddDays(1), Yesterday, Tomorrow, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.IsBetween.AtMinExclusive), (F.IsBetween.AtMinExclusive.value!.Value, F.IsBetween.AtMinExclusive.min, F.IsBetween.AtMinExclusive.max, F.IsBetween.AtMinExclusive.inclusion), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 
@@ -210,11 +215,13 @@ public static class GuardDateOnlyClausesTestData
     {
         public static TheoryData<GuardCase<(DateOnly start, DateOnly end, Inclusion inclusion)>> ValidCases =>
         [
-            new("chronological", (Yesterday, Today, Inclusion.Exclusive), new GuardExpected(true))
+            new("chronological", (Yesterday, Today, Inclusion.Exclusive), new GuardExpected(true)),
+            new(nameof(F.IsChronological.SameDayInclusive), (F.IsChronological.SameDayInclusive.start!.Value, F.IsChronological.SameDayInclusive.end!.Value, F.IsChronological.SameDayInclusive.inclusion), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateOnly start, DateOnly end, Inclusion inclusion)>> InvalidCases =>
         [
-            new("reverse", (Today, Yesterday, Inclusion.Exclusive), new GuardExpected(false, typeof(ArgumentException), "start"))
+            new("reverse", (Today, Yesterday, Inclusion.Exclusive), new GuardExpected(false, typeof(ArgumentException), "start")),
+            new(nameof(F.IsChronological.SameDayExclusive), (F.IsChronological.SameDayExclusive.start!.Value, F.IsChronological.SameDayExclusive.end!.Value, F.IsChronological.SameDayExclusive.inclusion), new GuardExpected(false, typeof(ArgumentException), "start"))
         ];
     }
 
@@ -225,11 +232,13 @@ public static class GuardDateOnlyClausesTestData
     {
         public static TheoryData<GuardCase<(DateOnly start, DateOnly end, Inclusion inclusion)>> ValidCases =>
         [
-            new("reverse", (Today, Yesterday, Inclusion.Exclusive), new GuardExpected(true))
+            new("reverse", (Today, Yesterday, Inclusion.Exclusive), new GuardExpected(true)),
+            new(nameof(F.IsChronological.SameDayExclusive), (F.IsChronological.SameDayExclusive.start!.Value, F.IsChronological.SameDayExclusive.end!.Value, F.IsChronological.SameDayExclusive.inclusion), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateOnly start, DateOnly end, Inclusion inclusion)>> InvalidCases =>
         [
-            new("chronological", (Yesterday, Today, Inclusion.Exclusive), new GuardExpected(false, typeof(ArgumentException), "start"))
+            new("chronological", (Yesterday, Today, Inclusion.Exclusive), new GuardExpected(false, typeof(ArgumentException), "start")),
+            new(nameof(F.IsChronological.SameDayInclusive), (F.IsChronological.SameDayInclusive.start!.Value, F.IsChronological.SameDayInclusive.end!.Value, F.IsChronological.SameDayInclusive.inclusion), new GuardExpected(false, typeof(ArgumentException), "start"))
         ];
     }
 
@@ -246,11 +255,13 @@ public static class GuardDateOnlyClausesTestData
 
         public static TheoryData<GuardCase<(DateOnly start1, DateOnly end1, DateOnly start2, DateOnly end2, Inclusion inclusion)>> ValidCases =>
         [
-            new("not overlapping", (D1, D2, D4, D5, Inclusion.Exclusive), new GuardExpected(true))
+            new("not overlapping", (D1, D2, D4, D5, Inclusion.Exclusive), new GuardExpected(true)),
+            new(nameof(F.IsOverlapping.TouchingExclusive), (F.IsOverlapping.TouchingExclusive.start1!.Value, F.IsOverlapping.TouchingExclusive.end1!.Value, F.IsOverlapping.TouchingExclusive.start2!.Value, F.IsOverlapping.TouchingExclusive.end2!.Value, F.IsOverlapping.TouchingExclusive.inclusion), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateOnly start1, DateOnly end1, DateOnly start2, DateOnly end2, Inclusion inclusion)>> InvalidCases =>
         [
-            new("overlapping", (D1, D2, D3, D4, Inclusion.Exclusive), new GuardExpected(false, typeof(ArgumentException), "start1"))
+            new("overlapping", (D1, D2, D3, D4, Inclusion.Exclusive), new GuardExpected(false, typeof(ArgumentException), "start1")),
+            new(nameof(F.IsOverlapping.TouchingInclusive), (F.IsOverlapping.TouchingInclusive.start1!.Value, F.IsOverlapping.TouchingInclusive.end1!.Value, F.IsOverlapping.TouchingInclusive.start2!.Value, F.IsOverlapping.TouchingInclusive.end2!.Value, F.IsOverlapping.TouchingInclusive.inclusion), new GuardExpected(false, typeof(ArgumentException), "start1"))
         ];
     }
 
@@ -267,11 +278,13 @@ public static class GuardDateOnlyClausesTestData
 
         public static TheoryData<GuardCase<(DateOnly start1, DateOnly end1, DateOnly start2, DateOnly end2, Inclusion inclusion)>> ValidCases =>
         [
-            new("overlapping", (D1, D2, D3, D4, Inclusion.Exclusive), new GuardExpected(true))
+            new("overlapping", (D1, D2, D3, D4, Inclusion.Exclusive), new GuardExpected(true)),
+            new(nameof(F.IsOverlapping.TouchingInclusive), (F.IsOverlapping.TouchingInclusive.start1!.Value, F.IsOverlapping.TouchingInclusive.end1!.Value, F.IsOverlapping.TouchingInclusive.start2!.Value, F.IsOverlapping.TouchingInclusive.end2!.Value, F.IsOverlapping.TouchingInclusive.inclusion), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateOnly start1, DateOnly end1, DateOnly start2, DateOnly end2, Inclusion inclusion)>> InvalidCases =>
         [
-            new("not overlapping", (D1, D2, D4, D5, Inclusion.Exclusive), new GuardExpected(false, typeof(ArgumentException), "start1"))
+            new("not overlapping", (D1, D2, D4, D5, Inclusion.Exclusive), new GuardExpected(false, typeof(ArgumentException), "start1")),
+            new(nameof(F.IsOverlapping.TouchingExclusive), (F.IsOverlapping.TouchingExclusive.start1!.Value, F.IsOverlapping.TouchingExclusive.end1!.Value, F.IsOverlapping.TouchingExclusive.start2!.Value, F.IsOverlapping.TouchingExclusive.end2!.Value, F.IsOverlapping.TouchingExclusive.inclusion), new GuardExpected(false, typeof(ArgumentException), "start1"))
         ];
     }
 

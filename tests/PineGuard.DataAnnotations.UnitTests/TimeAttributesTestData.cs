@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using PineGuard.Codes;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 
@@ -17,8 +18,9 @@ public static class TimeAttributesTestData
         // So we cannot list wrong type in valid/invalid cases if it throws.
     ];
 
-    private static readonly DateTime TodayDateTime = DateTime.UtcNow.Date;
-    private static readonly DateOnly TodayDateOnly = DateOnly.FromDateTime(TodayDateTime);
+    private static readonly DateTimeOffset Now = FixedTimeProvider.Default.GetUtcNow();
+    private static readonly DateTime NowDateTime = Now.UtcDateTime;
+    private static readonly DateOnly TodayDateOnly = DateOnly.FromDateTime(NowDateTime);
 
     // PastAttribute supports DateOnly, DateTime, DateTimeOffset
     public static class Past
@@ -26,15 +28,15 @@ public static class TimeAttributesTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("dateonly", TodayDateOnly.AddDays(-1), true),
-            new("datetime", DateTime.Now.AddSeconds(-10), true),
-            new("offset", DateTimeOffset.Now.AddSeconds(-10), true)
+            new("datetime", NowDateTime.AddSeconds(-10), true),
+            new("offset", Now.AddSeconds(-10), true)
         ];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases =>
         [
             new("dateonly future", TodayDateOnly.AddDays(1), false),
-            new("datetime future", DateTime.Now.AddSeconds(10), false),
-            new("offset future", DateTimeOffset.Now.AddSeconds(10), false)
+            new("datetime future", NowDateTime.AddSeconds(10), false),
+            new("offset future", Now.AddSeconds(10), false)
         ];
     }
 
@@ -44,8 +46,8 @@ public static class TimeAttributesTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("dateonly present", TodayDateOnly, true),
-            new("datetime present", DateTime.Now, true),
-            new("offset present", DateTimeOffset.Now, true)
+            new("datetime present", NowDateTime, true),
+            new("offset present", Now, true)
         ];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases =>
@@ -60,14 +62,14 @@ public static class TimeAttributesTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("dateonly future", TodayDateOnly.AddDays(1), true),
-            new("datetime future", DateTime.Now.AddSeconds(10), true),
-            new("offset future", DateTimeOffset.Now.AddSeconds(10), true)
+            new("datetime future", NowDateTime.AddSeconds(10), true),
+            new("offset future", Now.AddSeconds(10), true)
         ];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases =>
         [
             new("dateonly past", TodayDateOnly.AddDays(-1), false),
-            new("offset past", DateTimeOffset.Now.AddSeconds(-10), false)
+            new("offset past", Now.AddSeconds(-10), false)
         ];
     }
 
@@ -77,14 +79,14 @@ public static class TimeAttributesTestData
         public static TheoryData<ValidCase> ValidCases =>
         [
             new("dateonly present", TodayDateOnly, true),
-            new("datetime future", DateTime.Now.AddSeconds(10), true),
-            new("offset future", DateTimeOffset.Now.AddSeconds(10), true)
+            new("datetime future", NowDateTime.AddSeconds(10), true),
+            new("offset future", Now.AddSeconds(10), true)
         ];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases =>
         [
-            new("datetime past", DateTime.Now.AddSeconds(-10), false),
-            new("offset past", DateTimeOffset.Now.AddSeconds(-10), false)
+            new("datetime past", NowDateTime.AddSeconds(-10), false),
+            new("offset past", Now.AddSeconds(-10), false)
         ];
     }
 

@@ -19,8 +19,8 @@ public static class GuardStringTimeOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="min">The minimum bound.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="start">The start of the range.</param>
+    /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">The boundary inclusion mode.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
     /// <param name="message">An optional custom error message.</param>
@@ -37,15 +37,15 @@ public static class GuardStringTimeOnlyClauses
     /// <seealso cref="MustStringTimeOnlyClauses.BetweenTimeOnly"/>
     public static TimeOnly NotBetweenTimeOnly(this IGuardClause _,
         string? value,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.BetweenTimeOnly(value, min, max, inclusion, styles, paramName);
+        var result = Must.Be.BetweenTimeOnly(value, start, end, inclusion, styles, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -57,8 +57,8 @@ public static class GuardStringTimeOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="min">The minimum bound.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="start">The start of the range.</param>
+    /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">The boundary inclusion mode.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
     /// <param name="message">An optional custom error message.</param>
@@ -75,15 +75,15 @@ public static class GuardStringTimeOnlyClauses
     /// <seealso cref="MustStringTimeOnlyClauses.NotBetweenTimeOnly"/>
     public static TimeOnly BetweenTimeOnly(this IGuardClause _,
         string? value,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotBetweenTimeOnly(value, min, max, inclusion, styles, paramName); // Guard.Against.BetweenTimeOnly => Must.Be.NotBetweenTimeOnly (complement)
+        var result = Must.Be.NotBetweenTimeOnly(value, start, end, inclusion, styles, paramName); // Guard.Against.BetweenTimeOnly => Must.Be.NotBetweenTimeOnly (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

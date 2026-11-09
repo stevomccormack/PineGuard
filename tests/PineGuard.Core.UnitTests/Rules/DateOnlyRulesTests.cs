@@ -31,6 +31,48 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
     }
 
     [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsInPastAcrossTimeZones.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInPastAcrossTimeZones))]
+    public void IsInPastAcrossTimeZones_BehavesAsExpected(RuleCase<(DateOnly? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.IsInPast(value, timeProvider: timeProvider);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsInPastReferenceProjection.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInPastReferenceProjection))]
+    public void IsInPastReferenceProjection_BehavesAsExpected(RuleCase<(DateOnly? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.IsInPast(value, timeProvider: timeProvider);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.OneReadBehavior.Cases), MemberType = typeof(DateOnlyRulesTestData.OneReadBehavior))]
+    public void IsInPast_ReadsTheClockExactlyOnce(string _)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        DateOnlyRules.IsInPast(DateOnly.MinValue, timeProvider: provider);
+
+        // Assert
+        Assert.Equal(1, provider.UtcNowCallCount);
+    }
+
+    [Theory]
     [MemberData(nameof(DateOnlyRulesTestData.IsInFuture.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInFuture))]
     public void IsInFuture_BehavesAsExpected(RuleCase<DateOnly?> tc)
     {
@@ -50,6 +92,48 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
         // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsInFutureAcrossTimeZones.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInFutureAcrossTimeZones))]
+    public void IsInFutureAcrossTimeZones_BehavesAsExpected(RuleCase<(DateOnly? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.IsInFuture(value, timeProvider: timeProvider);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.IsInFutureReferenceProjection.Cases), MemberType = typeof(DateOnlyRulesTestData.IsInFutureReferenceProjection))]
+    public void IsInFutureReferenceProjection_BehavesAsExpected(RuleCase<(DateOnly? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.IsInFuture(value, timeProvider: timeProvider);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.OneReadBehavior.Cases), MemberType = typeof(DateOnlyRulesTestData.OneReadBehavior))]
+    public void IsInFuture_ReadsTheClockExactlyOnce(string _)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        DateOnlyRules.IsInFuture(DateOnly.MaxValue, timeProvider: provider);
+
+        // Assert
+        Assert.Equal(1, provider.UtcNowCallCount);
     }
 
     [Theory]
@@ -232,6 +316,48 @@ public sealed class DateOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 
         // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.HasMinimumAgeAcrossTimeZones.Cases), MemberType = typeof(DateOnlyRulesTestData.HasMinimumAgeAcrossTimeZones))]
+    public void HasMinimumAgeAcrossTimeZones_BehavesAsExpected(RuleCase<(DateOnly? value, int years, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, years, timeProvider) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.HasMinimumAge(value, years, timeProvider: timeProvider);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.HasMinimumAgeReferenceProjection.Cases), MemberType = typeof(DateOnlyRulesTestData.HasMinimumAgeReferenceProjection))]
+    public void HasMinimumAge_ReferenceProjectionFails_ReturnsFalse(RuleCase<(DateOnly? value, int years, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, years, timeProvider) = tc.Value;
+
+        // Act
+        var result = DateOnlyRules.HasMinimumAge(value, years, timeProvider: timeProvider);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateOnlyRulesTestData.OneReadBehavior.Cases), MemberType = typeof(DateOnlyRulesTestData.OneReadBehavior))]
+    public void HasMinimumAge_ReadsTheClockExactlyOnce(string _)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        DateOnlyRules.HasMinimumAge(DateOnly.MinValue, 18, timeProvider: provider);
+
+        // Assert
+        Assert.Equal(1, provider.UtcNowCallCount);
     }
 
     [Theory]

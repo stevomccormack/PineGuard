@@ -38,11 +38,11 @@ public sealed class TimeSpanAttributesTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(TimeSpanAttributesTestData.GreaterThanTimeSpan.Cases), MemberType = typeof(TimeSpanAttributesTestData.GreaterThanTimeSpan))]
-    public void GreaterThanTimeSpan_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(TimeSpanAttributesTestData.LongerThanTimeSpan.Cases), MemberType = typeof(TimeSpanAttributesTestData.LongerThanTimeSpan))]
+    public void LongerThanTimeSpan_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new GreaterThanTimeSpanAttribute("00:00:05");
+        var attr = new LongerThanTimeSpanAttribute("00:00:05");
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act
@@ -53,11 +53,11 @@ public sealed class TimeSpanAttributesTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [MemberData(nameof(TimeSpanAttributesTestData.LessThanTimeSpan.Cases), MemberType = typeof(TimeSpanAttributesTestData.LessThanTimeSpan))]
-    public void LessThanTimeSpan_BehavesAsExpected(DataAnnotationCase tc)
+    [MemberData(nameof(TimeSpanAttributesTestData.ShorterThanTimeSpan.Cases), MemberType = typeof(TimeSpanAttributesTestData.ShorterThanTimeSpan))]
+    public void ShorterThanTimeSpan_BehavesAsExpected(DataAnnotationCase tc)
     {
         // Arrange
-        var attr = new LessThanTimeSpanAttribute("00:00:10");
+        var attr = new ShorterThanTimeSpanAttribute("00:00:10");
         var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
         // Act

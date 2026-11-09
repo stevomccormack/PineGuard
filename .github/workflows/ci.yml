@@ -367,6 +367,61 @@ jobs:
         run: echo "Skipped — no relevant changes detected for ${{ matrix.name }}"
 
   # ---------------------------------------------------------------------------
+  # 3b. Core non-UTC null-provider invariant check (T1-U2, D-1 as ratified 2026-11-09)
+  #     DateTimeUtility.TryGetTodayDate with a null TimeProvider must yield the
+  #     UTC calendar date on every host: PineGuard never guesses the host zone.
+  #     Two dedicated Linux processes pin TZ to UTC+14 and UTC−12; at every
+  #     instant at least one of them is on a different calendar date from UTC,
+  #     so a host-zone leak cannot hide behind a shared date. Runs alongside —
+  #     never instead of — the normal UTC "Core" matrix entry above.
+  # ---------------------------------------------------------------------------
+  core-null-provider-timezone:
+    needs: [changes, build]
+    if: needs.changes.outputs.core == 'true' || needs.changes.outputs.testing == 'true' || needs.changes.outputs.shared == 'true' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        tz: [Pacific/Kiritimati, Etc/GMT+12]
+    env:
+      TZ: ${{ matrix.tz }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Download build output
+        uses: actions/download-artifact@v8
+        with:
+          name: build-output
+          path: .
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore NuGet packages
+        run: dotnet restore PineGuard.slnx
+
+      - name: Run the null-provider "today is the UTC date" test in a non-UTC zone
+        run: >
+          dotnet test tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj
+          -c Release
+          --no-build
+          --filter "FullyQualifiedName~DateTimeUtilityTests.TryGetTodayDate_NullProviderUsesUtcDate"
+          -- RunConfiguration.TreatNoTestsAsError=true
+
+  # ---------------------------------------------------------------------------
   # 4. Coverage — merge reports and enforce 100%
   # ---------------------------------------------------------------------------
   coverage:

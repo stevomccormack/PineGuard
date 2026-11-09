@@ -32,29 +32,29 @@ public static class MustStringTimeSpanClausesTestData
         ];
     }
 
-    public static class GreaterThan
+    public static class LongerThan
     {
         public static TheoryData<MustCase<(string? value, TimeSpan threshold, Inclusion inclusion)>> ValidCases =>
-            F.TimeSpanIsGreaterThan.AllValid.ToMustCases();
+            F.TimeSpanIsLongerThan.AllValid.ToMustCases();
         public static TheoryData<MustCase<(string? value, TimeSpan threshold, Inclusion inclusion)>> InvalidCases =>
-            F.TimeSpanIsGreaterThan.AllInvalid.ToMustCases(s => s.Name switch
+            F.TimeSpanIsLongerThan.AllInvalid.ToMustCases(s => s.Name switch
             {
-                nameof(F.TimeSpanIsGreaterThan.NullValue) => new MustExpected(false, "value must not be null.", "value"),
-                nameof(F.TimeSpanIsGreaterThan.EqualExclusive) => new MustExpected(false, "value must be a duration greater than the threshold.", Code: MustCodes.Time.Duration.NotGreater),
-                _ => new MustExpected(false, "value must be a duration greater than the threshold.")
+                nameof(F.TimeSpanIsLongerThan.NullValue) => new MustExpected(false, "value must not be null.", "value"),
+                nameof(F.TimeSpanIsLongerThan.EqualExclusive) => new MustExpected(false, "value must be a duration longer than the threshold.", Code: MustCodes.Time.Duration.NotLonger),
+                _ => new MustExpected(false, "value must be a duration longer than the threshold.")
             });
     }
 
-    public static class LessThan
+    public static class ShorterThan
     {
         public static TheoryData<MustCase<(string? value, TimeSpan threshold, Inclusion inclusion)>> ValidCases =>
-            F.TimeSpanIsLessThan.AllValid.ToMustCases();
+            F.TimeSpanIsShorterThan.AllValid.ToMustCases();
         public static TheoryData<MustCase<(string? value, TimeSpan threshold, Inclusion inclusion)>> InvalidCases =>
-            F.TimeSpanIsLessThan.AllInvalid.ToMustCases(s => s.Name switch
+            F.TimeSpanIsShorterThan.AllInvalid.ToMustCases(s => s.Name switch
             {
-                nameof(F.TimeSpanIsLessThan.NullValue) => new MustExpected(false, "value must not be null.", "value"),
-                nameof(F.TimeSpanIsLessThan.EqualExclusive) => new MustExpected(false, "value must be a duration less than the threshold.", Code: MustCodes.Time.Duration.NotLess),
-                _ => new MustExpected(false, "value must be a duration less than the threshold.")
+                nameof(F.TimeSpanIsShorterThan.NullValue) => new MustExpected(false, "value must not be null.", "value"),
+                nameof(F.TimeSpanIsShorterThan.EqualExclusive) => new MustExpected(false, "value must be a duration shorter than the threshold.", Code: MustCodes.Time.Duration.NotShorter),
+                _ => new MustExpected(false, "value must be a duration shorter than the threshold.")
             });
     }
 }

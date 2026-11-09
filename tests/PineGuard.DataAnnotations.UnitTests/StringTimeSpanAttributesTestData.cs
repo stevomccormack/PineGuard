@@ -19,16 +19,16 @@ public static class StringTimeSpanAttributesTestData
         public static TheoryData<ValidCase> InvalidCases => [new("too large", "03:00:00", false), new("unparseable", "abc", false)];
     }
 
-    // GreaterThan("00:05:00") — exclusive
-    public static class GreaterThanTimeSpanString
+    // LongerThan("00:05:00") — exclusive
+    public static class LongerThanTimeSpanString
     {
         public static TheoryData<ValidCase> ValidCases => [new("greater", "01:00:00", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();
         public static TheoryData<ValidCase> InvalidCases => [new("smaller", "00:01:00", false), new("unparseable", "abc", false)];
     }
 
-    // LessThan("02:00:00") — exclusive
-    public static class LessThanTimeSpanString
+    // ShorterThan("02:00:00") — exclusive
+    public static class ShorterThanTimeSpanString
     {
         public static TheoryData<ValidCase> ValidCases => [new("less", "01:00:00", true)];
         public static TheoryData<ValidCase> EdgeCases => CommonEdgeCases();

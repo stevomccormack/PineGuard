@@ -27,20 +27,20 @@ public sealed class MustTimeSpanClausesTests(ITestOutputHelper output) : BaseMus
     }
 
     [Theory]
-    [MemberData(nameof(MustTimeSpanClausesTestData.GreaterThan.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.GreaterThan))]
-    [MemberData(nameof(MustTimeSpanClausesTestData.GreaterThan.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.GreaterThan))]
-    public void GreaterThan_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustTimeSpanClausesTestData.LongerThan.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.LongerThan))]
+    [MemberData(nameof(MustTimeSpanClausesTestData.LongerThan.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.LongerThan))]
+    public void LongerThan_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)> tc)
     {
-        var result = Must.Be.GreaterThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.LongerThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 
     [Theory]
-    [MemberData(nameof(MustTimeSpanClausesTestData.LessThan.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.LessThan))]
-    [MemberData(nameof(MustTimeSpanClausesTestData.LessThan.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.LessThan))]
-    public void LessThan_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)> tc)
+    [MemberData(nameof(MustTimeSpanClausesTestData.ShorterThan.ValidCases), MemberType = typeof(MustTimeSpanClausesTestData.ShorterThan))]
+    [MemberData(nameof(MustTimeSpanClausesTestData.ShorterThan.InvalidCases), MemberType = typeof(MustTimeSpanClausesTestData.ShorterThan))]
+    public void ShorterThan_BehavesAsExpected(MustCase<(TimeSpan value, TimeSpan threshold, Inclusion inclusion)> tc)
     {
-        var result = Must.Be.LessThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion, paramName: "value");
+        var result = Must.Be.ShorterThan(tc.Value.value, tc.Value.threshold, tc.Value.inclusion, paramName: "value");
         AssertResult(tc, result);
     }
 }

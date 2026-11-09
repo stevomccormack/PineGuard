@@ -9,6 +9,8 @@ namespace PineGuard.Utils;
 /// <seealso href="https://pineguard.ai/docs/utils/timeonly">TimeOnly Utility documentation</seealso>
 public static class TimeOnlyUtility
 {
+    private const long TicksPerMicrosecond = 10;
+
     /// <summary>
     /// Attempts to truncate a <see cref="TimeOnly"/> to the specified precision.
     /// </summary>
@@ -30,11 +32,12 @@ public static class TimeOnlyUtility
             TimePrecision.Minute => new TimeOnly(v.Hour, v.Minute, 0, 0),
             TimePrecision.Second => new TimeOnly(v.Hour, v.Minute, v.Second, 0),
             TimePrecision.Millisecond => new TimeOnly(v.Ticks - (v.Ticks % TimeSpan.TicksPerMillisecond)),
+            TimePrecision.Microsecond => new TimeOnly(v.Ticks - (v.Ticks % TicksPerMicrosecond)),
             TimePrecision.Tick => v,
             _ => default
         };
 
-        return precision is TimePrecision.Hour or TimePrecision.Minute or TimePrecision.Second or TimePrecision.Millisecond or TimePrecision.Tick;
+        return precision is TimePrecision.Hour or TimePrecision.Minute or TimePrecision.Second or TimePrecision.Millisecond or TimePrecision.Microsecond or TimePrecision.Tick;
     }
 }
 #endif

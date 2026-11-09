@@ -112,6 +112,16 @@ public static partial class MustCodes
             public const string InRange = Prefix + ".in-range";
         }
 
+        /// <summary>Guarded derivation of a reference date ("today") from a caller-supplied clock.</summary>
+        public static class Reference
+        {
+            /// <summary>The code prefix for this node (<c>"date.reference"</c>).</summary>
+            public const string Prefix = Date.Prefix + ".reference";
+
+            /// <summary><c>date.reference.out-of-range</c></summary>
+            public const string OutOfRange = Prefix + ".out-of-range";
+        }
+
         /// <summary>Nearness to a reference date, measured against a tolerance window.</summary>
         public static class Proximity
         {

@@ -26,7 +26,10 @@ public static partial class StringRules
         /// accepts the whitespace-handling flags (<see cref="DateTimeStyles.AllowWhiteSpaces"/> and its constituents);
         /// passing any other flag causes parsing to fail for every input.
         /// </param>
-        /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+        /// <param name="timeProvider">
+        /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+        /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+        /// </param>
         /// <returns><see langword="true"/> if the parsed date is in the past; otherwise, <see langword="false"/>.</returns>
         public static bool IsInPast(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null) =>
             StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInPast(parsed, inclusion, timeProvider);
@@ -42,7 +45,10 @@ public static partial class StringRules
         /// accepts the whitespace-handling flags (<see cref="DateTimeStyles.AllowWhiteSpaces"/> and its constituents);
         /// passing any other flag causes parsing to fail for every input.
         /// </param>
-        /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+        /// <param name="timeProvider">
+        /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+        /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+        /// </param>
         /// <returns><see langword="true"/> if the parsed date is in the future; otherwise, <see langword="false"/>.</returns>
         public static bool IsInFuture(string? value, Inclusion inclusion = Inclusion.Exclusive, DateTimeStyles styles = DefaultStyles, TimeProvider? timeProvider = null) =>
             StringUtility.DateOnly.TryParse(value, out var parsed, styles) && DateOnlyRules.IsInFuture(parsed, inclusion, timeProvider);
@@ -78,7 +84,10 @@ public static partial class StringRules
         /// accepts the whitespace-handling flags (<see cref="DateTimeStyles.AllowWhiteSpaces"/> and its constituents);
         /// passing any other flag causes parsing to fail for every input.
         /// </param>
-        /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+        /// <param name="timeProvider">
+        /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+        /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+        /// </param>
         /// <returns><see langword="true"/> if the parsed date of birth meets the minimum age; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The age boundary is the one <see cref="DateOnlyRules.HasMinimumAge"/> documents, including how a

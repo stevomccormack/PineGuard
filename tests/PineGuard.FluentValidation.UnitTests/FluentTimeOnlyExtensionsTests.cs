@@ -15,6 +15,8 @@ public sealed class FluentTimeOnlyExtensionsTests(ITestOutputHelper output) : Ba
 
     private sealed class BetweenValidator : AbstractValidator<Model> { public BetweenValidator() => RuleFor(x => x.Value).Between(RefMinus1, RefPlus1); }
     private sealed class NotBetweenValidator : AbstractValidator<Model> { public NotBetweenValidator() => RuleFor(x => x.Value).NotBetween(RefMinus1, RefPlus1); }
+    private sealed class BetweenWrapValidator : AbstractValidator<Model> { public BetweenWrapValidator() => RuleFor(x => x.Value).Between(new TimeOnly(22, 0), new TimeOnly(2, 0)); }
+    private sealed class NotBetweenWrapValidator : AbstractValidator<Model> { public NotBetweenWrapValidator() => RuleFor(x => x.Value).NotBetween(new TimeOnly(22, 0), new TimeOnly(2, 0)); }
     private sealed class BeforeValidator : AbstractValidator<Model> { public BeforeValidator() => RuleFor(x => x.Value).Before(Ref); }
     private sealed class NotBeforeValidator : AbstractValidator<Model> { public NotBeforeValidator() => RuleFor(x => x.Value).NotBefore(Ref); }
     private sealed class OnOrBeforeValidator : AbstractValidator<Model> { public OnOrBeforeValidator() => RuleFor(x => x.Value).OnOrBefore(Ref); }
@@ -41,6 +43,16 @@ public sealed class FluentTimeOnlyExtensionsTests(ITestOutputHelper output) : Ba
     [MemberData(nameof(FluentTimeOnlyExtensionsTestData.NotBetween.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.NotBetween))]
     public void NotBetween_BehavesAsExpected(FluentCase<TimeOnly?> tc)
     { AssertResult(tc, new NotBetweenValidator().Validate(new Model { Value = tc.Value })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.BetweenWrap.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.BetweenWrap))]
+    public void BetweenWrap_BehavesAsExpected(FluentCase<TimeOnly?> tc)
+    { AssertResult(tc, new BetweenWrapValidator().Validate(new Model { Value = tc.Value })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.NotBetweenWrap.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.NotBetweenWrap))]
+    public void NotBetweenWrap_BehavesAsExpected(FluentCase<TimeOnly?> tc)
+    { AssertResult(tc, new NotBetweenWrapValidator().Validate(new Model { Value = tc.Value })); }
 
     [Theory]
     [MemberData(nameof(FluentTimeOnlyExtensionsTestData.Before.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.Before))]

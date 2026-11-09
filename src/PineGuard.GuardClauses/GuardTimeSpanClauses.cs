@@ -83,7 +83,8 @@ public static class GuardTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the LessThan constraint.
+    /// Throws if <paramref name="value"/> is shorter than <paramref name="threshold"/>.
+    /// <see cref="Inclusion.Inclusive"/> also throws when the two are equal.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -100,8 +101,8 @@ public static class GuardTimeSpanClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustTimeSpanClauses.GreaterThan"/>
-    public static TimeSpan LessThan(this IGuardClause _,
+    /// <seealso cref="MustTimeSpanClauses.LongerThan"/>
+    public static TimeSpan ShorterThan(this IGuardClause _,
         TimeSpan value,
         TimeSpan threshold,
         Inclusion inclusion = Inclusion.Exclusive,
@@ -109,7 +110,7 @@ public static class GuardTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.GreaterThan(value, threshold, inclusion, paramName);
+        var result = Must.Be.LongerThan(value, threshold, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -117,7 +118,8 @@ public static class GuardTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the GreaterThan constraint.
+    /// Throws if <paramref name="value"/> is longer than <paramref name="threshold"/>.
+    /// <see cref="Inclusion.Inclusive"/> also throws when the two are equal.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -134,8 +136,8 @@ public static class GuardTimeSpanClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustTimeSpanClauses.LessThan"/>
-    public static TimeSpan GreaterThan(this IGuardClause _,
+    /// <seealso cref="MustTimeSpanClauses.ShorterThan"/>
+    public static TimeSpan LongerThan(this IGuardClause _,
         TimeSpan value,
         TimeSpan threshold,
         Inclusion inclusion = Inclusion.Exclusive,
@@ -143,7 +145,7 @@ public static class GuardTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.LessThan(value, threshold, inclusion, paramName);
+        var result = Must.Be.ShorterThan(value, threshold, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : Inclusion.Inclusive, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

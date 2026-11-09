@@ -67,6 +67,36 @@ public sealed class StringTimeOnlyAttributesTests(ITestOutputHelper output) : Ba
     }
 
     [Theory]
+    [MemberData(nameof(StringTimeOnlyAttributesTestData.BetweenTimeOnlyStringWrap.Cases), MemberType = typeof(StringTimeOnlyAttributesTestData.BetweenTimeOnlyStringWrap))]
+    public void BetweenTimeOnlyStringWrap_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new BetweenTimeOnlyStringAttribute("22:00", "02:00");
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringTimeOnlyAttributesTestData.NotBetweenTimeOnlyStringWrap.Cases), MemberType = typeof(StringTimeOnlyAttributesTestData.NotBetweenTimeOnlyStringWrap))]
+    public void NotBetweenTimeOnlyStringWrap_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new NotBetweenTimeOnlyStringAttribute("22:00", "02:00");
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(StringTimeOnlyAttributesTestData.NotBeforeTimeOnlyString.Cases), MemberType = typeof(StringTimeOnlyAttributesTestData.NotBeforeTimeOnlyString))]
     public void NotBeforeTimeOnlyString_BehavesAsExpected(DataAnnotationCase tc)
     {

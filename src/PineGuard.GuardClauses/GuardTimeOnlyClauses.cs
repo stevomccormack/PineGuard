@@ -16,8 +16,8 @@ public static class GuardTimeOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="min">The minimum bound.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="start">The start of the range.</param>
+    /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">The boundary inclusion mode.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -33,14 +33,14 @@ public static class GuardTimeOnlyClauses
     /// <seealso cref="MustTimeOnlyClauses.Between"/>
     public static TimeOnly NotBetween(this IGuardClause _,
         TimeOnly value,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.Between(value, min, max, inclusion, paramName);
+        var result = Must.Be.Between(value, start, end, inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -52,8 +52,8 @@ public static class GuardTimeOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="min">The minimum bound.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="start">The start of the range.</param>
+    /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">The boundary inclusion mode.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -69,14 +69,14 @@ public static class GuardTimeOnlyClauses
     /// <seealso cref="MustTimeOnlyClauses.NotBetween"/>
     public static TimeOnly Between(this IGuardClause _,
         TimeOnly value,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null,
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.NotBetween(value, min, max, inclusion, paramName); // Guard.Against.Between => Must.Be.NotBetween (complement)
+        var result = Must.Be.NotBetween(value, start, end, inclusion, paramName); // Guard.Against.Between => Must.Be.NotBetween (complement)
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
