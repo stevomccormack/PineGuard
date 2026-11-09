@@ -29,6 +29,13 @@ namespace PineGuard.DataAnnotations;
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// An <see cref="InvalidOperationException"/> is thrown for unsupported types.
 /// </para>
+/// <para>
+/// The reference clock is the <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service
+/// provider, or the system clock when none is registered. For a <c>DateOnly</c> value the calendar date of "today"
+/// follows the registered provider's <see cref="TimeProvider.LocalTimeZone"/>, or is the UTC calendar date when
+/// none is registered (PineGuard never guesses the host machine's zone); for a <see cref="DateTime"/> or
+/// <see cref="DateTimeOffset"/> value the comparison is against the current instant.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -88,6 +95,13 @@ public sealed class PastAttribute() : ValidationAttributeBase(typeof(object), Mu
 /// <para>
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// An <see cref="InvalidOperationException"/> is thrown for unsupported types.
+/// </para>
+/// <para>
+/// The reference clock is the <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service
+/// provider, or the system clock when none is registered. For a <c>DateOnly</c> value the calendar date of "today"
+/// follows the registered provider's <see cref="TimeProvider.LocalTimeZone"/>, or is the UTC calendar date when
+/// none is registered (PineGuard never guesses the host machine's zone); for a <see cref="DateTime"/> or
+/// <see cref="DateTimeOffset"/> value the comparison is against the current instant.
 /// </para>
 /// </remarks>
 /// <example>
@@ -149,6 +163,13 @@ public sealed class PastOrPresentAttribute() : ValidationAttributeBase(typeof(ob
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// An <see cref="InvalidOperationException"/> is thrown for unsupported types.
 /// </para>
+/// <para>
+/// The reference clock is the <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service
+/// provider, or the system clock when none is registered. For a <c>DateOnly</c> value the calendar date of "today"
+/// follows the registered provider's <see cref="TimeProvider.LocalTimeZone"/>, or is the UTC calendar date when
+/// none is registered (PineGuard never guesses the host machine's zone); for a <see cref="DateTime"/> or
+/// <see cref="DateTimeOffset"/> value the comparison is against the current instant.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -209,6 +230,13 @@ public sealed class FutureAttribute() : ValidationAttributeBase(typeof(object), 
 /// <para>
 /// If the value is <see langword="null"/>, validation is skipped by the base class.
 /// An <see cref="InvalidOperationException"/> is thrown for unsupported types.
+/// </para>
+/// <para>
+/// The reference clock is the <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service
+/// provider, or the system clock when none is registered. For a <c>DateOnly</c> value the calendar date of "today"
+/// follows the registered provider's <see cref="TimeProvider.LocalTimeZone"/>, or is the UTC calendar date when
+/// none is registered (PineGuard never guesses the host machine's zone); for a <see cref="DateTime"/> or
+/// <see cref="DateTimeOffset"/> value the comparison is against the current instant.
 /// </para>
 /// </remarks>
 /// <example>

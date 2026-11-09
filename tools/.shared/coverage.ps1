@@ -161,6 +161,181 @@ function Get-ScopeTestResultsPaths {
 }
 
 # -------------------------------------------------------------------------------------------------
+# Isolated publish (per-TFM), binding runner-fix decision -- artifacts/reviews/T1-U0-fable-review.md
+# -------------------------------------------------------------------------------------------------
+
+function Resolve-CoverageTestFrameworks {
+    <#
+    .SYNOPSIS
+        Resolves the -Framework/-Isolated "passes" one coverage engine run over a project must
+        execute.
+
+    .DESCRIPTION
+        Every PineGuard test project multi-targets net8.0;net10.0 (tests/Directory.Build.props),
+        so 'dotnet publish' with no -f fails NETSDK1129. This is the single place that decides,
+        for one project, how many isolated-publish passes to run and with which framework each
+        pass binds -- consumed by coverlet/New-CoverageReport.ps1's -Isolated loop.
+
+        Behavior contract (binding runner-fix decision):
+
+        | -Framework | -Isolated | Passes |
+        |---|---|---|
+        | bound   | yes | one: @($Framework) |
+        | bound   | no  | one: @($Framework) |
+        | unbound | no  | one, framework null/empty -- the SDK fans out across TFMs itself, identical to today |
+        | unbound | yes | one per TFM from Get-ProjectTargetFrameworks |
+
+        The unbound+isolated case resolves and loops rather than throwing because the Brain's own
+        coverage agents (docs/ai/agents/coverage-all.md) invoke -Isolated for every scope with no
+        -Framework bound, and because it must collect the same TFM set the non-isolated run
+        collects.
+
+    .PARAMETER ProjectPath
+        Path to the test csproj being resolved. Only read when -Framework is unbound and
+        -Isolated is set (the one case that must discover the project's real TFMs).
+
+    .PARAMETER Framework
+        Caller-bound target framework moniker, or unbound/empty to let this function resolve or
+        defer resolution.
+
+    .PARAMETER Isolated
+        Whether the caller is publishing in isolation before testing.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $ProjectPath,
+
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $Framework,
+
+        [switch] $Isolated
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($Framework)) {
+        return @($Framework)
+    }
+
+    if (-not $Isolated) {
+        return @($Framework)
+    }
+
+    return @(Get-ProjectTargetFrameworks -CsprojPath $ProjectPath)
+}
+
+function Get-IsolatedPublishArguments {
+    <#
+    .SYNOPSIS
+        Builds the exact `dotnet publish` argument array for one isolated, single-TFM publish.
+
+    .DESCRIPTION
+        -Framework is mandatory and must be non-blank: publishing a multi-targeted test project
+        (net8.0;net10.0, tests/Directory.Build.props) with no -f is exactly the NETSDK1129 failure
+        this helper exists to prevent, so an unbound/blank -Framework is a caller bug, not a
+        resolvable case -- it throws immediately rather than shelling out to fail later.
+
+    .PARAMETER ProjectPath
+        Path to the test csproj to publish.
+
+    .PARAMETER Configuration
+        Build configuration (Debug/Release).
+
+    .PARAMETER Framework
+        Target framework moniker to restrict the publish to. Required, non-blank.
+
+    .PARAMETER OutputDirectory
+        Destination directory for the published output.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $ProjectPath,
+
+        [Parameter(Mandatory)]
+        [string] $Configuration,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [string] $Framework,
+
+        [Parameter(Mandatory)]
+        [string] $OutputDirectory
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Framework)) {
+        throw "Get-IsolatedPublishArguments requires a non-blank -Framework: isolated 'dotnet publish' of a multi-target test project fails NETSDK1129 without -f restricting it to one target framework."
+    }
+
+    return @('publish', $ProjectPath, '-c', $Configuration, '-f', $Framework, '-o', $OutputDirectory)
+}
+
+function Invoke-IsolatedPublish {
+    <#
+    .SYNOPSIS
+        Publishes one test project to an isolated output directory for one target framework, and
+        returns the published DLL path.
+
+    .DESCRIPTION
+        Renders the publish command via Get-IsolatedPublishArguments and prints it (with its TFM)
+        at the existing "Isolating:" diagnostic line. Captures publish output with 2>&1 instead of
+        discarding it (the previous `| Out-Null` swallowed the SDK's own NETSDK1129 error). On a
+        nonzero exit, writes the captured output to the host and throws a message naming the
+        project, the framework, the exit code and the command, with the output's tail appended so
+        the SDK's own error text (e.g. NETSDK1129) is visible in the exception itself.
+
+    .PARAMETER ProjectPath
+        Path to the test csproj to publish.
+
+    .PARAMETER Configuration
+        Build configuration (Debug/Release).
+
+    .PARAMETER Framework
+        Target framework moniker to restrict the publish to. Required, non-blank (see
+        Get-IsolatedPublishArguments).
+
+    .PARAMETER OutputDirectory
+        Destination directory for the published output.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $ProjectPath,
+
+        [Parameter(Mandatory)]
+        [string] $Configuration,
+
+        [Parameter(Mandatory)]
+        [string] $Framework,
+
+        [Parameter(Mandatory)]
+        [string] $OutputDirectory
+    )
+
+    $publishArgs = Get-IsolatedPublishArguments -ProjectPath $ProjectPath -Configuration $Configuration -Framework $Framework -OutputDirectory $OutputDirectory
+    $renderedCommand = "dotnet $($publishArgs -join ' ')"
+
+    Write-Host "  Isolating: $renderedCommand [$Framework]" -ForegroundColor Gray
+
+    $output = @(& dotnet @publishArgs 2>&1 | ForEach-Object { $_.ToString() })
+    $exitCode = $LASTEXITCODE
+
+    if ($exitCode -ne 0) {
+        $output | ForEach-Object { Write-Host $_ }
+        $tail = ($output | Select-Object -Last 20) -join [Environment]::NewLine
+        throw "dotnet publish failed (exit $exitCode) for '$ProjectPath' [$Framework]. Command: $renderedCommand. Output tail: $tail"
+    }
+
+    $projectName = [IO.Path]::GetFileNameWithoutExtension($ProjectPath)
+    $publishedDll = Join-Path $OutputDirectory "$projectName.dll"
+    if (-not (Test-Path -LiteralPath $publishedDll)) {
+        throw "dotnet publish succeeded for '$ProjectPath' [$Framework] but the published dll was not found at: $publishedDll"
+    }
+
+    return $publishedDll
+}
+
+# -------------------------------------------------------------------------------------------------
 # Coverlet RunSettings
 # -------------------------------------------------------------------------------------------------
 

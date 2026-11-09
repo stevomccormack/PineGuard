@@ -17,6 +17,16 @@ This modular plan targets **10/10 in every technical rubric criterion** and **10
 
 PineGuard is greenfield for this work. Choose the best globally consistent new design; no old-release compatibility, shims or migration work is required. Put small high-value CI/evidence repairs, naming/taxonomy decisions, the **new static rule structure and executable manifest**, and **benchmark baselines EARLY**. Put the largest API, DDD and Clean Architecture sample projects LAST. These current user instructions supersede contrary priorities in v1.6 and the original handoff.
 
+## Current API baseline
+
+Use the [Core/Common API decision record](../core-common-api-decisions.md) and
+[implementation evidence](../core-common-api-implementation.md) when inventorying the current
+surface. Implemented names include `NetworkRules.IsHostname`, `Must.Be.Hostname`,
+`Guard.Against.NotHostname`, and the `InRange` / `OutOfRange` vocabulary. Account for the
+integrated temporal duration words and parsed-type suffixes; historical snapshots retain the
+spellings of their reviewed commits. Further design changes must update all affected libraries,
+callers, tests and documentation together under the [greenfield policy](../../specs/spec.md).
+
 ## Approved test-project organization
 
 The user-approved [testing project layout](references/test-project-layout.md) groups added crosscutting checks into Rules and Architecture test projects, hosted composition into IntegrationTests, and distinct Fuzz, Benchmarks and Consumers executables. Testing techniques use folders within those responsibilities. Existing library unit suites, the shared PineGuard.Testing fixture library and its own PineGuard.Testing.UnitTests retain their responsibilities. The layout's stable TP-* identities and workstream mapping are authoritative; implementation must align the solution, relevant discovery/routing/coverage scripts, BRAIN and documentation. The six projects remain planned and must not be reported as present or passing.

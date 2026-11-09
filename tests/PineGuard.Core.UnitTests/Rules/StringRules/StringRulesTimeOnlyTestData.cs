@@ -8,7 +8,7 @@ public static class StringRulesTimeOnlyTestData
 {
     public static class IsInRange
     {
-        public static TheoryData<RuleCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases => F.StringTimeOnly.IsInRange.AllScenarios.ToRuleCases();
+        public static TheoryData<RuleCase<(string? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>> Cases => F.StringTimeOnly.IsInRange.AllScenarios.ToRuleCases();
     }
 
     public static class IsBefore

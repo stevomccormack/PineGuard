@@ -16,18 +16,19 @@ public static partial class StringRules
         private const DateTimeStyles DefaultStyles = DateTimeStyles.AllowWhiteSpaces;
 
         /// <summary>
-        /// Determines whether the specified string parses to a time within [<paramref name="min"/>, <paramref name="max"/>].
+        /// Determines whether the specified string parses to a time within [<paramref name="start"/>, <paramref name="end"/>],
+        /// wrapping across midnight when <paramref name="start"/> is later than <paramref name="end"/>.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid time string, returns <see langword="false"/>.</param>
-        /// <param name="min">The lower bound of the time range.</param>
-        /// <param name="max">The upper bound of the time range.</param>
+        /// <param name="start">The start of the time range.</param>
+        /// <param name="end">The end of the time range.</param>
         /// <param name="inclusion">Whether the bounds are inclusive or exclusive. Defaults to <see cref="Inclusion.Inclusive"/>.</param>
         /// <param name="styles">The <see cref="DateTimeStyles"/> to apply when parsing.</param>
         /// <returns><see langword="true"/> if the parsed time falls within the range; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInRange(string? value, System.TimeOnly min, System.TimeOnly max, Inclusion inclusion = Inclusion.Inclusive, DateTimeStyles styles = DefaultStyles)
+        public static bool IsInRange(string? value, System.TimeOnly start, System.TimeOnly end, Inclusion inclusion = Inclusion.Inclusive, DateTimeStyles styles = DefaultStyles)
         {
             TemporalRangeComparison.ValidateInclusion(inclusion);
-            return StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsInRange(parsed, min, max, inclusion);
+            return StringUtility.TimeOnly.TryParse(value, out var parsed, styles) && TimeOnlyRules.IsInRange(parsed, start, end, inclusion);
         }
 
         /// <summary>

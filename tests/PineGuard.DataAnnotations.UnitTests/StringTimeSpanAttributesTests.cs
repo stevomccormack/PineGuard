@@ -25,18 +25,18 @@ public sealed class StringTimeSpanAttributesTests
     }
 
     [Theory]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.GreaterThanTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.GreaterThanTimeSpanString))]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.GreaterThanTimeSpanString.EdgeCases), MemberType = typeof(StringTimeSpanAttributesTestData.GreaterThanTimeSpanString))]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.GreaterThanTimeSpanString.InvalidCases), MemberType = typeof(StringTimeSpanAttributesTestData.GreaterThanTimeSpanString))]
-    public void GreaterThanTimeSpanString_ShouldReturnExpected(StringTimeSpanAttributesTestData.ValidCase testCase)
-        => Verify(new GreaterThanTimeSpanStringAttribute("00:05:00"), testCase);
+    [MemberData(nameof(StringTimeSpanAttributesTestData.LongerThanTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.LongerThanTimeSpanString))]
+    [MemberData(nameof(StringTimeSpanAttributesTestData.LongerThanTimeSpanString.EdgeCases), MemberType = typeof(StringTimeSpanAttributesTestData.LongerThanTimeSpanString))]
+    [MemberData(nameof(StringTimeSpanAttributesTestData.LongerThanTimeSpanString.InvalidCases), MemberType = typeof(StringTimeSpanAttributesTestData.LongerThanTimeSpanString))]
+    public void LongerThanTimeSpanString_ShouldReturnExpected(StringTimeSpanAttributesTestData.ValidCase testCase)
+        => Verify(new LongerThanTimeSpanStringAttribute("00:05:00"), testCase);
 
     [Theory]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.LessThanTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.LessThanTimeSpanString))]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.LessThanTimeSpanString.EdgeCases), MemberType = typeof(StringTimeSpanAttributesTestData.LessThanTimeSpanString))]
-    [MemberData(nameof(StringTimeSpanAttributesTestData.LessThanTimeSpanString.InvalidCases), MemberType = typeof(StringTimeSpanAttributesTestData.LessThanTimeSpanString))]
-    public void LessThanTimeSpanString_ShouldReturnExpected(StringTimeSpanAttributesTestData.ValidCase testCase)
-        => Verify(new LessThanTimeSpanStringAttribute("02:00:00"), testCase);
+    [MemberData(nameof(StringTimeSpanAttributesTestData.ShorterThanTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.ShorterThanTimeSpanString))]
+    [MemberData(nameof(StringTimeSpanAttributesTestData.ShorterThanTimeSpanString.EdgeCases), MemberType = typeof(StringTimeSpanAttributesTestData.ShorterThanTimeSpanString))]
+    [MemberData(nameof(StringTimeSpanAttributesTestData.ShorterThanTimeSpanString.InvalidCases), MemberType = typeof(StringTimeSpanAttributesTestData.ShorterThanTimeSpanString))]
+    public void ShorterThanTimeSpanString_ShouldReturnExpected(StringTimeSpanAttributesTestData.ValidCase testCase)
+        => Verify(new ShorterThanTimeSpanStringAttribute("02:00:00"), testCase);
 
     [Theory]
     [MemberData(nameof(StringTimeSpanAttributesTestData.OutOfRangeTimeSpanString.ValidCases), MemberType = typeof(StringTimeSpanAttributesTestData.OutOfRangeTimeSpanString))]

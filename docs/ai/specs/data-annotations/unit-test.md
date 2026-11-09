@@ -334,7 +334,7 @@ public void InCidrRange_BehavesAsExpected(DataAnnotationCase tc)
 ## Pattern D — Temporal / Range Attribute
 
 For attributes parameterised with reference date/time/timespan values
-(e.g., `InRangeTimeOnlyAttribute(min, max)`, `BeforeDateOnlyAttribute(cutoff)`).
+(e.g., `InRangeTimeOnlyAttribute(start, end)`, `BeforeDateOnlyAttribute(cutoff)`).
 Use `private static readonly` fields sourced from fixture named fields or stable hardcoded values.
 
 **TestData:**
@@ -342,11 +342,11 @@ Use `private static readonly` fields sourced from fixture named fields or stable
 ```csharp
 public static class InRangeTimeOnly
 {
-    private static readonly TimeOnly Min = F.IsKnownTimes.T1000!.Value;
-    private static readonly TimeOnly Max = F.IsKnownTimes.T1200!.Value;
+    private static readonly TimeOnly Start = F.IsKnownTimes.T1000!.Value;
+    private static readonly TimeOnly End = F.IsKnownTimes.T1200!.Value;
 
-    public static TimeOnly MinParam => Min;
-    public static TimeOnly MaxParam => Max;
+    public static string StartParam => Start.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+    public static string EndParam => End.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
 
     public static TheoryData<DataAnnotationCase> Cases =>
     [
@@ -366,8 +366,8 @@ public void InRangeTimeOnly_BehavesAsExpected(DataAnnotationCase tc)
 {
     // Arrange
     var attr = new InRangeTimeOnlyAttribute(
-        TimeOnlyAttributesTestData.InRangeTimeOnly.MinParam,
-        TimeOnlyAttributesTestData.InRangeTimeOnly.MaxParam);
+        TimeOnlyAttributesTestData.InRangeTimeOnly.StartParam,
+        TimeOnlyAttributesTestData.InRangeTimeOnly.EndParam);
     var ctx = new ValidationContext(new object()) { MemberName = "Value" };
 
     // Act

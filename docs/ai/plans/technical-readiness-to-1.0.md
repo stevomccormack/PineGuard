@@ -8,6 +8,10 @@ last_updated: 2026-09-25
 
 # Technical readiness to 1.0
 
+> Historical v1.6 plan. The [modular plan](technical-readiness-to-1.0/plan.md) is the current
+> planning authority. Its greenfield policy and the [Core/Common implementation record](core-common-api-implementation.md)
+> supersede old API names and compatibility assumptions in this retained version.
+
 > **Status:** Planned. This document records the agreed planning scope; no implementation,
 > new test run, benchmark, publication or release is performed by creating it.
 > **Design owner:** Astra. Astra owns architecture decisions, sequencing, plans and review;

@@ -159,3 +159,28 @@ only the three agreed identifier substitutions were applied.
 A Must-only diagnostic run reached 100% lines and 99.70% branches: six branches in unchanged
 temporal code are exercised by cross-layer tests. The final gate uses the complete suite, as in
 the original verification, with the same exact 100% thresholds and no new exclusions.
+
+
+### Main integration and documentation reconciliation (2026-11-09)
+
+The owner requested direct integration to main and push without a PR. The integration
+reconciles the API branch with temporal Phase 1, rather than preserving competing spellings.
+Duration words follow ratified temporal D-16 (`LongerThan` / `ShorterThan`); string clauses
+apply the parsed-type suffix (`LongerThanTimeSpan` / `ShorterThanTimeSpan`). Single bounds
+use `other`. Scalar TimeOnly ranges use `InRange` / `OutOfRange` with `start` / `end` and
+midnight wrapping; linear range objects retain their ordered-endpoint contracts.
+
+Related new-surfaces plans, the temporal program and phase plans, the readiness master,
+comparison examples, Pattern D and canonical naming/greenfield policies are aligned.
+Historical receipts and the pre-integration surface inventory are explicitly labelled as
+snapshots. Documentation-link audit reports zero findings. Earlier test/coverage totals
+above describe their recorded branch heads; they are not evidence for this integration.
+
+Integration verification:
+
+- All-target solution build: zero warnings and errors (`artifacts/integration/build-host-2.log`).
+- Final full suite: 23,491 passing on net8.0 and 23,516 on net10.0, 15 suites each, no failures or skips (`artifacts/integration/test-summary.json`, `tests-all-final.log`). The first run exposed two stale Guard overlap expectations per runtime; explicit boundary cases and expectations were corrected before this clean run.
+- CLI: all 209 tests pass (`artifacts/integration/cli-tests-host.log`).
+- Required audit gate, layer parity, Must collision, code and nullability checks pass with zero findings. The collision audit has a bounded scope; consumer compilation and independent source review supplement it.
+- Independent source review found no confirmed declaration, suffix, runtime polarity or overload-collision defects. Its Guard range-summary finding was corrected to describe the forbidden state directly.
+- Coverage was not recollected for this merge; earlier coverage figures remain tied to their recorded heads.

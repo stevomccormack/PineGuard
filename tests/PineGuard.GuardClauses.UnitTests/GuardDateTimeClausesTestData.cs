@@ -93,7 +93,7 @@ public static class GuardDateTimeClausesTestData
     public static class OnOrAfter
     {
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> ValidCases =>
-            F.IsBefore.ValidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown", "SameInstantInclusive").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(true));
+            F.IsBefore.ValidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown", "PrecisionMicrosecond", "SameInstantInclusive").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(true));
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> InvalidCases =>
         [
             ..F.IsBefore.InvalidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
@@ -111,7 +111,7 @@ public static class GuardDateTimeClausesTestData
             new("SameInstantInclusive", (F.IsAfter.SameInstantInclusive.value!.Value, F.IsAfter.SameInstantInclusive.other!.Value), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> InvalidCases =>
-            F.IsAfter.ValidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown", "SameInstantInclusive").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+            F.IsAfter.ValidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown", "PrecisionMicrosecond", "SameInstantInclusive").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
     // Guard.Against.OnOrBefore — throws when value IS on-or-before; passes when after
@@ -119,7 +119,7 @@ public static class GuardDateTimeClausesTestData
     public static class OnOrBefore
     {
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> ValidCases =>
-            F.IsAfter.ValidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown", "SameInstantInclusive").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(true));
+            F.IsAfter.ValidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown", "PrecisionMicrosecond", "SameInstantInclusive").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(true));
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> InvalidCases =>
         [
             ..F.IsAfter.InvalidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
@@ -137,7 +137,7 @@ public static class GuardDateTimeClausesTestData
             new("SameInstantInclusive", (F.IsBefore.SameInstantInclusive.value!.Value, F.IsBefore.SameInstantInclusive.other!.Value), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> InvalidCases =>
-            F.IsBefore.ValidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown", "SameInstantInclusive").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
+            F.IsBefore.ValidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown", "PrecisionMicrosecond", "SameInstantInclusive").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value"));
     }
 
     // Guard.Against.NotSame — throws when value IS not-same; passes when same
@@ -146,13 +146,14 @@ public static class GuardDateTimeClausesTestData
     {
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> ValidCases =>
         [
-            ..F.IsSame.ValidScenarios.Except("NullValue", "NullOther", "BothNull", "PrecisionHour").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(true)),
+            ..F.IsSame.ValidScenarios.Except("NullValue", "NullOther", "BothNull", "PrecisionHour", "PrecisionMicrosecond").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(true)),
             new("PrecisionUnknown", (F.IsSame.PrecisionUnknown.value!.Value, F.IsSame.PrecisionUnknown.other!.Value), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> InvalidCases =>
         [
             ..F.IsSame.InvalidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
-            new("PrecisionHour", (F.IsSame.PrecisionHour.value!.Value, F.IsSame.PrecisionHour.other!.Value), new GuardExpected(false, typeof(ArgumentException), "value"))
+            new("PrecisionHour", (F.IsSame.PrecisionHour.value!.Value, F.IsSame.PrecisionHour.other!.Value), new GuardExpected(false, typeof(ArgumentException), "value")),
+            new("PrecisionMicrosecond", (F.IsSame.PrecisionMicrosecond.value!.Value, F.IsSame.PrecisionMicrosecond.other!.Value), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 
@@ -163,11 +164,12 @@ public static class GuardDateTimeClausesTestData
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> ValidCases =>
         [
             ..F.IsSame.InvalidScenarios.Except("NullValue", "NullOther", "PrecisionUnknown").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(true)),
-            new("PrecisionHour", (F.IsSame.PrecisionHour.value!.Value, F.IsSame.PrecisionHour.other!.Value), new GuardExpected(true))
+            new("PrecisionHour", (F.IsSame.PrecisionHour.value!.Value, F.IsSame.PrecisionHour.other!.Value), new GuardExpected(true)),
+            new("PrecisionMicrosecond", (F.IsSame.PrecisionMicrosecond.value!.Value, F.IsSame.PrecisionMicrosecond.other!.Value), new GuardExpected(true))
         ];
         public static TheoryData<GuardCase<(DateTime value, DateTime other)>> InvalidCases =>
         [
-            ..F.IsSame.ValidScenarios.Except("NullValue", "NullOther", "BothNull", "PrecisionHour").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
+            ..F.IsSame.ValidScenarios.Except("NullValue", "NullOther", "BothNull", "PrecisionHour", "PrecisionMicrosecond").Project(t => (t.value!.Value, t.other!.Value)).ToGuardCases(_ => new GuardExpected(false, typeof(ArgumentException), "value")),
             new("PrecisionUnknown", (F.IsSame.PrecisionUnknown.value!.Value, F.IsSame.PrecisionUnknown.other!.Value), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }

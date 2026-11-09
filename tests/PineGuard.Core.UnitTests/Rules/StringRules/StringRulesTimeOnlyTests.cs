@@ -8,10 +8,10 @@ public sealed class StringRulesTimeOnlyTests(ITestOutputHelper output) : BaseRul
 {
     [Theory]
     [MemberData(nameof(StringRulesTimeOnlyTestData.IsInRange.Cases), MemberType = typeof(StringRulesTimeOnlyTestData.IsInRange))]
-    public void IsInRange_BehavesAsExpected(RuleCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
+    public void IsInRange_BehavesAsExpected(RuleCase<(string? value, TimeOnly start, TimeOnly end, Inclusion inclusion)> tc)
     {
         // Act
-        var result = PineGuard.Rules.StringRules.TimeOnly.IsInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = PineGuard.Rules.StringRules.TimeOnly.IsInRange(tc.Value.value, tc.Value.start, tc.Value.end, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);

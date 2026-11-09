@@ -10,6 +10,8 @@ public static class FluentTimeOnlyExtensionsTestData
     private static readonly TimeOnly RefMinus1 = F.IsKnownTimes.T1100!.Value;
     private static readonly TimeOnly RefMinus2 = F.IsKnownTimes.T1000!.Value;
     private static readonly TimeOnly RefPlus1 = F.IsKnownTimes.T1300!.Value;
+    private static readonly TimeOnly WrapInside = F.IsInRange.WrapLateNightInside.value!.Value;
+    private static readonly TimeOnly WrapOutside = F.IsInRange.WrapOutside.value!.Value;
 
     public static class InRange
     {
@@ -27,6 +29,26 @@ public static class FluentTimeOnlyExtensionsTestData
         [
             new("outside", RefMinus2, new FluentExpected(true)),
             new("inside", Ref, new FluentExpected(false, "Value must not be within the expected range.")),
+            new("null", null, new FluentExpected(true))
+        ];
+    }
+
+    public static class InRangeWrap
+    {
+        public static TheoryData<FluentCase<TimeOnly?>> Cases =>
+        [
+            new("inside", WrapInside, new FluentExpected(true)),
+            new("outside", WrapOutside, new FluentExpected(false, "Value must be within the expected range.")),
+            new("null", null, new FluentExpected(true))
+        ];
+    }
+
+    public static class OutOfRangeWrap
+    {
+        public static TheoryData<FluentCase<TimeOnly?>> Cases =>
+        [
+            new("outside", WrapOutside, new FluentExpected(true)),
+            new("inside", WrapInside, new FluentExpected(false, "Value must not be within the expected range.")),
             new("null", null, new FluentExpected(true))
         ];
     }

@@ -42,27 +42,27 @@ public static class MustTimeSpanClausesTestData
         ];
     }
 
-    // Must.Be.GreaterThan — valid when value is greater than other
-    public static class GreaterThan
+    // Must.Be.LongerThan — valid when value is longer than other
+    public static class LongerThan
     {
         public static TheoryData<MustCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)>> ValidCases =>
-            F.IsGreaterThan.AllValid.Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
+            F.IsLongerThan.AllValid.Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
             .ToMustCases(_ => new MustExpected(true));
 
         public static TheoryData<MustCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)>> InvalidCases =>
-            F.IsGreaterThan.AllInvalid.Where(s => s.Inputs is { value: not null, other: not null }).Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
-            .ToMustCases(_ => new MustExpected(false, "value must be greater than the threshold.", Code: MustCodes.Time.Duration.NotGreater));
+            F.IsLongerThan.AllInvalid.Where(s => s.Inputs is { value: not null, other: not null }).Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
+            .ToMustCases(_ => new MustExpected(false, "value must be longer than the other.", Code: MustCodes.Time.Duration.NotLonger));
     }
 
-    // Must.Be.LessThan — valid when value is less than other
-    public static class LessThan
+    // Must.Be.ShorterThan — valid when value is shorter than other
+    public static class ShorterThan
     {
         public static TheoryData<MustCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)>> ValidCases =>
-            F.IsLessThan.AllValid.Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
+            F.IsShorterThan.AllValid.Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
             .ToMustCases(_ => new MustExpected(true));
 
         public static TheoryData<MustCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)>> InvalidCases =>
-            F.IsLessThan.AllInvalid.Where(s => s.Inputs is { value: not null, other: not null }).Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
-            .ToMustCases(_ => new MustExpected(false, "value must be less than the threshold.", Code: MustCodes.Time.Duration.NotLess));
+            F.IsShorterThan.AllInvalid.Where(s => s.Inputs is { value: not null, other: not null }).Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
+            .ToMustCases(_ => new MustExpected(false, "value must be shorter than the other.", Code: MustCodes.Time.Duration.NotShorter));
     }
 }

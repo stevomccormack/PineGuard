@@ -1,6 +1,14 @@
+<!-- metadata_header
+type: plan
+id: xml-schema-validation
+version: 1.0
+status: completed
+last_updated: 2026-11-08
+-->
+
 # Plan — XML: Core fix and `PineGuard.Xml` schema validation
 
-**Status**: executing (2026-09-14)
+**Status**: completed (merged to main 4a6e698, 2026-09-22)
 **Branch / worktree**: `feature/xml-schema` at `.claude/worktrees/xml-schema`
 **Governed by**: `new-surfaces-missing-validation-cases-00-program.md` (package conventions §4, code grammar §5.4, gates §7/§9, onboarding §8)
 **Supersedes**: the "XSD schema validation" deferral in `library-expansion-roadmap.md` §2.6 and the Xml bullets of its Part 6

@@ -23,12 +23,13 @@ public static class MustStringTimeOnlyClauses
     private const string InvalidTimePrecisionMessage = "{paramName} has an invalid time precision.";
 
     /// <summary>
-    /// Validates that the specified value must be less than or equal to .
+    /// Validates that the specified value is a time within the specified range, wrapping across midnight
+    /// when <paramref name="start"/> is later than <paramref name="end"/>.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="min">The minimum bound.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="start">The start of the range.</param>
+    /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
     /// <param name="styles">The value to validate.</param>
     /// <param name="paramName">
@@ -39,13 +40,13 @@ public static class MustStringTimeOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a time within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-only">String Time Only Must Clauses documentation</seealso>
     public static MustResult<TimeOnly> InRangeTimeOnly(this IMustClause _,
         string? value,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
@@ -56,9 +57,6 @@ public static class MustStringTimeOnlyClauses
         if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
-        if (min > max)
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
-
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, NullMessage, paramName, value);
 
@@ -68,17 +66,18 @@ public static class MustStringTimeOnlyClauses
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed;
-        var ok = TimeOnlyRules.IsInRange(parsedValue, min, max, inclusion);
+        var ok = TimeOnlyRules.IsInRange(parsedValue, start, end, inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Range.OutOfRange, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
-    /// Validates that the specified value must be less than or equal to .
+    /// Validates that the specified value is a time not within the specified range, wrapping across
+    /// midnight when <paramref name="start"/> is later than <paramref name="end"/>.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="min">The minimum bound.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="start">The start of the excluded range.</param>
+    /// <param name="end">The end of the excluded range.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
     /// <param name="styles">The value to validate.</param>
     /// <param name="paramName">
@@ -89,13 +88,13 @@ public static class MustStringTimeOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a time not within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-only">String Time Only Must Clauses documentation</seealso>
     public static MustResult<TimeOnly> OutOfRangeTimeOnly(this IMustClause _,
         string? value,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         DateTimeStyles styles = DefaultStyles,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
@@ -106,9 +105,6 @@ public static class MustStringTimeOnlyClauses
         if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
-        if (min > max)
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, "{paramName} must be less than or equal to " + nameof(max) + ".", nameof(min), min);
-
         if (value is null)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, NullMessage, paramName, value);
 
@@ -118,7 +114,7 @@ public static class MustStringTimeOnlyClauses
             return MustResult<TimeOnly>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed;
-        var ok = !TimeOnlyRules.IsInRange(parsedValue, min, max, inclusion);
+        var ok = !TimeOnlyRules.IsInRange(parsedValue, start, end, inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Range.InRange, messageTemplate, paramName, value, parsedValue);
     }
 

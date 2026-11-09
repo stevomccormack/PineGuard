@@ -14,6 +14,11 @@ namespace PineGuard.DataAnnotations;
 /// Delegates to <see cref="MustDateTimeOffsetClauses.Past"/>. Supported on properties, fields, and
 /// parameters of type <see cref="DateTimeOffset"/>.
 /// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. Instants are compared, so the value's offset does not affect the outcome.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -48,6 +53,11 @@ public sealed class PastDateTimeOffsetAttribute() : ValidationAttributeBase(type
 /// <para>
 /// Delegates to <see cref="MustDateTimeOffsetClauses.PastOrPresent"/>. Supported on properties, fields, and
 /// parameters of type <see cref="DateTimeOffset"/>.
+/// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. Instants are compared, so the value's offset does not affect the outcome.
 /// </para>
 /// </remarks>
 /// <example>
@@ -84,6 +94,11 @@ public sealed class PastOrPresentDateTimeOffsetAttribute() : ValidationAttribute
 /// Delegates to <see cref="MustDateTimeOffsetClauses.Future"/>. Supported on properties, fields, and
 /// parameters of type <see cref="DateTimeOffset"/>.
 /// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. Instants are compared, so the value's offset does not affect the outcome.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -118,6 +133,11 @@ public sealed class FutureDateTimeOffsetAttribute() : ValidationAttributeBase(ty
 /// <para>
 /// Delegates to <see cref="MustDateTimeOffsetClauses.FutureOrPresent"/>. Supported on properties, fields,
 /// and parameters of type <see cref="DateTimeOffset"/>.
+/// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. Instants are compared, so the value's offset does not affect the outcome.
 /// </para>
 /// </remarks>
 /// <example>

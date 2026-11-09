@@ -1,4 +1,5 @@
 using PineGuard.Codes;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.MustClauses;
 using PineGuard.Testing.UnitTests.Rules;
@@ -8,11 +9,22 @@ namespace PineGuard.MustClauses.UnitTests;
 
 public static class MustDateOnlyClausesTestData
 {
-    private static readonly DateOnly Now = DateOnly.FromDateTime(DateTime.UtcNow);
+    // Derived from FixedTimeProvider.Default (UTC zone) rather than the machine clock, mirroring
+    // DateOnlyRulesTestData.PinnedToday: the "present" rows below are pinned to the same clock the
+    // Past/PastOrPresent/Future/FutureOrPresent theories now inject, so they no longer drift with the host zone.
+    private static readonly DateOnly Now = DateOnly.FromDateTime(FixedTimeProvider.Default.GetUtcNow().UtcDateTime);
     private static readonly DateOnly LeapDayBirth = new(2008, 02, 29);
     private static readonly DateOnly PastDate = Now.AddDays(-1);
     private static readonly DateOnly FutureDate = Now.AddDays(1);
     private static readonly DateOnly WayFutureDate = Now.AddDays(5);
+
+    // Zones exactly at the ±14h boundary DateTimeOffsetUtility.TryGetDateAtOffset enforces, paired with an
+    // instant at the corresponding DateTimeOffset extreme, so the reference projection fails on tick range
+    // representability, not on the offset check.
+    private static readonly TimeZoneInfo PlusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.Must.PlusFourteen", TimeSpan.FromHours(14), "PineGuard Test +14", "PineGuard Test +14");
+    private static readonly TimeZoneInfo MinusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.Must.MinusFourteen", TimeSpan.FromHours(-14), "PineGuard Test -14", "PineGuard Test -14");
+    private static readonly TimeProvider MinValueProjectionFails = new FixedTimeProvider(DateTimeOffset.MinValue, MinusFourteen);
+    private static readonly TimeProvider MaxValueProjectionFails = new FixedTimeProvider(DateTimeOffset.MaxValue, PlusFourteen);
 
     public static class Past
     {
@@ -32,6 +44,15 @@ public static class MustDateOnlyClausesTestData
         public sealed record ValidCase(string Name, DateOnly Value, bool Expected) : IsCase<DateOnly>(Name, Value, Expected);
 
         public sealed record EdgeCase(string Name, DateOnly Value, bool Expected) : IsCase<DateOnly>(Name, Value, Expected);
+    }
+
+    public static class PastReferenceProjection
+    {
+        public static TheoryData<MustCase<(DateOnly value, TimeProvider timeProvider)>> Cases =>
+        [
+            new MustCase<(DateOnly value, TimeProvider timeProvider)>("MinValueUnderflow", (Now, MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new MustCase<(DateOnly value, TimeProvider timeProvider)>("MaxValueOverflow", (Now, MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange))
+        ];
     }
 
     public static class PastOrPresent
@@ -54,6 +75,15 @@ public static class MustDateOnlyClausesTestData
         public sealed record EdgeCase(string Name, DateOnly Value, bool Expected) : IsCase<DateOnly>(Name, Value, Expected);
     }
 
+    public static class PastOrPresentReferenceProjection
+    {
+        public static TheoryData<MustCase<(DateOnly value, TimeProvider timeProvider)>> Cases =>
+        [
+            new MustCase<(DateOnly value, TimeProvider timeProvider)>("MinValueUnderflow", (Now, MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new MustCase<(DateOnly value, TimeProvider timeProvider)>("MaxValueOverflow", (Now, MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange))
+        ];
+    }
+
     public static class Future
     {
         public static TheoryData<ValidCase> ValidCases =>
@@ -74,6 +104,15 @@ public static class MustDateOnlyClausesTestData
         public sealed record EdgeCase(string Name, DateOnly Value, bool Expected) : IsCase<DateOnly>(Name, Value, Expected);
     }
 
+    public static class FutureReferenceProjection
+    {
+        public static TheoryData<MustCase<(DateOnly value, TimeProvider timeProvider)>> Cases =>
+        [
+            new MustCase<(DateOnly value, TimeProvider timeProvider)>("MinValueUnderflow", (Now, MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new MustCase<(DateOnly value, TimeProvider timeProvider)>("MaxValueOverflow", (Now, MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange))
+        ];
+    }
+
     public static class FutureOrPresent
     {
         public static TheoryData<ValidCase> ValidCases =>
@@ -92,6 +131,15 @@ public static class MustDateOnlyClausesTestData
         public sealed record ValidCase(string Name, DateOnly Value, bool Expected) : IsCase<DateOnly>(Name, Value, Expected);
 
         public sealed record EdgeCase(string Name, DateOnly Value, bool Expected) : IsCase<DateOnly>(Name, Value, Expected);
+    }
+
+    public static class FutureOrPresentReferenceProjection
+    {
+        public static TheoryData<MustCase<(DateOnly value, TimeProvider timeProvider)>> Cases =>
+        [
+            new MustCase<(DateOnly value, TimeProvider timeProvider)>("MinValueUnderflow", (Now, MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new MustCase<(DateOnly value, TimeProvider timeProvider)>("MaxValueOverflow", (Now, MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange))
+        ];
     }
 
     public static class InRange
@@ -491,6 +539,15 @@ public static class MustDateOnlyClausesTestData
         });
     }
 
+    public static class MinimumAgeReferenceProjection
+    {
+        public static TheoryData<MustCase<(DateOnly value, int years, TimeProvider timeProvider)>> Cases =>
+        [
+            new MustCase<(DateOnly value, int years, TimeProvider timeProvider)>("MinValueUnderflow", (Now, 18, MinValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange)),
+            new MustCase<(DateOnly value, int years, TimeProvider timeProvider)>("MaxValueOverflow", (Now, 18, MaxValueProjectionFails), new MustExpected(false, "timeProvider requires a reference date within the supported range.", "timeProvider", Code: MustCodes.Date.Reference.OutOfRange))
+        ];
+    }
+
     public static class MinimumAgeOnLeapDay
     {
         // A 29-February birth date has no anniversary in a non-leap year, so each case pins its own clock:
@@ -501,6 +558,13 @@ public static class MustDateOnlyClausesTestData
             new MustCase<(DateOnly value, int years, DateTimeOffset utcNow)>("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new MustExpected(true)),
             new MustCase<(DateOnly value, int years, DateTimeOffset utcNow)>("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new MustExpected(true))
         ];
+    }
+
+    // Only one scenario is meaningful per clause: proving exactly one GetUtcNow() read per call. Asserted
+    // directly against CountingTimeProvider.UtcNowCallCount in the test method, not through AssertResult.
+    public static class OneReadBehavior
+    {
+        public static TheoryData<string> Cases => ["SingleRead"];
     }
 
     private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);

@@ -313,6 +313,48 @@ public sealed class DateTimeRulesTests(ITestOutputHelper output)
     }
 
     [Theory]
+    [MemberData(nameof(DateTimeRulesTestData.HasMinimumAgeAcrossTimeZones.Cases), MemberType = typeof(DateTimeRulesTestData.HasMinimumAgeAcrossTimeZones))]
+    public void HasMinimumAgeAcrossTimeZones_BehavesAsExpected(RuleCase<(DateTime? value, int years, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, years, timeProvider) = tc.Value;
+
+        // Act
+        var result = DateTimeRules.HasMinimumAge(value, years, timeProvider: timeProvider);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeRulesTestData.HasMinimumAgeReferenceProjection.Cases), MemberType = typeof(DateTimeRulesTestData.HasMinimumAgeReferenceProjection))]
+    public void HasMinimumAge_ReferenceProjectionFails_ReturnsFalse(RuleCase<(DateTime? value, int years, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, years, timeProvider) = tc.Value;
+
+        // Act
+        var result = DateTimeRules.HasMinimumAge(value, years, timeProvider: timeProvider);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeRulesTestData.OneReadBehavior.Cases), MemberType = typeof(DateTimeRulesTestData.OneReadBehavior))]
+    public void HasMinimumAge_ReadsTheClockExactlyOnce(string _)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        DateTimeRules.HasMinimumAge(DateTime.MinValue, 18, timeProvider: provider);
+
+        // Assert
+        Assert.Equal(1, provider.UtcNowCallCount);
+    }
+
+    [Theory]
     [MemberData(nameof(DateTimeRulesTestData.HasMinimumAgeOnLeapDay.Cases), MemberType = typeof(DateTimeRulesTestData.HasMinimumAgeOnLeapDay))]
     public void HasMinimumAge_LeapDayBirthDate_MaturesOnTheFirstOfMarch(RuleCase<(DateTime? value, int years, DateTimeOffset utcNow)> tc)
     {

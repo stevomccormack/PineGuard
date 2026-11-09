@@ -14,6 +14,12 @@ namespace PineGuard.DataAnnotations;
 /// Delegates to <see cref="MustDateTimeClauses.Past"/>. Supported on properties, fields, and parameters
 /// of type <see cref="DateTime"/>.
 /// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. The comparison is made in UTC: a <see cref="DateTimeKind.Local"/> value is converted, and a
+/// <see cref="DateTimeKind.Unspecified"/> value is treated as already UTC.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -48,6 +54,12 @@ public sealed class PastDateTimeAttribute() : ValidationAttributeBase(typeof(Dat
 /// <para>
 /// Delegates to <see cref="MustDateTimeClauses.PastOrPresent"/>. Supported on properties, fields, and
 /// parameters of type <see cref="DateTime"/>.
+/// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. The comparison is made in UTC: a <see cref="DateTimeKind.Local"/> value is converted, and a
+/// <see cref="DateTimeKind.Unspecified"/> value is treated as already UTC.
 /// </para>
 /// </remarks>
 /// <example>
@@ -84,6 +96,12 @@ public sealed class PastOrPresentDateTimeAttribute() : ValidationAttributeBase(t
 /// Delegates to <see cref="MustDateTimeClauses.Future"/>. Supported on properties, fields, and parameters
 /// of type <see cref="DateTime"/>.
 /// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. The comparison is made in UTC: a <see cref="DateTimeKind.Local"/> value is converted, and a
+/// <see cref="DateTimeKind.Unspecified"/> value is treated as already UTC.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -118,6 +136,12 @@ public sealed class FutureDateTimeAttribute() : ValidationAttributeBase(typeof(D
 /// <para>
 /// Delegates to <see cref="MustDateTimeClauses.FutureOrPresent"/>. Supported on properties, fields, and
 /// parameters of type <see cref="DateTime"/>.
+/// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. The comparison is made in UTC: a <see cref="DateTimeKind.Local"/> value is converted, and a
+/// <see cref="DateTimeKind.Unspecified"/> value is treated as already UTC.
 /// </para>
 /// </remarks>
 /// <example>
@@ -265,6 +289,11 @@ public sealed class UnspecifiedDateTimeAttribute() : ValidationAttributeBase(typ
 /// </para>
 /// <para>
 /// A negative minimum age is a configuration error and fails validation.
+/// </para>
+/// <para>
+/// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
+/// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
 /// </para>
 /// </remarks>
 /// <example>

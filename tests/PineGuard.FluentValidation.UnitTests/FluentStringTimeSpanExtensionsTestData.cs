@@ -30,25 +30,25 @@ public static class FluentStringTimeSpanExtensionsTestData
             });
     }
 
-    public static class GreaterThan
+    public static class LongerThan
     {
         public static TheoryData<FluentCase<(string? value, TimeSpan other, PineGuard.Common.Inclusion inclusion)>> Cases =>
-            F.TimeSpanIsGreaterThan.AllScenarios.ToFluentCases(s => s.Name switch
+            F.TimeSpanIsLongerThan.AllScenarios.ToFluentCases(s => s.Name switch
             {
-                nameof(F.TimeSpanIsGreaterThan.NullValue) => new FluentExpected(true),
+                nameof(F.TimeSpanIsLongerThan.NullValue) => new FluentExpected(true),
                 _ when s.IsValid => new FluentExpected(true),
-                _ => new FluentExpected(false, "Value must be a duration greater than the threshold.")
+                _ => new FluentExpected(false, "Value must be a duration longer than the other.")
             });
     }
 
-    public static class LessThan
+    public static class ShorterThan
     {
         public static TheoryData<FluentCase<(string? value, TimeSpan other, PineGuard.Common.Inclusion inclusion)>> Cases =>
-            F.TimeSpanIsLessThan.AllScenarios.ToFluentCases(s => s.Name switch
+            F.TimeSpanIsShorterThan.AllScenarios.ToFluentCases(s => s.Name switch
             {
-                nameof(F.TimeSpanIsLessThan.NullValue) => new FluentExpected(true),
+                nameof(F.TimeSpanIsShorterThan.NullValue) => new FluentExpected(true),
                 _ when s.IsValid => new FluentExpected(true),
-                _ => new FluentExpected(false, "Value must be a duration less than the threshold.")
+                _ => new FluentExpected(false, "Value must be a duration shorter than the other.")
             });
     }
 }

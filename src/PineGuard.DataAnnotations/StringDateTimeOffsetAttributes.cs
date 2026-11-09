@@ -23,6 +23,11 @@ namespace PineGuard.DataAnnotations;
 /// the host time zone.
 /// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. Instants are compared, so the parsed value's offset does not affect the outcome.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -68,6 +73,11 @@ public sealed class PastDateTimeOffsetStringAttribute() : ValidationAttributeBas
 /// <see cref="DateTimeStyles.AllowWhiteSpaces"/>, so offset-less input is treated as UTC regardless of
 /// the host time zone.
 /// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
+/// </para>
+/// <para>
+/// The current instant is read from the <see cref="TimeProvider"/> registered in the
+/// <see cref="ValidationContext"/> service provider; when none is registered, <see cref="TimeProvider.System"/> is
+/// used. Instants are compared, so the parsed value's offset does not affect the outcome.
 /// </para>
 /// </remarks>
 /// <example>

@@ -9,10 +9,10 @@ public sealed class TimeOnlyRulesTests(ITestOutputHelper output) : BaseRuleUnitT
 {
     [Theory]
     [MemberData(nameof(TimeOnlyRulesTestData.IsInRange.Cases), MemberType = typeof(TimeOnlyRulesTestData.IsInRange))]
-    public void IsInRange_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
+    public void IsInRange_BehavesAsExpected(RuleCase<(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion)> tc)
     {
         // Act
-        var result = TimeOnlyRules.IsInRange(tc.Value.value, tc.Value.min, tc.Value.max, tc.Value.inclusion);
+        var result = TimeOnlyRules.IsInRange(tc.Value.value, tc.Value.start, tc.Value.end, tc.Value.inclusion);
 
         // Assert
         AssertResult(tc, result);

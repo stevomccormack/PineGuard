@@ -10,24 +10,27 @@ public static class MustTimeOnlyClausesTestData
     private static readonly TimeOnly T1 = F.IsKnownTimes.T1000!.Value;
     private static readonly TimeOnly T2 = F.IsKnownTimes.T1200!.Value;
     private static readonly TimeOnly T3 = F.IsKnownTimes.T1400!.Value;
+    private static readonly TimeOnly T4 = F.IsKnownTimes.T2000!.Value;
 
     public static class InRange
     {
-        public static TheoryData<MustCase<(TimeOnly value, TimeOnly min, TimeOnly max)>> Cases =>
+        public static TheoryData<MustCase<(TimeOnly value, TimeOnly start, TimeOnly end)>> Cases =>
         [
             new("between", (T2, T1, T3), new MustExpected(true)),
             new("not-between", (new TimeOnly(9, 0), T1, T3), new MustExpected(false, "value must be within the expected range.", Code: MustCodes.Time.Range.OutOfRange)),
-            new("min-gt-max", (T2, T3, T1), new MustExpected(false, "min requires a valid range.", "min"))
+            new("wrap-inside", (T4, T3, T1), new MustExpected(true)),
+            new("wrap-outside", (T2, T3, T1), new MustExpected(false, "value must be within the expected range.", Code: MustCodes.Time.Range.OutOfRange))
         ];
     }
 
     public static class OutOfRange
     {
-        public static TheoryData<MustCase<(TimeOnly value, TimeOnly min, TimeOnly max)>> Cases =>
+        public static TheoryData<MustCase<(TimeOnly value, TimeOnly start, TimeOnly end)>> Cases =>
         [
             new("not-between", (new TimeOnly(9, 0), T1, T3), new MustExpected(true)),
             new("between", (T2, T1, T3), new MustExpected(false, "value must not be within the expected range.", Code: MustCodes.Time.Range.InRange)),
-            new("min-gt-max", (T2, T3, T1), new MustExpected(false, "min requires a valid range.", "min"))
+            new("wrap-outside", (T2, T3, T1), new MustExpected(true)),
+            new("wrap-inside", (T4, T3, T1), new MustExpected(false, "value must not be within the expected range.", Code: MustCodes.Time.Range.InRange))
         ];
     }
 

@@ -7,31 +7,33 @@ namespace PineGuard.MustClauses.UnitTests;
 
 public static class MustStringTimeOnlyClausesTestData
 {
-    private static readonly TimeOnly T1000 = F.StringTimeOnly.IsInRange.InRangeInclusive.min;
-    private static readonly TimeOnly T1200 = F.StringTimeOnly.IsInRange.InRangeInclusive.max;
+    private static readonly TimeOnly T1000 = F.StringTimeOnly.IsInRange.InRangeInclusive.start;
+    private static readonly TimeOnly T1200 = F.StringTimeOnly.IsInRange.InRangeInclusive.end;
     private static readonly TimeSpan Win = F.StringTimeOnly.IsWithin.WithinWindow.window;
 
     public static class InRangeTimeOnly
     {
-        public static TheoryData<MustCase<(string? value, TimeOnly min, TimeOnly max)>> Cases =>
+        public static TheoryData<MustCase<(string? value, TimeOnly start, TimeOnly end)>> Cases =>
         [
             new("in-range", ("11:00", T1000, T1200), new MustExpected(true)),
             new("out-of-range", ("13:00", T1000, T1200), new MustExpected(false, "value must be a time within the expected range.", Code: MustCodes.Time.Range.OutOfRange)),
             new("null-value", (null, T1000, T1200), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1000, T1200), new MustExpected(false, "value must be a time within the expected range.", Code: MustCodes.Time.Format.Invalid)),
-            new("min-gt-max", ("11:00", T1200, T1000), new MustExpected(false, "min must be less than or equal to max.", "min"))
+            new("wrap-inside", ("23:00", T1200, T1000), new MustExpected(true)),
+            new("wrap-outside", ("11:00", T1200, T1000), new MustExpected(false, "value must be a time within the expected range.", Code: MustCodes.Time.Range.OutOfRange))
         ];
     }
 
     public static class OutOfRangeTimeOnly
     {
-        public static TheoryData<MustCase<(string? value, TimeOnly min, TimeOnly max)>> Cases =>
+        public static TheoryData<MustCase<(string? value, TimeOnly start, TimeOnly end)>> Cases =>
         [
             new("out-of-range", ("13:00", T1000, T1200), new MustExpected(true)),
             new("in-range", ("11:00", T1000, T1200), new MustExpected(false, "value must be a time not within the expected range.", Code: MustCodes.Time.Range.InRange)),
             new("null-value", (null, T1000, T1200), new MustExpected(false, "value must not be null.", "value")),
             new("unparseable", ("invalid", T1000, T1200), new MustExpected(false, "value must be a time not within the expected range.")),
-            new("min-gt-max", ("11:00", T1200, T1000), new MustExpected(false, "min must be less than or equal to max.", "min"))
+            new("wrap-outside", ("11:00", T1200, T1000), new MustExpected(true)),
+            new("wrap-inside", ("23:00", T1200, T1000), new MustExpected(false, "value must be a time not within the expected range.", Code: MustCodes.Time.Range.InRange))
         ];
     }
 

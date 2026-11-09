@@ -11,29 +11,55 @@ namespace PineGuard.Rules;
 public static class DateOnlyRules
 {
     /// <summary>
-    /// Determines whether the specified date is in the past relative to UTC now.
+    /// Determines whether the specified date is in the past relative to today.
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether today is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the past; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// "Today" is derived from one sampled instant with checked projection into the clock's
+    /// <see cref="TimeProvider.LocalTimeZone"/>. A <see langword="null"/> <paramref name="timeProvider"/>
+    /// reads the system clock and uses the UTC calendar date: PineGuard never guesses the host's zone, so
+    /// inject a provider to evaluate today in a chosen zone. If the projection is not representable, this
+    /// method returns <see langword="false"/>.
+    /// </remarks>
     public static bool IsInPast(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null)
     {
         TemporalRangeComparison.ValidateInclusion(inclusion);
-        return value is not null && IsBefore(value, DateOnly.FromDateTime(DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime), inclusion);
+        if (value is null || !DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
+            return false;
+
+        return IsBefore(value, DateOnly.FromDateTime(referenceDate), inclusion);
     }
 
     /// <summary>
-    /// Determines whether the specified date is in the future relative to UTC now.
+    /// Determines whether the specified date is in the future relative to today.
     /// </summary>
     /// <param name="value">The date to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="inclusion">Whether today is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <returns><see langword="true"/> if <paramref name="value"/> is in the future; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    /// "Today" is derived from one sampled instant with checked projection into the clock's
+    /// <see cref="TimeProvider.LocalTimeZone"/>. A <see langword="null"/> <paramref name="timeProvider"/>
+    /// reads the system clock and uses the UTC calendar date: PineGuard never guesses the host's zone, so
+    /// inject a provider to evaluate today in a chosen zone. If the projection is not representable, this
+    /// method returns <see langword="false"/>.
+    /// </remarks>
     public static bool IsInFuture(DateOnly? value, Inclusion inclusion = Inclusion.Exclusive, TimeProvider? timeProvider = null)
     {
         TemporalRangeComparison.ValidateInclusion(inclusion);
-        return value is not null && IsAfter(value, DateOnly.FromDateTime(DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime), inclusion);
+        if (value is null || !DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
+            return false;
+
+        return IsAfter(value, DateOnly.FromDateTime(referenceDate), inclusion);
     }
 
     /// <summary>
@@ -280,30 +306,32 @@ public static class DateOnlyRules
     /// Determines whether the specified date of birth is at least <paramref name="years"/> whole years ago.
     /// </summary>
     /// <param name="value">The date of birth to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="years">
-    /// The minimum age in whole years. Negative, or large enough to place the boundary before year one,
-    /// returns <see langword="false"/>.
+    /// <param name="years">The minimum age in whole years. Negative returns <see langword="false"/>.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
     /// </param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> meets the minimum age; otherwise, <see langword="false"/>.</returns>
     /// <remarks>
-    /// Age is measured against the boundary <c>today.AddYears(-years)</c>: a birth date on that boundary has
-    /// just reached the age, and any later one has not. A 29 February birth date therefore reaches its next
-    /// birthday on 1 March of a non-leap year, because shifting a 28 February back by whole years lands on a
-    /// 28th, which falls before the 29th the birth date carries.
+    /// Age is the whole number of completed years between the birth date and today: the year difference,
+    /// minus one if the birthday's month and day have not yet occurred this year. A 29 February birth date
+    /// therefore reaches its next birthday on 1 March of a non-leap year, because that year has no 29th to
+    /// match against — this is PineGuard's calendar convention. "Today" is derived from one sampled instant
+    /// with checked projection into the clock's <see cref="TimeProvider.LocalTimeZone"/>. A
+    /// <see langword="null"/> <paramref name="timeProvider"/> reads the system clock and uses the UTC calendar
+    /// date: PineGuard never guesses the host's zone, so inject a provider to evaluate today in a chosen
+    /// zone. If the projection is not representable, this method returns <see langword="false"/>.
     /// </remarks>
     public static bool HasMinimumAge(DateOnly? value, int years, TimeProvider? timeProvider = null)
     {
         if (value is null || years < 0)
             return false;
 
-        var today = DateOnly.FromDateTime(DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime);
-
-        // Shifting today back that far would leave the boundary before year one, which no date can precede.
-        if (years >= today.Year)
+        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
             return false;
 
-        return value.Value <= today.AddYears(-years);
+        var today = DateOnly.FromDateTime(referenceDate);
+        return DateTimeUtility.TryGetAge(value, today, out var age) && age >= years;
     }
 }
 #endif

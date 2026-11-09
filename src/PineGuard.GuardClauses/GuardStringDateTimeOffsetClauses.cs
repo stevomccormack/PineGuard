@@ -150,7 +150,7 @@ public static class GuardStringDateTimeOffsetClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the OutOfRangeDateTimeOffset constraint.
+    /// Throws when <paramref name="value"/> cannot be parsed or its parsed value is outside the specified range.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -188,7 +188,7 @@ public static class GuardStringDateTimeOffsetClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the InRangeDateTimeOffset constraint.
+    /// Throws when <paramref name="value"/> cannot be parsed or its parsed value is inside the specified range.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>

@@ -151,7 +151,7 @@ public static class GuardStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the OutOfRangeDateOnly constraint.
+    /// Throws when <paramref name="value"/> cannot be parsed or its parsed value is outside the specified range.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -189,7 +189,7 @@ public static class GuardStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the InRangeDateOnly constraint.
+    /// Throws when <paramref name="value"/> cannot be parsed or its parsed value is inside the specified range.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -709,7 +709,10 @@ public static class GuardStringDateOnlyClauses
     /// <param name="value">The date of birth to guard.</param>
     /// <param name="years">The minimum age in whole years.</param>
     /// <param name="styles">The number or date-time parsing styles.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
     /// <param name="paramName">

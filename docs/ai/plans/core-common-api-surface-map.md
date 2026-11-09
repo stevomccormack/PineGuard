@@ -1,5 +1,9 @@
 # Core/Common API surface evidence
 
+> Snapshot scope: the inventory below records the API branch before integration with temporal
+> Phase 1. Its counts and hashes are historical evidence, not a regenerated inventory of the
+> merged tree. Integration verification is recorded separately in the implementation tracker.
+
 The [machine-readable map](core-common-api-surface-map.json) compares pristine commit `e88762c6ab2bd33d12bf93a3ad047bb706f55daf` with the completed implementation using rich Roslyn inventories targeting net10.0. The baseline was extracted directly with `git archive`; it is not the earlier in-progress snapshot.
 
 Every unique externally visible public documentation ID is accounted for:

@@ -1,3 +1,4 @@
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Utils;
 
@@ -24,6 +25,117 @@ public sealed class DateTimeUtilityTests : BaseUnitTest
         }
 
         Assert.InRange(result, before.AddSeconds(-1), DateTimeOffset.UtcNow.AddSeconds(1));
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeUtilityTestData.GetLocalNow.ValidCases), MemberType = typeof(DateTimeUtilityTestData.GetLocalNow))]
+    [MemberData(nameof(DateTimeUtilityTestData.GetLocalNow.EdgeCases), MemberType = typeof(DateTimeUtilityTestData.GetLocalNow))]
+    public void GetLocalNow_ReturnsExpected(DateTimeUtilityTestData.GetLocalNow.ValidCase testCase)
+    {
+        // Arrange
+        var before = DateTimeOffset.UtcNow;
+
+        // Act
+        var result = DateTimeUtility.GetLocalNow(testCase.Value);
+
+        // Assert
+        if (testCase.Expected is { } expected)
+        {
+            Assert.Equal(expected, result);
+            return;
+        }
+
+        Assert.InRange(result.ToUniversalTime(), before.AddSeconds(-1), DateTimeOffset.UtcNow.AddSeconds(1));
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeUtilityTestData.TryGetTodayDate.ValidCases), MemberType = typeof(DateTimeUtilityTestData.TryGetTodayDate))]
+    [MemberData(nameof(DateTimeUtilityTestData.TryGetTodayDate.EdgeCases), MemberType = typeof(DateTimeUtilityTestData.TryGetTodayDate))]
+    public void TryGetTodayDate_ReturnsExpected(DateTimeUtilityTestData.TryGetTodayDate.ValidCase testCase)
+    {
+        // Act
+        var ok = DateTimeUtility.TryGetTodayDate(testCase.Value, out var today);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Equal(testCase.ExpectedOutValue, today);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeUtilityTestData.TryGetTodayDateNullProvider.Cases), MemberType = typeof(DateTimeUtilityTestData.TryGetTodayDateNullProvider))]
+    public void TryGetTodayDate_NullProviderUsesUtcDate(string _)
+    {
+        // Arrange
+        // Bracket the real system clock read on both sides of the call, so a midnight rollover during
+        // the test cannot cause a false failure. The expectation is the UTC calendar date, never the
+        // host's zone (D-1). The CI job runs this under TZ=Pacific/Kiritimati (UTC+14) and TZ=Etc/GMT+12 (UTC-12),
+        // so at every instant at least one run is on a different calendar date from UTC and would fail if
+        // the host zone leaked into the null-provider path.
+        var beforeUtc = DateTimeOffset.UtcNow;
+        var beforeExpected = beforeUtc.UtcDateTime.Date;
+
+        // Act
+        var ok = DateTimeUtility.TryGetTodayDate(null, out var today);
+
+        // Assert
+        var afterUtc = DateTimeOffset.UtcNow;
+        var afterExpected = afterUtc.UtcDateTime.Date;
+
+        Assert.True(ok);
+        Assert.InRange(today, beforeExpected, afterExpected);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeUtilityTestData.OneReadBehavior.Cases), MemberType = typeof(DateTimeUtilityTestData.OneReadBehavior))]
+    public void TryGetTodayDate_ReadsTheClockExactlyOnce(string _)
+    {
+        // Arrange
+        var instant = FixedTimeProvider.Default.GetUtcNow();
+        var zone = FixedTimeProvider.Default.LocalTimeZone;
+        var expectedToday = TimeZoneInfo.ConvertTime(instant, zone).Date;
+        var provider = new CountingTimeProvider(instant, zone);
+
+        // Act
+        var ok = DateTimeUtility.TryGetTodayDate(provider, out var today);
+
+        // Assert
+        Assert.True(ok);
+        Assert.Equal(expectedToday, today);
+        Assert.Equal(1, provider.UtcNowCallCount);
+    }
+
+#if NET8_0_OR_GREATER
+    [Theory]
+    [MemberData(nameof(DateTimeUtilityTestData.TryGetAgeDateOnly.ValidCases), MemberType = typeof(DateTimeUtilityTestData.TryGetAgeDateOnly))]
+    [MemberData(nameof(DateTimeUtilityTestData.TryGetAgeDateOnly.EdgeCases), MemberType = typeof(DateTimeUtilityTestData.TryGetAgeDateOnly))]
+    public void TryGetAge_DateOnly_ReturnsExpected(DateTimeUtilityTestData.TryGetAgeDateOnly.ValidCase testCase)
+    {
+        // Arrange
+        var (birthDate, asOf) = testCase.Value;
+
+        // Act
+        var ok = DateTimeUtility.TryGetAge(birthDate, asOf, out var years);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Equal(testCase.ExpectedOutValue, years);
+    }
+#endif
+
+    [Theory]
+    [MemberData(nameof(DateTimeUtilityTestData.TryGetAgeDateTime.ValidCases), MemberType = typeof(DateTimeUtilityTestData.TryGetAgeDateTime))]
+    [MemberData(nameof(DateTimeUtilityTestData.TryGetAgeDateTime.EdgeCases), MemberType = typeof(DateTimeUtilityTestData.TryGetAgeDateTime))]
+    public void TryGetAge_DateTime_ReturnsExpected(DateTimeUtilityTestData.TryGetAgeDateTime.ValidCase testCase)
+    {
+        // Arrange
+        var (birthDate, asOf) = testCase.Value;
+
+        // Act
+        var ok = DateTimeUtility.TryGetAge(birthDate, asOf, out var years);
+
+        // Assert
+        Assert.Equal(testCase.Expected, ok);
+        Assert.Equal(testCase.ExpectedOutValue, years);
     }
 
     [Theory]

@@ -7,24 +7,48 @@ public static class TimeOnlyRulesFixtures
 {
     public static class IsInRange
     {
-        public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) MiddleInclusive = (new TimeOnly(12, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
-        public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) AtMinInclusive = (new TimeOnly(11, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
-        public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) AtMinExclusive = (new TimeOnly(11, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Exclusive);
-        public static readonly (TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion) NullValue = (null, new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) MiddleInclusive = (new TimeOnly(12, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) AtStartInclusive = (new TimeOnly(11, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) AtStartExclusive = (new TimeOnly(11, 0), new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) NullValue = (null, new TimeOnly(11, 0), new TimeOnly(13, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapLateNightInside = (new TimeOnly(23, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapEarlyMorningInside = (new TimeOnly(1, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapLateNightInsideExclusive = (new TimeOnly(23, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapEarlyMorningInsideExclusive = (new TimeOnly(1, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapOutside = (new TimeOnly(12, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapAtStartInclusive = (new TimeOnly(22, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapAtStartExclusive = (new TimeOnly(22, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapAtEndInclusive = (new TimeOnly(2, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) WrapAtEndExclusive = (new TimeOnly(2, 0), new TimeOnly(22, 0), new TimeOnly(2, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) EqualBoundsAtInstantInclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Inclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) EqualBoundsAtInstantExclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Exclusive);
+        public static readonly (TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion) EqualBoundsOffInstant = (new TimeOnly(11, 0), new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Inclusive);
 
-        public static RuleScenario<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>[] ValidScenarios =>
+        public static RuleScenario<(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>[] ValidScenarios =>
         [
             new(nameof(MiddleInclusive), MiddleInclusive, true),
-            new(nameof(AtMinInclusive), AtMinInclusive, true)
+            new(nameof(AtStartInclusive), AtStartInclusive, true),
+            new(nameof(WrapLateNightInside), WrapLateNightInside, true),
+            new(nameof(WrapEarlyMorningInside), WrapEarlyMorningInside, true),
+            new(nameof(WrapLateNightInsideExclusive), WrapLateNightInsideExclusive, true),
+            new(nameof(WrapEarlyMorningInsideExclusive), WrapEarlyMorningInsideExclusive, true),
+            new(nameof(WrapAtStartInclusive), WrapAtStartInclusive, true),
+            new(nameof(WrapAtEndInclusive), WrapAtEndInclusive, true),
+            new(nameof(EqualBoundsAtInstantInclusive), EqualBoundsAtInstantInclusive, true)
         ];
 
-        public static RuleScenario<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>[] InvalidScenarios =>
+        public static RuleScenario<(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>[] InvalidScenarios =>
         [
-            new(nameof(AtMinExclusive), AtMinExclusive, false),
-            new(nameof(NullValue), NullValue, false)
+            new(nameof(AtStartExclusive), AtStartExclusive, false),
+            new(nameof(NullValue), NullValue, false),
+            new(nameof(WrapOutside), WrapOutside, false),
+            new(nameof(WrapAtStartExclusive), WrapAtStartExclusive, false),
+            new(nameof(WrapAtEndExclusive), WrapAtEndExclusive, false),
+            new(nameof(EqualBoundsAtInstantExclusive), EqualBoundsAtInstantExclusive, false),
+            new(nameof(EqualBoundsOffInstant), EqualBoundsOffInstant, false)
         ];
 
-        public static RuleScenario<(TimeOnly? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+        public static RuleScenario<(TimeOnly? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
     public static class IsBefore
@@ -32,6 +56,7 @@ public static class TimeOnlyRulesFixtures
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) BeforeInclusive = (new TimeOnly(9, 0), new TimeOnly(10, 0), Inclusion.Inclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) SameInstantInclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Inclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) PrecisionSecond = (new TimeOnly(10, 0, 0, 500), new TimeOnly(10, 0, 0, 600), Inclusion.Inclusive, TimePrecision.Second);
+        public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) PrecisionMicrosecond = (new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(8)), new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(5)), Inclusion.Inclusive, TimePrecision.Microsecond);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) SameInstantExclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Exclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) InvalidPrecision = (new TimeOnly(9, 0), new TimeOnly(10, 0), Inclusion.Inclusive, (TimePrecision)123);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) NullValue = (null, new TimeOnly(10, 0), Inclusion.Inclusive, null);
@@ -41,7 +66,8 @@ public static class TimeOnlyRulesFixtures
         [
             new(nameof(BeforeInclusive), BeforeInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
-            new(nameof(PrecisionSecond), PrecisionSecond, true)
+            new(nameof(PrecisionSecond), PrecisionSecond, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)>[] InvalidScenarios =>
@@ -78,6 +104,7 @@ public static class TimeOnlyRulesFixtures
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) AfterInclusive = (new TimeOnly(10, 0), new TimeOnly(9, 0), Inclusion.Inclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) SameInstantInclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Inclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) PrecisionSecond = (new TimeOnly(10, 0, 0, 600), new TimeOnly(10, 0, 0, 500), Inclusion.Inclusive, TimePrecision.Second);
+        public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) PrecisionMicrosecond = (new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(5)), new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(8)), Inclusion.Inclusive, TimePrecision.Microsecond);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) SameInstantExclusive = (new TimeOnly(10, 0), new TimeOnly(10, 0), Inclusion.Exclusive, null);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) InvalidPrecision = (new TimeOnly(10, 0), new TimeOnly(9, 0), Inclusion.Inclusive, (TimePrecision)123);
         public static readonly (TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision) NullValue = (null, new TimeOnly(9, 0), Inclusion.Inclusive, null);
@@ -87,7 +114,8 @@ public static class TimeOnlyRulesFixtures
         [
             new(nameof(AfterInclusive), AfterInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
-            new(nameof(PrecisionSecond), PrecisionSecond, true)
+            new(nameof(PrecisionSecond), PrecisionSecond, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? other, Inclusion inclusion, TimePrecision? precision)>[] InvalidScenarios =>
@@ -124,6 +152,7 @@ public static class TimeOnlyRulesFixtures
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) SameExact = (new TimeOnly(10, 0), new TimeOnly(10, 0), null);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) BothNull = (null, null, null);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) PrecisionSecond = (new TimeOnly(10, 0, 0, 500), new TimeOnly(10, 0, 0, 600), TimePrecision.Second);
+        public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) PrecisionMicrosecond = (new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(5)), new TimeOnly(10, 0, 0).Add(TimeSpan.FromTicks(8)), TimePrecision.Microsecond);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) Different = (new TimeOnly(10, 0), new TimeOnly(10, 1), null);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) InvalidPrecision = (new TimeOnly(10, 0), new TimeOnly(10, 0), (TimePrecision)123);
         public static readonly (TimeOnly? value, TimeOnly? other, TimePrecision? precision) NullValue = (null, new TimeOnly(10, 0), null);
@@ -133,7 +162,8 @@ public static class TimeOnlyRulesFixtures
         [
             new(nameof(SameExact), SameExact, true),
             new(nameof(BothNull), BothNull, true),
-            new(nameof(PrecisionSecond), PrecisionSecond, true)
+            new(nameof(PrecisionSecond), PrecisionSecond, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(TimeOnly? value, TimeOnly? other, TimePrecision? precision)>[] InvalidScenarios =>

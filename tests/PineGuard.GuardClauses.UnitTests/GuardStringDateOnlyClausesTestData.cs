@@ -1,4 +1,5 @@
 using PineGuard.Codes;
+using PineGuard.Common;
 using PineGuard.Testing.UnitTests.GuardClauses;
 using F = PineGuard.Testing.Fixtures.StringRulesFixtures;
 
@@ -214,7 +215,8 @@ public static class GuardStringDateOnlyClausesTestData
         [
             new("not-chrono", ("2020-01-31", "2020-01-01"), new GuardExpected(true)),
             new("chrono", ("2020-01-01", "2020-01-31"), new GuardExpected(false, typeof(ArgumentException), "start")),
-            new("null-start", (null, "2020-01-31"), new GuardExpected(false, typeof(ArgumentNullException), "start"))
+            new("null-start", (null, "2020-01-31"), new GuardExpected(false, typeof(ArgumentNullException), "start")),
+            new(nameof(F.DateOnlyIsChronological.EqualExclusive), (F.DateOnlyIsChronological.EqualExclusive.start, F.DateOnlyIsChronological.EqualExclusive.end), new GuardExpected(true))
         ];
     }
 
@@ -223,11 +225,13 @@ public static class GuardStringDateOnlyClausesTestData
     // InvalidCases: IS overlapping / null start1 / unparseable
     public static class OverlappingDateOnly
     {
-        public static TheoryData<GuardCase<(string? start1, string? end1, string? start2, string? end2)>> Cases =>
+        public static TheoryData<GuardCase<(string? start1, string? end1, string? start2, string? end2, Inclusion inclusion)>> Cases =>
         [
-            new("disjoint", ("2020-01-01", "2020-01-10", "2020-01-15", "2020-01-31"), new GuardExpected(true)),
-            new("overlapping", ("2020-01-01", "2020-01-20", "2020-01-10", "2020-01-31"), new GuardExpected(false, typeof(ArgumentException), "start1")),
-            new("null-start1", (null, "2020-01-20", "2020-01-10", "2020-01-31"), new GuardExpected(false, typeof(ArgumentNullException), "start1"))
+            new("disjoint", ("2020-01-01", "2020-01-10", "2020-01-15", "2020-01-31", Inclusion.Inclusive), new GuardExpected(true)),
+            new("overlapping", ("2020-01-01", "2020-01-20", "2020-01-10", "2020-01-31", Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "start1")),
+            new("null-start1", (null, "2020-01-20", "2020-01-10", "2020-01-31", Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentNullException), "start1")),
+            new(nameof(F.DateOnlyIsOverlapping.TouchingInclusive), (F.DateOnlyIsOverlapping.TouchingInclusive.start1, F.DateOnlyIsOverlapping.TouchingInclusive.end1, F.DateOnlyIsOverlapping.TouchingInclusive.start2, F.DateOnlyIsOverlapping.TouchingInclusive.end2, F.DateOnlyIsOverlapping.TouchingInclusive.inclusion), new GuardExpected(false, typeof(ArgumentException), "start1")),
+            new("TouchingExclusive", (F.DateOnlyIsOverlapping.TouchingInclusive.start1, F.DateOnlyIsOverlapping.TouchingInclusive.end1, F.DateOnlyIsOverlapping.TouchingInclusive.start2, F.DateOnlyIsOverlapping.TouchingInclusive.end2, Inclusion.Exclusive), new GuardExpected(true))
         ];
     }
 
@@ -236,11 +240,13 @@ public static class GuardStringDateOnlyClausesTestData
     // InvalidCases: NOT overlapping / null start1 / unparseable
     public static class NotOverlappingDateOnly
     {
-        public static TheoryData<GuardCase<(string? start1, string? end1, string? start2, string? end2)>> Cases =>
+        public static TheoryData<GuardCase<(string? start1, string? end1, string? start2, string? end2, Inclusion inclusion)>> Cases =>
         [
-            new("overlapping", ("2020-01-01", "2020-01-20", "2020-01-10", "2020-01-31"), new GuardExpected(true)),
-            new("disjoint", ("2020-01-01", "2020-01-10", "2020-01-15", "2020-01-31"), new GuardExpected(false, typeof(ArgumentException), "start1")),
-            new("null-start1", (null, "2020-01-20", "2020-01-10", "2020-01-31"), new GuardExpected(false, typeof(ArgumentNullException), "start1"))
+            new("overlapping", ("2020-01-01", "2020-01-20", "2020-01-10", "2020-01-31", Inclusion.Inclusive), new GuardExpected(true)),
+            new("disjoint", ("2020-01-01", "2020-01-10", "2020-01-15", "2020-01-31", Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "start1")),
+            new("null-start1", (null, "2020-01-20", "2020-01-10", "2020-01-31", Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentNullException), "start1")),
+            new(nameof(F.DateOnlyIsOverlapping.TouchingInclusive), (F.DateOnlyIsOverlapping.TouchingInclusive.start1, F.DateOnlyIsOverlapping.TouchingInclusive.end1, F.DateOnlyIsOverlapping.TouchingInclusive.start2, F.DateOnlyIsOverlapping.TouchingInclusive.end2, F.DateOnlyIsOverlapping.TouchingInclusive.inclusion), new GuardExpected(true)),
+            new("TouchingExclusive", (F.DateOnlyIsOverlapping.TouchingInclusive.start1, F.DateOnlyIsOverlapping.TouchingInclusive.end1, F.DateOnlyIsOverlapping.TouchingInclusive.start2, F.DateOnlyIsOverlapping.TouchingInclusive.end2, Inclusion.Exclusive), new GuardExpected(false, typeof(ArgumentException), "start1"))
         ];
     }
 

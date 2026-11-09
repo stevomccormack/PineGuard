@@ -99,3 +99,4 @@ Conventions: `docs/ai/rules/fixture-conventions.md`
 - `fluent-audit.md` — Fluent layer v4 audit findings (Network/Uri/Csv/Dict/RODict/SqlDateTime batch + Date/Time batch)
 - `guard-audit.md` — Guard layer v2 audit findings (pre-migration drift cluster + all per-batch reviews)
 - [xml-audit](xml-audit.md) — XmlReader event timing, ReportValidationWarnings gating, Create(string) resolver gap, polyfill/IVT precedent, AGENTS.md baseline exemption
+- [temporal-phase1-audit](temporal-phase1-audit.md) — Temporal Phase 1 fitness review (Nov 2026): TryGetTodayDate UTC default (host-zone interim reverted 2026-11-09), Kind convention split, TimeOnly wrap, Guard complement tuple, Tick 4->5 inlining trap

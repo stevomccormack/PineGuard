@@ -2,8 +2,8 @@
 type: plan
 id: new-surfaces-05-rule-batches
 version: 1.2
-status: planned
-last_updated: 2026-08-26
+status: completed
+last_updated: 2026-11-09
 parent: new-surfaces-program
 -->
 
@@ -13,7 +13,7 @@ parent: new-surfaces-program
 > [Parent](new-surfaces-missing-validation-cases.md) · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · [02 Options](new-surfaces-missing-validation-cases-02-options.md) · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · **05 Rule batches** · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
 <!-- /plan-nav -->
 
-> **Status**: Planned | **Depends on**: Phase 1 (error codes — every new clause needs its `MustCodes` constant; `must-codes` gates it) | **Runs in parallel with**: Phases 2–4 (independent code paths; expect merge conflicts only in a shared `MustCodes.<Domain>.cs`, `vocabulary.json` and `gold-standard.md`)
+> **Status**: Completed — all units merged to main; see new-surfaces-orchestration.md | **Depends on**: Phase 1 (error codes — every new clause needs its `MustCodes` constant; `must-codes` gates it) | **Runs in parallel with**: Phases 2–4 (independent code paths; expect merge conflicts only in a shared `MustCodes.<Domain>.cs`, `vocabulary.json` and `gold-standard.md`)
 >
 > **Worktrees**: one per batch — `rules-string-content`, `rules-identifiers`, `rules-unicode`, `rules-numeric`, `rules-temporal`, `rules-file-signature` — each its own PR. Batches are independent; run them in the listed order unless the operator pulls Batch E (clock injection, the differentiator) forward.
 >
@@ -41,8 +41,8 @@ Batch E carries one genuine differentiator: **clock injection** via `TimeProvide
 - **Fixtures** (`docs/ai/specs/testing/fixture.md`): one `XxxRulesFixtures` group per new Core method; boundary shape (four arrays) when the rule has numeric parameters or constants, format shape (two arrays) otherwise; edge constants reference the source `const`s; partials mirror source partials.
 - **TFMs**: a rule that needs an API missing on `netstandard2.1` is gated exactly as `MustNumberClauses` is; the batch table says which.
 - **Ordering** (`ordering`): positive before `Not*` in Must/Fluent/DataAnnotations; Guard ordered by the Must clause it calls.
-- **No renames** of existing members even where a batch sits beside an open item in `core-common-api-decisions.md` (e.g. `IsValidHostname` stays).
-- **One deliberate signature change** (Batch E, pre-release so permitted by Plan 00 §4.6): inserting `TimeProvider? timeProvider = null` before `paramName`/`message` on every clock-reading member is source-compatible only for callers that never pass those positionally, and binary-breaking for all of them. Plan 00 §3.3's "additive only" claim carries this exception.
+- **Current API baseline**: use the names and contracts in [Core/Common API implementation](core-common-api-implementation.md), including `NetworkRules.IsHostname`. Keep independent redesigns in their owning plan; update affected callers, examples and docs together. No compatibility aliases or old-name preservation.
+- **Clock signatures** (Batch E): expose `TimeProvider? timeProvider = null` consistently on clock-reading members and update all affected callers and docs under Plan 00 §4.6. Source and binary compatibility do not constrain this design.
 
 ## 3. Batches
 
@@ -60,7 +60,7 @@ Batch E carries one genuine differentiator: **clock injection** via `TimeProvide
 
 ### Batch B — Identifiers, tokens and formats (`rules-identifiers`)
 
-Already covered, no work: hostname (`NetworkRules.IsValidHostname` / `Must.Be.Hostname`), scheme-restricted HTTP URL (`UriRules.IsUrl`/`IsHttpUrl`/`IsHttpsUrl`), slug (`IdentifierRules.IsSlug`). Deliberately skipped (low priority in `competitive-analysis.md` §5): NanoId, CUID/CUID2, emoji, hash formats.
+Already covered, no work: hostname (`NetworkRules.IsHostname` / `Must.Be.Hostname`), scheme-restricted HTTP URL (`UriRules.IsUrl`/`IsHttpUrl`/`IsHttpsUrl`), slug (`IdentifierRules.IsSlug`). Deliberately skipped (low priority in `competitive-analysis.md` §5): NanoId, CUID/CUID2, emoji, hash formats.
 
 | Concept | Core | Must / Guard / Fluent / DA | Notes |
 |---|---|---|---|
@@ -84,9 +84,9 @@ Codes: `identifier.ulid.invalid`, `guid.version.mismatch` (shared by the `Guid` 
 | Byte-order mark | `StringRules.HasByteOrderMark(string? value)` (starts with U+FEFF) | `HasByteOrderMark` + `NotHasByteOrderMark` / Guard both `NotHasByteOrderMark` (via `Must.Be.HasByteOrderMark`) and `HasByteOrderMark` (via `NotHas…`) / Fluent both / DA both | the forbidden state most callers want is `Guard.Against.HasByteOrderMark` |
 | Well-formed UTF-16 | `StringRules.IsWellFormedUtf16(string? value)` — no unpaired surrogates | `WellFormedUtf16` / `NotWellFormedUtf16` / `WellFormedUtf16()` / `[WellFormedUtf16]` | |
 | Normalization | `StringRules.IsNormalized(string? value, NormalizationForm form = NormalizationForm.FormC)` | `Normalized(value, form)` / `NotNormalized` / `Normalized(form)` / `[Normalized]` (+ `Form` property) | **At risk**: under globalization-invariant mode `string.IsNormalized` throws `PlatformNotSupportedException` for non-ASCII input. Treat as a genuinely exceptional environment condition (`docs/ai/specs/must-clauses/project.md` non-negotiables) and let it bubble; test on CI first — if the CI image runs invariant mode, drop this row from the batch and record why |
-| Grapheme counts | new partial `Rules/StringRules.Graphemes.cs` with nested `StringRules.Graphemes`: `HasExactCount(string? value, int count)`, `HasMinCount(value, int min)`, `HasMaxCount(value, int max)`, `HasCountBetween(value, int min, int max, Inclusion inclusion = Inclusive)` — via `Utils/StringUtility.Graphemes.cs` `TryGetCount(string? value, out int count)` (`StringInfo`); mirrors `CollectionRules` naming inside the sub-scope | new `MustStringGraphemesClauses`: `HasExactGraphemeCount`, `NotHasExactGraphemeCount`, `HasMinGraphemeCount`, `NotHas…`, `HasMaxGraphemeCount`, `NotHas…`, `HasGraphemeCountBetween`, `NotHas…` / Guard eight (`NotHasExactGraphemeCount` via `HasExact…`, etc.) / Fluent eight / DA eight (`HasExactGraphemeCountAttribute` …) | fixture partial `StringRulesFixtures.Graphemes.cs` with inner classes prefixed `Graphemes…` (collision rule, `fixture.md` §10); scenarios include ZWJ emoji sequences, combining marks, CRLF (one grapheme), surrogate pairs; boundary shape; the README explains the emoji-length bug in one sentence |
+| Grapheme counts | new partial `Rules/StringRules.Graphemes.cs` with nested `StringRules.Graphemes`: `HasExactCount(string? value, int count)`, `HasMinCount(value, int min)`, `HasMaxCount(value, int max)`, `HasCountInRange(value, int min, int max, Inclusion inclusion = Inclusive)` — via `Utils/StringUtility.Graphemes.cs` `TryGetCount(string? value, out int count)` (`StringInfo`); mirrors `CollectionRules` naming inside the sub-scope | new `MustStringGraphemesClauses`: `HasExactGraphemeCount`, `NotHasExactGraphemeCount`, `HasMinGraphemeCount`, `NotHas…`, `HasMaxGraphemeCount`, `NotHas…`, `HasGraphemeCountInRange`, `HasGraphemeCountOutOfRange` / Guard eight (`NotHasExactGraphemeCount` via `HasExact…`, etc.) / Fluent eight / DA eight (`HasExactGraphemeCountAttribute` …) | fixture partial `StringRulesFixtures.Graphemes.cs` with inner classes prefixed `Graphemes…` (collision rule, `fixture.md` §10); scenarios include ZWJ emoji sequences, combining marks, CRLF (one grapheme), surrogate pairs; boundary shape; the README explains the emoji-length bug in one sentence |
 
-Codes: `text.bom.missing` (for `HasByteOrderMark`) / `…bom.present` (for `NotHas…`); `text.unicode.malformed` / `…unicode.well-formed`; `text.unicode.not-normalized` / `…unicode.normalized`; `text.graphemes.mismatch`, `…graphemes.too-few`, `…graphemes.too-many`, `…graphemes.out-of-range` for the positive clauses, with the exact inverse state for each `NotHas*` complement (curated in the batch).
+Codes: `text.bom.missing` (for `HasByteOrderMark`) / `…bom.present` (for `NotHas…`); `text.unicode.malformed` / `…unicode.well-formed`; `text.unicode.not-normalized` / `…unicode.normalized`; `text.graphemes.mismatch`, `…graphemes.too-few`, `…graphemes.too-many`, `…graphemes.out-of-range` for the positive clauses, with the exact inverse state for each complement (`HasGraphemeCountOutOfRange` for the range pair) (curated in the batch).
 
 `IsPrintable` is not added: `NotContainsControlChars` already covers it.
 
@@ -175,7 +175,7 @@ Plan 00 §7, plus: every concept row in the batch's table exists in all five lay
 
 ## 8. Out of scope
 
-ISO/standards-registry validations (separate repository), NanoId/CUID/emoji/hash formats, IBAN/VAT, JSON Schema/XSD, transforms/coercion, any rename from `core-common-api-decisions.md`.
+ISO/standards-registry validations (separate repository), NanoId/CUID/emoji/hash formats, IBAN/VAT, JSON Schema/XSD, transforms/coercion, independent API redesigns owned by [Core/Common API decisions](core-common-api-decisions.md). Consuming implemented names and updating affected documentation are required; see the [implementation record](core-common-api-implementation.md).
 
 <!-- footer
 last_verified: 2026-08-26

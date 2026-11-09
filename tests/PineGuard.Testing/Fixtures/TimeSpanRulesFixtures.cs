@@ -43,7 +43,7 @@ public static class TimeSpanRulesFixtures
         public static RuleScenario<(TimeSpan? value, TimeSpan min, TimeSpan max, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
-    public static class IsGreaterThan
+    public static class IsLongerThan
     {
         public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) AboveExclusive = (TimeSpan.FromMinutes(11), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
         public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) EqualInclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Inclusive);
@@ -79,7 +79,7 @@ public static class TimeSpanRulesFixtures
         public static RuleScenario<(TimeSpan? value, TimeSpan? other, Inclusion inclusion)>[] AllScenarios => [.. AllValid, .. AllInvalid];
     }
 
-    public static class IsLessThan
+    public static class IsShorterThan
     {
         public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) BelowExclusive = (TimeSpan.FromMinutes(9), TimeSpan.FromMinutes(10), Inclusion.Exclusive);
         public static readonly (TimeSpan? value, TimeSpan? other, Inclusion inclusion) EqualInclusive = (TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10), Inclusion.Inclusive);

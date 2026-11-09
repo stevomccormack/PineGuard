@@ -12,13 +12,13 @@ public sealed class TemporalAttributeConsumerTests(ITestOutputHelper output)
         [InRangeDateOnly(min: "2024-01-01", max: "2024-12-31")]
         public DateOnly Date { get; init; }
 
-        [OutOfRangeTimeOnly(min: "09:00", max: "17:00")]
+        [OutOfRangeTimeOnly(start: "09:00", end: "17:00")]
         public TimeOnly Clock { get; init; }
 
-        [GreaterThanTimeSpan(other: "00:00:00")]
+        [LongerThanTimeSpan(other: "00:00:00")]
         public TimeSpan Duration { get; init; }
 
-        [LessThanTimeSpanString(other: "02:00:00")]
+        [ShorterThanTimeSpanString(other: "02:00:00")]
         public string DurationText { get; init; } = string.Empty;
 
         [InRangeDateOnlyString("2024-01-01", "2024-12-31")]

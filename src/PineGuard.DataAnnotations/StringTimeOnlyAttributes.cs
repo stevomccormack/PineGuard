@@ -18,9 +18,10 @@ namespace PineGuard.DataAnnotations;
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
-/// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
+/// The <paramref name="start"/> and <paramref name="end"/> constructor arguments are parsed from
 /// <see cref="TimeOnly"/> string format using invariant culture. The <see cref="Styles"/> property
 /// controls how the annotated value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
+/// When <paramref name="start"/> is later than <paramref name="end"/>, the range wraps across midnight.
 /// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
@@ -37,14 +38,14 @@ namespace PineGuard.DataAnnotations;
 /// <seealso cref="MustStringTimeOnlyClauses.InRangeTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class InRangeTimeOnlyStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+public sealed class InRangeTimeOnlyStringAttribute(string start, string end, Inclusion inclusion = Inclusion.Inclusive)
     : ValidationAttributeBase(typeof(string), MustCodes.Time.Range.OutOfRange, allowNull: false)
 {
-    /// <summary>Gets the lower boundary of the valid time range.</summary>
-    public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
+    /// <summary>Gets the start of the valid time range.</summary>
+    public TimeOnly Start { get; } = TimeOnly.Parse(start, CultureInfo.InvariantCulture);
 
-    /// <summary>Gets the upper boundary of the valid time range.</summary>
-    public TimeOnly Max { get; } = TimeOnly.Parse(max, CultureInfo.InvariantCulture);
+    /// <summary>Gets the end of the valid time range.</summary>
+    public TimeOnly End { get; } = TimeOnly.Parse(end, CultureInfo.InvariantCulture);
 
     /// <summary>Gets whether the boundary values are included or excluded in the valid range.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -58,7 +59,7 @@ public sealed class InRangeTimeOnlyStringAttribute(string min, string max, Inclu
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string?)value;
-        var result = Must.Be.InRangeTimeOnly(strValue, Min, Max, Inclusion, Styles, paramName: null);
+        var result = Must.Be.InRangeTimeOnly(strValue, Start, End, Inclusion, Styles, paramName: null);
         return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
@@ -121,9 +122,11 @@ public sealed class BeforeTimeOnlyStringAttribute(string other) : ValidationAttr
 /// fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
-/// The <paramref name="min"/> and <paramref name="max"/> constructor arguments are parsed from
+/// The <paramref name="start"/> and <paramref name="end"/> constructor arguments are parsed from
 /// <see cref="TimeOnly"/> string format using invariant culture. The <see cref="Styles"/> property
 /// controls how the annotated value is parsed; defaults to <see cref="DateTimeStyles.AllowWhiteSpaces"/>.
+/// When <paramref name="start"/> is later than <paramref name="end"/>, the excluded range wraps across
+/// midnight.
 /// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
@@ -140,14 +143,14 @@ public sealed class BeforeTimeOnlyStringAttribute(string other) : ValidationAttr
 /// <seealso cref="MustStringTimeOnlyClauses.OutOfRangeTimeOnly"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class OutOfRangeTimeOnlyStringAttribute(string min, string max, Inclusion inclusion = Inclusion.Inclusive)
+public sealed class OutOfRangeTimeOnlyStringAttribute(string start, string end, Inclusion inclusion = Inclusion.Inclusive)
     : ValidationAttributeBase(typeof(string), MustCodes.Time.Range.InRange, allowNull: false)
 {
-    /// <summary>Gets the lower boundary of the excluded time range.</summary>
-    public TimeOnly Min { get; } = TimeOnly.Parse(min, CultureInfo.InvariantCulture);
+    /// <summary>Gets the start of the excluded time range.</summary>
+    public TimeOnly Start { get; } = TimeOnly.Parse(start, CultureInfo.InvariantCulture);
 
-    /// <summary>Gets the upper boundary of the excluded time range.</summary>
-    public TimeOnly Max { get; } = TimeOnly.Parse(max, CultureInfo.InvariantCulture);
+    /// <summary>Gets the end of the excluded time range.</summary>
+    public TimeOnly End { get; } = TimeOnly.Parse(end, CultureInfo.InvariantCulture);
 
     /// <summary>Gets whether the boundary values are included or excluded in the excluded range.</summary>
     public Inclusion Inclusion { get; } = inclusion;
@@ -161,7 +164,7 @@ public sealed class OutOfRangeTimeOnlyStringAttribute(string min, string max, In
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string?)value;
-        var result = Must.Be.OutOfRangeTimeOnly(strValue, Min, Max, Inclusion, Styles, paramName: null);
+        var result = Must.Be.OutOfRangeTimeOnly(strValue, Start, End, Inclusion, Styles, paramName: null);
         return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }

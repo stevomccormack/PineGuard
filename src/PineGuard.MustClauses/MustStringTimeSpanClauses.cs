@@ -62,7 +62,7 @@ public static class MustStringTimeSpanClauses
     }
 
     /// <summary>
-    /// Validates that the specified value must be a duration greater than the threshold.
+    /// Validates that the specified value must be a duration longer than the other.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
@@ -76,33 +76,33 @@ public static class MustStringTimeSpanClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be a duration greater than the threshold."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a duration longer than the other."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-span">String Time Span Must Clauses documentation</seealso>
-    public static MustResult<TimeSpan> GreaterThanTimeSpan(this IMustClause _,
+    public static MustResult<TimeSpan> LongerThanTimeSpan(this IMustClause _,
         string? value,
         TimeSpan other,
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
-            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotGreater, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotLonger, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (value is null)
-            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotGreater, NullMessage, paramName, value);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotLonger, NullMessage, paramName, value);
 
-        const string messageTemplate = "{paramName} must be a duration greater than the threshold.";
+        const string messageTemplate = "{paramName} must be a duration longer than the other.";
 
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
             return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed;
-        var ok = TimeSpanRules.IsGreaterThan(parsedValue, other, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotGreater, messageTemplate, paramName, value, parsedValue);
+        var ok = TimeSpanRules.IsLongerThan(parsedValue, other, inclusion);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotLonger, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>
-    /// Validates that the specified value must be a duration less than the threshold.
+    /// Validates that the specified value must be a duration shorter than the other.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
@@ -116,29 +116,29 @@ public static class MustStringTimeSpanClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be a duration less than the threshold."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a duration shorter than the other."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-time-span">String Time Span Must Clauses documentation</seealso>
-    public static MustResult<TimeSpan> LessThanTimeSpan(this IMustClause _,
+    public static MustResult<TimeSpan> ShorterThanTimeSpan(this IMustClause _,
         string? value,
         TimeSpan other,
         Inclusion inclusion = Inclusion.Exclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
-            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotLess, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotShorter, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
         if (value is null)
-            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotLess, NullMessage, paramName, value);
+            return MustResult<TimeSpan>.Fail(MustCodes.Time.Duration.NotShorter, NullMessage, paramName, value);
 
-        const string messageTemplate = "{paramName} must be a duration less than the threshold.";
+        const string messageTemplate = "{paramName} must be a duration shorter than the other.";
 
         if (!StringUtility.TimeSpan.TryParse(value, out var parsed))
             return MustResult<TimeSpan>.FromBool(false, MustCodes.Time.Format.Invalid, messageTemplate, paramName, value, result: default);
 
         var parsedValue = parsed;
-        var ok = TimeSpanRules.IsLessThan(parsedValue, other, inclusion);
-        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotLess, messageTemplate, paramName, value, parsedValue);
+        var ok = TimeSpanRules.IsShorterThan(parsedValue, other, inclusion);
+        return MustResult<TimeSpan>.FromBool(ok, MustCodes.Time.Duration.NotShorter, messageTemplate, paramName, value, parsedValue);
     }
 
     /// <summary>

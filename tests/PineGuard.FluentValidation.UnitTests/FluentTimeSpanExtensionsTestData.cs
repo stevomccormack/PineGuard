@@ -26,21 +26,21 @@ public static class FluentTimeSpanExtensionsTestData
             .ToFluentCases(s => s.IsValid ? new FluentExpected(false, "Value must not be within the expected duration range.") : new FluentExpected(true));
     }
 
-    // GreaterThan — valid when value is greater than other
-    public static class GreaterThan
+    // LongerThan — valid when value is longer than other
+    public static class LongerThan
     {
         public static TheoryData<FluentCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)>> Cases =>
-            F.IsGreaterThan.AllScenarios.Where(s => s.Inputs is { value: not null, other: not null })
+            F.IsLongerThan.AllScenarios.Where(s => s.Inputs is { value: not null, other: not null })
             .Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
-            .ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be greater than the threshold."));
+            .ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be longer than the other."));
     }
 
-    // LessThan — valid when value is less than other
-    public static class LessThan
+    // ShorterThan — valid when value is shorter than other
+    public static class ShorterThan
     {
         public static TheoryData<FluentCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)>> Cases =>
-            F.IsLessThan.AllScenarios.Where(s => s.Inputs is { value: not null, other: not null })
+            F.IsShorterThan.AllScenarios.Where(s => s.Inputs is { value: not null, other: not null })
             .Select(s => new RuleScenario<(TimeSpan, TimeSpan, Inclusion)>(s.Name, (s.Inputs.value!.Value, s.Inputs.other!.Value, s.Inputs.inclusion), s.IsValid)).ToArray()
-            .ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be less than the threshold."));
+            .ToFluentCases(s => s.IsValid ? new FluentExpected(true) : new FluentExpected(false, "Value must be shorter than the other."));
     }
 }

@@ -26,29 +26,29 @@ public static partial class StringRules
         }
 
         /// <summary>
-        /// Determines whether the specified string parses to a duration greater than the given threshold.
+        /// Determines whether the specified string parses to a duration longer than the given other.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid duration string, returns <see langword="false"/>.</param>
-        /// <param name="other">The threshold duration to compare against.</param>
-        /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-        /// <returns><see langword="true"/> if the parsed duration exceeds the threshold; otherwise, <see langword="false"/>.</returns>
-        public static bool IsGreaterThan(string? value, System.TimeSpan other, Inclusion inclusion = Inclusion.Exclusive)
+        /// <param name="other">The other duration to compare against.</param>
+        /// <param name="inclusion">Whether the other is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+        /// <returns><see langword="true"/> if the parsed duration exceeds the other; otherwise, <see langword="false"/>.</returns>
+        public static bool IsLongerThan(string? value, System.TimeSpan other, Inclusion inclusion = Inclusion.Exclusive)
         {
             TemporalRangeComparison.ValidateInclusion(inclusion);
-            return StringUtility.TimeSpan.TryParse(value, out var parsed) && TimeSpanRules.IsGreaterThan(parsed, other, inclusion);
+            return StringUtility.TimeSpan.TryParse(value, out var parsed) && TimeSpanRules.IsLongerThan(parsed, other, inclusion);
         }
 
         /// <summary>
-        /// Determines whether the specified string parses to a duration less than the given threshold.
+        /// Determines whether the specified string parses to a duration shorter than the given other.
         /// </summary>
         /// <param name="value">The value to validate. If <see langword="null"/> or not a valid duration string, returns <see langword="false"/>.</param>
-        /// <param name="other">The threshold duration to compare against.</param>
-        /// <param name="inclusion">Whether the threshold is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-        /// <returns><see langword="true"/> if the parsed duration is below the threshold; otherwise, <see langword="false"/>.</returns>
-        public static bool IsLessThan(string? value, System.TimeSpan other, Inclusion inclusion = Inclusion.Exclusive)
+        /// <param name="other">The other duration to compare against.</param>
+        /// <param name="inclusion">Whether the other is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
+        /// <returns><see langword="true"/> if the parsed duration is below the other; otherwise, <see langword="false"/>.</returns>
+        public static bool IsShorterThan(string? value, System.TimeSpan other, Inclusion inclusion = Inclusion.Exclusive)
         {
             TemporalRangeComparison.ValidateInclusion(inclusion);
-            return StringUtility.TimeSpan.TryParse(value, out var parsed) && TimeSpanRules.IsLessThan(parsed, other, inclusion);
+            return StringUtility.TimeSpan.TryParse(value, out var parsed) && TimeSpanRules.IsShorterThan(parsed, other, inclusion);
         }
     }
 }

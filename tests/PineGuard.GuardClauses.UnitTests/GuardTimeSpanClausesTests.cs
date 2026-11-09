@@ -29,24 +29,24 @@ public sealed class GuardTimeSpanClausesTests(ITestOutputHelper output) : BaseGu
     }
 
     [Theory]
-    [MemberData(nameof(GuardTimeSpanClausesTestData.LessThan.ValidCases), MemberType = typeof(GuardTimeSpanClausesTestData.LessThan))]
-    [MemberData(nameof(GuardTimeSpanClausesTestData.LessThan.InvalidCases), MemberType = typeof(GuardTimeSpanClausesTestData.LessThan))]
-    public void LessThan_BehavesAsExpected(GuardCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)> tc)
+    [MemberData(nameof(GuardTimeSpanClausesTestData.ShorterThan.ValidCases), MemberType = typeof(GuardTimeSpanClausesTestData.ShorterThan))]
+    [MemberData(nameof(GuardTimeSpanClausesTestData.ShorterThan.InvalidCases), MemberType = typeof(GuardTimeSpanClausesTestData.ShorterThan))]
+    public void ShorterThan_BehavesAsExpected(GuardCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        var result = AssertResult(tc, () => Guard.Against.LessThan(value, tc.Value.other, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.LessThan(value, tc.Value.other, tc.Value.inclusion, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.ShorterThan(value, tc.Value.other, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.ShorterThan(value, tc.Value.other, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 
     [Theory]
-    [MemberData(nameof(GuardTimeSpanClausesTestData.GreaterThan.ValidCases), MemberType = typeof(GuardTimeSpanClausesTestData.GreaterThan))]
-    [MemberData(nameof(GuardTimeSpanClausesTestData.GreaterThan.InvalidCases), MemberType = typeof(GuardTimeSpanClausesTestData.GreaterThan))]
-    public void GreaterThan_BehavesAsExpected(GuardCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)> tc)
+    [MemberData(nameof(GuardTimeSpanClausesTestData.LongerThan.ValidCases), MemberType = typeof(GuardTimeSpanClausesTestData.LongerThan))]
+    [MemberData(nameof(GuardTimeSpanClausesTestData.LongerThan.InvalidCases), MemberType = typeof(GuardTimeSpanClausesTestData.LongerThan))]
+    public void LongerThan_BehavesAsExpected(GuardCase<(TimeSpan value, TimeSpan other, Inclusion inclusion)> tc)
     {
         var value = tc.Value.value;
-        var result = AssertResult(tc, () => Guard.Against.GreaterThan(value, tc.Value.other, tc.Value.inclusion));
-        AssertCustomMessage(tc, () => Guard.Against.GreaterThan(value, tc.Value.other, tc.Value.inclusion, message: CustomMessage));
+        var result = AssertResult(tc, () => Guard.Against.LongerThan(value, tc.Value.other, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.LongerThan(value, tc.Value.other, tc.Value.inclusion, message: CustomMessage));
         if (tc.Expected.IsValid) Assert.Equal(value, result);
     }
 }

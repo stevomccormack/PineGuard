@@ -40,7 +40,11 @@
 
 .PARAMETER Isolated
     Publish each test project to a temp directory before testing it, to avoid locking source
-    bin/ folders (useful when running coverage alongside an open IDE build).
+    bin/ folders (useful when running coverage alongside an open IDE build). When -Framework is
+    left unbound, every test project multi-targets net8.0;net10.0 (tests/Directory.Build.props),
+    so this publishes and tests once per actual target framework -- resolved via
+    Resolve-CoverageTestFrameworks (tools/.shared/coverage.ps1) -- rather than once with no -f,
+    which fails NETSDK1129. Bind -Framework to restrict to a single pass.
 
 .PARAMETER Format
     Coverlet collector output format: cobertura (default) or opencover.
@@ -190,75 +194,71 @@ try {
 
         Write-Host "Running tests + collecting coverage: $name" -ForegroundColor Cyan
 
-        $settingsArg = @('--settings', $runSettingsPath)
+        # Resolves how many isolated-publish passes this project needs and which framework each
+        # one binds (binding runner-fix decision, artifacts/reviews/T1-U0-fable-review.md): one
+        # pass when -Framework is bound or -Isolated is not set (unchanged from before), one pass
+        # per actual TFM when -Isolated is set with no -Framework bound (the NETSDK1129 fix).
+        $frameworkPasses = @(Resolve-CoverageTestFrameworks -ProjectPath $project -Framework $Framework -Isolated:$Isolated)
 
-        if (-not [string]::IsNullOrWhiteSpace($Framework)) {
-            $settingsArg += @('-f', $Framework)
-        }
+        foreach ($tfmPass in $frameworkPasses) {
+            $settingsArg = @('--settings', $runSettingsPath)
 
-        if (-not [string]::IsNullOrWhiteSpace($Filter)) {
-            $settingsArg += @('--filter', $Filter)
-        }
+            if (-not [string]::IsNullOrWhiteSpace($tfmPass)) {
+                $settingsArg += @('-f', $tfmPass)
+            }
 
-        # Isolation logic
-        $targetToTest = $project
-        $cleanupTempDir = $null
+            if (-not [string]::IsNullOrWhiteSpace($Filter)) {
+                $settingsArg += @('--filter', $Filter)
+            }
 
-        if ($Isolated) {
-            # Publish to temp directory to avoid locking source bin folders
-            $tempDirName = "iso-test-" + [Guid]::NewGuid().ToString('N')
-            $tempDir = Join-Path $scopeRoot $tempDirName
-            New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
-            $cleanupTempDir = $tempDir
+            # Isolation logic
+            $targetToTest = $project
+            $cleanupTempDir = $null
 
-            try {
-                Write-Host "  Isolating: Publishing to $tempDir ..." -ForegroundColor Gray
-                & dotnet publish $project -c $Configuration -o $tempDir | Out-Null
+            if ($Isolated) {
+                # Publish to a per-TFM temp directory to avoid locking source bin folders
+                $tempDirName = "iso-test-" + [Guid]::NewGuid().ToString('N')
+                $tempDir = Join-Path $scopeRoot $tempDirName
+                New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+                $cleanupTempDir = $tempDir
+
+                try {
+                    $targetToTest = Invoke-IsolatedPublish -ProjectPath $project -Configuration $Configuration -Framework $tfmPass -OutputDirectory $tempDir
+                    Write-Host "  Testing isolated dll: $targetToTest" -ForegroundColor Gray
+                }
+                catch {
+                    if ($cleanupTempDir) { Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue }
+                    throw
+                }
+            }
+
+            $attempt = 0
+            while ($true) {
+                $attempt++
+
+                & dotnet test $targetToTest -c $Configuration --collect:"XPlat Code Coverage" --results-directory $projectResults @settingsArg
                 if ($LASTEXITCODE -ne 0) {
-                    throw "dotnet publish failed for project: $project"
+                    if ($Isolated) { Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue }
+                    throw "dotnet test failed for project: $project"
                 }
 
-                # Locate the published dll
-                $publishedDll = Join-Path $tempDir "$name.dll"
-                if (-not (Test-Path $publishedDll)) {
-                    throw "Could not locate published dll at $publishedDll"
+                if (Test-CoverageLooksValid -ProjectResults $projectResults -Scope $Scope) {
+                    break
                 }
 
-                $targetToTest = $publishedDll
-                Write-Host "  Testing isolated dll: $publishedDll" -ForegroundColor Gray
-            }
-            catch {
-                if ($cleanupTempDir) { Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue }
-                throw
-            }
-        }
+                if ($attempt -ge 2) {
+                    if ($Isolated) { Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue }
+                    throw "Coverage output was empty or missing expected scope '$Scope' for project '$name'. See: $projectResults"
+                }
 
-        $attempt = 0
-        while ($true) {
-            $attempt++
-
-            & dotnet test $targetToTest -c $Configuration --collect:"XPlat Code Coverage" --results-directory $projectResults @settingsArg
-            if ($LASTEXITCODE -ne 0) {
-                if ($Isolated) { Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue }
-                throw "dotnet test failed for project: $project"
+                Write-Warning "Coverage output looked invalid for '$name' (attempt $attempt). Retrying once..."
+                Remove-Item -LiteralPath $projectResults -Recurse -Force -ErrorAction SilentlyContinue
+                New-Item -ItemType Directory -Path $projectResults -Force | Out-Null
             }
 
-            if (Test-CoverageLooksValid -ProjectResults $projectResults -Scope $Scope) {
-                break
+            if ($Isolated) {
+                Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue
             }
-
-            if ($attempt -ge 2) {
-                if ($Isolated) { Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue }
-                throw "Coverage output was empty or missing expected scope '$Scope' for project '$name'. See: $projectResults"
-            }
-
-            Write-Warning "Coverage output looked invalid for '$name' (attempt $attempt). Retrying once..."
-            Remove-Item -LiteralPath $projectResults -Recurse -Force -ErrorAction SilentlyContinue
-            New-Item -ItemType Directory -Path $projectResults -Force | Out-Null
-        }
-
-        if ($Isolated) {
-            Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue
         }
 
         $latest = Get-ChildItem -LiteralPath $projectResults -Recurse -File -Filter $coverageFileName -ErrorAction SilentlyContinue |

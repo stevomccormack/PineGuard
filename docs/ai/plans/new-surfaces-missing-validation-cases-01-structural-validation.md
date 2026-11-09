@@ -3,7 +3,7 @@ type: plan
 id: new-surfaces-01-structural-validation
 version: 1.2
 status: completed
-last_updated: 2026-08-26
+last_updated: 2026-11-09
 parent: new-surfaces-program
 -->
 
@@ -744,7 +744,7 @@ Plan 00 §7 applies to each of the four PRs, plus:
 
 ## 9. Out of scope
 
-Async rules, fail-fast mode, clock injection, object-graph walking, localisation, any rename from `docs/ai/plans/core-common-api-decisions.md`.
+Async rules, fail-fast mode, clock injection, object-graph walking, localisation, independent API redesigns owned by [Core/Common API decisions](core-common-api-decisions.md). Use current names and contracts in the [implementation record](core-common-api-implementation.md); updating affected callers and docs remains in scope.
 
 <!-- footer
 last_verified: 2026-08-26

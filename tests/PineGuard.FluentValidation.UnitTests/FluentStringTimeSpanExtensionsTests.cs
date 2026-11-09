@@ -49,41 +49,41 @@ public sealed class FluentStringTimeSpanExtensionsTests(ITestOutputHelper output
         AssertResult(tc, result);
     }
 
-    private sealed class GreaterThanValidator : AbstractValidator<Model>
+    private sealed class LongerThanValidator : AbstractValidator<Model>
     {
-        public GreaterThanValidator(TimeSpan other, Inclusion inclusion) =>
-            RuleFor(x => x.Value).GreaterThanTimeSpan(other, inclusion);
+        public LongerThanValidator(TimeSpan other, Inclusion inclusion) =>
+            RuleFor(x => x.Value).LongerThanTimeSpan(other, inclusion);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.GreaterThan.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.GreaterThan))]
-    public void GreaterThan_BehavesAsExpected(FluentCase<(string? value, TimeSpan other, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.LongerThan.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.LongerThan))]
+    public void LongerThan_BehavesAsExpected(FluentCase<(string? value, TimeSpan other, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, other, inclusion) = tc.Value;
 
         // Act
-        var result = new GreaterThanValidator(other, inclusion).Validate(new Model { Value = value });
+        var result = new LongerThanValidator(other, inclusion).Validate(new Model { Value = value });
 
         // Assert
         AssertResult(tc, result);
     }
 
-    private sealed class LessThanValidator : AbstractValidator<Model>
+    private sealed class ShorterThanValidator : AbstractValidator<Model>
     {
-        public LessThanValidator(TimeSpan other, Inclusion inclusion) =>
-            RuleFor(x => x.Value).LessThanTimeSpan(other, inclusion);
+        public ShorterThanValidator(TimeSpan other, Inclusion inclusion) =>
+            RuleFor(x => x.Value).ShorterThanTimeSpan(other, inclusion);
     }
 
     [Theory]
-    [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.LessThan.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.LessThan))]
-    public void LessThan_BehavesAsExpected(FluentCase<(string? value, TimeSpan other, Inclusion inclusion)> tc)
+    [MemberData(nameof(FluentStringTimeSpanExtensionsTestData.ShorterThan.Cases), MemberType = typeof(FluentStringTimeSpanExtensionsTestData.ShorterThan))]
+    public void ShorterThan_BehavesAsExpected(FluentCase<(string? value, TimeSpan other, Inclusion inclusion)> tc)
     {
         // Arrange
         var (value, other, inclusion) = tc.Value;
 
         // Act
-        var result = new LessThanValidator(other, inclusion).Validate(new Model { Value = value });
+        var result = new ShorterThanValidator(other, inclusion).Validate(new Model { Value = value });
 
         // Assert
         AssertResult(tc, result);

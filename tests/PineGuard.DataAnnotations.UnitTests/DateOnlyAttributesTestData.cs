@@ -1,4 +1,5 @@
 using PineGuard.Codes;
+using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
 using PineGuard.Testing.UnitTests.DataAnnotations;
 using F = PineGuard.Testing.Fixtures.DateOnlyRulesFixtures;
@@ -14,7 +15,7 @@ public static class DateOnlyAttributesTestData
         new("null", null, true)
     ];
 
-    private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.UtcNow);
+    private static readonly DateOnly Today = DateOnly.FromDateTime(FixedTimeProvider.Default.GetUtcNow().UtcDateTime);
 
     public static class PastDateOnly
     {

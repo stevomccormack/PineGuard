@@ -8,13 +8,13 @@ public sealed class MustTimeOnlyClausesTests(ITestOutputHelper output) : BaseMus
 {
     [Theory]
     [MemberData(nameof(MustTimeOnlyClausesTestData.InRange.Cases), MemberType = typeof(MustTimeOnlyClausesTestData.InRange))]
-    public void InRange_BehavesAsExpected(MustCase<(TimeOnly value, TimeOnly min, TimeOnly max)> tc)
-    { var value = tc.Value.value; var result = Must.Be.InRange(value, tc.Value.min, tc.Value.max); AssertResult(tc, result); }
+    public void InRange_BehavesAsExpected(MustCase<(TimeOnly value, TimeOnly start, TimeOnly end)> tc)
+    { var value = tc.Value.value; var result = Must.Be.InRange(value, tc.Value.start, tc.Value.end); AssertResult(tc, result); }
 
     [Theory]
     [MemberData(nameof(MustTimeOnlyClausesTestData.OutOfRange.Cases), MemberType = typeof(MustTimeOnlyClausesTestData.OutOfRange))]
-    public void OutOfRange_BehavesAsExpected(MustCase<(TimeOnly value, TimeOnly min, TimeOnly max)> tc)
-    { var value = tc.Value.value; var result = Must.Be.OutOfRange(value, tc.Value.min, tc.Value.max); AssertResult(tc, result); }
+    public void OutOfRange_BehavesAsExpected(MustCase<(TimeOnly value, TimeOnly start, TimeOnly end)> tc)
+    { var value = tc.Value.value; var result = Must.Be.OutOfRange(value, tc.Value.start, tc.Value.end); AssertResult(tc, result); }
 
     [Theory]
     [MemberData(nameof(MustTimeOnlyClausesTestData.Before.Cases), MemberType = typeof(MustTimeOnlyClausesTestData.Before))]

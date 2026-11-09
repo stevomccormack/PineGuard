@@ -7,6 +7,13 @@ status: completed
 
 # NuGet Publishing Plan for PineGuard
 
+> **Brand assets updated (2026-11-08):** Current assets are in [docs/brand](../../../brand/).
+> Use [pineguard-icon.png](../../../brand/pineguard-icon.png) for new package-icon references.
+> The original, white, and dark-background sets are now named `pineguard-*`,
+> `pineguard-light-*`, and `pineguard-dark-*`, respectively, in PNG and SVG formats.
+> The old filenames, dimensions, and processing notes below describe the completed release
+> and are retained as historical evidence, not current asset instructions.
+
 ## Status
 
 PineGuard is a mature multi-target validation library now living in a clean,

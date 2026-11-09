@@ -129,40 +129,6 @@ $ProgressPreference = 'SilentlyContinue'
 # expects bare names on Linux/macOS. $IsWindows is a pwsh 7+ automatic variable.
 $exeSuffix = if ($IsWindows) { '.exe' } else { '' }
 
-function Resolve-DotCoverTargetFrameworks {
-    <#
-    .SYNOPSIS
-        Resolves the effective TargetFramework(s) a test csproj actually builds.
-
-    .DESCRIPTION
-        Evaluated via `dotnet msbuild -getProperty`, not read as a literal XML element, because
-        every PineGuard test project inherits <TargetFrameworks> from tests/Directory.Build.props
-        (net8.0;net10.0 today) rather than declaring it in its own csproj -- a literal-element
-        read would find nothing. Falls back to the singular TargetFramework property for a
-        single-targeted project.
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory)]
-        [string] $CsprojPath
-    )
-
-    $multi = & dotnet msbuild $CsprojPath '-getProperty:TargetFrameworks' '-nologo' 2>$null
-    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($multi)) {
-        $tfms = @(($multi -split ';') | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-        if ($tfms.Count -gt 0) {
-            return $tfms
-        }
-    }
-
-    $single = & dotnet msbuild $CsprojPath '-getProperty:TargetFramework' '-nologo' 2>$null
-    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($single)) {
-        return @($single.Trim())
-    }
-
-    throw "Could not resolve TargetFramework(s) for '$CsprojPath' via 'dotnet msbuild -getProperty'."
-}
-
 # See -NoOpen/-SkipHtml/-Format PARAMETER blocks above: these three are kept in the param block
 # (not omitted) purely so the D-9 front door's blind splat (& $engineScript @forwardParams) never
 # fails to bind a parameter the caller passed for the *other* engine. Accept-and-warn here is
@@ -230,7 +196,7 @@ try {
             @($Framework)
         }
         else {
-            @(Resolve-DotCoverTargetFrameworks -CsprojPath $project)
+            @(Get-ProjectTargetFrameworks -CsprojPath $project)
         }
 
         Write-Host "Collecting dotCover snapshot(s): $name [$($tfms -join ', ')]" -ForegroundColor Cyan
@@ -246,19 +212,8 @@ try {
                 $cleanupTempDir = $tempDir
 
                 try {
-                    Write-Host "  Isolating: Publishing to $tempDir ($tfm)..." -ForegroundColor Gray
-                    & dotnet publish $project -c $Configuration -f $tfm -o $tempDir | Out-Null
-                    if ($LASTEXITCODE -ne 0) {
-                        throw "dotnet publish failed for project: $project ($tfm)"
-                    }
-
-                    $publishedDll = Join-Path $tempDir "$name.dll"
-                    if (-not (Test-Path $publishedDll)) {
-                        throw "Could not locate published dll at $publishedDll"
-                    }
-
-                    $targetToTest = $publishedDll
-                    Write-Host "  Testing isolated dll: $publishedDll" -ForegroundColor Gray
+                    $targetToTest = Invoke-IsolatedPublish -ProjectPath $project -Configuration $Configuration -Framework $tfm -OutputDirectory $tempDir
+                    Write-Host "  Testing isolated dll: $targetToTest" -ForegroundColor Gray
                 }
                 catch {
                     if ($cleanupTempDir) { Remove-Item -Path $cleanupTempDir -Recurse -Force -ErrorAction SilentlyContinue }

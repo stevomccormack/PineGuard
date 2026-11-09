@@ -14,75 +14,75 @@ namespace PineGuard.FluentValidation;
 /// <seealso href="https://pineguard.ai/docs/fluent/time-only">Fluent TimeOnly Extensions documentation</seealso>
 public static class FluentTimeOnlyExtensions
 {
-    /// <summary>Validates that the <see cref="TimeOnly"/> value is between the specified bounds.</summary>
+    /// <summary>Validates that the <see cref="TimeOnly"/> value is between the specified bounds, wrapping across midnight when <paramref name="start"/> is later than <paramref name="end"/>.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="min">The lower bound.</param>
-    /// <param name="max">The upper bound.</param>
+    /// <param name="start">The start of the range.</param>
+    /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <example><code>RuleFor(x => x.StartTime).InRange(new TimeOnly(9, 0), new TimeOnly(17, 0));</code></example>
     public static IRuleBuilderOptions<TModel, TimeOnly> InRange<TModel>(
         this IRuleBuilder<TModel, TimeOnly> ruleBuilder,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.InRange(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.InRange(val, start, end, inclusion, paramName: null),
             message, MustCodes.Time.Range.OutOfRange);
 
-    /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is between the specified bounds.</summary>
+    /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is between the specified bounds, wrapping across midnight when <paramref name="start"/> is later than <paramref name="end"/>.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="min">The lower bound.</param>
-    /// <param name="max">The upper bound.</param>
+    /// <param name="start">The start of the range.</param>
+    /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, TimeOnly?> InRange<TModel>(
         this IRuleBuilder<TModel, TimeOnly?> ruleBuilder,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.InRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.InRange(val.GetValueOrDefault(), start, end, inclusion, paramName: null)),
             message, MustCodes.Time.Range.OutOfRange);
 
-    /// <summary>Validates that the <see cref="TimeOnly"/> value is not between the specified bounds.</summary>
+    /// <summary>Validates that the <see cref="TimeOnly"/> value is not between the specified bounds, wrapping across midnight when <paramref name="start"/> is later than <paramref name="end"/>.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="min">The lower bound of the excluded range.</param>
-    /// <param name="max">The upper bound of the excluded range.</param>
+    /// <param name="start">The start of the excluded range.</param>
+    /// <param name="end">The end of the excluded range.</param>
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     public static IRuleBuilderOptions<TModel, TimeOnly> OutOfRange<TModel>(
         this IRuleBuilder<TModel, TimeOnly> ruleBuilder,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => Must.Be.OutOfRange(val, min, max, inclusion, paramName: null),
+        ruleBuilder.MustBe(val => Must.Be.OutOfRange(val, start, end, inclusion, paramName: null),
             message, MustCodes.Time.Range.InRange);
 
-    /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is not between the specified bounds.</summary>
+    /// <summary>Validates that the nullable <see cref="TimeOnly"/> value is not between the specified bounds, wrapping across midnight when <paramref name="start"/> is later than <paramref name="end"/>.</summary>
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
-    /// <param name="min">The lower bound of the excluded range.</param>
-    /// <param name="max">The upper bound of the excluded range.</param>
+    /// <param name="start">The start of the excluded range.</param>
+    /// <param name="end">The end of the excluded range.</param>
     /// <param name="inclusion">Whether the bounds are inclusive or exclusive.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
     public static IRuleBuilderOptions<TModel, TimeOnly?> OutOfRange<TModel>(
         this IRuleBuilder<TModel, TimeOnly?> ruleBuilder,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         string? message = null) =>
-        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OutOfRange(val.GetValueOrDefault(), min, max, inclusion, paramName: null)),
+        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.OutOfRange(val.GetValueOrDefault(), start, end, inclusion, paramName: null)),
             message, MustCodes.Time.Range.InRange);
 
     /// <summary>Validates that the <see cref="TimeOnly"/> value is before the specified time.</summary>

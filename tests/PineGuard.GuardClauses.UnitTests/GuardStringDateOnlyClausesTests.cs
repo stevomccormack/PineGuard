@@ -186,21 +186,21 @@ public sealed class GuardStringDateOnlyClausesTests(ITestOutputHelper output) : 
     // GuardStringDateOnlyClauses.OverlappingDateOnly
     [Theory]
     [MemberData(nameof(GuardStringDateOnlyClausesTestData.OverlappingDateOnly.Cases), MemberType = typeof(GuardStringDateOnlyClausesTestData.OverlappingDateOnly))]
-    public void OverlappingDateOnly_BehavesAsExpected(GuardCase<(string? start1, string? end1, string? start2, string? end2)> tc)
+    public void OverlappingDateOnly_BehavesAsExpected(GuardCase<(string? start1, string? end1, string? start2, string? end2, Inclusion inclusion)> tc)
     {
         var start1 = tc.Value.start1;
-        AssertResult(tc, () => Guard.Against.OverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!));
-        AssertCustomMessage(tc, () => Guard.Against.OverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.OverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.OverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, tc.Value.inclusion, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.NotOverlappingDateOnly
     [Theory]
     [MemberData(nameof(GuardStringDateOnlyClausesTestData.NotOverlappingDateOnly.Cases), MemberType = typeof(GuardStringDateOnlyClausesTestData.NotOverlappingDateOnly))]
-    public void NotOverlappingDateOnly_BehavesAsExpected(GuardCase<(string? start1, string? end1, string? start2, string? end2)> tc)
+    public void NotOverlappingDateOnly_BehavesAsExpected(GuardCase<(string? start1, string? end1, string? start2, string? end2, Inclusion inclusion)> tc)
     {
         var start1 = tc.Value.start1;
-        AssertResult(tc, () => Guard.Against.NotOverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!));
-        AssertCustomMessage(tc, () => Guard.Against.NotOverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, message: CustomMessage));
+        AssertResult(tc, () => Guard.Against.NotOverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, tc.Value.inclusion));
+        AssertCustomMessage(tc, () => Guard.Against.NotOverlappingDateOnly(start1!, tc.Value.end1!, tc.Value.start2!, tc.Value.end2!, tc.Value.inclusion, message: CustomMessage));
     }
 
     // GuardStringDateOnlyClauses.BelowMinimumAge

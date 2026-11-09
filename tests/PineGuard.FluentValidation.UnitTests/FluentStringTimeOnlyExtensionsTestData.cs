@@ -31,6 +31,26 @@ public static class FluentStringTimeOnlyExtensionsTestData
         ];
     }
 
+    public static class InRangeTimeOnlyWrap
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("inside", "23:00", new FluentExpected(true)),
+            new("outside", "12:00", new FluentExpected(false, "Value must be a time within the expected range.")),
+            new("null", null, new FluentExpected(true))
+        ];
+    }
+
+    public static class OutOfRangeTimeOnlyWrap
+    {
+        public static TheoryData<FluentCase<string?>> Cases =>
+        [
+            new("outside", "12:00", new FluentExpected(true)),
+            new("inside", "23:00", new FluentExpected(false, "Value must be a time not within the expected range.")),
+            new("null", null, new FluentExpected(true))
+        ];
+    }
+
     public static class WithinTimeOnly
     {
         public static TheoryData<FluentCase<string?>> Cases =>

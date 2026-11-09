@@ -3,7 +3,7 @@ type: plan
 id: competitive-analysis
 version: 1.0
 status: living
-last_updated: 2026-08-20
+last_updated: 2026-11-09
 -->
 
 # PineGuard Competitive Analysis
@@ -50,7 +50,7 @@ last_updated: 2026-08-20
 | jwt | **Gap** |
 | nanoid, cuid, cuid2, ulid | **Gap** |
 | emoji | **Gap** |
-| hostname | Has (`NetworkRules.IsValidHostname`, `Must.Be.Hostname` / `Must.Not.Be.Hostname`) |
+| hostname | Has (`NetworkRules.IsHostname`, `Must.Be.Hostname` / `Guard.Against.NotHostname`) |
 | mac address | **Gap** |
 | hash (md5/sha256/etc.) | **Gap** |
 | regex, includes, startsWith, endsWith | Has (IsMatch) -- **Gap**: includes/startsWith/endsWith as first-class |
@@ -165,7 +165,7 @@ last_updated: 2026-08-20
 | Nano ID | `.nanoid()` | Gap | Low |
 | CUID/CUID2 | `.cuid()`, `.cuid2()` | Gap | Low |
 | Emoji | `.emoji()` | Gap | Low |
-| Hostname | `.hostname()` | Has (`NetworkRules.IsValidHostname`) | -- |
+| Hostname | `.hostname()` | Has (`NetworkRules.IsHostname`) | -- |
 | MAC address | `.mac()` | Gap | Medium |
 | Hash format | `.hash({algorithm})` | Gap | Low |
 | ISO Duration | `.iso.duration()` | Gap | Medium |

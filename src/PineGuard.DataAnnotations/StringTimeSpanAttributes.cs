@@ -58,11 +58,11 @@ public sealed class InRangeTimeSpanStringAttribute(string min, string max, Inclu
 
 /// <summary>
 /// Validates that the annotated <see cref="string"/> property or field represents a <see cref="TimeSpan"/>
-/// duration greater than (or equal to, depending on <see cref="Inclusion"/>) the specified other.
+/// duration longer than (or equal to, depending on <see cref="Inclusion"/>) the specified other.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringTimeSpanClauses.GreaterThanTimeSpan"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustStringTimeSpanClauses.LongerThanTimeSpan"/>. Supported on properties, fields, and
 /// parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
@@ -75,17 +75,17 @@ public sealed class InRangeTimeSpanStringAttribute(string min, string max, Inclu
 /// <code>
 /// public class TimeoutModel
 /// {
-///     [GreaterThanTimeSpanString("00:00:00")]
+///     [LongerThanTimeSpanString("00:00:00")]
 ///     public string Timeout { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="LessThanTimeSpanStringAttribute"/>
-/// <seealso cref="MustStringTimeSpanClauses.GreaterThanTimeSpan"/>
+/// <seealso cref="ShorterThanTimeSpanStringAttribute"/>
+/// <seealso cref="MustStringTimeSpanClauses.LongerThanTimeSpan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class GreaterThanTimeSpanStringAttribute(string other, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Time.Duration.NotGreater, allowNull: false)
+public sealed class LongerThanTimeSpanStringAttribute(string other, Inclusion inclusion = Inclusion.Exclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Time.Duration.NotLonger, allowNull: false)
 {
     /// <summary>Gets the lower other that the duration must exceed.</summary>
     public TimeSpan Other { get; } = TimeSpan.Parse(other, CultureInfo.InvariantCulture);
@@ -97,23 +97,23 @@ public sealed class GreaterThanTimeSpanStringAttribute(string other, Inclusion i
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string?)value;
-        var result = Must.Be.GreaterThanTimeSpan(strValue, Other, Inclusion, paramName: null);
+        var result = Must.Be.LongerThanTimeSpan(strValue, Other, Inclusion, paramName: null);
         return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }
 
 /// <summary>
 /// Validates that the annotated <see cref="string"/> property or field represents a <see cref="TimeSpan"/>
-/// duration less than (or equal to, depending on <see cref="Inclusion"/>) the specified other.
+/// duration shorter than (or equal to, depending on <see cref="Inclusion"/>) the specified other.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringTimeSpanClauses.LessThanTimeSpan"/>. Supported on properties, fields, and
+/// Delegates to <see cref="MustStringTimeSpanClauses.ShorterThanTimeSpan"/>. Supported on properties, fields, and
 /// parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <paramref name="other"/> constructor argument is parsed from <see cref="TimeSpan"/> string
-/// format using invariant culture. By default, uses <see cref="Inclusion.Exclusive"/> (strictly less than).
+/// format using invariant culture. By default, uses <see cref="Inclusion.Exclusive"/> (strictly shorter than).
 /// If the value is <see langword="null"/>, validation is skipped after configuration is validated.
 /// </para>
 /// </remarks>
@@ -121,17 +121,17 @@ public sealed class GreaterThanTimeSpanStringAttribute(string other, Inclusion i
 /// <code>
 /// public class TimeoutModel
 /// {
-///     [LessThanTimeSpanString("01:00:00")]
+///     [ShorterThanTimeSpanString("01:00:00")]
 ///     public string Duration { get; set; }
 /// }
 /// </code>
 /// </example>
-/// <seealso cref="GreaterThanTimeSpanStringAttribute"/>
-/// <seealso cref="MustStringTimeSpanClauses.LessThanTimeSpan"/>
+/// <seealso cref="LongerThanTimeSpanStringAttribute"/>
+/// <seealso cref="MustStringTimeSpanClauses.ShorterThanTimeSpan"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public sealed class LessThanTimeSpanStringAttribute(string other, Inclusion inclusion = Inclusion.Exclusive)
-    : ValidationAttributeBase(typeof(string), MustCodes.Time.Duration.NotLess, allowNull: false)
+public sealed class ShorterThanTimeSpanStringAttribute(string other, Inclusion inclusion = Inclusion.Exclusive)
+    : ValidationAttributeBase(typeof(string), MustCodes.Time.Duration.NotShorter, allowNull: false)
 {
     /// <summary>Gets the upper other that the duration must be below.</summary>
     public TimeSpan Other { get; } = TimeSpan.Parse(other, CultureInfo.InvariantCulture);
@@ -143,7 +143,7 @@ public sealed class LessThanTimeSpanStringAttribute(string other, Inclusion incl
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string?)value;
-        var result = Must.Be.LessThanTimeSpan(strValue, Other, Inclusion, paramName: null);
+        var result = Must.Be.ShorterThanTimeSpan(strValue, Other, Inclusion, paramName: null);
         return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
     }
 }

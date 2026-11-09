@@ -6,6 +6,30 @@ namespace PineGuard.Rules;
 /// <summary>
 /// Provides pure <see cref="DateTime"/> validation predicates for temporal comparisons, range checks, and calendar queries.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Members that compare instants — <see cref="IsInPast"/>, <see cref="IsInFuture"/>, <see cref="IsInRange"/>,
+/// <see cref="IsBefore"/>, <see cref="IsAfter"/>, <see cref="IsSame"/>, <see cref="IsChronological"/>,
+/// <see cref="IsOverlapping"/>, <see cref="IsWithin"/>, <see cref="IsWithinDaysFromNow"/> and
+/// <see cref="IsWithinCalendarMonths"/> (which then counts months on the UTC calendar) — first normalize every
+/// <see cref="DateTime"/> through <see cref="DateTimeUtility.ToUtc"/>: a <see cref="DateTimeKind.Local"/> value is
+/// converted to UTC, a <see cref="DateTimeKind.Utc"/> value is used as-is, and a <see cref="DateTimeKind.Unspecified"/>
+/// value is assumed to already be UTC and is relabeled, not converted. "Now" for <see cref="IsInPast"/>,
+/// <see cref="IsInFuture"/> and <see cref="IsWithinDaysFromNow"/> is <see cref="TimeProvider.GetUtcNow"/> on the
+/// injected <see cref="TimeProvider"/> (the system clock when <see langword="null"/>).
+/// </para>
+/// <para>
+/// Members that answer calendar questions — <see cref="HasMinimumAge"/>, <see cref="IsSameDay"/>,
+/// <see cref="IsWeekday"/>, <see cref="IsWeekend"/>, <see cref="IsFirstDayOfMonth"/> and
+/// <see cref="IsLastDayOfMonth"/> — read the value's own civil <see cref="DateTime.Date"/> fields and ignore
+/// <see cref="DateTime.Kind"/> entirely; no conversion takes place. "Today" for <see cref="HasMinimumAge"/> is the
+/// calendar date in the injected <see cref="TimeProvider"/>'s <see cref="TimeProvider.LocalTimeZone"/>, or the UTC
+/// calendar date when the provider is <see langword="null"/>: PineGuard never guesses the host machine's zone. The
+/// kind inspectors <see cref="IsUtc"/>,
+/// <see cref="IsLocal"/>, <see cref="IsUnspecified"/> and <see cref="HasExplicitKind"/> belong to neither group:
+/// they report <see cref="DateTime.Kind"/> exactly as supplied.
+/// </para>
+/// </remarks>
 /// <seealso href="https://pineguard.ai/docs/rules/datetime">DateTime Rules documentation</seealso>
 public static class DateTimeRules
 {
@@ -311,20 +335,18 @@ public static class DateTimeRules
     }
 
     /// <summary>
-    /// Determines whether two date/times fall on the same calendar day in UTC (ignoring time components).
+    /// Determines whether two date/times fall on the same calendar day, compared by their own calendar
+    /// date; <see cref="DateTime.Kind"/> is ignored.
     /// </summary>
     /// <param name="value">The first date/time. If <see langword="null"/> and <paramref name="other"/> is also <see langword="null"/>, returns <see langword="true"/>.</param>
     /// <param name="other">The second date/time.</param>
-    /// <returns><see langword="true"/> if both values have the same UTC date component; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true"/> if both values have the same calendar date; otherwise, <see langword="false"/>.</returns>
     public static bool IsSameDay(DateTime? value, DateTime? other)
     {
         if (value is null && other is null) return true;
         if (value is null || other is null) return false;
 
-        var valueUtc = DateTimeUtility.ToUtc(value)!.Value;
-        var otherUtc = DateTimeUtility.ToUtc(other)!.Value;
-
-        return valueUtc.Date == otherUtc.Date;
+        return value.Value.Date == other.Value.Date;
     }
 
     /// <summary>
@@ -361,32 +383,32 @@ public static class DateTimeRules
     /// Determines whether the specified date of birth is at least <paramref name="years"/> whole years ago.
     /// </summary>
     /// <param name="value">The date of birth to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
-    /// <param name="years">
-    /// The minimum age in whole years. Negative, or large enough to place the boundary before year one,
-    /// returns <see langword="false"/>.
+    /// <param name="years">The minimum age in whole years. Negative returns <see langword="false"/>.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
     /// </param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
     /// <returns><see langword="true"/> if <paramref name="value"/> meets the minimum age; otherwise, <see langword="false"/>.</returns>
     /// <remarks>
-    /// Age is measured against the boundary <c>today.AddYears(-years)</c>: a birth date on that boundary has
-    /// just reached the age, and any later one has not. A 29 February birth date therefore reaches its next
-    /// birthday on 1 March of a non-leap year, because shifting a 28 February back by whole years lands on a
-    /// 28th, which falls before the 29th the birth date carries.
-    /// Both sides are reduced to a UTC calendar date first — via the normalization
-    /// <see cref="DateTimeUtility.ToUtc(DateTime?)"/> applies throughout this class — so the time of day a
-    /// birth date happens to carry never decides the answer.
+    /// Age is the whole number of completed years between the birth date and today: the year difference,
+    /// minus one if the birthday's month and day have not yet occurred this year. A 29 February birth date
+    /// therefore reaches its next birthday on 1 March of a non-leap year, because that year has no 29th to
+    /// match against — this is PineGuard's calendar convention. The birth date is always its own
+    /// <see cref="DateTime.Date"/>, regardless of <see cref="DateTime.Kind"/> — it is never converted.
+    /// "Today" is derived from one sampled instant with checked projection into the clock's
+    /// <see cref="TimeProvider.LocalTimeZone"/>. A <see langword="null"/> <paramref name="timeProvider"/>
+    /// reads the system clock and uses the UTC calendar date: PineGuard never guesses the host's zone, so
+    /// inject a provider to evaluate today in a chosen zone. If the projection is not representable, this
+    /// method returns <see langword="false"/>.
     /// </remarks>
     public static bool HasMinimumAge(DateTime? value, int years, TimeProvider? timeProvider = null)
     {
         if (value is null || years < 0)
             return false;
 
-        var today = DateTimeUtility.GetUtcNow(timeProvider).UtcDateTime.Date;
-
-        // Shifting today back that far would leave the boundary before year one, which no date can precede.
-        if (years >= today.Year)
+        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var today))
             return false;
 
-        return DateTimeUtility.ToUtc(value)!.Value.Date <= today.AddYears(-years);
+        return DateTimeUtility.TryGetAge(value.Value.Date, today, out var age) && age >= years;
     }
 }

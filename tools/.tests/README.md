@@ -31,6 +31,7 @@ than one major version is installed, pin the one you want with
 | `Bom-Absence.Tests.ps1` | F-47: no script has a UTF-8 byte-order mark |
 | `Windows-Isms.Tests.ps1` | F-30: no hardcoded backslash path separators, `.exe`, `$env:TEMP`, or `SetEnvironmentVariable(...,'User')` |
 | `Shared-Load-Order.Tests.ps1` | D-2: every `tools/.shared/*.ps1` file dot-sources standalone in a fresh process, in filename-alphabetical order, with no undeclared load-order dependency on another `.shared/*.ps1` file — T3.01's condition for keeping `.shared/` dot-sourced instead of converting it to a script module |
+| `Coverlet-IsolatedPublish.Tests.ps1` | `Resolve-CoverageTestFrameworks`, `Get-IsolatedPublishArguments`, `Invoke-IsolatedPublish` in `tools/.shared/coverage.ps1` — the bound/unbound `-Framework` × `-Isolated` pass resolution, the exact `dotnet publish` argument array, the `-Framework` blank-value guard, and the NETSDK1129 diagnostics on a mocked failing publish, plus (**Slow**) the real per-TFM resolution against `PineGuard.Testing.UnitTests.csproj` and the end-to-end `coverlet/New-CoverageReport.ps1 -Isolated` regression this fixes |
 
 ## Intentionally red tests
 

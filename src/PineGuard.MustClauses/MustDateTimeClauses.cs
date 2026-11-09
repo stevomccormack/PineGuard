@@ -1120,7 +1120,10 @@ public static class MustDateTimeClauses
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The date of birth to validate.</param>
     /// <param name="years">The minimum age in whole years.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -1130,7 +1133,11 @@ public static class MustDateTimeClauses
     /// </returns>
     /// <remarks>
     /// The failure message follows the pattern <c>"{paramName} must meet the expected minimum age."</c>
-    /// A negative <paramref name="years"/> is a configuration error, reported against that parameter.
+    /// A negative <paramref name="years"/> is a configuration error, reported against that parameter,
+    /// and is checked before the clock is read. "Today" is then sampled once from
+    /// <paramref name="timeProvider"/> via the guarded reference derivation; if that projection is not
+    /// representable, the failure is attributed to <paramref name="timeProvider"/> with code
+    /// <c>date.reference.out-of-range</c> rather than reported as a value that is not old enough.
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/date-time">Date Time Must Clauses documentation</seealso>
     public static MustResult<DateTime> MinimumAge(this IMustClause _,
@@ -1143,9 +1150,13 @@ public static class MustDateTimeClauses
             return MustResult<DateTime>.Fail(MustCodes.Date.Age.BelowMinimum,
                 "{paramName} requires a non-negative number of years.", nameof(years), years);
 
+        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
+            return MustResult<DateTime>.Fail(MustCodes.Date.Reference.OutOfRange,
+                "{paramName} requires a reference date within the supported range.", nameof(timeProvider), timeProvider);
+
         const string messageTemplate = "{paramName} must meet the expected minimum age.";
 
-        var ok = DateTimeRules.HasMinimumAge(value, years, timeProvider);
+        var ok = DateTimeUtility.TryGetAge(value.Date, referenceDate, out var age) && age >= years;
         return MustResult<DateTime>.FromBool(ok, MustCodes.Date.Age.BelowMinimum, messageTemplate, paramName, value, value);
     }
 }

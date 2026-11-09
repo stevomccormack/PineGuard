@@ -55,9 +55,10 @@ public static class GuardStringDateTimeOffsetClausesTestData
 
         public static TheoryData<GuardCase<(string? value, DateTimeOffset min, DateTimeOffset max, Common.Inclusion inclusion)>> InvalidCases =>
         [
-            new(nameof(F.DateTimeOffsetIsInRange.InsideRange), F.DateTimeOffsetIsInRange.InsideRange, new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.DateTimeOffsetIsInRange.NotADate),    F.DateTimeOffsetIsInRange.NotADate,    new GuardExpected(false, typeof(ArgumentException), "value")),
-            new(nameof(F.DateTimeOffsetIsInRange.NullValue),   F.DateTimeOffsetIsInRange.NullValue,   new GuardExpected(false, typeof(ArgumentNullException), "value"))
+            new(nameof(F.DateTimeOffsetIsInRange.InsideRange),          F.DateTimeOffsetIsInRange.InsideRange,          new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.DateTimeOffsetIsInRange.NotADate),             F.DateTimeOffsetIsInRange.NotADate,             new GuardExpected(false, typeof(ArgumentException), "value")),
+            new(nameof(F.DateTimeOffsetIsInRange.NullValue),            F.DateTimeOffsetIsInRange.NullValue,            new GuardExpected(false, typeof(ArgumentNullException), "value")),
+            new(nameof(F.DateTimeOffsetIsInRange.OffsetLessAssumedUtc), F.DateTimeOffsetIsInRange.OffsetLessAssumedUtc, new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 

@@ -11,7 +11,7 @@ namespace PineGuard.GuardClauses;
 public static class GuardTimeSpanClauses
 {
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the OutOfRange constraint.
+    /// Throws when <paramref name="value"/> is outside the specified range.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -47,7 +47,7 @@ public static class GuardTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the InRange constraint.
+    /// Throws when <paramref name="value"/> is inside the specified range.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
@@ -83,11 +83,12 @@ public static class GuardTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the LessThan constraint.
+    /// Throws if <paramref name="value"/> is shorter than <paramref name="other"/>.
+    /// <see cref="Inclusion.Inclusive"/> also throws when the two are equal.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="other">The threshold value.</param>
+    /// <param name="other">The other value.</param>
     /// <param name="inclusion">The boundary inclusion mode.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -100,8 +101,8 @@ public static class GuardTimeSpanClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustTimeSpanClauses.GreaterThan"/>
-    public static TimeSpan LessThan(this IGuardClause _,
+    /// <seealso cref="MustTimeSpanClauses.LongerThan"/>
+    public static TimeSpan ShorterThan(this IGuardClause _,
         TimeSpan value,
         TimeSpan other,
         Inclusion inclusion = Inclusion.Exclusive,
@@ -109,7 +110,7 @@ public static class GuardTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.GreaterThan(value, other, inclusion, paramName);
+        var result = Must.Be.LongerThan(value, other, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : inclusion == Inclusion.Exclusive ? Inclusion.Inclusive : inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 
@@ -117,11 +118,12 @@ public static class GuardTimeSpanClauses
     }
 
     /// <summary>
-    /// Throws if <paramref name="value"/> violates the GreaterThan constraint.
+    /// Throws if <paramref name="value"/> is longer than <paramref name="other"/>.
+    /// <see cref="Inclusion.Inclusive"/> also throws when the two are equal.
     /// </summary>
     /// <param name="_">The <see cref="IGuardClause"/> entry point (used via <c>Guard.Against</c>).</param>
     /// <param name="value">The value to guard.</param>
-    /// <param name="other">The threshold value.</param>
+    /// <param name="other">The other value.</param>
     /// <param name="inclusion">The boundary inclusion mode.</param>
     /// <param name="message">An optional custom error message.</param>
     /// <param name="exceptionCreator">An optional factory to create a custom exception.</param>
@@ -134,8 +136,8 @@ public static class GuardTimeSpanClauses
     /// Thrown when the guard condition is violated and no
     /// <paramref name="exceptionCreator"/> is provided.
     /// </exception>
-    /// <seealso cref="MustTimeSpanClauses.LessThan"/>
-    public static TimeSpan GreaterThan(this IGuardClause _,
+    /// <seealso cref="MustTimeSpanClauses.ShorterThan"/>
+    public static TimeSpan LongerThan(this IGuardClause _,
         TimeSpan value,
         TimeSpan other,
         Inclusion inclusion = Inclusion.Exclusive,
@@ -143,7 +145,7 @@ public static class GuardTimeSpanClauses
         Func<Exception>? exceptionCreator = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var result = Must.Be.LessThan(value, other, inclusion, paramName);
+        var result = Must.Be.ShorterThan(value, other, inclusion == Inclusion.Inclusive ? Inclusion.Exclusive : inclusion == Inclusion.Exclusive ? Inclusion.Inclusive : inclusion, paramName);
         if (result.Failed)
             GuardFailure.Throw(result, message, exceptionCreator);
 

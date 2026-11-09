@@ -2,8 +2,8 @@
 type: plan
 id: new-surfaces-02-options
 version: 1.2
-status: active
-last_updated: 2026-08-26
+status: completed
+last_updated: 2026-11-08
 parent: new-surfaces-program
 -->
 
@@ -13,7 +13,7 @@ parent: new-surfaces-program
 > [Parent](new-surfaces-missing-validation-cases.md) · [00 Program](new-surfaces-missing-validation-cases-00-program.md) · [01 Structural validation](new-surfaces-missing-validation-cases-01-structural-validation.md) · **02 Options** · [03 ASP.NET Core](new-surfaces-missing-validation-cases-03-aspnetcore.md) · [04 MediatR & bridges](new-surfaces-missing-validation-cases-04-mediatr-result-bridges.md) · [05 Rule batches](new-surfaces-missing-validation-cases-05-rule-batches.md) · [06 Analyzers](new-surfaces-missing-validation-cases-06-analyzers.md)
 <!-- /plan-nav -->
 
-> **Status**: Active | **Depends on**: Phase 1 (`IMustValidator<T>`, `MustValidationResult`, `InlineMustValidator<T>`) | **Unblocks**: Phases 3–4 reuse the scope-onboarding procedure this phase proves
+> **Status**: Completed — all units merged to main; see new-surfaces-orchestration.md | **Depends on**: Phase 1 (`IMustValidator<T>`, `MustValidationResult`, `InlineMustValidator<T>`) | **Unblocks**: Phases 3–4 reuse the scope-onboarding procedure this phase proves
 >
 > **Worktree**: `.claude/worktrees/options` on `feature/options`.
 >

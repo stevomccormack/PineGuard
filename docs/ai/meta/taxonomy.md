@@ -105,7 +105,8 @@ Make PineGuard’s AI documentation:
 - **Used by**: Humans and agents scoping multi-step work.
 - **Rule**: Every plan carries a `metadata_header` with `type: plan`, a stable `id:`, and a
   `status:` of `active`, `planned`, `living`, `non-binding`, `open` (decisions awaiting an
-  owner's call) or `completed`. A plan filed under `plans/completed/` is always `completed`.
+  owner's call), `superseded` (a plan whose deliverables were produced by another plan, retained
+  for its rationale) or `completed`. A plan filed under `plans/completed/` is always `completed`.
 - **Rule**: Everything under `plans/completed/` is a **historical record** — read it for
   provenance, never as a task list. When an archived plan has become misleading, add an archival
   banner saying what actually shipped; do not rewrite it and do not repair its links.

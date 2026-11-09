@@ -11,32 +11,212 @@ public sealed class MustStringDateOnlyClausesTests(ITestOutputHelper output) : B
     [MemberData(nameof(MustStringDateOnlyClausesTestData.PastDateOnly.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.PastDateOnly))]
     public void PastDateOnly_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.PastDateOnly(tc.Value, paramName: "value");
+        // Act
+        var result = Must.Be.PastDateOnly(tc.Value, timeProvider: FixedTimeProvider.Default, paramName: "value");
+
+        // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.PastDateOnlyAcrossTimeZones.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.PastDateOnlyAcrossTimeZones))]
+    public void PastDateOnlyAcrossTimeZones_BehavesAsExpected(MustCase<(string? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.PastDateOnly(value, timeProvider: timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.PastDateOnlyReferenceProjection.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.PastDateOnlyReferenceProjection))]
+    public void PastDateOnlyReferenceProjection_BehavesAsExpected(MustCase<(string? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.PastDateOnly(value, timeProvider: timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.PastDateOnlyClockReads.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.PastDateOnlyClockReads))]
+    public void PastDateOnly_ReadsTheClockAsExpected(MustStringDateOnlyClausesTestData.PastDateOnlyClockReads.ClockReadCase tc)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        Must.Be.PastDateOnly(tc.Value, timeProvider: provider, paramName: "value");
+
+        // Assert
+        Assert.Equal(tc.Expected, provider.UtcNowCallCount);
     }
 
     [Theory]
     [MemberData(nameof(MustStringDateOnlyClausesTestData.PastOrPresentDateOnly.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.PastOrPresentDateOnly))]
     public void PastOrPresentDateOnly_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.PastOrPresentDateOnly(tc.Value, paramName: "value");
+        // Act
+        var result = Must.Be.PastOrPresentDateOnly(tc.Value, timeProvider: FixedTimeProvider.Default, paramName: "value");
+
+        // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.PastOrPresentDateOnlyAcrossTimeZones.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.PastOrPresentDateOnlyAcrossTimeZones))]
+    public void PastOrPresentDateOnlyAcrossTimeZones_BehavesAsExpected(MustCase<(string? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.PastOrPresentDateOnly(value, timeProvider: timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.PastOrPresentDateOnlyReferenceProjection.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.PastOrPresentDateOnlyReferenceProjection))]
+    public void PastOrPresentDateOnlyReferenceProjection_BehavesAsExpected(MustCase<(string? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.PastOrPresentDateOnly(value, timeProvider: timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.PastOrPresentDateOnlyClockReads.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.PastOrPresentDateOnlyClockReads))]
+    public void PastOrPresentDateOnly_ReadsTheClockAsExpected(MustStringDateOnlyClausesTestData.PastOrPresentDateOnlyClockReads.ClockReadCase tc)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        Must.Be.PastOrPresentDateOnly(tc.Value, timeProvider: provider, paramName: "value");
+
+        // Assert
+        Assert.Equal(tc.Expected, provider.UtcNowCallCount);
     }
 
     [Theory]
     [MemberData(nameof(MustStringDateOnlyClausesTestData.FutureDateOnly.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.FutureDateOnly))]
     public void FutureDateOnly_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.FutureDateOnly(tc.Value, paramName: "value");
+        // Act
+        var result = Must.Be.FutureDateOnly(tc.Value, timeProvider: FixedTimeProvider.Default, paramName: "value");
+
+        // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.FutureDateOnlyAcrossTimeZones.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.FutureDateOnlyAcrossTimeZones))]
+    public void FutureDateOnlyAcrossTimeZones_BehavesAsExpected(MustCase<(string? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.FutureDateOnly(value, timeProvider: timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.FutureDateOnlyReferenceProjection.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.FutureDateOnlyReferenceProjection))]
+    public void FutureDateOnlyReferenceProjection_BehavesAsExpected(MustCase<(string? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.FutureDateOnly(value, timeProvider: timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.FutureDateOnlyClockReads.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.FutureDateOnlyClockReads))]
+    public void FutureDateOnly_ReadsTheClockAsExpected(MustStringDateOnlyClausesTestData.FutureDateOnlyClockReads.ClockReadCase tc)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        Must.Be.FutureDateOnly(tc.Value, timeProvider: provider, paramName: "value");
+
+        // Assert
+        Assert.Equal(tc.Expected, provider.UtcNowCallCount);
     }
 
     [Theory]
     [MemberData(nameof(MustStringDateOnlyClausesTestData.FutureOrPresentDateOnly.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.FutureOrPresentDateOnly))]
     public void FutureOrPresentDateOnly_BehavesAsExpected(MustCase<string?> tc)
     {
-        var result = Must.Be.FutureOrPresentDateOnly(tc.Value, paramName: "value");
+        // Act
+        var result = Must.Be.FutureOrPresentDateOnly(tc.Value, timeProvider: FixedTimeProvider.Default, paramName: "value");
+
+        // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.FutureOrPresentDateOnlyAcrossTimeZones.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.FutureOrPresentDateOnlyAcrossTimeZones))]
+    public void FutureOrPresentDateOnlyAcrossTimeZones_BehavesAsExpected(MustCase<(string? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.FutureOrPresentDateOnly(value, timeProvider: timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.FutureOrPresentDateOnlyReferenceProjection.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.FutureOrPresentDateOnlyReferenceProjection))]
+    public void FutureOrPresentDateOnlyReferenceProjection_BehavesAsExpected(MustCase<(string? value, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.FutureOrPresentDateOnly(value, timeProvider: timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.FutureOrPresentDateOnlyClockReads.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.FutureOrPresentDateOnlyClockReads))]
+    public void FutureOrPresentDateOnly_ReadsTheClockAsExpected(MustStringDateOnlyClausesTestData.FutureOrPresentDateOnlyClockReads.ClockReadCase tc)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        Must.Be.FutureOrPresentDateOnly(tc.Value, timeProvider: provider, paramName: "value");
+
+        // Assert
+        Assert.Equal(tc.Expected, provider.UtcNowCallCount);
     }
 
     [Theory]
@@ -232,6 +412,34 @@ public sealed class MustStringDateOnlyClausesTests(ITestOutputHelper output) : B
 
         // Assert
         AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.MinimumAgeReferenceProjection.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.MinimumAgeReferenceProjection))]
+    public void MinimumAgeReferenceProjection_BehavesAsExpected(MustCase<(string? value, int years, TimeProvider timeProvider)> tc)
+    {
+        // Arrange
+        var (value, years, timeProvider) = tc.Value;
+
+        // Act
+        var result = Must.Be.MinimumAgeDateOnly(value, years, timeProvider: timeProvider, paramName: "value");
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustStringDateOnlyClausesTestData.MinimumAgeClockReads.Cases), MemberType = typeof(MustStringDateOnlyClausesTestData.MinimumAgeClockReads))]
+    public void MinimumAge_ReadsTheClockAsExpected(MustStringDateOnlyClausesTestData.MinimumAgeClockReads.ClockReadCase tc)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        Must.Be.MinimumAgeDateOnly(tc.Value, 18, timeProvider: provider, paramName: "value");
+
+        // Assert
+        Assert.Equal(tc.Expected, provider.UtcNowCallCount);
     }
 
     [Theory]

@@ -88,6 +88,21 @@ Two consequences for this document:
    Guard, FluentValidation, DataAnnotations and XML where applicable, including result type,
    parameter shape, failure code and TFM. The examples below do not substitute for that inventory.
 
+## Integration with temporal Phase 1
+
+The scalar TimeOnly range predicates use `start` / `end` and support midnight crossing
+when `start > end`, as specified by temporal Phase 1. Their names are `IsInRange` in Core,
+`InRange` / `OutOfRange` on typed Must/Guard, and `InRangeTimeOnly` / `OutOfRangeTimeOnly`
+on string-input clauses. DateOnly, DateTime and DateTimeOffset bounds remain `min` / `max`.
+`TimeOnlyRange` remains a linear range object under P3; scalar midnight wrapping does not
+change its set model. This reconciles A-3/A-8 vocabulary with temporal U3 semantics.
+
+Duration comparisons honor the later temporal D-16 domain vocabulary: typed
+`LongerThan` / `ShorterThan`, string-input `LongerThanTimeSpan` / `ShorterThanTimeSpan`,
+and Core `IsLongerThan` / `IsShorterThan`. The single-bound parameter remains `other`.
+This supersedes GreaterThan/LessThan duration examples in the original findings below,
+without changing numeric comparison vocabulary or introducing aliases.
+
 ## How to read an entry
 
 Every entry states the defect, a concrete consequence, and either the fix or the options.

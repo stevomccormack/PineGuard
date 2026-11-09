@@ -6,26 +6,30 @@ namespace PineGuard.GuardClauses.UnitTests;
 
 public static class GuardStringTimeOnlyClausesTestData
 {
-    private static readonly TimeOnly T1000 = F.StringTimeOnly.IsInRange.InRangeInclusive.min;
-    private static readonly TimeOnly T1200 = F.StringTimeOnly.IsInRange.InRangeInclusive.max;
+    private static readonly TimeOnly T1000 = F.StringTimeOnly.IsInRange.InRangeInclusive.start;
+    private static readonly TimeOnly T1200 = F.StringTimeOnly.IsInRange.InRangeInclusive.end;
 
     public static class OutOfRangeTimeOnly
     {
-        public static TheoryData<GuardCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases =>
+        public static TheoryData<GuardCase<(string? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>> Cases =>
         [
             new("in-range", ("11:00", T1000, T1200, Inclusion.Inclusive), new GuardExpected(true)),
             new("out-of-range", ("09:00", T1000, T1200, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value")),
-            new("null-value", (null, T1000, T1200, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentNullException), "value"))
+            new("null-value", (null, T1000, T1200, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentNullException), "value")),
+            new("wrap-inside", ("23:00", T1200, T1000, Inclusion.Inclusive), new GuardExpected(true)),
+            new("wrap-outside", ("11:00", T1200, T1000, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 
     public static class InRangeTimeOnly
     {
-        public static TheoryData<GuardCase<(string? value, TimeOnly min, TimeOnly max, Inclusion inclusion)>> Cases =>
+        public static TheoryData<GuardCase<(string? value, TimeOnly start, TimeOnly end, Inclusion inclusion)>> Cases =>
         [
             new("out-of-range", ("09:00", T1000, T1200, Inclusion.Inclusive), new GuardExpected(true)),
             new("in-range", ("11:00", T1000, T1200, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value")),
-            new("null-value", (null, T1000, T1200, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentNullException), "value"))
+            new("null-value", (null, T1000, T1200, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentNullException), "value")),
+            new("wrap-outside", ("11:00", T1200, T1000, Inclusion.Inclusive), new GuardExpected(true)),
+            new("wrap-inside", ("23:00", T1200, T1000, Inclusion.Inclusive), new GuardExpected(false, typeof(ArgumentException), "value"))
         ];
     }
 

@@ -30,6 +30,22 @@ public sealed class FluentStringTimeOnlyExtensionsTests(ITestOutputHelper output
     public void OutOfRangeTimeOnly_BehavesAsExpected(FluentCase<string?> tc)
     { AssertResult(tc, new OutOfRangeTimeOnlyValidator().Validate(new Model { Value = tc.Value })); }
 
+    private sealed class InRangeTimeOnlyWrapValidator : AbstractValidator<Model>
+    { public InRangeTimeOnlyWrapValidator() => RuleFor(x => x.Value).InRangeTimeOnly(new TimeOnly(22, 0), new TimeOnly(2, 0)); }
+
+    [Theory]
+    [MemberData(nameof(FluentStringTimeOnlyExtensionsTestData.InRangeTimeOnlyWrap.Cases), MemberType = typeof(FluentStringTimeOnlyExtensionsTestData.InRangeTimeOnlyWrap))]
+    public void InRangeTimeOnlyWrap_BehavesAsExpected(FluentCase<string?> tc)
+    { AssertResult(tc, new InRangeTimeOnlyWrapValidator().Validate(new Model { Value = tc.Value })); }
+
+    private sealed class OutOfRangeTimeOnlyWrapValidator : AbstractValidator<Model>
+    { public OutOfRangeTimeOnlyWrapValidator() => RuleFor(x => x.Value).OutOfRangeTimeOnly(new TimeOnly(22, 0), new TimeOnly(2, 0)); }
+
+    [Theory]
+    [MemberData(nameof(FluentStringTimeOnlyExtensionsTestData.OutOfRangeTimeOnlyWrap.Cases), MemberType = typeof(FluentStringTimeOnlyExtensionsTestData.OutOfRangeTimeOnlyWrap))]
+    public void OutOfRangeTimeOnlyWrap_BehavesAsExpected(FluentCase<string?> tc)
+    { AssertResult(tc, new OutOfRangeTimeOnlyWrapValidator().Validate(new Model { Value = tc.Value })); }
+
     private sealed class WithinTimeOnlyValidator : AbstractValidator<Model>
     { public WithinTimeOnlyValidator() => RuleFor(x => x.Value).WithinTimeOnly(S1200, TimeSpan.FromMinutes(30)); }
 

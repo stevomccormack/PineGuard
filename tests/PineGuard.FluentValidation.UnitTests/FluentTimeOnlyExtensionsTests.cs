@@ -15,6 +15,8 @@ public sealed class FluentTimeOnlyExtensionsTests(ITestOutputHelper output) : Ba
 
     private sealed class InRangeValidator : AbstractValidator<Model> { public InRangeValidator() => RuleFor(x => x.Value).InRange(RefMinus1, RefPlus1); }
     private sealed class OutOfRangeValidator : AbstractValidator<Model> { public OutOfRangeValidator() => RuleFor(x => x.Value).OutOfRange(RefMinus1, RefPlus1); }
+    private sealed class InRangeWrapValidator : AbstractValidator<Model> { public InRangeWrapValidator() => RuleFor(x => x.Value).InRange(new TimeOnly(22, 0), new TimeOnly(2, 0)); }
+    private sealed class OutOfRangeWrapValidator : AbstractValidator<Model> { public OutOfRangeWrapValidator() => RuleFor(x => x.Value).OutOfRange(new TimeOnly(22, 0), new TimeOnly(2, 0)); }
     private sealed class BeforeValidator : AbstractValidator<Model> { public BeforeValidator() => RuleFor(x => x.Value).Before(Ref); }
     private sealed class NotBeforeValidator : AbstractValidator<Model> { public NotBeforeValidator() => RuleFor(x => x.Value).NotBefore(Ref); }
     private sealed class OnOrBeforeValidator : AbstractValidator<Model> { public OnOrBeforeValidator() => RuleFor(x => x.Value).OnOrBefore(Ref); }
@@ -41,6 +43,16 @@ public sealed class FluentTimeOnlyExtensionsTests(ITestOutputHelper output) : Ba
     [MemberData(nameof(FluentTimeOnlyExtensionsTestData.OutOfRange.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.OutOfRange))]
     public void OutOfRange_BehavesAsExpected(FluentCase<TimeOnly?> tc)
     { AssertResult(tc, new OutOfRangeValidator().Validate(new Model { Value = tc.Value })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.InRangeWrap.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.InRangeWrap))]
+    public void InRangeWrap_BehavesAsExpected(FluentCase<TimeOnly?> tc)
+    { AssertResult(tc, new InRangeWrapValidator().Validate(new Model { Value = tc.Value })); }
+
+    [Theory]
+    [MemberData(nameof(FluentTimeOnlyExtensionsTestData.OutOfRangeWrap.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.OutOfRangeWrap))]
+    public void OutOfRangeWrap_BehavesAsExpected(FluentCase<TimeOnly?> tc)
+    { AssertResult(tc, new OutOfRangeWrapValidator().Validate(new Model { Value = tc.Value })); }
 
     [Theory]
     [MemberData(nameof(FluentTimeOnlyExtensionsTestData.Before.Cases), MemberType = typeof(FluentTimeOnlyExtensionsTestData.Before))]

@@ -141,7 +141,14 @@ Guard applies the existing semantic opposite before the parsed-type suffix:
 `OutOfRangeInt32` calls `InRangeInt32`. Temporal equality boundaries remain explicit; `Past`
 and `Future` are not strict complements at the reference instant.
 
-Single-bound comparisons use `other`; two-bound comparisons use `min` / `max`. Required bounds
+Duration comparisons use the domain words `LongerThan` / `ShorterThan` (temporal D-16).
+Typed clauses retain those names; string-input clauses use `LongerThanTimeSpan` /
+`ShorterThanTimeSpan`. Core uses `IsLongerThan` / `IsShorterThan` within its TimeSpan context.
+This domain vocabulary and the parsed-type suffix convention apply together.
+
+Single-bound comparisons use `other`; linear two-bound comparisons use `min` / `max`.
+Wrapping scalar TimeOnly windows use `start` / `end`; the linear `TimeOnlyRange` object
+retains its ordered-endpoint contract. Required bounds
 are configuration, not optional validated values. Explicit nullable peer/equality contracts such
 as `IsSame` are separate and must document their null semantics.
 

@@ -93,8 +93,8 @@ public static class TemporalConfigurationTestData
             new("DateTimeOffset.IsInPast", () => DateTimeOffsetRules.IsInPast(null, (Inclusion)42), new ExpectedException(typeof(ArgumentOutOfRangeException), "inclusion")),
             new("DateTimeOffset.IsInFuture", () => DateTimeOffsetRules.IsInFuture(null, (Inclusion)42), new ExpectedException(typeof(ArgumentOutOfRangeException), "inclusion")),
             new("TimeSpan.IsInRange", () => TimeSpanRules.IsInRange(null, default, default, (Inclusion)42), new ExpectedException(typeof(ArgumentOutOfRangeException), "inclusion")),
-            new("TimeSpan.IsGreaterThan", () => TimeSpanRules.IsGreaterThan(null, default, (Inclusion)42), new ExpectedException(typeof(ArgumentOutOfRangeException), "inclusion")),
-            new("TimeSpan.IsLessThan", () => TimeSpanRules.IsLessThan(null, default, (Inclusion)42), new ExpectedException(typeof(ArgumentOutOfRangeException), "inclusion"))
+            new("TimeSpan.IsLongerThan", () => TimeSpanRules.IsLongerThan(null, default, (Inclusion)42), new ExpectedException(typeof(ArgumentOutOfRangeException), "inclusion")),
+            new("TimeSpan.IsShorterThan", () => TimeSpanRules.IsShorterThan(null, default, (Inclusion)42), new ExpectedException(typeof(ArgumentOutOfRangeException), "inclusion"))
         ];
         public sealed record Case(string Name, Action Value, ExpectedException ExpectedException)
             : ThrowsCase<Action>(Name, Value, ExpectedException);

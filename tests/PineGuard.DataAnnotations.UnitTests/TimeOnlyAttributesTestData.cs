@@ -32,6 +32,26 @@ public static class TimeOnlyAttributesTestData
         ];
     }
 
+    public static class InRangeTimeOnlyWrap
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("inside", new TimeOnly(23, 0), new DataAnnotationExpected(true)),
+            new("outside", new TimeOnly(12, 0), new DataAnnotationExpected(false, "Value must be within the expected range.")),
+            new("null", null, new DataAnnotationExpected(true))
+        ];
+    }
+
+    public static class OutOfRangeTimeOnlyWrap
+    {
+        public static TheoryData<DataAnnotationCase> Cases =>
+        [
+            new("outside", new TimeOnly(12, 0), new DataAnnotationExpected(true)),
+            new("inside", new TimeOnly(23, 0), new DataAnnotationExpected(false, "Value must not be within the expected range.")),
+            new("null", null, new DataAnnotationExpected(true))
+        ];
+    }
+
     public static class BeforeTimeOnly
     {
         public static TheoryData<DataAnnotationCase> Cases =>

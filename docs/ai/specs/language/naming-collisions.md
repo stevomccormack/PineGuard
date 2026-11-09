@@ -26,6 +26,24 @@ Priorities:
 3. Prefer explicitness over mechanical parity with Must naming.
 4. Do not rely on documentation to rescue an ambiguous public API.
 
+## Flattened Must and Guard surfaces
+
+Extension methods on `IMustClause` share the `Must.Be` overload set; methods on
+`IGuardClause` share `Guard.Against`. Separate declaring classes do not isolate those
+call sites. Review the complete imported surface, including optional arguments, generic
+inference, nullable inputs and implicit conversions. Return types and generic constraints
+alone cannot distinguish otherwise identical C# signatures.
+
+Use the [shared vocabulary](vocabulary.md) for parsed-type suffixes, range pairs and
+domain terms. Confirm overload binding with consumer compilation, including typed values,
+strings, named arguments and representative null/default calls. Check the expected return
+type and selected overload as well as whether a call compiles. Adapter differences require
+a documented framework or representation reason.
+
+Hostname is `NetworkRules.IsHostname`, `Must.Be.Hostname`, `Guard.Against.NotHostname`,
+Fluent `Hostname` and `[Hostname]`; the opposite clauses keep the corresponding forbidden
+or required-state meaning. There is no `IsValidHostname` compatibility alias.
+
 ## DataAnnotations
 
 For `PineGuard.DataAnnotations`, compare public attribute usage names after dropping the `Attribute` suffix.

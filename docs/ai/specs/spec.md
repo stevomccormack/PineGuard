@@ -350,16 +350,17 @@ AI output should be concise, factual, and engineering-focused:
 
 - Prefer small, surgical changes.
 - Avoid unrelated reformatting.
-- Keep public APIs stable unless explicitly asked to change.
+- Keep API changes within the requested scope; apply the greenfield policy in §6.4.
 
 ### 6.4 Temporary policy: greenfield foundational changes
 
-PineGuard is currently treated as a **greenfield** codebase for foundational work.
+PineGuard is currently designed as a **greenfield** codebase for all API work (owner reaffirmation, 2026-11-08). Backward compatibility is not a design constraint.
 
 Implications (temporary):
 
-- For major, cross-cutting decisions (e.g., solution-wide nullable adoption, reshaping Rule signatures), we may make **breaking API changes** without preserving backward/binary compatibility.
-- During this phase, **do not add** `[Obsolete]` attributes purely to maintain compatibility; we have full control of consumers.
+- Choose the correct names, signatures and behavior directly. Do not defer changes to a major release for source or binary compatibility.
+- Delete replaced members and update affected callers, tests, specifications, examples and related plans in the same change. Do not retain compatibility aliases, `[Obsolete]` forwarders or dual implementations.
+- Documentation alignment is part of completion: inspect inbound references and remove stale names, statuses and restrictions. Keep old names only in clearly labelled historical evidence or rename mappings.
 - Still aim for a **consistent and coherent** public surface (symmetry, naming, null semantics), but prefer the simplest correct API over compatibility scaffolding.
 
 Note on generics:
@@ -371,8 +372,8 @@ Note on generics:
 
 Exit criteria:
 
-- Once the foundational change is implemented and agreed (e.g., nullable policy stabilized), this temporary policy ends.
-- From that point forward, treat public APIs as **stable by default** again: avoid breaking changes unless explicitly approved, and use normal deprecation patterns only when/if needed.
+- This policy remains in force until the owner explicitly replaces it. Completing an individual foundational change does not end it.
+- Revisit compatibility policy at first release; do not apply a future compatibility policy to current design.
 
 ---
 

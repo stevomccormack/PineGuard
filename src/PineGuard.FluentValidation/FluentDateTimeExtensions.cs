@@ -610,7 +610,10 @@ public static class FluentDateTimeExtensions
     /// <typeparam name="TModel">The type of the model being validated.</typeparam>
     /// <param name="ruleBuilder">The FluentValidation rule builder to extend.</param>
     /// <param name="years">The minimum age in whole years.</param>
-    /// <param name="timeProvider">The clock that supplies today's date. If <see langword="null"/>, the system clock is used.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
     /// <remarks>A negative <paramref name="years"/> is a configuration error, reported against that parameter.</remarks>

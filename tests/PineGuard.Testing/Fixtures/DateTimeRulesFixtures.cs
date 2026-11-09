@@ -36,6 +36,7 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantInclusive = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantExclusive = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionDay = (new DateTime(2024, 01, 01, 12, 59, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, DateTimePrecision.Day);
+        public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionMicrosecond = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(8), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(5), Inclusion.Inclusive, DateTimePrecision.Microsecond);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionUnknown = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, (DateTimePrecision)999);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) ImplicitLocalVsUtc = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Local), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) NullValue = (null, new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
@@ -46,6 +47,7 @@ public static class DateTimeRulesFixtures
             new(nameof(BeforeInclusive), BeforeInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
             new(nameof(PrecisionDay), PrecisionDay, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true),
             new(nameof(ImplicitLocalVsUtc), ImplicitLocalVsUtc, true)
         ];
 
@@ -84,6 +86,7 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantInclusive = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) SameInstantExclusive = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Exclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionDay = (new DateTime(2020, 01, 02, 23, 59, 59, DateTimeKind.Utc), new DateTime(2020, 01, 01, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, DateTimePrecision.Day);
+        public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionMicrosecond = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(5), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(8), Inclusion.Inclusive, DateTimePrecision.Microsecond);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) PrecisionUnknown = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, (DateTimePrecision)999);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) NullValue = (null, new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), Inclusion.Inclusive, null);
         public static readonly (DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision) NullOther = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), null, Inclusion.Inclusive, null);
@@ -92,7 +95,8 @@ public static class DateTimeRulesFixtures
         [
             new(nameof(AfterInclusive), AfterInclusive, true),
             new(nameof(SameInstantInclusive), SameInstantInclusive, true),
-            new(nameof(PrecisionDay), PrecisionDay, true)
+            new(nameof(PrecisionDay), PrecisionDay, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true)
         ];
 
         public static RuleScenario<(DateTime? value, DateTime? other, Inclusion inclusion, DateTimePrecision? precision)>[] InvalidScenarios =>
@@ -129,6 +133,7 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) SameUtc = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), null);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) UnspecifiedVsUtc = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), null);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) PrecisionHour = (new DateTime(2020, 01, 01, 10, 59, 59, DateTimeKind.Utc), new DateTime(2020, 01, 01, 10, 0, 0, DateTimeKind.Utc), DateTimePrecision.Hour);
+        public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) PrecisionMicrosecond = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(5), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc).AddTicks(8), DateTimePrecision.Microsecond);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) BothNull = (null, null, null);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) Different = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 03, 0, 0, 0, DateTimeKind.Utc), null);
         public static readonly (DateTime? value, DateTime? other, DateTimePrecision? precision) PrecisionUnknown = (new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc), (DateTimePrecision)999);
@@ -140,6 +145,7 @@ public static class DateTimeRulesFixtures
             new(nameof(SameUtc), SameUtc, true),
             new(nameof(UnspecifiedVsUtc), UnspecifiedVsUtc, true),
             new(nameof(PrecisionHour), PrecisionHour, true),
+            new(nameof(PrecisionMicrosecond), PrecisionMicrosecond, true),
             new(nameof(BothNull), BothNull, true)
         ];
 
@@ -356,16 +362,23 @@ public static class DateTimeRulesFixtures
     {
         public static readonly (DateTime? value, DateTime? other) SameDay = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 23, 59, 59, DateTimeKind.Utc));
         public static readonly (DateTime? value, DateTime? other) DifferentDay = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 02, 0, 0, 0, DateTimeKind.Utc));
-        public static readonly (DateTime? value, DateTime? other) SameInstantDifferentKind = (new DateTime(2024, 01, 01, 12, 0, 0, DateTimeKind.Utc), new DateTime(2024, 01, 01, 12, 0, 0, DateTimeKind.Utc).ToLocalTime());
+        public static readonly (DateTime? value, DateTime? other) SameWallClockDifferentKind = (new DateTime(2024, 01, 01, 12, 0, 0, DateTimeKind.Utc), DateTime.SpecifyKind(new DateTime(2024, 01, 01, 12, 0, 0), DateTimeKind.Local));
         public static readonly (DateTime? value, DateTime? other) BothNull = (null, null);
         public static readonly (DateTime? value, DateTime? other) NullValue = (null, new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc));
         public static readonly (DateTime? value, DateTime? other) NullOther = (new DateTime(2024, 01, 01, 0, 0, 0, DateTimeKind.Utc), null);
 
+        // D-2: neither side is converted, so a Kind pairing that was never normalised the same way pre-fix
+        // (Unspecified/Utc were both left alone; Local was silently host-converted) is now a stable fixture.
+        public static readonly (DateTime? value, DateTime? other) MixedKindUnspecifiedAndUtcSameDate = (new DateTime(2026, 06, 15, 23, 30, 0, DateTimeKind.Unspecified), new DateTime(2026, 06, 15, 05, 00, 0, DateTimeKind.Utc));
+        public static readonly (DateTime? value, DateTime? other) MixedKindLocalAndUnspecifiedNowDeterministic = (new DateTime(2026, 06, 15, 23, 30, 0, DateTimeKind.Local), new DateTime(2026, 06, 15, 23, 30, 0, DateTimeKind.Unspecified));
+
         public static RuleScenario<(DateTime? value, DateTime? other)>[] ValidScenarios =>
         [
             new(nameof(SameDay), SameDay, true),
-            new(nameof(SameInstantDifferentKind), SameInstantDifferentKind, true),
-            new(nameof(BothNull), BothNull, true)
+            new(nameof(SameWallClockDifferentKind), SameWallClockDifferentKind, true),
+            new(nameof(BothNull), BothNull, true),
+            new(nameof(MixedKindUnspecifiedAndUtcSameDate), MixedKindUnspecifiedAndUtcSameDate, true),
+            new(nameof(MixedKindLocalAndUnspecifiedNowDeterministic), MixedKindLocalAndUnspecifiedNowDeterministic, true)
         ];
 
         public static RuleScenario<(DateTime? value, DateTime? other)>[] InvalidScenarios =>
@@ -501,12 +514,36 @@ public static class DateTimeRulesFixtures
         public static readonly (DateTime? value, int years) NegativeYears = (Today.AddYears(-40), -1);
         public static readonly (DateTime? value, int years) YearsBeyondTheCalendar = (Today.AddYears(-40), Today.Year);
 
+        // D-1: the birth date's own Kind never converts — Unspecified, Utc and Local at the same wall
+        // instant now all read the same completed age.
+        public static readonly (DateTime? value, int years) UnspecifiedAtDefault = (new DateTime(2008, 06, 15, 0, 0, 0, DateTimeKind.Unspecified), 18);
+        public static readonly (DateTime? value, int years) UtcKindAtDefault = (new DateTime(2008, 06, 15, 0, 0, 0, DateTimeKind.Utc), 18);
+        public static readonly (DateTime? value, int years) LocalKindAtDefault = (new DateTime(2008, 06, 15, 0, 0, 0, DateTimeKind.Local), 18);
+
         public static RuleScenario<(DateTime? value, int years)>[] ValidScenarios => [new(nameof(WellOverAge), WellOverAge, true), new(nameof(TurnedEighteenYesterday), TurnedEighteenYesterday, true)];
-        public static RuleScenario<(DateTime? value, int years)>[] ValidEdgeScenarios => [new(nameof(TurnsEighteenToday), TurnsEighteenToday, true), new(nameof(TurnsEighteenTodayLateInTheDay), TurnsEighteenTodayLateInTheDay, true), new(nameof(BornTodayNoMinimum), BornTodayNoMinimum, true), new(nameof(LocalKindWellOverAge), LocalKindWellOverAge, true)];
+        public static RuleScenario<(DateTime? value, int years)>[] ValidEdgeScenarios => [new(nameof(TurnsEighteenToday), TurnsEighteenToday, true), new(nameof(TurnsEighteenTodayLateInTheDay), TurnsEighteenTodayLateInTheDay, true), new(nameof(BornTodayNoMinimum), BornTodayNoMinimum, true), new(nameof(LocalKindWellOverAge), LocalKindWellOverAge, true), new(nameof(UnspecifiedAtDefault), UnspecifiedAtDefault, true), new(nameof(UtcKindAtDefault), UtcKindAtDefault, true), new(nameof(LocalKindAtDefault), LocalKindAtDefault, true)];
         public static RuleScenario<(DateTime? value, int years)>[] InvalidScenarios => [new(nameof(WellUnderAge), WellUnderAge, false), new(nameof(NullValue), NullValue, false)];
         public static RuleScenario<(DateTime? value, int years)>[] InvalidEdgeScenarios => [new(nameof(TurnsEighteenTomorrow), TurnsEighteenTomorrow, false), new(nameof(NotYetBorn), NotYetBorn, false), new(nameof(NegativeYears), NegativeYears, false), new(nameof(YearsBeyondTheCalendar), YearsBeyondTheCalendar, false)];
         public static RuleScenario<(DateTime? value, int years)>[] AllValid => [.. ValidScenarios, .. ValidEdgeScenarios];
         public static RuleScenario<(DateTime? value, int years)>[] AllInvalid => [.. InvalidScenarios, .. InvalidEdgeScenarios];
         public static RuleScenario<(DateTime? value, int years)>[] AllScenarios => [.. AllValid, .. AllInvalid];
+    }
+
+    // D-1: HasMinimumAge scenarios that require a non-Default clock, including the two named boundary
+    // reversals the today-derivation fix intentionally changes (T-01 U2 acceptance report call-out).
+    public static class HasMinimumAgeAcrossTimeZones
+    {
+        public static readonly (DateTime? value, int years, TimeProvider timeProvider) UnspecifiedBoundaryAheadOfUtc = (new DateTime(2008, 06, 16, 0, 0, 0, DateTimeKind.Unspecified), 18, FixedTimeProvider.DefaultAheadOfUtc);
+        public static readonly (DateTime? value, int years, TimeProvider timeProvider) UtcKindNoLongerConvertedAheadOfUtc = (new DateTime(2008, 06, 16, 20, 0, 0, DateTimeKind.Utc), 18, FixedTimeProvider.DefaultAheadOfUtc);
+        public static readonly (DateTime? value, int years, TimeProvider timeProvider) OneDayShortBehindUtc = (new DateTime(2008, 06, 15, 02, 0, 0, DateTimeKind.Utc), 18, FixedTimeProvider.DefaultBehindUtc);
+
+        public static RuleScenario<(DateTime? value, int years, TimeProvider timeProvider)>[] ValidScenarios =>
+        [
+            new(nameof(UnspecifiedBoundaryAheadOfUtc), UnspecifiedBoundaryAheadOfUtc, true),
+            new(nameof(UtcKindNoLongerConvertedAheadOfUtc), UtcKindNoLongerConvertedAheadOfUtc, true)
+        ];
+
+        public static RuleScenario<(DateTime? value, int years, TimeProvider timeProvider)>[] InvalidScenarios => [new(nameof(OneDayShortBehindUtc), OneDayShortBehindUtc, false)];
+        public static RuleScenario<(DateTime? value, int years, TimeProvider timeProvider)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 }

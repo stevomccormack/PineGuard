@@ -14,6 +14,14 @@ public static class DateOnlyRulesTestData
 
     private static readonly DateOnly LeapDayBirth = new(2008, 02, 29);
 
+    // A zone exactly at the ±14h boundary DateTimeOffsetUtility.TryGetDateAtOffset enforces, paired with an
+    // instant at the corresponding DateTimeOffset extreme, so the guarded reference projection fails on
+    // tick range representability, not on the offset check.
+    private static readonly TimeZoneInfo ProjectionFailsZone = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.Rules.DateOnly.MinusFourteen", TimeSpan.FromHours(-14), "PineGuard Test -14", "PineGuard Test -14");
+    private static readonly TimeProvider ProjectionFailsProvider = new FixedTimeProvider(DateTimeOffset.MinValue, ProjectionFailsZone);
+    private static readonly TimeZoneInfo ProjectionFailsMaxZone = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.Rules.DateOnly.PlusFourteen", TimeSpan.FromHours(14), "PineGuard Test +14", "PineGuard Test +14");
+    private static readonly TimeProvider ProjectionFailsMaxProvider = new FixedTimeProvider(DateTimeOffset.MaxValue, ProjectionFailsMaxZone);
+
     public static class IsInPast
     {
         public static TheoryData<RuleCase<DateOnly?>> Cases =>
@@ -28,6 +36,20 @@ public static class DateOnlyRulesTestData
     public static class IsInPastSystemClock
     {
         public static TheoryData<RuleCase<DateOnly?>> Cases => F.IsPast.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsInPastAcrossTimeZones
+    {
+        public static TheoryData<RuleCase<(DateOnly? value, TimeProvider timeProvider)>> Cases => F.IsInPastAcrossTimeZones.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsInPastReferenceProjection
+    {
+        public static TheoryData<RuleCase<(DateOnly? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new RuleCase<(DateOnly? value, TimeProvider timeProvider)>("MinValueUnderflow", (new DateOnly(2000, 01, 01), ProjectionFailsProvider), new RuleExpected(false)),
+            new RuleCase<(DateOnly? value, TimeProvider timeProvider)>("MaxValueOverflow", (new DateOnly(2000, 01, 01), ProjectionFailsMaxProvider), new RuleExpected(false))
+        ];
     }
 
     public static class IsInFuture
@@ -48,6 +70,20 @@ public static class DateOnlyRulesTestData
             new RuleCase<DateOnly?>(nameof(F.IsPast.FutureDate), F.IsPast.FutureDate, new RuleExpected(true)),
             new RuleCase<DateOnly?>(nameof(F.IsPast.PastDate), F.IsPast.PastDate, new RuleExpected(false)),
             new RuleCase<DateOnly?>(nameof(F.IsPast.NullValue), F.IsPast.NullValue, new RuleExpected(false))
+        ];
+    }
+
+    public static class IsInFutureAcrossTimeZones
+    {
+        public static TheoryData<RuleCase<(DateOnly? value, TimeProvider timeProvider)>> Cases => F.IsInFutureAcrossTimeZones.AllScenarios.ToRuleCases();
+    }
+
+    public static class IsInFutureReferenceProjection
+    {
+        public static TheoryData<RuleCase<(DateOnly? value, TimeProvider timeProvider)>> Cases =>
+        [
+            new RuleCase<(DateOnly? value, TimeProvider timeProvider)>("MinValueUnderflow", (new DateOnly(2000, 01, 01), ProjectionFailsProvider), new RuleExpected(false)),
+            new RuleCase<(DateOnly? value, TimeProvider timeProvider)>("MaxValueOverflow", (new DateOnly(2000, 01, 01), ProjectionFailsMaxProvider), new RuleExpected(false))
         ];
     }
 
@@ -135,6 +171,22 @@ public static class DateOnlyRulesTestData
         ];
     }
 
+    public static class HasMinimumAgeAcrossTimeZones
+    {
+        public static TheoryData<RuleCase<(DateOnly? value, int years, TimeProvider timeProvider)>> Cases => F.HasMinimumAgeAcrossTimeZones.AllScenarios.ToRuleCases();
+    }
+
+    // Proves the guarded reference derivation's failure path: when TryGetTodayDate cannot project the
+    // sampled instant, HasMinimumAge returns false rather than throwing or evaluating age.
+    public static class HasMinimumAgeReferenceProjection
+    {
+        public static TheoryData<RuleCase<(DateOnly? value, int years, TimeProvider timeProvider)>> Cases =>
+        [
+            new RuleCase<(DateOnly? value, int years, TimeProvider timeProvider)>("MinValueUnderflow", (new DateOnly(2000, 01, 01), 18, ProjectionFailsProvider), new RuleExpected(false)),
+            new RuleCase<(DateOnly? value, int years, TimeProvider timeProvider)>("MaxValueOverflow", (new DateOnly(2000, 01, 01), 18, ProjectionFailsMaxProvider), new RuleExpected(false))
+        ];
+    }
+
     public static class HasMinimumAgeOnLeapDay
     {
         // A 29-February birth date has no anniversary in a non-leap year, so each case pins its own clock:
@@ -145,6 +197,13 @@ public static class DateOnlyRulesTestData
             new RuleCase<(DateOnly? value, int years, DateTimeOffset utcNow)>("FirstOfMarchInANonLeapYear", (LeapDayBirth, 18, Noon(2026, 03, 01)), new RuleExpected(true)),
             new RuleCase<(DateOnly? value, int years, DateTimeOffset utcNow)>("TwentyNinthOfFebruaryInALeapYear", (LeapDayBirth, 20, Noon(2028, 02, 29)), new RuleExpected(true))
         ];
+    }
+
+    // Only one scenario is meaningful per predicate: proving exactly one GetUtcNow() read per call. Asserted
+    // directly against CountingTimeProvider.UtcNowCallCount in the test method, not through AssertResult.
+    public static class OneReadBehavior
+    {
+        public static TheoryData<string> Cases => ["SingleRead"];
     }
 
     private static DateTimeOffset Noon(int year, int month, int day) => new(year, month, day, 12, 0, 0, TimeSpan.Zero);

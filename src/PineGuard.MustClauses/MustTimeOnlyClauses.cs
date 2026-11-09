@@ -17,12 +17,13 @@ public static class MustTimeOnlyClauses
     private const string InvalidPrecisionMessage = "{paramName} requires a valid precision.";
 
     /// <summary>
-    /// Validates that the specified value requires a valid range.
+    /// Validates that the specified value is within the specified range, wrapping across midnight when
+    /// <paramref name="start"/> is later than <paramref name="end"/>.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="min">The minimum bound.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="start">The start of the range.</param>
+    /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
@@ -32,35 +33,33 @@ public static class MustTimeOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} requires a valid range."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/time-only">Time Only Must Clauses documentation</seealso>
     public static MustResult<TimeOnly> InRange(this IMustClause _,
         TimeOnly value,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
-        if (min > max)
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.OutOfRange, "{paramName} requires a valid range.", nameof(min), min);
-
         const string messageTemplate = "{paramName} must be within the expected range.";
 
-        var ok = TimeOnlyRules.IsInRange(value, min, max, inclusion);
+        var ok = TimeOnlyRules.IsInRange(value, start, end, inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Range.OutOfRange, messageTemplate, paramName, value, value);
     }
 
     /// <summary>
-    /// Validates that the specified value requires a valid range.
+    /// Validates that the specified value is not within the specified range, wrapping across midnight when
+    /// <paramref name="start"/> is later than <paramref name="end"/>.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="min">The minimum bound.</param>
-    /// <param name="max">The maximum bound.</param>
+    /// <param name="start">The start of the excluded range.</param>
+    /// <param name="end">The end of the excluded range.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
@@ -70,25 +69,22 @@ public static class MustTimeOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} requires a valid range."</c>
+    /// The failure message follows the pattern <c>"{paramName} must not be within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/time-only">Time Only Must Clauses documentation</seealso>
     public static MustResult<TimeOnly> OutOfRange(this IMustClause _,
         TimeOnly value,
-        TimeOnly min,
-        TimeOnly max,
+        TimeOnly start,
+        TimeOnly end,
         Inclusion inclusion = Inclusion.Inclusive,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
         if (inclusion is not Inclusion.Inclusive and not Inclusion.Exclusive)
             return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, "{paramName} must be a defined inclusion value.", nameof(inclusion), inclusion);
 
-        if (min > max)
-            return MustResult<TimeOnly>.Fail(MustCodes.Time.Range.InRange, "{paramName} requires a valid range.", nameof(min), min);
-
         const string messageTemplate = "{paramName} must not be within the expected range.";
 
-        var ok = !TimeOnlyRules.IsInRange(value, min, max, inclusion);
+        var ok = !TimeOnlyRules.IsInRange(value, start, end, inclusion);
         return MustResult<TimeOnly>.FromBool(ok, MustCodes.Time.Range.InRange, messageTemplate, paramName, value, value);
     }
 

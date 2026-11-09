@@ -2,8 +2,8 @@
 type: plan
 id: new-surfaces-program
 version: 1.3
-status: active
-last_updated: 2026-08-29
+status: completed
+last_updated: 2026-11-09
 parent: new-surfaces-missing-validation-cases
 children:
   - new-surfaces-missing-validation-cases-01-structural-validation.md
@@ -28,7 +28,7 @@ children:
 > under. This charter says what to build; that file says how the work is actually run and where
 > it currently stands.
 
-> **Status**: Active | **Author**: Fable planning pass | **Created**: 2026-08-25
+> **Status**: Completed — all units merged to main; see new-surfaces-orchestration.md | **Author**: Fable planning pass | **Created**: 2026-08-25
 >
 > **Parent**: [new-surfaces-missing-validation-cases.md](new-surfaces-missing-validation-cases.md) (Part 5 phasing).
 > **Reconciled with**: [library-expansion-roadmap.md](library-expansion-roadmap.md) (which declares itself the successor of the parent — see §2).
@@ -109,7 +109,7 @@ PineGuard's pitch is *"one rule library, every call site"*. Today that is true f
 - Eight new NuGet packages (`PineGuard.Extensions.Options`, `.DependencyInjection`, `.AspNetCore`, `.MediatR`, `.ErrorOr`, `.FluentResults`, `.OneOf`, `.Analyzers`), each with a paired `*.UnitTests` project at **100% line and 100% branch** coverage. (If the still-open bridge decision in §12 trims Phase 4 to ErrorOr-only, this becomes six packages and the `fluentresults`/`oneof` scopes are dropped everywhere.)
 - Every one of the ~550 `Must.Be.*` clauses carries a stable machine-readable code; the code catalogue is audited by a new audit rule.
 - An evaluator can write an object validator with cross-property, conditional and collection rules in the first ten minutes using only the README.
-- Zero regressions: the existing 13,698 tests per TFM keep passing; the existing public API changes only as Plan 01 §3.2 lists — additive everywhere except the Guard exception-policy redesign, which deletes members outright under §4.6.
+- Zero unintended regressions: update and pass affected tests against the approved contracts. API changes follow §4.6 and the [Core/Common implementation record](core-common-api-implementation.md); this program does not freeze superseded names or signatures.
 
 ### 3.4 Program risks
 
@@ -163,7 +163,7 @@ Anything that only exists on net8+ (`INumber<T>`, `TimeProvider` without the BCL
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\brand\pineguard-logo-128px.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\docs\brand\pineguard-icon.png" Pack="true" PackagePath="\" />
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
@@ -356,11 +356,11 @@ Precedent check (2026-08-26): libraries split between codes that name the *failu
 | `NotNull` / `Null` / `NotDefault` | `value.state.null` / `…state.not-null` / `…state.default` |
 | `EqualTo` / `NotEqualTo` | `value.equality.not-equal` / `…equality.equal` |
 | `NotNullOrWhiteSpace` / `NotNullOrEmpty` / `NotEmpty` (string) | `text.content.blank` / `…content.null-or-empty` / `…content.empty` |
-| `LengthBetween` / `ExactLength` / `LongerThan` | `text.length.out-of-range` / `…length.mismatch` / `…length.too-short` |
+| `LengthInRange` / `ExactLength` / `LongerThan` | `text.length.out-of-range` / `…length.mismatch` / `…length.too-short` |
 | `Uppercase` / `CamelCase` / `Ascii` / `DigitsOnly` / `Match` | `text.casing.not-upper` / `…casing.not-camel` / `…charset.not-ascii` / `…charset.not-digits` / `…pattern.no-match` |
 | `Positive` (number and numeric string) / `InRange` / `Even` / `MultipleOf` | `number.sign.not-positive` / `…range.out-of-range` / `…parity.odd` / `…divisibility.not-multiple` |
 | `Past` / `After` / `Weekday` / `Utc` (all temporal types) | `date.relative.not-past` / `…order.not-after` / `…calendar.not-weekday` / `…kind.not-utc` |
-| `NotEmpty` (collection) / `HasCountBetween` / `HasDistinctItems` / `Contains` | `collection.items.empty` / `…count.out-of-range` / `…items.duplicate` / `…items.missing` |
+| `NotEmpty` (collection) / `HasCountInRange` / `HasDistinctItems` / `Contains` | `collection.items.empty` / `…count.out-of-range` / `…items.duplicate` / `…items.missing` |
 | `HasKey` (both dictionary types) | `dictionary.keys.missing` |
 | `Guid` (string) / `NotEmpty` (guid) | `guid.format.invalid` / `guid.value.empty` |
 | `HttpsUrl` / `AbsoluteUri` / `HasScheme` | `uri.scheme.not-https` / `uri.form.not-absolute` / `uri.scheme.mismatch` |
@@ -595,7 +595,7 @@ The waves are **logical dependency groups, not a concurrency instruction**: the 
 - Json/Xml Core depth (roadmap Part 6) — separate plan.
 - Public validator assertion helpers in `PineGuard.Testing` (roadmap Part 8) — the package is **already published** (`tools/github/Run-Release.ps1`), so the `MustValidationResult` test family and `FixedTimeProvider` added here ship in it; a consumer-facing assertion API (`ShouldHaveFailure(...)`) is a later plan.
 - `HttpClient` response-contract validation, MassTransit/Wolverine/Mediator shims, gRPC/SignalR/Hangfire/Functions entry points — listed in Phase 3/4 as explicitly deferred.
-- Any `Core / Common API Decisions` item (`docs/ai/plans/core-common-api-decisions.md`) — those are the owner's calls and are not smuggled into these phases, even where a phase touches the same file (e.g. `IsValidHostname` is used as-is).
+- Reimplementing the [Core/Common API work](core-common-api-implementation.md) is outside these phases. Consume its approved names and contracts, including `NetworkRules.IsHostname`, and update affected examples and callers. Further redesign follows the [decision record](core-common-api-decisions.md); this scope boundary is not a compatibility freeze.
 
 ## 12. Decision log
 

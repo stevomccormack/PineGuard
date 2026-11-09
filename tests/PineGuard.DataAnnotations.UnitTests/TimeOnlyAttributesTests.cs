@@ -37,6 +37,36 @@ public sealed class TimeOnlyAttributesTests(ITestOutputHelper output) : BaseData
     }
 
     [Theory]
+    [MemberData(nameof(TimeOnlyAttributesTestData.InRangeTimeOnlyWrap.Cases), MemberType = typeof(TimeOnlyAttributesTestData.InRangeTimeOnlyWrap))]
+    public void InRangeTimeOnlyWrap_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new InRangeTimeOnlyAttribute("22:00", "02:00");
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(TimeOnlyAttributesTestData.OutOfRangeTimeOnlyWrap.Cases), MemberType = typeof(TimeOnlyAttributesTestData.OutOfRangeTimeOnlyWrap))]
+    public void OutOfRangeTimeOnlyWrap_BehavesAsExpected(DataAnnotationCase tc)
+    {
+        // Arrange
+        var attr = new OutOfRangeTimeOnlyAttribute("22:00", "02:00");
+        var ctx = new ValidationContext(new object()) { MemberName = "Value" };
+
+        // Act
+        var result = attr.GetValidationResult(tc.Value, ctx);
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
     [MemberData(nameof(TimeOnlyAttributesTestData.BeforeTimeOnly.Cases), MemberType = typeof(TimeOnlyAttributesTestData.BeforeTimeOnly))]
     public void BeforeTimeOnly_BehavesAsExpected(DataAnnotationCase tc)
     {

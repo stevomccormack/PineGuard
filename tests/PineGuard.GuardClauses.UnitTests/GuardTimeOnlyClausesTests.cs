@@ -8,13 +8,13 @@ public sealed class GuardTimeOnlyClausesTests(ITestOutputHelper output) : BaseGu
 {
     [Theory]
     [MemberData(nameof(GuardTimeOnlyClausesTestData.InRange.Cases), MemberType = typeof(GuardTimeOnlyClausesTestData.InRange))]
-    public void InRange_BehavesAsExpected(GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
-    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.InRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
+    public void InRange_BehavesAsExpected(GuardCase<(TimeOnly value, TimeOnly start, TimeOnly end, Inclusion inclusion)> tc)
+    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.InRange(value, tc.Value.start, tc.Value.end, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.InRange(value, tc.Value.start, tc.Value.end, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
 
     [Theory]
     [MemberData(nameof(GuardTimeOnlyClausesTestData.OutOfRange.Cases), MemberType = typeof(GuardTimeOnlyClausesTestData.OutOfRange))]
-    public void OutOfRange_BehavesAsExpected(GuardCase<(TimeOnly value, TimeOnly min, TimeOnly max, Inclusion inclusion)> tc)
-    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.OutOfRange(value, tc.Value.min, tc.Value.max, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
+    public void OutOfRange_BehavesAsExpected(GuardCase<(TimeOnly value, TimeOnly start, TimeOnly end, Inclusion inclusion)> tc)
+    { var value = tc.Value.value; var result = AssertResult(tc, () => Guard.Against.OutOfRange(value, tc.Value.start, tc.Value.end, tc.Value.inclusion)); AssertCustomMessage(tc, () => Guard.Against.OutOfRange(value, tc.Value.start, tc.Value.end, tc.Value.inclusion, message: CustomMessage)); if (tc.Expected.IsValid) Assert.Equal(value, result); }
 
     [Theory]
     [MemberData(nameof(GuardTimeOnlyClausesTestData.Before.Cases), MemberType = typeof(GuardTimeOnlyClausesTestData.Before))]

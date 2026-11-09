@@ -23,13 +23,13 @@ public static class TimeSpanRules
     }
 
     /// <summary>
-    /// Determines whether the specified duration is greater than the reference duration.
+    /// Determines whether the specified duration is longer than the reference duration.
     /// </summary>
     /// <param name="value">The duration to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference duration to compare against.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is greater than <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsGreaterThan(TimeSpan? value, TimeSpan other, Inclusion inclusion = Inclusion.Exclusive)
+    /// <returns><see langword="true"/> if <paramref name="value"/> is longer than <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+    public static bool IsLongerThan(TimeSpan? value, TimeSpan other, Inclusion inclusion = Inclusion.Exclusive)
     {
         TemporalRangeComparison.ValidateInclusion(inclusion);
         if (value is null)
@@ -39,13 +39,13 @@ public static class TimeSpanRules
     }
 
     /// <summary>
-    /// Determines whether the specified duration is less than the reference duration.
+    /// Determines whether the specified duration is shorter than the reference duration.
     /// </summary>
     /// <param name="value">The duration to validate. If <see langword="null"/>, returns <see langword="false"/>.</param>
     /// <param name="other">The reference duration to compare against.</param>
     /// <param name="inclusion">Whether the boundary is inclusive or exclusive. Defaults to <see cref="Inclusion.Exclusive"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="value"/> is less than <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
-    public static bool IsLessThan(TimeSpan? value, TimeSpan other, Inclusion inclusion = Inclusion.Exclusive)
+    /// <returns><see langword="true"/> if <paramref name="value"/> is shorter than <paramref name="other"/>; otherwise, <see langword="false"/>.</returns>
+    public static bool IsShorterThan(TimeSpan? value, TimeSpan other, Inclusion inclusion = Inclusion.Exclusive)
     {
         TemporalRangeComparison.ValidateInclusion(inclusion);
         if (value is null)
