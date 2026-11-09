@@ -63,20 +63,21 @@ public sealed class DateTimeUtilityTests : BaseUnitTest
 
     [Theory]
     [MemberData(nameof(DateTimeUtilityTestData.TryGetTodayDateNullProvider.Cases), MemberType = typeof(DateTimeUtilityTestData.TryGetTodayDateNullProvider))]
-    public void TryGetTodayDate_NullProviderUsesSystemLocalTimeZone(string _)
+    public void TryGetTodayDate_NullProviderUsesUtcDate(string _)
     {
         // Arrange
         // Bracket the real system clock read on both sides of the call, so a midnight rollover during
-        // the test cannot cause a false failure. Never mutates the process-global time zone.
+        // the test cannot cause a false failure. The expectation is the UTC calendar date, never the
+        // host's zone (D-1); the CI job that runs this under TZ=Pacific/Auckland proves the independence.
         var beforeUtc = DateTimeOffset.UtcNow;
-        var beforeExpected = TimeZoneInfo.ConvertTime(beforeUtc, TimeZoneInfo.Local).Date;
+        var beforeExpected = beforeUtc.UtcDateTime.Date;
 
         // Act
         var ok = DateTimeUtility.TryGetTodayDate(null, out var today);
 
         // Assert
         var afterUtc = DateTimeOffset.UtcNow;
-        var afterExpected = TimeZoneInfo.ConvertTime(afterUtc, TimeZoneInfo.Local).Date;
+        var afterExpected = afterUtc.UtcDateTime.Date;
 
         Assert.True(ok);
         Assert.True(today == beforeExpected || today == afterExpected);

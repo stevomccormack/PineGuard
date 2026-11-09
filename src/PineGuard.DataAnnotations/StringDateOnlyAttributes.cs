@@ -25,7 +25,7 @@ namespace PineGuard.DataAnnotations;
 /// <para>
 /// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
 /// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
-/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
 /// </para>
 /// </remarks>
 /// <example>
@@ -74,7 +74,7 @@ public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(type
 /// <para>
 /// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
 /// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
-/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
 /// </para>
 /// </remarks>
 /// <example>
@@ -123,7 +123,7 @@ public sealed class FutureDateOnlyStringAttribute() : ValidationAttributeBase(ty
 /// <para>
 /// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
 /// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
-/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
 /// </para>
 /// </remarks>
 /// <example>
@@ -172,7 +172,7 @@ public sealed class PastOrPresentDateOnlyStringAttribute() : ValidationAttribute
 /// <para>
 /// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
 /// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
-/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
 /// </para>
 /// </remarks>
 /// <example>
@@ -907,7 +907,7 @@ public sealed class NotOverlappingDateOnlyStringAttribute(string end1, string st
 /// <para>
 /// The calendar date of "today" follows the <see cref="TimeProvider.LocalTimeZone"/> of the
 /// <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service provider; when none is
-/// registered, <see cref="TimeProvider.System"/> and therefore the host machine's zone is used.
+/// registered, today is the UTC calendar date. PineGuard never guesses the host machine's zone.
 /// </para>
 /// </remarks>
 /// <example>

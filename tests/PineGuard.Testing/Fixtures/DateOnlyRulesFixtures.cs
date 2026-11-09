@@ -388,8 +388,9 @@ public static class DateOnlyRulesFixtures
         public static RuleScenario<DateOnly?>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 
-    // D-1: "today" follows the clock's LocalTimeZone rather than the UTC date, so these scenarios pin a
-    // per-row clock (DefaultAheadOfUtc / DefaultBehindUtc) alongside the value under test.
+    // D-1: with an injected clock, "today" follows that clock's LocalTimeZone (without one it is the UTC
+    // date), so these scenarios pin a per-row clock (DefaultAheadOfUtc / DefaultBehindUtc) alongside the
+    // value under test.
     public static class IsInPastAcrossTimeZones
     {
         public static readonly (DateOnly? value, TimeProvider timeProvider) LocalYesterdayAheadOfUtc = (new DateOnly(2026, 06, 15), FixedTimeProvider.DefaultAheadOfUtc);

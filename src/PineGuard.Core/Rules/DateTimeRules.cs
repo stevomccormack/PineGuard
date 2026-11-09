@@ -23,8 +23,9 @@ namespace PineGuard.Rules;
 /// <see cref="IsWeekday"/>, <see cref="IsWeekend"/>, <see cref="IsFirstDayOfMonth"/> and
 /// <see cref="IsLastDayOfMonth"/> — read the value's own civil <see cref="DateTime.Date"/> fields and ignore
 /// <see cref="DateTime.Kind"/> entirely; no conversion takes place. "Today" for <see cref="HasMinimumAge"/> is the
-/// calendar date in the injected <see cref="TimeProvider"/>'s <see cref="TimeProvider.LocalTimeZone"/>, which is the
-/// host machine's zone when the provider is <see langword="null"/>. The kind inspectors <see cref="IsUtc"/>,
+/// calendar date in the injected <see cref="TimeProvider"/>'s <see cref="TimeProvider.LocalTimeZone"/>, or the UTC
+/// calendar date when the provider is <see langword="null"/>: PineGuard never guesses the host machine's zone. The
+/// kind inspectors <see cref="IsUtc"/>,
 /// <see cref="IsLocal"/>, <see cref="IsUnspecified"/> and <see cref="HasExplicitKind"/> belong to neither group:
 /// they report <see cref="DateTime.Kind"/> exactly as supplied.
 /// </para>
@@ -374,11 +375,11 @@ public static class DateTimeRules
     /// therefore reaches its next birthday on 1 March of a non-leap year, because that year has no 29th to
     /// match against — this is PineGuard's calendar convention. The birth date is always its own
     /// <see cref="DateTime.Date"/>, regardless of <see cref="DateTime.Kind"/> — it is never converted.
-    /// "Today" is the clock's local calendar date, derived from one sampled instant with checked
-    /// projection into the clock's <see cref="TimeProvider.LocalTimeZone"/>. A <see langword="null"/>
-    /// <paramref name="timeProvider"/> selects <see cref="TimeProvider.System"/>, so today follows the
-    /// host's local time zone; inject a provider to pin a stable reference zone. If the projection is
-    /// not representable, this method returns <see langword="false"/>.
+    /// "Today" is derived from one sampled instant with checked projection into the clock's
+    /// <see cref="TimeProvider.LocalTimeZone"/>. A <see langword="null"/> <paramref name="timeProvider"/>
+    /// reads the system clock and uses the UTC calendar date: PineGuard never guesses the host's zone, so
+    /// inject a provider to evaluate today in a chosen zone. If the projection is not representable, this
+    /// method returns <see langword="false"/>.
     /// </remarks>
     public static bool HasMinimumAge(DateTime? value, int years, TimeProvider? timeProvider = null)
     {

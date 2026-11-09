@@ -35,10 +35,10 @@ namespace PineGuard.DataAnnotations;
 /// </para>
 /// <para>
 /// The reference clock is the <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service
-/// provider, or <see cref="TimeProvider.System"/> when none is registered. For a <c>DateOnly</c> value the calendar
-/// date of "today" follows that provider's <see cref="TimeProvider.LocalTimeZone"/> (the host machine's zone for
-/// the system provider); for a <see cref="DateTime"/> or <see cref="DateTimeOffset"/> value the comparison is
-/// against the current instant.
+/// provider, or the system clock when none is registered. For a <c>DateOnly</c> value the calendar date of "today"
+/// follows the registered provider's <see cref="TimeProvider.LocalTimeZone"/>, or is the UTC calendar date when
+/// none is registered (PineGuard never guesses the host machine's zone); for a <see cref="DateTime"/> or
+/// <see cref="DateTimeOffset"/> value the comparison is against the current instant.
 /// </para>
 /// </remarks>
 /// <example>
@@ -102,10 +102,10 @@ public sealed class PastAttribute() : ValidationAttributeBase(typeof(object), Mu
 /// </para>
 /// <para>
 /// The reference clock is the <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service
-/// provider, or <see cref="TimeProvider.System"/> when none is registered. For a <c>DateOnly</c> value the calendar
-/// date of "today" follows that provider's <see cref="TimeProvider.LocalTimeZone"/> (the host machine's zone for
-/// the system provider); for a <see cref="DateTime"/> or <see cref="DateTimeOffset"/> value the comparison is
-/// against the current instant.
+/// provider, or the system clock when none is registered. For a <c>DateOnly</c> value the calendar date of "today"
+/// follows the registered provider's <see cref="TimeProvider.LocalTimeZone"/>, or is the UTC calendar date when
+/// none is registered (PineGuard never guesses the host machine's zone); for a <see cref="DateTime"/> or
+/// <see cref="DateTimeOffset"/> value the comparison is against the current instant.
 /// </para>
 /// </remarks>
 /// <example>
@@ -169,10 +169,10 @@ public sealed class PastOrPresentAttribute() : ValidationAttributeBase(typeof(ob
 /// </para>
 /// <para>
 /// The reference clock is the <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service
-/// provider, or <see cref="TimeProvider.System"/> when none is registered. For a <c>DateOnly</c> value the calendar
-/// date of "today" follows that provider's <see cref="TimeProvider.LocalTimeZone"/> (the host machine's zone for
-/// the system provider); for a <see cref="DateTime"/> or <see cref="DateTimeOffset"/> value the comparison is
-/// against the current instant.
+/// provider, or the system clock when none is registered. For a <c>DateOnly</c> value the calendar date of "today"
+/// follows the registered provider's <see cref="TimeProvider.LocalTimeZone"/>, or is the UTC calendar date when
+/// none is registered (PineGuard never guesses the host machine's zone); for a <see cref="DateTime"/> or
+/// <see cref="DateTimeOffset"/> value the comparison is against the current instant.
 /// </para>
 /// </remarks>
 /// <example>
@@ -237,10 +237,10 @@ public sealed class FutureAttribute() : ValidationAttributeBase(typeof(object), 
 /// </para>
 /// <para>
 /// The reference clock is the <see cref="TimeProvider"/> registered in the <see cref="ValidationContext"/> service
-/// provider, or <see cref="TimeProvider.System"/> when none is registered. For a <c>DateOnly</c> value the calendar
-/// date of "today" follows that provider's <see cref="TimeProvider.LocalTimeZone"/> (the host machine's zone for
-/// the system provider); for a <see cref="DateTime"/> or <see cref="DateTimeOffset"/> value the comparison is
-/// against the current instant.
+/// provider, or the system clock when none is registered. For a <c>DateOnly</c> value the calendar date of "today"
+/// follows the registered provider's <see cref="TimeProvider.LocalTimeZone"/>, or is the UTC calendar date when
+/// none is registered (PineGuard never guesses the host machine's zone); for a <see cref="DateTime"/> or
+/// <see cref="DateTimeOffset"/> value the comparison is against the current instant.
 /// </para>
 /// </remarks>
 /// <example>

@@ -408,12 +408,12 @@ jobs:
       - name: Restore NuGet packages
         run: dotnet restore PineGuard.slnx
 
-      - name: Run non-UTC system-provider test
+      - name: Run the null-provider "today is the UTC date" test in a non-UTC zone
         run: >
           dotnet test tests/PineGuard.Core.UnitTests/PineGuard.Core.UnitTests.csproj
           -c Release
           --no-build
-          --filter "FullyQualifiedName~DateTimeUtilityTests.TryGetTodayDate_NullProviderUsesSystemLocalTimeZone"
+          --filter "FullyQualifiedName~DateTimeUtilityTests.TryGetTodayDate_NullProviderUsesUtcDate"
           -- RunConfiguration.TreatNoTestsAsError=true
 
   # ---------------------------------------------------------------------------

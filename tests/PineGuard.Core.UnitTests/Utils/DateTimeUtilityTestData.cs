@@ -65,9 +65,9 @@ public static class DateTimeUtilityTestData
             : TryCase<TimeProvider, DateTime>(Name, Value, Expected, ExpectedOutValue);
     }
 
-    // Only one scenario is meaningful here: proving a null provider falls through to TimeProvider.System
-    // and reads the host's LocalTimeZone. Asserted against the real machine clock in a dedicated CI
-    // process pinned to a non-UTC zone (TZ=Pacific/Auckland), per unit-test.md §6 (time-relative ops).
+    // Only one scenario is meaningful here: proving a null provider reads the system clock and yields the
+    // UTC calendar date, never the host's LocalTimeZone (D-1). Asserted against the real machine clock in a
+    // dedicated CI process pinned to a non-UTC zone (TZ=Pacific/Auckland), per unit-test.md §6 (time-relative ops).
     public static class TryGetTodayDateNullProvider
     {
         public static TheoryData<string> Cases => ["SystemClock"];

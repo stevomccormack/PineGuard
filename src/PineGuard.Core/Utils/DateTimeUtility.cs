@@ -35,30 +35,36 @@ public static class DateTimeUtility
         (timeProvider ?? TimeProvider.System).GetLocalNow();
 
     /// <summary>
-    /// Attempts to derive today's calendar date from the supplied clock's <see cref="TimeProvider.LocalTimeZone"/>,
-    /// sampling the clock exactly once and guarding the projection against out-of-range results.
+    /// Attempts to derive today's calendar date, sampling the clock exactly once and guarding the projection
+    /// against out-of-range results. With an injected clock the date is read in that clock's
+    /// <see cref="TimeProvider.LocalTimeZone"/>; with no clock it is the UTC calendar date.
     /// </summary>
-    /// <param name="timeProvider">The clock to read. If <see langword="null"/>, <see cref="TimeProvider.System"/> is used.</param>
+    /// <param name="timeProvider">
+    /// The clock to read. If <see langword="null"/>, the system clock is sampled and today is its UTC calendar date.
+    /// </param>
     /// <param name="today">
-    /// When this method returns <see langword="true"/>, contains the local calendar date, at midnight with
+    /// When this method returns <see langword="true"/>, contains the calendar date, at midnight with
     /// <see cref="DateTimeKind.Unspecified"/> kind. Otherwise, <see langword="default"/>.
     /// </param>
     /// <returns>
     /// <see langword="true"/> if the projected date is representable as a <see cref="DateTime"/>; otherwise, <see langword="false"/>.
     /// </returns>
     /// <remarks>
-    /// This is the single guarded reference every calendar-relative rule reads "today" through. It selects
-    /// the provider once, samples <see cref="TimeProvider.GetUtcNow"/> once, reads
-    /// <see cref="TimeProvider.LocalTimeZone"/> once, and obtains that zone's UTC offset at the sampled
-    /// instant once, before delegating to <see cref="DateTimeOffsetUtility.TryGetDateAtOffset"/>. There is
-    /// no public <c>GetTodayDate</c>/<c>GetToday</c> wrapper — new predicates call this method directly
-    /// rather than reading <see cref="TimeProvider.GetLocalNow"/> unchecked.
+    /// This is the single guarded reference every calendar-relative rule reads "today" through, and it is
+    /// where PineGuard's zone contract lives: <b>PineGuard never guesses the host's zone.</b> Without an
+    /// injected clock, today is the UTC calendar date, so a rule answers the same on a developer machine, in
+    /// CI and in production regardless of the process time zone. To evaluate "today" in a particular zone,
+    /// inject a <see cref="TimeProvider"/> whose <see cref="TimeProvider.LocalTimeZone"/> is that zone. The
+    /// method samples <see cref="TimeProvider.GetUtcNow"/> once and, for an injected clock, reads
+    /// <see cref="TimeProvider.LocalTimeZone"/> once and obtains that zone's UTC offset at the sampled instant
+    /// once, before delegating to <see cref="DateTimeOffsetUtility.TryGetDateAtOffset"/>. There is no public
+    /// <c>GetTodayDate</c>/<c>GetToday</c> wrapper — new predicates call this method directly rather than
+    /// reading <see cref="TimeProvider.GetLocalNow"/> unchecked.
     /// </remarks>
     internal static bool TryGetTodayDate(TimeProvider? timeProvider, out DateTime today)
     {
-        var provider = timeProvider ?? TimeProvider.System;
-        var utcNow = provider.GetUtcNow();
-        var offset = provider.LocalTimeZone.GetUtcOffset(utcNow);
+        var utcNow = GetUtcNow(timeProvider);
+        var offset = timeProvider is null ? TimeSpan.Zero : timeProvider.LocalTimeZone.GetUtcOffset(utcNow);
 
         return DateTimeOffsetUtility.TryGetDateAtOffset(utcNow, offset, out today);
     }
