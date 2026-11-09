@@ -235,8 +235,10 @@ at `artifacts/reviews/T1-U1-fable-source-review.json`.
 **Named host integration check (U2 ownership)**: U2 adds
 `DateTimeUtilityTests.TryGetTodayDate_NullProviderUsesUtcDate` (named
 `…UsesSystemLocalTimeZone` until the D-1 ratification of 2026-11-09) and paired
-data in `DateTimeUtilityTestData.cs`. Run it in a dedicated Linux CI process with
-`TZ=Pacific/Auckland` (non-UTC) once, alongside the normal UTC jobs. Bracket the system
+data in `DateTimeUtilityTestData.cs`. Run it in two dedicated Linux CI processes, `TZ=Pacific/Kiritimati`
+(UTC+14) and `TZ=Etc/GMT+12` (UTC-12), alongside the normal UTC jobs; at every instant at least one of
+those zones is on a different calendar date from UTC, so a host-zone leak cannot hide behind a shared
+date (Astra re-review 2026-11-09; the original single `TZ=Pacific/Auckland` process could). Bracket the system
 instant reads to tolerate midnight rollover and assert the derived **UTC** calendar date, proving
 the null-provider path is independent of the process zone; do not change the running process's
 global zone or infer this result from FixedTimeProvider.
@@ -844,7 +846,7 @@ Claude Fable 5.1 phase review (orchestration §2.4) with this phase's file list.
 - `DateOnlyRules.IsInPast(new DateOnly(2026,6,15), timeProvider: FixedTimeProvider.DefaultAheadOfUtc)` is `true` (it was `false`).
 - `TimeOnlyRules.IsBetween(new TimeOnly(23,0), new TimeOnly(22,0), new TimeOnly(6,0))` is `true`; every TimeOnly integration layer follows this wrap contract.
 - `Guard.Against.ShorterThan(TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5))` does not throw (its predecessor `Guard.Against.LessThan` did, before U4b; the clause was renamed by U4a).
-- `DateTimeUtility.TryGetTodayDate(null, out var today)` yields the UTC calendar date on a host in any zone (D-1 as ratified 2026-11-09; asserted by the `core-null-provider-timezone` CI job under `TZ=Pacific/Auckland`).
+- `DateTimeUtility.TryGetTodayDate(null, out var today)` yields the UTC calendar date on a host in any zone (D-1 as ratified 2026-11-09; asserted by the `core-null-provider-timezone` CI job under `TZ=Pacific/Kiritimati` and `TZ=Etc/GMT+12`).
 - Standards is **not** affected yet (it pins alpha.7); the rename reaches it in Phase 3.
 
 ## 6. Risks specific to this phase

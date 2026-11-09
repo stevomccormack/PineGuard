@@ -13,10 +13,13 @@ name: pineguard
 
 services:
   sonarqube:
-    # Pinned to the 2025.1 Community Build release, not the floating :community tag — see F-51 in
+    # Pinned to the 26.11.0 Community Build release, not the floating :community tag — see F-51 in
     # docs/ai/plans/tools-review-and-standardisation.md. Docker Hub retired the `2025.1-community`
-    # alias (2026-11-09: "not found"); the same release is published as the full build tag below.
-    image: sonarqube:25.1.0.102122-community
+    # alias (2026-11-09: "not found"), and the existing data volume already holds a newer Elasticsearch
+    # index (8.19.x), which the 25.1.0 build refuses to downgrade; the current build is pinned instead.
+    # The volumes carry a -v26 suffix because the embedded H2 database cannot be migrated in place
+    # ("Upgrade is not supported on embedded database"); the pre-2026-11-09 volumes are left untouched.
+    image: sonarqube:26.11.0.134175-community
     container_name: pineguard-sonarqube
     ports:
       # Loopback-only — the admin UI must not be reachable from the LAN (F-23).
@@ -25,9 +28,9 @@ services:
       # Disables Elasticsearch bootstrap checks — required for local dev on Windows/Mac.
       SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
     volumes:
-      - pineguard-sonarqube-data:/opt/sonarqube/data
-      - pineguard-sonarqube-extensions:/opt/sonarqube/extensions
-      - pineguard-sonarqube-logs:/opt/sonarqube/logs
+      - pineguard-sonarqube-data-v26:/opt/sonarqube/data
+      - pineguard-sonarqube-extensions-v26:/opt/sonarqube/extensions
+      - pineguard-sonarqube-logs-v26:/opt/sonarqube/logs
     networks:
       - pineguard
     stop_grace_period: 60s
@@ -41,12 +44,12 @@ services:
       start_period: 120s
 
 volumes:
-  pineguard-sonarqube-data:
-    name: pineguard-sonarqube-data
-  pineguard-sonarqube-extensions:
-    name: pineguard-sonarqube-extensions
-  pineguard-sonarqube-logs:
-    name: pineguard-sonarqube-logs
+  pineguard-sonarqube-data-v26:
+    name: pineguard-sonarqube-data-v26
+  pineguard-sonarqube-extensions-v26:
+    name: pineguard-sonarqube-extensions-v26
+  pineguard-sonarqube-logs-v26:
+    name: pineguard-sonarqube-logs-v26
 
 networks:
   pineguard:

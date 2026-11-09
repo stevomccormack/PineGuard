@@ -246,7 +246,8 @@ Change the null-provider branch of `DateTimeUtility.TryGetTodayDate` (Core Utils
 - Applied on `codex/temporal-foundation`: `TryGetTodayDate` null branch → UTC calendar date
   (offset zero; an injected provider's `LocalTimeZone` is honoured); the null-provider test renamed
   `TryGetTodayDate_NullProviderUsesUtcDate` and its expectation inverted; the
-  `core-null-provider-timezone` CI job repointed at it; the remarks on `DateOnlyRules`,
+  `core-null-provider-timezone` CI job repointed at it (and, after Astra's re-review, run under UTC+14 and UTC-12
+  rather than Auckland alone, so one process always sits on a different calendar date from UTC); the remarks on `DateOnlyRules`,
   `DateTimeRules` and the fifteen DataAnnotations attribute paragraphs reworded. The chairman's
   predicted failure list was empty: the full suite was already green on the Windows host because
   every legacy test injects a fixed clock, so the change surfaced in the one dedicated test only.
