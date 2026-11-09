@@ -62,11 +62,11 @@ the orchestration §2.3 template. U6 is the Claude Fable 5.1 phase review (orche
 | Action | File |
 |---|---|
 | Edit | `tests/PineGuard.Testing/Common/FixedTimeProvider.cs` |
-| Add | `+ tests/PineGuard.Testing/Common/CountingTimeProvider.cs` |
-| Add | `+ tests/PineGuard.Testing/Common/AdvancingTimeProvider.cs` |
-| Add | `+ tests/PineGuard.Testing.UnitTests/Common/CountingTimeProviderTests.cs`, `CountingTimeProviderTestData.cs` |
-| Add | `+ tests/PineGuard.Testing.UnitTests/Common/AdvancingTimeProviderTests.cs`, `AdvancingTimeProviderTestData.cs` |
-| Add | `+ tests/PineGuard.Testing/Common/TestTimeZones.cs` (this unit adds only `PlusTen` and `MinusEight`; U1 extends the same file with the DST/platform members) |
+| Add | `tests/PineGuard.Testing/Common/CountingTimeProvider.cs` |
+| Add | `tests/PineGuard.Testing/Common/AdvancingTimeProvider.cs` |
+| Add | `tests/PineGuard.Testing.UnitTests/Common/CountingTimeProviderTests.cs`, `CountingTimeProviderTestData.cs` |
+| Add | `tests/PineGuard.Testing.UnitTests/Common/AdvancingTimeProviderTests.cs`, `AdvancingTimeProviderTestData.cs` |
+| Add | `tests/PineGuard.Testing/Common/TestTimeZones.cs` (this unit adds only `PlusTen` and `MinusEight`; U1 extends the same file with the DST/platform members) |
 | Edit | `tests/PineGuard.Testing.UnitTests/Common/FixedTimeProviderTests.cs`, `FixedTimeProviderTestData.cs` |
 
 **Clone from**: the existing `FixedTimeProviderTests.cs` / `FixedTimeProviderTestData.cs` pair.
@@ -149,7 +149,7 @@ default and that the host zone is never consulted —
 |---|---|
 | Edit | `tests/PineGuard.Testing/Common/TestTimeZones.cs` (extends the `PlusTen`/`MinusEight` file from U0) |
 | Edit | `tests/PineGuard.Testing.UnitTests/Common/FixedTimeProviderTests.cs`, `FixedTimeProviderTestData.cs` (adds `GetLocalNow_BehavesAsExpected` only; `LocalTimeZone_BehavesAsExpected` already landed in U0) |
-| Add | `+ tests/PineGuard.Testing.UnitTests/Common/TestTimeZonesTests.cs`, `TestTimeZonesTestData.cs` |
+| Add | `tests/PineGuard.Testing.UnitTests/Common/TestTimeZonesTests.cs`, `TestTimeZonesTestData.cs` |
 
 **Clone from**: the existing `FixedTimeProviderTests.cs` / `FixedTimeProviderTestData.cs` pair.
 
@@ -252,9 +252,9 @@ List `.github/workflows/ci.yml` as U2's CI file ownership. [A-03; Fable correcti
 |---|---|
 | Edit | `src/PineGuard.Core/Utils/DateTimeUtility.cs` |
 | Edit | `.github/workflows/ci.yml` (dedicated non-UTC system-provider integration check) |
-| Edit | `+ src/PineGuard.Core/Utils/DateTimeOffsetUtility.cs` (`TryGetDateAtOffset`; paired boundary tests below) |
+| Edit | `src/PineGuard.Core/Utils/DateTimeOffsetUtility.cs` (`TryGetDateAtOffset`; paired boundary tests below) |
 | Edit | `src/PineGuard.Core/Codes/MustCodes.Date.cs` (`Date.Reference.OutOfRange`; first consumers in U2b before the Phase 1 merge) |
-| Edit | `+ tests/PineGuard.Core.UnitTests/Utils/DateTimeOffsetUtilityTests.cs`, `DateTimeOffsetUtilityTestData.cs` |
+| Edit | `tests/PineGuard.Core.UnitTests/Utils/DateTimeOffsetUtilityTests.cs`, `DateTimeOffsetUtilityTestData.cs` |
 | Edit | `src/PineGuard.Core/Rules/DateOnlyRules.cs` (`IsInPast`, `IsInFuture`, `HasMinimumAge`) |
 | Edit | `src/PineGuard.Core/Rules/DateTimeRules.cs` (`HasMinimumAge` and `IsSameDay` only) |
 | Edit | tests: `tests/PineGuard.Core.UnitTests/Utils/DateTimeUtilityTests.cs` + `TestData`, `tests/PineGuard.Core.UnitTests/Rules/DateOnlyRulesTestData.cs`, `DateTimeRulesTestData.cs`, `tests/PineGuard.Testing/Fixtures/DateOnlyRulesFixtures.cs`, `DateTimeRulesFixtures.cs` |
