@@ -1,9 +1,12 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0
-version: 1.10
+version: 1.11
 status: planned
-last_updated: 2026-09-26
+last_updated: 2026-11-09
+council_verdict_ref: docs/ai/plans/technical-readiness-to-1.0.council-transcript.md
+council_verdict_date: 2026-11-09
+council_trigger: explicit
 -->
 # PineGuard technical readiness to 1.0
 
@@ -22,6 +25,16 @@ PineGuard is greenfield for this work. Choose the best globally consistent new d
 The user-approved [testing project layout](references/test-project-layout.md) groups added crosscutting checks into Rules and Architecture test projects, hosted composition into IntegrationTests, and distinct Fuzz, Benchmarks and Consumers executables. Testing techniques use folders within those responsibilities. Existing library unit suites, the shared PineGuard.Testing fixture library and its own PineGuard.Testing.UnitTests retain their responsibilities. The layout's stable TP-* identities and workstream mapping are authoritative; implementation must align the solution, relevant discovery/routing/coverage scripts, BRAIN and documentation. The six projects remain planned and must not be reported as present or passing.
 
 ## Status, authority and preservation
+
+> **Council verdict (2026-11-09).** The plan-gated Fable council required by D19 has run; its transcript is
+> [technical-readiness-to-1.0.council-transcript.md](../technical-readiness-to-1.0.council-transcript.md).
+> Verdict: do not activate the plan as written; activate one unit, the string→DateOnly pilot, as a single PR
+> with the rule object, all four adapters, a cross-layer consistency test, a BenchmarkDotNet baseline against
+> the current path and an owner-signed names table, under the existing CI gates, with a two-week time-box
+> and an explicit kill criterion; Email and bounded numeric follow only if it passes; W22 runs after the
+> pilot; `core-common-api-decisions.md` is not touched; Temporal Phase 2 waits for the pilot's time-box.
+> The owner's implementation authorization (the second half of D19) is still to be given; until then the
+> status stays `planned`.
 
 Status is **Planned**. Astra owns architecture, decisions, planning and review; Luna owns all reading/lookups/web/MCP with BRAIN first; Sol owns coding and comparative analysis; the orchestrator coordinates only. Formal council has not occurred. Before Planned→Active, satisfy `docs/ai/specs/council.md` §§1,4–6 and the plan-with-council workflow, record a real verdict reference, and obtain implementation authorization. The user's Astra model policy overrides the Fable model prescription but does not silently waive procedural roles or independent review.
 
