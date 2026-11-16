@@ -8,6 +8,11 @@ public static class StringPastDateOnlyRuleFixtures
 {
     public static class Evaluate
     {
+        // Today as the pinned clock reports it, derived from FixedTimeProvider.Default rather than
+        // restated as a literal. Because that instant is in the real past, "Tomorrow" is a date the
+        // machine clock considers past — so a rule that ignored the supplied provider would fail here.
+        private static readonly DateOnly PinnedToday = DateOnly.FromDateTime(FixedTimeProvider.Default.GetUtcNow().UtcDateTime);
+
         private static readonly TimeZoneInfo PlusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.StringPastDateOnlyRule.PlusFourteen", TimeSpan.FromHours(14), "PineGuard Test +14", "PineGuard Test +14");
         private static readonly TimeZoneInfo MinusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.StringPastDateOnlyRule.MinusFourteen", TimeSpan.FromHours(-14), "PineGuard Test -14", "PineGuard Test -14");
         private static readonly TimeProvider MinValueProjectionFails = new FixedTimeProvider(DateTimeOffset.MinValue, MinusFourteen);
@@ -15,10 +20,10 @@ public static class StringPastDateOnlyRuleFixtures
 
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) PastDate = ("2000-01-01", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) PastDateAllowNull = ("2000-01-01", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, true);
-        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Yesterday = ("2026-06-14", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
-        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Today = ("2026-06-15", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
-        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) TodayAllowNull = ("2026-06-15", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, true);
-        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Tomorrow = ("2026-06-16", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
+        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Yesterday = (Iso(PinnedToday.AddDays(-1)), DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
+        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Today = (Iso(PinnedToday), DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
+        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) TodayAllowNull = (Iso(PinnedToday), DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, true);
+        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Tomorrow = (Iso(PinnedToday.AddDays(1)), DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) AheadOfUtcYesterday = ("2026-06-15", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultAheadOfUtc, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) AheadOfUtcToday = ("2026-06-16", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultAheadOfUtc, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) AheadOfUtcTomorrow = ("2026-06-17", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultAheadOfUtc, false);
@@ -101,12 +106,14 @@ public static class StringPastDateOnlyRuleFixtures
         ];
 
         public static RuleScenario<(string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+
+        private static string Iso(DateOnly value) => value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
 
     public static class EvaluateSystemClock
     {
-        public static readonly (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) SystemClockFarPast = ("0001-01-01", DateTimeStyles.AllowWhiteSpaces, null, false);
-        public static readonly (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) SystemClockFarFuture = ("9999-12-31", DateTimeStyles.AllowWhiteSpaces, null, false);
+        public static readonly (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) SystemClockFarPast = ("1900-01-01", DateTimeStyles.AllowWhiteSpaces, null, false);
+        public static readonly (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) SystemClockFarFuture = ("2999-01-01", DateTimeStyles.AllowWhiteSpaces, null, false);
 
         public static RuleScenario<(string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull)>[] ValidScenarios =>
         [

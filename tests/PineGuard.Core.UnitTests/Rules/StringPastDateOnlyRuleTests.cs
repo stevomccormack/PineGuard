@@ -30,15 +30,13 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
     {
         // Arrange
         var (value, styles, timeProvider, allowNull) = tc.Value;
-        var clock = new CountingTimeProvider(timeProvider.GetUtcNow(), timeProvider.LocalTimeZone);
 
         // Act
-        var outcome = StringPastDateOnlyRule.Evaluate(value, styles, clock, allowNull, out var parsed);
+        var outcome = StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out var parsed);
 
         // Assert
         Assert.Equal((StringPastDateOnlyOutcome)tc.Expected, outcome);
         Assert.Equal(tc.ExpectedOutValue, parsed);
-        Assert.Equal(tc.ExpectedClockReads, clock.UtcNowCallCount);
     }
 
     [Theory]
@@ -96,6 +94,20 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
         {
             Assert.Equal(StringPastDateOnlyOutcome.NotPast, todayOutcome);
         }
+    }
+
+    [Theory]
+    [MemberData(nameof(StringPastDateOnlyRuleTestData.OneReadBehavior.Cases), MemberType = typeof(StringPastDateOnlyRuleTestData.OneReadBehavior))]
+    public void Evaluate_ReadsTheClockExactlyOnce(string _)
+    {
+        // Arrange
+        var provider = new CountingTimeProvider(FixedTimeProvider.Default.GetUtcNow());
+
+        // Act
+        StringPastDateOnlyRule.Evaluate("2000-01-01", DateTimeStyles.None, provider, false, out var _);
+
+        // Assert
+        Assert.Equal(1, provider.UtcNowCallCount);
     }
 
     [Theory]

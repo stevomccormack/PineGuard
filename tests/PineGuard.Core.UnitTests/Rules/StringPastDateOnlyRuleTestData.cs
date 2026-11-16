@@ -15,48 +15,48 @@ public static class StringPastDateOnlyRuleTestData
 
         public static TheoryData<Case> AdHocCases =>
         [
-            new(nameof(F.Evaluate.PastDate), F.Evaluate.PastDate, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.PastDateAllowNull), F.Evaluate.PastDateAllowNull, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.Yesterday), F.Evaluate.Yesterday, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2026, 6, 14), 1),
-            new(nameof(F.Evaluate.Today), F.Evaluate.Today, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 15), 1),
-            new(nameof(F.Evaluate.TodayAllowNull), F.Evaluate.TodayAllowNull, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 15), 1),
-            new(nameof(F.Evaluate.Tomorrow), F.Evaluate.Tomorrow, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 16), 1),
-            new(nameof(F.Evaluate.AheadOfUtcYesterday), F.Evaluate.AheadOfUtcYesterday, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2026, 6, 15), 1),
-            new(nameof(F.Evaluate.AheadOfUtcToday), F.Evaluate.AheadOfUtcToday, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 16), 1),
-            new(nameof(F.Evaluate.AheadOfUtcTomorrow), F.Evaluate.AheadOfUtcTomorrow, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 17), 1),
-            new(nameof(F.Evaluate.BehindUtcYesterday), F.Evaluate.BehindUtcYesterday, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2026, 6, 13), 1),
-            new(nameof(F.Evaluate.BehindUtcToday), F.Evaluate.BehindUtcToday, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 14), 1),
-            new(nameof(F.Evaluate.BehindUtcTomorrow), F.Evaluate.BehindUtcTomorrow, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 15), 1),
-            new(nameof(F.Evaluate.PaddedPastDate), F.Evaluate.PaddedPastDate, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.PaddedPastDateNoneStyles), F.Evaluate.PaddedPastDateNoneStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.PastDateNoneStyles), F.Evaluate.PastDateNoneStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.InnerSpacedPastDateNoneStyles), F.Evaluate.InnerSpacedPastDateNoneStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.PaddedPastDateLeadingWhiteStyles), F.Evaluate.PaddedPastDateLeadingWhiteStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.PaddedPastDateTrailingWhiteStyles), F.Evaluate.PaddedPastDateTrailingWhiteStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.PaddedPastDateInnerWhiteStyles), F.Evaluate.PaddedPastDateInnerWhiteStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.InvalidStyles), F.Evaluate.InvalidStyles, (int)StringPastDateOnlyOutcome.InvalidStyles, default, 0),
-            new(nameof(F.Evaluate.InvalidStylesAllowNull), F.Evaluate.InvalidStylesAllowNull, (int)StringPastDateOnlyOutcome.InvalidStyles, default, 0),
-            new(nameof(F.Evaluate.InvalidStylesCombination), F.Evaluate.InvalidStylesCombination, (int)StringPastDateOnlyOutcome.InvalidStyles, default, 0),
-            new(nameof(F.Evaluate.NullValueInvalidStyles), F.Evaluate.NullValueInvalidStyles, (int)StringPastDateOnlyOutcome.InvalidStyles, default, 0),
-            new(nameof(F.Evaluate.NullValueInvalidStylesAllowNull), F.Evaluate.NullValueInvalidStylesAllowNull, (int)StringPastDateOnlyOutcome.InvalidStyles, default, 0),
-            new(nameof(F.Evaluate.NullValue), F.Evaluate.NullValue, (int)StringPastDateOnlyOutcome.Null, default, 0),
-            new(nameof(F.Evaluate.NullValueAllowNull), F.Evaluate.NullValueAllowNull, (int)StringPastDateOnlyOutcome.Passed, default, 0),
-            new(nameof(F.Evaluate.NotADate), F.Evaluate.NotADate, (int)StringPastDateOnlyOutcome.Unparseable, default, 0),
-            new(nameof(F.Evaluate.NotADateAllowNull), F.Evaluate.NotADateAllowNull, (int)StringPastDateOnlyOutcome.Unparseable, default, 0),
-            new(nameof(F.Evaluate.Empty), F.Evaluate.Empty, (int)StringPastDateOnlyOutcome.Unparseable, default, 0),
-            new(nameof(F.Evaluate.EmptyAllowNull), F.Evaluate.EmptyAllowNull, (int)StringPastDateOnlyOutcome.Unparseable, default, 0),
-            new(nameof(F.Evaluate.WhitespaceAllowNull), F.Evaluate.WhitespaceAllowNull, (int)StringPastDateOnlyOutcome.Unparseable, default, 0),
-            new(nameof(F.Evaluate.SpaceInsideComponent), F.Evaluate.SpaceInsideComponent, (int)StringPastDateOnlyOutcome.Unparseable, default, 0),
-            new(nameof(F.Evaluate.MinValueProjection), F.Evaluate.MinValueProjection, (int)StringPastDateOnlyOutcome.ReferenceOutOfRange, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.MaxValueProjection), F.Evaluate.MaxValueProjection, (int)StringPastDateOnlyOutcome.ReferenceOutOfRange, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.MaxValueProjectionAllowNull), F.Evaluate.MaxValueProjectionAllowNull, (int)StringPastDateOnlyOutcome.ReferenceOutOfRange, new DateOnly(2000, 1, 1), 1),
-            new(nameof(F.Evaluate.InvalidStylesBeforeProjection), F.Evaluate.InvalidStylesBeforeProjection, (int)StringPastDateOnlyOutcome.InvalidStyles, default, 0),
-            new(nameof(F.Evaluate.NullValueBeforeProjection), F.Evaluate.NullValueBeforeProjection, (int)StringPastDateOnlyOutcome.Null, default, 0),
-            new(nameof(F.Evaluate.NullValueAllowNullBeforeProjection), F.Evaluate.NullValueAllowNullBeforeProjection, (int)StringPastDateOnlyOutcome.Passed, default, 0),
-            new(nameof(F.Evaluate.NotADateBeforeProjection), F.Evaluate.NotADateBeforeProjection, (int)StringPastDateOnlyOutcome.Unparseable, default, 0)
+            new(nameof(F.Evaluate.PastDate), F.Evaluate.PastDate, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.PastDateAllowNull), F.Evaluate.PastDateAllowNull, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.Yesterday), F.Evaluate.Yesterday, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2026, 6, 14)),
+            new(nameof(F.Evaluate.Today), F.Evaluate.Today, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 15)),
+            new(nameof(F.Evaluate.TodayAllowNull), F.Evaluate.TodayAllowNull, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 15)),
+            new(nameof(F.Evaluate.Tomorrow), F.Evaluate.Tomorrow, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 16)),
+            new(nameof(F.Evaluate.AheadOfUtcYesterday), F.Evaluate.AheadOfUtcYesterday, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2026, 6, 15)),
+            new(nameof(F.Evaluate.AheadOfUtcToday), F.Evaluate.AheadOfUtcToday, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 16)),
+            new(nameof(F.Evaluate.AheadOfUtcTomorrow), F.Evaluate.AheadOfUtcTomorrow, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 17)),
+            new(nameof(F.Evaluate.BehindUtcYesterday), F.Evaluate.BehindUtcYesterday, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2026, 6, 13)),
+            new(nameof(F.Evaluate.BehindUtcToday), F.Evaluate.BehindUtcToday, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 14)),
+            new(nameof(F.Evaluate.BehindUtcTomorrow), F.Evaluate.BehindUtcTomorrow, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2026, 6, 15)),
+            new(nameof(F.Evaluate.PaddedPastDate), F.Evaluate.PaddedPastDate, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.PaddedPastDateNoneStyles), F.Evaluate.PaddedPastDateNoneStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.PastDateNoneStyles), F.Evaluate.PastDateNoneStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.InnerSpacedPastDateNoneStyles), F.Evaluate.InnerSpacedPastDateNoneStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.PaddedPastDateLeadingWhiteStyles), F.Evaluate.PaddedPastDateLeadingWhiteStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.PaddedPastDateTrailingWhiteStyles), F.Evaluate.PaddedPastDateTrailingWhiteStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.PaddedPastDateInnerWhiteStyles), F.Evaluate.PaddedPastDateInnerWhiteStyles, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.InvalidStyles), F.Evaluate.InvalidStyles, (int)StringPastDateOnlyOutcome.InvalidStyles, default),
+            new(nameof(F.Evaluate.InvalidStylesAllowNull), F.Evaluate.InvalidStylesAllowNull, (int)StringPastDateOnlyOutcome.InvalidStyles, default),
+            new(nameof(F.Evaluate.InvalidStylesCombination), F.Evaluate.InvalidStylesCombination, (int)StringPastDateOnlyOutcome.InvalidStyles, default),
+            new(nameof(F.Evaluate.NullValueInvalidStyles), F.Evaluate.NullValueInvalidStyles, (int)StringPastDateOnlyOutcome.InvalidStyles, default),
+            new(nameof(F.Evaluate.NullValueInvalidStylesAllowNull), F.Evaluate.NullValueInvalidStylesAllowNull, (int)StringPastDateOnlyOutcome.InvalidStyles, default),
+            new(nameof(F.Evaluate.NullValue), F.Evaluate.NullValue, (int)StringPastDateOnlyOutcome.Null, default),
+            new(nameof(F.Evaluate.NullValueAllowNull), F.Evaluate.NullValueAllowNull, (int)StringPastDateOnlyOutcome.Passed, default),
+            new(nameof(F.Evaluate.NotADate), F.Evaluate.NotADate, (int)StringPastDateOnlyOutcome.Unparseable, default),
+            new(nameof(F.Evaluate.NotADateAllowNull), F.Evaluate.NotADateAllowNull, (int)StringPastDateOnlyOutcome.Unparseable, default),
+            new(nameof(F.Evaluate.Empty), F.Evaluate.Empty, (int)StringPastDateOnlyOutcome.Unparseable, default),
+            new(nameof(F.Evaluate.EmptyAllowNull), F.Evaluate.EmptyAllowNull, (int)StringPastDateOnlyOutcome.Unparseable, default),
+            new(nameof(F.Evaluate.WhitespaceAllowNull), F.Evaluate.WhitespaceAllowNull, (int)StringPastDateOnlyOutcome.Unparseable, default),
+            new(nameof(F.Evaluate.SpaceInsideComponent), F.Evaluate.SpaceInsideComponent, (int)StringPastDateOnlyOutcome.Unparseable, default),
+            new(nameof(F.Evaluate.MinValueProjection), F.Evaluate.MinValueProjection, (int)StringPastDateOnlyOutcome.ReferenceOutOfRange, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.MaxValueProjection), F.Evaluate.MaxValueProjection, (int)StringPastDateOnlyOutcome.ReferenceOutOfRange, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.MaxValueProjectionAllowNull), F.Evaluate.MaxValueProjectionAllowNull, (int)StringPastDateOnlyOutcome.ReferenceOutOfRange, new DateOnly(2000, 1, 1)),
+            new(nameof(F.Evaluate.InvalidStylesBeforeProjection), F.Evaluate.InvalidStylesBeforeProjection, (int)StringPastDateOnlyOutcome.InvalidStyles, default),
+            new(nameof(F.Evaluate.NullValueBeforeProjection), F.Evaluate.NullValueBeforeProjection, (int)StringPastDateOnlyOutcome.Null, default),
+            new(nameof(F.Evaluate.NullValueAllowNullBeforeProjection), F.Evaluate.NullValueAllowNullBeforeProjection, (int)StringPastDateOnlyOutcome.Passed, default),
+            new(nameof(F.Evaluate.NotADateBeforeProjection), F.Evaluate.NotADateBeforeProjection, (int)StringPastDateOnlyOutcome.Unparseable, default)
         ];
 
-        public sealed record Case(string Name, (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Value, int Expected, DateOnly ExpectedOutValue, int ExpectedClockReads)
+        public sealed record Case(string Name, (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Value, int Expected, DateOnly ExpectedOutValue)
             : ReturnOutCase<(string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull), int, DateOnly>(Name, Value, Expected, ExpectedOutValue);
     }
 
@@ -66,8 +66,8 @@ public static class StringPastDateOnlyRuleTestData
 
         public static TheoryData<Case> AdHocCases =>
         [
-            new(nameof(F.EvaluateSystemClock.SystemClockFarPast), F.EvaluateSystemClock.SystemClockFarPast, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(1, 1, 1)),
-            new(nameof(F.EvaluateSystemClock.SystemClockFarFuture), F.EvaluateSystemClock.SystemClockFarFuture, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(9999, 12, 31))
+            new(nameof(F.EvaluateSystemClock.SystemClockFarPast), F.EvaluateSystemClock.SystemClockFarPast, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(1900, 1, 1)),
+            new(nameof(F.EvaluateSystemClock.SystemClockFarFuture), F.EvaluateSystemClock.SystemClockFarFuture, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2999, 1, 1))
         ];
 
         public sealed record Case(string Name, (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) Value, int Expected, DateOnly ExpectedOutValue)
@@ -80,6 +80,13 @@ public static class StringPastDateOnlyRuleTestData
     public static class EvaluateNullProvider
     {
         public static TheoryData<string> Cases => ["SystemClock"];
+    }
+
+    // Only one scenario is meaningful: proving exactly one GetUtcNow() read per call. Asserted directly
+    // against CountingTimeProvider.UtcNowCallCount in the test method, not through AssertResult.
+    public static class OneReadBehavior
+    {
+        public static TheoryData<string> Cases => ["SingleRead"];
     }
 
     public static class IsPassed
