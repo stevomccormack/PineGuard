@@ -17,7 +17,7 @@ Email, bounded numeric, W22, Temporal Phase 2 and every wave stay parked.
 
 | Pilot | Status | PR | Names signed | Benchmark numbers | Verdict |
 |---|---|---|---|---|---|
-| string→DateOnly | In PR (draft) — C1 done, C2 next | PR link added by the run that opens it (see Run log) | No — table not drafted yet (C7) | None yet (C6) | Open |
+| string→DateOnly | In PR (draft) — C1 done, C2 next | [#66](https://github.com/stevomccormack/PineGuard/pull/66) | No — table not drafted yet (C7) | None yet (C6) | Open |
 | Email | Parked — runs only if the string→DateOnly pilot passes | — | — | — | — |
 | Bounded numeric | Parked — runs only if the string→DateOnly pilot passes | — | — | — | — |
 
@@ -116,6 +116,8 @@ owner can redirect them; none is an owner gate unless listed under Awaiting owne
 
 ## Ten-line file list (D22)
 
+This list is also in the description of [PR #66](https://github.com/stevomccormack/PineGuard/pull/66), which is what satisfies D22.
+
 Paths marked `+` are new. The new names are provisional until the names table is signed.
 
 1. `+ src/PineGuard.Core/Rules/StringPastDateOnlyRule.cs` — the rule object: predicate, codes, message templates, null policy
@@ -159,4 +161,4 @@ A signature counts only if it is the owner's own text on this page or a PR comme
 | Date | Run | What was done | Models | Review verdicts | CI | Days remaining | Awaiting owner | Next |
 |---|---|---|---|---|---|---|---|---|
 | 2026-11-16 | 1 | Stopped at the environment check: the egress proxy refused `builds.dotnet.microsoft.com`. Nothing written | Fable | — | — | Clock not started | Allow the host | Re-run |
-| 2026-11-16 | 2 | Environment and sync checks passed. Created `feature/dateonly-pilot` from main `2a7dd20`. Created this tracker and recorded the authorisation in the plan header and D19. C1: inventory, ten-line file list, draft PR opened, D22 updated. Full local gate run on the unchanged source tree | Fable: orchestration, decisions, tracker. Opus: three read digests (plan documents, repository rules, DateOnly surface) | None — no code commit | See the PR description for the run's CI status | 14 of 14 (clock not started) | AO-3; AO-4 and AO-5 for information | C2 |
+| 2026-11-16 | 2 | Environment and sync checks passed. Created `feature/dateonly-pilot` from main `2a7dd20`. Created this tracker and recorded the authorisation in the plan header and D19. C1: inventory, ten-line file list, draft PR #66 opened, D22 updated. Full local gate run on the source tree, which is identical to main: Release build 0 warnings; 47,007 passing executions (23,491 net8.0; 23,516 net10.0) plus the four timezone executions; 100% line and branch (8,986 of 8,986); format clean; audit gate 0 findings | Fable: orchestration, decisions, tracker. Opus: three read digests (plan documents, repository rules, DateOnly surface) | None — no code commit | Reported in the PR #66 description; a documentation-only change does not trigger the build, test, format or audit jobs | 14 of 14 (clock not started) | AO-3; AO-4 and AO-5 for information | C2 |
