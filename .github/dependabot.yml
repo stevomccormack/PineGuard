@@ -24,6 +24,22 @@ updates:
       # once merged unreviewed, broke 4 tests and had to be reverted (e17d1d6).
       - dependency-name: "MediatR"
         update-types: ["version-update:semver-major"]
+      # The .NET 11 package wave dropped net8.0, which Directory.Build.props still targets
+      # (netstandard2.1;net8.0;net10.0). On net8.0 the 11.x packages fall back to their
+      # netstandard2.0 assets, which breaks the build two ways: the netstandard polyfill chain
+      # re-introduces the phantom CS0419 CallerArgumentExpressionAttribute cref ambiguity that
+      # Directory.Build.props only suppresses for netstandard2.1 (PRs #74, #76), and the test
+      # host dies at runtime on `JsonObjectInfoValues`1.set_ObjectCreator` (PR #69). PineGuard
+      # also publishes these as public dependencies, so a major bump would raise the floor for
+      # every consumer with no API gain — against the lowest-line pinning policy recorded in
+      # Directory.Packages.props. Lift these three entries when net8.0 is dropped as a target
+      # (.NET 8 left support on 2026-11-10), not before.
+      - dependency-name: "System.Text.Json"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.SourceLink.GitHub"
+        update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 10
     commit-message:
       prefix: "deps"
