@@ -26,6 +26,21 @@ Before implementing any feature, read these specifications:
 - Minimal impact: no side effects, no defensive restructuring of nearby code.
 - Demand elegance for non-trivial work; skip it for simple fixes.
 
+## Precedent and Consistency (owner instruction, 2026-11-16)
+- Consistency is the standard. Before writing code, tests, fixtures or docs, find the nearest existing
+  precedent in the repository (the sibling member, file or fixture) and the spec that governs it, and
+  match both exactly: structure, naming, dataset shape, helper usage.
+- Never deviate on your own judgment. "The existing type does not quite fit" is not a reason; adapt the
+  work to the precedent.
+- A deviation is VERY exceptional. If you believe one is unavoidable, stop before writing it and ask the
+  owner: state the precedent, why it cannot be followed, and the smallest alternative. Proceed only on
+  the owner's answer. Under an unattended run, record it under "Awaiting owner" and do only work that
+  does not depend on it.
+- Do not add a label, dataset or pattern the precedent does not use (for example `EdgeCases` in Core
+  test data, or edge scenario arrays where `fixture.md` §2 prescribes two arrays). Changing a standard
+  is the owner's decision and is applied to every affected member at once, never to one file.
+- Reviewers treat an unrecorded deviation from precedent or spec as a blocker.
+
 ## File Hygiene
 - All output files (logs, reports, temp) MUST go to `artifacts/` or `logs/`.
 - NEVER create files in the project root.
