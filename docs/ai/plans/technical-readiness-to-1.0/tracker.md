@@ -6,6 +6,35 @@ every wave ([decision register](references/decision-register.md) D29). It replac
 ledgers and the planning-era review protocol for the pilot. The [plan](plan.md) says what the
 programme is; this page says where the pilot stands.
 
+## Read before every run (owner instruction, 2026-11-16)
+
+Every run reads this section first and does what it says before any code or test is written. It
+exists because runs 3 and 4 wrote tests from a summary of the testing docs, not from the docs, and
+departed from them.
+
+1. **Read the standard itself, in full, not a digest.** The orchestrator and every subagent that
+   writes or reviews code or tests reads these files directly:
+   - `docs/ai/rules/global.md` (including "Precedent and Consistency"), `docs/ai/rules/testing.md`,
+     `docs/ai/rules/fixture-conventions.md`
+   - `docs/ai/specs/testing/unit-test.md`, `docs/ai/specs/testing/fixture.md`,
+     `docs/ai/specs/testing/gold-standard.md`
+   - the layer addenda for every layer the chunk touches: `docs/ai/specs/<layer>/unit-test.md` and
+     the layer's coding spec
+2. **Name the precedent.** Every implementation packet names the sibling source file, fixture,
+   test-data file and test file to mirror, and says "match it exactly".
+3. **No deviation without the owner.** If a doc or precedent cannot be followed, stop that item
+   before writing it and record it under [Awaiting owner](#awaiting-owner) with the doc section, the
+   reason and the smallest alternative. Where a doc and an existing file disagree, follow the doc and
+   list the file for the owner; do not change it in the pilot.
+4. **Review against the docs.** Every reviewer is told to compare the diff with the docs and the named
+   precedent section by section, and to return any unrecorded departure as a blocker.
+5. **Checklist for every test change:** fixture scenario arrays per `fixture.md` §2; `Cases` shape
+   per the layer addendum; `Xxx_BehavesAsExpected` naming and group order per `unit-test.md` §4.4–§4.5;
+   structural comments only per `fixture.md` §11.1; time-relative values per the Core addendum §6;
+   `gold-standard.md` index updated per `unit-test.md` §10.5.
+6. **One run at a time.** If the branch tip is less than two hours old and was not made by this run,
+   do a verification-only run.
+
 ## Authorisation
 
 The owner authorised exactly one unit on 2026-11-09: the string→DateOnly pilot, as a single PR, per
