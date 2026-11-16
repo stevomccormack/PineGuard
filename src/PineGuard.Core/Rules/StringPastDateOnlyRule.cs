@@ -61,13 +61,13 @@ internal static class StringPastDateOnlyRule
     /// </param>
     /// <returns>
     /// The first failing step, in this order: <see cref="StringPastDateOnlyOutcome.InvalidStyles"/>,
-    /// <see cref="StringPastDateOnlyOutcome.Null"/>, <see cref="StringPastDateOnlyOutcome.Unparsable"/>,
+    /// <see cref="StringPastDateOnlyOutcome.Null"/>, <see cref="StringPastDateOnlyOutcome.Unparseable"/>,
     /// <see cref="StringPastDateOnlyOutcome.ReferenceOutOfRange"/>, <see cref="StringPastDateOnlyOutcome.NotPast"/>;
     /// or <see cref="StringPastDateOnlyOutcome.Passed"/>.
     /// </returns>
     /// <remarks>
     /// The clock is read exactly once, and only after <paramref name="value"/> has parsed: invalid styles, a
-    /// <see langword="null"/> value and an unparsable value never read it.
+    /// <see langword="null"/> value and an unparseable value never read it.
     /// </remarks>
     internal static StringPastDateOnlyOutcome Evaluate(string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull, out DateOnly parsed)
     {
@@ -80,7 +80,7 @@ internal static class StringPastDateOnlyRule
             return allowNull ? StringPastDateOnlyOutcome.Passed : StringPastDateOnlyOutcome.Null;
 
         if (!StringUtility.DateOnly.TryParse(value, out parsed, styles))
-            return StringPastDateOnlyOutcome.Unparsable;
+            return StringPastDateOnlyOutcome.Unparseable;
 
         if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
             return StringPastDateOnlyOutcome.ReferenceOutOfRange;
@@ -95,7 +95,7 @@ internal static class StringPastDateOnlyRule
     /// </summary>
     /// <param name="outcome">The outcome of <see cref="Evaluate"/>.</param>
     /// <returns>
-    /// <see cref="MustCodes.Date.Format.Invalid"/> for <see cref="StringPastDateOnlyOutcome.Unparsable"/>,
+    /// <see cref="MustCodes.Date.Format.Invalid"/> for <see cref="StringPastDateOnlyOutcome.Unparseable"/>,
     /// <see cref="MustCodes.Date.Reference.OutOfRange"/> for <see cref="StringPastDateOnlyOutcome.ReferenceOutOfRange"/>,
     /// and the rule's primary code, <see cref="MustCodes.Date.Relative.NotPast"/>, for every other outcome. For
     /// <see cref="StringPastDateOnlyOutcome.Passed"/> that primary code identifies the rule; it is never reported
@@ -106,7 +106,7 @@ internal static class StringPastDateOnlyRule
         outcome switch
         {
             StringPastDateOnlyOutcome.Passed or StringPastDateOnlyOutcome.InvalidStyles or StringPastDateOnlyOutcome.Null or StringPastDateOnlyOutcome.NotPast => MustCodes.Date.Relative.NotPast,
-            StringPastDateOnlyOutcome.Unparsable => MustCodes.Date.Format.Invalid,
+            StringPastDateOnlyOutcome.Unparseable => MustCodes.Date.Format.Invalid,
             StringPastDateOnlyOutcome.ReferenceOutOfRange => MustCodes.Date.Reference.OutOfRange,
             _ => throw new ArgumentOutOfRangeException(nameof(outcome), outcome, null)
         };
@@ -117,7 +117,7 @@ internal static class StringPastDateOnlyRule
     /// </summary>
     /// <param name="outcome">The outcome of <see cref="Evaluate"/>.</param>
     /// <returns>
-    /// The template for the failing step. <see cref="StringPastDateOnlyOutcome.Unparsable"/> shares the rule's
+    /// The template for the failing step. <see cref="StringPastDateOnlyOutcome.Unparseable"/> shares the rule's
     /// primary template with <see cref="StringPastDateOnlyOutcome.NotPast"/>, and
     /// <see cref="StringPastDateOnlyOutcome.Passed"/> returns that primary template too.
     /// </returns>
@@ -125,7 +125,7 @@ internal static class StringPastDateOnlyRule
     internal static string MessageTemplate(StringPastDateOnlyOutcome outcome) =>
         outcome switch
         {
-            StringPastDateOnlyOutcome.Passed or StringPastDateOnlyOutcome.Unparsable or StringPastDateOnlyOutcome.NotPast => NotPastMessageTemplate,
+            StringPastDateOnlyOutcome.Passed or StringPastDateOnlyOutcome.Unparseable or StringPastDateOnlyOutcome.NotPast => NotPastMessageTemplate,
             StringPastDateOnlyOutcome.InvalidStyles => InvalidStylesMessageTemplate,
             StringPastDateOnlyOutcome.Null => NullMessageTemplate,
             StringPastDateOnlyOutcome.ReferenceOutOfRange => ReferenceOutOfRangeMessageTemplate,
@@ -148,7 +148,7 @@ internal static class StringPastDateOnlyRule
         {
             StringPastDateOnlyOutcome.InvalidStyles => StylesParamName,
             StringPastDateOnlyOutcome.ReferenceOutOfRange => TimeProviderParamName,
-            StringPastDateOnlyOutcome.Passed or StringPastDateOnlyOutcome.Null or StringPastDateOnlyOutcome.Unparsable or StringPastDateOnlyOutcome.NotPast => paramName,
+            StringPastDateOnlyOutcome.Passed or StringPastDateOnlyOutcome.Null or StringPastDateOnlyOutcome.Unparseable or StringPastDateOnlyOutcome.NotPast => paramName,
             _ => throw new ArgumentOutOfRangeException(nameof(outcome), outcome, null)
         };
 
@@ -175,7 +175,7 @@ internal static class StringPastDateOnlyRule
         {
             StringPastDateOnlyOutcome.InvalidStyles => styles,
             StringPastDateOnlyOutcome.ReferenceOutOfRange => timeProvider,
-            StringPastDateOnlyOutcome.Passed or StringPastDateOnlyOutcome.Null or StringPastDateOnlyOutcome.Unparsable or StringPastDateOnlyOutcome.NotPast => value,
+            StringPastDateOnlyOutcome.Passed or StringPastDateOnlyOutcome.Null or StringPastDateOnlyOutcome.Unparseable or StringPastDateOnlyOutcome.NotPast => value,
             _ => throw new ArgumentOutOfRangeException(nameof(outcome), outcome, null)
         };
 }

@@ -31,7 +31,7 @@ internal enum StringPastDateOnlyOutcome
     /// <summary>
     /// The value is empty, whitespace or not a date the invariant culture can parse with the given styles.
     /// </summary>
-    Unparsable,
+    Unparseable,
 
     /// <summary>
     /// The value parsed, but today's date could not be derived from the clock because the projection into

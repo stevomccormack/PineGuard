@@ -1,3 +1,4 @@
+using System.Globalization;
 using PineGuard.Rules;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
@@ -21,7 +22,7 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
         var outcome = StringPastDateOnlyRule.Evaluate(value, styles, clock, allowNull, out var parsed);
 
         // Assert
-        Assert.Equal(tc.Expected, outcome.ToString());
+        Assert.Equal((StringPastDateOnlyOutcome)tc.Expected, outcome);
         Assert.Equal(tc.ExpectedOutValue, parsed);
         Assert.Equal(tc.ExpectedClockReads, clock.UtcNowCallCount);
     }
@@ -37,8 +38,36 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
         var outcome = StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out var parsed);
 
         // Assert
-        Assert.Equal(tc.Expected, outcome.ToString());
+        Assert.Equal((StringPastDateOnlyOutcome)tc.Expected, outcome);
         Assert.Equal(tc.ExpectedOutValue, parsed);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringPastDateOnlyRuleTestData.EvaluateNullProvider.Cases), MemberType = typeof(StringPastDateOnlyRuleTestData.EvaluateNullProvider))]
+    public void Evaluate_NullProviderUsesUtcDate(string _)
+    {
+        // Arrange
+        // The rule's "today" must be the UTC date at its own clock read, which falls between the before and after
+        // reads (D-1). UTC-yesterday comes from the before read, so it is in the past even if midnight passes
+        // mid-test. UTC-today must be built before the call too, so it is asserted not-past only when the after read
+        // shows no rollover; a rollover would rightly make it yesterday. CI runs this under UTC+14 and UTC-12, where
+        // a host-zone leak fails one of the two assertions at every instant.
+        var beforeDate = DateTimeOffset.UtcNow.UtcDateTime.Date;
+        var utcYesterday = beforeDate.AddDays(-1).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        var utcToday = beforeDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+        // Act
+        var yesterdayOutcome = StringPastDateOnlyRule.Evaluate(utcYesterday, DateTimeStyles.None, null, false, out var _);
+        var todayOutcome = StringPastDateOnlyRule.Evaluate(utcToday, DateTimeStyles.None, null, false, out var _);
+
+        // Assert
+        var afterDate = DateTimeOffset.UtcNow.UtcDateTime.Date;
+
+        Assert.Equal(StringPastDateOnlyOutcome.Passed, yesterdayOutcome);
+        if (afterDate == beforeDate)
+        {
+            Assert.Equal(StringPastDateOnlyOutcome.NotPast, todayOutcome);
+        }
     }
 
     [Theory]
