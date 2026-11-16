@@ -14,8 +14,9 @@ namespace PineGuard.Rules;
 /// <remarks>
 /// <para>
 /// <see cref="Evaluate"/> decides the <see cref="StringPastDateOnlyOutcome"/>. The lookups
-/// (<see cref="Code"/>, <see cref="MessageTemplate"/>, <see cref="ParamName"/> and <see cref="Value"/>)
-/// translate that outcome into what a result type carries, and are total over every defined outcome,
+/// (<see cref="IsPassed"/>, <see cref="Code"/>, <see cref="MessageTemplate"/>, <see cref="ParamName"/> and
+/// <see cref="Value"/>) translate that outcome into what a result type carries, from its success flag to its
+/// failure details, and are total over every defined outcome,
 /// <see cref="StringPastDateOnlyOutcome.Passed"/> included, so a single result factory call can take all
 /// of them at once.
 /// </para>
@@ -42,8 +43,9 @@ internal static class StringPastDateOnlyRule
     /// <param name="styles">
     /// The parsing styles. Only <see cref="DateTimeStyles.None"/>, <see cref="DateTimeStyles.AllowWhiteSpaces"/>
     /// and its constituent flags are supported; any other flag gives <see cref="StringPastDateOnlyOutcome.InvalidStyles"/>.
-    /// The supported values all parse alike, because the non-exact parser always permits leading, inner and
-    /// trailing white space.
+    /// The supported values all parse alike, because the non-exact parser always permits white space before, between
+    /// and after the date's components; white space inside a component, as in <c>"2000-0 1-01"</c>, is rejected
+    /// under every one of them.
     /// </param>
     /// <param name="timeProvider">
     /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its
@@ -89,6 +91,24 @@ internal static class StringPastDateOnlyRule
             ? StringPastDateOnlyOutcome.Passed
             : StringPastDateOnlyOutcome.NotPast;
     }
+
+    /// <summary>
+    /// Gets whether <paramref name="outcome"/> is a pass: the success flag a result type maps from, so an adapter
+    /// never compares outcomes itself.
+    /// </summary>
+    /// <param name="outcome">The outcome of <see cref="Evaluate"/>.</param>
+    /// <returns>
+    /// <see langword="true"/> for <see cref="StringPastDateOnlyOutcome.Passed"/>; <see langword="false"/> for every
+    /// failure outcome.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="outcome"/> is not a defined outcome.</exception>
+    internal static bool IsPassed(StringPastDateOnlyOutcome outcome) =>
+        outcome switch
+        {
+            StringPastDateOnlyOutcome.Passed => true,
+            StringPastDateOnlyOutcome.InvalidStyles or StringPastDateOnlyOutcome.Null or StringPastDateOnlyOutcome.Unparseable or StringPastDateOnlyOutcome.ReferenceOutOfRange or StringPastDateOnlyOutcome.NotPast => false,
+            _ => throw new ArgumentOutOfRangeException(nameof(outcome), outcome, null)
+        };
 
     /// <summary>
     /// Gets the <see cref="MustCodes"/> code for <paramref name="outcome"/>.

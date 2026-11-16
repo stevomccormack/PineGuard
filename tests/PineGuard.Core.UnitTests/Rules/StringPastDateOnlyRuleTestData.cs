@@ -27,6 +27,10 @@ public static class StringPastDateOnlyRuleTestData
             new(nameof(F.Evaluate.PaddedPastDate), F.Evaluate.PaddedPastDate, (int)Outcome.Passed, new DateOnly(2000, 1, 1), 1),
             new(nameof(F.Evaluate.PaddedPastDateNoneStyles), F.Evaluate.PaddedPastDateNoneStyles, (int)Outcome.Passed, new DateOnly(2000, 1, 1), 1),
             new(nameof(F.Evaluate.PastDateNoneStyles), F.Evaluate.PastDateNoneStyles, (int)Outcome.Passed, new DateOnly(2000, 1, 1), 1),
+            new(nameof(F.Evaluate.InnerSpacedPastDateNoneStyles), F.Evaluate.InnerSpacedPastDateNoneStyles, (int)Outcome.Passed, new DateOnly(2000, 1, 1), 1),
+            new(nameof(F.Evaluate.PaddedPastDateLeadingWhiteStyles), F.Evaluate.PaddedPastDateLeadingWhiteStyles, (int)Outcome.Passed, new DateOnly(2000, 1, 1), 1),
+            new(nameof(F.Evaluate.PaddedPastDateTrailingWhiteStyles), F.Evaluate.PaddedPastDateTrailingWhiteStyles, (int)Outcome.Passed, new DateOnly(2000, 1, 1), 1),
+            new(nameof(F.Evaluate.PaddedPastDateInnerWhiteStyles), F.Evaluate.PaddedPastDateInnerWhiteStyles, (int)Outcome.Passed, new DateOnly(2000, 1, 1), 1),
             new(nameof(F.Evaluate.InvalidStyles), F.Evaluate.InvalidStyles, (int)Outcome.InvalidStyles, default, 0),
             new(nameof(F.Evaluate.InvalidStylesAllowNull), F.Evaluate.InvalidStylesAllowNull, (int)Outcome.InvalidStyles, default, 0),
             new(nameof(F.Evaluate.InvalidStylesCombination), F.Evaluate.InvalidStylesCombination, (int)Outcome.InvalidStyles, default, 0),
@@ -39,6 +43,7 @@ public static class StringPastDateOnlyRuleTestData
             new(nameof(F.Evaluate.Empty), F.Evaluate.Empty, (int)Outcome.Unparseable, default, 0),
             new(nameof(F.Evaluate.EmptyAllowNull), F.Evaluate.EmptyAllowNull, (int)Outcome.Unparseable, default, 0),
             new(nameof(F.Evaluate.WhitespaceAllowNull), F.Evaluate.WhitespaceAllowNull, (int)Outcome.Unparseable, default, 0),
+            new(nameof(F.Evaluate.SpaceInsideComponent), F.Evaluate.SpaceInsideComponent, (int)Outcome.Unparseable, default, 0),
             new(nameof(F.Evaluate.MinValueProjection), F.Evaluate.MinValueProjection, (int)Outcome.ReferenceOutOfRange, new DateOnly(2000, 1, 1), 1),
             new(nameof(F.Evaluate.MaxValueProjection), F.Evaluate.MaxValueProjection, (int)Outcome.ReferenceOutOfRange, new DateOnly(2000, 1, 1), 1),
             new(nameof(F.Evaluate.MaxValueProjectionAllowNull), F.Evaluate.MaxValueProjectionAllowNull, (int)Outcome.ReferenceOutOfRange, new DateOnly(2000, 1, 1), 1),
@@ -70,6 +75,31 @@ public static class StringPastDateOnlyRuleTestData
     public static class EvaluateNullProvider
     {
         public static TheoryData<string> Cases => ["SystemClock"];
+    }
+
+    public static class IsPassed
+    {
+        public static TheoryData<Case> Cases =>
+        [
+            new(nameof(Outcome.Passed), (int)Outcome.Passed, true),
+            new(nameof(Outcome.InvalidStyles), (int)Outcome.InvalidStyles, false),
+            new(nameof(Outcome.Null), (int)Outcome.Null, false),
+            new(nameof(Outcome.Unparseable), (int)Outcome.Unparseable, false),
+            new(nameof(Outcome.ReferenceOutOfRange), (int)Outcome.ReferenceOutOfRange, false),
+            new(nameof(Outcome.NotPast), (int)Outcome.NotPast, false)
+        ];
+
+        public static TheoryData<IThrowsCase> InvalidCases =>
+        [
+            new InvalidCase("Default", 0, new ExpectedException(typeof(ArgumentOutOfRangeException), "outcome")),
+            new InvalidCase("Undefined", 99, new ExpectedException(typeof(ArgumentOutOfRangeException), "outcome"))
+        ];
+
+        public sealed record Case(string Name, int Value, bool Expected)
+            : ReturnCase<int, bool>(Name, Value, Expected);
+
+        public sealed record InvalidCase(string Name, int Value, ExpectedException ExpectedException)
+            : ThrowsCase<int>(Name, Value, ExpectedException);
     }
 
     public static class Code

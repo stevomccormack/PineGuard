@@ -71,6 +71,29 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
     }
 
     [Theory]
+    [MemberData(nameof(StringPastDateOnlyRuleTestData.IsPassed.Cases), MemberType = typeof(StringPastDateOnlyRuleTestData.IsPassed))]
+    public void IsPassed_BehavesAsExpected(StringPastDateOnlyRuleTestData.IsPassed.Case tc)
+    {
+        // Act
+        var result = StringPastDateOnlyRule.IsPassed((StringPastDateOnlyOutcome)tc.Value);
+
+        // Assert
+        Assert.Equal(tc.Expected, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringPastDateOnlyRuleTestData.IsPassed.InvalidCases), MemberType = typeof(StringPastDateOnlyRuleTestData.IsPassed))]
+    public void IsPassed_ThrowsAsExpected(IThrowsCase tc)
+    {
+        // Arrange
+        var t = (StringPastDateOnlyRuleTestData.IsPassed.InvalidCase)tc;
+
+        // Act & Assert
+        var ex = Assert.Throws(tc.ExpectedException.Type, () => StringPastDateOnlyRule.IsPassed((StringPastDateOnlyOutcome)t.Value));
+        ThrowsCaseAssert.Expected(ex, tc);
+    }
+
+    [Theory]
     [MemberData(nameof(StringPastDateOnlyRuleTestData.Code.Cases), MemberType = typeof(StringPastDateOnlyRuleTestData.Code))]
     public void Code_BehavesAsExpected(StringPastDateOnlyRuleTestData.Code.Case tc)
     {
