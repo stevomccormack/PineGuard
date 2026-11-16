@@ -12,7 +12,21 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
 {
     [Theory]
     [MemberData(nameof(StringPastDateOnlyRuleTestData.Evaluate.Cases), MemberType = typeof(StringPastDateOnlyRuleTestData.Evaluate))]
-    public void Evaluate_BehavesAsExpected(StringPastDateOnlyRuleTestData.Evaluate.Case tc)
+    public void Evaluate_BehavesAsExpected(RuleCase<(string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull)> tc)
+    {
+        // Arrange
+        var (value, styles, timeProvider, allowNull) = tc.Value;
+
+        // Act
+        var result = StringPastDateOnlyRule.IsPassed(StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out _));
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringPastDateOnlyRuleTestData.Evaluate.AdHocCases), MemberType = typeof(StringPastDateOnlyRuleTestData.Evaluate))]
+    public void Evaluate_AdHoc_BehavesAsExpected(StringPastDateOnlyRuleTestData.Evaluate.Case tc)
     {
         // Arrange
         var (value, styles, timeProvider, allowNull) = tc.Value;
@@ -29,7 +43,21 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
 
     [Theory]
     [MemberData(nameof(StringPastDateOnlyRuleTestData.EvaluateSystemClock.Cases), MemberType = typeof(StringPastDateOnlyRuleTestData.EvaluateSystemClock))]
-    public void EvaluateSystemClock_BehavesAsExpected(StringPastDateOnlyRuleTestData.EvaluateSystemClock.Case tc)
+    public void EvaluateSystemClock_BehavesAsExpected(RuleCase<(string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull)> tc)
+    {
+        // Arrange
+        var (value, styles, timeProvider, allowNull) = tc.Value;
+
+        // Act
+        var result = StringPastDateOnlyRule.IsPassed(StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out _));
+
+        // Assert
+        AssertResult(tc, result);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringPastDateOnlyRuleTestData.EvaluateSystemClock.AdHocCases), MemberType = typeof(StringPastDateOnlyRuleTestData.EvaluateSystemClock))]
+    public void EvaluateSystemClock_AdHoc_BehavesAsExpected(StringPastDateOnlyRuleTestData.EvaluateSystemClock.Case tc)
     {
         // Arrange
         var (value, styles, timeProvider, allowNull) = tc.Value;

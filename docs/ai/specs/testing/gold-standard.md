@@ -36,7 +36,7 @@ A test operation group reaches **GOLD** when:
 
 | Project | TestData Files | Op Groups | Fixture-Based Files | Status |
 |---------|---------------|-----------|--------------------|--------|
-| PineGuard.Core.UnitTests | 87 | 486 | 49 (56%) | GOLD |
+| PineGuard.Core.UnitTests | 115 | 701 | 59 (51%) | GOLD |
 | PineGuard.MustClauses.UnitTests | 50 | 541 | 31 (62%) | GOLD |
 | PineGuard.GuardClauses.UnitTests | 49 | 538 | 41 (84%) | GOLD |
 | PineGuard.FluentValidation.UnitTests | 52 | 660 | 40 (77%) | GOLD |
@@ -94,7 +94,7 @@ TestData files using the `RuleScenario<T>` → `.ToXxxCases()` fixture pattern (
 | GuardClauses | 41 | 49 | 84% |
 | FluentValidation | 40 | 52 | 77% |
 | MustClauses | 31 | 50 | 62% |
-| Core | 49 | 87 | 56% |
+| Core | 59 | 115 | 51% |
 | DataAnnotations | 18 | 50 | 36% |
 | Testing | 0 | 15 | N/A — tests the framework itself, no cross-layer validation inputs (`unit-test.md` §9.6) |
 

@@ -1,6 +1,7 @@
 using System.Globalization;
 using PineGuard.Testing.Common;
 using PineGuard.Testing.UnitTests;
+using PineGuard.Testing.UnitTests.Rules;
 using F = PineGuard.Testing.Fixtures.StringPastDateOnlyRuleFixtures;
 using Outcome = PineGuard.Rules.StringPastDateOnlyOutcome;
 
@@ -10,7 +11,9 @@ public static class StringPastDateOnlyRuleTestData
 {
     public static class Evaluate
     {
-        public static TheoryData<Case> Cases =>
+        public static TheoryData<RuleCase<(string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull)>> Cases => F.Evaluate.AllScenarios.ToRuleCases();
+
+        public static TheoryData<Case> AdHocCases =>
         [
             new(nameof(F.Evaluate.PastDate), F.Evaluate.PastDate, (int)Outcome.Passed, new DateOnly(2000, 1, 1), 1),
             new(nameof(F.Evaluate.PastDateAllowNull), F.Evaluate.PastDateAllowNull, (int)Outcome.Passed, new DateOnly(2000, 1, 1), 1),
@@ -59,10 +62,12 @@ public static class StringPastDateOnlyRuleTestData
 
     public static class EvaluateSystemClock
     {
-        public static TheoryData<Case> Cases =>
+        public static TheoryData<RuleCase<(string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull)>> Cases => F.EvaluateSystemClock.AllScenarios.ToRuleCases();
+
+        public static TheoryData<Case> AdHocCases =>
         [
-            new(nameof(F.Evaluate.SystemClockFarPast), F.Evaluate.SystemClockFarPast, (int)Outcome.Passed, new DateOnly(1, 1, 1)),
-            new(nameof(F.Evaluate.SystemClockFarFuture), F.Evaluate.SystemClockFarFuture, (int)Outcome.NotPast, new DateOnly(9999, 12, 31))
+            new(nameof(F.EvaluateSystemClock.SystemClockFarPast), F.EvaluateSystemClock.SystemClockFarPast, (int)Outcome.Passed, new DateOnly(1, 1, 1)),
+            new(nameof(F.EvaluateSystemClock.SystemClockFarFuture), F.EvaluateSystemClock.SystemClockFarFuture, (int)Outcome.NotPast, new DateOnly(9999, 12, 31))
         ];
 
         public sealed record Case(string Name, (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) Value, int Expected, DateOnly ExpectedOutValue)

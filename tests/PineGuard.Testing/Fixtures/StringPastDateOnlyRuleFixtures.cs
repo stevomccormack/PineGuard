@@ -1,5 +1,6 @@
 using System.Globalization;
 using PineGuard.Testing.Common;
+using PineGuard.Testing.UnitTests.Rules;
 
 namespace PineGuard.Testing.Fixtures;
 
@@ -11,8 +12,6 @@ public static class StringPastDateOnlyRuleFixtures
         private static readonly TimeZoneInfo MinusFourteen = TimeZoneInfo.CreateCustomTimeZone("PineGuard.Test.StringPastDateOnlyRule.MinusFourteen", TimeSpan.FromHours(-14), "PineGuard Test -14", "PineGuard Test -14");
         private static readonly TimeProvider MinValueProjectionFails = new FixedTimeProvider(DateTimeOffset.MinValue, MinusFourteen);
         private static readonly TimeProvider MaxValueProjectionFails = new FixedTimeProvider(DateTimeOffset.MaxValue, PlusFourteen);
-
-        // ── Pinned clock ────────────────────────────────────────────────
 
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) PastDate = ("2000-01-01", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) PastDateAllowNull = ("2000-01-01", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, true);
@@ -54,9 +53,71 @@ public static class StringPastDateOnlyRuleFixtures
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) NullValueAllowNullBeforeProjection = (null, DateTimeStyles.AllowWhiteSpaces, MinValueProjectionFails, true);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) NotADateBeforeProjection = ("not-a-date", DateTimeStyles.AllowWhiteSpaces, MinValueProjectionFails, false);
 
-        // ── System clock ────────────────────────────────────────────────
+        public static RuleScenario<(string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull)>[] ValidScenarios =>
+        [
+            new(nameof(PastDate), PastDate, true),
+            new(nameof(PastDateAllowNull), PastDateAllowNull, true),
+            new(nameof(Yesterday), Yesterday, true),
+            new(nameof(AheadOfUtcYesterday), AheadOfUtcYesterday, true),
+            new(nameof(BehindUtcYesterday), BehindUtcYesterday, true),
+            new(nameof(PaddedPastDate), PaddedPastDate, true),
+            new(nameof(PaddedPastDateNoneStyles), PaddedPastDateNoneStyles, true),
+            new(nameof(PastDateNoneStyles), PastDateNoneStyles, true),
+            new(nameof(InnerSpacedPastDateNoneStyles), InnerSpacedPastDateNoneStyles, true),
+            new(nameof(PaddedPastDateLeadingWhiteStyles), PaddedPastDateLeadingWhiteStyles, true),
+            new(nameof(PaddedPastDateTrailingWhiteStyles), PaddedPastDateTrailingWhiteStyles, true),
+            new(nameof(PaddedPastDateInnerWhiteStyles), PaddedPastDateInnerWhiteStyles, true),
+            new(nameof(NullValueAllowNull), NullValueAllowNull, true),
+            new(nameof(NullValueAllowNullBeforeProjection), NullValueAllowNullBeforeProjection, true)
+        ];
 
+        public static RuleScenario<(string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull)>[] InvalidScenarios =>
+        [
+            new(nameof(Today), Today, false),
+            new(nameof(TodayAllowNull), TodayAllowNull, false),
+            new(nameof(Tomorrow), Tomorrow, false),
+            new(nameof(AheadOfUtcToday), AheadOfUtcToday, false),
+            new(nameof(AheadOfUtcTomorrow), AheadOfUtcTomorrow, false),
+            new(nameof(BehindUtcToday), BehindUtcToday, false),
+            new(nameof(BehindUtcTomorrow), BehindUtcTomorrow, false),
+            new(nameof(InvalidStyles), InvalidStyles, false),
+            new(nameof(InvalidStylesAllowNull), InvalidStylesAllowNull, false),
+            new(nameof(InvalidStylesCombination), InvalidStylesCombination, false),
+            new(nameof(NullValueInvalidStyles), NullValueInvalidStyles, false),
+            new(nameof(NullValueInvalidStylesAllowNull), NullValueInvalidStylesAllowNull, false),
+            new(nameof(NullValue), NullValue, false),
+            new(nameof(NotADate), NotADate, false),
+            new(nameof(NotADateAllowNull), NotADateAllowNull, false),
+            new(nameof(Empty), Empty, false),
+            new(nameof(EmptyAllowNull), EmptyAllowNull, false),
+            new(nameof(WhitespaceAllowNull), WhitespaceAllowNull, false),
+            new(nameof(SpaceInsideComponent), SpaceInsideComponent, false),
+            new(nameof(MinValueProjection), MinValueProjection, false),
+            new(nameof(MaxValueProjection), MaxValueProjection, false),
+            new(nameof(MaxValueProjectionAllowNull), MaxValueProjectionAllowNull, false),
+            new(nameof(InvalidStylesBeforeProjection), InvalidStylesBeforeProjection, false),
+            new(nameof(NullValueBeforeProjection), NullValueBeforeProjection, false),
+            new(nameof(NotADateBeforeProjection), NotADateBeforeProjection, false)
+        ];
+
+        public static RuleScenario<(string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
+    }
+
+    public static class EvaluateSystemClock
+    {
         public static readonly (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) SystemClockFarPast = ("0001-01-01", DateTimeStyles.AllowWhiteSpaces, null, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) SystemClockFarFuture = ("9999-12-31", DateTimeStyles.AllowWhiteSpaces, null, false);
+
+        public static RuleScenario<(string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull)>[] ValidScenarios =>
+        [
+            new(nameof(SystemClockFarPast), SystemClockFarPast, true)
+        ];
+
+        public static RuleScenario<(string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull)>[] InvalidScenarios =>
+        [
+            new(nameof(SystemClockFarFuture), SystemClockFarFuture, false)
+        ];
+
+        public static RuleScenario<(string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull)>[] AllScenarios => [.. ValidScenarios, .. InvalidScenarios];
     }
 }
