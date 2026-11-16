@@ -18,7 +18,7 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
         var (value, styles, timeProvider, allowNull) = tc.Value;
 
         // Act
-        var result = StringPastDateOnlyRule.IsPassed(StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out _));
+        var result = StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out _) == StringPastDateOnlyOutcome.Passed;
 
         // Assert
         AssertResult(tc, result);
@@ -49,7 +49,7 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
         var (value, styles, timeProvider, allowNull) = tc.Value;
 
         // Act
-        var result = StringPastDateOnlyRule.IsPassed(StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out _));
+        var result = StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out _) == StringPastDateOnlyOutcome.Passed;
 
         // Assert
         AssertResult(tc, result);
@@ -100,13 +100,13 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
 
     [Theory]
     [MemberData(nameof(StringPastDateOnlyRuleTestData.IsPassed.Cases), MemberType = typeof(StringPastDateOnlyRuleTestData.IsPassed))]
-    public void IsPassed_BehavesAsExpected(StringPastDateOnlyRuleTestData.IsPassed.Case tc)
+    public void IsPassed_BehavesAsExpected(RuleCase<int> tc)
     {
         // Act
         var result = StringPastDateOnlyRule.IsPassed((StringPastDateOnlyOutcome)tc.Value);
 
         // Assert
-        Assert.Equal(tc.Expected, result);
+        AssertResult(tc, result);
     }
 
     [Theory]
@@ -186,7 +186,8 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
     public void ParamName_ThrowsAsExpected(IThrowsCase tc)
     {
         // Arrange
-        var (outcome, paramName) = ((StringPastDateOnlyRuleTestData.ParamName.InvalidCase)tc).Value;
+        var t = (StringPastDateOnlyRuleTestData.ParamName.InvalidCase)tc;
+        var (outcome, paramName) = t.Value;
 
         // Act & Assert
         var ex = Assert.Throws(tc.ExpectedException.Type, () => StringPastDateOnlyRule.ParamName((StringPastDateOnlyOutcome)outcome, paramName));
@@ -212,7 +213,8 @@ public sealed class StringPastDateOnlyRuleTests(ITestOutputHelper output)
     public void Value_ThrowsAsExpected(IThrowsCase tc)
     {
         // Arrange
-        var (outcome, value, styles, timeProvider) = ((StringPastDateOnlyRuleTestData.Value.InvalidCase)tc).Value;
+        var t = (StringPastDateOnlyRuleTestData.Value.InvalidCase)tc;
+        var (outcome, value, styles, timeProvider) = t.Value;
 
         // Act & Assert
         var ex = Assert.Throws(tc.ExpectedException.Type, () => StringPastDateOnlyRule.Value((StringPastDateOnlyOutcome)outcome, value, styles, timeProvider));

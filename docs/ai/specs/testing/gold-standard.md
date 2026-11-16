@@ -37,11 +37,11 @@ A test operation group reaches **GOLD** when:
 | Project | TestData Files | Op Groups | Fixture-Based Files | Status |
 |---------|---------------|-----------|--------------------|--------|
 | PineGuard.Core.UnitTests | 115 | 701 | 59 (51%) | GOLD |
-| PineGuard.MustClauses.UnitTests | 50 | 541 | 31 (62%) | GOLD |
-| PineGuard.GuardClauses.UnitTests | 49 | 538 | 41 (84%) | GOLD |
-| PineGuard.FluentValidation.UnitTests | 52 | 660 | 40 (77%) | GOLD |
-| PineGuard.DataAnnotations.UnitTests | 50 | 355 | 18 (36%) | GOLD |
-| PineGuard.Testing.UnitTests | 15 | 57 | 0 (n/a) | GOLD |
+| PineGuard.MustClauses.UnitTests | 59 | 641 | 48 (81%) | GOLD |
+| PineGuard.GuardClauses.UnitTests | 58 | 601 | 49 (84%) | GOLD |
+| PineGuard.FluentValidation.UnitTests | 67 | 805 | 49 (73%) | GOLD |
+| PineGuard.DataAnnotations.UnitTests | 64 | 493 | 34 (53%) | GOLD |
+| PineGuard.Testing.UnitTests | 20 | 82 | 0 (n/a) | GOLD |
 
 **Counting method** (rerun these to reproduce the table):
 
@@ -91,14 +91,14 @@ TestData files using the `RuleScenario<T>` → `.ToXxxCases()` fixture pattern (
 
 | Project | Fixture-Based Files | TestData Files | Adoption |
 |---------|--------------------|----------------|----------|
-| GuardClauses | 41 | 49 | 84% |
-| FluentValidation | 40 | 52 | 77% |
-| MustClauses | 31 | 50 | 62% |
+| GuardClauses | 49 | 58 | 84% |
+| MustClauses | 48 | 59 | 81% |
+| FluentValidation | 49 | 67 | 73% |
+| DataAnnotations | 34 | 64 | 53% |
 | Core | 59 | 115 | 51% |
-| DataAnnotations | 18 | 50 | 36% |
-| Testing | 0 | 15 | N/A — tests the framework itself, no cross-layer validation inputs (`unit-test.md` §9.6) |
+| Testing | 0 | 20 | N/A — tests the framework itself, no cross-layer validation inputs (`unit-test.md` §9.6) |
 
-**Note**: DataAnnotations is now the only layer with materially low adoption. Migrating its remaining TestData files to the pattern defined in `fixture.md` is the outstanding gap.
+**Note**: Core (51%) and DataAnnotations (53%) are now the layers with the lowest adoption. Migrating their remaining TestData files to the pattern defined in `fixture.md` is the outstanding gap.
 
 ## Re-verifying Coverage
 
@@ -117,7 +117,7 @@ If a scope comes back below 100%, demote that project to SILVER here, close the 
 
 ## Next Steps
 
-1. **Increase fixture adoption** in the DataAnnotations project (36% — the outstanding gap)
+1. **Increase fixture adoption** in the Core and DataAnnotations projects (51% and 53% — the outstanding gap)
 2. **Maintain this index** — recompute the tables (per the counting method above) and re-date the
    coverage verification whenever new test classes are added
 
