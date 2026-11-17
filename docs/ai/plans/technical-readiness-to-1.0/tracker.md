@@ -32,7 +32,23 @@ departed from them.
    per the layer addendum; `Xxx_BehavesAsExpected` naming and group order per `unit-test.md` §4.4–§4.5;
    structural comments only per `fixture.md` §11.1; time-relative values per the Core addendum §6;
    `gold-standard.md` index updated per `unit-test.md` §10.5.
-6. **One run at a time.** If the branch tip is less than two hours old and was not made by this run,
+6. **Gold standard is the minimum; nothing is left behind** (`global.md` → "Gold Standard Is the
+   Minimum"). A chunk is not done while anything it touched is stale, incorrect or half finished: no
+   removed assertion without a replacement, no index or doc left untrue, no "later". Anything that
+   cannot be finished is stopped and put to the owner as open work, and the run report says so
+   first.
+7. **Standing packet header.** Subagents see only the packet they are given. Paste this block, word
+   for word, at the top of every implementation and review packet:
+
+   > OWNER STANDARD. Gold standard is the minimum. Before writing or judging anything, read in full:
+   > `docs/ai/rules/global.md`, `docs/ai/rules/testing.md`, `docs/ai/rules/fixture-conventions.md`,
+   > `docs/ai/specs/testing/unit-test.md`, `docs/ai/specs/testing/fixture.md`,
+   > `docs/ai/specs/testing/gold-standard.md` and the layer specs for every layer you touch. Match
+   > the docs and the nearest sibling file exactly. Never deviate on your own judgment: if a doc or
+   > precedent cannot be followed, stop that item and report it. Leave nothing stale, incorrect or
+   > half finished: update every doc, index and count your change makes untrue; never remove an
+   > assertion without an equal or stronger replacement. Report what is not done before what is.
+8. **One run at a time.** If the branch tip is less than two hours old and was not made by this run,
    do a verification-only run.
 
 ## Authorisation

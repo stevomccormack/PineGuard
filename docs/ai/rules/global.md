@@ -41,6 +41,23 @@ Before implementing any feature, read these specifications:
   is the owner's decision and is applied to every affected member at once, never to one file.
 - Reviewers treat an unrecorded deviation from precedent or spec as a blocker.
 
+## Gold Standard Is the Minimum — Nothing Left Behind (owner instruction, 2026-11-17)
+- Gold standard is the minimum bar for every change: code, tests, fixtures, docs and indexes. "Good
+  enough for now" does not exist in this repository.
+- A unit of work is done only when nothing it touched is stale, incorrect or half finished:
+  - every doc, index, count, table and example that the change makes untrue is corrected in the same
+    change (for example `docs/ai/specs/testing/gold-standard.md`, layer specs, READMEs, trackers);
+  - no assertion, test or guarantee is removed without an equal or stronger one replacing it in the
+    same change;
+  - no TODO, placeholder, empty dataset, skipped test, suppression or "follow-up later" is left in
+    the tree.
+- If finishing properly needs something you cannot do (a decision, a tool, access), do not ship the
+  partial version quietly. Stop, say exactly what is unfinished and why, and put it to the owner. An
+  item recorded for the owner is still open work, not a closed one.
+- Never report work as complete while any of the above is outstanding. Say what is not done.
+- Reviewers return any stale, incorrect or half-finished item as a blocker, whether or not the change
+  introduced it in the files it touched.
+
 ## File Hygiene
 - All output files (logs, reports, temp) MUST go to `artifacts/` or `logs/`.
 - NEVER create files in the project root.
