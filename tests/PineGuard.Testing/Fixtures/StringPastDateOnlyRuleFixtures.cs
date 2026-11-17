@@ -112,7 +112,7 @@ public static class StringPastDateOnlyRuleFixtures
 
     public static class EvaluateSystemClock
     {
-        public static readonly (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) SystemClockFarPast = ("1900-01-01", DateTimeStyles.AllowWhiteSpaces, null, false);
+        public static readonly (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) SystemClockFarPast = ("2000-01-01", DateTimeStyles.AllowWhiteSpaces, null, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull) SystemClockFarFuture = ("2999-01-01", DateTimeStyles.AllowWhiteSpaces, null, false);
 
         public static RuleScenario<(string? value, DateTimeStyles styles, TimeProvider? timeProvider, bool allowNull)>[] ValidScenarios =>

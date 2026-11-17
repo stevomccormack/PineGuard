@@ -36,7 +36,7 @@ A test operation group reaches **GOLD** when:
 
 | Project | TestData Files | Op Groups | Fixture-Based Files | Status |
 |---------|---------------|-----------|--------------------|--------|
-| PineGuard.Core.UnitTests | 115 | 701 | 59 (51%) | GOLD |
+| PineGuard.Core.UnitTests | 115 | 702 | 59 (51%) | GOLD |
 | PineGuard.MustClauses.UnitTests | 59 | 641 | 48 (81%) | GOLD |
 | PineGuard.GuardClauses.UnitTests | 58 | 601 | 49 (84%) | GOLD |
 | PineGuard.FluentValidation.UnitTests | 67 | 805 | 49 (73%) | GOLD |

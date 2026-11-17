@@ -66,7 +66,7 @@ public static class StringPastDateOnlyRuleTestData
 
         public static TheoryData<Case> AdHocCases =>
         [
-            new(nameof(F.EvaluateSystemClock.SystemClockFarPast), F.EvaluateSystemClock.SystemClockFarPast, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(1900, 1, 1)),
+            new(nameof(F.EvaluateSystemClock.SystemClockFarPast), F.EvaluateSystemClock.SystemClockFarPast, (int)StringPastDateOnlyOutcome.Passed, new DateOnly(2000, 1, 1)),
             new(nameof(F.EvaluateSystemClock.SystemClockFarFuture), F.EvaluateSystemClock.SystemClockFarFuture, (int)StringPastDateOnlyOutcome.NotPast, new DateOnly(2999, 1, 1))
         ];
 
@@ -82,11 +82,21 @@ public static class StringPastDateOnlyRuleTestData
         public static TheoryData<string> Cases => ["SystemClock"];
     }
 
-    // Only one scenario is meaningful: proving exactly one GetUtcNow() read per call. Asserted directly
-    // against CountingTimeProvider.UtcNowCallCount in the test method, not through AssertResult.
-    public static class OneReadBehavior
+    public static class EvaluateClockReads
     {
-        public static TheoryData<string> Cases => ["SingleRead"];
+        public static TheoryData<ClockReadCase> Cases =>
+        [
+            new(nameof(F.Evaluate.PastDate), F.Evaluate.PastDate, 1),
+            new(nameof(F.Evaluate.Tomorrow), F.Evaluate.Tomorrow, 1),
+            new(nameof(F.Evaluate.InvalidStyles), F.Evaluate.InvalidStyles, 0),
+            new(nameof(F.Evaluate.NullValue), F.Evaluate.NullValue, 0),
+            new(nameof(F.Evaluate.NullValueAllowNull), F.Evaluate.NullValueAllowNull, 0),
+            new(nameof(F.Evaluate.NotADate), F.Evaluate.NotADate, 0),
+            new(nameof(F.Evaluate.MinValueProjection), F.Evaluate.MinValueProjection, 1)
+        ];
+
+        public sealed record ClockReadCase(string Name, (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Value, int Expected)
+            : ReturnCase<(string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull), int>(Name, Value, Expected);
     }
 
     public static class IsPassed
@@ -193,13 +203,13 @@ public static class StringPastDateOnlyRuleTestData
     {
         public static TheoryData<Case> Cases =>
         [
-            new(nameof(StringPastDateOnlyOutcome.Passed), ((int)StringPastDateOnlyOutcome.Passed, F.Evaluate.PastDate.value, F.Evaluate.PastDate.styles, F.Evaluate.PastDate.timeProvider), F.Evaluate.PastDate.value),
-            new(nameof(StringPastDateOnlyOutcome.InvalidStyles), ((int)StringPastDateOnlyOutcome.InvalidStyles, F.Evaluate.InvalidStyles.value, F.Evaluate.InvalidStyles.styles, F.Evaluate.InvalidStyles.timeProvider), F.Evaluate.InvalidStyles.styles),
-            new($"{nameof(StringPastDateOnlyOutcome.InvalidStyles)}-NullValue", ((int)StringPastDateOnlyOutcome.InvalidStyles, F.Evaluate.NullValueInvalidStyles.value, F.Evaluate.NullValueInvalidStyles.styles, F.Evaluate.NullValueInvalidStyles.timeProvider), F.Evaluate.NullValueInvalidStyles.styles),
-            new(nameof(StringPastDateOnlyOutcome.Null), ((int)StringPastDateOnlyOutcome.Null, F.Evaluate.NullValue.value, F.Evaluate.NullValue.styles, F.Evaluate.NullValue.timeProvider), F.Evaluate.NullValue.value),
-            new(nameof(StringPastDateOnlyOutcome.Unparseable), ((int)StringPastDateOnlyOutcome.Unparseable, F.Evaluate.NotADate.value, F.Evaluate.NotADate.styles, F.Evaluate.NotADate.timeProvider), F.Evaluate.NotADate.value),
+            new(nameof(StringPastDateOnlyOutcome.Passed), ((int)StringPastDateOnlyOutcome.Passed, F.Evaluate.PastDate.value, F.Evaluate.PastDate.styles, F.Evaluate.PastDate.timeProvider), "2000-01-01"),
+            new(nameof(StringPastDateOnlyOutcome.InvalidStyles), ((int)StringPastDateOnlyOutcome.InvalidStyles, F.Evaluate.InvalidStyles.value, F.Evaluate.InvalidStyles.styles, F.Evaluate.InvalidStyles.timeProvider), DateTimeStyles.AssumeUniversal),
+            new($"{nameof(StringPastDateOnlyOutcome.InvalidStyles)}-NullValue", ((int)StringPastDateOnlyOutcome.InvalidStyles, F.Evaluate.NullValueInvalidStyles.value, F.Evaluate.NullValueInvalidStyles.styles, F.Evaluate.NullValueInvalidStyles.timeProvider), DateTimeStyles.AssumeUniversal),
+            new(nameof(StringPastDateOnlyOutcome.Null), ((int)StringPastDateOnlyOutcome.Null, F.Evaluate.NullValue.value, F.Evaluate.NullValue.styles, F.Evaluate.NullValue.timeProvider), null),
+            new(nameof(StringPastDateOnlyOutcome.Unparseable), ((int)StringPastDateOnlyOutcome.Unparseable, F.Evaluate.NotADate.value, F.Evaluate.NotADate.styles, F.Evaluate.NotADate.timeProvider), "not-a-date"),
             new(nameof(StringPastDateOnlyOutcome.ReferenceOutOfRange), ((int)StringPastDateOnlyOutcome.ReferenceOutOfRange, F.Evaluate.MinValueProjection.value, F.Evaluate.MinValueProjection.styles, F.Evaluate.MinValueProjection.timeProvider), F.Evaluate.MinValueProjection.timeProvider),
-            new(nameof(StringPastDateOnlyOutcome.NotPast), ((int)StringPastDateOnlyOutcome.NotPast, F.Evaluate.Tomorrow.value, F.Evaluate.Tomorrow.styles, F.Evaluate.Tomorrow.timeProvider), F.Evaluate.Tomorrow.value)
+            new(nameof(StringPastDateOnlyOutcome.NotPast), ((int)StringPastDateOnlyOutcome.NotPast, F.Evaluate.Tomorrow.value, F.Evaluate.Tomorrow.styles, F.Evaluate.Tomorrow.timeProvider), "2026-06-16")
         ];
 
         public static TheoryData<IThrowsCase> InvalidCases =>
