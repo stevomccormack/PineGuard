@@ -50,6 +50,10 @@
       "Bash(mv:*)",
       "Bash(chmod:*)",
 
+      "Bash(cd:*)",
+      "Bash(export:*)",
+      "Bash(timeout:*)",
+
       "Bash(bash:*)",
       "Bash(pwsh:*)",
 
@@ -78,9 +82,13 @@
       "Bash(git stash:*)",
       "Bash(git fetch:*)",
       "Bash(git pull:*)",
+      "Bash(git push origin:*)",
+      "Bash(git merge:*)",
+      "Bash(git checkout:*)",
 
       "Bash(dotnet:*)",
 
+      "Bash(pnpm:*)",
       "Bash(npm run:*)",
       "Bash(npm test:*)",
       "Bash(npm install:*)",
@@ -90,7 +98,7 @@
       "Bash(npm audit)",
       "Bash(node --version)",
       "Bash(node -v)",
-      "Bash(node app/cli/dist/index.js:*)",
+      "Bash(node apps/cli/dist/index.js:*)",
       "Bash(node dist/index.js:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vitest run:*)",
@@ -102,6 +110,7 @@
       "Bash(qodana:*)",
       "Bash(curl:*)",
 
+      "Bash(gh api:*)",
       "Bash(gh auth status)",
       "Bash(gh repo view:*)",
       "Bash(gh run list:*)",
@@ -115,6 +124,14 @@
       "Bash(gh issue view:*)",
       "Bash(gh release list:*)",
       "Bash(gh release view:*)",
+
+      "mcp__github",
+      "mcp__memory",
+      "mcp__sequential-thinking",
+      "mcp__nuget",
+      "mcp__sonarqube",
+      "mcp__Context7",
+      "mcp__Microsoft-Learn",
 
       "WebFetch(domain:www.iso.org)",
       "WebFetch(domain:www.iana.org)",
@@ -155,7 +172,7 @@
       "PowerShell(git checkout -b:*)",
       "PowerShell(npm run:*)",
       "PowerShell(npm test:*)",
-      "PowerShell(node app/cli/dist/index.js:*)",
+      "PowerShell(node apps/cli/dist/index.js:*)",
       "PowerShell(gh auth status)",
       "PowerShell(gh run list:*)",
       "PowerShell(gh run view:*)"
@@ -195,6 +212,8 @@
       "Bash(npm install --global:*)",
       "Bash(npm i -g:*)",
       "Bash(gh repo delete:*)",
+      "Bash(gh api -X DELETE:*)",
+      "Bash(gh api --method DELETE:*)",
 
       "PowerShell(Remove-Item -Recurse:*)",
       "PowerShell(git reset --hard:*)",
@@ -212,10 +231,8 @@
       "Bash(kill:*)",
       "Bash(taskkill:*)",
 
-      "Bash(git push:*)",
       "Bash(git restore:*)",
       "Bash(git reset:*)",
-      "Bash(git merge:*)",
       "Bash(git rebase:*)",
       "Bash(git cherry-pick:*)",
       "Bash(git clean:*)",
@@ -243,7 +260,6 @@
       "Bash(docker volume rm:*)",
       "Bash(docker volume prune:*)",
 
-      "Bash(gh api:*)",
       "Bash(gh secret:*)",
       "Bash(gh variable:*)",
 
