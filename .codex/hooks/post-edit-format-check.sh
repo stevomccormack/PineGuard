@@ -10,9 +10,11 @@
 
 set -uo pipefail
 
-# Extract file_path from stdin JSON without python (pure bash/sed)
-INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file_path" *: *"\([^"]*\)".*/\1/p' | head -1)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/hook-lib.sh" 2>/dev/null || exit 0
+
+hook_read_input
+FILE_PATH=$(hook_field "tool_input.file_path")
 
 # If we can't parse, exit silently
 if [ -z "$FILE_PATH" ]; then

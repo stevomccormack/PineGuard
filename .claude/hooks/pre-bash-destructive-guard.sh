@@ -1,181 +1,124 @@
 #!/usr/bin/env bash
 # Hook: pre-bash-destructive-guard.sh
 # PreToolUse (Bash)
-# Purpose: Intercept and block destructive git and filesystem operations.
-#          Prompts the user to CONFIRM, STASH (for git reset), or CANCEL.
+# Purpose: Stop a destructive git or filesystem command before it runs, say exactly what was found,
+#          and let it through only when the caller has confirmed it is intended.
 #
-# BYPASS: Add  # FORCE-CONFIRMED  as a comment anywhere in the command.
-#         Valid comment syntax in bash, PowerShell, and Python.
+# FORCE override (see hook-lib.sh for all three forms):
+#   re-run the same command with the trailing comment   # FORCE-CONFIRMED
+#   or once:  bash .claude/hooks/coordination.sh force destructive-guard "<reason>"
 #
-# Covered operations:
-#   git  : reset --hard | push --force/-f/--force-with-lease | branch -D | clean -f
-#   bash : rm -rf (and all recursive+force flag variants)
-#   pwsh : Remove-Item -Recurse -Force (any flag order)
-#   cmd  : rd /s  |  rmdir /s
+# Covered operations (judged per command, by destructive-guard.py):
+#   git  : reset --hard | push --force / -f / --force-with-lease / --mirror / +refspec
+#          push --delete / :refspec | branch -D | clean -f | checkout -- <path> / . / -f
+#          restore (working tree) | stash drop/clear | filter-branch | reflog expire/delete
+#          update-ref -d | worktree remove --force
+#   bash : rm -rf (every recursive+force spelling) | find -delete / -exec rm | shred | mkfs
+#   pwsh : Remove-Item -Recurse -Force (any order, any abbreviation)
+#   cmd  : rd /s | rmdir /s
 #   py   : shutil.rmtree
 #
-# Input:  JSON on stdin  { tool_name, tool_input: { command } }
+# Not flagged: text that is never executed — commit messages, heredocs written to a file, arguments
+# to echo/grep — and a clean-tree `git checkout -- <path>` / `git restore`, which has nothing to lose.
+#
+# Input:  JSON on stdin  { session_id, tool_name, tool_input: { command } }
 # Exit 0: allow
 # Exit 2: block  (stderr message shown to Claude + user)
 
 set -uo pipefail
 
-INPUT=$(cat)
+HOOK_NAME="destructive-guard"
+FORCE_MARKER="FORCE-CONFIRMED"
 
-# ─── Parse command from JSON ──────────────────────────────────────────────────
-# Python3 primary: handles multiline commands and proper JSON string decoding.
-COMMAND=$(echo "$INPUT" | python3 -c "
-import json, sys
-try:
-    data = json.load(sys.stdin)
-    print(data.get('tool_input', {}).get('command', ''))
-except Exception:
-    pass
-" 2>/dev/null)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Fail open if the shared library is missing (first-time setup, partial checkout).
+source "$SCRIPT_DIR/hook-lib.sh" 2>/dev/null || exit 0
 
-# Fallback: sed (works for simple single-line JSON values)
-if [ -z "$COMMAND" ]; then
-    COMMAND=$(echo "$INPUT" | sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
-fi
-
+hook_read_input
+COMMAND=$(hook_field "tool_input.command")
 [ -z "$COMMAND" ] && exit 0
 
-# ─── Bypass: explicit confirmation marker ────────────────────────────────────
-# When the user confirms, Claude re-runs the command with # FORCE-CONFIRMED.
-if echo "$COMMAND" | grep -qF "# FORCE-CONFIRMED"; then
-    exit 0
-fi
-
 # ─── Quick pre-filter ─────────────────────────────────────────────────────────
-# Skip all checks early if no dangerous keywords are present.
-if ! echo "$COMMAND" | grep -qiE \
-    '(rm[[:space:]]|git[[:space:]]+(reset|push|branch|clean)|Remove-Item|(rd|rmdir)[[:space:]]|shutil\.rmtree)'; then
+# Nearly every command has none of these words; skip the parser for them.
+if ! printf '%s' "$COMMAND" | grep -qiE \
+    '(rm|git|find|Remove-Item|ri|del|erase|rd|rmdir|rmtree|shred|mkfs)'; then
     exit 0
 fi
 
-# ─── Helper: print standard block message ────────────────────────────────────
-REPO_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-
-print_options() {
-    local show_stash="${1:-false}"
-    echo "   ── Options ──────────────────────────────────────────────────────" >&2
-    if [ "$show_stash" = "true" ]; then
-    echo "   STASH   — run git stash first, then proceed (no data loss)"      >&2
+# ─── Classify ─────────────────────────────────────────────────────────────────
+FINDINGS=""
+if [ -n "$HOOK_PYTHON" ] && [ -f "$SCRIPT_DIR/destructive-guard.py" ]; then
+    FINDINGS=$(printf '%s' "$COMMAND" | "$HOOK_PYTHON" "$SCRIPT_DIR/destructive-guard.py" 2>/dev/null)
+else
+    # No Python: fall back to matching the whole string. Coarser, and it can flag text that is not
+    # executed, but it never lets a destructive command through unseen.
+    add() { FINDINGS="${FINDINGS}${1}"$'\t'"${2}"$'\t'"${3}"$'\t'"0"$'\n'; }
+    if printf '%s' "$COMMAND" | grep -qE '(^|[[:space:];&|(])rm[[:space:]]' &&
+       printf '%s' "$COMMAND" | grep -qE -- '(-[a-zA-Z]*[rR][a-zA-Z]*[fF]|-[a-zA-Z]*[fF][a-zA-Z]*[rR]|--recursive.*--force|--force.*--recursive|-[rR][[:space:]].*-[fF]([[:space:]]|$)|-[fF][[:space:]].*-[rR]([[:space:]]|$))'; then
+        add "rm-recursive-force" "rm with recursive + force" "Permanently deletes directories and all their contents."
     fi
-    echo "   CONFIRM — explicitly authorize this destructive operation"        >&2
-    echo "             (I will re-run the command with # FORCE-CONFIRMED)"     >&2
-    echo "   CANCEL  — stop, do not proceed"                                   >&2
-    echo "   ─────────────────────────────────────────────────────────────────" >&2
-}
+    printf '%s' "$COMMAND" | grep -qE 'git([[:space:]]+-[cC][[:space:]]+[^[:space:]]+)*[[:space:]]+reset[[:space:]].*--hard' &&
+        add "git-reset-hard" "git reset --hard" "Moves HEAD and discards uncommitted changes."
+    printf '%s' "$COMMAND" | grep -qE 'git[[:space:]]+push[[:space:]].*(--force|--mirror|[[:space:]]-[a-zA-Z]*f[a-zA-Z]*([[:space:]]|$)|[[:space:]]\+[^[:space:]])' &&
+        add "git-push-force" "git push --force" "Rewrites remote history."
+    printf '%s' "$COMMAND" | grep -qE 'git[[:space:]]+push[[:space:]].*(--delete|[[:space:]]:[^[:space:]])' &&
+        add "git-push-delete" "git push that deletes a remote ref" "Deletes a branch or tag on the remote."
+    printf '%s' "$COMMAND" | grep -qE 'git[[:space:]]+branch[[:space:]].*-[a-zA-Z]*D' &&
+        add "git-branch-force-delete" "git branch -D (force delete)" "Unmerged commits may become unreachable."
+    printf '%s' "$COMMAND" | grep -qE 'git[[:space:]]+clean[[:space:]].*-[a-zA-Z]*f' &&
+        add "git-clean" "git clean -f" "Permanently deletes untracked files."
+    printf '%s' "$COMMAND" | grep -qiE 'Remove-Item.*-Recurse.*-Force|Remove-Item.*-Force.*-Recurse' &&
+        add "pwsh-remove-item" "PowerShell Remove-Item -Recurse -Force" "Recursive force-delete through PowerShell."
+    printf '%s' "$COMMAND" | grep -qiE '(^|[[:space:]])(rd|rmdir)[[:space:]]+/s' &&
+        add "cmd-rd-s" "rd /s or rmdir /s" "Recursively removes a directory."
+    printf '%s' "$COMMAND" | grep -qE 'shutil\.rmtree' &&
+        add "python-rmtree" "Python shutil.rmtree" "Recursive directory removal through Python."
+fi
 
-print_block() {
-    local title="$1"
-    local detail="$2"
-    local show_stash="${3:-false}"
+[ -z "$FINDINGS" ] && exit 0
+
+# ─── Drop findings that cannot lose anything on a clean tree ─────────────────
+GIT_STATUS=$(git -C "$HOOK_ROOT_DIR" status --porcelain 2>/dev/null || true)
+ACTIVE=""
+while IFS=$'\t' read -r rule title why dirty_only; do
+    [ -z "$rule" ] && continue
+    if [ "$dirty_only" = "1" ] && [ -z "$GIT_STATUS" ]; then
+        continue
+    fi
+    ACTIVE="${ACTIVE}${rule}"$'\t'"${title}"$'\t'"${why}"$'\n'
+done <<< "$FINDINGS"
+
+[ -z "$ACTIVE" ] && exit 0
+
+# ─── FORCE override ───────────────────────────────────────────────────────────
+if hook_force_requested "$HOOK_NAME" "$FORCE_MARKER" "$COMMAND" "$COMMAND"; then
+    exit 0
+fi
+
+# ─── Block ────────────────────────────────────────────────────────────────────
+NEEDS_STASH="false"
+while IFS=$'\t' read -r rule title why; do
+    [ -z "$rule" ] && continue
     echo "🚫  BLOCKED — $title" >&2
+    echo "   $why" >&2
+    case "$rule" in
+        git-reset-hard|git-checkout-discard|git-restore-discard|git-clean) NEEDS_STASH="true" ;;
+    esac
+done <<< "$ACTIVE"
+echo "" >&2
+echo "   Command:" >&2
+printf '%s\n' "$COMMAND" | head -5 | sed 's/^/     /' >&2
+echo "" >&2
+
+if [ "$NEEDS_STASH" = "true" ] && [ -n "$GIT_STATUS" ]; then
+    CHANGE_COUNT=$(printf '%s\n' "$GIT_STATUS" | grep -c "")
+    echo "   Uncommitted changes that would be lost ($CHANGE_COUNT file(s)):" >&2
+    printf '%s\n' "$GIT_STATUS" | head -15 | sed 's/^/     /' >&2
+    [ "$CHANGE_COUNT" -gt 15 ] && echo "     ... ($((CHANGE_COUNT - 15)) more)" >&2
     echo "" >&2
-    [ -n "$detail" ] && { echo "   $detail" >&2; echo "" >&2; }
-    echo "   Command:" >&2
-    echo "$COMMAND" | head -5 | sed 's/^/     /' >&2
+    echo "   Safer: run 'git stash' first, then repeat the command." >&2
     echo "" >&2
-    print_options "$show_stash"
-}
-
-# ─── 1. rm with recursive + force flags ──────────────────────────────────────
-# Covers: -rf  -fr  -rF  -fR  -Rf  -Fr  and  -r -f  -r --force  --recursive -f
-if echo "$COMMAND" | grep -qE '(^|[[:space:]])rm[[:space:]]'; then
-    HAS_RF=$(echo "$COMMAND" | grep -cE -- \
-        '(-[a-zA-Z]*[rR][a-zA-Z]*[fF][a-zA-Z]*|-[a-zA-Z]*[fF][a-zA-Z]*[rR][a-zA-Z]*)' 2>/dev/null || true)
-    HAS_R_SEPARATE=$(echo "$COMMAND" | grep -cE -- '(-r[[:space:]]|-R[[:space:]]|--recursive)' 2>/dev/null || true)
-    HAS_F_SEPARATE=$(echo "$COMMAND" | grep -cE -- '(-f[[:space:]]|-F[[:space:]]|--force)' 2>/dev/null || true)
-
-    if [ "$HAS_RF" -gt 0 ] || { [ "$HAS_R_SEPARATE" -gt 0 ] && [ "$HAS_F_SEPARATE" -gt 0 ]; }; then
-        print_block "rm with recursive + force" \
-            "Permanently deletes directories and all contents. Cannot be undone."
-        exit 2
-    fi
 fi
 
-# ─── 2. git reset --hard ──────────────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE '(^|[[:space:]])git[[:space:]]+reset[[:space:]]+--hard'; then
-    GIT_STATUS=$(git -C "$REPO_DIR" status --porcelain 2>/dev/null || true)
-
-    if [ -n "$GIT_STATUS" ]; then
-        CHANGE_COUNT=$(echo "$GIT_STATUS" | grep -c "" 2>/dev/null || echo "?")
-        echo "🚫  BLOCKED — git reset --hard with uncommitted changes" >&2
-        echo "" >&2
-        echo "   Uncommitted changes ($CHANGE_COUNT file(s)):" >&2
-        echo "$GIT_STATUS" | head -15 | sed 's/^/     /' >&2
-        if [ "$CHANGE_COUNT" -gt 15 ] 2>/dev/null; then
-            echo "     ... ($((CHANGE_COUNT - 15)) more)" >&2
-        fi
-        echo "" >&2
-        echo "   ── Options ──────────────────────────────────────────────────────" >&2
-        echo "   STASH   — git stash first, then reset --hard (changes preserved)"  >&2
-        echo "   CONFIRM — PERMANENTLY DISCARD all uncommitted changes listed above" >&2
-        echo "             (I will re-run with # FORCE-CONFIRMED)"                  >&2
-        echo "   CANCEL  — stop, do not proceed"                                    >&2
-        echo "   ─────────────────────────────────────────────────────────────────" >&2
-    else
-        print_block "git reset --hard (clean working tree)" \
-            "Moves HEAD and discards commits after the target — history is lost." \
-            "false"
-    fi
-    exit 2
-fi
-
-# ─── 3. git push --force ──────────────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE '(^|[[:space:]])git[[:space:]]+push([[:space:]]|$)'; then
-    if echo "$COMMAND" | grep -qE -- \
-        '(--force|--force-with-lease|-f([[:space:]]|$)|-[a-zA-Z]*f[a-zA-Z]*(--| |$))'; then
-        print_block "git push --force" \
-            "Rewrites remote history — affects all collaborators and cannot be undone."
-        exit 2
-    fi
-fi
-
-# ─── 4. git branch -D ─────────────────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE '(^|[[:space:]])git[[:space:]]+branch([[:space:]]|$)'; then
-    if echo "$COMMAND" | grep -qE -- '-[a-zA-Z]*D[a-zA-Z]*'; then
-        print_block "git branch -D (force delete)" \
-            "Force-deletes a branch — unmerged commits may become unreachable."
-        exit 2
-    fi
-fi
-
-# ─── 5. git clean -f ──────────────────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE '(^|[[:space:]])git[[:space:]]+clean([[:space:]]|$)'; then
-    if echo "$COMMAND" | grep -qE -- '-[a-zA-Z]*f[a-zA-Z]*'; then
-        print_block "git clean -f" \
-            "Permanently deletes all untracked files — not recoverable from git."
-        exit 2
-    fi
-fi
-
-# ─── 6. PowerShell Remove-Item with -Recurse + -Force (any order) ────────────
-if echo "$COMMAND" | grep -qiE 'Remove-Item'; then
-    HAS_RECURSE=$(echo "$COMMAND" | grep -ciE -- '(-Recurse[^a-zA-Z]|-r[[:space:]])' 2>/dev/null || true)
-    HAS_FORCE=$(  echo "$COMMAND" | grep -ciE -- '(-Force[^a-zA-Z]|-fo([[:space:]]|$))' 2>/dev/null || true)
-    if [ "$HAS_RECURSE" -gt 0 ] && [ "$HAS_FORCE" -gt 0 ]; then
-        print_block "PowerShell Remove-Item -Recurse -Force" \
-            "Recursive force-delete via PowerShell — cannot be undone."
-        exit 2
-    fi
-fi
-
-# ─── 7. Windows rd /s or rmdir /s ─────────────────────────────────────────────
-if echo "$COMMAND" | grep -qiE '(^|[[:space:]])(rd|rmdir)[[:space:]]+(/s|/S)'; then
-    print_block "rd /s or rmdir /s (Windows recursive delete)" \
-        "Recursively removes a directory and all contents — cannot be undone."
-    exit 2
-fi
-
-# ─── 8. Python shutil.rmtree ──────────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE 'shutil\.rmtree'; then
-    print_block "Python shutil.rmtree" \
-        "Recursive directory removal via Python — cannot be undone."
-    exit 2
-fi
-
-# ─── All clear ────────────────────────────────────────────────────────────────
-exit 0
+hook_force_hint "$HOOK_NAME" "$FORCE_MARKER"
+exit 2
