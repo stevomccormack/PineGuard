@@ -51,6 +51,12 @@
       "Bash(chmod:*)",
 
       "Bash(cd:*)",
+      "Bash(xargs:*)",
+      "Bash(tee:*)",
+      "Bash(jq:*)",
+      "Bash(sleep:*)",
+      "Bash(true)",
+      "Bash(comm:*)",
       "Bash(export:*)",
       "Bash(timeout:*)",
 
@@ -72,6 +78,12 @@
       "Bash(git merge-base:*)",
       "Bash(git shortlog:*)",
       "Bash(git worktree list:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git ls-remote:*)",
+      "Bash(git rev-list:*)",
+      "Bash(git cat-file:*)",
+      "Bash(git config --get:*)",
+      "Bash(git switch:*)",
 
       "Bash(git add:*)",
       "Bash(git commit:*)",
@@ -83,6 +95,8 @@
       "Bash(git fetch:*)",
       "Bash(git pull:*)",
       "Bash(git push origin:*)",
+      "Bash(git push -u origin:*)",
+      "Bash(git push --set-upstream origin:*)",
       "Bash(git merge:*)",
       "Bash(git checkout:*)",
 
@@ -100,6 +114,7 @@
       "Bash(node -v)",
       "Bash(node apps/cli/dist/index.js:*)",
       "Bash(node dist/index.js:*)",
+      "Bash(node --check:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vitest run:*)",
 
@@ -196,6 +211,11 @@
       "Bash(git clean -dfx *)",
       "Bash(git push --force *)",
       "Bash(git push -f *)",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin master:*)",
+      "Bash(git push -u origin main:*)",
+      "Bash(git push origin HEAD:main:*)",
+      "Bash(git push origin --delete:*)",
       "Bash(git branch -D main)",
       "Bash(git branch -D master)",
       "Bash(git add .)",
@@ -262,6 +282,12 @@
 
       "Bash(gh secret:*)",
       "Bash(gh variable:*)",
+
+      "mcp__github__merge_pull_request",
+      "mcp__github__enable_pr_auto_merge",
+      "mcp__github__delete_file",
+      "mcp__github__create_repository",
+      "mcp__github__fork_repository",
 
       "PowerShell(Remove-Item:*)",
       "PowerShell(rm:*)",
