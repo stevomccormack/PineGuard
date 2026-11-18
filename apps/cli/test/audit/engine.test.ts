@@ -381,10 +381,10 @@ describe("runAudit", () => {
             }),
         );
 
-        // The real apps/cli/config/exceptions.json is still the P1.1
-        // placeholder `{}`, so nothing is configured for "excepted-rule" —
-        // this proves the exceptions step runs without over-filtering when
-        // there is genuinely nothing to except.
+        // The real apps/cli/config/exceptions.json was populated at P6.2
+        // (cutover cleanup) but has no "excepted-rule" key, so nothing is
+        // configured for "excepted-rule" — this proves the exceptions step
+        // runs without over-filtering when there is genuinely nothing to except.
         const result = await runAudit({ rules: ["excepted-rule"] });
 
         expect(result.exitCode).toBe(1);

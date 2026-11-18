@@ -84,7 +84,10 @@ where a parsed value was available. Reference: `docs/ai/specs/core/project.md` �
 - **No defensive type guard.** Cast straight through (`var strValue = (string)value!;`). The base already
   returned `Success` for null and threw `InvalidOperationException` on a type mismatch, so an `is not T`
   check is an uncoverable dead branch that breaks the 100% gate (project.md §4). Exceptions:
-  `typeof(object)` polymorphic families (switch with a throwing `default:`) and `allowNull: false`
+  `typeof(object)` polymorphic families (a `switch` with a throwing default arm, an `IsEnum` or `GetType()`
+  equality check before reflection dispatch, reflection dispatch that throws when no method fits, or an
+  `is not` type pattern, each throwing `InvalidOperationException` for an unsupported runtime type;
+  `docs/ai/specs/data-annotations/project.md` §4) and `allowNull: false`
   attributes, which really do receive null.
 - Delegate: `var result = Must.Be.X(strValue, paramName: null); return FromMustResult(result, validationContext);`
 - Naming: string validators take the `String` suffix; collisions are broken with a Type/Domain suffix.
@@ -98,9 +101,10 @@ where a parsed value was available. Reference: `docs/ai/specs/core/project.md` �
 - `init` on **any** member of a `netstandard2.1` project needs `System.Runtime.CompilerServices.IsExternalInit`,
   which that TFM does not ship → `error CS0518`. It compiles fine on net8.0/net10.0/net11.0, so the error only
   appears on a full multi-TFM build — never conclude from a single-TFM build.
-- Core's polyfill is `internal` and its `InternalsVisibleTo` covers only MustClauses and GuardClauses.
-  `src/PineGuard.DataAnnotations/Polyfills/IsExternalInit.cs` is a mirrored copy. FluentValidation has no
-  copy yet and will need one the first time it uses `init`.
+- Core's polyfill is `internal` and its `InternalsVisibleTo` covers only `PineGuard.Core.UnitTests`,
+  `PineGuard.Testing.UnitTests.Rules`, `PineGuard.MustClauses`, `PineGuard.GuardClauses` and `PineGuard.Xml`.
+  `src/PineGuard.DataAnnotations/Polyfills/IsExternalInit.cs` is a mirrored copy.
+  FluentValidation has no copy yet and will need one the first time it uses `init`.
 
 ## Recurring mistakes
 

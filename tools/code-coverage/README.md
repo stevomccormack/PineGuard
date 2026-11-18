@@ -65,7 +65,7 @@ gated") remains the only engine this repo's automated 100% gate can enforce agai
 - PowerShell 7+ (`pwsh`). (Windows PowerShell 5.1 may work for some commands, but the scripts are written/tested with `pwsh`.)
 - .NET 11 SDK — see [tools/README.md](../README.md#prerequisites).
 
-The HTML report uses ReportGenerator via `dotnet-reportgenerator-globaltool`, pinned to `5.4.18` in
+The HTML report uses ReportGenerator via `dotnet-reportgenerator-globaltool`, pinned to `5.6.0` in
 `.config/dotnet-tools.json` and restored with `dotnet tool restore` (a local tool manifest, not a
 global install); the scripts invoke it as `dotnet reportgenerator`.
 

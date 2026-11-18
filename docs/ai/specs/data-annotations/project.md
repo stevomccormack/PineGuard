@@ -168,11 +168,23 @@ public sealed class PastDateOnlyAttribute() : ValidationAttributeBase(typeof(Dat
 > `InvalidOperationException` on a type mismatch, so an `is not T` guard is an uncoverable dead branch
 > and breaks the 100% line + branch gate. Two exceptions:
 >
-> - Attributes constructed with `typeof(object)` for a polymorphic family (`TimeAttributes.cs`,
->   `NumberAttributes.cs`, `CollectionAttributes.cs`) must `switch` on the runtime type with a throwing
->   `default:` arm.
-> - Attributes constructed with `allowNull: false` (`ObjectAttributes.cs`, `StringAttributes.cs`) still
->   receive `null` and must handle it explicitly.
+> - Attributes constructed with `typeof(object)` for a polymorphic family must check the runtime type
+>   themselves and throw `InvalidOperationException` for an unsupported one: with a `switch` and a throwing
+>   default arm (`ComparePropertyAttributes.cs`, `NumberAttributes.cs`, `SqlDateTimeAttributes.cs`,
+>   `TimeAttributes.cs`); with an `IsEnum` check before reflection dispatch (`EnumAttributes.cs`); with a
+>   `GetType()` equality check before reflection dispatch (`ComparePropertyAttributes.cs`); with reflection
+>   dispatch that throws when no method fits the runtime type (`CollectionAttributes.cs`,
+>   `DictionaryAttributes.cs`, `NumberAttributes.cs`, `ReadOnlyDictionaryAttributes.cs`); or with an `is not`
+>   type pattern (`XmlAttributes.cs`). Attributes constructed with `typeof(object)` that accept every runtime
+>   type (`DefaultEqualityAttributes.cs`, `ObjectAttributes.cs`, and the equality attributes in
+>   `ComparePropertyAttributes.cs`) need no type check.
+> - Attributes constructed with `allowNull: false` (`DateOnlyAttributes.cs`, `DateOnlyRangeAttributes.cs`,
+>   `DateTimeAttributes.cs`, `DateTimeOffsetRangeAttributes.cs`, `DateTimeRangeAttributes.cs`,
+>   `DefaultEqualityAttributes.cs`, `NetworkAttributes.cs`, `ObjectAttributes.cs`, `StringAttributes.cs`,
+>   `StringDateOnlyAttributes.cs`, `StringDateTimeOffsetAttributes.cs`, `StringGeoLocationAttributes.cs`,
+>   `StringGraphemesAttributes.cs`, `StringNumberTypesAttributes.cs`, `StringNumbersAttributes.cs`,
+>   `StringTimeOnlyAttributes.cs`, `StringTimeSpanAttributes.cs`, `TimeOnlyAttributes.cs`,
+>   `TimeOnlyRangeAttributes.cs`, `TimeSpanAttributes.cs`) still receive `null` and must handle it explicitly.
 
 ### 4.1 The Rule
 

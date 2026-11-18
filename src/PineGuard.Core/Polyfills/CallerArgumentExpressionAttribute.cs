@@ -11,9 +11,9 @@ namespace System.Runtime.CompilerServices;
 /// well-known attribute by its fully-qualified name regardless of accessibility, so callers never need to see
 /// the type itself. Keeping it internal (rather than public) prevents it from being exported as part of this
 /// assembly's public API surface, where it would collide with the real BCL type for any netcoreapp3.0-net7.0
-/// consumer resolving the netstandard2.1 asset. <c>PineGuard.MustClauses</c> and <c>PineGuard.GuardClauses</c>
-/// apply <c>[CallerArgumentExpression]</c> on their own netstandard2.1 builds and are granted friend access via
-/// <c>InternalsVisibleTo</c> in this project's csproj so they can still see this type at compile time.
+/// consumer resolving the netstandard2.1 asset. <c>PineGuard.MustClauses</c>, <c>PineGuard.GuardClauses</c> and
+/// <c>PineGuard.Xml</c> apply <c>[CallerArgumentExpression]</c> on their own netstandard2.1 builds and are granted
+/// friend access via <c>InternalsVisibleTo</c> in this project's csproj so they can still see this type at compile time.
 /// </remarks>
 /// <param name="parameterName">The name of the parameter whose caller expression should be captured.</param>
 [AttributeUsage(AttributeTargets.Parameter)]

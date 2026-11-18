@@ -88,7 +88,9 @@ the legacy methods untouched, the same treatment the Must layer gave `MustString
 
 One fixture's null scenario is a failure at Must, a throw at Guard, and a pass at both Fluent and
 DataAnnotations (FluentValidation skips null per its project.md §5; the DA base returns `Success` for
-null). See [[fluent-adapter-nuances]].
+null under the default `allowNull: true`, while an `allowNull: false` attribute receives the null and
+skips it only when Must does not attribute the failure to configuration — presence-style attributes such
+as `NotNullAttribute` carry the clause's verdict instead). See [[fluent-adapter-nuances]].
 
 **Only null flips.** For a reference-typed fixture (`byte[]?`, `string?`), the *empty* row is a
 different row: `[]` and `""` are present rather than absent, so `ValidationAttributeBase.IsValid`

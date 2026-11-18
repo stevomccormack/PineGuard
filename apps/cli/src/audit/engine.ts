@@ -228,9 +228,9 @@ export function resolveSelection(
  * `config/exceptions.json`'s `{ "<slug>": ["<substring>", ...] }`, a finding
  * is suppressed when any of its rule's substrings appears in either the
  * finding's `file` or its `message`. Deliberately simple for P1.5's "wire it
- * up" mandate; the real ported exceptions (from
- * `tools/audit-cli/test-audit-exceptions.json`) are P5's job and can refine
- * the matching shape then if a plain substring proves too coarse.
+ * up" mandate; the entries ported from
+ * `tools/audit-cli/test-audit-exceptions.json` at P6.2 (cutover cleanup) kept
+ * the plain-substring shape.
  */
 export function applyExceptions(
     findings: readonly Finding[],

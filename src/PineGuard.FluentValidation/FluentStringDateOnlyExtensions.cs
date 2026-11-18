@@ -27,7 +27,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> has been validated;
+    /// the clock is not read.
+    /// </remarks>
     /// <example><code>RuleFor(x => x.BirthDate).PastDateOnly();</code></example>
     public static IRuleBuilderOptions<TModel, string?> PastDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         TimeProvider? timeProvider = null,
@@ -46,7 +49,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> has been validated;
+    /// the clock is not read.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> PastOrPresentDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         TimeProvider? timeProvider = null,
         DateTimeStyles styles = DefaultStyles,
@@ -64,7 +70,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> has been validated;
+    /// the clock is not read.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> FutureDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         TimeProvider? timeProvider = null,
         DateTimeStyles styles = DefaultStyles,
@@ -82,7 +91,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> has been validated;
+    /// the clock is not read.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> FutureOrPresentDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         TimeProvider? timeProvider = null,
         DateTimeStyles styles = DefaultStyles,
@@ -99,7 +111,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> InRangeDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly min,
         DateOnly max,
@@ -118,7 +130,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> OutOfRangeDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly min,
         DateOnly max,
@@ -136,7 +148,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> has been validated;
+    /// <paramref name="days"/> is not validated.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> WithinDaysDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly? reference,
         int days,
@@ -153,7 +168,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> has been validated;
+    /// <paramref name="days"/> is not validated.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> NotWithinDaysDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly? reference,
         int days,
@@ -170,7 +188,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> has been validated;
+    /// <paramref name="months"/> is not validated.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> WithinCalendarMonthsDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly? reference,
         int months,
@@ -187,7 +208,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> has been validated;
+    /// <paramref name="months"/> is not validated.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> NotWithinCalendarMonthsDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly? reference,
         int months,
@@ -204,7 +228,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> BeforeDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -221,7 +245,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotBeforeDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -238,7 +262,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> OnOrBeforeDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -255,7 +279,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotOnOrBeforeDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -272,7 +296,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> AfterDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -289,7 +313,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotAfterDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -306,7 +330,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> OnOrAfterDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -323,7 +347,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotOnOrAfterDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -340,7 +364,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> SameDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -357,7 +381,7 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>If the value is <see langword="null"/>, validation is skipped after configuration is validated.</remarks>
     public static IRuleBuilderOptions<TModel, string?> NotSameDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         DateOnly other,
         DatePrecision? precision = null,
@@ -374,7 +398,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> and
+    /// <paramref name="inclusion"/> have been validated; <paramref name="end"/> is not validated.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> ChronologicalDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         string end,
         Inclusion inclusion = Inclusion.Exclusive,
@@ -391,7 +418,10 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> and
+    /// <paramref name="inclusion"/> have been validated; <paramref name="end"/> is not validated.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> NotChronologicalDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         string end,
         Inclusion inclusion = Inclusion.Exclusive,
@@ -410,7 +440,11 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> and
+    /// <paramref name="inclusion"/> have been validated; <paramref name="end1"/>, <paramref name="start2"/> and
+    /// <paramref name="end2"/> are not validated.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> OverlappingDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         string end1,
         string start2,
@@ -431,7 +465,11 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> and
+    /// <paramref name="inclusion"/> have been validated; <paramref name="end1"/>, <paramref name="start2"/> and
+    /// <paramref name="end2"/> are not validated.
+    /// </remarks>
     public static IRuleBuilderOptions<TModel, string?> NotOverlappingDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         string end1,
         string start2,
@@ -453,7 +491,11 @@ public static class FluentStringDateOnlyExtensions
     /// <param name="styles">The <see cref="DateTimeStyles"/> used for parsing.</param>
     /// <param name="message">An optional custom error message. If <see langword="null"/>, uses the default PineGuard message.</param>
     /// <returns>An <see cref="IRuleBuilderOptions{TModel, TProperty}"/> for further rule chaining.</returns>
-    /// <remarks>If the value is <see langword="null"/>, validation passes. A negative <paramref name="years"/> is a configuration error, reported against that parameter.</remarks>
+    /// <remarks>
+    /// If the value is <see langword="null"/>, validation is skipped once <paramref name="styles"/> and
+    /// <paramref name="years"/> have been validated; the clock is not read. A negative <paramref name="years"/> is a
+    /// configuration error, reported against that parameter.
+    /// </remarks>
     /// <example><code>RuleFor(x => x.DateOfBirth).MinimumAgeDateOnly(18);</code></example>
     public static IRuleBuilderOptions<TModel, string?> MinimumAgeDateOnly<TModel>(this IRuleBuilder<TModel, string?> ruleBuilder,
         int years,
