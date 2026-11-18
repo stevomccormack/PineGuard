@@ -71,7 +71,7 @@ Containers").
 
 | Unit | Working branch | Session | Chunk | Started (UTC) | Heartbeat (UTC) |
 |---|---|---|---|---|---|
-| string→DateOnly pilot | `feature/dateonly-pilot` | — | — | — | — |
+| string→DateOnly pilot | `feature/dateonly-pilot` | https://claude.ai/code/session_01LjSDTZW2psJHVbDXnVS2hy | Owner replies and `main` sync; C3 only if AO-11 is answered, otherwise verification only | 2026-11-18 05:03 | 2026-11-18 05:03 |
 
 ## Authorisation
 
