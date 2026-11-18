@@ -68,3 +68,6 @@ Before implementing any feature, read these specifications:
   concurrently with another session; never clear another session's status or lock.
 - Claude Code sessions get this enforced automatically via `.claude/hooks/`. Other surfaces satisfy the
   same contract by hand — see coordination.md §Universal Contract.
+- Sessions in separate containers (cloud sessions, scheduled runs) cannot see that status board. They
+  claim their unit in its tracker's Active runs table on the working branch before any other work —
+  see coordination.md §Sessions in Separate Containers.
