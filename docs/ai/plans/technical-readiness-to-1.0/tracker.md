@@ -71,7 +71,7 @@ Containers").
 
 | Unit | Working branch | Session | Chunk | Started (UTC) | Heartbeat (UTC) |
 |---|---|---|---|---|---|
-| string→DateOnly pilot | `feature/dateonly-pilot` | — | — | — | — |
+| string→DateOnly pilot | `feature/dateonly-pilot` | `session_01LjSDTZCSAGkZKPDC8nTE86` | Sync with `main`, then C3 | 2026-11-18 02:09 | 2026-11-18 02:09 |
 
 ## Authorisation
 
