@@ -8,51 +8,81 @@
 #            artifacts/test-results/YYYY-MM-DD/ — .trx test results
 #            artifacts/code-coverage/ — coverage XML
 #
-# Input: JSON from stdin with tool_name and tool_input
+# Scope: only a file written directly into the project root. A file outside the project (a session
+# scratchpad, the system temp directory) and a file in any subdirectory are not this hook's concern.
+#
+# FORCE override (see hook-lib.sh):
+#   once:  bash .claude/hooks/coordination.sh force output-dirs "<reason>"
+#
+# Input: JSON from stdin with session_id, tool_name and tool_input
 # Exit 0: Allow the write
 # Exit 2: Block the write (stderr message shown to user)
 
 set -uo pipefail
 
-# Extract file_path from stdin JSON without python (pure bash/sed)
-INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file_path" *: *"\([^"]*\)".*/\1/p' | head -1)
+HOOK_NAME="output-dirs"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/hook-lib.sh" 2>/dev/null || exit 0
+
+hook_read_input
+FILE_PATH=$(hook_field "tool_input.file_path")
 
 # If we can't parse, allow (fail open)
 if [ -z "$FILE_PATH" ]; then
   exit 0
 fi
 
-# Normalize path separators for Windows
-FILE_PATH=$(echo "$FILE_PATH" | tr '\\' '/')
+# Normalize path separators and drive-letter case for Windows
+normalize() {
+  local path
+  path=$(printf '%s' "$1" | tr '\\' '/')
+  path="${path%/}"
+  case "$path" in
+    [A-Za-z]:/*) path="$(printf '%s' "${path:0:1}" | tr '[:upper:]' '[:lower:]')${path:1}" ;;
+  esac
+  printf '%s' "$path"
+}
 
-# Get just the filename and its parent directory
+FILE_PATH=$(normalize "$FILE_PATH")
+ROOT=$(normalize "$HOOK_ROOT_DIR")
 FILENAME=$(basename "$FILE_PATH")
-# Get the relative path from project root (strip drive letter and project path)
-REL_PATH=$(echo "$FILE_PATH" | sed -E 's|^.*/PineGuard/||' | sed -E 's|^[A-Za-z]:/[^/]*/||')
 
-# Check if file is in the project root (no directory separator in relative path)
-DIR_PART=$(dirname "$REL_PATH")
+# Relative paths are relative to the project root.
+case "$FILE_PATH" in
+  /*|[A-Za-z]:/*) ;;
+  *) FILE_PATH="$ROOT/${FILE_PATH#./}" ;;
+esac
 
-# Allow files in known source directories
+# Outside the project: not ours to police.
+case "$FILE_PATH" in
+  "$ROOT"/*) REL_PATH="${FILE_PATH#"$ROOT"/}" ;;
+  *) exit 0 ;;
+esac
+
+# In a subdirectory: allowed. Only the root itself is protected.
 case "$REL_PATH" in
-  src/*|tests/*|docs/*|tools/*|apps/*|.claude/*|.agent/*|.agents/*|.codex/*|.cursor/*|.github/*|.opencode/*|.vscode/*|artifacts/*|logs/*|diagnostics/*)
-    exit 0
-    ;;
+  */*) exit 0 ;;
 esac
 
-# Allow known root config/source files by extension
+# Allow known root config/source files by extension or name
 case "$FILENAME" in
-  *.cs|*.csproj|*.sln|*.md|*.json|*.xml|*.yaml|*.yml|*.ps1|*.psm1|*.psd1|*.sh|*.editorconfig|*.gitignore|*.gitattributes|*.props|*.targets|*.ruleset|*.DotSettings)
+  *.cs|*.csproj|*.sln|*.slnx|*.md|*.json|*.xml|*.yaml|*.yml|*.ps1|*.psm1|*.psd1|*.sh|*.props|*.targets|*.ruleset|*.DotSettings|*.config|*.toml)
     exit 0
     ;;
-  # Allow specific known root files
-  CLAUDE.md|AGENTS.md|LICENSE|LICENSE.md|README.md|Directory.Build.props|Directory.Packages.props|nuget.config|global.json)
+  .editorconfig|.gitignore|.gitattributes|.node-version|.nvmrc|.npmrc|.dockerignore|.globalconfig)
+    exit 0
+    ;;
+  CLAUDE.md|AGENTS.md|LICENSE|LICENSE.md|README.md|Directory.Build.props|Directory.Packages.props|global.json)
     exit 0
     ;;
 esac
 
-# If we got here, the file is in the project root and not a recognized source file
+if hook_force_requested "$HOOK_NAME" "" "" "$REL_PATH"; then
+  exit 0
+fi
+
+# The file is in the project root and not a recognized source file.
 # Block it and suggest a structured location based on file type
 TODAY=$(date +%Y-%m-%d)
 
@@ -75,12 +105,14 @@ case "$FILENAME" in
   *.sarif)
     echo "  Move to: artifacts/<tool>/report/$FILENAME" >&2
     ;;
-  *.ps1|*.sh|*.py)
+  *.py)
     echo "  Move to: \$TEMP (system temp) or artifacts/tmp/$FILENAME" >&2
     ;;
   *)
     echo "  Move to: artifacts/<category>/$FILENAME or logs/$TODAY/$FILENAME" >&2
     ;;
 esac
+echo "" >&2
+hook_force_hint "$HOOK_NAME"
 
 exit 2
