@@ -5,8 +5,8 @@ essentials: how to build, test, and submit changes that pass CI on the first try
 
 ## Prerequisites
 
-- [.NET SDK 10.0](https://dotnet.microsoft.com/download) (the solution multi-targets
-  `netstandard2.1;net8.0;net10.0`; test projects run on `net8.0` and `net10.0`)
+- [.NET SDK 11.0](https://dotnet.microsoft.com/download) (the solution multi-targets
+  `netstandard2.1;net8.0;net10.0;net11.0`; test projects run on `net8.0`, `net10.0` and `net11.0`)
 - PowerShell 7+ (repo tooling under `tools/` is PowerShell-based)
 - Node 22+ and pnpm (only for the audit CLI under `apps/cli`; `.node-version` pins the version)
 
@@ -26,7 +26,7 @@ essentials: how to build, test, and submit changes that pass CI on the first try
 # Build (Release, zero warnings — TreatWarningsAsErrors is on)
 dotnet build PineGuard.slnx -c Release
 
-# Run all tests (14 test projects × 2 target frameworks)
+# Run all tests (15 test projects × 3 target frameworks)
 dotnet test PineGuard.slnx -c Release
 
 # Formatting must be clean before you push (CI gates on this)

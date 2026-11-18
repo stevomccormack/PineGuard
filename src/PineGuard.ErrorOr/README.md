@@ -16,7 +16,7 @@ Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core) and `
 
 ### Supported frameworks
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`. `ErrorOr` ships a `netstandard2.0` asset, so every one of those three resolves.
+Targets `net8.0`, `net10.0`, `net11.0`, and `netstandard2.1`. `ErrorOr` ships a `netstandard2.0` asset, so every one of those four resolves.
 
 ## What you get
 

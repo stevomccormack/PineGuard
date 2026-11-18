@@ -373,5 +373,5 @@ var ok = NumberRules.IsPositive(parsed); // concrete decimal overload, every tar
 When asked to add a new MustClause feature, produce:
 
 - One or more new/updated MustXxxClauses.cs files under src/PineGuard.MustClauses/.
-- Code that compiles under all repo target frameworks — `netstandard2.1`, `net8.0` and `net10.0` (see `Directory.Build.props`) — with nullable enabled. Guard any BCL API not present on `netstandard2.1` behind the existing conditional-compilation pattern rather than assuming net8.0+.
+- Code that compiles under all repo target frameworks — `netstandard2.1`, `net8.0`, `net10.0` and `net11.0` (see `Directory.Build.props`) — with nullable enabled. Guard any BCL API not present on `netstandard2.1` behind the existing conditional-compilation pattern rather than assuming net8.0+.
 - No unit tests (unless explicitly requested in a separate task).

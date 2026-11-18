@@ -5,7 +5,7 @@ PowerShell scripts for building, testing, auditing, formatting, generating, and 
 ## Prerequisites
 
 - PowerShell 7+ (`pwsh`)
-- .NET 10 SDK (builds every target framework). Libraries multi-target `netstandard2.1;net8.0;net10.0`; test projects target `net8.0;net10.0`.
+- .NET 11 SDK (builds every target framework). Libraries multi-target `netstandard2.1;net8.0;net10.0;net11.0`; test projects target `net8.0;net10.0;net11.0`.
 
 ## Tool Directories
 

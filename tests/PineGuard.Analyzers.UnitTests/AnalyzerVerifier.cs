@@ -26,13 +26,18 @@ public static class AnalyzerVerifier
     ];
 
     // The snippets are compiled against the same framework the test host runs on, so the PineGuard
-    // assemblies loaded above (net8.0 on one leg, net10.0 on the other) never out-version the
-    // reference assemblies they are placed beside.
-    private static ReferenceAssemblies TargetFrameworkReferences =>
-#if NET10_0_OR_GREATER
-        ReferenceAssemblies.Net.Net100;
+    // assemblies loaded above (one framework per test leg: net8.0, net10.0 or net11.0) never
+    // out-version the reference assemblies they are placed beside.
+#if NET11_0_OR_GREATER
+    // Microsoft.CodeAnalysis.Testing 1.1.4 predates .NET 11 — its Net collection stops at Net100 — so
+    // the net11.0 set is constructed the same way the library builds its own, and held in one instance
+    // so the resolved reference packages are cached across tests.
+    private static readonly ReferenceAssemblies TargetFrameworkReferences =
+        new("net11.0", new PackageIdentity("Microsoft.NETCore.App.Ref", "11.0.0"), Path.Combine("ref", "net11.0"));
+#elif NET10_0_OR_GREATER
+    private static ReferenceAssemblies TargetFrameworkReferences => ReferenceAssemblies.Net.Net100;
 #else
-        ReferenceAssemblies.Net.Net80;
+    private static ReferenceAssemblies TargetFrameworkReferences => ReferenceAssemblies.Net.Net80;
 #endif
 
     /// <summary>

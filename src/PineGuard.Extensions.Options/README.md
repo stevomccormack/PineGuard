@@ -16,7 +16,7 @@ Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core), [Pin
 
 ### Supported frameworks
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`. `ValidateOnStart()` and `IStartupValidator` ship inside `Microsoft.Extensions.Options` itself on every one of those three — confirmed against the package this project actually restores — so this package adds no dependency on `Microsoft.Extensions.Hosting` anywhere in `src/`. Your application already references `Microsoft.Extensions.Hosting` (directly, or via `Microsoft.NET.Sdk.Web`) because that is what actually calls `IStartupValidator.Validate()` during `Host.StartAsync()`; this package's job stops at registering the validator and formatting its failures.
+Targets `net8.0`, `net10.0`, `net11.0`, and `netstandard2.1`. `ValidateOnStart()` and `IStartupValidator` ship inside `Microsoft.Extensions.Options` itself on every one of those four — confirmed against the package this project actually restores — so this package adds no dependency on `Microsoft.Extensions.Hosting` anywhere in `src/`. Your application already references `Microsoft.Extensions.Hosting` (directly, or via `Microsoft.NET.Sdk.Web`) because that is what actually calls `IStartupValidator.Validate()` during `Host.StartAsync()`; this package's job stops at registering the validator and formatting its failures.
 
 ## What you get
 

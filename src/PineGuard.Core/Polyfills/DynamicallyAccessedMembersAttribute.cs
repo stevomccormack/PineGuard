@@ -5,7 +5,7 @@ namespace System.Diagnostics.CodeAnalysis;
 /// A netstandard2.1 polyfill of the BCL <c>System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes</c>,
 /// used to describe which members of a type are dynamically accessed (e.g. via reflection) so trimming tools
 /// can preserve them. Only compiled when targeting frameworks below net5.0 (the type is provided by the
-/// runtime on net5.0 and later, including net8.0 and net10.0).
+/// runtime on net5.0 and later, including every modern PineGuard target).
 /// </summary>
 [Flags]
 internal enum DynamicallyAccessedMemberTypes

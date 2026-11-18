@@ -171,7 +171,7 @@ function Resolve-CoverageTestFrameworks {
         execute.
 
     .DESCRIPTION
-        Every PineGuard test project multi-targets net8.0;net10.0 (tests/Directory.Build.props),
+        Every PineGuard test project multi-targets net8.0;net10.0;net11.0 (tests/Directory.Build.props),
         so 'dotnet publish' with no -f fails NETSDK1129. This is the single place that decides,
         for one project, how many isolated-publish passes to run and with which framework each
         pass binds -- consumed by coverlet/New-CoverageReport.ps1's -Isolated loop.
@@ -231,7 +231,7 @@ function Get-IsolatedPublishArguments {
 
     .DESCRIPTION
         -Framework is mandatory and must be non-blank: publishing a multi-targeted test project
-        (net8.0;net10.0, tests/Directory.Build.props) with no -f is exactly the NETSDK1129 failure
+        (net8.0;net10.0;net11.0, tests/Directory.Build.props) with no -f is exactly the NETSDK1129 failure
         this helper exists to prevent, so an unbound/blank -Framework is a caller bug, not a
         resolvable case -- it throws immediately rather than shelling out to fail later.
 

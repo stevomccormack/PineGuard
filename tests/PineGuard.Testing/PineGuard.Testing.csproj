@@ -7,7 +7,7 @@
          docs that do exist (base classes, helpers) still ship in the doc file. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
-    <!-- TFMs inherited from tests/Directory.Build.props: net8.0;net10.0. netstandard2.1 is intentionally excluded — fixtures reference TimeOnly (net6.0+) unconditionally. -->
+    <!-- TFMs inherited from tests/Directory.Build.props: net8.0;net10.0;net11.0. netstandard2.1 is intentionally excluded — fixtures reference TimeOnly (net6.0+) unconditionally. -->
     <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
     <Description>Shared fixtures, base test classes, and assertion helpers for consumers writing PineGuard-based validation tests.</Description>
     <PackageTags>xunit;testing;test-fixtures;validation-testing;pineguard</PackageTags>

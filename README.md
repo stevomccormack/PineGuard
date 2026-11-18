@@ -23,9 +23,9 @@
 
 <p align="center">
   <a href="#quality-metrics"><img src="https://img.shields.io/badge/Coverage%20gate-100%25%20line%20%C2%B7%20100%25%20branch-brightgreen?style=for-the-badge" alt="Default CI coverage gate: 100% line and branch" /></a>
-  <a href="#quality-metrics"><img src="https://img.shields.io/badge/Test%20matrix-15%20projects%20%C3%97%202%20TFMs-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="15 test projects on .NET 8 and .NET 10" /></a>
+  <a href="#quality-metrics"><img src="https://img.shields.io/badge/Test%20matrix-15%20projects%20%C3%97%203%20TFMs-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="15 test projects on .NET 8, .NET 10 and .NET 11" /></a>
   <a href="SECURITY.md"><img src="https://img.shields.io/badge/Security-private%20reporting-blue?style=for-the-badge" alt="Security policy and private vulnerability reporting" /></a>
-  <img src="https://img.shields.io/badge/.NET-netstandard2.1%20%7C%20net8.0%20%7C%20net10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="netstandard2.1 | net8.0 | net10.0" />
+  <img src="https://img.shields.io/badge/.NET-netstandard2.1%20%7C%20net8.0%20%7C%20net10.0%20%7C%20net11.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="netstandard2.1 | net8.0 | net10.0 | net11.0" />
 </p>
 
 ```csharp
@@ -39,7 +39,7 @@ var callback = Guard.Against.NotHttpsUrl(url);   // returns a parsed Uri, not th
 
 **Fifteen packages, one validation engine.** Result-based validation, fail-fast guards, FluentValidation
 extensions, DataAnnotations, and integrations for the rest of your .NET application. The CI matrix covers
-15 test projects on .NET 8 and .NET 10, with a default **100% line and branch coverage** gate.
+15 test projects on .NET 8, .NET 10 and .NET 11, with a default **100% line and branch coverage** gate.
 See [quality metrics](#quality-metrics) for evidence, scan snapshots, and checks still to be added.
 
 > **Release status:** PineGuard is pre-1.0. This README describes the current source tree; the
@@ -109,7 +109,7 @@ fixtures and test helpers across these surfaces.
 
 ## Quick start
 
-For a .NET 8 or .NET 10 application, install the published alpha packages:
+For a .NET 8, .NET 10 or .NET 11 application, install the published alpha packages:
 
 ```bash
 dotnet add package PineGuard.MustClauses --prerelease
@@ -412,8 +412,8 @@ flowchart TB
 ```
 
 Guard exceptions stay 500s by default, because a guard three layers deep is a bug in your code, not a bad
-request. On .NET 10, `AddValidation(o => o.AddMustValidatorResolver())` plugs the same validators into the
-built-in `Microsoft.Extensions.Validation` pipeline. Attempted values are omitted from the response.
+request. On .NET 10 and later, `AddValidation(o => o.AddMustValidatorResolver())` plugs the same validators
+into the built-in `Microsoft.Extensions.Validation` pipeline. Attempted values are omitted from the response.
 
 > **Same rule, next stop:** the mediator.
 
@@ -608,7 +608,7 @@ including overloads; they are not counts of distinct underlying validation rules
 | [`PineGuard.Xml`](src/PineGuard.Xml/README.md) | `Must.Be.ValidXml(payload, schemas)`: XSD conformance over a compiled schema set, every violation listed by element path |
 | [`PineGuard.Extensions.Options`](src/PineGuard.Extensions.Options/README.md) | `ValidateMustRules()` for `IOptions<T>`; fail at host start with every violation listed |
 | [`PineGuard.Extensions.DependencyInjection`](src/PineGuard.Extensions.DependencyInjection/README.md) | Register one validator or scan an assembly; resolve by `Type` at run time |
-| [`PineGuard.AspNetCore`](src/PineGuard.AspNetCore/README.md) | Minimal API and MVC auto-validation, RFC 9457 bodies with codes, exception handler, .NET 10 validation resolver, localisation seam |
+| [`PineGuard.AspNetCore`](src/PineGuard.AspNetCore/README.md) | Minimal API and MVC auto-validation, RFC 9457 bodies with codes, exception handler, .NET 10+ validation resolver, localisation seam |
 | [`PineGuard.MediatR`](src/PineGuard.MediatR/README.md) | `IPipelineBehavior` that validates every request, throw or respond |
 | [`PineGuard.ErrorOr`](src/PineGuard.ErrorOr/README.md) | `ToErrorOr()`, `ToErrors()`: code, message and path onto `Error.Validation` |
 | [`PineGuard.FluentResults`](src/PineGuard.FluentResults/README.md) | `ToResult()` with a `MustError` that carries the code |
@@ -630,11 +630,12 @@ the published alpha.
 | `netstandard2.1` | Runtime libraries except `PineGuard.AspNetCore` and `PineGuard.Testing` |
 | `net8.0` | All runtime libraries, including `PineGuard.Testing` |
 | `net10.0` | All runtime libraries; also enables the `Microsoft.Extensions.Validation` integration in `PineGuard.AspNetCore` |
+| `net11.0` | All runtime libraries, including the `Microsoft.Extensions.Validation` integration in `PineGuard.AspNetCore` |
 | `netstandard2.0` | `PineGuard.Analyzers`, loaded by the compiler rather than the application |
 
 `PineGuard.Analyzers` targets `netstandard2.0` and runs inside the compiler, not your app, so the project's
-own target does not matter. It is built against Roslyn 5.9, so the build machine needs the compiler that
-ships with the .NET 10 SDK (10.0.400 or newer).
+own target does not matter. It is built against Roslyn 5.12, so the build machine needs a compiler at least
+that new — the .NET 11 SDK (11.0.100 or newer) ships it.
 
 Generic-math clauses such as `Must.Be.Positive<T>` need `INumber<T>` and therefore `net8.0` or later.
 `PineGuard.Core` carries no third-party dependencies: only `System.Text.Json`,
@@ -651,7 +652,7 @@ PineGuard amplifies what you already run. It does not ask you to leave it.
 | **FluentValidation** | 770+ rule-builder extensions on the same `RuleFor(...)`; any Must clause drops in via `MustBe(...)`; validators cross both ways with `SetMustValidator(...)` and `FluentMustValidator<T>` |
 | **Guard clauses** | the familiar `Guard.Against.X` shape, parsed return values, and your own exception via a global, scoped or per-call policy |
 | **DataAnnotations** | 390+ attributes on top of the built-in handful, and `ToValidationResults()` to run a `MustValidator<T>` inside `IValidatableObject` |
-| **Minimal APIs / MVC** | auto-validation after binding, one RFC 9457 body with codes, and the .NET 10 built-in validation pipeline |
+| **Minimal APIs / MVC** | auto-validation after binding, one RFC 9457 body with codes, and the .NET 10+ built-in validation pipeline |
 | **MediatR** | the validation behavior, written once, with merge-every-failure semantics |
 | **ErrorOr / FluentResults / OneOf** | one extension method per library; the code survives the crossing |
 | **Options pattern** | `ValidateMustRules().ValidateOnStart()` with every violation in a single exception |
@@ -673,7 +674,7 @@ reports live workflow status; the archived screenshots are historical snapshots.
 
 | Metric or check | Status | Evidence and scope |
 |---|---|---|
-| Test matrix | **15 test projects × 2 target frameworks** | [CI workflow](.github/workflows/ci.yml) and [test targets](tests/Directory.Build.props): .NET 8 and .NET 10; affected suites on pull requests, all suites on `main` |
+| Test matrix | **15 test projects × 3 target frameworks** | [CI workflow](.github/workflows/ci.yml) and [test targets](tests/Directory.Build.props): .NET 8, .NET 10 and .NET 11; affected suites on pull requests, all suites on `main` |
 | .NET 10 tests | **18,887 passed / 18,887 executed** | [25 September 2026 local run](docs/reports/readme-verification-2026-09-25.md): 0 failed, 0 skipped |
 | .NET 8 tests | **18,862 passed / 18,862 executed** | [25 September 2026 local run after reference-cache repair](docs/reports/readme-verification-2026-09-25.md): 0 failed, 0 skipped |
 | Line coverage | **100% default CI threshold** | [Coverage job](.github/workflows/ci.yml); configurable through `MIN_CODE_COVERAGE` |
@@ -704,7 +705,7 @@ runs for every change.
 flowchart TB
     Change["Push or pull request"] --> Scope["Detect affected projects"]
     Scope --> Build["Build and compiler checks"]
-    Build --> Test["Run selected test suites<br/>.NET 8 and .NET 10"]
+    Build --> Test["Run selected test suites<br/>.NET 8, .NET 10 and .NET 11"]
     Test --> Cov["Coverage gate<br/>Default: 100% lines and branches"]
     Scope --> Checks["Formatting and repository audit"]
     Change --> Tools["Tooling lint and tests"]

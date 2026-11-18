@@ -7,7 +7,7 @@ The consumer discovers enumeration members only through `GetAll`, `FromName` and
 Run from the repository root on Windows:
 
 ```powershell
-foreach ($framework in @('net8.0', 'net10.0')) {
+foreach ($framework in @('net8.0', 'net10.0', 'net11.0')) {
     dotnet publish tests/PineGuard.Core.TrimSmoke/PineGuard.Core.TrimSmoke.csproj -c Release -f $framework -r win-x64 -o artifacts/trim-smoke/$framework
     if ($LASTEXITCODE -ne 0) { throw "Trim publication failed for $framework" }
     & ./artifacts/trim-smoke/$framework/PineGuard.Core.TrimSmoke.exe
@@ -15,4 +15,4 @@ foreach ($framework in @('net8.0', 'net10.0')) {
 }
 ```
 
-For another platform, select its runtime identifier and executable filename. Both target frameworks must publish without compiler or linker warnings and print `Enumeration trimmed consumer passed.` No trimming warnings are suppressed.
+For another platform, select its runtime identifier and executable filename. All three target frameworks must publish without compiler or linker warnings and print `Enumeration trimmed consumer passed.` No trimming warnings are suppressed.

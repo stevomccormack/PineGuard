@@ -49,7 +49,7 @@ public enum CsvColumnType
     /// A date-only column.
     /// </summary>
     /// <remarks>
-    /// The accepted formats differ by target framework. On <c>net8.0</c> and <c>net10.0</c>, validation uses
+    /// The accepted formats differ by target framework. On <c>net8.0</c> and later, validation uses
     /// the general invariant-culture <c>DateOnly.TryParse(string?, IFormatProvider?, out DateOnly)</c>,
     /// which accepts a broad range of date representations (e.g. <c>"01/15/2024"</c>). On <c>netstandard2.1</c>,
     /// where <c>System.DateOnly</c> does not exist, the fallback parser accepts only the exact format
@@ -62,7 +62,7 @@ public enum CsvColumnType
     /// A time-only column.
     /// </summary>
     /// <remarks>
-    /// The accepted formats differ by target framework. On <c>net8.0</c> and <c>net10.0</c>, validation uses
+    /// The accepted formats differ by target framework. On <c>net8.0</c> and later, validation uses
     /// the general invariant-culture <c>TimeOnly.TryParse(string?, IFormatProvider?, out TimeOnly)</c>,
     /// which accepts a broad range of time representations. On <c>netstandard2.1</c>, where
     /// <c>System.TimeOnly</c> does not exist, the fallback parser accepts only the exact formats

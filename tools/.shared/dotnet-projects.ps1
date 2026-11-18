@@ -419,7 +419,7 @@ function Get-ProjectTargetFrameworks {
     .DESCRIPTION
         Evaluated via `dotnet msbuild -getProperty`, not read as a literal XML element, because
         every PineGuard test project inherits <TargetFrameworks> from tests/Directory.Build.props
-        (net8.0;net10.0 today) rather than declaring it in its own csproj -- a literal-element
+        (net8.0;net10.0;net11.0 today) rather than declaring it in its own csproj -- a literal-element
         read would find nothing. Falls back to the singular TargetFramework property for a
         single-targeted project.
 

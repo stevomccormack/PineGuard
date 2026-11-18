@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- ASP.NET Core has no netstandard asset, so this package overrides the inherited three TFMs. -->
-    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
-    <Description>Request validation for ASP.NET Core: Minimal API and MVC auto-validation, RFC 9457 ValidationProblemDetails with stable codes, a boundary-aware exception handler, and .NET 10 Microsoft.Extensions.Validation integration.</Description>
+    <!-- ASP.NET Core has no netstandard asset, so this package overrides the inherited four TFMs. -->
+    <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
+    <Description>Request validation for ASP.NET Core: Minimal API and MVC auto-validation, RFC 9457 ValidationProblemDetails with stable codes, a boundary-aware exception handler, and Microsoft.Extensions.Validation integration on .NET 10 and later.</Description>
     <PackageTags>$(PackageTags);aspnetcore;minimal-api;mvc;problem-details;endpoint-filter;action-filter</PackageTags>
   </PropertyGroup>
 
