@@ -9,8 +9,8 @@ using PineGuard.Extensions.DependencyInjection;
 namespace PineGuard.AspNetCore.UnitTests.Samples;
 
 /// <summary>
-/// The application of Plan 03's story 4 — PineGuard validators running inside .NET 10's own
-/// <c>Microsoft.Extensions.Validation</c> pipeline rather than inside a PineGuard filter.
+/// The application of Plan 03's story 4 — PineGuard validators running inside the platform's own
+/// <c>Microsoft.Extensions.Validation</c> pipeline (net10.0 onwards) rather than inside a PineGuard filter.
 /// </summary>
 /// <remarks>
 /// No endpoint here calls <c>AddMustValidation()</c>: validation is attached by the platform once

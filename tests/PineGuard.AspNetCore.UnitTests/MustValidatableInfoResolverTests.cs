@@ -1,6 +1,8 @@
 #if NET10_0_OR_GREATER
 #pragma warning disable ASP0029
+#if !NET11_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
+#endif
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Validation;
 using PineGuard.AspNetCore.UnitTests.Samples;
@@ -65,26 +67,17 @@ public sealed class MustValidatableInfoResolverTests(ITestOutputHelper output)
 
         Assert.True(new MustValidatableInfoResolver().TryGetValidatableTypeInfo(validatedType, out var info));
 
-        var context = new ValidateContext
-        {
-            ValidationContext = new ValidationContext(value ?? new object(), provider, items: null),
-            ValidationOptions = validationOptions()!,
-            CurrentValidationPath = currentValidationPath
-        };
+#if NET11_0_OR_GREATER
+        var context = BuildContext(provider, validationOptions()!, currentValidationPath);
+#else
+        var context = BuildContext(value, provider, validationOptions()!, currentValidationPath);
+#endif
 
         // Act
         await info.ValidateAsync(value, context, CancellationToken.None);
 
         // Assert
-        var errors = context.ValidationErrors;
-
-        Assert.Equal(tc.Expected.IsValid, errors is null || errors.Count == 0);
-
-        if (tc.Expected.Keys is not null)
-            Assert.Equal(tc.Expected.Keys, errors!.Keys);
-
-        if (tc.Expected.Messages is not null)
-            Assert.Equal(tc.Expected.Messages, errors!.Values.SelectMany(messages => messages));
+        AssertExpectedErrors(context, tc.Expected);
     }
 
     [Theory]
@@ -98,6 +91,78 @@ public sealed class MustValidatableInfoResolverTests(ITestOutputHelper output)
         var ex = await Assert.ThrowsAsync(tc.ExpectedException.Type, action);
         ThrowsCaseAssert.Expected(ex, tc);
     }
+
+#if NET11_0_OR_GREATER
+    [Theory]
+    [MemberData(nameof(MustValidatableInfoResolverTestData.Validate.Cases), MemberType = typeof(MustValidatableInfoResolverTestData.Validate))]
+    public async Task Validate_BehavesAsExpected(MustValidatableInfoResolverTestData.ValidateAsync.Case tc)
+    {
+        // Arrange
+        var (value, validatedType, configureServices, currentValidationPath, validationOptions) = tc.Value;
+        await using var provider = SampleServices.Build(configureServices);
+
+        Assert.True(new MustValidatableInfoResolver().TryGetValidatableTypeInfo(validatedType, out var info));
+
+        var context = BuildContext(provider, validationOptions()!, currentValidationPath);
+
+        // Act
+        info.Validate(value, context);
+
+        // Assert
+        AssertExpectedErrors(context, tc.Expected);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatableInfoResolverTestData.Validate.InvalidCases), MemberType = typeof(MustValidatableInfoResolverTestData.Validate))]
+    public void Validate_ThrowsAsExpected(IThrowsCase tc)
+    {
+        // Arrange
+        var action = ((ValueCase<Action>)tc).Value;
+
+        // Act & Assert
+        var ex = Assert.Throws(tc.ExpectedException.Type, action);
+        ThrowsCaseAssert.Expected(ex, tc);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatableInfoResolverTestData.ValidateAsyncWithoutServices.Cases), MemberType = typeof(MustValidatableInfoResolverTestData.ValidateAsyncWithoutServices))]
+    public async Task ValidateAsync_WithoutServices_BehavesAsExpected(MustValidatableInfoResolverTestData.ValidateAsync.Case tc)
+    {
+        // Arrange
+        var (value, validatedType, _, currentValidationPath, validationOptions) = tc.Value;
+
+        Assert.True(new MustValidatableInfoResolver().TryGetValidatableTypeInfo(validatedType, out var info));
+
+        var context = new ValidateContext
+        {
+            ValidationOptions = validationOptions()!,
+            CurrentValidationPath = currentValidationPath
+        };
+
+        // Act
+        await info.ValidateAsync(value, context, CancellationToken.None);
+
+        // Assert
+        AssertExpectedErrors(context, tc.Expected);
+    }
+
+    [Theory]
+    [MemberData(nameof(MustValidatableInfoResolverTestData.TryFindProperty.Cases), MemberType = typeof(MustValidatableInfoResolverTestData.TryFindProperty))]
+    public void TryFindProperty_BehavesAsExpected(MustValidatableInfoResolverTestData.TryFindProperty.Case tc)
+    {
+        // Arrange
+        var (validationOptions, propertyName) = tc.Value;
+
+        Assert.True(new MustValidatableInfoResolver().TryGetValidatableTypeInfo(typeof(CreateOrder), out var info));
+
+        // Act
+        var found = info.TryFindProperty(propertyName, validationOptions()!, out var propertyInfo);
+
+        // Assert
+        Assert.Equal(tc.Expected.IsValid, found);
+        Assert.Equal(tc.Expected.IsValid, propertyInfo is not null);
+    }
+#endif
 
     [Theory]
     [MemberData(nameof(MustValidatableInfoResolverTestData.EndToEnd.Cases), MemberType = typeof(MustValidatableInfoResolverTestData.EndToEnd))]
@@ -130,6 +195,41 @@ public sealed class MustValidatableInfoResolverTests(ITestOutputHelper output)
         Assert.Equal(problem.ErrorKeys, errors.EnumerateObject().Select(error => error.Name));
         Assert.Equal(problem.Messages, errors.EnumerateObject().SelectMany(error => error.Value.EnumerateArray().Select(message => message.GetString())));
         Assert.False(body.TryGetProperty(ProblemDetailsExtension.FailuresExtensionKey, out _));
+    }
+
+#if NET11_0_OR_GREATER
+    private static ValidateContext BuildContext(IServiceProvider provider, ValidationOptions options, string currentValidationPath) =>
+        new()
+        {
+            ServiceProvider = provider,
+            ValidationOptions = options,
+            CurrentValidationPath = currentValidationPath
+        };
+#else
+    private static ValidateContext BuildContext(object? value, IServiceProvider provider, ValidationOptions options, string currentValidationPath) =>
+        new()
+        {
+            ValidationContext = new ValidationContext(value ?? new object(), provider, items: null),
+            ValidationOptions = options,
+            CurrentValidationPath = currentValidationPath
+        };
+#endif
+
+    private static void AssertExpectedErrors(ValidateContext context, MustValidatableInfoResolverTestData.ValidateAsync.ValidationErrorsExpected expected)
+    {
+        var errors = context.ValidationErrors;
+
+        Assert.Equal(expected.IsValid, errors is null || errors.Count == 0);
+
+        if (expected.Keys is not null)
+            Assert.Equal(expected.Keys, errors!.Keys);
+
+        if (expected.Messages is not null)
+#if NET11_0_OR_GREATER
+            Assert.Equal(expected.Messages, errors!.Values.SelectMany(list => list).Select(error => error.ErrorMessage));
+#else
+            Assert.Equal(expected.Messages, errors!.Values.SelectMany(messages => messages));
+#endif
     }
 }
 #pragma warning restore ASP0029

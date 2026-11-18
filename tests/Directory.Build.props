@@ -4,7 +4,7 @@
 
   <!-- Test projects are executables — cannot target netstandard2.1 -->
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
     <!-- Test assemblies don't ship — no XML doc file, no CS1591 on public test classes -->
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <!-- Test code follows xUnit conventions (underscored test names, fixture types named for the
