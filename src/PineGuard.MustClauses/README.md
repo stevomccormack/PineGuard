@@ -14,7 +14,7 @@ Use MustClauses anywhere the caller should decide what happens on failure — AP
 dotnet add package PineGuard.MustClauses
 ```
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`. Depends only on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core).
+Targets `net8.0`, `net10.0`, `net11.0`, and `netstandard2.1`. Depends only on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core).
 
 ## Examples
 

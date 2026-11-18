@@ -16,7 +16,7 @@ Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core) and `
 
 ### Supported frameworks
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`.
+Targets `net8.0`, `net10.0`, `net11.0`, and `netstandard2.1`.
 
 ## What you get
 

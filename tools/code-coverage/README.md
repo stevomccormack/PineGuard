@@ -22,8 +22,8 @@ Coverage collection is engine-pluggable behind a delegating front door (`New-Cov
 
 | Engine | Folder | Status |
 |---|---|---|
-| Coverlet | `coverlet/` | Authoritative. CI and the 100% gate use it. Collects via `dotnet test --collect:"XPlat Code Coverage"` on both test TFMs (`net8.0`, `net10.0`), rendered to HTML + Cobertura by ReportGenerator. |
-| JetBrains dotCover | `dotcover/` | Local, snapshot-only. Collects a Rider-native `.dcvr` snapshot via `dotCover cover --snapshot-output` on both test TFMs. Not gated, not converted to HTML/Cobertura — see below for why. |
+| Coverlet | `coverlet/` | Authoritative. CI and the 100% gate use it. Collects via `dotnet test --collect:"XPlat Code Coverage"` on all three test TFMs (`net8.0`, `net10.0`, `net11.0`), rendered to HTML + Cobertura by ReportGenerator. |
+| JetBrains dotCover | `dotcover/` | Local, snapshot-only. Collects a Rider-native `.dcvr` snapshot via `dotCover cover --snapshot-output` on the test TFMs. Not gated, not converted to HTML/Cobertura — see below for why. |
 
 The engine folder is named after the tool, never after a collector's display string:
 `coverlet.collector` registers the data collector `friendlyName` "XPlat Code Coverage" — that is
@@ -63,7 +63,7 @@ gated") remains the only engine this repo's automated 100% gate can enforce agai
 ## Prerequisites
 
 - PowerShell 7+ (`pwsh`). (Windows PowerShell 5.1 may work for some commands, but the scripts are written/tested with `pwsh`.)
-- .NET 10 SDK — see [tools/README.md](../README.md#prerequisites).
+- .NET 11 SDK — see [tools/README.md](../README.md#prerequisites).
 
 The HTML report uses ReportGenerator via `dotnet-reportgenerator-globaltool`, pinned to `5.4.18` in
 `.config/dotnet-tools.json` and restored with `dotnet tool restore` (a local tool manifest, not a
@@ -151,7 +151,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/Ne
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Configuration Debug -Clean
 
 # Run in isolated mode (separate test results per run). Publish is per target framework: when
-# -Framework is left unbound, every test project multi-targets net8.0;net10.0
+# -Framework is left unbound, every test project multi-targets net8.0;net10.0;net11.0
 # (tests/Directory.Build.props), so -Isolated publishes to its own temp directory once per TFM
 # rather than once with no -f (which fails NETSDK1129). Bind -Framework to restrict to one pass.
 pwsh -NoProfile -ExecutionPolicy Bypass -File "./tools/code-coverage/coverlet/New-CoverageReport.ps1" -Scope All -Isolated

@@ -16,7 +16,7 @@ Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core), [Pin
 
 ### Supported frameworks
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`. `System.Xml.Schema` is in-box on all three, so no extra package reference is needed to resolve any of them.
+Targets `net8.0`, `net10.0`, `net11.0`, and `netstandard2.1`. `System.Xml.Schema` is in-box on all four, so no extra package reference is needed to resolve any of them.
 
 ## What you get
 

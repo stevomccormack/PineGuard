@@ -14,7 +14,7 @@ Guards fit anywhere invalid input should stop execution immediately — construc
 dotnet add package PineGuard.GuardClauses
 ```
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`. Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core) and [PineGuard.MustClauses](https://www.nuget.org/packages/PineGuard.MustClauses).
+Targets `net8.0`, `net10.0`, `net11.0`, and `netstandard2.1`. Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core) and [PineGuard.MustClauses](https://www.nuget.org/packages/PineGuard.MustClauses).
 
 ## Examples
 

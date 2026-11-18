@@ -1,7 +1,7 @@
 #if NET10_0_OR_GREATER
 // ValidationOptions.Resolvers ships [Experimental("ASP0029")] in .NET 10; the diagnostic is taken here so
 // that AddMustValidatorResolver() — whose signature names only the stable ValidationOptions — is clean at
-// every call site.
+// every call site. .NET 11 stabilised the member, so there the pragma is a no-op.
 #pragma warning disable ASP0029
 using Microsoft.Extensions.Validation;
 using PineGuard.Common;
@@ -9,7 +9,7 @@ using PineGuard.Common;
 namespace PineGuard.AspNetCore;
 
 /// <summary>
-/// Turns PineGuard validators on inside .NET 10's built-in validation pipeline.
+/// Turns PineGuard validators on inside the built-in validation pipeline that ships from .NET 10 onwards.
 /// </summary>
 /// <remarks>
 /// Assumes <c>services.AddMustValidation(...)</c> has already registered the validators; this extension

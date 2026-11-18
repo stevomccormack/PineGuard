@@ -64,7 +64,7 @@ Written to `artifacts/code-diagnostics/<scope>/diagnostics.json`:
       "Code": "CS8604",
       "Message": "...",
       "Project": "...",
-      "TargetFrameworks": ["net8.0", "net10.0"],
+      "TargetFrameworks": ["net8.0", "net10.0", "net11.0"],
       "Occurrences": 2
     }
   ],

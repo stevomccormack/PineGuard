@@ -3,7 +3,7 @@
 This matrix accompanies the [shared vocabulary](vocabulary.md). It records intentional platform
 boundaries; a missing entry in an adapter is not automatically justified by a target limitation.
 
-| Family | netstandard2.1 | net8.0 / net10.0 | Naming and result contract |
+| Family | netstandard2.1 | net8.0 / net10.0 / net11.0 | Naming and result contract |
 |---|---|---|---|
 | Decimal string numeric rules and adapters | Available | Available | Flattened operations end in `Decimal`; successful Must/Guard output is decimal. |
 | Int32/Int64 string parsing and ranges | Available | Available | `Int32`, `Int64`, `InRangeInt32`, `OutOfRangeInt64`; no generic-math dependency. |

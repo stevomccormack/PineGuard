@@ -41,7 +41,7 @@
 .PARAMETER Isolated
     Publish each test project to a temp directory before testing it, to avoid locking source
     bin/ folders (useful when running coverage alongside an open IDE build). When -Framework is
-    left unbound, every test project multi-targets net8.0;net10.0 (tests/Directory.Build.props),
+    left unbound, every test project multi-targets net8.0;net10.0;net11.0 (tests/Directory.Build.props),
     so this publishes and tests once per actual target framework -- resolved via
     Resolve-CoverageTestFrameworks (tools/.shared/coverage.ps1) -- rather than once with no -f,
     which fails NETSDK1129. Bind -Framework to restrict to a single pass.
