@@ -50,24 +50,14 @@ public static class MustStringDateOnlyClauses
         TimeProvider? timeProvider = null,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (!StringUtility.DateOnly.IsValidStyles(styles))
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotPast, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
-
-        if (value is null)
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotPast, NullMessage, paramName, value);
-
-        const string messageTemplate = "{paramName} must be a date in the past.";
-
-        if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
-
-        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Reference.OutOfRange,
-                "{paramName} requires a reference date within the supported range.", nameof(timeProvider), timeProvider);
-
-        var parsedValue = parsed;
-        var ok = DateOnlyRules.IsBefore(parsedValue, DateOnly.FromDateTime(referenceDate), Inclusion.Exclusive);
-        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, parsedValue);
+        var outcome = StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull: false, out var parsed);
+        return MustResult<DateOnly>.FromBool(
+            StringPastDateOnlyRule.IsPassed(outcome),
+            StringPastDateOnlyRule.Code(outcome),
+            StringPastDateOnlyRule.MessageTemplate(outcome),
+            StringPastDateOnlyRule.ParamName(outcome, paramName),
+            StringPastDateOnlyRule.Value(outcome, value, styles, timeProvider),
+            parsed);
     }
 
     /// <summary>
