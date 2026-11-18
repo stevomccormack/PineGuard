@@ -34,6 +34,11 @@ version: 2.0
 | `docs/ai/business-units/` | Organisational context | Engineering business unit |
 | `docs/ai/meta/` | Meta-documentation | Taxonomy, tooling alignment, [adapter surfaces](meta/adapter-surfaces.md), and the document templates (`template-spec.md`, `template-agent.md`, `template-project.md`, `template-unit-test.md`, `template-coverage.md`) |
 | `docs/ai/plans/` | Implementation plans | Phased execution plans for major initiatives |
+<!-- sync:local:start -->
+<!-- Downstream mirrors own this block: when another repository syncs this file, the sync engine
+     splices that repository's locally-owned Brain Map rows between these markers. Keep the pair
+     intact — only the first sync:local marker pair in a file is honored. -->
+<!-- sync:local:end -->
 
 
 ### Top-Level Files

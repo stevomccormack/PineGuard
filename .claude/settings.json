@@ -319,7 +319,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/block-sln-edit.sh"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-sln-edit.sh\""
           }
         ]
       },
@@ -328,7 +328,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/enforce-output-dirs.sh"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/enforce-output-dirs.sh\""
           }
         ]
       },
@@ -337,11 +337,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/pre-bash-lock.sh"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-bash-lock.sh\""
           },
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/pre-bash-destructive-guard.sh"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-bash-destructive-guard.sh\""
           }
         ]
       }
@@ -352,11 +352,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-format-check.sh"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-format-check.sh\""
           },
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-testdata-check.sh"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-testdata-check.sh\""
           }
         ]
       },
@@ -365,7 +365,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/post-bash-lock.sh"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-bash-lock.sh\""
           }
         ]
       }
@@ -376,7 +376,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/on-stop.sh"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/on-stop.sh\""
           }
         ]
       }
@@ -386,7 +386,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/on-session-end.sh"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/on-session-end.sh\""
           }
         ]
       }

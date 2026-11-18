@@ -151,7 +151,9 @@ surfaces in §2–§3 above.
 ## 4. Parity policy
 
 Command parity is expected across the four **full adapters** in §2, with these declared exceptions.
-Anything not listed here is parity debt and the audit-cli adapter-parity rule will fail on it.
+Anything not listed here is parity debt and the `surface-parity` rule
+(`apps/cli/src/audit/rules/surface-parity.ts`, run via `pineguard audit surface-parity`) will fail
+on it.
 
 | Exception | Surfaces | Rationale |
 |-----------|----------|-----------|

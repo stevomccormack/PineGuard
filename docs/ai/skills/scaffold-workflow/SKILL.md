@@ -27,8 +27,8 @@ maintain its own list — read that file, then work its §5 cascade checklist ro
 
 > [!IMPORTANT]
 > **Cascade or declare**: Every row of `docs/ai/meta/adapter-surfaces.md` §5 is either **done** or
-> **N/A under a declared policy** (§4 of that file). An omitted row is parity debt, and the audit-cli
-> adapter-parity rule will fail on it.
+> **N/A under a declared policy** (§4 of that file). An omitted row is parity debt, and the
+> `surface-parity` rule (run via `pineguard audit surface-parity`) will fail on it.
 
 > [!IMPORTANT]
 > **Role canon**: The role named in the playbook MUST be one of the eleven files in `docs/ai/roles/`
