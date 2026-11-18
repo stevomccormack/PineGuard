@@ -71,7 +71,7 @@ Containers").
 
 | Unit | Working branch | Session | Chunk | Started (UTC) | Heartbeat (UTC) |
 |---|---|---|---|---|---|
-| string→DateOnly pilot | `feature/dateonly-pilot` | Claude Code desktop session `1dae198c-d44c-4285-9f6d-e6991567b75d` | Owner instruction in session: gold-standard review of the outstanding items and of the rule object's shape; no code change | 2026-11-18 14:06 | 2026-11-18 14:41 |
+| string→DateOnly pilot | `feature/dateonly-pilot` | https://claude.ai/code/session_01LjSDTWmApYFE9TwDt49HkJ | Owner instruction in session: review and fix everything outstanding; C6 and C7. Took the row over from desktop session `1dae198c-d44c-4285-9f6d-e6991567b75d`, whose heartbeat (2026-11-18 14:41) was over 3 hours old | 2026-11-18 19:41 | 2026-11-18 19:41 |
 
 ## Authorisation
 
