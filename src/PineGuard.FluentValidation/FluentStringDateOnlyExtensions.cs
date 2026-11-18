@@ -33,7 +33,7 @@ public static class FluentStringDateOnlyExtensions
         TimeProvider? timeProvider = null,
         DateTimeStyles styles = DefaultStyles,
         string? message = null) =>
-        ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.PastDateOnly(val, styles, timeProvider, paramName: null)),
+        ruleBuilder.MustBe(val => Must.Be.PastDateOnly(val, styles, timeProvider, allowNull: true, paramName: null),
             message, MustCodes.Date.Relative.NotPast);
 
     /// <summary>Validates that the string value represents a <see cref="DateOnly"/> in the past or present.</summary>
@@ -462,6 +462,7 @@ public static class FluentStringDateOnlyExtensions
         string? message = null) =>
         ruleBuilder.MustBe(val => SkipAbsentValue(val, Must.Be.MinimumAgeDateOnly(val, years, styles, timeProvider, paramName: null)),
             message, MustCodes.Date.Age.BelowMinimum);
+
     private static MustResult<T> SkipAbsentValue<T>(string? value, MustResult<T> result) =>
         value is null && result.ParamName is null ? MustResult<T>.Ok(default) : result;
 }

@@ -48,9 +48,46 @@ public static class MustStringDateOnlyClauses
         string? value,
         DateTimeStyles styles = DefaultStyles,
         TimeProvider? timeProvider = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null) =>
+        _.PastDateOnly(value, styles, timeProvider, allowNull: false, paramName);
+
+    /// <summary>
+    /// Validates that the specified value is a date in the past, under the given null policy.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
+    /// <param name="allowNull">
+    /// The null policy. When <see langword="true"/>, a <see langword="null"/> <paramref name="value"/> passes; when
+    /// <see langword="false"/>, it fails. Either way <paramref name="styles"/> is checked first.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Captured via <see cref="CallerArgumentExpressionAttribute"/> when omitted.
+    /// The public overload forwards its own, and the adapters pass <see langword="null"/>, so that the message keeps
+    /// its <c>{paramName}</c> token for the property name.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// Delegates to <see cref="StringPastDateOnlyRule.Evaluate"/> and maps its outcome to the result through the rule's
+    /// lookups, so the failure messages are the rule's templates, such as <c>"{paramName} must be a date in the past."</c>
+    /// Internal rather than public so that the null policy is not public API: the public overload calls it with
+    /// <paramref name="allowNull"/> <see langword="false"/>, and the FluentValidation and DataAnnotations adapters, which
+    /// treat an absent value as valid, call it with <see langword="true"/>, so neither carries a null branch of its own.
+    /// </remarks>
+    internal static MustResult<DateOnly> PastDateOnly(this IMustClause _,
+        string? value,
+        DateTimeStyles styles,
+        TimeProvider? timeProvider,
+        bool allowNull,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        var outcome = StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull: false, out var parsed);
+        var outcome = StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out var parsed);
         return MustResult<DateOnly>.FromBool(
             StringPastDateOnlyRule.IsPassed(outcome),
             StringPastDateOnlyRule.Code(outcome),

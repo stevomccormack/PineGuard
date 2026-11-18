@@ -12,6 +12,11 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="PineGuard.MustClauses.UnitTests" />
+    <!-- PineGuard.FluentValidation and PineGuard.DataAnnotations call the internal Must.Be.PastDateOnly
+         overload that takes the null policy, so the string past-date rule object decides null for them and
+         neither adapter carries a null branch of its own. -->
+    <InternalsVisibleTo Include="PineGuard.FluentValidation" />
+    <InternalsVisibleTo Include="PineGuard.DataAnnotations" />
   </ItemGroup>
 
   <ItemGroup>

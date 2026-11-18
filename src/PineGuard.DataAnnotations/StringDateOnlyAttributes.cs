@@ -14,8 +14,8 @@ namespace PineGuard.DataAnnotations;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Delegates to <see cref="MustStringDateOnlyClauses.PastDateOnly"/>. Supported on properties, fields,
-/// and parameters of type <see cref="string"/>.
+/// Delegates to <see cref="MustStringDateOnlyClauses.PastDateOnly(IMustClause, string, DateTimeStyles, TimeProvider, string)"/>.
+/// Supported on properties, fields, and parameters of type <see cref="string"/>.
 /// </para>
 /// <para>
 /// The <see cref="Styles"/> property controls parsing flags; defaults to
@@ -38,7 +38,7 @@ namespace PineGuard.DataAnnotations;
 /// </code>
 /// </example>
 /// <seealso cref="FutureDateOnlyStringAttribute"/>
-/// <seealso cref="MustStringDateOnlyClauses.PastDateOnly"/>
+/// <seealso cref="MustStringDateOnlyClauses.PastDateOnly(IMustClause, string, DateTimeStyles, TimeProvider, string)"/>
 /// <seealso href="https://pineguard.ai/docs/annotations/string">String Attribute documentation</seealso>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(typeof(string), MustCodes.Date.Relative.NotPast, allowNull: false)
@@ -52,8 +52,8 @@ public sealed class PastDateOnlyStringAttribute() : ValidationAttributeBase(type
     protected override ValidationResult? ValidateValue(object? value, ValidationContext validationContext)
     {
         var strValue = (string?)value;
-        var result = Must.Be.PastDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), paramName: null);
-        return value is null && result.ParamName is null ? ValidationResult.Success : FromMustResult(result, validationContext);
+        var result = Must.Be.PastDateOnly(strValue, Styles, ResolveTimeProvider(validationContext), allowNull: true, paramName: null);
+        return FromMustResult(result, validationContext);
     }
 }
 
