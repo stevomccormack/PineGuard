@@ -10,6 +10,10 @@ set -uo pipefail
 
 HOOKS="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORK="$(mktemp -d)"
+# Git Bash hands native programs Windows-spelled paths, so a POSIX $WORK comes back from python3
+# re-spelled ("/tmp/x" -> "C:/Users/.../Temp/x") and no longer matches the root the hooks read from
+# $CLAUDE_PROJECT_DIR. Spell it the Windows way up front, where cygpath can.
+WORK="$(cygpath -m "$WORK" 2>/dev/null || printf '%s' "$WORK")"
 trap 'cd /; find "$WORK" -mindepth 1 -delete 2>/dev/null; rmdir "$WORK" 2>/dev/null' EXIT
 
 export CLAUDE_PROJECT_DIR="$WORK/repo"
@@ -216,6 +220,49 @@ check nothld
 # ── advisory hooks never block ───────────────────────────────────────────────
 expect "format reminder"   0 post-edit-format-check.sh   file_path "$CLAUDE_PROJECT_DIR/src/A.cs"
 expect "testdata reminder" 0 post-edit-testdata-check.sh file_path "$CLAUDE_PROJECT_DIR/tests/ATestData.cs"
+
+# ── wiring: every configured hook command must be able to start ──────────────
+# The command strings in .claude/settings.json and .codex/hooks.json run through a shell, so an
+# unquoted $CLAUDE_PROJECT_DIR word-splits on any checkout path that contains a space. On this
+# repository's own working copy ("D:\Steve McCormack\...") that made bash look for "D:\Steve"
+# and every hook exited 127 — never run, never seen. The directory below has a space on purpose.
+REPO_ROOT="$(cd "$HOOKS/../.." && pwd)"
+WIRE_DIR="$WORK/wire dir"
+WIRE_PAYLOAD="$WORK/wire-payload.json"
+mkdir -p "$WIRE_DIR"
+git -C "$WIRE_DIR" init -q
+payload command 'echo hi' > "$WIRE_PAYLOAD"
+
+for surface in .claude .codex; do
+  [ -d "$REPO_ROOT/$surface/hooks" ] || continue
+  mkdir -p "$WIRE_DIR/$surface"
+  cp -R "$REPO_ROOT/$surface/hooks" "$WIRE_DIR/$surface/hooks"
+done
+
+for config in "$REPO_ROOT/.claude/settings.json" "$REPO_ROOT/.codex/hooks.json"; do
+  [ -f "$config" ] || continue
+  while IFS= read -r cmd; do
+    [ -n "$cmd" ] || continue
+    ( cd "$WIRE_DIR" && export CLAUDE_PROJECT_DIR="$WIRE_DIR" && eval "$cmd" )       < "$WIRE_PAYLOAD" >/dev/null 2>&1
+    got=$?
+    case "$got" in
+      126|127)
+        FAIL=$((FAIL + 1))
+        echo "FAIL [wiring] $(basename "$config"): exit $got — the hook could not be started"
+        echo "      $cmd"
+        ;;
+      *) PASS=$((PASS + 1)) ;;
+    esac
+  done <<EOF
+$(python3 -c 'import json, sys
+hooks = json.load(open(sys.argv[1], encoding="utf-8")).get("hooks", {})
+for entries in hooks.values():
+    for entry in entries:
+        for hook in entry.get("hooks", []):
+            if hook.get("type") == "command":
+                print(hook["command"])' "$config")
+EOF
+done
 
 echo "hooks: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
