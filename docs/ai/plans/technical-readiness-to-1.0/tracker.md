@@ -71,7 +71,7 @@ Containers").
 
 | Unit | Working branch | Session | Chunk | Started (UTC) | Heartbeat (UTC) |
 |---|---|---|---|---|---|
-| string→DateOnly pilot | `feature/dateonly-pilot` | — | — | — | — |
+| string→DateOnly pilot | `feature/dateonly-pilot` | https://claude.ai/code/session_01LjSDTWmApYFE9TwDt49HkJ | Owner instruction in session: review and fix everything outstanding; `main` sync | 2026-11-18 06:47 | 2026-11-18 06:47 |
 
 ## Authorisation
 
