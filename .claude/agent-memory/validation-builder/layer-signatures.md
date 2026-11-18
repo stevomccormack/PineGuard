@@ -40,7 +40,7 @@ scoped to just those classes.
 The scope-wide `Line coverage:` / `Branch coverage:` summary is printed *above* that Top-30 table, so
 piping the run to `tail` shows the table and hides the only numbers that matter. Grep instead:
 `| grep -E 'Scope:|Found [0-9]+ classes|Line coverage|Branch coverage|<YourClass>'`. Single-TFM runs
-take `-Framework net8.0` / `-Framework net10.0`; with `-Enforce100` the script's exit code is the gate.
+take `-Framework net8.0` / `-Framework net10.0` / `-Framework net11.0`; with `-Enforce100` the script's exit code is the gate.
 
 ## MustClause parsed-result contract
 
@@ -96,8 +96,8 @@ where a parsed value was available. Reference: `docs/ai/specs/core/project.md` �
   StringComparison.Ordinal`, used as `[EndsWith(".pdf", Comparison = StringComparison.OrdinalIgnoreCase)]`.
   Required config stays a primary-ctor parameter exposed as `{ get; }`.
 - `init` on **any** member of a `netstandard2.1` project needs `System.Runtime.CompilerServices.IsExternalInit`,
-  which that TFM does not ship → `error CS0518`. It compiles fine on net8.0/net10.0, so the error only
-  appears on a full multi-TFM build — never conclude from a net10.0-only build.
+  which that TFM does not ship → `error CS0518`. It compiles fine on net8.0/net10.0/net11.0, so the error only
+  appears on a full multi-TFM build — never conclude from a single-TFM build.
 - Core's polyfill is `internal` and its `InternalsVisibleTo` covers only MustClauses and GuardClauses.
   `src/PineGuard.DataAnnotations/Polyfills/IsExternalInit.cs` is a mirrored copy. FluentValidation has no
   copy yet and will need one the first time it uses `init`.

@@ -33,7 +33,7 @@ What this file does NOT restate:
 - Lives under `tests/`, but it is a **shipped library**, not a test project: it contains no test
   methods and is never executed directly. Its own tests live in
   `tests/PineGuard.Testing.UnitTests/`.
-- Targets `net8.0` and `net10.0` only (its fixtures use `TimeOnly`); it does not target
+- Targets `net8.0`, `net10.0` and `net11.0` only (its fixtures use `TimeOnly`); it does not target
   `netstandard2.1` like the five `src/` packages.
 - May reference the `src/` packages it builds fixtures for; nothing under `src/` may ever
   reference it (`../dependencies.md`).

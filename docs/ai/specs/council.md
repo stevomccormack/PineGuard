@@ -25,7 +25,7 @@ The council is expensive (≥10 sub-agent invocations) and changes the tone of t
 
 A plan file under `docs/ai/plans/` MUST be pressure-tested by the council **before its status moves from `Planned` → `Active`** if it meets **any** of:
 
-1. **Public API impact** — changes exported symbols in `src/PineGuard.*` or the `netstandard2.1`/`net8.0`/`net10.0` surface.
+1. **Public API impact** — changes exported symbols in `src/PineGuard.*` or the `netstandard2.1`/`net8.0`/`net10.0`/`net11.0` surface.
 2. **Cross-project scope** — affects ≥3 projects in `src/` or `tests/`.
 3. **Protocol / spec cascade** — modifies files under `docs/ai/specs/` that other specs inherit from (`spec.md`, `protocol.md`, `dependencies.md`, `safety.md`).
 4. **Release / IP implications** — affects NuGet packaging, licensing, sync to the public PineGuard mirror, or separation of IP between Internal and public repos.

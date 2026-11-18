@@ -14,7 +14,7 @@ DataAnnotations are the .NET idiom for input-model validation — request DTOs, 
 dotnet add package PineGuard.DataAnnotations
 ```
 
-Targets `net8.0`, `net10.0`, and `netstandard2.1`. Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core), [PineGuard.MustClauses](https://www.nuget.org/packages/PineGuard.MustClauses), and `System.ComponentModel.DataAnnotations`.
+Targets `net8.0`, `net10.0`, `net11.0`, and `netstandard2.1`. Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core), [PineGuard.MustClauses](https://www.nuget.org/packages/PineGuard.MustClauses), and `System.ComponentModel.DataAnnotations`.
 
 ## Examples
 

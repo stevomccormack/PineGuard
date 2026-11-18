@@ -16,9 +16,9 @@ Depends on [PineGuard.Core](https://www.nuget.org/packages/PineGuard.Core), [Pin
 
 ### Supported frameworks
 
-Targets `net8.0` and `net10.0`. ASP.NET Core has no `netstandard` asset, so this package does not carry the `netstandard2.1` target the rest of PineGuard does.
+Targets `net8.0`, `net10.0`, and `net11.0`. ASP.NET Core has no `netstandard` asset, so this package does not carry the `netstandard2.1` target the rest of PineGuard does.
 
-`AddMustValidatorResolver()` — the `Microsoft.Extensions.Validation` integration — exists on `net10.0` only, because that is where the built-in validation pipeline ships.
+`AddMustValidatorResolver()` — the `Microsoft.Extensions.Validation` integration — exists on `net10.0` and `net11.0` only, because the built-in validation pipeline ships from `net10.0` onwards.
 
 ## What you get
 

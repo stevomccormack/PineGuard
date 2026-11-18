@@ -8,7 +8,7 @@
     Root cause (artifacts/reviews/T1-U0-fable-review.md, "Binding runner-fix decision"):
     coverlet/New-CoverageReport.ps1's -Isolated branch ran `dotnet publish $project -c
     $Configuration -o $tempDir` with no -f. Every test project inherits <TargetFrameworks>
-    net8.0;net10.0 from tests/Directory.Build.props, so the SDK rejects the publish with
+    net8.0;net10.0;net11.0 from tests/Directory.Build.props, so the SDK rejects the publish with
     NETSDK1129 whenever -Framework is left unbound, and the failure's own error text was
     discarded by a `| Out-Null`.
 
