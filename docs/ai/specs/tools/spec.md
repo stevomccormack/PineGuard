@@ -155,7 +155,6 @@ Most tool domains are governed by this spec alone. A domain gets its own spec on
 
 | Domain | Spec |
 |--------|------|
-| `tools/audit-cli/` | `docs/ai/specs/tools/audit-cli/spec.md` |
 | `tools/code-diagnostics/` | `docs/ai/specs/tools/code-diagnostics/spec.md` |
 | `tools/code-scan/qodana/` | `docs/ai/specs/tools/code-scan/qodana/qodana.md` |
 | `tools/code-scan/sonarqube/` | `docs/ai/specs/scan/spec.md` |

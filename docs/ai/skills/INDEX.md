@@ -54,6 +54,12 @@ Canonical, model-agnostic skill definitions. These are the source of truth.
 |-------|----|-------------|
 | [Ask Council](ask-council/SKILL.md) | `pineguard.skill.ask-council` | Pressure-test a decision via 5 advisors + anonymous peer review + chairman synthesis |
 
+<!-- sync:local:start -->
+<!-- Downstream mirrors own this block: when another repository syncs this file, the sync engine
+     splices that repository's locally-owned skill catalog section between these markers. Keep the
+     pair intact — only the first sync:local marker pair in a file is honored. -->
+<!-- sync:local:end -->
+
 ---
 
 ## Claude Code Adapter Skills (`.claude/skills/`)
