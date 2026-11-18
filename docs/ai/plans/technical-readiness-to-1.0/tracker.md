@@ -71,7 +71,7 @@ Containers").
 
 | Unit | Working branch | Session | Chunk | Started (UTC) | Heartbeat (UTC) |
 |---|---|---|---|---|---|
-| string→DateOnly pilot | `feature/dateonly-pilot` | https://claude.ai/code/session_01LjSDTWmApYFE9TwDt49HkJ | Owner instruction in session: review and fix everything outstanding; `main` sync | 2026-11-18 06:47 | 2026-11-18 09:32 |
+| string→DateOnly pilot | `feature/dateonly-pilot` | Claude Code desktop session `1dae198c-d44c-4285-9f6d-e6991567b75d` | Owner instruction in session: re-judge every outstanding item against the gold standard and rewrite Awaiting owner; refresh the PR description | 2026-11-18 14:06 | 2026-11-18 14:06 |
 
 ## Authorisation
 
