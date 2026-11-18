@@ -26,7 +26,7 @@ essentials: how to build, test, and submit changes that pass CI on the first try
 # Build (Release, zero warnings — TreatWarningsAsErrors is on)
 dotnet build PineGuard.slnx -c Release
 
-# Run all tests (15 test projects × 3 target frameworks)
+# Run all tests (16 test projects × 3 target frameworks)
 dotnet test PineGuard.slnx -c Release
 
 # Formatting must be clean before you push (CI gates on this)

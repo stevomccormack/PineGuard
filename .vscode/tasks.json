@@ -196,6 +196,21 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: Rules (fast)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "./tools/testing/Run-Tests.ps1",
+                "-Project",
+                "./tests/PineGuard.Testing.UnitTests.Rules/PineGuard.Testing.UnitTests.Rules.csproj"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Test: All (sequential)",
             "dependsOrder": "sequence",
             "dependsOn": [
@@ -211,7 +226,8 @@
                 "Test: FluentResults (fast)",
                 "Test: OneOf (fast)",
                 "Test: Xml (fast)",
-                "Test: Testing (fast)"
+                "Test: Testing (fast)",
+                "Test: Rules (fast)"
             ],
             "problemMatcher": []
         },

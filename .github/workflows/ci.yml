@@ -41,6 +41,7 @@ jobs:
       xml: ${{ steps.filter.outputs.xml }}
       analyzers: ${{ steps.filter.outputs.analyzers }}
       testing: ${{ steps.filter.outputs.testing }}
+      testing-rules: ${{ steps.filter.outputs.testing-rules }}
       any-src: ${{ steps.filter.outputs.any-src }}
       shared: ${{ steps.filter.outputs.shared }}
     steps:
@@ -96,10 +97,12 @@ jobs:
             testing:
               - 'tests/PineGuard.Testing/**'
               - 'tests/PineGuard.Testing.UnitTests/**'
+            testing-rules:
+              - 'tests/PineGuard.Testing.UnitTests.Rules/**'
             # Root build inputs every project consumes. A change here (a dependency bump, a
             # shared MSBuild property, the pinned SDK tools) must run EVERY test job, not zero of
-            # them — a green PR that built but skipped all fifteen suites is how a MediatR bump
-            # once broke 4 tests on main (e17d1d6).
+            # them — a green PR that built but skipped every suite is how a MediatR bump once
+            # broke 4 tests on main (e17d1d6).
             shared:
               - 'Directory.Packages.props'
               - 'Directory.Build.props'
@@ -252,6 +255,11 @@ jobs:
             name: Testing
             run-if: testing-or-main
 
+          # Rules (cross-layer conformance) tests: run if core, must, guard, fluent, data (every adapter they compare), rules, testing, or main
+          - project: tests/PineGuard.Testing.UnitTests.Rules/PineGuard.Testing.UnitTests.Rules.csproj
+            name: Rules
+            run-if: core-or-must-or-guard-or-fluent-or-data-or-rules-or-testing-or-main
+
     name: "Test: ${{ matrix.name }}"
     steps:
       - uses: actions/checkout@v7
@@ -278,6 +286,7 @@ jobs:
           XML="${{ needs.changes.outputs.xml }}"
           ANALYZERS="${{ needs.changes.outputs.analyzers }}"
           TESTING="${{ needs.changes.outputs.testing }}"
+          RULES="${{ needs.changes.outputs.testing-rules }}"
           RUN_IF="${{ matrix.run-if }}"
 
           SHOULD_RUN=false
@@ -313,6 +322,8 @@ jobs:
               [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$ANALYZERS" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
             testing-or-main)
               [[ "$RUN_ALL" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
+            core-or-must-or-guard-or-fluent-or-data-or-rules-or-testing-or-main)
+              [[ "$RUN_ALL" == "true" || "$CORE" == "true" || "$MUST" == "true" || "$GUARD" == "true" || "$FLUENT" == "true" || "$DATA" == "true" || "$RULES" == "true" || "$TESTING" == "true" ]] && SHOULD_RUN=true ;;
           esac
 
           echo "result=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
@@ -449,7 +460,7 @@ jobs:
       - name: Restore dotnet tools
         run: dotnet tool restore
 
-      # merge-multiple: false (the default) — downloading up to 15 parallel matrix jobs' artifacts
+      # merge-multiple: false (the default) — downloading up to 16 parallel matrix jobs' artifacts
       # into one flat directory with merge-multiple: true was occasionally colliding on an internal
       # extraction path shared between two artifacts, corrupting one job's coverage.cobertura.xml
       # (observed as "Data at the root level is invalid" / "multiple root elements" in Generate
@@ -494,7 +505,11 @@ jobs:
       # matrix entry actually ran, using the exact same run-if logic as the "Should run" step
       # above (test job, per matrix.run-if). On push to main, or when a shared root build input
       # changed, every scope runs, so the filter includes every assembly (equivalent to no
-      # filtering).
+      # filtering). The Rules matrix entry (tests/PineGuard.Testing.UnitTests.Rules) owns no
+      # source assembly, so it adds no filter of its own: its coverage only adds to assemblies
+      # whose own entry also ran. When it is the only entry that ran, the filter is empty and
+      # nothing is gated (an empty -assemblyfilters would otherwise merge every assembly it
+      # touched at partial coverage).
       - name: Compute coverage assembly filters
         id: assembly-filters
         if: steps.find-coverage.outputs.found == 'true'
@@ -599,7 +614,7 @@ jobs:
           echo "filters=$FILTERS" >> "$GITHUB_OUTPUT"
 
       - name: Generate coverage report
-        if: steps.find-coverage.outputs.found == 'true'
+        if: steps.find-coverage.outputs.found == 'true' && steps.assembly-filters.outputs.filters != ''
         run: >
           dotnet reportgenerator
           -reports:"${{ steps.find-coverage.outputs.files }}"
@@ -609,7 +624,7 @@ jobs:
 
       - name: Check coverage threshold
         id: coverage-check
-        if: steps.find-coverage.outputs.found == 'true'
+        if: steps.find-coverage.outputs.found == 'true' && steps.assembly-filters.outputs.filters != ''
         continue-on-error: true
         env:
           MIN_COV: ${{ vars.MIN_CODE_COVERAGE }}
@@ -658,7 +673,7 @@ jobs:
         run: exit 1
 
       - name: Upload coverage report
-        if: always() && steps.find-coverage.outputs.found == 'true'
+        if: always() && steps.find-coverage.outputs.found == 'true' && steps.assembly-filters.outputs.filters != ''
         uses: actions/upload-artifact@v7
         with:
           name: coverage-report

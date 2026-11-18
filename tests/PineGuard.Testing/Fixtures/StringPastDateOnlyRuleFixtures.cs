@@ -24,9 +24,11 @@ public static class StringPastDateOnlyRuleFixtures
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Today = (Iso(PinnedToday), DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) TodayAllowNull = (Iso(PinnedToday), DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, true);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) Tomorrow = (Iso(PinnedToday.AddDays(1)), DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.Default, false);
+        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) AheadOfUtcPastDate = ("2000-01-01", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultAheadOfUtc, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) AheadOfUtcYesterday = ("2026-06-15", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultAheadOfUtc, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) AheadOfUtcToday = ("2026-06-16", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultAheadOfUtc, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) AheadOfUtcTomorrow = ("2026-06-17", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultAheadOfUtc, false);
+        public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) BehindUtcPastDate = ("2000-01-01", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultBehindUtc, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) BehindUtcYesterday = ("2026-06-13", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultBehindUtc, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) BehindUtcToday = ("2026-06-14", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultBehindUtc, false);
         public static readonly (string? value, DateTimeStyles styles, TimeProvider timeProvider, bool allowNull) BehindUtcTomorrow = ("2026-06-15", DateTimeStyles.AllowWhiteSpaces, FixedTimeProvider.DefaultBehindUtc, false);
@@ -63,7 +65,9 @@ public static class StringPastDateOnlyRuleFixtures
             new(nameof(PastDate), PastDate, true),
             new(nameof(PastDateAllowNull), PastDateAllowNull, true),
             new(nameof(Yesterday), Yesterday, true),
+            new(nameof(AheadOfUtcPastDate), AheadOfUtcPastDate, true),
             new(nameof(AheadOfUtcYesterday), AheadOfUtcYesterday, true),
+            new(nameof(BehindUtcPastDate), BehindUtcPastDate, true),
             new(nameof(BehindUtcYesterday), BehindUtcYesterday, true),
             new(nameof(PaddedPastDate), PaddedPastDate, true),
             new(nameof(PaddedPastDateNoneStyles), PaddedPastDateNoneStyles, true),

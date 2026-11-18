@@ -23,7 +23,7 @@
 
 <p align="center">
   <a href="#quality-metrics"><img src="https://img.shields.io/badge/Coverage%20gate-100%25%20line%20%C2%B7%20100%25%20branch-brightgreen?style=for-the-badge" alt="Default CI coverage gate: 100% line and branch" /></a>
-  <a href="#quality-metrics"><img src="https://img.shields.io/badge/Test%20matrix-15%20projects%20%C3%97%203%20TFMs-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="15 test projects on .NET 8, .NET 10 and .NET 11" /></a>
+  <a href="#quality-metrics"><img src="https://img.shields.io/badge/Test%20matrix-16%20projects%20%C3%97%203%20TFMs-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="16 test projects on .NET 8, .NET 10 and .NET 11" /></a>
   <a href="SECURITY.md"><img src="https://img.shields.io/badge/Security-private%20reporting-blue?style=for-the-badge" alt="Security policy and private vulnerability reporting" /></a>
   <img src="https://img.shields.io/badge/.NET-netstandard2.1%20%7C%20net8.0%20%7C%20net10.0%20%7C%20net11.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt="netstandard2.1 | net8.0 | net10.0 | net11.0" />
 </p>
@@ -39,7 +39,7 @@ var callback = Guard.Against.NotHttpsUrl(url);   // returns a parsed Uri, not th
 
 **Fifteen packages, one validation engine.** Result-based validation, fail-fast guards, FluentValidation
 extensions, DataAnnotations, and integrations for the rest of your .NET application. The CI matrix covers
-15 test projects on .NET 8, .NET 10 and .NET 11, with a default **100% line and branch coverage** gate.
+16 test projects on .NET 8, .NET 10 and .NET 11, with a default **100% line and branch coverage** gate.
 See [quality metrics](#quality-metrics) for evidence, scan snapshots, and checks still to be added.
 
 > **Release status:** PineGuard is pre-1.0. This README describes the current source tree; the
@@ -674,7 +674,7 @@ reports live workflow status; the archived screenshots are historical snapshots.
 
 | Metric or check | Status | Evidence and scope |
 |---|---|---|
-| Test matrix | **15 test projects × 3 target frameworks** | [CI workflow](.github/workflows/ci.yml) and [test targets](tests/Directory.Build.props): .NET 8, .NET 10 and .NET 11; affected suites on pull requests, all suites on `main` |
+| Test matrix | **16 test projects × 3 target frameworks** | [CI workflow](.github/workflows/ci.yml) and [test targets](tests/Directory.Build.props): .NET 8, .NET 10 and .NET 11; affected suites on pull requests, all suites on `main` |
 | .NET 10 tests | **18,887 passed / 18,887 executed** | [25 September 2026 local run](docs/reports/readme-verification-2026-09-25.md): 0 failed, 0 skipped |
 | .NET 8 tests | **18,862 passed / 18,862 executed** | [25 September 2026 local run after reference-cache repair](docs/reports/readme-verification-2026-09-25.md): 0 failed, 0 skipped |
 | Line coverage | **100% default CI threshold** | [Coverage job](.github/workflows/ci.yml); configurable through `MIN_CODE_COVERAGE` |

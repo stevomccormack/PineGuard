@@ -25,6 +25,7 @@
     <Project Path="tests/PineGuard.MustClauses.UnitTests/PineGuard.MustClauses.UnitTests.csproj" />
     <Project Path="tests/PineGuard.Testing/PineGuard.Testing.csproj" Id="25fce7fa-931f-473b-8f94-a50e5789298d" />
     <Project Path="tests/PineGuard.OneOf.UnitTests/PineGuard.OneOf.UnitTests.csproj" />
+    <Project Path="tests/PineGuard.Testing.UnitTests.Rules/PineGuard.Testing.UnitTests.Rules.csproj" />
     <Project Path="tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj" />
     <Project Path="tests/PineGuard.Xml.UnitTests/PineGuard.Xml.UnitTests.csproj" />
   </Folder>

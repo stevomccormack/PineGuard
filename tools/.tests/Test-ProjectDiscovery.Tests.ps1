@@ -6,6 +6,7 @@
 Describe 'Ordinary test-project discovery' {
     BeforeAll {
         . (Join-Path $PSScriptRoot '..' '.shared' 'dotnet-projects.ps1')
+        . (Join-Path $PSScriptRoot '..' '.shared' 'coverage.ps1')
 
         function New-DiscoveryFixture {
             param([string] $Root, [string] $Name, [switch] $Empty)
@@ -95,6 +96,18 @@ Describe 'Ordinary test-project discovery' {
         New-DiscoveryFixture -Root $script:FixtureRoot -Name 'PineGuard.Testing.IntegrationTests' | Out-Null
         @(Get-TestProjects -RepoRoot $script:FixtureRoot -ProjectFilter $testing.DefaultProjectFilter).Count | Should -Be 2
         (Get-PineGuardScope -Name Core).DefaultProjectFilter | Should -Be 'PineGuard.Core.UnitTests.csproj'
+    }
+
+    It 'resolves the All coverage aggregate through every ordinary family so -Clean and analysis see what generation ran' {
+        foreach ($name in @('PineGuard.Core.UnitTests', 'PineGuard.Testing.UnitTests.Rules', 'PineGuard.Testing.IntegrationTests', 'PineGuard.Testing.Fuzz')) {
+            New-DiscoveryFixture -Root $script:FixtureRoot -Name $name | Out-Null
+        }
+        $actual = @(Get-ScopeTestProjectPaths -RepoRoot $script:FixtureRoot -Scope All | ForEach-Object { [IO.Path]::GetFileNameWithoutExtension($_) })
+        $actual.Count | Should -Be 3
+        foreach ($name in @('PineGuard.Core.UnitTests', 'PineGuard.Testing.UnitTests.Rules', 'PineGuard.Testing.IntegrationTests')) { $actual | Should -Contain $name }
+        $actual | Should -Not -Contain 'PineGuard.Testing.Fuzz'
+        $resultsRoot = Join-Path $script:FixtureRoot 'testresults'
+        @(Get-ScopeTestResultsPaths -RepoRoot $script:FixtureRoot -ResultsRoot $resultsRoot -Scope All) | Should -Contain (Join-Path $resultsRoot 'PineGuard.Testing.UnitTests.Rules')
     }
 
     It 'derives the exact dotCover assembly list and excludes only ordinary test families' {

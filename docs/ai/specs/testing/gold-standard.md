@@ -42,14 +42,15 @@ A test operation group reaches **GOLD** when:
 | PineGuard.FluentValidation.UnitTests | 67 | 805 | 49 (73%) | GOLD |
 | PineGuard.DataAnnotations.UnitTests | 64 | 493 | 34 (53%) | GOLD |
 | PineGuard.Testing.UnitTests | 20 | 82 | 0 (n/a) | GOLD |
+| PineGuard.Testing.UnitTests.Rules | 1 | 1 | 1 (100%) | GOLD |
 
 **Counting method** (rerun these to reproduce the table):
 
 - **TestData Files** — files matching `*TestData*.cs` under `tests/<Project>/`, excluding `bin/` and `obj/`.
 - **Op Groups** — lines in those files matching `^\s+public static (partial )?class \w+`, i.e. nested Operation Groups, excluding the outer `XxxTestData` class.
-- **Fixture-Based Files** — TestData files containing at least one call to the project's scenario extension: `.ToRuleCases(` for Core and Testing, `.ToMustCases(`, `.ToGuardCases(`, `.ToFluentCases(`, `.ToDataAnnotationCases(` for the other layers.
+- **Fixture-Based Files** — TestData files containing at least one call to the project's scenario extension: `.ToRuleCases(` for Core and Testing, `.ToMustCases(`, `.ToGuardCases(`, `.ToFluentCases(`, `.ToDataAnnotationCases(` for the other layers, and the project-local `.ToConformanceCases(` for PineGuard.Testing.UnitTests.Rules.
 
-**All projects are GOLD** — structure is correct, no `=> [];` scaffolding remains in any TestData file, and coverage is verified at the 100% target (see below).
+**All projects are GOLD** — structure is correct, no `=> [];` scaffolding remains in any TestData file, and coverage is verified at the 100% target (see below). PineGuard.Testing.UnitTests.Rules meets criteria 1–4; criterion 5 does not apply to it, because it owns no source assembly and so has no coverage scope of its own. Locally its results feed only the `All` and `Testing` scopes, whose project filter is the broad ordinary-test family (`Get-DefaultTestProjectFilter` in `tools/.shared/dotnet-projects.ps1`); every other scope's `DefaultProjectFilter` is that scope's own test project. In CI its results merge into the coverage report only for the assemblies whose own matrix entry ran.
 
 ## Coverage Verification (2026-08-21)
 
@@ -91,6 +92,7 @@ TestData files using the `RuleScenario<T>` → `.ToXxxCases()` fixture pattern (
 
 | Project | Fixture-Based Files | TestData Files | Adoption |
 |---------|--------------------|----------------|----------|
+| Testing.UnitTests.Rules | 1 | 1 | 100% |
 | GuardClauses | 49 | 58 | 84% |
 | MustClauses | 48 | 59 | 81% |
 | FluentValidation | 49 | 67 | 73% |
