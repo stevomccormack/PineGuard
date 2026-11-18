@@ -43,42 +43,57 @@ A test operation group reaches **GOLD** when:
 | PineGuard.DataAnnotations.UnitTests | 64 | 493 | 34 (53%) | GOLD |
 | PineGuard.Testing.UnitTests | 20 | 82 | 0 (n/a) | GOLD |
 | PineGuard.Testing.UnitTests.Rules | 1 | 1 | 1 (100%) | GOLD |
+| PineGuard.Extensions.Options.UnitTests | 2 | 7 | 0 (n/a) | GOLD |
+| PineGuard.Extensions.DependencyInjection.UnitTests | 2 | 8 | 0 (n/a) | GOLD |
+| PineGuard.AspNetCore.UnitTests | 14 | 30 | 0 (n/a) | GOLD |
+| PineGuard.MediatR.UnitTests | 2 | 2 | 0 (n/a) | GOLD |
+| PineGuard.ErrorOr.UnitTests | 1 | 4 | 0 (n/a) | GOLD |
+| PineGuard.FluentResults.UnitTests | 2 | 6 | 0 (n/a) | GOLD |
+| PineGuard.OneOf.UnitTests | 1 | 2 | 0 (n/a) | GOLD |
+| PineGuard.Xml.UnitTests | 8 | 25 | 0 (n/a) | GOLD |
+| PineGuard.Analyzers.UnitTests | 3 | 12 | 0 (n/a) | GOLD |
 
 **Counting method** (rerun these to reproduce the table):
 
 - **TestData Files** — files matching `*TestData*.cs` under `tests/<Project>/`, excluding `bin/` and `obj/`.
 - **Op Groups** — lines in those files matching `^\s+public static (partial )?class \w+`, i.e. nested Operation Groups, excluding the outer `XxxTestData` class.
-- **Fixture-Based Files** — TestData files containing at least one call to the project's scenario extension: `.ToRuleCases(` for Core and Testing, `.ToMustCases(`, `.ToGuardCases(`, `.ToFluentCases(`, `.ToDataAnnotationCases(` for the other layers, and the project-local `.ToConformanceCases(` for PineGuard.Testing.UnitTests.Rules.
+- **Fixture-Based Files** — TestData files containing at least one call to the project's scenario extension: `.ToRuleCases(` for Core and Testing, `.ToMustCases(`, `.ToGuardCases(`, `.ToFluentCases(`, `.ToDataAnnotationCases(` for the other layers, and the project-local `.ToConformanceCases(` for PineGuard.Testing.UnitTests.Rules. The nine adapter and tooling projects (Options to Analyzers) take no cross-layer validation inputs and use no scenario extension, so their column reads `0 (n/a)`, as it does for Testing.
 
 **All projects are GOLD** — structure is correct, no `=> [];` scaffolding remains in any TestData file, and coverage is verified at the 100% target (see below). PineGuard.Testing.UnitTests.Rules meets criteria 1–4; criterion 5 does not apply to it, because it owns no source assembly and so has no coverage scope of its own. Locally its results feed only the `All` and `Testing` scopes, whose project filter is the broad ordinary-test family (`Get-DefaultTestProjectFilter` in `tools/.shared/dotnet-projects.ps1`); every other scope's `DefaultProjectFilter` is that scope's own test project. In CI its results merge into the coverage report only for the assemblies whose own matrix entry ran.
 
-## Coverage Verification (2026-08-21)
+## Coverage Verification (2026-11-18)
 
 `tools/code-coverage/Test-Coverage.ps1 -Enforce100` exits 0 for `All` and for every individual
-scope, against a full `tools/code-coverage/New-CoverageReport.ps1 -Scope All` run covering net8.0 and
-net10.0 (13,698 tests per target framework, 0 failures):
+scope, against a full `tools/code-coverage/New-CoverageReport.ps1 -Scope All -Configuration Release`
+run covering net8.0, net10.0 and net11.0 (71,158 passing executions: 23,700 on net8.0, 23,725 on
+net10.0 and 23,733 on net11.0; 0 failed, 0 skipped), on commit `55f050e` plus the documentation-only
+commit `2c3cd92`:
 
 | Scope | Line | Branch |
 |-------|------|--------|
-| All | 100.00% (15621/15621) | 100.00% (7192/7192) |
-| Core | 100.00% (2776/2776) | 100.00% (2588/2588) |
-| MustClauses | 100.00% (2286/2286) | 100.00% (1190/1190) |
-| GuardClauses | 100.00% (2156/2156) | 100.00% (2152/2152) |
-| DataAnnotations | 100.00% (1768/1768) | 100.00% (150/150) |
-| FluentValidation | 100.00% (1438/1438) | 100.00% (1022/1022) |
-| Testing | 100.00% (5197/5197) | 100.00% (90/90) |
+| All | 100.00% (20678/20678) | 100.00% (8134/8134) |
+| Core | 100.00% (3783/3783) | 100.00% (3162/3162) |
+| MustClauses | 100.00% (3067/3067) | 100.00% (1986/1986) |
+| GuardClauses | 100.00% (2359/2359) | 100.00% (1192/1192) |
+| DataAnnotations | 100.00% (2285/2285) | 100.00% (824/824) |
+| FluentValidation | 100.00% (1748/1748) | 100.00% (514/514) |
+| Testing | 100.00% (6613/6613) | 100.00% (120/120) |
+| Options | 100.00% (30/30) | 100.00% (8/8) |
+| DependencyInjection | 100.00% (35/35) | 100.00% (24/24) |
+| AspNetCore | 100.00% (157/157) | 100.00% (70/70) |
+| ErrorOr | 100.00% (15/15) | 100.00% (4/4) |
+| FluentResults | 100.00% (26/26) | 100.00% (6/6) |
+| OneOf | 100.00% (8/8) | 100.00% (4/4) |
+| MediatR | 100.00% (25/25) | 100.00% (14/14) |
+| Xml | 100.00% (145/145) | 100.00% (62/62) |
+| Analyzers | 100.00% (382/382) | 100.00% (144/144) |
 
-Per-scope figures apply their own class filters and are not expected to sum to the
-`All` row, which matches 983 classes. No `[ExcludeFromCodeCoverage]` attributes were
-added to reach these numbers.
-
-**Update (2026-08-28)**: the Phase 1 structural-validation merge (commit `357ab00`) — error
-codes across every layer, the `MustValidator<T>` keystone, the `GuardExceptionPolicy` redesign,
-ten new cross-property DataAnnotations attributes, and `must-codes` — reconfirmed `-Scope All` at
-100.00% line / 100.00% branch coverage on both net8.0 and net10.0, with all 6 test projects
-passing on both TFMs. The per-scope test/line/branch counts in the table above predate this
-merge and have not been re-verified at the granular level; re-run the coverage script (see
-"Re-verifying Coverage" below) to refresh them.
+Per-scope figures apply their own class filters and are not expected to sum to the `All` row.
+`Test-Coverage.ps1` reads the newest Cobertura file per test project, so each figure comes from one
+target framework per project and can differ by a few framework-specific lines between runs; CI
+merges all three frameworks and enforces the same 100% target on the merged report. Every scope
+was read from the one `-Scope All` run through `-ResultsRoot`. No `[ExcludeFromCodeCoverage]`
+attributes exist in `src/`.
 
 Where a branch was genuinely unreachable through the public API, the enclosing private
 helper was widened to `internal` and tested directly rather than deleted or suppressed
@@ -99,6 +114,7 @@ TestData files using the `RuleScenario<T>` → `.ToXxxCases()` fixture pattern (
 | DataAnnotations | 34 | 64 | 53% |
 | Core | 59 | 115 | 51% |
 | Testing | 0 | 20 | N/A — tests the framework itself, no cross-layer validation inputs (`unit-test.md` §9.6) |
+| Options, DependencyInjection, AspNetCore, MediatR, ErrorOr, FluentResults, OneOf, Xml, Analyzers | 0 | 35 | N/A — adapter and tooling projects with no cross-layer validation inputs (`unit-test.md` §9.6) |
 
 **Note**: Core (51%) and DataAnnotations (53%) are now the layers with the lowest adoption. Migrating their remaining TestData files to the pattern defined in `fixture.md` is the outstanding gap.
 
@@ -159,5 +175,5 @@ If a scope comes back below 100%, demote that project to SILVER here, close the 
 | Parameterless/no-logic methods | 3 | `CreateCancelledToken()`, `OnDispose()`, etc. |
 
 <!-- footer
-last_verified: 2026-08-28
+last_verified: 2026-11-18
 -->
