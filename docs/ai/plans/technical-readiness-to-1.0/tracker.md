@@ -71,7 +71,7 @@ Containers").
 
 | Unit | Working branch | Session | Chunk | Started (UTC) | Heartbeat (UTC) |
 |---|---|---|---|---|---|
-| string→DateOnly pilot | `feature/dateonly-pilot` | https://claude.ai/code/session_01LjSDTWmApYFE9TwDt49HkJ | Owner instruction in session: review and fix everything outstanding; C6 and C7. Took the row over from desktop session `1dae198c-d44c-4285-9f6d-e6991567b75d`, whose heartbeat (2026-11-18 14:41) was over 3 hours old | 2026-11-18 19:41 | 2026-11-18 19:41 |
+| string→DateOnly pilot | `feature/dateonly-pilot` | https://claude.ai/code/session_01LjSDTWmApYFE9TwDt49HkJ | Owner instruction in session: review and fix everything outstanding; C6 and C7. Took the row over from desktop session `1dae198c-d44c-4285-9f6d-e6991567b75d`, whose heartbeat (2026-11-18 14:41) was over 3 hours old | 2026-11-18 19:41 | 2026-11-19 01:36 |
 
 ## Authorisation
 
@@ -84,7 +84,7 @@ Email, bounded numeric, W22, Temporal Phase 2 and every wave stay parked.
 
 | Pilot | Status | PR | Names signed | Benchmark numbers | Verdict |
 |---|---|---|---|---|---|
-| string→DateOnly | In PR (draft) — C1 to C5 done; C6 next. The owner instructed in session on 2026-11-18 "review and fix all outstanding"; the items this run proceeds on without a ruling by name (AO-3, AO-11, AO-14) are marked "Proceeding on recommendation" under [Awaiting owner](#awaiting-owner) and stay his to confirm or reverse | [#66](https://github.com/stevomccormack/PineGuard/pull/66) | No — table not drafted yet (C7) | None yet (C6) | Open |
+| string→DateOnly | In PR — C1 to C6 done; C7 next. The PR was marked ready for review on 2026-11-18 at about 13:46 UTC, not by a pilot run; it is still not to be merged before the owner's pass/kill call. The owner instructed in session on 2026-11-18 "review and fix all outstanding"; the items this run proceeds on without a ruling by name (AO-3, AO-11, AO-14) are marked "Proceeding on recommendation" under [Awaiting owner](#awaiting-owner) and stay his to confirm or reverse | [#66](https://github.com/stevomccormack/PineGuard/pull/66) | No — table not drafted yet (C7) | Committed (`0f0de32`): no input allocates more on the branch than on `main`; see [Benchmark numbers](#benchmark-numbers-c6) | Open |
 | Email | Parked — runs only if the string→DateOnly pilot passes | — | — | — | — |
 | Bounded numeric | Parked — runs only if the string→DateOnly pilot passes | — | — | — | — |
 
@@ -94,7 +94,7 @@ Email, bounded numeric, W22, Temporal Phase 2 and every wave stay parked.
 |---|---|
 | Start (first code commit) | 2026-11-16 (`f676e18`) |
 | End (start + 14 days) | 2026-11-30 |
-| Days remaining | 12 of 14 on 2026-11-18 |
+| Days remaining | 11 of 14 on 2026-11-19 |
 
 The council's own wording is stricter: "two weeks from authorization to merge of PR one". Read that
 way the box started on 2026-11-09 and ends on 2026-11-23. The scheduled-task instruction defines the
@@ -133,7 +133,7 @@ The council verdict that D29 records, verbatim from the
 | C3 | Must and Guard adapters, no rule logic in either | Done 2026-11-18 (`b5aca45`): `Must.Be.PastDateOnly` became one evaluate call and one mapping call (since C4 that expression lives in the internal overload the public clause forwards to); Guard unchanged (F-9). Proceeding on the AO-11 recommendation |
 | C4 | FluentValidation and DataAnnotations adapters, no rule logic. DataAnnotations resolves `TimeProvider` through `ValidationContext.GetService` | Done 2026-11-18 (`fcfad70`), design F-10: the FluentValidation extension and `PastDateOnlyStringAttribute.ValidateValue` are each one call into the `internal` `Must.Be.PastDateOnly(…, allowNull: true, paramName: null)`; neither has a null branch. The public clause is one forwarding call with `allowNull: false`; the single mapping expression lives in the internal overload. No public API or behaviour change. Proceeding on the AO-3 and AO-14 recommendations |
 | C5 | Cross-layer consistency test: one `TheoryData`, four adapters against the new rule object on validity, failure code and rendered message; expected cases written independently per W01 | Done 2026-11-18 (`55f050e`): new project `tests/PineGuard.Testing.UnitTests.Rules` (TP-RULES), one `Cases` dataset of 34 inputs run on three target frameworks. Tier (a) checks the rule object against hand-written literals under both null policies; tier (b) checks Must, Guard, FluentValidation and DataAnnotations against the rule object on every row. 15 of 15 seeded faults in production code failed at least one row. Projection differences asserted openly (AO-3). Departures: R18 |
-| C6 | BenchmarkDotNet project (TP-BENCH), new path against the current `StringRules.DateOnly` / Must path; results and an allocation comparison committed | Not started |
+| C6 | BenchmarkDotNet project (TP-BENCH), new path against the current `StringRules.DateOnly` / Must path; results and an allocation comparison committed | Done 2026-11-19 (`0f0de32`): `benchmarks/PineGuard.Benchmarks`, the same source run on `main` `8b24472` and on the branch, results in `benchmarks/PineGuard.Benchmarks/Results/string-past-date-only.md`. No kill signal |
 | C7 | Names table (awaits owner signature), full-PR Fable review of record, exit-criteria evaluation with a pass/kill recommendation (awaits owner call) | Not started |
 
 ## C1 inventory (main at `2a7dd20`)
@@ -183,7 +183,7 @@ owner can redirect them; none is an owner gate unless listed under Awaiting owne
 | F-6 | Null policy is a `bool allowNull` argument to `Evaluate`. Styles are checked before null under either policy | It is the repository's existing word (`ValidationAttributeBase`). It reproduces today's behaviour exactly: Must and Guard fail on null; FluentValidation and DataAnnotations pass null only after the styles check. The rule object owns the branch, so no adapter needs one |
 | F-7 | The lookups do not assemble a `MustResult`; each adapter that needs one writes the same mapping expression | Assembling the result inside `PineGuard.Rules` would make Rules depend on the Must result type, against the Utils → Rules → Must layer order. Whether C3 and C4 share one assembly point is settled there |
 | F-8 | The failing-parameter names `"styles"` and `"timeProvider"` are literals in the rule object, not `nameof` at the adapter | They have to live with the rule for the adapters to carry no literal. The C5 consistency test pins them (done, `55f050e`) |
-| F-4 | The current-path benchmark baseline uses only public API that exists on main (`StringRules.DateOnly.IsInPast`, `Must.Be.PastDateOnly`), so the same benchmark source can run against a main checkout and against the branch | The pilot rewires the Must clause, so the "current path" will not exist on the branch by C6. Method to be fixed in C6 |
+| F-4 | The current-path benchmark baseline uses only public API that exists on main (`StringRules.DateOnly.IsInPast`, `Must.Be.PastDateOnly`), so the same benchmark source can run against a main checkout and against the branch | The pilot rewires the Must clause, so the "current path" will not exist on the branch by C6. Method fixed in C6 (`0f0de32`): a git worktree of `origin/main` with the benchmark project copied in, measured back to back with the branch on the same machine |
 | F-9 | Guard keeps mapping through the Must result (`Must.Be.PastDateOnly` then `GuardFailure.Throw(result, …)`); it does not call the rule object itself. Its `if (result.Failed) GuardFailure.Throw(…)` line is projection, not rule logic: it branches on the mapped success flag, never on the input, and is the same line in every Guard clause (Guard spec §8 and §11.2). Read literally, the council wording "a mapping call into the rule object" is met by Guard only through Must; the owner weighs that at the pass/kill call | It is the precedent for every Guard clause, `global.md` ("Guard calls Must. Never duplicate logic.") and the `must-codes` rule (e) require it, and a direct call would repeat the result assembly F-7 warns about. The rule object still supplies everything Guard reports, through the Must result. Both the C3 implementer and the C3 reviewer reached the same view independently |
 | F-10 | C4 design. FluentValidation and DataAnnotations keep calling the Must layer, as their specs require ("calls MustClauses only — never Core directly"). The null policy reaches them through one `internal` Must-layer overload of `PastDateOnly` that takes `allowNull` and holds the single mapping expression; the public clause calls it with `allowNull: false`, the two adapters with `allowNull: true`. The adapters lose their null branch (`SkipAbsentValue`, and the `value is null && result.ParamName is null` test). Both keep passing the catalogue constant `MustCodes.Date.Relative.NotPast` at registration, as the FluentValidation spec §3 and the DataAnnotations spec §2.1 require; C5 pins it against the rule object's primary code (done, `55f050e`). No public API and no behaviour change | It removes the last rule logic from the two adapters while they keep calling the Must layer only, and it needs no decision on D08 or D09. As with Guard (F-9), the two adapters reach the rule object only through Must. FluentValidation 11.12 fixes `ErrorCode` when the rule is built (`WithErrorCode(string)` is the only setter on rule options), so a per-outcome code cannot be reported without leaving the `IRuleBuilderOptions` chaining contract; see AO-3. The design does depart from three layer-spec sentences on where the null skip lives; they are recorded as AO-14 |
 
@@ -210,13 +210,52 @@ Paths marked `+` are new. The new names are provisional until the names table is
 7. `src/PineGuard.FluentValidation/FluentStringDateOnlyExtensions.cs` — `PastDateOnly` is a mapping call through the Must layer (F-10, `fcfad70`); the fixed registration code stays (AO-3)
 8. `src/PineGuard.DataAnnotations/StringDateOnlyAttributes.cs` — `PastDateOnlyStringAttribute` is a mapping call through the Must layer (F-10, `fcfad70`)
 9. `+ tests/PineGuard.Testing.UnitTests.Rules/` — TP-RULES project holding the cross-layer consistency test under `Conformance/`
-10. `+ benchmarks/PineGuard.Benchmarks/` — TP-BENCH BenchmarkDotNet project, registered in `PineGuard.slnx`, outside ordinary `dotnet test`
+10. `+ benchmarks/PineGuard.Benchmarks/` — TP-BENCH BenchmarkDotNet project, registered in `PineGuard.slnx`, outside ordinary `dotnet test` (C6, `0f0de32`), with `benchmarks/Directory.Build.props` and the committed results
 
 Supporting changes that follow from these: unit tests and test data beside each changed member in
 the five existing unit-test projects, shared scenarios in
 `tests/PineGuard.Testing/Fixtures/StringPastDateOnlyRuleFixtures.cs`, `src/PineGuard.MustClauses/PineGuard.MustClauses.csproj` (two `InternalsVisibleTo` entries, F-10), `src/PineGuard.Core/PineGuard.Core.csproj` (one `InternalsVisibleTo` entry for TP-RULES), `PineGuard.slnx`, the Qodana solution, the CI
 workflow, `.editorconfig`, `.vscode/tasks.json`, `tools/.shared/coverage.ps1` with its test, the project counts in `README.md` and `CONTRIBUTING.md`, `docs/ai/specs/testing/gold-standard.md` and `project.md`, and this
 tracker. `apps/cli/config/baseline.json` is unchanged.
+
+## Benchmark numbers (C6)
+
+Committed in `0f0de32`. The full tables, the environment, the job and the uncertainty notes are in
+[`benchmarks/PineGuard.Benchmarks/Results/string-past-date-only.md`](../../../../benchmarks/PineGuard.Benchmarks/Results/string-past-date-only.md).
+The same benchmark source, using only public API that exists on both trees, ran on `main` `8b24472` (the
+current path) and on the branch at `98ca171` (the rule-object path; `src/` is unchanged since), Release,
+.NET 10.0.15, BenchmarkDotNet 0.15.8 default job, on 2026-11-18. The Guard failure rows were measured
+the same way against `8b24472` and `ee4f9a5`. Fable checked every row of the results file against the
+raw BenchmarkDotNet reports (46 of 46 match).
+
+Bytes allocated per call:
+
+| Benchmark | `PastDate` | `Today` | `NotADate` | `NullValue` | `InvalidStyles` |
+|---|---:|---:|---:|---:|---:|
+| Core `StringRules.DateOnly.IsInPast` (control), both trees | 0 | 0 | 0 | 0 | not run |
+| `Must.Be.PastDateOnly`, `main` | 64 | 152 | 152 | 136 | 216 |
+| `Must.Be.PastDateOnly`, branch | 64 | 152 | 152 | 136 | 216 |
+| `Guard.Against.FutureOrPresentDateOnly`, `main` | 64 | 488 | 488 | 472 | not run |
+| `Guard.Against.FutureOrPresentDateOnly`, branch | 64 | 488 | 488 | 472 | not run |
+| FluentValidation `PastDateOnly`, `main` | 600 | 2064 | 2064 | 600 | 2168 |
+| FluentValidation `PastDateOnly`, branch | 600 | 2064 | 2064 | 600 | 2168 |
+| DataAnnotations `PastDateOnlyString`, `main` | 64 | 208 | 208 | 64 | 272 |
+| DataAnnotations `PastDateOnlyString`, branch | 64 | 208 | 208 | **0** | 272 |
+
+- **Kill criterion ("the new path allocates where the current one does not"): not hit.** In no row of
+  any run does the branch allocate more than `main`. The one difference on .NET 10 is the
+  DataAnnotations null value, where `main` allocates 64 bytes and the branch none. On .NET 8, and on
+  .NET 10 with object stack allocation switched off, the FluentValidation null value is also 64 bytes
+  lighter on the branch (728 against 664); every other row is equal there too.
+- **Timing is reported, not relied on, and it is not neutral.** The machine is a shared cloud
+  container. Against a control that moved by up to 3.6% between the two runs, the branch's Must clause
+  was slower on every input by 3% to 19% (3.6 to 11.8 ns per call), and a repeat in the reverse order
+  pointed the same way (8% to 23%). The mapping call adds five lookups and one forward. D11 sets no
+  budget, so this is a finding for the pass/kill call, not a failure.
+- BenchmarkDotNet 0.15.8 does not recognise .NET 11 in its default toolchain; there is no .NET 11
+  comparison. The project targets `net8.0`, `net10.0` and `net11.0` and every benchmark runs on each.
+- The project is not a test project: ordinary test discovery and the CI test matrix never run it,
+  and no threshold is set anywhere.
 
 ## Awaiting owner
 
@@ -332,6 +371,7 @@ each is open work for the owner to schedule):
 | 2026-11-18 | C4 working tree, first version | C4 | Fable (fresh subagent) | Findings: code behaviourally clean; 1 blocker | (1) blocker: the internal overload's `paramName` lacked `CallerArgumentExpression`, an unrecorded departure from the Must spec signature rule — attribute added; the no-precedent items recorded in AO-14. (2) a documentation line over 140 characters — re-wrapped. (3) the FluentValidation null remark is imprecise for every `styles` method in the file — corrected in the documentation commit that follows. (4) ambiguous remark — reworded. (5) missing blank line — added. (6) a stale memory note outside the pilot — listed
 | 2026-11-18 | `fcfad70` (reviewed as the working tree before commit) | C4 | Fable (second fresh subagent) | **ship** | No blocker or should-fix. Two nits, recorded and not changed: the attribute's "Delegates to" reference names the public overload; the internal overload's `CallerArgumentExpression` default is reached by no caller and exists for the spec signature rule. Surviving mutations listed for C5 (R17)
 | 2026-11-18 | `55f050e` and `2c3cd92`, reviewed as the working tree in four rounds | C5 and the documentation corrections | Fable (four fresh subagents: one on C5, one on the documentation, then two on the whole tree, the last of which also verified its own four findings after the fix) | Findings in rounds 1 to 3; **ship** in round 4, for both commits | Every round found the consistency test itself sound: independent literal expectations, both tiers on all four adapters on all 34 rows, no wrong expectation. Round 1, C5: `.editorconfig` and the `All` coverage aggregate did not know the new project; literals in the Tests file; unrecorded departures; a dropped byte-order mark. Round 1, documentation: four remarks made untrue, two lines over 140 characters, a mislisted attribute, stale README sections, two wrong parameter descriptions. Round 2: expected `Value` restated fixture inputs; three inexact sentences; two incomplete lists. Round 3: eight FluentValidation remarks still inexact; one stale sentence in `docs/ai/specs/testing/project.md`; one incomplete list; a missing package reference. All fixed before commit; what was recorded and not changed is in R18, R19 and the list under the departures table |
+| 2026-11-19 | `0f0de32`, reviewed as the working tree in two rounds | C6 | Fable (fresh subagent, which also verified its own findings after the fix) | Findings in round 1; **ship** in round 2 | Round 1 found the benchmark code, the wiring and the results file internally consistent, and the project excluded from tests and packing. Findings, all fixed before commit: private fields not `_camelCase` (renamed; Must and Guard now pass `paramName: "value"` so the measured messages and allocations are unchanged, proved by a dry run); "results committed" in the root README (now "measured"); a stale doc comment; reverse-order and repeat figures quoted with no table (tables added from the raw reports); the reason for the projects own fixed clock unrecorded (README); three inexact sentences in the results file. The C6 work was done by three Opus agents in turn, because the container restarted twice mid-chunk; Fable checked every row of the results file against the raw reports before the review |
 
 ## Run log
 
