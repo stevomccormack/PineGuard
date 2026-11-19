@@ -3,7 +3,7 @@ type: plan
 id: technical-readiness-to-1.0
 version: 1.13
 status: active
-last_updated: 2026-11-16
+last_updated: 2026-11-19
 council_verdict_ref: docs/ai/plans/technical-readiness-to-1.0.council-transcript.md
 council_verdict_date: 2026-11-09
 council_trigger: explicit
