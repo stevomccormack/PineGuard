@@ -1,0 +1,13 @@
+<Project>
+  <!-- Chain to root Directory.Build.props for shared settings -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <!-- Benchmark projects are executables — cannot target netstandard2.1. Set here, not in the project file, because
+       BenchmarkDotNet builds a generated project under the benchmark's bin/ folder that inherits this file: a project
+       file setting would leave the generated project with the root netstandard2.1 target, which fails to restore -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
+    <!-- Benchmark assemblies don't ship — no XML doc file, no CS1591 on public benchmark classes -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>

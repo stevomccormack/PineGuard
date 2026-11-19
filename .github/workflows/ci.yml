@@ -114,6 +114,7 @@ jobs:
             any-src:
               - 'src/**'
               - 'tests/**'
+              - 'benchmarks/**'
               - '*.slnx'
               - '*.sln'
               - 'Directory.Packages.props'
@@ -911,7 +912,7 @@ jobs:
   #    docs/ai/plans/tools-review-and-standardisation.md, Phase 2)
   #
   #    No needs:/if: — tools/** is not one of the "changes" job's path filters
-  #    (those only cover src/**, tests/**, and a handful of root files), so
+  #    (those only cover src/**, tests/**, benchmarks/**, and a handful of root files), so
   #    this is the only check watching tools/** and it runs on every trigger
   #    regardless of whether application code or tooling scripts changed.
   #    Needs no .NET setup or build artifacts: Test-Tools.ps1 only runs

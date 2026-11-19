@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PineGuard.Core\PineGuard.Core.csproj" />
+    <ProjectReference Include="..\..\src\PineGuard.MustClauses\PineGuard.MustClauses.csproj" />
+    <ProjectReference Include="..\..\src\PineGuard.GuardClauses\PineGuard.GuardClauses.csproj" />
+    <ProjectReference Include="..\..\src\PineGuard.FluentValidation\PineGuard.FluentValidation.csproj" />
+    <ProjectReference Include="..\..\src\PineGuard.DataAnnotations\PineGuard.DataAnnotations.csproj" />
+  </ItemGroup>
+
+</Project>

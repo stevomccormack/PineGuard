@@ -686,7 +686,7 @@ reports live workflow status; the archived screenshots are historical snapshots.
 | SonarQube | **Archived passing scan** | [20 March 2026 snapshot](docs/reports/code-scanner/pineguard-sonarqube-report.jpeg): 0 issues, 0 security hotspots, 0.0% duplication; not a job in the current CI workflow |
 | Qodana | **Archived scan; opt-in CI job** | [21 March 2026 snapshot](docs/reports/code-analysis/pineguard-qodana-report--problems.jpeg): 0 problems across 3,194 inspections; CI runs it only when `QODANA_ENABLED=true` |
 | Fuzz / property-based testing | **Not configured** | No dedicated fuzzing harness or property-based test suite in the current repository |
-| Benchmarks | **Not provided** | No benchmark suite or published performance baseline in the current repository |
+| Benchmarks | **One rule measured; no budgets** | [BenchmarkDotNet project](benchmarks/PineGuard.Benchmarks/README.md) for the string→DateOnly "in the past" pilot rule only, with [results measured 18 November 2026](benchmarks/PineGuard.Benchmarks/Results/string-past-date-only.md) for `main` and the pilot branch; no performance budget or regression check, and not run in CI |
 | Security policy | **Published** | [Private vulnerability reporting, supported versions and response targets](SECURITY.md) |
 | Dependency updates | **Weekly updates configured** | [Dependabot](.github/dependabot.yml) for NuGet packages and GitHub Actions |
 | API compatibility | **No automated gate yet** | No checked-in API baseline or cross-release compatibility check; multi-target builds do not establish compatibility between releases |

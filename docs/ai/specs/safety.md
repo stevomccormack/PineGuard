@@ -284,6 +284,7 @@ These directories contain source-of-truth content. An agent must never delete fi
 
 - `src/**` — production source code
 - `tests/**` — test source code
+- `benchmarks/**` — benchmark source code and committed benchmark results
 - `docs/**` — documentation and AI specs
 - `.github/**` — CI/CD configuration
 - `.git/**` — repository internals

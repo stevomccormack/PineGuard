@@ -5,6 +5,8 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Central package versions -->
+    <!-- Benchmark runner for benchmarks/PineGuard.Benchmarks only; never referenced by a shipped package -->
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="coverlet.collector" Version="10.1.1" />
     <!-- Result-pattern bridge targets: pinned to the lowest line carrying the API each bridge needs
          (Directory.Packages.props §4.3), so a consumer already on a newer line is never held back -->
