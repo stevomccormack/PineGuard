@@ -22,6 +22,7 @@
   <Project Path="../../../src/PineGuard.OneOf/PineGuard.OneOf.csproj" />
   <Project Path="../../../tests/PineGuard.OneOf.UnitTests/PineGuard.OneOf.UnitTests.csproj" />
   <Project Path="../../../tests/PineGuard.Testing/PineGuard.Testing.csproj" />
+  <Project Path="../../../tests/PineGuard.Testing.UnitTests.Rules/PineGuard.Testing.UnitTests.Rules.csproj" />
   <Project Path="../../../tests/PineGuard.Testing.UnitTests/PineGuard.Testing.UnitTests.csproj" />
   <Project Path="../../../src/PineGuard.MediatR/PineGuard.MediatR.csproj" />
   <Project Path="../../../tests/PineGuard.MediatR.UnitTests/PineGuard.MediatR.UnitTests.csproj" />
@@ -30,5 +31,6 @@
   <Project Path="../../../src/PineGuard.Analyzers/PineGuard.Analyzers.csproj" />
   <Project Path="../../../src/PineGuard.Analyzers.CodeFixes/PineGuard.Analyzers.CodeFixes.csproj" />
   <Project Path="../../../tests/PineGuard.Analyzers.UnitTests/PineGuard.Analyzers.UnitTests.csproj" />
+  <Project Path="../../../benchmarks/PineGuard.Benchmarks/PineGuard.Benchmarks.csproj" />
 </Solution>
 

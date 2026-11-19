@@ -100,12 +100,12 @@ function Get-ScopeTestProjectPaths {
     .DESCRIPTION
         Mirrors the resolution coverlet/New-CoverageReport.ps1 performs when the caller does not
         override -ProjectFilter: a registry scope's own DefaultProjectFilter and
-        IncludeEmptyTestProjects, or '*.UnitTests.csproj' with empty projects excluded for
-        the 'All' aggregate (which is not a registry entry). This is the single place that
-        answers "which test projects does this scope canonically own", so New-CoverageReport.ps1
-        (-Clean) and Test-Coverage.ps1 (aggregation) cannot drift apart and re-open the
-        stale-data problem (F-19): a run for one scope must never touch or read another
-        scope's results.
+        IncludeEmptyTestProjects, or Get-DefaultTestProjectFilter (every ordinary test-project
+        family) with empty projects excluded for the 'All' aggregate (which is not a registry
+        entry). This is the single place that answers "which test projects does this scope
+        canonically own", so New-CoverageReport.ps1 (-Clean) and Test-Coverage.ps1 (aggregation)
+        cannot drift apart and re-open the stale-data problem (F-19): a run for one scope must
+        never touch or read another scope's results.
 
         An explicit -ProjectFilter override passed to New-CoverageReport.ps1 for a one-off run is
         intentionally NOT reflected here — this answers what the scope owns by default, which
@@ -123,7 +123,7 @@ function Get-ScopeTestProjectPaths {
     $registryScopeNames = @(Get-PineGuardScope -All | ForEach-Object Name)
     $scopeEntry = if ($Scope -in $registryScopeNames) { Get-PineGuardScope -Name $Scope } else { $null }
 
-    $projectFilter = if ($null -ne $scopeEntry) { $scopeEntry.DefaultProjectFilter } else { '*.UnitTests.csproj' }
+    $projectFilter = if ($null -ne $scopeEntry) { $scopeEntry.DefaultProjectFilter } else { Get-DefaultTestProjectFilter }
     $includeEmpty = if ($null -ne $scopeEntry) { [bool]$scopeEntry.IncludeEmptyTestProjects } else { $false }
 
     return @(Get-TestProjects -RepoRoot $RepoRoot -ProjectFilter $projectFilter -IncludeEmpty:$includeEmpty)

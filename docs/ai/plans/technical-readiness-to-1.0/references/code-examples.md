@@ -591,7 +591,7 @@ Checks.Require(consumed == iterations, "timing result consumed");
 Console.WriteLine($"TIMING illustration: consumed={consumed}; elapsedTicks={timer.ElapsedTicks}; allocatedBytes={allocated}");
 ```
 
-Purpose: complete package-free timing probe consumes 100,000 static results after 1,000 consumed warmup calls. Stopwatch construction and warmup are outside the allocation-measurement window; no validator construction/reuse claim. Expected consumed=100000, elapsed/allocation observed, no threshold selected. Timer/counter overhead, JIT tiering and host noise remain uncontrolled; this is a smoke measurement, not BenchmarkDotNet, a regression budget or a publishable benchmark. BDN version/config remain unverified; D10/D11 open. Status pending.
+Purpose: complete package-free timing probe consumes 100,000 static results after 1,000 consumed warmup calls. Stopwatch construction and warmup are outside the allocation-measurement window; no validator construction/reuse claim. Expected consumed=100000, elapsed/allocation observed, no threshold selected. Timer/counter overhead, JIT tiering and host noise remain uncontrolled; this is a smoke measurement, not BenchmarkDotNet, a regression budget or a publishable benchmark. BDN version/config remain unverified for the wave workloads (the pilot's TP-BENCH project uses BenchmarkDotNet 0.15.8 with the default job); D10/D11 open. Status pending.
 
 ### W11 — 11-trimming-and-native-consumers
 

@@ -14,8 +14,9 @@ essentials: how to build, test, and submit changes that pass CI on the first try
 
 | Path | What it holds |
 |------|---------------|
-| `src/` | The fourteen packages, one project each, with a README per package |
-| `tests/` | One `*.UnitTests` project per package, plus `PineGuard.Testing` (the shared test toolkit, also a package) |
+| `src/` | The fourteen packages, one project each (the analyzer package also packs `PineGuard.Analyzers.CodeFixes`), with a README per package |
+| `tests/` | One `*.UnitTests` project per package, `PineGuard.Testing` (the shared test toolkit, also a package) with its own `PineGuard.Testing.UnitTests`, the cross-layer `PineGuard.Testing.UnitTests.Rules`, and the trimmed-consumer executable `PineGuard.Core.TrimSmoke` |
+| `benchmarks/` | `PineGuard.Benchmarks`, a BenchmarkDotNet executable with committed results; not a test project and not run by `dotnet test` (see its [README](benchmarks/PineGuard.Benchmarks/README.md)) |
 | `tools/` | PowerShell tooling: coverage, diagnostics, formatting, scanning, git hooks, release |
 | `apps/cli/` | The TypeScript audit CLI (`pineguard audit`) that machine-checks repo conventions |
 | `docs/ai/` | The engineering specs, rules, skills and agent playbooks that built the library |
@@ -26,7 +27,7 @@ essentials: how to build, test, and submit changes that pass CI on the first try
 # Build (Release, zero warnings — TreatWarningsAsErrors is on)
 dotnet build PineGuard.slnx -c Release
 
-# Run all tests (15 test projects × 3 target frameworks)
+# Run all tests (16 test projects × 3 target frameworks)
 dotnet test PineGuard.slnx -c Release
 
 # Formatting must be clean before you push (CI gates on this)

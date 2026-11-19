@@ -1,9 +1,9 @@
 <!-- metadata_header
 type: plan
 id: technical-readiness-to-1.0
-version: 1.12
-status: planned
-last_updated: 2026-11-09
+version: 1.13
+status: active
+last_updated: 2026-11-19
 council_verdict_ref: docs/ai/plans/technical-readiness-to-1.0.council-transcript.md
 council_verdict_date: 2026-11-09
 council_trigger: explicit
@@ -15,14 +15,14 @@ council_trigger: explicit
 | Question | Answer |
 |---|---|
 | Council | Run on 2026-11-09 (Fable council, [transcript](../technical-readiness-to-1.0.council-transcript.md)); header stamped. The first half of D19 is satisfied. |
-| Owner authorization | **Not yet given.** The second half of D19. Until the owner's explicit go, status is `planned` and nothing below is active. |
-| Active path once authorized | One unit only: the **string→DateOnly pilot** as a single PR (see [council verdict](#status-authority-and-preservation)). Not Wave A, not the 23 workstreams. |
+| Owner authorization | **Given 2026-11-09, for the pilot only.** The owner authorised exactly one unit, the string→DateOnly pilot as a single PR, through the scheduled-task instruction that runs it (recorded 2026-11-16 here, in D19 and in the [tracker](tracker.md)). Status is `active` with scope restricted to the pilot; nothing else below is active. |
+| Active path | One unit only: the **string→DateOnly pilot** as a single PR (see [council verdict](#status-authority-and-preservation)). Not Wave A, not the 23 workstreams. |
 | Parked behind the pilot | Email and bounded-numeric pilots (only if PR one passes); W22 naming (runs after the pilot); every wave; Temporal Program Phase 2 (T-02), which waits for the pilot's two-week box. |
 | Current API baseline | The Core/Common API decisions are implemented and merged to main on 2026-11-09 (`c124601`, `f76733d`, merged as `148fb95`/`86ba9c9`); see [Current API baseline](#current-api-baseline). They are no longer open decisions. |
 | Temporal baseline | Temporal Program Phase 1 merged to main as `ee08ccd` on 2026-11-09. D-1 ratified: without an injected `TimeProvider`, "today" is the UTC calendar date; an injected provider's `LocalTimeZone` chooses the zone. See [temporal-00-program.md](../temporal-00-program.md) §3. |
 | Current evidence | Main CI run 42599717255 at `86ba9c9`: 47,011 passing framework executions (23,493 net8.0; 23,518 net10.0), 100% line and 100% branch (8,986 of 8,986 branches) in the audited Coverlet denominator, `MIN_CODE_COVERAGE=100`; main `3c925f7` (run 42611203241) is fully green including the audit job. See [baseline evidence](references/baseline-evidence.md). |
-| Process for the pilot | Tracker page (`+ technical-readiness-to-1.0/tracker.md`, created on authorization) with three rows, one Fable code review per PR, owner name sign-off. Closure ledgers, the Astra/Luna/Sol protocol, checkpoints and hash caches are off the pilot's critical path; whether any of them return is decided when the waves are redrawn from pilot evidence. |
-| Model policy | Fable for judgment, review, decisions and council; Opus for implementation; Sonnet for reads (owner instruction, 2026-11-08). This replaces the planning-era "Astra model override" language of plan v1.11 and earlier. |
+| Process for the pilot | [Tracker page](tracker.md) with three rows, one Fable code review per PR, owner name sign-off. Closure ledgers, the Astra/Luna/Sol protocol, checkpoints and hash caches are off the pilot's critical path; whether any of them return is decided when the waves are redrawn from pilot evidence. |
+| Model policy | Fable for judgment, review, decisions and council; Opus for implementation and reads; no other models (owner instruction, 2026-11-09). This replaces the planning-era "Astra model override" language of plan v1.11 and earlier. |
 
 ## Code examples
 
@@ -48,7 +48,7 @@ callers, tests and documentation together under the [greenfield policy](../../sp
 
 ## Approved test-project organization
 
-The user-approved [testing project layout](references/test-project-layout.md) groups added crosscutting checks into Rules and Architecture test projects, hosted composition into IntegrationTests, and distinct Fuzz, Benchmarks and Consumers executables. Testing techniques use folders within those responsibilities. Existing library unit suites, the shared PineGuard.Testing fixture library and its own PineGuard.Testing.UnitTests retain their responsibilities. The layout's stable TP-* identities and workstream mapping are authoritative; implementation must align the solution, relevant discovery/routing/coverage scripts, BRAIN and documentation. The six projects remain planned and must not be reported as present or passing.
+The user-approved [testing project layout](references/test-project-layout.md) groups added crosscutting checks into Rules and Architecture test projects, hosted composition into IntegrationTests, and distinct Fuzz, Benchmarks and Consumers executables. Testing techniques use folders within those responsibilities. Existing library unit suites, the shared PineGuard.Testing fixture library and its own PineGuard.Testing.UnitTests retain their responsibilities. The layout's stable TP-* identities and workstream mapping are authoritative; implementation must align the solution, relevant discovery/routing/coverage scripts, BRAIN and documentation. TP-RULES and TP-BENCH exist through the string→DateOnly pilot (2026-11-18 and 2026-11-19); the other four projects remain planned and must not be reported as present or passing.
 
 ## Status, authority and preservation
 
@@ -59,10 +59,11 @@ The user-approved [testing project layout](references/test-project-layout.md) gr
 > the current path and an owner-signed names table, under the existing CI gates, with a two-week time-box
 > and an explicit kill criterion; Email and bounded numeric follow only if it passes; W22 runs after the
 > pilot; `core-common-api-decisions.md` is not touched; Temporal Phase 2 waits for the pilot's time-box.
-> The owner's implementation authorization (the second half of D19) is still to be given; until then the
-> status stays `planned`.
+> The owner's implementation authorization (the second half of D19) was given on 2026-11-09 for the pilot
+> only; the status is `active` with scope restricted to the pilot, and its state is in the
+> [tracker](tracker.md).
 
-Status is **Planned**. The formal council required by `docs/ai/specs/council.md` §§1,4–6 and the plan-with-council workflow occurred on 2026-11-09 and its verdict reference is recorded in the header above. The one remaining gate before any implementation is the owner's explicit authorization. The planning-era role split (Astra architecture/review, Luna reading, Sol coding, orchestrator coordinating) describes how this plan was written; for the authorized pilot the council replaced it with one Fable code review per PR and the owner's name sign-off, and the owner's current model policy is Fable for judgment and review, Opus for implementation, Sonnet for reads. No model choice waives independent review.
+Status is **Active for the string→DateOnly pilot only**; every wave stays Planned. The formal council required by `docs/ai/specs/council.md` §§1,4–6 and the plan-with-council workflow occurred on 2026-11-09 and its verdict reference is recorded in the header above. The owner's explicit authorization, the second gate, was given on 2026-11-09 for the pilot only. The planning-era role split (Astra architecture/review, Luna reading, Sol coding, orchestrator coordinating) describes how this plan was written; for the authorized pilot the council replaced it with one Fable code review per PR and the owner's name sign-off, and the owner's current model policy is Fable for judgment, review, decisions and council; Opus for implementation and reads; no other models (owner instruction, 2026-11-09). No model choice waives independent review.
 
 The original uncommitted v1.6, rubric, verification report and existing unrelated edits remain untouched. Portable byte-preserving historical snapshots and hashes are in [snapshot provenance](references/snapshot-provenance.md). The old flat plan is historical reference; this folder master is the sole new canonical README plan row. Children are indexed here, not as23 separate active rows. Preserve `.codex/config.toml`, root README changes and `docs/ai/plans/schema-driven-validation-agent.md` outside this task's ownership. Only the reviewed canonical-index hunk in `docs/ai/README.md` is included.
 
@@ -86,7 +87,7 @@ The [coverage contract](references/validation-coverage-contract.md) preserves 10
 
 ## Workstream index
 
-Numeric IDs organize files; the dependency graph determines execution. The council verdict (2026-11-09) moved W22 to run after the pilot: names are the output of the shape, and D01 makes renames free. No workstream is active; the pilot PR is the only authorized unit once the owner says go.
+Numeric IDs organize files; the dependency graph determines execution. The council verdict (2026-11-09) moved W22 to run after the pilot: names are the output of the shape, and D01 makes renames free. No workstream is active; the pilot PR is the only authorized unit (owner authorization 2026-11-09).
 
 | ID | Plan | Main placement |
 |---|---|---|

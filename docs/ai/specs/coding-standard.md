@@ -10,6 +10,7 @@ spec:
 applies_to:
   - "src/**"
   - "tests/**"
+  - "benchmarks/**"
 ---
 
 # Coding Standards & Static Analysis Rules

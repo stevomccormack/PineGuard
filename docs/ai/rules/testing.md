@@ -21,5 +21,16 @@ When implementing, follow:
 
 Follow the spec EXACTLY. Do not improvise patterns.
 
+## Before Every Test Change (owner instruction, 2026-11-16)
+
+- Read the specs listed above in full, every time — not a summary, a digest or memory of them. This
+  applies to whoever writes the tests and whoever reviews them, subagents included.
+- Open the nearest sibling fixture, TestData and Tests files and mirror them exactly
+  (`global.md` → "Precedent and Consistency").
+- If a spec or precedent cannot be followed, stop before writing and ask the owner with the spec
+  section and the reason. Where a spec and an existing file disagree, follow the spec and report the
+  file.
+- Update `docs/ai/specs/testing/gold-standard.md` when a test class is added (`unit-test.md` §10.5).
+
 
 - Production-bound documentation examples are subject to the documentation/example conformance clause in docs/ai/specs/testing/unit-test.md and the applicable layer specifications; include that check in test review.

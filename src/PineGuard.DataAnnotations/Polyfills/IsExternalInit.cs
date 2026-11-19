@@ -13,8 +13,9 @@ namespace System.Runtime.CompilerServices;
 /// this type by its fully-qualified name regardless of accessibility, and keeping it internal prevents it from
 /// being exported as part of this assembly's public API surface, where it would collide with the real BCL type
 /// for any netcoreapp3.0-net7.0 consumer resolving the netstandard2.1 asset. This project needs its own copy
-/// because Core's is internal and grants friend access only to <c>PineGuard.MustClauses</c> and
-/// <c>PineGuard.GuardClauses</c>.
+/// because Core's is internal and grants friend access only to <c>PineGuard.Core.UnitTests</c>,
+/// <c>PineGuard.Testing.UnitTests.Rules</c>, <c>PineGuard.MustClauses</c>, <c>PineGuard.GuardClauses</c> and
+/// <c>PineGuard.Xml</c>.
 /// </remarks>
 internal static class IsExternalInit;
 #endif

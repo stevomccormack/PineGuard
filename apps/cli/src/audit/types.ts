@@ -87,10 +87,9 @@ export interface VocabularyConfig {
  * "Exceptions application"). Keyed by rule slug; each value is a list of
  * substrings. A finding is suppressed by the engine when one of its rule's
  * entries is a substring of either the finding's `file` or its `message`.
- * Deliberately simple — this is the load-and-apply mechanism P1.5 owes P2/P5,
- * not the final shape ported from `tools/audit-cli/test-audit-exceptions.json`
- * (that port is P5's job; today's file is still the placeholder `{}` from
- * P1.1).
+ * Deliberately simple — this is the load-and-apply mechanism P1.5 built; the
+ * entries ported from `tools/audit-cli/test-audit-exceptions.json` at P6.2
+ * (cutover cleanup) use this same shape.
  */
 export type ExceptionsConfig = Readonly<Record<string, readonly string[]>>;
 

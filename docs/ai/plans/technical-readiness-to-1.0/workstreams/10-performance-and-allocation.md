@@ -15,7 +15,7 @@ last_updated: 2026-11-09
 
 Benchmarks begin EARLY, by explicit user direction: the string→DateOnly pilot PR carries a BenchmarkDotNet project measuring the new path and the current `StringRules.DateOnly`/Must path (council 2026-11-09), and a new-path allocation where the current path has none is the pilot's kill criterion. This overrides v1.6 §9's later-phase placement. Baseline representative current behavior before the new rule structure, then measure each structural decision. The final budget gate remains dependent on approved semantics and measured evidence.
 
-Rubric performance/resource is4/10 with high confidence in the evidence gap. The handoff's numeric budgets are proposals, not measurements. No concrete benchmark project was verified; D11/D22 requires inventory and approval.
+Rubric performance/resource is4/10 with high confidence in the evidence gap. The handoff's numeric budgets are proposals, not measurements. No concrete benchmark project was verified when this workstream was written; D11/D22 requires inventory and approval. Since 2026-11-19 the string→DateOnly pilot's `benchmarks/PineGuard.Benchmarks` (TP-BENCH) exists and measures that one rule on `main` and on the pilot branch; it sets no budget.
 
 Output: `+ docs/reports/readiness-performance.md`; benchmark source/config/result paths selected from inventory.
 
@@ -72,4 +72,4 @@ Checks.Require(consumed == iterations, "timing result consumed");
 Console.WriteLine($"TIMING illustration: consumed={consumed}; elapsedTicks={timer.ElapsedTicks}; allocatedBytes={allocated}");
 ```
 
-Purpose: complete package-free timing probe consumes 100,000 static results after 1,000 consumed warmup calls. Stopwatch construction and warmup are outside the allocation-measurement window; no validator construction/reuse claim. Expected consumed=100000, elapsed/allocation observed, no threshold selected. Timer/counter overhead, JIT tiering and host noise remain uncontrolled; this is a smoke measurement, not BenchmarkDotNet, a regression budget or a publishable benchmark. BDN version/config remain unverified; D10/D11 open. Status pending.
+Purpose: complete package-free timing probe consumes 100,000 static results after 1,000 consumed warmup calls. Stopwatch construction and warmup are outside the allocation-measurement window; no validator construction/reuse claim. Expected consumed=100000, elapsed/allocation observed, no threshold selected. Timer/counter overhead, JIT tiering and host noise remain uncontrolled; this is a smoke measurement, not BenchmarkDotNet, a regression budget or a publishable benchmark. BDN version/config remain unverified for the wave workloads (the pilot's TP-BENCH project uses BenchmarkDotNet 0.15.8 with the default job); D10/D11 open. Status pending.

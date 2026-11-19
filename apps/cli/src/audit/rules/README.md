@@ -12,5 +12,5 @@ rule's registration actually runs). Tests go in
 `test/rules/<slug>.test.ts` against `test/fixtures/<slug>/{valid,invalid}/`
 per the VIBE convention in [`../../../test/README.md`](../../../test/README.md).
 
-Empty until plan P2 lands the first rule
+Plan P2 landed the 14 rules registered here
 (`docs/ai/plans/audit-cli-rebuild.md` §9.2, P2.1-P2.14).

@@ -25,7 +25,7 @@ public static class MustStringDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="timeProvider">
     /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
     /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
@@ -48,26 +48,53 @@ public static class MustStringDateOnlyClauses
         string? value,
         DateTimeStyles styles = DefaultStyles,
         TimeProvider? timeProvider = null,
+        [CallerArgumentExpression(nameof(value))] string? paramName = null) =>
+        _.PastDateOnly(value, styles, timeProvider, allowNull: false, paramName);
+
+    /// <summary>
+    /// Validates that the specified value is a date in the past, under the given null policy.
+    /// </summary>
+    /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
+    /// <param name="timeProvider">
+    /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
+    /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
+    /// </param>
+    /// <param name="allowNull">
+    /// The null policy. When <see langword="true"/>, a <see langword="null"/> <paramref name="value"/> passes; when
+    /// <see langword="false"/>, it fails. Either way <paramref name="styles"/> is checked first.
+    /// </param>
+    /// <param name="paramName">
+    /// The name of the calling parameter. Captured via <see cref="CallerArgumentExpressionAttribute"/> when omitted.
+    /// The public overload forwards its own, and the adapters pass <see langword="null"/>, so that the message keeps
+    /// its <c>{paramName}</c> token for the property name.
+    /// </param>
+    /// <returns>
+    /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
+    /// </returns>
+    /// <remarks>
+    /// Delegates to <see cref="StringPastDateOnlyRule.Evaluate"/> and maps its outcome to the result through the rule's
+    /// lookups, so the failure messages are the rule's templates, such as <c>"{paramName} must be a date in the past."</c>
+    /// Internal rather than public so that the null policy is not public API: the public overload calls it with
+    /// <paramref name="allowNull"/> <see langword="false"/>, and the FluentValidation and DataAnnotations adapters, which
+    /// treat an absent value as valid, call it with <see langword="true"/>, so neither carries a null branch of its own.
+    /// </remarks>
+    internal static MustResult<DateOnly> PastDateOnly(this IMustClause _,
+        string? value,
+        DateTimeStyles styles,
+        TimeProvider? timeProvider,
+        bool allowNull,
         [CallerArgumentExpression(nameof(value))] string? paramName = null)
     {
-        if (!StringUtility.DateOnly.IsValidStyles(styles))
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotPast, "{paramName} must be a valid combination of parsing styles.", nameof(styles), styles);
-
-        if (value is null)
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Relative.NotPast, NullMessage, paramName, value);
-
-        const string messageTemplate = "{paramName} must be a date in the past.";
-
-        if (!StringUtility.DateOnly.TryParse(value, out var parsed, styles))
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Format.Invalid, messageTemplate, paramName, value);
-
-        if (!DateTimeUtility.TryGetTodayDate(timeProvider, out var referenceDate))
-            return MustResult<DateOnly>.Fail(MustCodes.Date.Reference.OutOfRange,
-                "{paramName} requires a reference date within the supported range.", nameof(timeProvider), timeProvider);
-
-        var parsedValue = parsed;
-        var ok = DateOnlyRules.IsBefore(parsedValue, DateOnly.FromDateTime(referenceDate), Inclusion.Exclusive);
-        return MustResult<DateOnly>.FromBool(ok, MustCodes.Date.Relative.NotPast, messageTemplate, paramName, value, parsedValue);
+        var outcome = StringPastDateOnlyRule.Evaluate(value, styles, timeProvider, allowNull, out var parsed);
+        return MustResult<DateOnly>.FromBool(
+            StringPastDateOnlyRule.IsPassed(outcome),
+            StringPastDateOnlyRule.Code(outcome),
+            StringPastDateOnlyRule.MessageTemplate(outcome),
+            StringPastDateOnlyRule.ParamName(outcome, paramName),
+            StringPastDateOnlyRule.Value(outcome, value, styles, timeProvider),
+            parsed);
     }
 
     /// <summary>
@@ -75,7 +102,7 @@ public static class MustStringDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="timeProvider">
     /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
     /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
@@ -125,7 +152,7 @@ public static class MustStringDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="timeProvider">
     /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
     /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
@@ -175,7 +202,7 @@ public static class MustStringDateOnlyClauses
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="timeProvider">
     /// The clock that supplies today's date. If <see langword="null"/>, the system clock is used and today is its UTC
     /// calendar date; inject a provider to evaluate today in its <see cref="TimeProvider.LocalTimeZone"/>.
@@ -221,14 +248,14 @@ public static class MustStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Validates that the specified value must be less than or equal to .
+    /// Validates that the specified value must be a date within the expected range.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="min">The minimum bound.</param>
     /// <param name="max">The maximum bound.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -237,7 +264,7 @@ public static class MustStringDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a date within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> InRangeDateOnly(this IMustClause _,
@@ -272,14 +299,14 @@ public static class MustStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Validates that the specified value must be less than or equal to .
+    /// Validates that the specified value must be a date not within the expected range.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="min">The minimum bound.</param>
     /// <param name="max">The maximum bound.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -288,7 +315,7 @@ public static class MustStringDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} must be less than or equal to "</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a date not within the expected range."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> OutOfRangeDateOnly(this IMustClause _,
@@ -323,13 +350,13 @@ public static class MustStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Validates that the specified value requires a non-negative number of days.
+    /// Validates that the specified value must be a date within the expected number of days.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="reference">The reference value to compare against.</param>
     /// <param name="days">The number of days within which the value must fall.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -338,7 +365,7 @@ public static class MustStringDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} requires a non-negative number of days."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a date within the expected number of days."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> WithinDaysDateOnly(this IMustClause _,
@@ -369,13 +396,13 @@ public static class MustStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Validates that the specified value requires a non-negative number of days.
+    /// Validates that the specified value must be a date not within the expected number of days.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="reference">The reference value to compare against.</param>
-    /// <param name="days">The number of days within which the value must fall.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="days">The number of days within which the value must not fall.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -384,7 +411,7 @@ public static class MustStringDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} requires a non-negative number of days."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a date not within the expected number of days."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> NotWithinDaysDateOnly(this IMustClause _,
@@ -415,13 +442,13 @@ public static class MustStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Validates that the specified value requires a non-negative number of months.
+    /// Validates that the specified value must be a date within the expected number of calendar months.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="reference">The reference value to compare against.</param>
     /// <param name="months">The number of calendar months within which the value must fall.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -430,7 +457,7 @@ public static class MustStringDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} requires a non-negative number of months."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a date within the expected number of calendar months."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> WithinCalendarMonthsDateOnly(this IMustClause _,
@@ -462,13 +489,13 @@ public static class MustStringDateOnlyClauses
     }
 
     /// <summary>
-    /// Validates that the specified value requires a non-negative number of months.
+    /// Validates that the specified value must be a date not within the expected number of calendar months.
     /// </summary>
     /// <param name="_">The <see cref="IMustClause"/> entry point (used via <c>Must.Be</c>).</param>
     /// <param name="value">The value to validate.</param>
     /// <param name="reference">The reference value to compare against.</param>
-    /// <param name="months">The number of calendar months within which the value must fall.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="months">The number of calendar months within which the value must not fall.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -477,7 +504,7 @@ public static class MustStringDateOnlyClauses
     /// A <see cref="MustResult{T}"/> indicating whether validation succeeded.
     /// </returns>
     /// <remarks>
-    /// The failure message follows the pattern <c>"{paramName} requires a non-negative number of months."</c>
+    /// The failure message follows the pattern <c>"{paramName} must be a date not within the expected number of calendar months."</c>
     /// </remarks>
     /// <seealso href="https://pineguard.ai/docs/must/string-date-only">String Date Only Must Clauses documentation</seealso>
     public static MustResult<DateOnly> NotWithinCalendarMonthsDateOnly(this IMustClause _,
@@ -515,7 +542,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -560,7 +587,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -605,7 +632,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -650,7 +677,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -695,7 +722,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -740,7 +767,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -785,7 +812,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -830,7 +857,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -875,7 +902,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -920,7 +947,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="value">The value to validate.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="precision">The precision level for comparison.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="value"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -965,7 +992,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="start">The start of the range.</param>
     /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="start"/> and <paramref name="end"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -1017,7 +1044,7 @@ public static class MustStringDateOnlyClauses
     /// <param name="start">The start of the range.</param>
     /// <param name="end">The end of the range.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">The styles permitted when parsing <paramref name="start"/> and <paramref name="end"/>.</param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -1070,7 +1097,10 @@ public static class MustStringDateOnlyClauses
     /// <param name="start2">The start of the second range.</param>
     /// <param name="end2">The end of the second range.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">
+    /// The styles permitted when parsing <paramref name="start1"/>, <paramref name="end1"/>, <paramref name="start2"/> and
+    /// <paramref name="end2"/>.
+    /// </param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.
@@ -1142,7 +1172,10 @@ public static class MustStringDateOnlyClauses
     /// <param name="start2">The start of the second range.</param>
     /// <param name="end2">The end of the second range.</param>
     /// <param name="inclusion">The inclusion mode for range boundaries.</param>
-    /// <param name="styles">The value to validate.</param>
+    /// <param name="styles">
+    /// The styles permitted when parsing <paramref name="start1"/>, <paramref name="end1"/>, <paramref name="start2"/> and
+    /// <paramref name="end2"/>.
+    /// </param>
     /// <param name="paramName">
     /// The name of the calling parameter. Automatically captured via
     /// <see cref="CallerArgumentExpressionAttribute"/> — do not pass explicitly.

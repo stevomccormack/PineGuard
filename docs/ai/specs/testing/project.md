@@ -25,8 +25,11 @@ What this file does NOT restate:
 - The base-class / case-record / Expected-type architecture — canonical in
   [`fixture.md`](fixture.md) (§1–§6) and [`unit-test.md`](unit-test.md) §2.2.
 - How consuming test projects use the library — [`unit-test.md`](unit-test.md).
-- Coverage targets — [`coverage.md`](coverage.md) (the `Testing` scope runs
-  `tests/PineGuard.Testing.UnitTests/`).
+- Coverage targets — [`coverage.md`](coverage.md). The `Testing` coverage scope runs every ordinary
+  test project (its `DefaultProjectFilter` is the whole `Get-DefaultTestProjectFilter` family in
+  `tools/.shared/dotnet-projects.ps1`) and reports on `[PineGuard.Testing]*`; only
+  `Run-Tests -Scope Testing` (`/test-testing`) runs the single `TestCsproj`,
+  `tests/PineGuard.Testing.UnitTests/`.
 
 ## 1. Position in the solution
 
@@ -85,4 +88,8 @@ go in that layer's folder — never in `Common/` unless genuinely shared by two 
 
 PineGuard.Testing remains the shared fixture/case/projection library, and PineGuard.Testing.UnitTests tests that infrastructure. Added crosscutting rule and architecture checks have separately approved project boundaries; they do not move into these infrastructure tests or existing library unit suites. The authoritative planned names, folders and responsibilities are recorded in docs/ai/plans/technical-readiness-to-1.0/references/test-project-layout.md under decision TEST-LAYOUT-01. That decision groups techniques into responsibility-based projects and reuses this shared infrastructure rather than adding another fixture library.
 
-The approved projects remain planned until implemented. Their creation requires explicit solution membership, dependency/TFM review, correct test-versus-executable classification, applicable CI/evidence registration and documentation updates. Fuzz and consumer executables under tests/ must review shared Directory.Build.props inheritance before creation. Missing required projects or artifacts cannot satisfy an activated implementation gate; absence during planning is not a claim of successful execution.
+Two approved projects are implemented. The first is TP-RULES, `tests/PineGuard.Testing.UnitTests.Rules/`, an ordinary test project (TFMs from `tests/Directory.Build.props`, discovered by the `*.UnitTests.*.csproj` family) registered in `PineGuard.slnx` and in CI as the `Rules` matrix entry. Its `Conformance/` folder holds the string→DateOnly pilot's cross-layer consistency test, which compares Must, Guard, FluentValidation and DataAnnotations with the rule object over the shared `StringPastDateOnlyRuleFixtures` scenarios. It inherits `BaseUnitTest` and keeps a project-local `ConformanceExpected`/`ConformanceCase` pair and `ToConformanceCases` scenario extension. That follows the shape `unit-test.md` §2.1 prescribes for "(Other)" by analogy only: §2.1 limits "(Other)" to adapter packages with no layer base, and this project is a cross-layer test project, not a package. Whether §2.1 is widened to cover cross-layer TP-* test projects is an open owner decision. Its root namespace, `PineGuard.Testing.UnitTests.Rules`, is also a namespace of this library (§2); the project adds only `PineGuard.Testing.UnitTests.Rules.Conformance` beneath it.
+
+The second is TP-BENCH, `benchmarks/PineGuard.Benchmarks/`, a BenchmarkDotNet executable and not a test project (`IsTestProject` is `false`; it references no test framework and no test assembly). It lives outside `tests/`, so neither `tests/Directory.Build.props` nor the ordinary-test discovery in `tools/.shared/dotnet-projects.ps1` reaches it: it takes its target frameworks (`net8.0`, `net10.0`, `net11.0`) from `benchmarks/Directory.Build.props`, and it is registered in `PineGuard.slnx`, so CI builds it, formats it and checks it for compiler warnings, but no `dotnet test` run and no CI job executes it. It holds the string→DateOnly pilot's benchmarks, which call public API only, so the same source measures the current path on `main` and the new path on the pilot branch; its [README](../../../../benchmarks/PineGuard.Benchmarks/README.md) says how they are run and where the committed results are. No performance budget or threshold is set (decision register D11).
+
+The other approved projects remain planned until implemented. Their creation requires explicit solution membership, dependency/TFM review, correct test-versus-executable classification, applicable CI/evidence registration and documentation updates. Fuzz and consumer executables under tests/ must review shared Directory.Build.props inheritance before creation. Missing required projects or artifacts cannot satisfy an activated implementation gate; absence during planning is not a claim of successful execution.
